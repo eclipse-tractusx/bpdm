@@ -38,15 +38,6 @@ fun <S: Any, T> Page<S>.toDto(map: (S) -> T): PageDto<T> {
     return PageDto(totalElements, totalPages, number, numberOfElements, content.map { map(it) })
 }
 
-
-fun LegalEntityDb.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
-    return LegalEntityMatchVerboseDto(
-        score = score,
-        legalEntity = this.toDto(),
-        legalAddress = legalAddress.toInvariantDto(),
-    )
-}
-
 fun LegalEntityDb.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDto {
     return LegalEntityPartnerCreateVerboseDto(
         legalEntity = toLegalEntityWithLegalAddress(),
@@ -73,7 +64,7 @@ fun LegalEntityDb.toDto(): LegalEntityHeaderVerboseDto {
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
         confidenceCriteria = confidenceCriteria.toDto(),
-        isParticipantData = isCatenaXMemberData,
+        isParticipantData = isDataSpaceParticipant,
         createdAt = createdAt,
         updatedAt = updatedAt,
         ownershipUltimate = ownershipUltimate,
@@ -154,7 +145,7 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
-        isParticipantData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
+        isParticipantData = legalEntity?.isDataSpaceParticipant ?: mainSite?.legalEntity?.isDataSpaceParticipant ?: false,
         addressType = getAddressType(this)
     )
 }
@@ -213,22 +204,11 @@ private fun StreetDb.toDto(): StreetDto {
     )
 }
 
-fun LogisticAddressDb.toMatchDto(score: Float): AddressMatchVerboseDto {
-    return AddressMatchVerboseDto(score, this.toInvariantDto())
-}
-
 fun LogisticAddressDb.toCreateResponse(index: String?): AddressPartnerCreateVerboseDto {
     return AddressPartnerCreateVerboseDto(
         address = toInvariantDto(),
         scriptVariants = scriptVariants.map { it.toLogisticAddressScriptVariant() },
         index = index
-    )
-}
-
-fun SiteDb.toMatchDto(): SiteMatchVerboseDto {
-    return SiteMatchVerboseDto(
-        mainAddress = this.mainAddress.toInvariantDto(),
-        site = this.toDto(),
     )
 }
 
@@ -247,7 +227,7 @@ fun SiteDb.toDto(): SiteVerboseDto {
         states = states.map { it.toDto() },
         bpnLegalEntity = legalEntity.bpn,
         confidenceCriteria = confidenceCriteria.toDto(),
-        isParticipantData = legalEntity.isCatenaXMemberData,
+        isParticipantData = legalEntity.isDataSpaceParticipant,
         scriptVariants = toSiteScriptVariants(),
         createdAt = createdAt,
         updatedAt = updatedAt,
@@ -262,7 +242,7 @@ fun SiteDb.toPoolDto(): SiteWithMainAddressVerboseDto {
             states = states.map { it.toDto() },
             bpnLegalEntity = legalEntity.bpn,
             confidenceCriteria = confidenceCriteria.toDto(),
-            isParticipantData = legalEntity.isCatenaXMemberData,
+            isParticipantData = legalEntity.isDataSpaceParticipant,
             scriptVariants = toSiteScriptVariants(),
             createdAt = createdAt,
             updatedAt = updatedAt,

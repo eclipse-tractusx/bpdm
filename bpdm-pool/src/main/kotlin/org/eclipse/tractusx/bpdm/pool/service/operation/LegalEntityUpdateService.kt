@@ -28,12 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
-import org.eclipse.tractusx.bpdm.pool.model.update.orKeep
+import org.eclipse.tractusx.bpdm.pool.model.update.*
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
@@ -97,7 +92,7 @@ class LegalEntityUpdateService(
         applyLegalName(target, header)
         header.legalForm.ifSet { target.legalForm = it }
         header.confidenceCriteria.ifSet { target.confidenceCriteria = legalEntityEntityMapper.toConfidence(it, numberOfSharingMembers) }
-        header.isCatenaXMemberData.ifSet { target.isCatenaXMemberData = it }
+        header.isDataSpaceParticipant.ifSet { target.isDataSpaceParticipant = it }
         header.ownershipUltimate.ifSet { target.ownershipUltimate = it }
         header.ultimateOwnerBpnl.ifSet { target.ultimateOwnerBpnl = it }
         header.currentness.ifSet { target.currentness = it }

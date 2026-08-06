@@ -52,7 +52,7 @@ class AddressSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchAddresses(searchRequest: AddressSearchRequestDto, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = null).toDto { it.toDto() }
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toDto { it.toDto() }
 
     /**
      * Returns the requested page of addresses matching the given criteria, restricted to those of Catena-X members and
@@ -63,7 +63,7 @@ class AddressSearchApplicationV7Service(
         searchRequest: AddressSearchRequestDto,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressInvariantVerboseDto> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = true).toDto { it.toInvariantDto() }
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toDto { it.toInvariantDto() }
 
     /**
      * Returns the requested page of addresses that belong to the given legal entity directly instead of through one of
@@ -79,9 +79,9 @@ class AddressSearchApplicationV7Service(
         return addressSearchService.search(criteria, paginationRequest.toPageRequest()).toDto { it.toDto() }
     }
 
-    private fun search(searchRequest: AddressSearchRequestDto, paginationRequest: PaginationRequest, isCatenaXMemberData: Boolean?) =
+    private fun search(searchRequest: AddressSearchRequestDto, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         addressSearchService.search(
-            addressSearchParser.parse(addressSearchRequestMapper.toSearchRequest(searchRequest, isCatenaXMemberData)),
+            addressSearchParser.parse(addressSearchRequestMapper.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()
         )
 }

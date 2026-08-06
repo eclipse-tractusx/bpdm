@@ -51,7 +51,7 @@ class ChangelogSearchParser(
                 bpns = bpnFilterParser.parse(bpns).toSet(),
                 businessPartnerTypes = request.businessPartnerTypes.orEmpty(),
                 timestampAfter = request.timestampAfter,
-                isCatenaXMemberData = request.isCatenaXMemberData
+                isDataSpaceParticipant = request.isDataSpaceParticipant
             )
         )
     }

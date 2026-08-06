@@ -104,7 +104,7 @@ class ManagedRelationUpsertService(
     }
 
     private fun validateManagingEntityIsParticipant(target: LegalEntityDb) {
-        if (!target.isCatenaXMemberData) {
+        if (!target.isDataSpaceParticipant) {
             throw BpdmValidationException(
                 "Invalid 'IsManagedBy' relation: The Managing Legal Entity with BPNL '${target.bpn}' is not a dataspace participant. " +
                         "Only dataspace participants can manage other entities."
@@ -146,7 +146,7 @@ class ManagedRelationUpsertService(
     }
 
     private fun makeManagedEntityParticipantIfRequired(source: LegalEntityDb) {
-        if (!source.isCatenaXMemberData) {
+        if (!source.isDataSpaceParticipant) {
             dataSpaceParticipantsService.updateMemberships(
                 DataSpaceParticipantUpdateRequest(
                     listOf(DataSpaceParticipantDto(source.bpn, true))

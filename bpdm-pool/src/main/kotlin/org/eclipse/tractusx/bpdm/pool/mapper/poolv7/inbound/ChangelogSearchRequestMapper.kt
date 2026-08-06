@@ -33,11 +33,11 @@ class ChangelogSearchRequestMapper {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: ChangelogSearchRequestDto, isCatenaXMemberData: Boolean?): ChangelogSearchRequest =
+    fun toSearchRequest(searchRequest: ChangelogSearchRequestDto, isDataSpaceParticipant: Boolean?): ChangelogSearchRequest =
         ChangelogSearchRequest(
             bpns = searchRequest.bpns,
             businessPartnerTypes = searchRequest.businessPartnerTypes,
             timestampAfter = searchRequest.timestampAfter,
-            isCatenaXMemberData = isCatenaXMemberData
+            isDataSpaceParticipant = isDataSpaceParticipant
         )
 }

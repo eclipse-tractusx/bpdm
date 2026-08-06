@@ -43,7 +43,7 @@ class AddressSearchParser(
             siteBpns = bpnFilterParser.parse(request.siteBpns),
             legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
             name = request.name?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData,
+            isDataSpaceParticipant = request.isDataSpaceParticipant,
             excludesSiteAddresses = request.excludesSiteAddresses
         )
 }

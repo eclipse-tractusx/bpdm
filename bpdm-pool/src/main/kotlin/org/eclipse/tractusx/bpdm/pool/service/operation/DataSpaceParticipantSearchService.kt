@@ -44,7 +44,7 @@ class DataSpaceParticipantSearchService(
     fun search(criteria: DataSpaceParticipantSearchParsed, pageable: Pageable): Page<LegalEntityDb> {
         val specification = Specification.allOf(
             LegalEntityRepository.byBpns(criteria.legalEntityBpns),
-            LegalEntityRepository.byIsMember(criteria.isDataSpaceParticipant)
+            LegalEntityRepository.byIsDataSpaceParticipant(criteria.isDataSpaceParticipant)
         )
 
         return legalEntityRepository.findAll(specification, pageable)

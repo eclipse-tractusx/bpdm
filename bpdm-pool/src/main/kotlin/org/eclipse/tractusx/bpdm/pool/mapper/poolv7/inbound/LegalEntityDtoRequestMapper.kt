@@ -59,7 +59,7 @@ class LegalEntityDtoRequestMapper(
             identifiers = header.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
             states = header.states.map { LegalEntityState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(header.confidenceCriteria),
-            isParticipantData = header.isParticipantData,
+            isDataSpaceParticipant = header.isParticipantData,
             ownershipUltimate = header.ownershipUltimate,
             scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariant(it.scriptCode, it.legalName, it.shortName) }
         )

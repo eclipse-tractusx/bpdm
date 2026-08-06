@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.ChangelogSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBusinessPartnerTypesIn
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byIsMember
+import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byIsDataSpaceParticipant
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byUpdatedGreaterThan
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -52,7 +52,7 @@ class ChangelogSearchService(
             byBpnsIn(criteria.bpns),
             byBusinessPartnerTypesIn(criteria.businessPartnerTypes),
             byUpdatedGreaterThan(criteria.timestampAfter),
-            byIsMember(criteria.isCatenaXMemberData)
+            byIsDataSpaceParticipant(criteria.isDataSpaceParticipant)
         )
 
         val chronologically = PageRequest.of(pageable.pageNumber, pageable.pageSize, Sort.by(PartnerChangelogEntryDb::updatedAt.name))

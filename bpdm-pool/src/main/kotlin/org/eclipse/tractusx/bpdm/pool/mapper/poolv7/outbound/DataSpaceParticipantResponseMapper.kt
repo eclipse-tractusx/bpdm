@@ -33,5 +33,5 @@ class DataSpaceParticipantResponseMapper {
      * Returns the data space participation the given legal entity holds.
      */
     fun toParticipant(legalEntity: LegalEntityDb): DataSpaceParticipantDto =
-        DataSpaceParticipantDto(bpnL = legalEntity.bpn, isDataSpaceParticipant = legalEntity.isCatenaXMemberData)
+        DataSpaceParticipantDto(bpnL = legalEntity.bpn, isDataSpaceParticipant = legalEntity.isDataSpaceParticipant)
 }

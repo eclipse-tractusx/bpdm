@@ -55,8 +55,8 @@ class CxMembershipLegacyServiceMapper(
 
         foundLegalEntities.forEach { legalEntity ->
             val updateValue = updatesByBpnL[legalEntity.bpn]!!
-            if(legalEntity.isCatenaXMemberData != updateValue){
-                legalEntity.isCatenaXMemberData = updateValue
+            if(legalEntity.isDataSpaceParticipant != updateValue){
+                legalEntity.isDataSpaceParticipant = updateValue
                 legalEntityRepository.save(legalEntity)
 
                 changelogService.createChangelogEntry(

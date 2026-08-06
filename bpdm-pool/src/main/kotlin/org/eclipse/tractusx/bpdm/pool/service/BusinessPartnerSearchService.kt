@@ -284,7 +284,7 @@ class BusinessPartnerSearchService(
             legalEntity = legalEntityDto,
             site = siteDto,
             address = addressDto,
-            isParticipantData = legalEntity.isCatenaXMemberData
+            isParticipantData = legalEntity.isDataSpaceParticipant
         )
     }
 }

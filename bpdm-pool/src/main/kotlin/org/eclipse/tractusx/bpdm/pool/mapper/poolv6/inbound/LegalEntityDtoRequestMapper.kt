@@ -35,7 +35,7 @@ import java.time.ZoneOffset
 /**
  * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRequest] / [LegalEntityUpdateRequest]. v6
  * differs from v7: the legal entity is flat (no `header` wrapper), the legal address is a sibling field (not nested),
- * there are no script variants, and membership is `isCatenaXMemberData` (→ domain `isParticipantData`).
+ * there are no script variants, and membership is `isCatenaXMemberData` (→ domain `isDataSpaceParticipant`).
  */
 @Component("legalEntityDtoRequestMapperLegacy")
 class LegalEntityDtoRequestMapper(
@@ -62,7 +62,7 @@ class LegalEntityDtoRequestMapper(
             identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
             states = legalEntity.states.map { LegalEntityState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(legalEntity.confidenceCriteria),
-            isParticipantData = legalEntity.isCatenaXMemberData,
+            isDataSpaceParticipant = legalEntity.isCatenaXMemberData,
             // V6 has no ownership flag, so a V6 write must never change it.
             ownershipUltimate = null,
             scriptVariants = emptyList()

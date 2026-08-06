@@ -54,7 +54,7 @@ class ChangelogSearchApplicationV6Service(
         searchRequest: ChangelogSearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = null)
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = null)
 
     /**
      * Returns the requested page of changelog entries matching the given criteria, restricted to Catena-X members.
@@ -64,10 +64,10 @@ class ChangelogSearchApplicationV6Service(
         searchRequest: ChangelogSearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = true)
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
-    private fun search(searchRequest: ChangelogSearchRequestV6, paginationRequest: PaginationRequest, isCatenaXMemberData: Boolean?) =
-        when (val criteria = changelogSearchParser.parse(changelogSearchRequestMapper.toSearchRequest(searchRequest.toV7(), isCatenaXMemberData))) {
+    private fun search(searchRequest: ChangelogSearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+        when (val criteria = changelogSearchParser.parse(changelogSearchRequestMapper.toSearchRequest(searchRequest.toV7(), isDataSpaceParticipant))) {
             is ParseResult.Failure -> throw changelogParseErrorMapper.toSearchException(criteria.errors)
             is ParseResult.Success -> changelogSearchService.search(criteria.parsed, paginationRequest.toPageRequest()).toDto { it.toDto().toV6() }
         }

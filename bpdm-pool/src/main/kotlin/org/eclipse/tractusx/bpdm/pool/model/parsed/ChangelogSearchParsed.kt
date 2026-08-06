@@ -26,5 +26,5 @@ data class ChangelogSearchParsed(
     val bpns: Set<String>,
     val businessPartnerTypes: Set<BusinessPartnerType>,
     val timestampAfter: Instant?,
-    val isCatenaXMemberData: Boolean?
+    val isDataSpaceParticipant: Boolean?
 )

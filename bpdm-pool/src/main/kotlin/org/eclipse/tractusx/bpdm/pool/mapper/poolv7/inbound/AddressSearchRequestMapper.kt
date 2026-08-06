@@ -33,13 +33,13 @@ class AddressSearchRequestMapper {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: AddressSearchRequestDto, isCatenaXMemberData: Boolean?): AddressSearchRequest =
+    fun toSearchRequest(searchRequest: AddressSearchRequestDto, isDataSpaceParticipant: Boolean?): AddressSearchRequest =
         AddressSearchRequest(
             addressBpns = searchRequest.addressBpns,
             siteBpns = searchRequest.siteBpns,
             legalEntityBpns = searchRequest.legalEntityBpns,
             name = searchRequest.name,
-            isCatenaXMemberData = isCatenaXMemberData,
+            isDataSpaceParticipant = isDataSpaceParticipant,
             excludesSiteAddresses = false
         )
 
@@ -53,7 +53,7 @@ class AddressSearchRequestMapper {
             siteBpns = emptyList(),
             legalEntityBpns = listOf(legalEntityBpn),
             name = null,
-            isCatenaXMemberData = null,
+            isDataSpaceParticipant = null,
             excludesSiteAddresses = true
         )
 }

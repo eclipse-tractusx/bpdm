@@ -41,6 +41,6 @@ class LegalEntitySearchParser(
         LegalEntitySearchParsed(
             legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
             legalName = request.legalName?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData
+            isDataSpaceParticipant = request.isDataSpaceParticipant
         )
 }

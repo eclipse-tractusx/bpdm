@@ -129,13 +129,13 @@ class TaskStepBuildService(
 
         val existingLegalEntityInformation by lazy { fetchLegalEntityResult(bpnL!!, hasChanged = false) }
 
-        val isCatenaXMember = legalEntity.isParticipantData ?: if(bpnL != null) existingLegalEntityInformation.isParticipantData else false
+        val isDataSpaceParticipant = legalEntity.isParticipantData ?: if(bpnL != null) existingLegalEntityInformation.isParticipantData else false
 
         val legalEntityResult = if(bpnL != null && legalEntity.hasChanged == false){
             //No need to upsert, just fetch the information
             existingLegalEntityInformation
         }else{
-            upsertLegalEntity(legalEntity.copy(isParticipantData = isCatenaXMember), taskEntryBpnMapping)
+            upsertLegalEntity(legalEntity.copy(isParticipantData = isDataSpaceParticipant), taskEntryBpnMapping)
         }
 
         return legalEntityResult

@@ -51,7 +51,7 @@ class LegalEntitySearchApplicationV6Service(
         searchRequest: LegalEntitySearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = null)
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = null)
 
     /**
      * Returns the requested page of legal entities matching the given criteria, restricted to Catena-X members.
@@ -61,11 +61,11 @@ class LegalEntitySearchApplicationV6Service(
         searchRequest: LegalEntitySearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = true)
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
-    private fun search(searchRequest: LegalEntitySearchRequestV6, paginationRequest: PaginationRequest, isCatenaXMemberData: Boolean?) =
+    private fun search(searchRequest: LegalEntitySearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         legalEntitySearchService.search(
-            legalEntitySearchParser.parse(legalEntitySearchRequestMapper.toSearchRequest(searchRequest.toV7(), isCatenaXMemberData)),
+            legalEntitySearchParser.parse(legalEntitySearchRequestMapper.toSearchRequest(searchRequest.toV7(), isDataSpaceParticipant)),
             paginationRequest.toPageRequest()
         ).toDto { it.toV6PoolDto() }
 }

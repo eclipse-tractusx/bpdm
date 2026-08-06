@@ -54,14 +54,14 @@ class SiteSearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchSites(searchRequest: SiteSearchRequestV6, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = null).toDto { it.toV6PoolDto() }
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toDto { it.toV6PoolDto() }
 
     /**
      * Returns the requested page of sites matching the given criteria, restricted to those of Catena-X members.
      */
     @Transactional(readOnly = true)
     fun searchMemberSites(searchRequest: SiteSearchRequestV6, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = true).toDto { it.toV6PoolDto() }
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toDto { it.toV6PoolDto() }
 
     /**
      * Returns the requested page of sites of the given legal entity, without their main addresses, and fails with a
@@ -77,9 +77,9 @@ class SiteSearchApplicationV6Service(
         return siteSearchService.search(criteria, paginationRequest.toPageRequest()).toDto { it.toV6Dto() }
     }
 
-    private fun search(searchRequest: SiteSearchRequestV6, paginationRequest: PaginationRequest, isCatenaXMemberData: Boolean?) =
+    private fun search(searchRequest: SiteSearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         siteSearchService.search(
-            siteSearchParser.parse(siteSearchRequestMapper.toSearchRequest(searchRequest.toV7(), isCatenaXMemberData)),
+            siteSearchParser.parse(siteSearchRequestMapper.toSearchRequest(searchRequest.toV7(), isDataSpaceParticipant)),
             paginationRequest.toPageRequest()
         )
 }

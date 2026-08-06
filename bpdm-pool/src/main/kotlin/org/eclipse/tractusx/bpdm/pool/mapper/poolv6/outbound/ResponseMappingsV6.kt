@@ -49,7 +49,7 @@ fun LogisticAddressDb.toV6Dto(): LogisticAddressVerboseDtoV6 {
         physicalPostalAddress = physicalPostalAddress.toDto().toV6(),
         alternativePostalAddress = alternativePostalAddress?.toDto()?.toV6(),
         confidenceCriteria = confidenceCriteria.toDto().toV6(),
-        isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
+        isCatenaXMemberData = legalEntity?.isDataSpaceParticipant ?: mainSite?.legalEntity?.isDataSpaceParticipant ?: false,
         addressType = getAddressType(this)
     )
 }
@@ -68,7 +68,7 @@ fun SiteDb.toV6Dto(): SiteVerboseDtoV6 {
         states = states.map { it.toDto().toV6() },
         bpnLegalEntity = legalEntity.bpn,
         confidenceCriteria = confidenceCriteria.toDto().toV6(),
-        isCatenaXMemberData = legalEntity.isCatenaXMemberData,
+        isCatenaXMemberData = legalEntity.isDataSpaceParticipant,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -92,7 +92,7 @@ fun LegalEntityDb.toV6Dto(): LegalEntityVerboseDtoV6 {
         relations = startNodeRelations.plus(endNodeRelations).map { it.toV6Dto() },
         currentness = currentness,
         confidenceCriteria = confidenceCriteria.toDto().toV6(),
-        isCatenaXMemberData = isCatenaXMemberData,
+        isCatenaXMemberData = isDataSpaceParticipant,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

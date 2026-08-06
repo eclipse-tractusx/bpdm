@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -39,7 +39,7 @@ class LegalEntityHeaderUpdateMapper {
         legalShortName = FieldUpdate.Set(header.legalShortName),
         legalForm = FieldUpdate.Set(header.legalForm),
         confidenceCriteria = FieldUpdate.Set(header.confidenceCriteria),
-        isCatenaXMemberData = FieldUpdate.Set(header.isParticipantData),
+        isDataSpaceParticipant = FieldUpdate.Set(header.isDataSpaceParticipant),
         // A payload that does not state the ownership flag must not clear it (V6 can never state it).
         ownershipUltimate = header.ownershipUltimate?.let { FieldUpdate.Set(it) } ?: FieldUpdate.NoOp,
         ultimateOwnerBpnl = FieldUpdate.NoOp,
