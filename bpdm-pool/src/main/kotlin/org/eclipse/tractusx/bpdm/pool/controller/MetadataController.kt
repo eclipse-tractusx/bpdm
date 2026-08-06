@@ -29,7 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
-import org.springframework.data.domain.PageRequest
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormSearchApplicationV7Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,7 +40,9 @@ import org.springframework.web.bind.annotation.RestController
 class MetadataController(
     val metadataService: MetadataService,
     val identifierTypeCreateApplicationV7Service: IdentifierTypeCreateApplicationV7Service,
-    val identifierTypeSearchApplicationV7Service: IdentifierTypeSearchApplicationV7Service
+    val identifierTypeSearchApplicationV7Service: IdentifierTypeSearchApplicationV7Service,
+    val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
+    val legalFormSearchApplicationV7Service: LegalFormSearchApplicationV7Service
 ) : PoolMetadataApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
@@ -58,12 +61,12 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
-        return metadataService.createLegalForm(type)
+        return legalFormCreateApplicationV7Service.createLegalForm(type)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto> {
-        return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
+        return legalFormSearchApplicationV7Service.searchLegalForms(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

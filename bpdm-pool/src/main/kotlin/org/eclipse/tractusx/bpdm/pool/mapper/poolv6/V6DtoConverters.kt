@@ -62,6 +62,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6 as V6CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6 as V6IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6 as V6LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6 as V6LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6 as V6SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6 as V6SitePartnerUpdateRequest
@@ -269,6 +270,18 @@ fun V6CxMembershipSearchRequest.toV7() = DataSpaceParticipantSearchRequest(
 
 fun V6CxMembershipUpdateRequest.toV7() = DataSpaceParticipantUpdateRequest(
     participants = memberships.map { DataSpaceParticipantDto(bpnL = it.bpnL, isDataSpaceParticipant = it.isCatenaXMember) }
+)
+
+fun V6LegalFormRequest.toV7() = LegalFormRequest(
+    technicalKey = technicalKey,
+    name = name,
+    transliteratedName = transliteratedName,
+    abbreviations = abbreviation,
+    transliteratedAbbreviations = transliteratedAbbreviations,
+    country = country,
+    language = language,
+    administrativeAreaLevel1 = administrativeAreaLevel1,
+    isActive = isActive
 )
 
 fun V6IdentifierTypeDto.toV7() = IdentifierTypeDto(

@@ -20,25 +20,17 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
-import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
-import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 /**
  * Service for fetching and creating metadata entities
@@ -52,49 +44,6 @@ class MetadataService(
     private val scriptCodeRepository: ScriptCodeRepository,
     private val reasonCodeRepository: ReasonCodeRepository,
 ) {
-
-    private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun createLegalForm(request: LegalFormRequest): LegalFormDto {
-        if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
-            throw BpdmAlreadyExists(LegalFormDb::class.simpleName!!, request.technicalKey)
-
-        logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
-
-        val region: RegionDb? = request.administrativeAreaLevel1?.let { code ->
-            val regionDb = regionRepository.findByRegionCodeIn(setOf(code)).firstOrNull()
-            if (regionDb == null) {
-                val validationError = ValidationError(
-                    validationErrorCode = "AdministrativeAreaNotFound",
-                    errorDetails = "Administrative area '$code' not found in system.",
-                    erroneousValue = code,
-                    context = ValidationContext.fromRoot( LegalFormRequest::class, "request", LegalFormRequest::administrativeAreaLevel1)
-                )
-                throw BpdmValidationErrorException(listOf(validationError))
-            }
-            regionDb
-        }
-
-        val legalForm = LegalFormDb(
-            technicalKey = request.technicalKey,
-            name = request.name,
-            transliteratedName = request.transliteratedName,
-            abbreviation = request.abbreviations,
-            transliteratedAbbreviations = request.transliteratedAbbreviations,
-            countryCode = request.country,
-            languageCode = request.language,
-            administrativeArea = region,
-            isActive = request.isActive
-        )
-
-        return legalFormRepository.save(legalForm).toDto()
-    }
-
-    fun getLegalForms(pageRequest: Pageable): PageDto<LegalFormDto> {
-        val page = legalFormRepository.findAll(pageRequest)
-        return page.toDto(page.content.map { it.toDto() })
-    }
 
     /**
      * Get quality rules for the given country merged with the default rules. Forbidden rules are ignored.
