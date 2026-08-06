@@ -29,71 +29,26 @@ import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MetadataLegacyServiceMapper(
-    private val identifierTypeRepository: IdentifierTypeRepository,
     private val legalFormRepository: LegalFormRepository,
     private val regionRepository: RegionRepository,
     private val metadataService: MetadataService
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun createIdentifierType(type: IdentifierTypeDtoV6): IdentifierTypeDtoV6 {
-        if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType.toV7(), type.technicalKey) != null)
-            throw BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
-
-        logger.info { "Create new Identifier-Type with key ${type.technicalKey}, businessPartnerType ${type.businessPartnerType} and name ${type.name}" }
-        val entity = IdentifierTypeDb(
-            technicalKey = type.technicalKey,
-            businessPartnerType = type.businessPartnerType.toV7(),
-            name = type.name,
-            abbreviation = type.abbreviation,
-            transliteratedName = type.transliteratedName,
-            transliteratedAbbreviation = type.transliteratedAbbreviation
-        )
-        entity.details.addAll(
-            type.details.map { IdentifierTypeDetailDb(entity, it.country, it.mandatory) }.toSet()
-        )
-        return identifierTypeRepository.save(entity).toDto()
-    }
-
-    fun IdentifierTypeDb.toDto(): IdentifierTypeDtoV6 {
-        return IdentifierTypeDtoV6(
-            technicalKey, businessPartnerType.toV6(), name, abbreviation, transliteratedName, transliteratedAbbreviation,
-            details.map { IdentifierTypeDetailDtoV6(it.countryCode, it.mandatory) })
-    }
-
-    fun getIdentifierTypes(
-        pageRequest: Pageable,
-        businessPartnerType: IdentifierBusinessPartnerTypeV6,
-        country: CountryCode? = null
-    ): PageDto<IdentifierTypeDtoV6> {
-        val spec = Specification.allOf(
-            IdentifierTypeRepository.Specs.byBusinessPartnerType(businessPartnerType.toV7()),
-            IdentifierTypeRepository.Specs.byCountry(country)
-        )
-        val page = identifierTypeRepository.findAll(spec, pageRequest)
-        return page.toDto(page.content.map { it.toDto() })
-    }
 
     @Transactional
     fun createLegalForm(request: LegalFormRequestV6): LegalFormDtoV6 {

@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeSearchApplicationV6Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -38,12 +40,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("MetadataControllerLegacy")
 class MetadataV6Controller(
-    val metadataLegacyServiceMapper: MetadataLegacyServiceMapper
+    val metadataLegacyServiceMapper: MetadataLegacyServiceMapper,
+    val identifierTypeCreateApplicationV6Service: IdentifierTypeCreateApplicationV6Service,
+    val identifierTypeSearchApplicationV6Service: IdentifierTypeSearchApplicationV6Service
 ) : PoolMetadataV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createIdentifierType(identifierType: IdentifierTypeDtoV6): IdentifierTypeDtoV6 {
-        return metadataLegacyServiceMapper.createIdentifierType(identifierType)
+        return identifierTypeCreateApplicationV6Service.createIdentifierType(identifierType)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
@@ -52,7 +56,7 @@ class MetadataV6Controller(
         businessPartnerType: IdentifierBusinessPartnerTypeV6,
         country: CountryCode?
     ): PageDto<IdentifierTypeDtoV6> {
-        return metadataLegacyServiceMapper.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), businessPartnerType, country)
+        return identifierTypeSearchApplicationV6Service.searchIdentifierTypes(businessPartnerType, country, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")

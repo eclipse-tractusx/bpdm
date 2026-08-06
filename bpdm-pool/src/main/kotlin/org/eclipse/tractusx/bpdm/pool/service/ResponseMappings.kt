@@ -84,19 +84,6 @@ fun IdentifierTypeDb.toTypeKeyNameDto(): TypeKeyNameVerboseDto<String> {
     return TypeKeyNameVerboseDto(technicalKey, name)
 }
 
-fun IdentifierTypeDb.toDto(): IdentifierTypeDto {
-    return IdentifierTypeDto(
-        technicalKey = technicalKey,
-        businessPartnerType = businessPartnerType,
-        name = name,
-        abbreviation = abbreviation,
-        transliteratedName = transliteratedName,
-        transliteratedAbbreviation = transliteratedAbbreviation,
-        format = format,
-        categories = categories.ifEmpty { mutableSetOf(IdentifierTypeCategory.OTH) }.toSortedSet(),
-        details = details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
-}
-
 fun LegalFormDb.toDto(): LegalFormDto {
     return LegalFormDto(
         technicalKey = technicalKey,

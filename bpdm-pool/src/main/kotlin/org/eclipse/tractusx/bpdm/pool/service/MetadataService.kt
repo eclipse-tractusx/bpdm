@@ -37,7 +37,6 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -55,41 +54,6 @@ class MetadataService(
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun createIdentifierType(type: IdentifierTypeDto): IdentifierTypeDto {
-        if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType, type.technicalKey) != null)
-            throw BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
-
-        logger.info { "Create new Identifier-Type with key ${type.technicalKey}, businessPartnerType ${type.businessPartnerType} and name ${type.name}" }
-        val entity = IdentifierTypeDb(
-            technicalKey = type.technicalKey,
-            businessPartnerType = type.businessPartnerType,
-            name = type.name,
-            abbreviation = type.abbreviation,
-            transliteratedName = type.transliteratedName,
-            transliteratedAbbreviation = type.transliteratedAbbreviation,
-            format = type.format
-        )
-        entity.categories.addAll(type.categories)
-        entity.details.addAll(
-            type.details.map { IdentifierTypeDetailDb(entity, it.country, it.mandatory) }.toSet()
-        )
-        return identifierTypeRepository.save(entity).toDto()
-    }
-
-    fun getIdentifierTypes(
-        pageRequest: Pageable,
-        businessPartnerType: IdentifierBusinessPartnerType,
-        country: CountryCode? = null
-    ): PageDto<IdentifierTypeDto> {
-        val spec = Specification.allOf(
-            IdentifierTypeRepository.Specs.byBusinessPartnerType(businessPartnerType),
-            IdentifierTypeRepository.Specs.byCountry(country)
-        )
-        val page = identifierTypeRepository.findAll(spec, pageRequest)
-        return page.toDto(page.content.map { it.toDto() })
-    }
 
     @Transactional
     fun createLegalForm(request: LegalFormRequest): LegalFormDto {

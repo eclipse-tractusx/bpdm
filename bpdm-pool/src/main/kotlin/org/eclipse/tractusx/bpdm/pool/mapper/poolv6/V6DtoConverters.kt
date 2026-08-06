@@ -42,6 +42,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6 as V6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6 as V6CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6 as V6CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6 as V6IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDetailDtoV6 as V6IdentifierTypeDetailDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6 as V6IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseDtoV6 as V6LegalEntityIdentifierVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityRelationTypeV6 as V6LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateVerboseDtoV6 as V6LegalEntityStateVerboseDto
@@ -158,6 +160,16 @@ fun BpnRequestIdentifierMappingDto.toV6() = V6BpnRequestIdentifierMappingDto(req
 
 fun DataSpaceParticipantDto.toV6() = V6CxMembershipDto(bpnL = bpnL, isCatenaXMember = isDataSpaceParticipant)
 
+fun IdentifierTypeDto.toV6() = V6IdentifierTypeDto(
+    technicalKey = technicalKey,
+    businessPartnerType = businessPartnerType.toV6(),
+    name = name,
+    abbreviation = abbreviation,
+    transliteratedName = transliteratedName,
+    transliteratedAbbreviation = transliteratedAbbreviation,
+    details = details.map { V6IdentifierTypeDetailDto(country = it.country, mandatory = it.mandatory) }
+)
+
 /* --------------------- Inbound: v6 -> v7 --------------------- */
 
 fun V6ConfidenceCriteriaDto.toV7() = ConfidenceCriteriaDto(
@@ -257,6 +269,18 @@ fun V6CxMembershipSearchRequest.toV7() = DataSpaceParticipantSearchRequest(
 
 fun V6CxMembershipUpdateRequest.toV7() = DataSpaceParticipantUpdateRequest(
     participants = memberships.map { DataSpaceParticipantDto(bpnL = it.bpnL, isDataSpaceParticipant = it.isCatenaXMember) }
+)
+
+fun V6IdentifierTypeDto.toV7() = IdentifierTypeDto(
+    technicalKey = technicalKey,
+    businessPartnerType = businessPartnerType.toV7(),
+    name = name,
+    abbreviation = abbreviation,
+    transliteratedName = transliteratedName,
+    transliteratedAbbreviation = transliteratedAbbreviation,
+    format = null,
+    categories = sortedSetOf(),
+    details = details.map { IdentifierTypeDetailDto(country = it.country, mandatory = it.mandatory) }
 )
 
 fun V6IdentifiersSearchRequest.toV7() = IdentifiersSearchRequest(
