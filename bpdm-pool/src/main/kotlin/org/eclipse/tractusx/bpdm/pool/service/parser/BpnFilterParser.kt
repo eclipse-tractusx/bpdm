@@ -19,28 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntitySearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntitySearchRequest
 import org.springframework.stereotype.Service
 
 /**
- * Turns loose legal entity search criteria into the normalized form the search operation queries with.
+ * Turns the BPNs a search filters by into the normalized form the search operations query with.
  *
- * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
- * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
+ * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no filter value can
+ * be rejected — an unknown or malformed one matches nothing — so there is no failure to report.
  */
 @Service
-class LegalEntitySearchParser(
-    private val bpnFilterParser: BpnFilterParser
-) {
+class BpnFilterParser {
 
     /**
-     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
+     * Normalizes the filter by dropping blank values and reading BPNs case-insensitively.
      */
-    fun parse(request: LegalEntitySearchRequest): LegalEntitySearchParsed =
-        LegalEntitySearchParsed(
-            legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
-            legalName = request.legalName?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData
-        )
+    fun parse(bpns: Collection<String>): List<String> =
+        bpns.filter { it.isNotBlank() }.map { it.uppercase() }
 }

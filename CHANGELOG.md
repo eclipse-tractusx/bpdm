@@ -34,6 +34,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Pool: A golden record task that puts a new site on an already existing address now applies the site main address payload it carries to that address, instead of leaving the address content untouched.
   This is what lets such a site be named in its own scripts; in exchange the payload has to keep covering the scripts the address's other business partners are named in [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Pool: Searching data space participants (`memberships` in the deprecated v6 API) by a BPNL that is no valid BPNL now returns an empty page instead of being rejected as a bad request.
+  Searching by BPNL is also case-insensitive now. This brings the endpoint in line with the legal entity, site, address and changelog searches, which have always treated an unmatchable filter value as matching nothing
 
 ## [7.4.0] - 2026-06-10
 

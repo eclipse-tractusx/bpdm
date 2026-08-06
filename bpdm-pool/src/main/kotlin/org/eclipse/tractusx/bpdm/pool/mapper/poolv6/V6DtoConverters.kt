@@ -40,6 +40,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.AlternativePostalAddressVerbo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ChangelogTypeV6 as V6ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6 as V6ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6 as V6CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6 as V6CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6 as V6IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseDtoV6 as V6LegalEntityIdentifierVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityRelationTypeV6 as V6LegalEntityRelationType
@@ -55,6 +56,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.StreetDtoV6 as V6StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6 as V6AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierSearchRequestV6 as V6BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6 as V6ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6 as V6CxMembershipSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6 as V6IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6 as V6LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
@@ -153,6 +155,8 @@ fun BpnIdentifierMappingDto.toV6() = V6BpnIdentifierMappingDto(idValue = idValue
 
 fun BpnRequestIdentifierMappingDto.toV6() = V6BpnRequestIdentifierMappingDto(requestedIdentifier = requestedIdentifier, bpn = bpn)
 
+fun DataSpaceParticipantDto.toV6() = V6CxMembershipDto(bpnL = bpnL, isCatenaXMember = isDataSpaceParticipant)
+
 /* --------------------- Inbound: v6 -> v7 --------------------- */
 
 fun V6ConfidenceCriteriaDto.toV7() = ConfidenceCriteriaDto(
@@ -243,6 +247,11 @@ fun V6ChangelogSearchRequest.toV7() = ChangelogSearchRequest(
     timestampAfter = timestampAfter,
     bpns = bpns,
     businessPartnerTypes = businessPartnerTypes
+)
+
+fun V6CxMembershipSearchRequest.toV7() = DataSpaceParticipantSearchRequest(
+    bpnLs = bpnLs,
+    isDataSpaceParticipant = isCatenaXMember
 )
 
 fun V6IdentifiersSearchRequest.toV7() = IdentifiersSearchRequest(

@@ -181,6 +181,26 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
     }
 
 
+    /**
+     * GIVEN member legal entity
+     * WHEN operator searches for memberships by a BPNL that is no valid BPNL
+     * THEN operator sees no memberships
+     */
+    @Test
+    fun `search memberships by malformed BpnL`(){
+        //GIVEN
+        createLegalEntity(testName, true)
+
+        //WHEN
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf("NO BPNL"), null), PaginationRequest())
+
+        //THEN
+        val expectedResponse = PageDto<CxMembershipDtoV6>(0, 0, 0, 0, emptyList())
+
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+
     private fun createLegalEntity(seed: String, isMember: Boolean): String{
         val legalEntityRequest = with(testDataFactory.request.buildLegalEntityCreateRequest(seed)){
             copy(legalEntity = legalEntity.copy(isCatenaXMemberData = isMember))

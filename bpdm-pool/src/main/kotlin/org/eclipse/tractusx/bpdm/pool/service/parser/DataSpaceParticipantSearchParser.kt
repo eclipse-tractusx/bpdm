@@ -19,31 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantSearchRequest
 import org.springframework.stereotype.Service
 
 /**
- * Turns loose address search criteria into the normalized form the search operation queries with.
+ * Turns loose data space participant search criteria into the normalized form the search operation queries with.
  *
  * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
  * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
 @Service
-class AddressSearchParser(
+class DataSpaceParticipantSearchParser(
     private val bpnFilterParser: BpnFilterParser
 ) {
 
     /**
      * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
      */
-    fun parse(request: AddressSearchRequest): AddressSearchParsed =
-        AddressSearchParsed(
-            addressBpns = bpnFilterParser.parse(request.addressBpns),
-            siteBpns = bpnFilterParser.parse(request.siteBpns),
-            legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
-            name = request.name?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData,
-            excludesSiteAddresses = request.excludesSiteAddresses
+    fun parse(request: DataSpaceParticipantSearchRequest): DataSpaceParticipantSearchParsed =
+        DataSpaceParticipantSearchParsed(
+            legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns.orEmpty()),
+            isDataSpaceParticipant = request.isDataSpaceParticipant
         )
 }

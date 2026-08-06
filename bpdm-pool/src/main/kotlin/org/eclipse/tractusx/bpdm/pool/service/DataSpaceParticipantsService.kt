@@ -20,20 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext.Companion.fromRoot
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,18 +36,6 @@ class DataSpaceParticipantsService(
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogService: PartnerChangelogService
 ) {
-    fun searchMemberships(searchRequest: DataSpaceParticipantSearchRequest, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantDto>{
-        searchRequest.bpnLs?.let { BpnLString.assert(it, fromRoot(DataSpaceParticipantSearchRequest::class, "searchRequest", DataSpaceParticipantSearchRequest::bpnLs)) }
-
-        val spec = Specification.allOf(
-            LegalEntityRepository.byBpns(searchRequest.bpnLs),
-            LegalEntityRepository.byIsMember(searchRequest.isDataSpaceParticipant)
-        )
-        val legalEntityPage = legalEntityRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
-
-        return legalEntityPage.toPageDto { DataSpaceParticipantDto(it.bpn, it.isCatenaXMemberData) }
-    }
-
     @Transactional
     fun updateMemberships(updateRequest: DataSpaceParticipantUpdateRequest){
         BpnLString.assert(

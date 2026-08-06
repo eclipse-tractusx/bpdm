@@ -27,17 +27,19 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSear
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.DataSpaceParticipantsService
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.DataSpaceParticipantSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class DataSpaceParticipantsController(
+    private val dataSpaceParticipantSearchApplicationV7Service: DataSpaceParticipantSearchApplicationV7Service,
     private val dataSpaceParticipantsService: DataSpaceParticipantsService
 ): PoolDataSpaceParticipantsApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun get(searchRequest: DataSpaceParticipantSearchRequest, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantDto> {
-       return dataSpaceParticipantsService.searchMemberships(searchRequest, paginationRequest)
+       return dataSpaceParticipantSearchApplicationV7Service.searchParticipants(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

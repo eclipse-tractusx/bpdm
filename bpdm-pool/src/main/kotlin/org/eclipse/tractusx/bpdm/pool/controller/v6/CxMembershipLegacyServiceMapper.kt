@@ -20,21 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext.Companion.fromRoot
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,18 +37,6 @@ class CxMembershipLegacyServiceMapper(
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogService: PartnerChangelogService
 ) {
-
-    fun searchMemberships(searchRequest: CxMembershipSearchRequestV6, paginationRequest: PaginationRequest): PageDto<CxMembershipDtoV6> {
-        searchRequest.bpnLs?.let { BpnLString.assert(it, fromRoot(CxMembershipSearchRequestV6::class, "searchRequest", CxMembershipSearchRequestV6::bpnLs)) }
-
-        val spec = Specification.allOf(
-            LegalEntityRepository.byBpns(searchRequest.bpnLs),
-            LegalEntityRepository.byIsMember(searchRequest.isCatenaXMember)
-        )
-        val legalEntityPage = legalEntityRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
-
-        return legalEntityPage.toPageDto { CxMembershipDtoV6(it.bpn, it.isCatenaXMemberData) }
-    }
 
     @Transactional
     fun updateMemberships(updateRequest: CxMembershipUpdateRequestV6){

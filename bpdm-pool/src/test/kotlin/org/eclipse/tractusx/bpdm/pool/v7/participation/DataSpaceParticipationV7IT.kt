@@ -218,6 +218,42 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
+     * GIVEN participant legal entity
+     * WHEN operator searches for participations by the BPNL in lower case
+     * THEN operator sees the participation of that legal entity
+     */
+    @Test
+    fun `search participations by lower case BPNL`() {
+        //GIVEN
+        val bpnL = testDataClient.createParticipantLegalEntity(testName).header.bpnl
+
+        //WHEN
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL.lowercase()), null), PaginationRequest())
+
+        //THEN
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, true)))
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * GIVEN participant legal entity
+     * WHEN operator searches for participations by a BPNL that is no valid BPNL
+     * THEN operator sees no participations
+     */
+    @Test
+    fun `search participations by malformed BPNL`() {
+        //GIVEN
+        testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf("NO BPNL"), null), PaginationRequest())
+
+        //THEN
+        val expectedResponse = PageDto<DataSpaceParticipantDto>(0, 0, 0, 0, emptyList())
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
      * GIVEN non-participant legal entity
      * WHEN operator sets participation to true
      * THEN the legal entity's isParticipantData flag is updated accordingly
