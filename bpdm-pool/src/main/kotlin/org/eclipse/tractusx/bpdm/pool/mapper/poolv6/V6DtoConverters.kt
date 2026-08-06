@@ -42,6 +42,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6 as V6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6 as V6CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6 as V6CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6 as V6IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDetailDtoV6 as V6IdentifierTypeDetailDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6 as V6IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseDtoV6 as V6LegalEntityIdentifierVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityRelationTypeV6 as V6LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateVerboseDtoV6 as V6LegalEntityStateVerboseDto
@@ -60,6 +62,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6 as V6CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6 as V6IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6 as V6LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6 as V6LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6 as V6SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6 as V6SitePartnerUpdateRequest
@@ -157,6 +160,16 @@ fun BpnIdentifierMappingDto.toV6() = V6BpnIdentifierMappingDto(idValue = idValue
 fun BpnRequestIdentifierMappingDto.toV6() = V6BpnRequestIdentifierMappingDto(requestedIdentifier = requestedIdentifier, bpn = bpn)
 
 fun DataSpaceParticipantDto.toV6() = V6CxMembershipDto(bpnL = bpnL, isCatenaXMember = isDataSpaceParticipant)
+
+fun IdentifierTypeDto.toV6() = V6IdentifierTypeDto(
+    technicalKey = technicalKey,
+    businessPartnerType = businessPartnerType.toV6(),
+    name = name,
+    abbreviation = abbreviation,
+    transliteratedName = transliteratedName,
+    transliteratedAbbreviation = transliteratedAbbreviation,
+    details = details.map { V6IdentifierTypeDetailDto(country = it.country, mandatory = it.mandatory) }
+)
 
 /* --------------------- Inbound: v6 -> v7 --------------------- */
 
@@ -257,6 +270,30 @@ fun V6CxMembershipSearchRequest.toV7() = DataSpaceParticipantSearchRequest(
 
 fun V6CxMembershipUpdateRequest.toV7() = DataSpaceParticipantUpdateRequest(
     participants = memberships.map { DataSpaceParticipantDto(bpnL = it.bpnL, isDataSpaceParticipant = it.isCatenaXMember) }
+)
+
+fun V6LegalFormRequest.toV7() = LegalFormRequest(
+    technicalKey = technicalKey,
+    name = name,
+    transliteratedName = transliteratedName,
+    abbreviations = abbreviation,
+    transliteratedAbbreviations = transliteratedAbbreviations,
+    country = country,
+    language = language,
+    administrativeAreaLevel1 = administrativeAreaLevel1,
+    isActive = isActive
+)
+
+fun V6IdentifierTypeDto.toV7() = IdentifierTypeDto(
+    technicalKey = technicalKey,
+    businessPartnerType = businessPartnerType.toV7(),
+    name = name,
+    abbreviation = abbreviation,
+    transliteratedName = transliteratedName,
+    transliteratedAbbreviation = transliteratedAbbreviation,
+    format = null,
+    categories = sortedSetOf(),
+    details = details.map { IdentifierTypeDetailDto(country = it.country, mandatory = it.mandatory) }
 )
 
 fun V6IdentifiersSearchRequest.toV7() = IdentifiersSearchRequest(

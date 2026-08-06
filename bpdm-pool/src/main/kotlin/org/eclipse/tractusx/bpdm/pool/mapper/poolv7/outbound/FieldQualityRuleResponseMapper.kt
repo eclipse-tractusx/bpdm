@@ -17,9 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-data class LegalEntityMetadataDto(
-    val headerMetadata: LegalEntityHeaderMetadataDto,
-    val legalAddressMetadata: AddressMetadataDto
-)
+import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
+import org.eclipse.tractusx.bpdm.pool.model.FieldQualityRule
+import org.springframework.stereotype.Component
+
+/**
+ * Maps the results of the field quality rule search to the v7 API field quality rule DTOs.
+ */
+@Component
+class FieldQualityRuleResponseMapper {
+
+    /**
+     * Returns the given field quality rule as the API reports it.
+     */
+    fun toFieldQualityRule(rule: FieldQualityRule): FieldQualityRuleDto =
+        FieldQualityRuleDto(
+            fieldPath = rule.fieldPath,
+            schemaName = rule.schemaName,
+            country = rule.country,
+            qualityLevel = rule.qualityLevel
+        )
+}

@@ -17,14 +17,31 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-data class AddressMetadataDto(
-    val idTypes: Collection<IdentifierTypeDb>,
-    val regions: Collection<RegionDb>,
-    val scriptCodes: Collection<ScriptCodeDb>
-)
+/**
+ * Queries the administrative areas an address may name as its level 1 area.
+ */
+@Service
+class AdministrativeAreaSearchService(
+    private val regionRepository: RegionRepository
+) {
+
+    /**
+     * Returns the requested page of all known administrative areas, grouped by country.
+     */
+    @Transactional(readOnly = true)
+    fun search(pageable: Pageable): Page<RegionDb> {
+        val byCountry = PageRequest.of(pageable.pageNumber, pageable.pageSize, RegionRepository.DEFAULT_SORTING)
+
+        return regionRepository.findAll(byCountry)
+    }
+}

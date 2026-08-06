@@ -104,6 +104,24 @@ class LegalFormCreateV7IT : UnscheduledPoolTestBaseV7() {
             .isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
+    /**
+     * WHEN operator tries to create legal form with both an existing technical key and an unknown administrative area
+     * THEN 409 CONFLICT returned, the taken key outranking the unknown area
+     */
+    @Test
+    fun `try create new legal form with duplicate technical key and unknown admin area v7`() {
+        //GIVEN
+        val request = createLegalFormRequest(testName)
+        poolClient.metadata.createLegalForm(request)
+
+        //WHEN
+        val conflictingRequest = request.copy(administrativeAreaLevel1 = "UNKNOWN")
+
+        //THEN
+        Assertions.assertThatThrownBy { poolClient.metadata.createLegalForm(conflictingRequest) }
+            .isInstanceOf(WebClientResponseException.Conflict::class.java)
+    }
+
     private fun createLegalFormRequest(seed: String): LegalFormRequest {
         return LegalFormRequest(
             technicalKey = seed,

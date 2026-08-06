@@ -17,12 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
-import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
+import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
+import org.springframework.stereotype.Component
 
-data class LegalEntityInvariantHeaderMetadataDto(
-    val idTypes: Collection<IdentifierTypeDb>,
-    val legalForms: Collection<LegalFormDb>,
-)
+/**
+ * Maps stored regions to the v7 API country subdivision DTOs.
+ */
+@Component
+class AdministrativeAreaResponseMapper {
+
+    /**
+     * Returns the given region as the country subdivision the API reports it as.
+     */
+    fun toCountrySubdivision(region: RegionDb): CountrySubdivisionDto =
+        CountrySubdivisionDto(countryCode = region.countryCode, code = region.regionCode, name = region.regionName)
+}

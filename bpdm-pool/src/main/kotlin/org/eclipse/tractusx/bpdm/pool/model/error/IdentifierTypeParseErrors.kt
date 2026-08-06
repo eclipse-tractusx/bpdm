@@ -17,11 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model.error
 
-import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 
-data class SiteMetadataDto (
-    val scriptCodes: Collection<ScriptCodeDb>,
-    val addressMetadata: AddressMetadataDto
-)
+sealed interface IdentifierTypeCreateParseError {
+    data class TechnicalKeyAlreadyTaken(
+        val technicalKey: String,
+        val businessPartnerType: IdentifierBusinessPartnerType
+    ) : IdentifierTypeCreateParseError
+}
