@@ -274,10 +274,6 @@ fun PartnerChangelogEntryDb.toDto(): ChangelogEntryVerboseDto {
     return ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt, changelogType)
 }
 
-fun RegionDb.toCountrySubdivisionDto(): CountrySubdivisionDto {
-    return CountrySubdivisionDto(countryCode = countryCode, code = regionCode, name = regionName)
-}
-
 fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
     ConfidenceCriteriaDto(
         sharedByOwner,

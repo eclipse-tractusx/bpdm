@@ -17,35 +17,33 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.controller.v6
+package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.service.MetadataService
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AdministrativeAreaResponseMapper
+import org.eclipse.tractusx.bpdm.pool.service.operation.AdministrativeAreaSearchService
+import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+/**
+ * The REST-API boundary for the legacy v6 "search administrative areas level 1" operation, using the v6 response shapes.
+ */
 @Service
-class MetadataLegacyServiceMapper(
-    private val metadataService: MetadataService
+class AdministrativeAreaSearchApplicationV6Service(
+    private val administrativeAreaSearchService: AdministrativeAreaSearchService,
+    private val administrativeAreaResponseMapper: AdministrativeAreaResponseMapper
 ) {
 
-    fun getFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDtoV6> {
-        return metadataService.getFieldQualityRules(country).map { it.toV6() }
-    }
-
-    fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> {
-        val page = metadataService.getCountrySubdivisions(paginationRequest)
-        return PageDto(
-            totalElements = page.totalElements,
-            totalPages = page.totalPages,
-            page = page.page,
-            contentSize = page.contentSize,
-            content = page.content.map { it.toV6() }
-        )
-    }
-
+    /**
+     * Returns the requested page of all known administrative areas level 1.
+     */
+    @Transactional(readOnly = true)
+    fun searchAdministrativeAreas(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> =
+        administrativeAreaSearchService.search(paginationRequest.toPageRequest())
+            .toDto { administrativeAreaResponseMapper.toCountrySubdivision(it).toV6() }
 }

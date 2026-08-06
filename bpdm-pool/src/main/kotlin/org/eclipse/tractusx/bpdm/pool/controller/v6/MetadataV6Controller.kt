@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.AdministrativeAreaSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.FieldQualityRuleSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalFormCreateApplicationV6Service
@@ -41,11 +43,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("MetadataControllerLegacy")
 class MetadataV6Controller(
-    val metadataLegacyServiceMapper: MetadataLegacyServiceMapper,
     val identifierTypeCreateApplicationV6Service: IdentifierTypeCreateApplicationV6Service,
     val identifierTypeSearchApplicationV6Service: IdentifierTypeSearchApplicationV6Service,
     val legalFormCreateApplicationV6Service: LegalFormCreateApplicationV6Service,
-    val legalFormSearchApplicationV6Service: LegalFormSearchApplicationV6Service
+    val legalFormSearchApplicationV6Service: LegalFormSearchApplicationV6Service,
+    val fieldQualityRuleSearchApplicationV6Service: FieldQualityRuleSearchApplicationV6Service,
+    val administrativeAreaSearchApplicationV6Service: AdministrativeAreaSearchApplicationV6Service
 ) : PoolMetadataV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
@@ -74,12 +77,12 @@ class MetadataV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDtoV6>> {
-        return ResponseEntity(metadataLegacyServiceMapper.getFieldQualityRules(country), HttpStatus.OK)
+        return ResponseEntity(fieldQualityRuleSearchApplicationV6Service.searchFieldQualityRules(country), HttpStatus.OK)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> {
-        return metadataLegacyServiceMapper.getAdminAreasLevel1(paginationRequest)
+        return administrativeAreaSearchApplicationV6Service.searchAdministrativeAreas(paginationRequest)
     }
 
 }

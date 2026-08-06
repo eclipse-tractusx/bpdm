@@ -19,75 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityInvariantHeaderMetadataDto
-import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.eclipse.tractusx.bpdm.pool.repository.*
-import org.springframework.data.domain.PageRequest
+import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.springframework.stereotype.Service
 
 /**
- * Service for fetching and creating metadata entities
+ * Fetches the metadata entities that legal entity and address requests reference.
  */
 @Service
 class MetadataService(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val fieldQualityRuleRepository: FieldQualityRuleRepository,
-    private val regionRepository: RegionRepository,
-    private val scriptCodeRepository: ScriptCodeRepository,
-    private val reasonCodeRepository: ReasonCodeRepository,
+    private val regionRepository: RegionRepository
 ) {
-
-    /**
-     * Get quality rules for the given country merged with the default rules. Forbidden rules are ignored.
-     */
-    fun getFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDto> {
-
-        val defaultRules = fieldQualityRuleRepository.findByCountryCodeIsNullOrderBySchemaNameAscFieldPathAsc()
-        val rulesForCountry = fieldQualityRuleRepository.findByCountryCodeOrderBySchemaNameAscFieldPathAsc(country)
-
-        val pathToDefaultRule = defaultRules.associateBy(
-            { it.schemaName + "." + it.fieldPath }, { it }
-        )
-        val pathToCountrRule = rulesForCountry.associateBy(
-            { it.schemaName + "." + it.fieldPath }, { it }
-        )
-
-        val pathsFromDefaultAndCountry = pathToDefaultRule.keys + pathToCountrRule.keys
-
-        val mergedRulesForCountry = pathsFromDefaultAndCountry.mapNotNull { path ->
-            mergeRules(pathToDefaultRule[path], pathToCountrRule[path])
-        }
-
-        val resultList = mergedRulesForCountry.filter {
-            it.qualityLevel != QualityLevel.FORBIDDEN
-        }.map { rule ->
-            FieldQualityRuleDto(
-                fieldPath = rule.fieldPath,
-                schemaName = rule.schemaName,
-                country = (if (rule.countryCode != null) rule.countryCode else country)!!,
-                qualityLevel = rule.qualityLevel
-            )
-        }
-
-        resultList.sortedWith(compareBy({ it.schemaName }, { it.fieldPath }))
-        return resultList
-    }
-
-    fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
-        return scriptCodeRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size)).toDto {
-            ScriptCodeDto(it.technicalKey, it.description)
-        }
-    }
 
     fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityInvariantHeaderMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
@@ -114,29 +65,4 @@ class MetadataService(
         return idTypes
     }
 
-    fun getReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>{
-        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val pageResponse = reasonCodeRepository.findAll(pageRequest)
-
-        return pageResponse.toDto { ReasonCodeDto(technicalKey = it.technicalKey, description = it.description) }
-    }
-
-
-    /**
-     * If no country rule exists use default rules
-     */
-    private fun mergeRules(defaultRule: FieldQualityRuleDb?, countryRule: FieldQualityRuleDb?): FieldQualityRuleDb? {
-
-        if (countryRule == null) {
-            return defaultRule
-        }
-
-        return countryRule
-    }
-
-    fun getCountrySubdivisions(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
-        val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
-        val page = regionRepository.findAll(pageRequest)
-        return page.toDto(page.content.map { it.toCountrySubdivisionDto() })
-    }
 }
