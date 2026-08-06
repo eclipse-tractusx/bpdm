@@ -26,8 +26,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.dto.*
-import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityInvariantHeaderMetadataDto
+import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -87,30 +89,6 @@ class MetadataService(
         }
     }
 
-    fun getMetadata(requests: Collection<LegalEntityDto>): LegalEntityMetadataDto{
-        val invariantHeaderMetadata = getMetadata(requests.map { it.header })
-        val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(requests.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet())
-
-        val headerMetaData = LegalEntityHeaderMetadataDto(invariantHeaderMetadata.idTypes, invariantHeaderMetadata.legalForms, scriptCodes)
-
-        val invariantAddressMetadata = getMetadata(requests.map { it.legalAddress })
-        val addressMetadata = AddressMetadataDto(invariantAddressMetadata.idTypes, invariantAddressMetadata.regions, scriptCodes)
-
-        return LegalEntityMetadataDto(headerMetaData, addressMetadata)
-    }
-
-    fun getMetadata(requests: Collection<SiteDto>): SiteMetadataDto{
-        val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(requests.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet())
-
-        val invariantAddressMetadata = getMetadata(requests.map { it.mainAddress })
-        val addressMetadata = AddressMetadataDto(invariantAddressMetadata.idTypes, invariantAddressMetadata.regions, scriptCodes)
-
-        return SiteMetadataDto(scriptCodes, addressMetadata)
-    }
-
-    fun getSiteHeaderScriptCodes(scriptVariants: Collection<SiteHeaderScriptVariantDto>): Set<ScriptCodeDb> =
-        scriptCodeRepository.findByTechnicalKeyIn(scriptVariants.map { it.scriptCode }.toSet())
-
     fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityInvariantHeaderMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
@@ -119,25 +97,6 @@ class MetadataService(
         val legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys)
 
         return LegalEntityInvariantHeaderMetadataDto(idTypes, legalForms)
-    }
-
-    fun getMetadata(requests: Collection<LogisticAddressWithScriptVariantsDto>): AddressMetadataDto{
-        val invariantMetadata = getMetadata(requests.map { it.address })
-        val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(requests.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet())
-
-        return AddressMetadataDto(invariantMetadata.idTypes, invariantMetadata.regions, scriptCodes)
-    }
-
-    fun getMetadata(requests: Collection<IBaseLogisticAddressDto>): AddressInvariantMetadataDto {
-        val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
-        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
-
-        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.administrativeAreaLevel1 }
-            .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
-            .toSet()
-        val regions = regionRepository.findByRegionCodeIn(regionKeys)
-
-        return AddressInvariantMetadataDto(idTypes, regions)
     }
 
     fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<RegionDb> {
