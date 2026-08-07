@@ -30,11 +30,9 @@ import java.time.LocalDate
 
 /**
  * Validates that an alternative headquarter cannot carry the ultimate-owner flag.
- * An entity is considered an alternative if it is the source (startNode) in an IsAlternativeHeadquarterFor relation
- * that is valid today.
  */
 @Service
-class AlternativeHeadquarterValidator(
+class AlternativeHeadquarterUltimateOwnerValidator(
     private val relationRepository: RelationRepository
 ) {
 
@@ -48,7 +46,6 @@ class AlternativeHeadquarterValidator(
             return emptyList()
         }
 
-        // Check if this entity is an alternative (startNode in IsAlternativeHeadquarterFor) today
         val today = LocalDate.now()
         val alternativeRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, target)
         val validToday = alternativeRelations.any { it.isValidOn(today) }
@@ -61,7 +58,8 @@ class AlternativeHeadquarterValidator(
     }
 
     /**
-     * Batch validation: checks each target-flag pair.
+     * Validates each target-flag pair in batch: checks if each legal entity is an alternative headquarter today
+     * and if it's being set to ownershipUltimate = true. Returns violations for each entry.
      */
     @Transactional(readOnly = true)
     fun validate(targets: List<LegalEntityDb?>, requestedFlags: List<Boolean?>): List<List<AlternativeHeadquarterCannotOwnUltimately>> {
