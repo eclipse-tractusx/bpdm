@@ -21,14 +21,15 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.ChangelogSearchRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.ChangelogParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.ChangelogResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.ChangelogParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.ChangelogSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest as ChangelogSearchRequestDto
@@ -41,7 +42,8 @@ class ChangelogSearchApplicationV7Service(
     private val changelogSearchParser: ChangelogSearchParser,
     private val changelogSearchService: ChangelogSearchService,
     private val changelogSearchRequestMapper: ChangelogSearchRequestMapper,
-    private val changelogParseErrorMapper: ChangelogParseErrorMapper
+    private val changelogParseErrorMapper: ChangelogParseErrorMapper,
+    private val changelogResponseMapper: ChangelogResponseMapper
 ) {
 
     /**
@@ -67,6 +69,7 @@ class ChangelogSearchApplicationV7Service(
     private fun search(searchRequest: ChangelogSearchRequestDto, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         when (val criteria = changelogSearchParser.parse(changelogSearchRequestMapper.toSearchRequest(searchRequest, isDataSpaceParticipant))) {
             is ParseResult.Failure -> throw changelogParseErrorMapper.toSearchException(criteria.errors)
-            is ParseResult.Success -> changelogSearchService.search(criteria.parsed, paginationRequest.toPageRequest()).toDto { it.toDto() }
+            is ParseResult.Success -> changelogSearchService.search(criteria.parsed, paginationRequest.toPageRequest())
+                .toPageDto { changelogResponseMapper.toChangelogEntry(it) }
         }
 }

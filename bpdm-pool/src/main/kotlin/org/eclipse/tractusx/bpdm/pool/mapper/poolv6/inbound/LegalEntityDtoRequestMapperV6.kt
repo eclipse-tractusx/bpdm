@@ -21,11 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
@@ -37,21 +36,27 @@ import java.time.ZoneOffset
  * differs from v7: the legal entity is flat (no `header` wrapper), the legal address is a sibling field (not nested),
  * there are no script variants, and membership is `isCatenaXMemberData` (→ domain `isDataSpaceParticipant`).
  */
-@Component("legalEntityDtoRequestMapperLegacy")
-class LegalEntityDtoRequestMapper(
-    private val addressDtoRequestMapper: AddressDtoRequestMapper
+@Component
+class LegalEntityDtoRequestMapperV6(
+    private val addressDtoRequestMapperV6: AddressDtoRequestMapperV6
 ) {
 
+    /**
+     * Returns the create request for the legal entity and legal address a client sent.
+     */
     fun toCreateRequest(request: LegalEntityPartnerCreateRequestV6): LegalEntityCreateRequest =
         LegalEntityCreateRequest(content = toContentRequest(request.legalEntity, request.legalAddress))
 
+    /**
+     * Returns the update request for the legal entity a client sent, addressed by its BPN.
+     */
     fun toUpdateRequest(request: LegalEntityPartnerUpdateRequestV6): LegalEntityUpdateRequest =
         LegalEntityUpdateRequest(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity, request.legalAddress))
 
     private fun toContentRequest(legalEntity: LegalEntityDtoV6, legalAddress: LogisticAddressDtoV6): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
-            legalAddress = addressDtoRequestMapper.toContentRequest(legalAddress.toV7(), emptyList())
+            legalAddress = addressDtoRequestMapperV6.toContentRequest(legalAddress)
         )
 
     private fun toHeaderRequest(legalEntity: LegalEntityDtoV6): LegalEntityHeaderRequest =
@@ -60,13 +65,16 @@ class LegalEntityDtoRequestMapper(
             legalShortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
             identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
-            states = legalEntity.states.map { LegalEntityState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = legalEntity.states.map { toStateRequest(it) },
             confidenceCriteria = toConfidenceRequest(legalEntity.confidenceCriteria),
             isDataSpaceParticipant = legalEntity.isCatenaXMemberData,
             // V6 has no ownership flag, so a V6 write must never change it.
             ownershipUltimate = null,
             scriptVariants = emptyList()
         )
+
+    private fun toStateRequest(state: LegalEntityStateDtoV6): LegalEntityState =
+        LegalEntityState(state.validFrom?.toUtcInstant(), state.validTo?.toUtcInstant(), state.type)
 
     private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(

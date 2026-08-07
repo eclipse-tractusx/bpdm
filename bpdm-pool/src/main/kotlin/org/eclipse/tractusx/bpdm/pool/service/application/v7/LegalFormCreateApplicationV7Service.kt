@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalFormRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalFormCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalFormCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest as LegalFormRequestDto
@@ -38,7 +38,8 @@ class LegalFormCreateApplicationV7Service(
     private val legalFormCreateParser: LegalFormCreateParser,
     private val legalFormCreateService: LegalFormCreateService,
     private val legalFormRequestMapper: LegalFormRequestMapper,
-    private val legalFormParseErrorMapper: LegalFormParseErrorMapper
+    private val legalFormParseErrorMapper: LegalFormParseErrorMapper,
+    private val legalFormResponseMapper: LegalFormResponseMapper
 ) {
 
     /**
@@ -48,6 +49,6 @@ class LegalFormCreateApplicationV7Service(
     fun createLegalForm(legalForm: LegalFormRequestDto): LegalFormDto =
         when (val parsed = legalFormCreateParser.parse(legalFormRequestMapper.toCreateRequest(legalForm))) {
             is ParseResult.Failure -> throw legalFormParseErrorMapper.toCreateException(parsed.errors)
-            is ParseResult.Success -> legalFormCreateService.create(parsed.parsed).toDto()
+            is ParseResult.Success -> legalFormResponseMapper.toLegalForm(legalFormCreateService.create(parsed.parsed))
         }
 }

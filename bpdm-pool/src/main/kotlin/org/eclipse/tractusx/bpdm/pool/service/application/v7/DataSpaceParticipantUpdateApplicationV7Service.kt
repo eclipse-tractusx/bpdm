@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantUpdateRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.DataSpaceParticipantParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantUpdateParser

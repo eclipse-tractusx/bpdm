@@ -27,11 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdat
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.toUpsertDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,7 +43,8 @@ class LegalEntityUpdateApplicationV7Service(
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
     private val legalEntityPayloadUpdateService: LegalEntityPayloadUpdateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
-    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
+    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper,
+    private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -63,7 +64,7 @@ class LegalEntityUpdateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
+                is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed.value, request.bpnl))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
             }
         }

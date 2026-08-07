@@ -101,12 +101,12 @@ class AddressRelationUpsertService(
             throw BpdmValidationException("Invalid 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' and target address with BPNA '${target.bpn}' do not belong to the same Legal Entity (BPNL '${source.legalEntity!!.bpn}' and '${target.legalEntity!!.bpn}'). "
                     + "Both addresses must belong to the same Legal Entity to create an 'IsReplacedBy' relation.")
         }
-        if (getAddressType(source) != AddressType.LegalAddress) {
-            throw BpdmValidationException("Invalid source address type for 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' is of type '${getAddressType(source)}'. "
+        if (source.addressType != AddressType.LegalAddress) {
+            throw BpdmValidationException("Invalid source address type for 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' is of type '${source.addressType}'. "
                     + "Only addresses of type 'LegalAddress' can be the source of an 'IsReplacedBy' relation.")
         }
-        if (getAddressType(target) != AddressType.AdditionalAddress) {
-            throw BpdmValidationException("Invalid target address type for 'IsReplacedBy' relation: The target address with BPNA '${target.bpn}' is of type '${getAddressType(target)}'. "
+        if (target.addressType != AddressType.AdditionalAddress) {
+            throw BpdmValidationException("Invalid target address type for 'IsReplacedBy' relation: The target address with BPNA '${target.bpn}' is of type '${target.addressType}'. "
                     + "Only addresses of type 'AdditionalAddress' can be the target of an 'IsReplacedBy' relation.")
         }
     }

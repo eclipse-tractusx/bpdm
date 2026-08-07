@@ -20,16 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.SitePayloadUpdateService
@@ -44,8 +42,9 @@ import org.springframework.transaction.annotation.Transactional
 class SiteUpdateApplicationV6Service(
     private val siteUpdateParser: SiteUpdateParser,
     private val sitePayloadUpdateService: SitePayloadUpdateService,
-    private val siteDtoRequestMapper: SiteDtoRequestMapper,
-    private val siteParseErrorMapper: SiteParseErrorMapper
+    private val siteDtoRequestMapperV6: SiteDtoRequestMapperV6,
+    private val siteParseErrorMapperV6: SiteParseErrorMapperV6,
+    private val siteResponseMapperV6: SiteResponseMapperV6
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -59,17 +58,17 @@ class SiteUpdateApplicationV6Service(
         logger.info { "Update ${requests.size} sites" }
 
         val requestList = requests.toList()
-        val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it.toV7()) }
+        val updateRequests = requestList.map { siteDtoRequestMapperV6.toUpdateRequest(it) }
 
         val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
-        val errors = mutableListOf<ErrorInfo<SiteUpdateError>>()
+        val errors = mutableListOf<ErrorInfoV6<SiteUpdateErrorV6>>()
         requestList.zip(parseAndExecute(updateRequests, siteUpdateParser::parse, sitePayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpns))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toUpdateErrorInfo(it, request.bpns) })
+                is ParseResult.Success -> responses.add(siteResponseMapperV6.toUpsertResponse(result.parsed.value, request.bpns))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapperV6.toUpdateErrorInfo(it, request.bpns) })
             }
         }
 
-        return SitePartnerUpdateResponseWrapperV6(responses, errors.map { it.toV6() })
+        return SitePartnerUpdateResponseWrapperV6(responses, errors)
     }
 }

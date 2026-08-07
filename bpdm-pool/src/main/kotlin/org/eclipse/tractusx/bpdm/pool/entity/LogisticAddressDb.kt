@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
@@ -68,9 +69,8 @@ class LogisticAddressDb(
 
     /**
      * The sites this address belongs to. A single unified relationship: there is no stored "primary" site — the API's
-     * `bpnSite` is derived as the oldest member by `createdAt` and the remainder is exposed as `additionalSites`
-     * (see [mainSite] / [additionalSites] in ResponseMappings). A site's main address is also a member of its own set,
-     * which is how it is classified (see `getAddressType`).
+     * `bpnSite` is derived as the oldest member by `createdAt` and the remainder is exposed as [additionalSites].
+     * A site's main address is also a member of its own set, which is how it is classified (see [addressType]).
      */
     @ManyToMany
     @JoinTable(
@@ -80,5 +80,32 @@ class LogisticAddressDb(
     )
     val sites: MutableSet<SiteDb> = mutableSetOf()
 
+    /**
+     * The site rendered as the API's `bpnSite` for backward compatibility: the oldest member by `createdAt`, which for
+     * pre-existing data is the address's former single site. The remaining members are exposed as [additionalSites].
+     */
+    val mainSite: SiteDb?
+        get() = sites.minByOrNull { it.createdAt }
+
+    val additionalSites: List<SiteDb>
+        get() = sites.sortedBy { it.createdAt }.drop(1)
+
+    /** The role this address plays for its legal entity and its sites. */
+    val addressType: AddressType
+        get() = when {
+            isLegalAddress() && isSiteMainAddress() -> AddressType.LegalAndSiteMainAddress
+            !isLegalAddress() && !isSiteMainAddress() -> AddressType.AdditionalAddress
+            isLegalAddress() -> AddressType.LegalAddress
+            isSiteMainAddress() -> AddressType.SiteMainAddress
+            else -> throw IllegalStateException("Unable to determine address type.")
+        }
+
     fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
+
+    // Identity is compared by BPN, not by reference: navigating to an address yields a lazy proxy while `this` is always
+    // the unproxied instance, so a reference comparison inside the entity reports a false mismatch.
+    private fun isLegalAddress() = legalEntity?.legalAddress?.bpn == bpn
+
+    /** An address is a site's main address iff one of the sites it belongs to has it as its main address. */
+    private fun isSiteMainAddress() = sites.any { it.mainAddress.bpn == bpn }
 }

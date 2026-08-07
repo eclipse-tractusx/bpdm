@@ -19,23 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.springframework.stereotype.Component
 
 /**
- * Maps the changelog search parser's sealed parse errors to the errors the changelog endpoints report them with.
+ * Maps stored changelog entries to the v7 API changelog DTOs.
  */
 @Component
-class ChangelogParseErrorMapper {
+class ChangelogResponseMapper {
 
     /**
-     * Returns the exception reporting a failed changelog search parse, surfacing the first error because the search
-     * fails as a whole rather than per entry.
+     * Returns the given changelog entry as the API reports it.
      */
-    fun toSearchException(errors: List<ChangelogSearchParseError>): RuntimeException =
-        when (val error = errors.first()) {
-            is SearchValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
-        }
+    fun toChangelogEntry(changelogEntry: PartnerChangelogEntryDb): ChangelogEntryVerboseDto =
+        with(changelogEntry) { ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt, changelogType) }
 }

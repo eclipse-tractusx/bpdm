@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.pool.service.operation.ScriptCodeSearchService
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,5 +42,5 @@ class ScriptCodeSearchApplicationV7Service(
     @Transactional(readOnly = true)
     fun searchScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> =
         scriptCodeSearchService.search(paginationRequest.toPageRequest())
-            .toDto { ScriptCodeDto(it.technicalKey, it.description) }
+            .toPageDto { ScriptCodeDto(it.technicalKey, it.description) }
 }

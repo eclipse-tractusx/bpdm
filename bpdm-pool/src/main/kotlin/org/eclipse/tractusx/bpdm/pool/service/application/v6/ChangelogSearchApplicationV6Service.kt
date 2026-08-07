@@ -21,17 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.ChangelogSearchRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.ChangelogParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.ChangelogSearchRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.ChangelogResponseMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.ChangelogParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.ChangelogSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,8 +41,9 @@ import org.springframework.transaction.annotation.Transactional
 class ChangelogSearchApplicationV6Service(
     private val changelogSearchParser: ChangelogSearchParser,
     private val changelogSearchService: ChangelogSearchService,
-    private val changelogSearchRequestMapper: ChangelogSearchRequestMapper,
-    private val changelogParseErrorMapper: ChangelogParseErrorMapper
+    private val changelogSearchRequestMapperV6: ChangelogSearchRequestMapperV6,
+    private val changelogParseErrorMapper: ChangelogParseErrorMapper,
+    private val changelogResponseMapperV6: ChangelogResponseMapperV6
 ) {
 
     /**
@@ -67,8 +67,9 @@ class ChangelogSearchApplicationV6Service(
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
     private fun search(searchRequest: ChangelogSearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
-        when (val criteria = changelogSearchParser.parse(changelogSearchRequestMapper.toSearchRequest(searchRequest.toV7(), isDataSpaceParticipant))) {
+        when (val criteria = changelogSearchParser.parse(changelogSearchRequestMapperV6.toSearchRequest(searchRequest, isDataSpaceParticipant))) {
             is ParseResult.Failure -> throw changelogParseErrorMapper.toSearchException(criteria.errors)
-            is ParseResult.Success -> changelogSearchService.search(criteria.parsed, paginationRequest.toPageRequest()).toDto { it.toDto().toV6() }
+            is ParseResult.Success -> changelogSearchService.search(criteria.parsed, paginationRequest.toPageRequest())
+                .toPageDto { changelogResponseMapperV6.toChangelogEntry(it) }
         }
 }
