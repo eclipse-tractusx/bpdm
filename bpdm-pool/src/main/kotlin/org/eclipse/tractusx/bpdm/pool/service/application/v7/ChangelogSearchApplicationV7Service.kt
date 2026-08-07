@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.ChangelogSearchRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.ChangelogParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.ChangelogResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.ChangelogParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.ChangelogSearchParser

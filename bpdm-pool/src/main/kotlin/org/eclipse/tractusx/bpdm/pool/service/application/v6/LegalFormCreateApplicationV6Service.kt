@@ -21,11 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalFormRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalFormRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalFormParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalFormResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalFormCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalFormCreateParser
@@ -39,9 +37,9 @@ import org.springframework.transaction.annotation.Transactional
 class LegalFormCreateApplicationV6Service(
     private val legalFormCreateParser: LegalFormCreateParser,
     private val legalFormCreateService: LegalFormCreateService,
-    private val legalFormRequestMapper: LegalFormRequestMapper,
-    private val legalFormParseErrorMapper: LegalFormParseErrorMapper,
-    private val legalFormResponseMapper: LegalFormResponseMapper
+    private val legalFormRequestMapperV6: LegalFormRequestMapperV6,
+    private val legalFormParseErrorMapperV6: LegalFormParseErrorMapperV6,
+    private val legalFormResponseMapperV6: LegalFormResponseMapperV6
 ) {
 
     /**
@@ -49,8 +47,8 @@ class LegalFormCreateApplicationV6Service(
      */
     @Transactional
     fun createLegalForm(legalForm: LegalFormRequestV6): LegalFormDtoV6 =
-        when (val parsed = legalFormCreateParser.parse(legalFormRequestMapper.toCreateRequest(legalForm.toV7()))) {
-            is ParseResult.Failure -> throw legalFormParseErrorMapper.toCreateException(parsed.errors)
-            is ParseResult.Success -> legalFormResponseMapper.toLegalForm(legalFormCreateService.create(parsed.parsed)).toV6Dto()
+        when (val parsed = legalFormCreateParser.parse(legalFormRequestMapperV6.toCreateRequest(legalForm))) {
+            is ParseResult.Failure -> throw legalFormParseErrorMapperV6.toCreateException(parsed.errors)
+            is ParseResult.Success -> legalFormResponseMapperV6.toLegalForm(legalFormCreateService.create(parsed.parsed))
         }
 }

@@ -20,11 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.IdentifierTypeRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.IdentifierTypeRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.IdentifierTypeResponseMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.IdentifierTypeParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.IdentifierTypeCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.IdentifierTypeCreateParser
@@ -38,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional
 class IdentifierTypeCreateApplicationV6Service(
     private val identifierTypeCreateParser: IdentifierTypeCreateParser,
     private val identifierTypeCreateService: IdentifierTypeCreateService,
-    private val identifierTypeRequestMapper: IdentifierTypeRequestMapper,
-    private val identifierTypeResponseMapper: IdentifierTypeResponseMapper,
+    private val identifierTypeRequestMapperV6: IdentifierTypeRequestMapperV6,
+    private val identifierTypeResponseMapperV6: IdentifierTypeResponseMapperV6,
     private val identifierTypeParseErrorMapper: IdentifierTypeParseErrorMapper
 ) {
 
@@ -48,8 +46,8 @@ class IdentifierTypeCreateApplicationV6Service(
      */
     @Transactional
     fun createIdentifierType(identifierType: IdentifierTypeDtoV6): IdentifierTypeDtoV6 =
-        when (val parsed = identifierTypeCreateParser.parse(identifierTypeRequestMapper.toCreateRequest(identifierType.toV7()))) {
+        when (val parsed = identifierTypeCreateParser.parse(identifierTypeRequestMapperV6.toCreateRequest(identifierType))) {
             is ParseResult.Failure -> throw identifierTypeParseErrorMapper.toCreateException(parsed.errors)
-            is ParseResult.Success -> identifierTypeResponseMapper.toIdentifierType(identifierTypeCreateService.create(parsed.parsed)).toV6()
+            is ParseResult.Success -> identifierTypeResponseMapperV6.toIdentifierType(identifierTypeCreateService.create(parsed.parsed))
         }
 }

@@ -26,10 +26,8 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressSearchRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressSearchRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressSearchParser
@@ -45,8 +43,8 @@ class AddressSearchApplicationV6Service(
     private val addressSearchParser: AddressSearchParser,
     private val legalEntityAddressSearchParser: LegalEntityAddressSearchParser,
     private val addressSearchService: AddressSearchService,
-    private val addressSearchRequestMapper: AddressSearchRequestMapper,
-    private val addressResponseMapper: AddressResponseMapper
+    private val addressSearchRequestMapperV6: AddressSearchRequestMapperV6,
+    private val addressResponseMapperV6: AddressResponseMapperV6
 ) {
 
     /**
@@ -54,14 +52,14 @@ class AddressSearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchAddresses(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toPageDto { addressResponseMapper.toInvariantAddress(it).toV6Dto() }
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toPageDto { addressResponseMapperV6.toAddress(it) }
 
     /**
      * Returns the requested page of addresses matching the given criteria, restricted to those of Catena-X members.
      */
     @Transactional(readOnly = true)
     fun searchMemberAddresses(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toPageDto { addressResponseMapper.toInvariantAddress(it).toV6Dto() }
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toPageDto { addressResponseMapperV6.toAddress(it) }
 
     /**
      * Returns the requested page of addresses that belong to the given legal entity directly instead of through one of
@@ -69,17 +67,17 @@ class AddressSearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchLegalEntityAddresses(bpnl: String, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> {
-        val criteria = when (val result = legalEntityAddressSearchParser.parse(addressSearchRequestMapper.toDirectAddressesRequest(bpnl))) {
+        val criteria = when (val result = legalEntityAddressSearchParser.parse(addressSearchRequestMapperV6.toDirectAddressesRequest(bpnl))) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmNotFoundException("Business Partner", bpnl)
         }
 
-        return addressSearchService.search(criteria, paginationRequest.toPageRequest()).toPageDto { addressResponseMapper.toInvariantAddress(it).toV6Dto() }
+        return addressSearchService.search(criteria, paginationRequest.toPageRequest()).toPageDto { addressResponseMapperV6.toAddress(it) }
     }
 
     private fun search(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         addressSearchService.search(
-            addressSearchParser.parse(addressSearchRequestMapper.toSearchRequest(searchRequest.toV7(), isDataSpaceParticipant)),
+            addressSearchParser.parse(addressSearchRequestMapperV6.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()
         )
 }

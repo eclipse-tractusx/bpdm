@@ -24,8 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AdministrativeAreaResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AdministrativeAreaResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.AdministrativeAreaSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AdministrativeAreaSearchApplicationV6Service(
     private val administrativeAreaSearchService: AdministrativeAreaSearchService,
-    private val administrativeAreaResponseMapper: AdministrativeAreaResponseMapper
+    private val administrativeAreaResponseMapperV6: AdministrativeAreaResponseMapperV6
 ) {
 
     /**
@@ -45,5 +44,5 @@ class AdministrativeAreaSearchApplicationV6Service(
     @Transactional(readOnly = true)
     fun searchAdministrativeAreas(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> =
         administrativeAreaSearchService.search(paginationRequest.toPageRequest())
-            .toPageDto { administrativeAreaResponseMapper.toCountrySubdivision(it).toV6() }
+            .toPageDto { administrativeAreaResponseMapperV6.toCountrySubdivision(it) }
 }

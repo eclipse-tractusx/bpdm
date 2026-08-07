@@ -23,11 +23,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierS
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnRequestIdentifierMappingDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.BpnSearchRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.BpnSearchParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.BpnSearchResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.BpnSearchRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.BpnSearchResponseMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.BpnSearchParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.BpnIdentifierSearchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.BpnRequestIdentifierSearchService
@@ -45,8 +43,8 @@ class BpnSearchApplicationV6Service(
     private val bpnRequestIdentifierSearchParser: BpnRequestIdentifierSearchParser,
     private val bpnIdentifierSearchService: BpnIdentifierSearchService,
     private val bpnRequestIdentifierSearchService: BpnRequestIdentifierSearchService,
-    private val bpnSearchRequestMapper: BpnSearchRequestMapper,
-    private val bpnSearchResponseMapper: BpnSearchResponseMapper,
+    private val bpnSearchRequestMapperV6: BpnSearchRequestMapperV6,
+    private val bpnSearchResponseMapperV6: BpnSearchResponseMapperV6,
     private val bpnSearchParseErrorMapper: BpnSearchParseErrorMapper
 ) {
 
@@ -55,10 +53,10 @@ class BpnSearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchBpnsByIdentifiers(searchRequest: IdentifiersSearchRequestV6): Set<BpnIdentifierMappingDtoV6> =
-        when (val criteria = bpnIdentifierSearchParser.parse(bpnSearchRequestMapper.toIdentifierSearchRequest(searchRequest.toV7()))) {
+        when (val criteria = bpnIdentifierSearchParser.parse(bpnSearchRequestMapperV6.toIdentifierSearchRequest(searchRequest))) {
             is ParseResult.Failure -> throw bpnSearchParseErrorMapper.toIdentifierSearchException(criteria.errors)
-            is ParseResult.Success -> bpnSearchResponseMapper.toIdentifierMappings(bpnIdentifierSearchService.search(criteria.parsed))
-                .map { it.toV6() }
+            is ParseResult.Success -> bpnSearchResponseMapperV6.toIdentifierMappings(bpnIdentifierSearchService.search(criteria.parsed))
+                .map { it }
                 .toSet()
         }
 
@@ -67,11 +65,11 @@ class BpnSearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchBpnsByRequestedIdentifiers(searchRequest: BpnRequestIdentifierSearchRequestV6): Set<BpnRequestIdentifierMappingDtoV6> =
-        when (val criteria = bpnRequestIdentifierSearchParser.parse(bpnSearchRequestMapper.toRequestIdentifierSearchRequest(searchRequest.toV7()))) {
+        when (val criteria = bpnRequestIdentifierSearchParser.parse(bpnSearchRequestMapperV6.toRequestIdentifierSearchRequest(searchRequest))) {
             is ParseResult.Failure -> throw bpnSearchParseErrorMapper.toRequestIdentifierSearchException(criteria.errors)
             is ParseResult.Success ->
-                bpnSearchResponseMapper.toRequestIdentifierMappings(bpnRequestIdentifierSearchService.search(criteria.parsed))
-                    .map { it.toV6() }
+                bpnSearchResponseMapperV6.toRequestIdentifierMappings(bpnRequestIdentifierSearchService.search(criteria.parsed))
+                    .map { it }
                     .toSet()
         }
 }

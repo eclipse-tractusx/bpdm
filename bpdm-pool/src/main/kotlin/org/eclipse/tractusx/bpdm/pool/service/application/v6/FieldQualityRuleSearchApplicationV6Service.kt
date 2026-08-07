@@ -21,8 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.FieldQualityRuleResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.FieldQualityRuleResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.FieldQualityRuleSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.FieldQualityRuleSearchParser
@@ -36,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 class FieldQualityRuleSearchApplicationV6Service(
     private val fieldQualityRuleSearchParser: FieldQualityRuleSearchParser,
     private val fieldQualityRuleSearchService: FieldQualityRuleSearchService,
-    private val fieldQualityRuleResponseMapper: FieldQualityRuleResponseMapper
+    private val fieldQualityRuleResponseMapperV6: FieldQualityRuleResponseMapperV6
 ) {
 
     /**
@@ -46,6 +45,6 @@ class FieldQualityRuleSearchApplicationV6Service(
     fun searchFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDtoV6> {
         val criteria = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))
 
-        return fieldQualityRuleSearchService.search(criteria).map { fieldQualityRuleResponseMapper.toFieldQualityRule(it).toV6() }
+        return fieldQualityRuleSearchService.search(criteria).map { fieldQualityRuleResponseMapperV6.toFieldQualityRule(it) }
     }
 }

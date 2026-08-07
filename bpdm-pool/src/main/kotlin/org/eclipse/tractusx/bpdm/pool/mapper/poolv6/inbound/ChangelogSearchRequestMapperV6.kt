@@ -17,25 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.model.request.ChangelogSearchRequest
 import org.springframework.stereotype.Component
 
 /**
- * Maps the changelog search parser's sealed parse errors to the errors the changelog endpoints report them with.
+ * Creates changelog search criteria from the v6 API search requests.
  */
 @Component
-class ChangelogParseErrorMapper {
+class ChangelogSearchRequestMapperV6 {
 
     /**
-     * Returns the exception reporting a failed changelog search parse, surfacing the first error because the search
-     * fails as a whole rather than per entry.
+     * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
+     * imposes.
      */
-    fun toSearchException(errors: List<ChangelogSearchParseError>): RuntimeException =
-        when (val error = errors.first()) {
-            is SearchValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
-        }
+    fun toSearchRequest(searchRequest: ChangelogSearchRequestV6, isDataSpaceParticipant: Boolean?): ChangelogSearchRequest =
+        ChangelogSearchRequest(
+            bpns = searchRequest.bpns,
+            businessPartnerTypes = searchRequest.businessPartnerTypes,
+            timestampAfter = searchRequest.timestampAfter,
+            isDataSpaceParticipant = isDataSpaceParticipant
+        )
 }

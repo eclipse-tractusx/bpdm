@@ -26,10 +26,8 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.IdentifierTypeRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.IdentifierTypeRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.IdentifierTypeResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.IdentifierTypeSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.IdentifierTypeSearchParser
 import org.springframework.stereotype.Service
@@ -42,8 +40,8 @@ import org.springframework.transaction.annotation.Transactional
 class IdentifierTypeSearchApplicationV6Service(
     private val identifierTypeSearchParser: IdentifierTypeSearchParser,
     private val identifierTypeSearchService: IdentifierTypeSearchService,
-    private val identifierTypeRequestMapper: IdentifierTypeRequestMapper,
-    private val identifierTypeResponseMapper: IdentifierTypeResponseMapper
+    private val identifierTypeRequestMapperV6: IdentifierTypeRequestMapperV6,
+    private val identifierTypeResponseMapperV6: IdentifierTypeResponseMapperV6
 ) {
 
     /**
@@ -55,9 +53,9 @@ class IdentifierTypeSearchApplicationV6Service(
         country: CountryCode?,
         paginationRequest: PaginationRequest
     ): PageDto<IdentifierTypeDtoV6> {
-        val criteria = identifierTypeSearchParser.parse(identifierTypeRequestMapper.toSearchRequest(businessPartnerType.toV7(), country))
+        val criteria = identifierTypeSearchParser.parse(identifierTypeRequestMapperV6.toSearchRequest(businessPartnerType, country))
 
         return identifierTypeSearchService.search(criteria, paginationRequest.toPageRequest())
-            .toPageDto { identifierTypeResponseMapper.toIdentifierType(it).toV6() }
+            .toPageDto { identifierTypeResponseMapperV6.toIdentifierType(it) }
     }
 }

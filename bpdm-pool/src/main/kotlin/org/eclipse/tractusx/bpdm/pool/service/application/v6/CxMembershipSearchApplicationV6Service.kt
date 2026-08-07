@@ -25,10 +25,8 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantSearchRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.DataSpaceParticipantResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.CxMembershipResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantSearchParser
 import org.springframework.stereotype.Service
@@ -41,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional
 class CxMembershipSearchApplicationV6Service(
     private val dataSpaceParticipantSearchParser: DataSpaceParticipantSearchParser,
     private val dataSpaceParticipantSearchService: DataSpaceParticipantSearchService,
-    private val dataSpaceParticipantSearchRequestMapper: DataSpaceParticipantSearchRequestMapper,
-    private val dataSpaceParticipantResponseMapper: DataSpaceParticipantResponseMapper
+    private val cxMembershipRequestMapperV6: CxMembershipRequestMapperV6,
+    private val cxMembershipResponseMapperV6: CxMembershipResponseMapperV6
 ) {
 
     /**
@@ -53,9 +51,9 @@ class CxMembershipSearchApplicationV6Service(
         searchRequest: CxMembershipSearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<CxMembershipDtoV6> {
-        val criteria = dataSpaceParticipantSearchParser.parse(dataSpaceParticipantSearchRequestMapper.toSearchRequest(searchRequest.toV7()))
+        val criteria = dataSpaceParticipantSearchParser.parse(cxMembershipRequestMapperV6.toSearchRequest(searchRequest))
 
         return dataSpaceParticipantSearchService.search(criteria, paginationRequest.toPageRequest())
-            .toPageDto { dataSpaceParticipantResponseMapper.toParticipant(it).toV6() }
+            .toPageDto { cxMembershipResponseMapperV6.toMembership(it) }
     }
 }

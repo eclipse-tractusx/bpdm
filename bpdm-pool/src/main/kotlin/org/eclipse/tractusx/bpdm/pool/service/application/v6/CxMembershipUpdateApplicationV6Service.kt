@@ -21,9 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantUpdateRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.DataSpaceParticipantParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantUpdateParser
@@ -37,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional
 class CxMembershipUpdateApplicationV6Service(
     private val dataSpaceParticipantUpdateParser: DataSpaceParticipantUpdateParser,
     private val dataSpaceParticipantUpdateService: DataSpaceParticipantUpdateService,
-    private val dataSpaceParticipantUpdateRequestMapper: DataSpaceParticipantUpdateRequestMapper,
+    private val cxMembershipRequestMapperV6: CxMembershipRequestMapperV6,
     private val dataSpaceParticipantParseErrorMapper: DataSpaceParticipantParseErrorMapper
 ) {
 
@@ -52,7 +51,7 @@ class CxMembershipUpdateApplicationV6Service(
         logger.info { "Update membership of ${updateRequest.memberships.size} legal entities" }
 
         parseAndExecuteAllOrNone(
-            dataSpaceParticipantUpdateRequestMapper.toUpdateRequests(updateRequest.toV7()),
+            cxMembershipRequestMapperV6.toUpdateRequests(updateRequest),
             dataSpaceParticipantUpdateParser::parse,
             dataSpaceParticipantParseErrorMapper::toUpdateException,
             dataSpaceParticipantUpdateService::update

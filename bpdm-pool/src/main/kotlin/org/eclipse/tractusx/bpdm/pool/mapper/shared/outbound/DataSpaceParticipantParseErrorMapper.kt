@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
+package org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmDuplicateRequestEntriesException

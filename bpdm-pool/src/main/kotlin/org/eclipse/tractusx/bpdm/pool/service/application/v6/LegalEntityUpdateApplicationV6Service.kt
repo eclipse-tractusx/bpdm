@@ -20,16 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6UpsertDto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityPayloadUpdateService
@@ -44,9 +42,9 @@ import org.springframework.transaction.annotation.Transactional
 class LegalEntityUpdateApplicationV6Service(
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
     private val legalEntityPayloadUpdateService: LegalEntityPayloadUpdateService,
-    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
-    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper,
-    private val legalEntityResponseMapper: LegalEntityResponseMapper
+    private val legalEntityDtoRequestMapperV6: LegalEntityDtoRequestMapperV6,
+    private val legalEntityParseErrorMapperV6: LegalEntityParseErrorMapperV6,
+    private val legalEntityResponseMapperV6: LegalEntityResponseMapperV6
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -60,17 +58,17 @@ class LegalEntityUpdateApplicationV6Service(
         logger.info { "Update ${requests.size} legal entities" }
 
         val requestList = requests.toList()
-        val updateRequests = requestList.map { legalEntityDtoRequestMapper.toUpdateRequest(it) }
+        val updateRequests = requestList.map { legalEntityDtoRequestMapperV6.toUpdateRequest(it) }
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDtoV6>()
-        val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
+        val errors = mutableListOf<ErrorInfoV6<LegalEntityUpdateErrorV6>>()
         requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed.value, request.bpnl).toV6UpsertDto())
-                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
+                is ParseResult.Success -> responses.add(legalEntityResponseMapperV6.toUpsertResponse(result.parsed.value, request.bpnl))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapperV6.toUpdateErrorInfo(it, request.bpnl) })
             }
         }
 
-        return LegalEntityPartnerUpdateResponseWrapperV6(responses, errors.map { it.toV6() })
+        return LegalEntityPartnerUpdateResponseWrapperV6(responses, errors)
     }
 }
