@@ -49,11 +49,17 @@ class UltimateOwnerResolutionService(
      * reaches no ultimate owner.
      */
     @Transactional(readOnly = true)
-    fun resolve(legalEntity: LegalEntityDb): String? =
-        mainOfAlternative(legalEntity)?.let { resolve(it) } ?: when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
+    fun resolve(legalEntity: LegalEntityDb): String? {
+        val alternativeMain = mainOfAlternative(legalEntity)
+        if (alternativeMain != null) {
+            return resolve(alternativeMain)
+        }
+
+        return when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
             is Resolution.UltimateOwner -> resolution.bpnl
             Resolution.CycleDetected -> null
         }
+    }
 
     /**
      * Resolves [legalEntities] and every entity owned by them, transitively — the set whose ultimate owner can change
