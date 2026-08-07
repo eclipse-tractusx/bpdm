@@ -50,7 +50,7 @@ class UltimateOwnerResolutionService(
      */
     @Transactional(readOnly = true)
     fun resolve(legalEntity: LegalEntityDb): String? =
-        when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
+        mainOfAlternative(legalEntity)?.let { resolve(it) } ?: when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
             is Resolution.UltimateOwner -> resolution.bpnl
             Resolution.CycleDetected -> null
         }
@@ -79,9 +79,26 @@ class UltimateOwnerResolutionService(
 
         resolved[legalEntity] = resolve(legalEntity)
 
+        if (mainOfAlternative(legalEntity) != null) {
+            return
+        }
+
+        currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
+            .forEach { alternativeRelation ->
+                val alternative = alternativeRelation.startNode
+                if (visited.add(alternative.bpn)) {
+                    resolved[alternative] = resolve(alternative)
+                }
+            }
+
         currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity))
             .forEach { collectWithDescendants(it.startNode, visited, resolved) }
     }
+
+    private fun mainOfAlternative(legalEntity: LegalEntityDb): LegalEntityDb? =
+        currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
+            .firstOrNull()
+            ?.endNode
 
     private fun resolveWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): Resolution {
         val currentBpn = legalEntity.bpn
