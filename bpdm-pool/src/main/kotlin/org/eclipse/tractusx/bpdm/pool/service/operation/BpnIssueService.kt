@@ -17,10 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntryDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpnInvalidCounterValueException
@@ -30,44 +29,43 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.pow
 
-
+/**
+ * The single authority for issuing BPNs: advances the stored counter of the requested business partner kind and turns
+ * each number it reserves into a check-summed BPN. Every BPN it hands back is new, so a caller that discards one leaves
+ * a permanent gap in the sequence.
+ */
 @Service
-class BpnIssuingService(
+class BpnIssueService(
     private val configurationEntryRepository: ConfigurationEntryRepository,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
-    private val bpnlPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}"
-    private val bpnsPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.siteChar}"
-    private val bpnAPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.addressChar}"
+    private val maxSupportedCount = bpnConfigProperties.alphabet.length.toDouble().pow(bpnConfigProperties.counterDigits).toLong()
 
+    /**
+     * Issues the given number of fresh legal entity BPNs, in the order they were reserved.
+     */
     @Transactional
     fun issueLegalEntityBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.legalEntityChar, bpnConfigProperties.counterKeyLegalEntities)
     }
 
+    /**
+     * Issues the given number of fresh address BPNs, in the order they were reserved.
+     */
     @Transactional
     fun issueAddressBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.addressChar, bpnConfigProperties.counterKeyAddresses)
     }
 
+    /**
+     * Issues the given number of fresh site BPNs, in the order they were reserved.
+     */
     @Transactional
     fun issueSiteBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.siteChar, bpnConfigProperties.counterKeySites)
     }
-
-    fun translateToBusinessPartnerType(bpn: String): BusinessPartnerType? {
-        return with(bpn) {
-            when {
-                startsWith(bpnlPrefix) -> BusinessPartnerType.LEGAL_ENTITY
-                startsWith(bpnsPrefix) -> BusinessPartnerType.SITE
-                startsWith(bpnAPrefix) -> BusinessPartnerType.ADDRESS
-                else -> null
-            }
-        }
-    }
-
 
     private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): List<String> {
         if (count == 0) return emptyList()
@@ -112,9 +110,8 @@ class BpnIssuingService(
         var currentDigit: Char
         val toBase = bpnConfigProperties.alphabet.length
 
-        val maxSupported = bpnConfigProperties.counterDigits.toDouble().pow(toBase).toLong()
-        if(count >= maxSupported)
-            throw BpnMaxNumberReachedException(maxSupported)
+        if(count >= maxSupportedCount)
+            throw BpnMaxNumberReachedException(maxSupportedCount)
 
         do{
             fitIn = remainingCount.floorDiv(toBase)

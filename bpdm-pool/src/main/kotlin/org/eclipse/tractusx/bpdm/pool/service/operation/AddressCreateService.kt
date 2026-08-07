@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -35,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class AddressCreateService(
-    private val bpnIssuingService: BpnIssuingService,
+    private val bpnIssueService: BpnIssueService,
     private val addressEntityMapper: AddressEntityMapper,
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
@@ -52,7 +51,7 @@ class AddressCreateService(
      * not-yet-persisted parent before handing them to [commit].
      */
     fun stageCreate(parsed: List<AddressCreateParsed>): List<PendingAddressWrite> {
-        val bpns = bpnIssuingService.issueAddressBpns(parsed.size)
+        val bpns = bpnIssueService.issueAddressBpns(parsed.size)
         return parsed.zip(bpns) { entry, bpn ->
             PendingAddressWrite(addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
         }
