@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
@@ -30,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipant
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.DataSpaceParticipantResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -56,6 +56,6 @@ class CxMembershipSearchApplicationV6Service(
         val criteria = dataSpaceParticipantSearchParser.parse(dataSpaceParticipantSearchRequestMapper.toSearchRequest(searchRequest.toV7()))
 
         return dataSpaceParticipantSearchService.search(criteria, paginationRequest.toPageRequest())
-            .toDto { dataSpaceParticipantResponseMapper.toParticipant(it).toV6() }
+            .toPageDto { dataSpaceParticipantResponseMapper.toParticipant(it).toV6() }
     }
 }

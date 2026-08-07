@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityAssociationFetchService
 import org.springframework.stereotype.Service
@@ -33,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class BusinessPartnerFetchService(
     private val legalEntityRepository: LegalEntityRepository,
-    private val legalEntityAssociationFetchService: LegalEntityAssociationFetchService
+    private val legalEntityAssociationFetchService: LegalEntityAssociationFetchService,
+    private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -56,6 +58,6 @@ class BusinessPartnerFetchService(
     @Transactional
     fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseDto> {
         logger.debug { "Executing fetchDtosByBpns() with parameters $bpns " }
-        return fetchByBpns(bpns).map { it.toLegalEntityWithLegalAddress() }
+        return fetchByBpns(bpns).map { legalEntityResponseMapper.toLegalEntityWithLegalAddress(it) }
     }
 }

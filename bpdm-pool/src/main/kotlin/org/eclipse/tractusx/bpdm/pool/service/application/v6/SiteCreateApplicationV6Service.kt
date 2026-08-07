@@ -26,11 +26,12 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWith
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6UpsertDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -52,6 +53,7 @@ class SiteCreateApplicationV6Service(
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
+    private val siteResponseMapper: SiteResponseMapper,
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
@@ -72,7 +74,7 @@ class SiteCreateApplicationV6Service(
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, request.index).toV6UpsertDto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }
@@ -132,7 +134,7 @@ class SiteCreateApplicationV6Service(
             .forEachIndexed { index, result ->
                 val entityKey = index.toString()
                 when (result) {
-                    is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(entityKey))
+                    is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, entityKey).toV6UpsertDto())
                     is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, entityKey) })
                 }
             }

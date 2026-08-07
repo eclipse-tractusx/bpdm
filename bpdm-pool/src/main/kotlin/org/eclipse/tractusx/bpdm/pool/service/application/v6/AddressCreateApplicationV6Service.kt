@@ -25,11 +25,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toCreateResponse
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6CreateResponse
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
@@ -46,7 +47,8 @@ class AddressCreateApplicationV6Service(
     private val untypedParentAddressCreateParser: UntypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val addressResponseMapper: AddressResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -69,7 +71,7 @@ class AddressCreateApplicationV6Service(
         val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
         requestList.zip(parseAndExecute(createRequests, untypedParentAddressCreateParser::parse, addressCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
+                is ParseResult.Success -> responses.add(addressResponseMapper.toCreateResponse(result.parsed, request.index).toV6CreateResponse())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }

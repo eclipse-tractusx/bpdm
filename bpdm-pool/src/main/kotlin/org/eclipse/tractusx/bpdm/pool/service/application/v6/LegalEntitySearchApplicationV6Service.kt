@@ -21,15 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6PoolDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntitySearchRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntitySearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntitySearchParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,7 +41,8 @@ import org.springframework.transaction.annotation.Transactional
 class LegalEntitySearchApplicationV6Service(
     private val legalEntitySearchParser: LegalEntitySearchParser,
     private val legalEntitySearchService: LegalEntitySearchService,
-    private val legalEntitySearchRequestMapper: LegalEntitySearchRequestMapper
+    private val legalEntitySearchRequestMapper: LegalEntitySearchRequestMapper,
+    private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
     /**
@@ -67,5 +69,5 @@ class LegalEntitySearchApplicationV6Service(
         legalEntitySearchService.search(
             legalEntitySearchParser.parse(legalEntitySearchRequestMapper.toSearchRequest(searchRequest.toV7(), isDataSpaceParticipant)),
             paginationRequest.toPageRequest()
-        ).toDto { it.toV6PoolDto() }
+        ).toPageDto { legalEntityResponseMapper.toLegalEntityWithLegalAddress(it).toV6PoolDto() }
 }

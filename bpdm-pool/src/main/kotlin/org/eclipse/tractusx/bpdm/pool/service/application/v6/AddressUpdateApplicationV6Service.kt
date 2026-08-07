@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
@@ -46,7 +47,8 @@ class AddressUpdateApplicationV6Service(
     private val addressUpdateParser: AddressUpdateParser,
     private val addressPayloadUpdateService: AddressPayloadUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val addressResponseMapper: AddressResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -70,7 +72,7 @@ class AddressUpdateApplicationV6Service(
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toV6Dto())
+                is ParseResult.Success -> responses.add(addressResponseMapper.toInvariantAddress(result.parsed.value).toV6Dto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })
             }
         }

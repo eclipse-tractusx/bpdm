@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6PoolDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityGetRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityGetService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityGetParser
@@ -34,7 +35,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityGetApplicationV6Service(
     private val legalEntityGetParser: LegalEntityGetParser,
-    private val legalEntityGetService: LegalEntityGetService
+    private val legalEntityGetService: LegalEntityGetService,
+    private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
     /**
@@ -46,6 +48,6 @@ class LegalEntityGetApplicationV6Service(
         val criteria = legalEntityGetParser.parse(LegalEntityGetRequest(identifierValue, identifierType))
         val legalEntity = legalEntityGetService.get(criteria) ?: throw BpdmNotFoundException("Legal Entity", identifierValue)
 
-        return legalEntity.toV6PoolDto()
+        return legalEntityResponseMapper.toLegalEntityWithLegalAddress(legalEntity).toV6PoolDto()
     }
 }

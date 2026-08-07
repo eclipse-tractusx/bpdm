@@ -21,10 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalFormSearchService
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalFormSearchApplicationV7Service(
-    private val legalFormSearchService: LegalFormSearchService
+    private val legalFormSearchService: LegalFormSearchService,
+    private val legalFormResponseMapper: LegalFormResponseMapper
 ) {
 
     /**
@@ -41,5 +43,5 @@ class LegalFormSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto> =
-        legalFormSearchService.search(paginationRequest.toPageRequest()).toDto { it.toDto() }
+        legalFormSearchService.search(paginationRequest.toPageRequest()).toPageDto { legalFormResponseMapper.toLegalForm(it) }
 }

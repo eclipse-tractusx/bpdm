@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteGetRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteGetService
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteGetParser
-import org.eclipse.tractusx.bpdm.pool.service.toPoolDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteGetApplicationV7Service(
     private val siteGetParser: SiteGetParser,
-    private val siteGetService: SiteGetService
+    private val siteGetService: SiteGetService,
+    private val siteResponseMapper: SiteResponseMapper
 ) {
 
     /**
@@ -45,6 +46,6 @@ class SiteGetApplicationV7Service(
         val criteria = siteGetParser.parse(SiteGetRequest(bpns))
         val site = siteGetService.get(criteria) ?: throw BpdmNotFoundException("Site", criteria.siteBpn)
 
-        return site.toPoolDto()
+        return siteResponseMapper.toSiteWithMainAddress(site)
     }
 }

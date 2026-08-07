@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v7
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
@@ -29,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.IdentifierTypeReques
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.IdentifierTypeSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.IdentifierTypeSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -56,6 +56,6 @@ class IdentifierTypeSearchApplicationV7Service(
         val criteria = identifierTypeSearchParser.parse(identifierTypeRequestMapper.toSearchRequest(businessPartnerType, country))
 
         return identifierTypeSearchService.search(criteria, paginationRequest.toPageRequest())
-            .toDto { identifierTypeResponseMapper.toIdentifierType(it) }
+            .toPageDto { identifierTypeResponseMapper.toIdentifierType(it) }
     }
 }

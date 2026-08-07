@@ -26,9 +26,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCre
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6UpsertDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
@@ -44,7 +45,8 @@ class LegalEntityCreateApplicationV6Service(
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
-    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
+    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper,
+    private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -64,7 +66,7 @@ class LegalEntityCreateApplicationV6Service(
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
         requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed, request.index).toV6UpsertDto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }

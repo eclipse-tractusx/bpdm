@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
@@ -45,4 +46,10 @@ class IdentifierTypeResponseMapper {
             categories = identifierType.categories.toSortedSet(),
             details = identifierType.details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) }
         )
+
+    /**
+     * Returns the given identifier type as the key/name pair by which identifiers reference their type.
+     */
+    fun toTypeKeyName(identifierType: IdentifierTypeDb): TypeKeyNameVerboseDto<String> =
+        TypeKeyNameVerboseDto(identifierType.technicalKey, identifierType.name)
 }

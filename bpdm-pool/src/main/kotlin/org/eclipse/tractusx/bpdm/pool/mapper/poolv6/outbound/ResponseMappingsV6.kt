@@ -19,122 +19,110 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.service.getAddressType
-import org.eclipse.tractusx.bpdm.pool.service.mainSite
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 
-/**
- * DB → `api.v6.model` DTO mappers. Aggregate shapes are named `toV6Dto`, not `toDto`, on purpose: the reused leaf value
- * mappers from `service.ResponseMappings` also declare `toDto` for the current API, so the distinct name keeps the two
- * versions unambiguous where both are in scope.
+/*
+ * Aggregate-level translation of the v7 API response DTOs into their v6 counterparts, on top of the leaf converters in
+ * V6DtoConverters. The v6 controllers reach the stored data through the v7 response mappers and convert here, so v6
+ * response shaping stays a translation of the current API rather than a second mapping of the entities.
  */
 
-fun LogisticAddressDb.toV6Dto(): LogisticAddressVerboseDtoV6 {
-    return LogisticAddressVerboseDtoV6(
-        bpna = bpn,
-        bpnLegalEntity = legalEntity?.bpn,
-        bpnSite = mainSite?.bpn,
+fun LogisticAddressInvariantVerboseDto.toV6Dto(): LogisticAddressVerboseDtoV6 =
+    LogisticAddressVerboseDtoV6(
+        bpna = bpna,
+        bpnLegalEntity = bpnLegalEntity,
+        bpnSite = bpnSite,
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,
-        states = states.map { it.toDto().toV6() },
-        identifiers = identifiers.map { it.toDto().toV6() },
-        physicalPostalAddress = physicalPostalAddress.toDto().toV6(),
-        alternativePostalAddress = alternativePostalAddress?.toDto()?.toV6(),
-        confidenceCriteria = confidenceCriteria.toDto().toV6(),
-        isCatenaXMemberData = legalEntity?.isDataSpaceParticipant ?: mainSite?.legalEntity?.isDataSpaceParticipant ?: false,
-        addressType = getAddressType(this)
+        states = states.map { it.toV6() },
+        identifiers = identifiers.map { it.toV6() },
+        physicalPostalAddress = physicalPostalAddress.toV6(),
+        alternativePostalAddress = alternativePostalAddress?.toV6(),
+        confidenceCriteria = confidenceCriteria.toV6(),
+        isCatenaXMemberData = isParticipantData,
+        addressType = addressType
     )
-}
 
-fun SiteDb.toV6PoolDto(): SiteWithMainAddressVerboseDtoV6 {
-    return SiteWithMainAddressVerboseDtoV6(
-        site = toV6Dto(),
+fun SiteWithMainAddressVerboseDto.toV6PoolDto(): SiteWithMainAddressVerboseDtoV6 =
+    SiteWithMainAddressVerboseDtoV6(
+        site = site.toV6Dto(),
         mainAddress = mainAddress.toV6Dto()
     )
-}
 
-fun SiteDb.toV6Dto(): SiteVerboseDtoV6 {
-    return SiteVerboseDtoV6(
-        bpn,
+fun SiteVerboseDto.toV6Dto(): SiteVerboseDtoV6 =
+    SiteVerboseDtoV6(
+        bpns,
         name,
-        states = states.map { it.toDto().toV6() },
-        bpnLegalEntity = legalEntity.bpn,
-        confidenceCriteria = confidenceCriteria.toDto().toV6(),
-        isCatenaXMemberData = legalEntity.isDataSpaceParticipant,
+        states = states.map { it.toV6() },
+        bpnLegalEntity = bpnLegalEntity,
+        confidenceCriteria = confidenceCriteria.toV6(),
+        isCatenaXMemberData = isParticipantData,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
-}
 
-fun LegalEntityDb.toV6PoolDto(): LegalEntityWithLegalAddressVerboseDtoV6 {
-    return LegalEntityWithLegalAddressVerboseDtoV6(
-        legalEntity = toV6Dto(),
+fun LegalEntityWithLegalAddressVerboseDto.toV6PoolDto(): LegalEntityWithLegalAddressVerboseDtoV6 =
+    LegalEntityWithLegalAddressVerboseDtoV6(
+        legalEntity = header.toV6Dto(),
         legalAddress = legalAddress.toV6Dto()
     )
-}
 
-fun LegalEntityDb.toV6Dto(): LegalEntityVerboseDtoV6 {
-    return LegalEntityVerboseDtoV6(
-        bpnl = bpn,
-        legalName = legalName.value,
-        legalShortName = legalName.shortName,
-        legalFormVerbose = legalForm?.toV6Dto(),
-        identifiers = identifiers.map { it.toDto().toV6() },
-        states = states.map { it.toDto().toV6() },
-        relations = startNodeRelations.plus(endNodeRelations).map { it.toV6Dto() },
+fun LegalEntityHeaderVerboseDto.toV6Dto(): LegalEntityVerboseDtoV6 =
+    LegalEntityVerboseDtoV6(
+        bpnl = bpnl,
+        legalName = legalName,
+        legalShortName = legalShortName,
+        legalFormVerbose = legalFormVerbose?.toV6Dto(),
+        identifiers = identifiers.map { it.toV6() },
+        states = states.map { it.toV6() },
+        relations = relations.map { it.toV6Dto() },
         currentness = currentness,
-        confidenceCriteria = confidenceCriteria.toDto().toV6(),
-        isCatenaXMemberData = isDataSpaceParticipant,
+        confidenceCriteria = confidenceCriteria.toV6(),
+        isCatenaXMemberData = isParticipantData,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
-}
 
-fun LegalFormDb.toV6Dto(): LegalFormDtoV6 {
-    return LegalFormDtoV6(
+fun LegalFormDto.toV6Dto(): LegalFormDtoV6 =
+    LegalFormDtoV6(
         technicalKey = technicalKey,
         name = name,
         transliteratedName = transliteratedName,
-        abbreviation = abbreviation,
+        abbreviation = abbreviations,
         transliteratedAbbreviations = transliteratedAbbreviations,
-        country = countryCode,
-        language = languageCode,
-        administrativeAreaLevel1 = administrativeArea?.regionCode,
+        country = country,
+        language = language,
+        administrativeAreaLevel1 = administrativeAreaLevel1,
         isActive = isActive
     )
-}
 
-private fun RelationDb.toV6Dto(): RelationVerboseDtoV6 {
-    return RelationVerboseDtoV6(type.toV6(), startNode.bpn, endNode.bpn)
-}
+private fun RelationVerboseDto.toV6Dto(): RelationVerboseDtoV6 =
+    RelationVerboseDtoV6(type.toV6(), businessPartnerSourceBpnl, businessPartnerTargetBpnl)
 
-fun LogisticAddressDb.toCreateResponse(index: String?): AddressPartnerCreateVerboseDtoV6 {
-    return AddressPartnerCreateVerboseDtoV6(
-        address = toV6Dto(),
+fun AddressPartnerCreateVerboseDto.toV6CreateResponse(): AddressPartnerCreateVerboseDtoV6 =
+    AddressPartnerCreateVerboseDtoV6(
+        address = address.toV6Dto(),
         index = index
     )
-}
 
-fun SiteDb.toUpsertDto(entryId: String?): SitePartnerCreateVerboseDtoV6 {
-    return SitePartnerCreateVerboseDtoV6(
-        site = toV6Dto(),
+fun SitePartnerCreateVerboseDto.toV6UpsertDto(): SitePartnerCreateVerboseDtoV6 =
+    SitePartnerCreateVerboseDtoV6(
+        site = site.toV6Dto(),
         mainAddress = mainAddress.toV6Dto(),
-        index = entryId
+        index = index
     )
-}
 
-fun LegalEntityDb.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDtoV6 {
-    return LegalEntityPartnerCreateVerboseDtoV6(
-        legalEntity = toV6Dto(),
-        legalAddress = legalAddress.toV6Dto(),
-        index = entryId
+fun LegalEntityPartnerCreateVerboseDto.toV6UpsertDto(): LegalEntityPartnerCreateVerboseDtoV6 =
+    LegalEntityPartnerCreateVerboseDtoV6(
+        legalEntity = legalEntity.header.toV6Dto(),
+        legalAddress = legalEntity.legalAddress.toV6Dto(),
+        index = index
     )
-}

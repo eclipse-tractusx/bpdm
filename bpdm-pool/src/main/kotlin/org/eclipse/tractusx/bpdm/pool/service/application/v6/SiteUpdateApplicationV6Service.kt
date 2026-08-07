@@ -25,11 +25,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6UpsertDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.SitePayloadUpdateService
@@ -45,7 +46,8 @@ class SiteUpdateApplicationV6Service(
     private val siteUpdateParser: SiteUpdateParser,
     private val sitePayloadUpdateService: SitePayloadUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
-    private val siteParseErrorMapper: SiteParseErrorMapper
+    private val siteParseErrorMapper: SiteParseErrorMapper,
+    private val siteResponseMapper: SiteResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -65,7 +67,7 @@ class SiteUpdateApplicationV6Service(
         val errors = mutableListOf<ErrorInfo<SiteUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, siteUpdateParser::parse, sitePayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpns))
+                is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed.value, request.bpns).toV6UpsertDto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toUpdateErrorInfo(it, request.bpns) })
             }
         }

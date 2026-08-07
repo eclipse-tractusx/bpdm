@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AdministrativeAreaResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.AdministrativeAreaSearchService
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -45,5 +45,5 @@ class AdministrativeAreaSearchApplicationV6Service(
     @Transactional(readOnly = true)
     fun searchAdministrativeAreas(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> =
         administrativeAreaSearchService.search(paginationRequest.toPageRequest())
-            .toDto { administrativeAreaResponseMapper.toCountrySubdivision(it).toV6() }
+            .toPageDto { administrativeAreaResponseMapper.toCountrySubdivision(it).toV6() }
 }
