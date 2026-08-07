@@ -21,5 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 enum class TriggerEventType {
     ReplacedAddress,
-    OwnershipValidityBoundary
+    OwnershipValidityBoundary,
+    AlternativeHeadquarterValidityBoundary
 }
