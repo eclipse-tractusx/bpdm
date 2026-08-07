@@ -1602,8 +1602,10 @@ class TaskResolutionServiceTest @Autowired constructor(
         val main = createLegalEntity("BPNL_MAIN_RES")
         val owner = createLegalEntity("BPNL_OWNER_RES")
 
-        createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
-        createIsOwnedByRelation(main.legalEntity.header.bpnl, owner.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+            createIsOwnedByRelation(main.legalEntity.header.bpnl, owner.legalEntity.header.bpnl)
+        }
 
         val ownerEntity = legalEntityRepository.findByBpnIgnoreCase(owner.legalEntity.header.bpnl)!!
         ownerEntity.ownershipUltimate = true
@@ -1618,7 +1620,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val alternative = createLegalEntity("BPNL_ALT_FLAG")
         val main = createLegalEntity("BPNL_MAIN_FLAG")
 
-        createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        }
 
         val mainEntity = legalEntityRepository.findByBpnIgnoreCase(main.legalEntity.header.bpnl)!!
         mainEntity.ownershipUltimate = true
@@ -1634,7 +1638,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val alternative = createLegalEntity("BPNL_ALT_NULL")
         val main = createLegalEntity("BPNL_MAIN_NULL")
 
-        createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        }
 
         val alternativeEntity = legalEntityRepository.findByBpnIgnoreCase(alternative.legalEntity.header.bpnl)!!
         assertThat(ultimateOwnerResolutionService.resolve(alternativeEntity)).isNull()
@@ -1646,8 +1652,10 @@ class TaskResolutionServiceTest @Autowired constructor(
         val main = createLegalEntity("BPNL_MAIN_STALE")
         val staleOwner = createLegalEntity("BPNL_OWNER_STALE")
 
-        createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
-        createIsOwnedByRelation(alternative.legalEntity.header.bpnl, staleOwner.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+            createIsOwnedByRelation(alternative.legalEntity.header.bpnl, staleOwner.legalEntity.header.bpnl)
+        }
 
         val staleOwnerEntity = legalEntityRepository.findByBpnIgnoreCase(staleOwner.legalEntity.header.bpnl)!!
         staleOwnerEntity.ownershipUltimate = true
@@ -1708,8 +1716,10 @@ class TaskResolutionServiceTest @Autowired constructor(
         val main = createLegalEntity("BPNL_MAIN_ALT")
         val owner = createLegalEntity("BPNL_OWNER_ALT")
 
-        createIsAlternativeHeadquarterRelation(alternativeOne.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
-        createIsAlternativeHeadquarterRelation(alternativeTwo.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(alternativeOne.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+            createIsAlternativeHeadquarterRelation(alternativeTwo.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        }
         createIsOwnedByRelationViaService(main.legalEntity.header.bpnl, owner.legalEntity.header.bpnl)
 
         val ownerEntity = legalEntityRepository.findByBpnIgnoreCase(owner.legalEntity.header.bpnl)!!
@@ -2029,8 +2039,10 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         createIsOwnedByRelationViaService(child.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
         createIsOwnedByRelationViaService(grandChild.legalEntity.header.bpnl, child.legalEntity.header.bpnl)
-        createIsAlternativeHeadquarterRelation(parentAlternative.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
-        createIsAlternativeHeadquarterRelation(childAlternative.legalEntity.header.bpnl, child.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(parentAlternative.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+            createIsAlternativeHeadquarterRelation(childAlternative.legalEntity.header.bpnl, child.legalEntity.header.bpnl)
+        }
 
         val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
         parentDb.ownershipUltimate = true
@@ -2057,7 +2069,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val alternative = createLegalEntity("BPNL_ALT_NOOP")
         val main = createLegalEntity("BPNL_MAIN_NOOP")
 
-        createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        transactionTemplate.execute {
+            createIsAlternativeHeadquarterRelation(alternative.legalEntity.header.bpnl, main.legalEntity.header.bpnl)
+        }
 
         val mainDb = legalEntityRepository.findByBpnIgnoreCase(main.legalEntity.header.bpnl)!!
         mainDb.ownershipUltimate = true
