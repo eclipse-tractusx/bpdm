@@ -65,6 +65,7 @@ class LegalEntityParseErrorMapperV6(
             is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityUpdateErrorInfo(error, entityKey)
             // A v6 write never sets the ownership flag, so the uniqueness rule it guards cannot be broken from v6.
             is MultipleUltimateOwnersInHierarchy -> throw internalError(error)
+            is AlternativeHeadquarterCannotOwnUltimately -> throw internalError(error)
             // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
             // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
             is ScriptVariantCoverageStillNeeded -> throw internalError(error)
