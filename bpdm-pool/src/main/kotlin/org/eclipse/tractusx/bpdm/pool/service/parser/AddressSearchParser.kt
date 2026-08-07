@@ -30,21 +30,20 @@ import org.springframework.stereotype.Service
  * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
 @Service
-class AddressSearchParser {
+class AddressSearchParser(
+    private val bpnFilterParser: BpnFilterParser
+) {
 
     /**
      * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
      */
     fun parse(request: AddressSearchRequest): AddressSearchParsed =
         AddressSearchParsed(
-            addressBpns = normalizeBpns(request.addressBpns),
-            siteBpns = normalizeBpns(request.siteBpns),
-            legalEntityBpns = normalizeBpns(request.legalEntityBpns),
+            addressBpns = bpnFilterParser.parse(request.addressBpns),
+            siteBpns = bpnFilterParser.parse(request.siteBpns),
+            legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
             name = request.name?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData,
+            isDataSpaceParticipant = request.isDataSpaceParticipant,
             excludesSiteAddresses = request.excludesSiteAddresses
         )
-
-    private fun normalizeBpns(bpns: List<String>): List<String> =
-        bpns.filter { it.isNotBlank() }.map { it.uppercase() }
 }

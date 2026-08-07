@@ -67,15 +67,15 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<PartnerChangelogEntryDb> { root, query, builder ->
-                isCatenaXMemberData?.let {
+                isDataSpaceParticipant?.let {
                     val legalEntitySubquery = query!!.subquery(PartnerChangelogEntryDb::class.java)
                     val changelogSubRoot = legalEntitySubquery.from(PartnerChangelogEntryDb::class.java)
                     val legalEntitySubRoot = legalEntitySubquery.from(LegalEntityDb::class.java)
                     legalEntitySubquery.select(changelogSubRoot)
                     legalEntitySubquery.where( builder.and(
-                        builder.equal(legalEntitySubRoot.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData),
+                        builder.equal(legalEntitySubRoot.get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant),
                         builder.equal(changelogSubRoot.get<String>("bpn"), legalEntitySubRoot.get<String>("bpn")),
                     ))
 
@@ -85,7 +85,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
                     val sSiteSubRoot = siteSubquery.from(SiteDb::class.java)
                     siteSubquery.select(chSiteSubRoot)
                     siteSubquery.where( builder.and(
-                        builder.equal(lSiteSubRoot.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData),
+                        builder.equal(lSiteSubRoot.get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant),
                         builder.equal(chSiteSubRoot.get<String>("bpn"), sSiteSubRoot.get<String>("bpn")),
                         builder.equal(sSiteSubRoot.get<LegalEntityDb>(SiteDb::legalEntity.name), lSiteSubRoot),
                     ))
@@ -96,7 +96,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
                     val sAddressSubRoot = addressSubquery.from(LogisticAddressDb::class.java)
                     addressSubquery.select(chAddressSubRoot)
                     addressSubquery.where( builder.and(
-                        builder.equal(lAddressSubRoot.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData),
+                        builder.equal(lAddressSubRoot.get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant),
                         builder.equal(chAddressSubRoot.get<String>("bpn"), sAddressSubRoot.get<String>("bpn")),
                         builder.equal(sAddressSubRoot.get<LegalEntityDb>(LogisticAddressDb::legalEntity.name), lAddressSubRoot),
                     ))

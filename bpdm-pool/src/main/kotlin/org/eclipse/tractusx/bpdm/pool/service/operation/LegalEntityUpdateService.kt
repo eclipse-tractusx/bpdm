@@ -25,17 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.NameDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
-import org.eclipse.tractusx.bpdm.pool.model.update.orKeep
+import org.eclipse.tractusx.bpdm.pool.model.update.*
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalEntityUpdateService(
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
     private val addressUpdateService: AddressUpdateService,
     private val legalEntityEntityMapper: LegalEntityEntityMapper,
     private val repository: LegalEntityRepository,
@@ -84,12 +76,57 @@ class LegalEntityUpdateService(
     }
 
     private fun updateHeader(request: LegalEntityUpdate): UpsertResult<LegalEntityDb> {
-        val before = equivalenceMapper.toEquivalenceDto(request.legalEntity)
+        // The verdict is taken before the change is applied, but the change is applied either way: `currentness` does
+        // not count towards the verdict yet must still be restamped.
+        val changed = willChange(request.legalEntity, request.header)
         applyHeader(request.legalEntity, request.header)
-        val hasChanged = equivalenceMapper.toEquivalenceDto(request.legalEntity) != before
 
-        return UpsertResult(request.legalEntity, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
+        return UpsertResult(request.legalEntity, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
+
+    /**
+     * Reports whether applying the given change would leave the legal entity's own fields different from how they stand
+     * now; the legal address answers for itself.
+     *
+     * Each field is compared as the value [applyHeader] would write, built through the same entity mapper so the two
+     * cannot drift apart. Stored entities a field points at — legal forms, identifier types, script codes — are compared
+     * by their technical key rather than by reference, because navigating to one can yield a lazy proxy while the parsed
+     * value holds the initialised instance.
+     *
+     * `currentness` is deliberately absent: the Pool restamps it on every task resolution, so counting it would emit a
+     * changelog for every touch and keep the golden record process rediscovering its own writes.
+     */
+    private fun willChange(target: LegalEntityDb, header: LegalEntityHeaderUpdate): Boolean {
+        header.legalName.ifSet { if (it != target.legalName.value) return true }
+        header.legalShortName.ifSet { if (it != target.legalName.shortName) return true }
+        header.legalForm.ifSet { if (it?.technicalKey != target.legalForm?.technicalKey) return true }
+        header.confidenceCriteria.ifSet {
+            if (legalEntityEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+        }
+        header.isDataSpaceParticipant.ifSet { if (it != target.isDataSpaceParticipant) return true }
+        header.ownershipUltimate.ifSet { if (it != target.ownershipUltimate) return true }
+        header.ultimateOwnerBpnl.ifSet { if (it != target.ultimateOwnerBpnl) return true }
+        header.identifiers.ifSet {
+            if (identifierKeys(legalEntityEntityMapper.toIdentifiers(it, target)) != identifierKeys(target.identifiers)) return true
+        }
+        header.states.ifSet {
+            if (stateKeys(legalEntityEntityMapper.toStates(it, target)) != stateKeys(target.states)) return true
+        }
+        header.scriptVariants.ifSet {
+            if (scriptVariantKeys(legalEntityEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+        }
+
+        return false
+    }
+
+    private fun identifierKeys(identifiers: Collection<LegalEntityIdentifierDb>): Set<Any?> =
+        identifiers.map { listOf(it.value, it.type.technicalKey, it.issuingBody) }.toSet()
+
+    private fun stateKeys(states: Collection<LegalEntityStateDb>): Set<Any?> =
+        states.map { listOf(it.validFrom, it.validTo, it.type) }.toSet()
+
+    private fun scriptVariantKeys(variants: Collection<LegalEntityScriptVariantDb>): Set<Any?> =
+        variants.map { listOf(it.scriptCode.technicalKey, it.legalName, it.shortName) }.toSet()
 
     private fun applyHeader(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
@@ -97,7 +134,7 @@ class LegalEntityUpdateService(
         applyLegalName(target, header)
         header.legalForm.ifSet { target.legalForm = it }
         header.confidenceCriteria.ifSet { target.confidenceCriteria = legalEntityEntityMapper.toConfidence(it, numberOfSharingMembers) }
-        header.isCatenaXMemberData.ifSet { target.isCatenaXMemberData = it }
+        header.isDataSpaceParticipant.ifSet { target.isDataSpaceParticipant = it }
         header.ownershipUltimate.ifSet { target.ownershipUltimate = it }
         header.ultimateOwnerBpnl.ifSet { target.ultimateOwnerBpnl = it }
         header.currentness.ifSet { target.currentness = it }

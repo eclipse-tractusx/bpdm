@@ -20,19 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
 import org.springframework.stereotype.Service
@@ -45,8 +42,9 @@ import org.springframework.transaction.annotation.Transactional
 class AddressUpdateApplicationV6Service(
     private val addressUpdateParser: AddressUpdateParser,
     private val addressPayloadUpdateService: AddressPayloadUpdateService,
-    private val addressDtoRequestMapper: AddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressDtoRequestMapperV6: AddressDtoRequestMapperV6,
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6,
+    private val addressResponseMapperV6: AddressResponseMapperV6
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -60,21 +58,17 @@ class AddressUpdateApplicationV6Service(
         logger.info { "Update ${requests.size} business partner addresses" }
 
         val requestList = requests.toList()
-        val updateRequests = requestList.map {
-            // v6 has no script variants and an update replaces the full list, so a v6 update drops the script variants
-            // the address may have gained through v7 or the task path.
-            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address.toV7(), emptyList()))
-        }
+        val updateRequests = requestList.map { addressDtoRequestMapperV6.toUpdateRequest(it) }
 
         val responses = mutableListOf<LogisticAddressVerboseDtoV6>()
-        val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
+        val errors = mutableListOf<ErrorInfoV6<AddressUpdateErrorV6>>()
         requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toV6Dto())
-                is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })
+                is ParseResult.Success -> responses.add(addressResponseMapperV6.toAddress(result.parsed.value))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapperV6.toUpdateErrorInfo(it, request.bpna) })
             }
         }
 
-        return AddressPartnerUpdateResponseWrapperV6(responses, errors.map { it.toV6() })
+        return AddressPartnerUpdateResponseWrapperV6(responses, errors)
     }
 }

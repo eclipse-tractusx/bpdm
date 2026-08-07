@@ -24,6 +24,6 @@ data class AddressSearchRequest(
     val siteBpns: List<String>,
     val legalEntityBpns: List<String>,
     val name: String?,
-    val isCatenaXMemberData: Boolean?,
+    val isDataSpaceParticipant: Boolean?,
     val excludesSiteAddresses: Boolean
 )

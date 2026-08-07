@@ -30,15 +30,17 @@ import org.springframework.stereotype.Service
  * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
 @Service
-class LegalEntitySearchParser {
+class LegalEntitySearchParser(
+    private val bpnFilterParser: BpnFilterParser
+) {
 
     /**
      * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
      */
     fun parse(request: LegalEntitySearchRequest): LegalEntitySearchParsed =
         LegalEntitySearchParsed(
-            legalEntityBpns = request.legalEntityBpns.filter { it.isNotBlank() }.map { it.uppercase() },
+            legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
             legalName = request.legalName?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData
+            isDataSpaceParticipant = request.isDataSpaceParticipant
         )
 }

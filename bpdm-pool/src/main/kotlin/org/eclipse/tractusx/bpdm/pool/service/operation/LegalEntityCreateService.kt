@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,7 +43,7 @@ import java.time.temporal.ChronoUnit
 class LegalEntityCreateService(
     private val addressCreateService: AddressCreateService,
     private val legalEntityEntityMapper: LegalEntityEntityMapper,
-    private val bpnIssuingService: BpnIssuingService,
+    private val bpnIssueService: BpnIssueService,
     private val changelogService: PartnerChangelogService,
     private val legalEntityRepository: LegalEntityRepository
 ) {
@@ -70,7 +69,7 @@ class LegalEntityCreateService(
     }
 
     private fun createHeaders(headers: List<LegalEntityHeaderParsed>): List<LegalEntityDb>{
-        val bpns = bpnIssuingService.issueLegalEntityBpns(headers.size)
+        val bpns = bpnIssueService.issueLegalEntityBpns(headers.size)
         val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
         // A just-issued BPNL cannot be referenced by any ownership relation yet — relations are written through their own
         // path — so a new entity has no ultimate owner above it and keeps the mapper's null. No recalculation needed.

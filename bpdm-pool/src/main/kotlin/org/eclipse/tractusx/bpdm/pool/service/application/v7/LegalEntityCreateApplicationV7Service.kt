@@ -27,11 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreat
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.toUpsertDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,7 +43,8 @@ class LegalEntityCreateApplicationV7Service(
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
-    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
+    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper,
+    private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -63,7 +64,7 @@ class LegalEntityCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
         requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }

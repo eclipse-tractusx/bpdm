@@ -20,17 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -50,8 +48,9 @@ class SiteCreateApplicationV6Service(
     private val siteCreateService: SiteCreateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
-    private val siteDtoRequestMapper: SiteDtoRequestMapper,
-    private val siteParseErrorMapper: SiteParseErrorMapper,
+    private val siteDtoRequestMapperV6: SiteDtoRequestMapperV6,
+    private val siteParseErrorMapperV6: SiteParseErrorMapperV6,
+    private val siteResponseMapperV6: SiteResponseMapperV6,
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
@@ -66,18 +65,18 @@ class SiteCreateApplicationV6Service(
         logger.info { "Create ${requests.size} new sites" }
 
         val requestList = requests.toList()
-        val createRequests = requestList.map { siteDtoRequestMapper.toCreateRequest(it.toV7()) }
+        val createRequests = requestList.map { siteDtoRequestMapperV6.toCreateRequest(it) }
 
         val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
-        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
         requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
+                is ParseResult.Success -> responses.add(siteResponseMapperV6.toUpsertResponse(result.parsed, request.index))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapperV6.toCreateErrorInfo(it, request.index) })
             }
         }
 
-        return SitePartnerCreateResponseWrapperV6(responses, errors.map { it.toV6() })
+        return SitePartnerCreateResponseWrapperV6(responses, errors)
     }
 
     /**
@@ -95,15 +94,15 @@ class SiteCreateApplicationV6Service(
         val legalEntitiesByBpn = legalEntityRepository.findDistinctByBpnIn(requestList.map { it.bpnLParent }).associateBy { it.bpn }
 
         val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
-        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
 
         val validRequests = requestList.filter { request ->
             val legalEntity = legalEntitiesByBpn[request.bpnLParent]
             when {
                 legalEntity == null -> {
                     errors.add(
-                        ErrorInfo(
-                            SiteCreateError.LegalEntityNotFound,
+                        ErrorInfoV6(
+                            SiteCreateErrorV6.LegalEntityNotFound,
                             "Parent ${request.bpnLParent} not found for site to create",
                             request.bpnLParent
                         )
@@ -113,8 +112,8 @@ class SiteCreateApplicationV6Service(
 
                 legalEntity.legalAddress.sites.isNotEmpty() -> {
                     errors.add(
-                        ErrorInfo(
-                            SiteCreateError.MainAddressDuplicateIdentifier,
+                        ErrorInfoV6(
+                            SiteCreateErrorV6.MainAddressDuplicateIdentifier,
                             "Can't create site for legal entity ${request.bpnLParent} with legal address as site main address: " +
                                     "Legal address already belongs to site ${legalEntity.legalAddress.sites.first().bpn}",
                             request.name
@@ -127,16 +126,16 @@ class SiteCreateApplicationV6Service(
             }
         }
 
-        val createRequests = validRequests.map { siteDtoRequestMapper.toCreateWithLegalAddressAsMainRequest(it.toV7()) }
+        val createRequests = validRequests.map { siteDtoRequestMapperV6.toCreateWithLegalAddressAsMainRequest(it) }
         parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create)
             .forEachIndexed { index, result ->
                 val entityKey = index.toString()
                 when (result) {
-                    is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(entityKey))
-                    is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, entityKey) })
+                    is ParseResult.Success -> responses.add(siteResponseMapperV6.toUpsertResponse(result.parsed, entityKey))
+                    is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapperV6.toCreateErrorInfo(it, entityKey) })
                 }
             }
 
-        return SitePartnerCreateResponseWrapperV6(responses, errors.map { it.toV6() })
+        return SitePartnerCreateResponseWrapperV6(responses, errors)
     }
 }

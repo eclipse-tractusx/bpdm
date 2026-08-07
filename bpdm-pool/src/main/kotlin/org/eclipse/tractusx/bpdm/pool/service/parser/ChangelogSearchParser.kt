@@ -32,7 +32,8 @@ import org.springframework.stereotype.Service
  */
 @Service
 class ChangelogSearchParser(
-    private val controllerConfigProperties: ControllerConfigProperties
+    private val controllerConfigProperties: ControllerConfigProperties,
+    private val bpnFilterParser: BpnFilterParser
 ) {
 
     /**
@@ -47,10 +48,10 @@ class ChangelogSearchParser(
 
         return ParseResult.Success(
             ChangelogSearchParsed(
-                bpns = bpns.filter { it.isNotBlank() }.map { it.uppercase() }.toSet(),
+                bpns = bpnFilterParser.parse(bpns).toSet(),
                 businessPartnerTypes = request.businessPartnerTypes.orEmpty(),
                 timestampAfter = request.timestampAfter,
-                isCatenaXMemberData = request.isCatenaXMemberData
+                isDataSpaceParticipant = request.isDataSpaceParticipant
             )
         )
     }

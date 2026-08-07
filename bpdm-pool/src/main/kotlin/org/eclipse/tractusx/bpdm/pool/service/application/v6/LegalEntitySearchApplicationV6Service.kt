@@ -21,15 +21,14 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6PoolDto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntitySearchRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntitySearchRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntitySearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntitySearchParser
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,7 +39,8 @@ import org.springframework.transaction.annotation.Transactional
 class LegalEntitySearchApplicationV6Service(
     private val legalEntitySearchParser: LegalEntitySearchParser,
     private val legalEntitySearchService: LegalEntitySearchService,
-    private val legalEntitySearchRequestMapper: LegalEntitySearchRequestMapper
+    private val legalEntitySearchRequestMapperV6: LegalEntitySearchRequestMapperV6,
+    private val legalEntityResponseMapperV6: LegalEntityResponseMapperV6
 ) {
 
     /**
@@ -51,7 +51,7 @@ class LegalEntitySearchApplicationV6Service(
         searchRequest: LegalEntitySearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = null)
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = null)
 
     /**
      * Returns the requested page of legal entities matching the given criteria, restricted to Catena-X members.
@@ -61,11 +61,11 @@ class LegalEntitySearchApplicationV6Service(
         searchRequest: LegalEntitySearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> =
-        search(searchRequest, paginationRequest, isCatenaXMemberData = true)
+        search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
-    private fun search(searchRequest: LegalEntitySearchRequestV6, paginationRequest: PaginationRequest, isCatenaXMemberData: Boolean?) =
+    private fun search(searchRequest: LegalEntitySearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         legalEntitySearchService.search(
-            legalEntitySearchParser.parse(legalEntitySearchRequestMapper.toSearchRequest(searchRequest.toV7(), isCatenaXMemberData)),
+            legalEntitySearchParser.parse(legalEntitySearchRequestMapperV6.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()
-        ).toDto { it.toV6PoolDto() }
+        ).toPageDto { legalEntityResponseMapperV6.toLegalEntityWithLegalAddress(it) }
 }

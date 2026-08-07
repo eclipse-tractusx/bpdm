@@ -27,12 +27,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.toUpdateDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -44,7 +44,8 @@ class AddressUpdateApplicationV7Service(
     private val addressUpdateParser: AddressUpdateParser,
     private val addressPayloadUpdateService: AddressPayloadUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val addressResponseMapper: AddressResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -66,7 +67,7 @@ class AddressUpdateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toUpdateDto())
+                is ParseResult.Success -> responses.add(addressResponseMapper.toUpdateResponse(result.parsed.value))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })
             }
         }

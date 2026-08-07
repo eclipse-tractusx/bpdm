@@ -47,7 +47,7 @@ class AddressSearchService(
             LogisticAddressRepository.bySiteBpns(criteria.siteBpns),
             LogisticAddressRepository.byLegalEntityBpns(criteria.legalEntityBpns),
             LogisticAddressRepository.byName(criteria.name),
-            LogisticAddressRepository.byIsMember(criteria.isCatenaXMemberData),
+            LogisticAddressRepository.byIsDataSpaceParticipant(criteria.isDataSpaceParticipant),
             LogisticAddressRepository.withoutSites(criteria.excludesSiteAddresses)
         )
 

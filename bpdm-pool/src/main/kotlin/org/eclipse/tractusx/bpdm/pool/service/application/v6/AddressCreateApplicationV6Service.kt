@@ -20,19 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toCreateResponse
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
@@ -45,8 +42,9 @@ import org.springframework.transaction.annotation.Transactional
 class AddressCreateApplicationV6Service(
     private val untypedParentAddressCreateParser: UntypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
-    private val addressDtoRequestMapper: AddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressDtoRequestMapperV6: AddressDtoRequestMapperV6,
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6,
+    private val addressResponseMapperV6: AddressResponseMapperV6
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -60,20 +58,17 @@ class AddressCreateApplicationV6Service(
         logger.info { "Create ${requests.size} new addresses" }
 
         val requestList = requests.toList()
-        val createRequests = requestList.map {
-            // v6 has no script variants, so an address created over v6 starts out without any.
-            AddressCreateUntypedParentRequest(it.bpnParent, addressDtoRequestMapper.toContentRequest(it.address.toV7(), emptyList()))
-        }
+        val createRequests = requestList.map { addressDtoRequestMapperV6.toCreateRequest(it) }
 
         val responses = mutableListOf<AddressPartnerCreateVerboseDtoV6>()
-        val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
+        val errors = mutableListOf<ErrorInfoV6<AddressCreateErrorV6>>()
         requestList.zip(parseAndExecute(createRequests, untypedParentAddressCreateParser::parse, addressCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
+                is ParseResult.Success -> responses.add(addressResponseMapperV6.toCreateResponse(result.parsed, request.index))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapperV6.toCreateErrorInfo(it, request.index) })
             }
         }
 
-        return AddressPartnerCreateResponseWrapperV6(responses, errors.map { it.toV6() })
+        return AddressPartnerCreateResponseWrapperV6(responses, errors)
     }
 }

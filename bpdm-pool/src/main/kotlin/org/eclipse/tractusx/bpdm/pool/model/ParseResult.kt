@@ -163,6 +163,27 @@ fun <REQUEST, PARSED, CREATED, ERROR> parseAndExecute(
     }
 }
 
+/**
+ * The all-or-nothing counterpart of [parseAndExecute]: executes the batch only when *every* entry parsed, and otherwise
+ * throws the exception [onParseFailure] builds from the errors of all entries that failed.
+ *
+ * For an operation whose endpoint answers with a single result and therefore has no per-entry error channel to report a
+ * rejection through, where letting the sound entries through would half-apply the batch. Errors are still accumulated
+ * across the whole batch, so one call reports every bad entry.
+ */
+fun <REQUEST, PARSED, RESULT, ERROR> parseAndExecuteAllOrNone(
+    requests: List<REQUEST>,
+    parse: (List<REQUEST>) -> List<ParseResult<PARSED, ERROR>>,
+    onParseFailure: (List<ERROR>) -> RuntimeException,
+    execute: (List<PARSED>) -> RESULT
+): RESULT {
+    val parseResults = parse(requests)
+    val errors = parseResults.filterIsInstance<ParseResult.Failure<ERROR>>().flatMap { it.errors }
+    if (errors.isNotEmpty()) throw onParseFailure(errors)
+
+    return execute(parseResults.filterIsInstance<ParseResult.Success<PARSED>>().map { it.parsed })
+}
+
 
 private fun <E> failureErrors(vararg results: ParseResult<*, E>): List<E> =
     results.filterIsInstance<ParseResult.Failure<E>>().flatMap { it.errors }

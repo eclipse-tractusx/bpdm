@@ -22,13 +22,18 @@ package org.eclipse.tractusx.bpdm.pool.v7.participation
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
+
+    private val unknownBpnL = "BPNL0000000000XY"
 
     /**
      * GIVEN non-participant legal entity
@@ -215,6 +220,108 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val expectedParticipations = listOf(DataSpaceParticipantDto(bpnLA, true))
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * GIVEN participant legal entity
+     * WHEN operator searches for participations by the BPNL in lower case
+     * THEN operator sees the participation of that legal entity
+     */
+    @Test
+    fun `search participations by lower case BPNL`() {
+        //GIVEN
+        val bpnL = testDataClient.createParticipantLegalEntity(testName).header.bpnl
+
+        //WHEN
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL.lowercase()), null), PaginationRequest())
+
+        //THEN
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, true)))
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * GIVEN participant legal entity
+     * WHEN operator searches for participations by a BPNL that is no valid BPNL
+     * THEN operator sees no participations
+     */
+    @Test
+    fun `search participations by malformed BPNL`() {
+        //GIVEN
+        testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf("NO BPNL"), null), PaginationRequest())
+
+        //THEN
+        val expectedResponse = PageDto<DataSpaceParticipantDto>(0, 0, 0, 0, emptyList())
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * GIVEN non-participant legal entity
+     * WHEN operator updates its participation together with an unknown legal entity
+     * THEN the update is rejected and the known legal entity keeps its participation
+     */
+    @Test
+    fun `update participations naming an unknown legal entity`() {
+        //GIVEN
+        val bpnL = testDataClient.createLegalEntity(testName).header.bpnl
+
+        //WHEN
+        val updateRequest = DataSpaceParticipantUpdateRequest(
+            listOf(DataSpaceParticipantDto(bpnL, true), DataSpaceParticipantDto(unknownBpnL, true))
+        )
+        Assertions.assertThatThrownBy { poolClient.participants.put(updateRequest) }
+            .isInstanceOf(WebClientResponseException.NotFound::class.java)
+
+        //THEN
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL), null), PaginationRequest())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, false)))
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * GIVEN non-participant legal entity
+     * WHEN operator names that legal entity twice in one participation update
+     * THEN the update is rejected and the legal entity keeps its participation
+     */
+    @Test
+    fun `update participations naming a legal entity twice`() {
+        //GIVEN
+        val bpnL = testDataClient.createLegalEntity(testName).header.bpnl
+
+        //WHEN
+        val updateRequest = DataSpaceParticipantUpdateRequest(
+            listOf(DataSpaceParticipantDto(bpnL, true), DataSpaceParticipantDto(bpnL, false))
+        )
+        Assertions.assertThatThrownBy { poolClient.participants.put(updateRequest) }
+            .isInstanceOf(WebClientResponseException.BadRequest::class.java)
+
+        //THEN
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL), null), PaginationRequest())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, false)))
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * GIVEN participant legal entity
+     * WHEN operator sets its participation to the value it already holds
+     * THEN no changelog entry is written for that legal entity
+     */
+    @Test
+    fun `update participation to the value already held`() {
+        //GIVEN
+        val bpnL = testDataClient.createParticipantLegalEntity(testName).header.bpnl
+        val changelogBefore = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(bpns = setOf(bpnL)), PaginationRequest())
+
+        //WHEN
+        poolClient.participants.put(DataSpaceParticipantUpdateRequest(listOf(DataSpaceParticipantDto(bpnL, true))))
+
+        //THEN
+        val changelogAfter = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(bpns = setOf(bpnL)), PaginationRequest())
+        Assertions.assertThat(changelogAfter.content).isEqualTo(changelogBefore.content)
+        Assertions.assertThat(changelogAfter.content.map { it.changelogType }).containsExactly(ChangelogType.CREATE)
     }
 
     /**
