@@ -28,6 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskLegalEntityRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
@@ -48,6 +50,8 @@ class TaskStepBuildService(
     private val addressService: AddressService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val taskResolutionMapper: TaskResolutionMapper,
+    private val addressResponseMapper: AddressResponseMapper,
+    private val siteResponseMapper: SiteResponseMapper,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
@@ -129,13 +133,13 @@ class TaskStepBuildService(
 
         val existingLegalEntityInformation by lazy { fetchLegalEntityResult(bpnL!!, hasChanged = false) }
 
-        val isCatenaXMember = legalEntity.isParticipantData ?: if(bpnL != null) existingLegalEntityInformation.isParticipantData else false
+        val isDataSpaceParticipant = legalEntity.isParticipantData ?: if(bpnL != null) existingLegalEntityInformation.isParticipantData else false
 
         val legalEntityResult = if(bpnL != null && legalEntity.hasChanged == false){
             //No need to upsert, just fetch the information
             existingLegalEntityInformation
         }else{
-            upsertLegalEntity(legalEntity.copy(isParticipantData = isCatenaXMember), taskEntryBpnMapping)
+            upsertLegalEntity(legalEntity.copy(isParticipantData = isDataSpaceParticipant), taskEntryBpnMapping)
         }
 
         return legalEntityResult
@@ -313,7 +317,7 @@ class TaskStepBuildService(
     }
 
     private fun fetchSiteResult(bpnS: String, hasChanged: Boolean?): Site =
-        siteRepository.findByBpn(bpnS)?.toPoolDto()
+        siteRepository.findByBpn(bpnS)?.let { siteResponseMapper.toSiteWithMainAddress(it) }
             ?.let { taskResolutionMapper.toTaskResult(it.site, it.mainAddress, hasChanged) }
             ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
 
@@ -358,7 +362,8 @@ class TaskStepBuildService(
     }
 
     private fun fetchAddressResult(bpnA: String, hasChanged: Boolean?): PostalAddressWithScriptVariants {
-        val result = addressService.findAddressByBpn(bpnA)?.toDto() ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+        val result = addressService.findAddressByBpn(bpnA)?.let { addressResponseMapper.toAddress(it) }
+            ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
         return taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
     }
 

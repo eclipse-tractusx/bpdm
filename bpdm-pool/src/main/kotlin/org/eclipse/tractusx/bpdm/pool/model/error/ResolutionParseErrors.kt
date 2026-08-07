@@ -26,7 +26,11 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  * Caveat: can't distinguish two roles resolving the *same* entity type within *one* operation. None do today; add a role
  * distinction there if one ever does.
  */
-data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError, SiteCreateParseError, LegalEntityUpdateParseError
+data class UnresolvableLegalEntity(val bpn: String) :
+    AddressCreateParseError,
+    SiteCreateParseError,
+    LegalEntityUpdateParseError,
+    DataSpaceParticipantUpdateParseError
 data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError
 data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError, SiteCreateParseError
 

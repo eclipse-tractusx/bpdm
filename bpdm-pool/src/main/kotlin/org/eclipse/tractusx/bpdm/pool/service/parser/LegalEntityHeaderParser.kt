@@ -91,7 +91,7 @@ class LegalEntityHeaderParser(
                 identifiers = identifiers,
                 states = header.states,
                 confidenceCriteria = confidence!!,
-                isParticipantData = header.isParticipantData,
+                isDataSpaceParticipant = header.isDataSpaceParticipant,
                 ownershipUltimate = header.ownershipUltimate,
                 scriptVariants = scriptVariants
             )

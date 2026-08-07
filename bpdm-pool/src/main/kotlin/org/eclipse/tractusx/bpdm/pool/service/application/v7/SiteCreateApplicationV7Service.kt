@@ -28,13 +28,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateRespon
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithLegalAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.toUpsertDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,7 +48,8 @@ class SiteCreateApplicationV7Service(
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
-    private val siteParseErrorMapper: SiteParseErrorMapper
+    private val siteParseErrorMapper: SiteParseErrorMapper,
+    private val siteResponseMapper: SiteResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -68,7 +69,7 @@ class SiteCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }
@@ -92,7 +93,7 @@ class SiteCreateApplicationV7Service(
         parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).forEachIndexed { index, result ->
             val entityKey = index.toString()
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(entityKey))
+                is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, entityKey))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, entityKey) })
             }
         }

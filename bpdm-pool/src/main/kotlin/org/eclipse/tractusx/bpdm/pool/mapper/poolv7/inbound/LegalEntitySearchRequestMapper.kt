@@ -33,10 +33,10 @@ class LegalEntitySearchRequestMapper {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: LegalEntitySearchRequestDto, isCatenaXMemberData: Boolean?): LegalEntitySearchRequest =
+    fun toSearchRequest(searchRequest: LegalEntitySearchRequestDto, isDataSpaceParticipant: Boolean?): LegalEntitySearchRequest =
         LegalEntitySearchRequest(
             legalEntityBpns = searchRequest.bpnLs,
             legalName = searchRequest.legalName,
-            isCatenaXMemberData = isCatenaXMemberData
+            isDataSpaceParticipant = isDataSpaceParticipant
         )
 }

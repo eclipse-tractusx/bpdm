@@ -26,13 +26,14 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteScriptVariantDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,7 +49,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteUpdateService(
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
     private val addressUpdateService: AddressUpdateService,
     private val siteEntityMapper: SiteEntityMapper,
     private val siteRepository: SiteRepository,
@@ -80,12 +80,42 @@ class SiteUpdateService(
     }
 
     private fun updateHeader(request: SiteUpdate): UpsertResult<SiteDb> {
-        val before = equivalenceMapper.toEquivalenceDto(request.site)
+        // The verdict is taken before the change is applied, but the change is applied either way: a field that does
+        // not count towards the verdict is still written.
+        val changed = willChange(request.site, request.header)
         applyHeader(request.site, request.header)
-        val hasChanged = equivalenceMapper.toEquivalenceDto(request.site) != before
 
-        return UpsertResult(request.site, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
+        return UpsertResult(request.site, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
+
+    /**
+     * Reports whether applying the given change would leave the site's own fields different from how they stand now;
+     * the main address answers for itself.
+     *
+     * Each field is compared as the value [applyHeader] would write, built through the same entity mapper so the two
+     * cannot drift apart. A script code is a stored entity and is compared by its technical key rather than by
+     * reference, because navigating to one can yield a lazy proxy while the parsed value holds the initialised instance.
+     */
+    private fun willChange(target: SiteDb, header: SiteHeaderUpdate): Boolean {
+        header.name.ifSet { if (it != target.name) return true }
+        header.confidenceCriteria.ifSet {
+            if (siteEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+        }
+        header.states.ifSet {
+            if (stateKeys(siteEntityMapper.toStates(it, target)) != stateKeys(target.states)) return true
+        }
+        header.scriptVariants.ifSet {
+            if (scriptVariantKeys(siteEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+        }
+
+        return false
+    }
+
+    private fun stateKeys(states: Collection<SiteStateDb>): Set<Any?> =
+        states.map { listOf(it.validFrom, it.validTo, it.type) }.toSet()
+
+    private fun scriptVariantKeys(variants: Collection<SiteScriptVariantDb>): Set<Any?> =
+        variants.map { it.scriptCode.technicalKey to it.name }.toSet()
 
     private fun applyHeader(target: SiteDb, header: SiteHeaderUpdate) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.

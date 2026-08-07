@@ -46,7 +46,7 @@ class SiteSearchService(
             SiteRepository.byBpns(criteria.siteBpns),
             SiteRepository.byParentBpns(criteria.legalEntityBpns),
             SiteRepository.byName(criteria.name),
-            SiteRepository.byIsMember(criteria.isCatenaXMemberData)
+            SiteRepository.byIsDataSpaceParticipant(criteria.isDataSpaceParticipant)
         )
 
         val sitePage = siteRepository.findAll(specification, pageable)

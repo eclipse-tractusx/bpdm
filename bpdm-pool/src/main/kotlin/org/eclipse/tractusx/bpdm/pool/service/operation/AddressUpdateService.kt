@@ -22,25 +22,23 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * The single authority for updating logistic addresses: applies each requested change to its address — a caller
- * describes *what* to change, this service decides *how* — detects by equivalence whether the address actually changed,
+ * describes *what* to change, this service decides *how* — detects whether the address actually changed,
  * and persists and emits an UPDATE changelog only for those that did. The change vocabulary has no field for an
  * address's identity, parent, or relations, so no update can re-identify or re-parent an address.
  */
 @Service
 class AddressUpdateService(
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
     private val addressEntityMapper: AddressEntityMapper,
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
@@ -64,13 +62,11 @@ class AddressUpdateService(
     fun stageUpdate(request: AddressUpdate): PendingAddressWrite {
         val target = request.address
 
-        // A change that sets nothing cannot make the address differ, so skip the equivalence snapshots — they would
-        // otherwise force its identifiers, states and script variants to load for nothing.
-        if (request.content == AddressContentUpdate.NoOp) return PendingAddressWrite(target, UpsertType.NoChange)
-
-        val before = equivalenceMapper.toEquivalenceDto(target)
+        // The verdict is taken before the change is applied, but the change is applied either way: a field that does
+        // not count towards the verdict is still written.
+        val changed = willChange(target, request.content)
         apply(target, request.content)
-        val changed = equivalenceMapper.toEquivalenceDto(target) != before
+
         return PendingAddressWrite(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
@@ -80,6 +76,75 @@ class AddressUpdateService(
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressWriteCommitService.commit(staged)
+
+    /**
+     * Reports whether applying the given change would leave the address different from how it stands now.
+     *
+     * Each field is compared as the value [apply] would write, built through the same entity mapper so the two cannot
+     * drift apart. Stored entities a field points at — regions, identifier types, script codes — are compared by their
+     * technical key rather than by reference: navigating to one can yield a lazy proxy while the parsed value holds the
+     * initialised instance, and those two are never reference-equal.
+     */
+    private fun willChange(target: LogisticAddressDb, update: AddressContentUpdate): Boolean {
+        update.name.ifSet { if (it != target.name) return true }
+        update.physicalPostalAddress.ifSet {
+            if (physicalKey(addressEntityMapper.toPhysical(it)) != physicalKey(target.physicalPostalAddress)) return true
+        }
+        update.alternativePostalAddress.ifSet { alternative ->
+            val updated = alternative?.let { alternativeKey(addressEntityMapper.toAlternative(it)) }
+            if (updated != target.alternativePostalAddress?.let { alternativeKey(it) }) return true
+        }
+        update.confidenceCriteria.ifSet {
+            if (addressEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+        }
+        update.identifiers.ifSet {
+            if (identifierKeys(addressEntityMapper.toIdentifiers(it)) != identifierKeys(target.identifiers)) return true
+        }
+        update.states.ifSet {
+            if (stateKeys(addressEntityMapper.toStates(it)) != stateKeys(target.states)) return true
+        }
+        update.scriptVariants.ifSet {
+            if (scriptVariantKeys(addressEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+        }
+        // Site membership is add-only, so assigning a site the address already belongs to changes nothing.
+        update.assignToSite.ifSet { site -> if (target.sites.none { it.bpn == site.bpn }) return true }
+
+        return false
+    }
+
+    private fun physicalKey(address: PhysicalPostalAddressDb): List<Any?> =
+        with(address) {
+            listOf(
+                geographicCoordinates, country, administrativeAreaLevel1?.regionCode, administrativeAreaLevel2,
+                administrativeAreaLevel3, postCode, city, districtLevel1, street?.let { streetKey(it) },
+                companyPostCode, industrialZone, building, floor, door, taxJurisdictionCode
+            )
+        }
+
+    private fun alternativeKey(address: AlternativePostalAddressDb): List<Any?> =
+        with(address) {
+            listOf(
+                geographicCoordinates, country, administrativeAreaLevel1?.regionCode, postCode, city,
+                deliveryServiceType, deliveryServiceNumber, deliveryServiceQualifier
+            )
+        }
+
+    private fun streetKey(street: StreetDb): List<Any?> =
+        with(street) {
+            listOf(
+                name, houseNumber, houseNumberSupplement, milestone, direction,
+                namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix
+            )
+        }
+
+    private fun identifierKeys(identifiers: Collection<AddressIdentifierDb>): Set<Any?> =
+        identifiers.map { it.value to it.type.technicalKey }.toSet()
+
+    private fun stateKeys(states: Collection<AddressStateDb>): Set<Any?> =
+        states.map { listOf(it.validFrom, it.validTo, it.type) }.toSet()
+
+    private fun scriptVariantKeys(variants: Collection<LogisticAddressScriptVariantDb>): Set<Any?> =
+        variants.map { listOf(it.scriptCode.technicalKey, it.name, it.physicalAddress, it.alternativeAddress) }.toSet()
 
     private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.

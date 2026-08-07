@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
 
@@ -176,6 +177,51 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
             CxMembershipDtoV6(nonMemberBpnlC, false),
         )
         val expectedResponse = PageDto(expectedMemberships.size.toLong(), 1, 0, expectedMemberships.size, expectedMemberships)
+
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+
+    /**
+     * GIVEN member legal entity
+     * WHEN operator searches for memberships by a BPNL that is no valid BPNL
+     * THEN operator sees no memberships
+     */
+    @Test
+    fun `search memberships by malformed BpnL`(){
+        //GIVEN
+        createLegalEntity(testName, true)
+
+        //WHEN
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf("NO BPNL"), null), PaginationRequest())
+
+        //THEN
+        val expectedResponse = PageDto<CxMembershipDtoV6>(0, 0, 0, 0, emptyList())
+
+        Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
+    }
+
+
+    /**
+     * GIVEN non-member legal entity
+     * WHEN operator updates its membership together with an unknown legal entity
+     * THEN the update is rejected and the known legal entity keeps its membership
+     */
+    @Test
+    fun `update memberships naming an unknown legal entity`(){
+        //GIVEN
+        val bpnL = createLegalEntity(testName, false)
+
+        //WHEN
+        val updateRequest = CxMembershipUpdateRequestV6(
+            listOf(CxMembershipDtoV6(bpnL, true), CxMembershipDtoV6("BPNL0000000000XY", true))
+        )
+        Assertions.assertThatThrownBy { poolClient.memberships.put(updateRequest) }
+            .isInstanceOf(WebClientResponseException.NotFound::class.java)
+
+        //THEN
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf(bpnL), null), PaginationRequest())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(CxMembershipDtoV6(bpnL, false)))
 
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }

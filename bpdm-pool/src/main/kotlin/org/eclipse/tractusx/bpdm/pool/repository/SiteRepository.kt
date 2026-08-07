@@ -50,10 +50,10 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<SiteDb> { root, _, builder ->
-                isCatenaXMemberData?.let {
-                    builder.equal(root.get<LegalEntityDb>(SiteDb::legalEntity.name).get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
+                isDataSpaceParticipant?.let {
+                    builder.equal(root.get<LegalEntityDb>(SiteDb::legalEntity.name).get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant)
                 }
             }
     }

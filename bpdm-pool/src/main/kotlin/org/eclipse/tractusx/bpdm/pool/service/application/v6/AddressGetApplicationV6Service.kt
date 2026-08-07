@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressGetRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressGetService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressGetParser
@@ -34,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressGetApplicationV6Service(
     private val addressGetParser: AddressGetParser,
-    private val addressGetService: AddressGetService
+    private val addressGetService: AddressGetService,
+    private val addressResponseMapperV6: AddressResponseMapperV6
 ) {
 
     /**
@@ -45,6 +46,6 @@ class AddressGetApplicationV6Service(
         val criteria = addressGetParser.parse(AddressGetRequest(bpna))
         val address = addressGetService.get(criteria) ?: throw BpdmNotFoundException("Address", criteria.addressBpn)
 
-        return address.toV6Dto()
+        return addressResponseMapperV6.toAddress(address)
     }
 }

@@ -27,12 +27,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVer
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.toCreateResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -44,7 +44,8 @@ class AddressCreateApplicationV7Service(
     private val untypedParentAddressCreateParser: UntypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val addressResponseMapper: AddressResponseMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -66,7 +67,7 @@ class AddressCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
         requestList.zip(parseAndExecute(createRequests, untypedParentAddressCreateParser::parse, addressCreateService::create)).forEach { (request, result) ->
             when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
+                is ParseResult.Success -> responses.add(addressResponseMapper.toCreateResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }

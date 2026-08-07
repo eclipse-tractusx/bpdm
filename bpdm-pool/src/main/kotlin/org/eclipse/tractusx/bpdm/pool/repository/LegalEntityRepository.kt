@@ -44,10 +44,10 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<LegalEntityDb> { root, _, builder ->
-                isCatenaXMemberData?.let {
-                    builder.equal(root.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
+                isDataSpaceParticipant?.let {
+                    builder.equal(root.get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant)
                 }
             }
     }

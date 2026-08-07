@@ -46,7 +46,7 @@ class LegalEntityDb(
     var confidenceCriteria: ConfidenceCriteriaDb,
 
     @Column(name = "is_catena_member", nullable = false)
-    var isCatenaXMemberData: Boolean,
+    var isDataSpaceParticipant: Boolean,
 
     @Column(name = "ownership_ultimate", nullable = false)
     var ownershipUltimate: Boolean = false,

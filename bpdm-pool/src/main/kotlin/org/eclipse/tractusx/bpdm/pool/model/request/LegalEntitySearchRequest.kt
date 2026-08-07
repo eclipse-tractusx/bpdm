@@ -22,5 +22,5 @@ package org.eclipse.tractusx.bpdm.pool.model.request
 data class LegalEntitySearchRequest(
     val legalEntityBpns: List<String>,
     val legalName: String?,
-    val isCatenaXMemberData: Boolean?
+    val isDataSpaceParticipant: Boolean?
 )
