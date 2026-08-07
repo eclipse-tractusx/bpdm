@@ -66,6 +66,11 @@ class LegalEntityParseErrorMapper(
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}",
                 entityKey
             )
+            is AlternativeHeadquarterCannotOwnUltimately -> ErrorInfo(
+                LegalEntityUpdateError.AlternativeHeadquarterCannotOwnUltimately,
+                "Legal entity '${error.bpnl}' cannot carry the ultimate-owner flag because it is an alternative headquarter",
+                entityKey
+            )
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
             is ScriptVariantCoverageStillNeeded ->
                 ErrorInfo(

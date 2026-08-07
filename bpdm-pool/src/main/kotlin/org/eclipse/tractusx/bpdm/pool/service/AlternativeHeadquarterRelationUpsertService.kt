@@ -36,50 +36,101 @@ class AlternativeHeadquarterRelationUpsertService(
 
     @Transactional
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb>{
-        val standardisedRequest = standardise(upsertRequest)
+        val alternative = upsertRequest.source
+        val main = upsertRequest.target
 
-        validateOnlyOneAlternative(standardisedRequest)
+        validateStarTopology(alternative, main, upsertRequest)
+        validateAlternativeNotInOwnership(alternative, upsertRequest)
+        validateAlternativeNotFlagged(alternative)
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
-                source = standardisedRequest.source,
-                target = standardisedRequest.target,
+                source = alternative,
+                target = main,
                 legalEntityRelationType = LegalEntityRelationType.IsAlternativeHeadquarterFor,
-                validityPeriods = standardisedRequest.validityPeriods,
-                existingRelation = standardisedRequest.existingRelation,
-                reasonCode = standardisedRequest.reasonCode
+                validityPeriods = upsertRequest.validityPeriods,
+                existingRelation = upsertRequest.existingRelation,
+                reasonCode = upsertRequest.reasonCode
             )
         )
 
         return result
     }
 
-    private fun standardise(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): IRelationUpsertStrategyService.UpsertRequest{
-        val proposedSource = upsertRequest.source
-        val proposedTarget = upsertRequest.target
 
-        val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
-        val standardisedUpsertRequest = if(sourceIsOlder) upsertRequest.copy(source = proposedTarget, target = proposedSource) else upsertRequest
+    private fun validateStarTopology(alternative: LegalEntityDb, main: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val allAltHqRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, alternative)
+        val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allAltHqRelations)
 
-        return standardisedUpsertRequest
-    }
+        val otherRelations = overlappingRelations.filterNot { it.startNode.bpn == alternative.bpn && it.endNode.bpn == main.bpn }
 
-    private fun validateOnlyOneAlternative(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
-        validateOnlyOneAlternative(upsertRequest.source, upsertRequest)
-        validateOnlyOneAlternative(upsertRequest.target, upsertRequest)
-    }
+        for (relation in otherRelations) {
+            when {
+                relation.endNode.bpn == alternative.bpn && relation.startNode.bpn != main.bpn -> {
+                    throw BpdmValidationException(
+                        "Star topology violated: Legal entity '${alternative.bpn}' is already the main of an " +
+                        "alternative relation with '${relation.startNode.bpn}' in an overlapping period. " +
+                        "Cannot also be alternative to '${main.bpn}'."
+                    )
+                }
+                relation.startNode.bpn == main.bpn && relation.endNode.bpn != alternative.bpn -> {
+                    throw BpdmValidationException(
+                        "Star topology violated: Legal entity '${main.bpn}' is already alternative to " +
+                        "'${relation.endNode.bpn}' in an overlapping period. Cannot also be main to '${alternative.bpn}'."
+                    )
+                }
+                relation.startNode.bpn == alternative.bpn && relation.endNode.bpn != main.bpn -> {
+                    throw BpdmValidationException(
+                        "Star topology violated: Legal entity '${alternative.bpn}' is already alternative to " +
+                        "'${relation.endNode.bpn}' in an overlapping period. Cannot also be alternative to '${main.bpn}'."
+                    )
+                }
+            }
+        }
 
-    private fun validateOnlyOneAlternative(legalEntity: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
-        val relations =  relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity)
-        val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, relations)
+        val allMainRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, main)
+        val overlappingMainRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allMainRelations)
 
-        val otherRelations =  overlappingRelations.filterNot { it.startNode.bpn == upsertRequest.source.bpn && it.endNode.bpn == upsertRequest.target.bpn }
-
-        if(otherRelations.isNotEmpty()){
-            val otherRelation = otherRelations.first()
-            val otherLegalEntity = if(otherRelation.startNode.bpn == legalEntity.bpn) otherRelation.endNode else otherRelation.startNode
+        val conflictingRelation = overlappingMainRelations.find {
+            it.startNode.bpn == main.bpn && it.endNode.bpn != alternative.bpn
+        }
+        if (conflictingRelation != null) {
             throw BpdmValidationException(
-                "Invalid 'IsAlternativeHeadquarter' relation: Legal Entity ${legalEntity.bpn} is already alternative headquarter to ${otherLegalEntity.bpn}"
+                "Star topology violated: Legal entity '${main.bpn}' is already alternative to '${conflictingRelation.endNode.bpn}' in an overlapping period. " +
+                        "Cannot also be main for '${alternative.bpn}'."
+            )
+        }
+
+        val reverseRelation = overlappingMainRelations.find { it.startNode.bpn == main.bpn && it.endNode.bpn == alternative.bpn }
+        if (reverseRelation != null) {
+            throw BpdmValidationException(
+                "Cannot reverse alternative headquarter relation: '${main.bpn}' cannot be alternative to '${alternative.bpn}' " +
+                "while the reverse relation ('${alternative.bpn}' alternative to '${main.bpn}') exists in an overlapping period. " +
+                "End the original relation first."
+            )
+        }
+    }
+
+
+    private fun validateAlternativeNotInOwnership(alternative: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val ownedByRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsOwnedBy, alternative)
+        val overlappingOwnedByRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, ownedByRelations)
+
+        if (overlappingOwnedByRelations.isNotEmpty()) {
+            val relation = overlappingOwnedByRelations.first()
+            val role = if (relation.startNode.bpn == alternative.bpn) "owned" else "owning"
+            throw BpdmValidationException(
+                "Invalid alternative headquarter relation: Legal entity '${alternative.bpn}' cannot be alternative " +
+                "because it participates in an overlapping IsOwnedBy relation (as $role entity with '${if (role == "owned") relation.endNode.bpn else relation.startNode.bpn}')."
+            )
+        }
+    }
+
+    private fun validateAlternativeNotFlagged(alternative: LegalEntityDb) {
+        if (alternative.ownershipUltimate) {
+            throw BpdmValidationException(
+                "Invalid alternative headquarter relation: Legal entity '${alternative.bpn}' cannot be alternative " +
+                "because it carries the ownershipUltimate flag."
             )
         }
     }

@@ -41,6 +41,7 @@ class LegalEntityUpdateParser(
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
     private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
+    private val alternativeHeadquarterUltimateOwnerValidator: AlternativeHeadquarterUltimateOwnerValidator,
     private val addressContentParser: AddressContentParser,
     private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val partnerReader: AddressPartnerScriptCodeReader
@@ -79,8 +80,11 @@ class LegalEntityUpdateParser(
         // folded in at this level rather than into the header result.
         val resolvedTargets = targetResults.map { (it as? ParseResult.Success)?.parsed }
         val ownershipViolations = ultimateOwnerUniquenessValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
+        val alternativeViolations = alternativeHeadquarterUltimateOwnerValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
 
-        return updateResults.zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }
+        return updateResults
+            .zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }
+            .zip(alternativeViolations) { result, violations -> result.combine(violations) { it } }
     }
 
     private fun scriptCodeCoverageErrors(result: ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>): List<LegalEntityUpdateParseError> {
