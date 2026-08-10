@@ -52,7 +52,7 @@ This version establishes **directional** relations and enforces **star topology*
 2. **Move ownership and flags to main entity:**
    - Any alternative entity currently participating in IsOwnedBy relations (as source or target) must have that ownership moved to its corresponding main entity.
    - Any alternative entity carrying the `ownershipUltimate = true` flag must have that flag cleared and moved to its corresponding main entity.
-   - Update the **Pool** database directly (or via the Pool API) to:
+   - Update the **Pool** database directly to:
      - Remove the entity from ownership relations
      - Clear the `ownershipUltimate` flag
      - Apply the flag and ownership relations to its main entity
@@ -77,7 +77,7 @@ After this version, the Pool enforces:
 - **Ownership separation**:
   - Only the main entity can participate in IsOwnedBy relations
   - Only the main entity can carry the `ownershipUltimate` flag
-  - An alternative caught violating these rules causes the task to fail with reason "Cannot set ownershipUltimate flag on alternative headquarter"
+  - An alternative caught violating these rules causes the task to fail because an alternative headquarter cannot carry the ultimate-owner flag
 - **Rejection rules**:
   - Relations are rejected if:
     - Source is already the main of an overlapping relation

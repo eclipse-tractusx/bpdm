@@ -34,6 +34,9 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Pool: A golden record task that puts a new site on an already existing address now applies the site main address payload it carries to that address, instead of leaving the address content untouched.
   This is what lets such a site be named in its own scripts; in exchange the payload has to keep covering the scripts the address's other business partners are named in [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Pool: IsAlternativeHeadquarterFor relations now carry semantic meaning through their direction: the relation starts at the alternative entity and ends at the main entity.
+  The Pool enforces star topology to keep ownership trees separate per real-world entity, and only the main entity can participate in IsOwnedBy relations or carry the `ownershipUltimate` flag.
+  An alternative entity attempting to violate these rules causes the task to fail. Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1764](https://github.com/eclipse-tractusx/bpdm/issues/1764)
 - BPDM Pool: Searching data space participants (`memberships` in the deprecated v6 API) by a BPNL that is no valid BPNL now returns an empty page instead of being rejected as a bad request.
   Searching by BPNL is also case-insensitive now. This brings the endpoint in line with the legal entity, site, address and changelog searches, which have always treated an unmatchable filter value as matching nothing
 - BPDM Pool: Updating data space participants (`memberships` in the deprecated v6 API) with a BPNL that is no valid BPNL is now reported as an unknown legal entity (404) instead of as a bad request (400).
