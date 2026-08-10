@@ -131,11 +131,10 @@ class AlternativeHeadquarterRelationUpsertService(
         val allMainRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, main)
         val overlappingMainRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allMainRelations)
 
-        val targetAlreadyAlternative = overlappingMainRelations.any {
+        val conflictingRelation = overlappingMainRelations.find {
             it.startNode.bpn == main.bpn && it.endNode.bpn != alternative.bpn
         }
-        if (targetAlreadyAlternative) {
-            val conflictingRelation = overlappingMainRelations.first { it.startNode.bpn == main.bpn && it.endNode.bpn != alternative.bpn }
+        if (conflictingRelation != null) {
             throw BpdmValidationException(
                 "Star topology violated: Legal entity '${main.bpn}' is already alternative to '${conflictingRelation.endNode.bpn}' in an overlapping period. " +
                         "Cannot also be main for '${alternative.bpn}'."

@@ -49,12 +49,18 @@ class UltimateOwnerResolutionService(
      * reaches no ultimate owner.
      */
     @Transactional(readOnly = true)
-    fun resolve(legalEntity: LegalEntityDb): String? {
+    fun resolve(legalEntity: LegalEntityDb): String? =
+        resolveWithAlternativeGuard(legalEntity, mutableSetOf())
+
+    private fun resolveWithAlternativeGuard(legalEntity: LegalEntityDb, visited: MutableSet<String>): String? {
+        if (!visited.add(legalEntity.bpn)) {
+            logger.warn { "Cycle detected in alternative headquarter chain at BPNL: ${legalEntity.bpn}" }
+            return null
+        }
         val alternativeMain = mainOfAlternative(legalEntity)
         if (alternativeMain != null) {
-            return resolve(alternativeMain)
+            return resolveWithAlternativeGuard(alternativeMain, visited)
         }
-
         return when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
             is Resolution.UltimateOwner -> resolution.bpnl
             Resolution.CycleDetected -> null
@@ -93,7 +99,7 @@ class UltimateOwnerResolutionService(
             .forEach { alternativeRelation ->
                 val alternative = alternativeRelation.startNode
                 if (visited.add(alternative.bpn)) {
-                    resolved[alternative] = resolve(alternative)
+                    resolved[alternative] = resolved[legalEntity]
                 }
             }
 

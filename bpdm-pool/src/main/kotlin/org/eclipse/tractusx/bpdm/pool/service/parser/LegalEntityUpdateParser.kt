@@ -80,8 +80,6 @@ class LegalEntityUpdateParser(
         // folded in at this level rather than into the header result.
         val resolvedTargets = targetResults.map { (it as? ParseResult.Success)?.parsed }
         val ownershipViolations = ultimateOwnerUniquenessValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
-
-        // The alternative-headquarter flag rule also spans the batch
         val alternativeViolations = alternativeHeadquarterValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
 
         return updateResults
