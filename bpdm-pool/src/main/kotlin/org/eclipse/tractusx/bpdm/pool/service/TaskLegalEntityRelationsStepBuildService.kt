@@ -40,6 +40,7 @@ class TaskLegalEntityRelationsStepBuildService(
     private val legalEntityRepository: LegalEntityRepository,
     private val managedRelationUpsertService: ManagedRelationUpsertService,
     private val ownedByRelationService: OwnedByRelationUpsertService,
+    private val isReplacedByRelationService: IsReplacedByRelationUpsertService,
     private val relationRepository: RelationRepository,
     private val reasonCodeRepository: ReasonCodeRepository
 ) {
@@ -76,7 +77,7 @@ class TaskLegalEntityRelationsStepBuildService(
             OrchestratorRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationType.IsAlternativeHeadquarterFor
             OrchestratorRelationType.IsManagedBy -> LegalEntityRelationType.IsManagedBy
             OrchestratorRelationType.IsOwnedBy -> LegalEntityRelationType.IsOwnedBy
-            else -> throw BpdmValidationException("Unsupported relation type for legal entity relations: ${relationDto.relationType}")
+            OrchestratorRelationType.IsReplacedBy -> LegalEntityRelationType.IsReplacedBy
         }
 
         val existingRelation = relationRepository.findAll(
@@ -98,6 +99,7 @@ class TaskLegalEntityRelationsStepBuildService(
             LegalEntityRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
             LegalEntityRelationType.IsManagedBy -> managedRelationUpsertService
             LegalEntityRelationType.IsOwnedBy -> ownedByRelationService
+            LegalEntityRelationType.IsReplacedBy -> isReplacedByRelationService
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)
@@ -129,6 +131,7 @@ class TaskLegalEntityRelationsStepBuildService(
             LegalEntityRelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
             LegalEntityRelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
             LegalEntityRelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
     }
 

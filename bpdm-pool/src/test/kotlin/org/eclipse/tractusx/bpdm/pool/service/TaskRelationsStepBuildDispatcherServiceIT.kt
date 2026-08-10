@@ -144,6 +144,31 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         assertThat(result.errors.size).isEqualTo(0)
     }
 
+    @Test
+    fun `route legal entity IsReplacedBy relation to legal entity relation service`() {
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val createLegalEntityRelationsRequest = BusinessPartnerRelations(
+            relationType = LegalEntityRelationType.IsReplacedBy.toTaskDto(),
+            businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
+            validityPeriods = listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.parse("1970-01-01"),
+                    validTo = LocalDate.parse("9999-12-31")
+                )
+            ),
+            reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
+        )
+
+        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        assertThat(result.taskId).isEqualTo("TASK_1")
+        assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
+        assertThat(result.errors.size).isEqualTo(0)
+    }
+
     @ParameterizedTest
     @EnumSource(AddressRelationType::class)
     fun `route address relation to address relation service`(relationType: AddressRelationType) {
@@ -199,6 +224,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
             LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
             LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 

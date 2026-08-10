@@ -84,3 +84,24 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
     When the sharing member shares relation "relocation" of type "IsReplacedBy" from "legal-address-record" to "branch-record" effective immediately
     And the golden record process establishes relation "relocation"
     Then relation "relocation" output reflects the established golden record relation
+
+  #h3. Test Objective:
+  #
+  #* Verify the sharing member's relation output reflects an established IsReplacedBy golden record relation between two legal entities.
+  #
+  #h3. Preconditions:
+  #
+  ## Two records each reflect a legal entity (predecessor and successor).
+  #
+  #h3. Description:
+  #
+  ## The sharing member shares an IsReplacedBy relation from the predecessor record to the successor record.
+  ## The golden record process establishes the relation.
+  ## The relation output reflects the established golden record relation.
+  @BPDM
+  Scenario: IsReplacedBy Relation Between Legal Entities Reflected In Sharing Member Relation Output
+    Given record "predecessor-record" reflects legal entity "predecessor"
+    And record "successor-record" reflects legal entity "successor"
+    When the sharing member shares relation "succession" of type "IsReplacedBy" from "predecessor-record" to "successor-record"
+    And the golden record process establishes relation "succession"
+    Then relation "succession" output reflects the established golden record relation

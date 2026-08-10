@@ -227,7 +227,12 @@ class RelationTaskCreationService(
         fun isAdditional(t: AddressType?) = t == AddressType.AdditionalAddress
 
         return when {
-            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(RelationType.IsAlternativeHeadquarterFor, RelationType.IsOwnedBy, RelationType.IsManagedBy) -> BusinessPartnerType.LEGAL_ENTITY
+            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(
+                RelationType.IsAlternativeHeadquarterFor,
+                RelationType.IsOwnedBy,
+                RelationType.IsManagedBy,
+                RelationType.IsReplacedBy
+            ) -> BusinessPartnerType.LEGAL_ENTITY
             ((isAdditional(sourceAddressType) && isLegalEntityLike(targetAddressType)) || (isLegalEntityLike(sourceAddressType) && isAdditional(targetAddressType))) && relationType == RelationType.IsReplacedBy -> BusinessPartnerType.ADDRESS
             else -> null
         }
