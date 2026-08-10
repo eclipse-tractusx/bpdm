@@ -19,14 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
@@ -66,6 +72,8 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val poolAssertHelper: PoolAssertHelper
 ) {
+
+    private val anyTime = Instant.MIN
 
     private lateinit var testDataEnvironment: TestDataEnvironment
     private lateinit var testName: String
@@ -142,6 +150,44 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         )
 
         poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(5), updateEndTime.plusSeconds(5)))
+    }
+
+    /**
+     * GIVEN a legal entity and an additional address
+     * WHEN additional address replaces legal address effective immediately
+     * THEN sharing member sees one changelog entry per affected business partner, the legal entity before its addresses
+     */
+    @Test
+    fun `replaced legal address logs each affected business partner once`(){
+        //GIVEN
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
+
+        val beforeRelocation = Instant.now()
+
+        //WHEN
+        val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
+        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeNow, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+
+        //THEN
+        val searchResponse = poolApiClient.changelogs.getChangelogEntries(ChangelogSearchRequest(timestampAfter = beforeRelocation), PaginationRequest(0, 20))
+
+        val expectedEntries = listOf(
+            ChangelogEntryVerboseDto(createdLegalEntity.legalEntity.header.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.UPDATE),
+            ChangelogEntryVerboseDto(createdLegalEntity.legalEntity.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
+            ChangelogEntryVerboseDto(createdAddAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE)
+        )
+        val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
+
+        assertThat(searchResponse)
+            .usingRecursiveComparison()
+            .ignoringFields("${PageDto<*>::content.name}.${ChangelogEntryVerboseDto::timestamp.name}")
+            .isEqualTo(expectedResponse)
     }
 
     private fun anyReasonCode(): String{
