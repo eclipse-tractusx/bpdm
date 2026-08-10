@@ -50,6 +50,7 @@ class OwnedByRelationUpsertService(
         validateSingleParent(upsertRequest)
         validateNoCycles(upsertRequest)
         validateSingleUltimateOwner(upsertRequest)
+        validateNotAlternativeHeadquarter(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
@@ -143,6 +144,36 @@ class OwnedByRelationUpsertService(
         val allOwningAncestors = getAllAncestors(upsertRequest)
         if(allOwningAncestors.contains(child))
             throw BpdmValidationException("Circular ownership detected in entity hierarchy: legal entity '${child.bpn}' is (transitively) owning '${parent.bpn}' and therefore can't be owned by '${parent.bpn}'.")
+    }
+
+    /**
+     * Either end of an IsOwnedBy relation cannot be an alternative headquarter in an overlapping period
+     */
+    private fun validateNotAlternativeHeadquarter(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+
+        // Check if source is an alternative (startNode in IsAlternativeHeadquarterFor)
+        val sourceAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, source)
+        val overlappingSourceAlternative = relationUpsertService.filterOverlappingRelations(upsertRequest, sourceAsAlternative)
+        if (overlappingSourceAlternative.isNotEmpty()) {
+            val relation = overlappingSourceAlternative.first()
+            throw BpdmValidationException(
+                "Invalid IsOwnedBy relation: Legal entity '${source.bpn}' cannot participate in ownership because " +
+                "it is an alternative headquarter to '${relation.endNode.bpn}' in an overlapping period."
+            )
+        }
+
+        // Check if target is an alternative (startNode in IsAlternativeHeadquarterFor)
+        val targetAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, target)
+        val overlappingTargetAlternative = relationUpsertService.filterOverlappingRelations(upsertRequest, targetAsAlternative)
+        if (overlappingTargetAlternative.isNotEmpty()) {
+            val relation = overlappingTargetAlternative.first()
+            throw BpdmValidationException(
+                "Invalid IsOwnedBy relation: Legal entity '${target.bpn}' cannot participate in ownership because " +
+                "it is an alternative headquarter to '${relation.endNode.bpn}' in an overlapping period."
+            )
+        }
     }
 
     /**

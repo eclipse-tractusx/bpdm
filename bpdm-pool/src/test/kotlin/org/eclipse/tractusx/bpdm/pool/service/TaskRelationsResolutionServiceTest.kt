@@ -614,6 +614,171 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors[0].description).contains("Invalid 'IsReplacedBy' relation:")
     }
 
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'B is alternative headquarter of A'
+     * THEN return star topology error because A is already an alternative (target cannot be alternative)
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject target already alternative`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+        val otherB = createLegalEntity("$testName B")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val bToA = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = otherB.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_B_TO_A", bToA)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Star topology violated")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'M is alternative headquarter of D'
+     * THEN return star topology error because M is already a main (source cannot be main)
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject source already main`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+        val otherD = createLegalEntity("$testName D")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val mToD = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = otherD.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_M_TO_D", mToD)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Star topology violated")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'A is alternative headquarter of D'
+     * THEN return star topology error because A is already alternative to M
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject source already alternative of different main`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+        val otherD = createLegalEntity("$testName D")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val aToD = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = otherD.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_A_TO_D", aToD)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Star topology violated")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'M is alternative headquarter of A'
+     * THEN return reverse relation error
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject reverse pair`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val mToA = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_M_TO_A", mToA)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Cannot reverse alternative headquarter relation")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'A is owned by M'
+     * THEN return error because alternative cannot participate in IsOwnedBy
+     */
+    @Test
+    fun `create IsOwnedBy relation - reject alternative as source`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_ALT", aToM)[0].errors).isEmpty()
+
+        val aOwnedByM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_OWNED", aOwnedByM)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("cannot participate in ownership")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'M is owned by A'
+     * THEN return error because A is alternative and cannot be an owner
+     */
+    @Test
+    fun `create IsOwnedBy relation - reject alternative as target`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_ALT", aToM)[0].errors).isEmpty()
+
+        val mOwnedByA = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_OWNED", mOwnedByA)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("cannot participate in ownership")
+    }
+
 
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)

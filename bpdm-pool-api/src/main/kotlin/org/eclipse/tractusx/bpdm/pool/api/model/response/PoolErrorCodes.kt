@@ -55,6 +55,7 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalEntityIdentifiersTooMany,
     LegalAddressIdentifiersTooMany,
     MultipleUltimateOwnersInHierarchy,
+    AlternativeHeadquarterCannotOwnUltimately,
     ScriptVariantLegalNameMissing,
     ScriptVariantDuplicateScriptCode,
     LegalAddressScriptVariantCityMissing,

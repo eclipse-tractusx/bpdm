@@ -3,6 +3,7 @@
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [7.4.x to 7.5.x](#74x-to-75x)
+    * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
     * [Script variants removed from the deprecated Pool v6 API](#script-variants-removed-from-the-deprecated-pool-v6-api)
     * [Script variants are validated like invariant data (Pool)](#script-variants-are-validated-like-invariant-data-pool)
@@ -28,6 +29,72 @@
 
 
 ## 7.4.x to 7.5.x
+
+### Alternative Headquarter Relation Directionality
+
+The IsAlternativeHeadquarterFor relation now carries semantic meaning through its direction: the relation starts at the alternative entity and ends at the main entity.
+Previously, relation direction was normalized by creation timestamp (`createdAt`), making both ends symmetric.
+This version establishes **directional** relations and enforces **star topology** to keep ownership trees separate per real-world entity.
+
+#### Required Operator Actions
+
+**CRITICAL: This is a mandatory data remediation step before upgrading.**
+
+1. **Review and re-establish relation directions:**
+   - All existing IsAlternativeHeadquarterFor relations were stored with arbitrary direction (based on `createdAt`).
+   - Operators must review each relation and determine the intended roles:
+     - **Alternative**: The headquarter entity that serves as a secondary representation
+     - **Main**: The authoritative headquarter entity that participates in ownership
+   - In both the **Pool** and the **Gate output database**, re-create relations with the correct direction:
+     - Delete the incorrectly-directed relation
+     - Create a new relation with source = alternative and target = main
+
+2. **Move ownership and flags to main entity:**
+   - Any alternative entity currently participating in IsOwnedBy relations (as source or target) must have that ownership moved to its corresponding main entity.
+   - Any alternative entity carrying the `ownershipUltimate = true` flag must have that flag cleared and moved to its corresponding main entity.
+   - Update the **Pool** database directly to:
+     - Remove the entity from ownership relations
+     - Clear the `ownershipUltimate` flag
+     - Apply the flag and ownership relations to its main entity
+
+3. **Validate after remediation:**
+   - Confirm that in the Pool and Gate:
+     - Each IsAlternativeHeadquarterFor relation has the correct direction (alternative → main)
+     - No alternative entity participates in ownership
+     - No alternative entity carries the `ownershipUltimate` flag
+     - Star topology is maintained (multiple alternatives can point to the same main, but no cycles or reversed relations)
+
+#### What Happens After Upgrade
+
+After this version, the Pool enforces:
+
+- **Directionality**: IsAlternativeHeadquarterFor relations are stored and validated with direction as supplied; no reordering.
+- **Star topology**: 
+  - An alternative cannot point at another alternative
+  - A main cannot point at an alternative
+  - An alternative cannot be both main and alternative in overlapping validity periods
+  - Re-upsert of the same pair still works and updates validity periods
+- **Ownership separation**:
+  - Only the main entity can participate in IsOwnedBy relations
+  - Only the main entity can carry the `ownershipUltimate` flag
+  - An alternative caught violating these rules causes the task to fail because an alternative headquarter cannot carry the ultimate-owner flag
+- **Rejection rules**:
+  - Relations are rejected if:
+    - Source is already the main of an overlapping relation
+    - Target is already the alternative of an overlapping relation
+    - Source is already the alternative of a different main in an overlapping period
+    - Source participates in an overlapping IsOwnedBy relation
+    - Source carries `ownershipUltimate = true`
+    - Either end is an alternative in an overlapping period (for IsOwnedBy)
+  - The rejection reason names both BPNLs and the broken rule
+
+#### Disjoint Periods
+
+Entities may still take different roles in non-overlapping periods:
+
+- An entity may be alternative to different mains in non-overlapping periods
+- An entity may participate in ownership in periods after its alternative-headquarter relation has ended
+- No action is required for relations that do not overlap in time
 
 ### Unique site names per legal entity
 
