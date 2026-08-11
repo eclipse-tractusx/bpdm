@@ -43,8 +43,9 @@ class UltimateOwnerRecalculationService(
 ) {
 
     /**
-     * Re-derives the ultimate owner of [legalEntities] and of every entity they own, transitively — a flag or relation
-     * change moves the ultimate owner of the whole subtree, not just the entity written.
+     * Re-derives the ultimate owner of [legalEntities], of every entity they own transitively, and of the currently valid
+     * alternative headquarters of every visited entity. A flag or relation change moves the ultimate owner of the whole
+     * affected subtree, not just the entity written.
      */
     @Transactional
     fun recalculate(legalEntities: List<LegalEntityDb>) {
