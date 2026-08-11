@@ -21,13 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressWriteCommitService(
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
     /**
      * Persists the staged addresses that changed, emits their CREATE or UPDATE changelog, and returns one result per
@@ -49,10 +48,10 @@ class AddressWriteCommitService(
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> {
         logisticAddressRepository.saveAll(staged.filter { it.upsertType != UpsertType.NoChange }.map { it.address })
 
-        changelogService.createChangelogEntries(staged.mapNotNull {
+        changelogCreateService.record(staged.mapNotNull {
             when (it.upsertType) {
-                UpsertType.Created -> ChangelogEntryCreateRequest(it.address.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
-                UpsertType.Updated -> ChangelogEntryCreateRequest(it.address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
+                UpsertType.Created -> ChangelogRecord(it.address.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
+                UpsertType.Updated -> ChangelogRecord(it.address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
                 UpsertType.NoChange -> null
             }
         })

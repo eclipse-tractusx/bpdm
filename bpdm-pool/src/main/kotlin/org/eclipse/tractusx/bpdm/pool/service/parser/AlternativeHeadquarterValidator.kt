@@ -30,9 +30,11 @@ import java.time.LocalDate
 
 /**
  * Validates that an alternative headquarter cannot carry the ultimate-owner flag.
+ * An entity is considered an alternative if it is the source (startNode) in an IsAlternativeHeadquarterFor relation
+ * that is valid today.
  */
 @Service
-class AlternativeHeadquarterUltimateOwnerValidator(
+class AlternativeHeadquarterValidator(
     private val relationRepository: RelationRepository
 ) {
 
