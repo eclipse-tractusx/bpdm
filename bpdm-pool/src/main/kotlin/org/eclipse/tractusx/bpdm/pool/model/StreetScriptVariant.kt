@@ -30,4 +30,8 @@ data class StreetScriptVariant(
     val additionalNamePrefix: String? = null,
     val nameSuffix: String? = null,
     val additionalNameSuffix: String? = null
-)
+) {
+    companion object {
+        val empty = StreetScriptVariant(null, null, null, null, null, null)
+    }
+}
