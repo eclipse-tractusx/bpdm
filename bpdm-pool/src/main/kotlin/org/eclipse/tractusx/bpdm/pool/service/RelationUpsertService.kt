@@ -111,7 +111,8 @@ class RelationUpsertService(
 
 
     private fun isTheSameRelation(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
-        return relationToUpsert.source.bpn == relation.startNode.bpn && relationToUpsert.target.bpn == relation.endNode.bpn
+        val existingRelation = relationToUpsert.existingRelation ?: return false
+        return existingRelation.id == relation.id
     }
 
     private fun hasOverlap(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{

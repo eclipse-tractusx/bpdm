@@ -30,6 +30,12 @@ sealed interface LegalEntityUpdateParseError
 data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateParseError
 
 /**
+ * An alternative headquarter cannot carry the ultimate-owner flag. Update-only: setting the flag on an alternative is rejected,
+ * but clearing it stays allowed.
+ */
+data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateParseError
+
+/**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
  * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
  * [AddressContentParseError] directly.

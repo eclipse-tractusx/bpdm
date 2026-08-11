@@ -481,6 +481,8 @@ class TaskStepBuildService(
             is MultipleUltimateOwnersInHierarchy ->
                 "An ownership hierarchy can have at most one ultimate owner, but these legal entities are also flagged " +
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
+            is AlternativeHeadquarterCannotOwnUltimately ->
+                "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
             is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
             is LegalEntityContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
