@@ -26,31 +26,17 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
-import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHelper
-import org.eclipse.tractusx.bpdm.test.system.utils.RelationState
-import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
-import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
-import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withExternalId
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withTarget
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withValidityPeriods
+import org.eclipse.tractusx.bpdm.test.system.utils.*
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDate
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
+import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 /**
  * Steps for the "Output Reflects Golden Record Relations" feature.
@@ -143,6 +129,22 @@ class GoldenRecordRelationsInOutputStepDefs(
         context.addressBpnByLabel[addressId] = addressWithParent.address.address.bpna
     }
 
+    @Given("record {string} reflects site {string} of legal entity {string}")
+    fun `given record reflects site of legal entity`(recordId: String, siteId: String, legalEntityId: String) {
+        logger.info { "[$scenarioName] Given: record '$recordId' reflects site '$siteId' of legal entity '$legalEntityId'" }
+        // Distinct site labels under one legal entity label land on two sites of the same Pool legal entity,
+        // which an IsReplacedBy relation between sites requires.
+        shareActions.upload(recordId, isOwnCompanyData = true)
+        val siteWithParent = shareActions.refineAsSite(
+            recordId,
+            masterDataSeed = siteId,
+            siteLabel = siteId,
+            legalEntityLabel = legalEntityId
+        )
+        context.legalEntities[legalEntityId] = siteWithParent.legalEntity
+        context.sites[siteId] = siteWithParent
+    }
+
     @Given("record {string} reflects legal entity {string} with legal address {string}")
     fun `given record reflects legal entity with legal address`(recordId: String, legalEntityId: String, legalAddressId: String) {
         logger.info {
@@ -231,17 +233,9 @@ class GoldenRecordRelationsInOutputStepDefs(
         val taskId = relationSharingStatePage.content.single().taskId!!
         taskReservationWatcher.waitForReservedRelationTask(taskId)
 
-        // The relation connects golden records, so resolve it with the matched golden records' BPNs: the
-        // legal entity BPN for legal-entity relations and the address BPN for address relations. IsReplacedBy
-        // holds between legal entities as well as between addresses, so the relation type alone does not decide
-        // which of the two it is - the additional address endpoint does, the same way the Gate routes the task.
         val sourceOutput = goldenRecordOutputOf(relationState.sourceRecordId)
         val targetOutput = goldenRecordOutputOf(relationState.targetRecordId)
-        val isAddressRelation = relationState.submittedEntry.relationType in ADDRESS_CAPABLE_RELATION_TYPES
-                && listOf(sourceOutput, targetOutput).any { it.address.addressType == AddressType.AdditionalAddress }
-
-        val sourceBpn = goldenRecordBpnOf(sourceOutput, isAddressRelation)
-        val targetBpn = goldenRecordBpnOf(targetOutput, isAddressRelation)
+        val (sourceBpn, targetBpn) = goldenRecordBpnsOf(relationState.submittedEntry.relationType, sourceOutput, targetOutput)
 
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(
             TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(
@@ -278,6 +272,12 @@ class GoldenRecordRelationsInOutputStepDefs(
         val parentBpnl = context.legalEntities[parentLegalEntityId]?.header?.bpnl
             ?: error("legal entity '$parentLegalEntityId' must be defined by an earlier golden record refinement step")
         assertHelper.assertLegalEntityRelationReflected(recordId, context.relations[relationId]!!, expectedParentBpnl = parentBpnl)
+    }
+
+    @Then("{string} output reflects the site golden record relation {string}")
+    fun `then output reflects site relation`(recordId: String, relationId: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output reflects the site golden record relation '$relationId'" }
+        assertHelper.assertSiteRelationReflected(recordId, context.relations[relationId]!!)
     }
 
     @Then("{string} output reflects the address golden record relation {string}")
@@ -323,8 +323,34 @@ class GoldenRecordRelationsInOutputStepDefs(
         return outputPage.content.single()
     }
 
-    private fun goldenRecordBpnOf(output: BusinessPartnerOutputDto, isAddressRelation: Boolean): String =
-        if (isAddressRelation) output.address.addressBpn else output.legalEntity.legalEntityBpn
+    /**
+     * The BPN pair to establish the relation between, chosen the same way the Gate routes the golden record task:
+     * IsReplacedBy holds between legal entities, between sites and between addresses, so the relation type alone
+     * does not decide which - the two records' address types do.
+     */
+    private fun goldenRecordBpnsOf(
+        relationType: GateRelationType,
+        sourceOutput: BusinessPartnerOutputDto,
+        targetOutput: BusinessPartnerOutputDto
+    ): Pair<String, String> {
+        val outputs = listOf(sourceOutput, targetOutput)
+        val bothSiteMain = outputs.all { it.address.addressType == AddressType.SiteMainAddress }
+        val anyAdditional = outputs.any { it.address.addressType == AddressType.AdditionalAddress }
+
+        return when {
+            relationType !in ADDRESS_CAPABLE_RELATION_TYPES ->
+                sourceOutput.legalEntity.legalEntityBpn to targetOutput.legalEntity.legalEntityBpn
+            bothSiteMain ->
+                siteBpnOf(sourceOutput) to siteBpnOf(targetOutput)
+            anyAdditional ->
+                sourceOutput.address.addressBpn to targetOutput.address.addressBpn
+            else ->
+                sourceOutput.legalEntity.legalEntityBpn to targetOutput.legalEntity.legalEntityBpn
+        }
+    }
+
+    private fun siteBpnOf(output: BusinessPartnerOutputDto): String =
+        output.site?.siteBpn ?: error("record output '${output.externalId}' must have a site to take part in a site relation")
 
     private fun attachGateCall(method: String, path: String, request: Any? = null, response: Any? = null) {
         val content = buildMap {

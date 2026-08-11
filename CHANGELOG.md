@@ -34,6 +34,12 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
   A succession carries no further consequences: nothing is inherited from the predecessor, its state is unchanged, and it stays free to participate in ownership.
   A Gate relation between two legal entities of this type previously ended in a sharing error and is now shared as a legal entity relation.
   Legal entity `IsReplacedBy` relations are omitted from the deprecated v6 API, whose relation types are frozen [#1680](https://github.com/eclipse-tractusx/bpdm/issues/1680)
+- BPDM Pool, Gate and Orchestrator: `IsReplacedBy` is now also a valid relation between two sites (BPNS to BPNS), expressing that the source site is succeeded by the target site.
+  Sites had no supported relations over the golden record process at all before, so the Pool now stores site relations, reports them on every site it returns, and the Gate surfaces them on the site of a business partner output.
+  Both sites must belong to the same legal entity. The Pool rejects a succession that gives a site more than one successor in overlapping validity periods, and one that would close a cycle over overlapping validity periods; several sites may be succeeded by the same one, so mergers are accepted.
+  A succession carries no further consequences: nothing is inherited from the predecessor, no addresses or site memberships move, and its state is unchanged.
+  A Gate relation of this type is shared as a site relation only when both business partners are refined to a site whose main address is its own; where a site shares its legal entity's address, `IsReplacedBy` continues to mean that the two legal entities succeed each other, so such a site cannot be replaced.
+  Because a site name is unique within its legal entity, a site and its successor always carry different names [#1676](https://github.com/eclipse-tractusx/bpdm/issues/1676)
 
 ### Changed
 

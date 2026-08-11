@@ -48,6 +48,9 @@ data class SiteVerboseDto(
 
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
-    val scriptVariants: List<SiteScriptVariantDto>
+    val scriptVariants: List<SiteScriptVariantDto>,
+
+    @get:Schema(description = "Relations this site is the source or the target of")
+    val relations: Collection<SiteRelationVerboseDto> = emptyList()
 
 ) : IBaseSiteDto

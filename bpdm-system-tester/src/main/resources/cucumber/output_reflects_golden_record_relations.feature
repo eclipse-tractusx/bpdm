@@ -2,12 +2,13 @@
 # golden record(s) it is matched to. For any relation between two golden records, every record matched to
 # one of those golden records must surface that relation in its output.
 #
-# Relations are shown on two levels, independent of the record's own golden record type:
+# Relations are shown on three levels, independent of the record's own golden record type:
 #   - legal entity relations (IsOwnedBy, IsManagedBy, IsAlternativeHeadquarterFor) surface on the output's
 #     legal entity,
+#   - site relations (IsReplacedBy between sites) surface on the output's site,
 #   - address relations (IsReplacedBy between addresses) surface on the output's address.
 # IsReplacedBy also exists between two legal entities, where it surfaces on the legal entity; that variant is
-# covered in legal_entity_succession.feature.
+# covered in legal_entity_succession.feature and the site variant in site_succession.feature.
 # All levels are shown regardless of what the record itself was refined to. In particular, a record refined
 # as an additional address still shows the relations of its parent legal entity, even though the record is
 # technically the additional address and the legal entity is only its parent.

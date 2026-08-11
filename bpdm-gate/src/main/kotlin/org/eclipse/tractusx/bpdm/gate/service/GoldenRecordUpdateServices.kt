@@ -31,6 +31,11 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.GeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Street
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -40,10 +45,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -261,6 +263,7 @@ class GoldenRecordUpdateChunkService(
             addressUpdatedAt = addressUpdatedAt,
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
+            siteGoldenRecordRelations = siteGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
             ownershipUltimate = ownershipUltimate,
             ultimateOwnerBpnl = ultimateOwnerBpnl,
@@ -342,6 +345,10 @@ class GoldenRecordUpdateChunkService(
         return LegalEntityGoldenRecordRelation(relationType, sourceBpn, targetBpn)
     }
 
+    private fun SiteGoldenRecordRelationDb.toUpsertData(): SiteGoldenRecordRelation {
+        return SiteGoldenRecordRelation(relationType, sourceBpn, targetBpn)
+    }
+
     private fun AddressGoldenRecordRelationDb.toUpsertData(): AddressGoldenRecordRelation {
         return AddressGoldenRecordRelation(relationType, sourceBpn, targetBpn)
     }
@@ -376,6 +383,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.siteName = site.name
         businessPartner.siteUpdatedAt = site.updatedAt
         businessPartner.siteConfidence?.let { update(it,  site.confidenceCriteria) }
+        businessPartner.siteGoldenRecordRelations.replace(site.relations.map(::toEntity))
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 
@@ -490,6 +498,15 @@ class GoldenRecordUpdateChunkService(
             targetBpn = poolDto.businessPartnerTargetBpnl
         )
 
+
+    private fun toEntity(poolDto: SiteRelationVerboseDto) =
+        SiteGoldenRecordRelationDb(
+            relationType = when (poolDto.type) {
+                SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = poolDto.businessPartnerSourceBpns,
+            targetBpn = poolDto.businessPartnerTargetBpns
+        )
 
     private fun toEntity(poolDto: AddressRelationVerboseDto) =
         AddressGoldenRecordRelationDb(

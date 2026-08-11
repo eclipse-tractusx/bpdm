@@ -26,15 +26,11 @@ import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class RelationUpsertService(
@@ -121,8 +117,8 @@ class RelationUpsertService(
     }
 
     private fun hasOverlap(validity1: RelationValidityPeriodDb, validity2: RelationValidityPeriodDb): Boolean {
-        return TimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
-            .hasOverlap(TimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
+        return RelationTimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
+            .hasOverlap(RelationTimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
     }
 
     data class UpsertRequest(
@@ -133,21 +129,4 @@ class RelationUpsertService(
         val existingRelation: RelationDb?,
         val reasonCode: ReasonCodeDb?
     )
-
-    data class TimePeriod(
-        val validFrom: LocalDate,
-        val validTo: LocalDate
-    ){
-        companion object{
-            private val maxValidTo = LocalDate.parse("9999-01-01")
-
-            fun fromUnlimited(validFrom: LocalDate, validTo: LocalDate?): TimePeriod{
-                return TimePeriod(validFrom, validTo ?: maxValidTo)
-            }
-        }
-
-        fun hasOverlap(other: TimePeriod): Boolean{
-            return validFrom < other.validTo && validTo > other.validFrom
-        }
-    }
 }

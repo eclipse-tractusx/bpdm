@@ -25,12 +25,26 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
 
 @Embeddable
 data class LegalEntityGoldenRecordRelationDb(
     @Enumerated(EnumType.STRING)
     @Column(name = "relation_type", nullable = false)
     val relationType: LegalEntityGoldenRecordRelationType,
+
+    @Column(name = "source_bpn", nullable = false)
+    val sourceBpn: String,
+
+    @Column(name = "target_bpn", nullable = false)
+    val targetBpn: String
+)
+
+@Embeddable
+data class SiteGoldenRecordRelationDb(
+    @Enumerated(EnumType.STRING)
+    @Column(name = "relation_type", nullable = false)
+    val relationType: SiteGoldenRecordRelationType,
 
     @Column(name = "source_bpn", nullable = false)
     val sourceBpn: String,

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
@@ -33,8 +34,6 @@ import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerResolutionService
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.springframework.transaction.support.TransactionTemplate
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
@@ -51,6 +50,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -1824,7 +1824,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
     }
 
-    // Production rejects relations without validity periods (see TaskLegalEntityRelationsStepBuildService.validateValidityPeriods),
+    // Production rejects relations without validity periods (see RelationValidityPeriodValidator),
     // so fixtures must supply a currently-active, open-ended period to mirror that guarantee.
     private fun currentValidityPeriod() =
         org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb(

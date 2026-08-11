@@ -69,6 +69,9 @@ class TaskResolutionMapper {
                 // and perform that last step to set this to null later on after we use this site main address to override the legal entities legal address
                 siteMainAddress = toTaskResult(siteMainAddress, hasChanged),
                 scriptVariants = scriptVariants.map { toTaskResult(it) },
+                goldenRecordRelations = relations
+                    .distinctBy { Triple(it.type, it.businessPartnerSourceBpns, it.businessPartnerTargetBpns) }
+                    .map { toTaskResult(it) },
                 updatedAt = updatedAt
             )
         }
@@ -245,6 +248,16 @@ class TaskResolutionMapper {
             },
             sourceBpn = relation.businessPartnerSourceBpnl,
             targetBpn = relation.businessPartnerTargetBpnl
+        )
+    }
+
+    fun toTaskResult(relation: SiteRelationVerboseDto): SiteGoldenRecordRelation{
+        return SiteGoldenRecordRelation(
+            relationType = when (relation.type) {
+                SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = relation.businessPartnerSourceBpns,
+            targetBpn = relation.businessPartnerTargetBpns
         )
     }
 
