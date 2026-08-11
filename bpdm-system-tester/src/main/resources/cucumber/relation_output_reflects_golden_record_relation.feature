@@ -105,3 +105,24 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
     When the sharing member shares relation "succession" of type "IsReplacedBy" from "predecessor-record" to "successor-record"
     And the golden record process establishes relation "succession"
     Then relation "succession" output reflects the established golden record relation
+
+  #h3. Test Objective:
+  #
+  #* Verify the sharing member's relation output reflects an established IsReplacedBy golden record relation between two sites.
+  #
+  #h3. Preconditions:
+  #
+  ## Two records each reflect a site of the same legal entity (predecessor and successor).
+  #
+  #h3. Description:
+  #
+  ## The sharing member shares an IsReplacedBy relation from the predecessor site record to the successor site record, effective immediately.
+  ## The golden record process establishes the relation between the two BPNS.
+  ## The relation output reflects the established golden record relation.
+  @BPDM
+  Scenario: IsReplacedBy Relation Between Sites Reflected In Sharing Member Relation Output
+    Given record "predecessor-site-record" reflects site "predecessor-site" of legal entity "acme"
+    And record "successor-site-record" reflects site "successor-site" of legal entity "acme"
+    When the sharing member shares relation "site-succession" of type "IsReplacedBy" from "predecessor-site-record" to "successor-site-record" effective immediately
+    And the golden record process establishes relation "site-succession"
+    Then relation "site-succession" output reflects the established golden record relation

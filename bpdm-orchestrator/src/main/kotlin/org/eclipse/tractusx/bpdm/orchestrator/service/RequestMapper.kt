@@ -52,6 +52,7 @@ class RequestMapper {
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
                 legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
+                siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
                 addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner)
             )
         }
@@ -311,6 +312,12 @@ class RequestMapper {
     fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<LegalEntityGoldenRecordRelationDb> =
         businessPartner.legalEntity.goldenRecordRelations
             .map { LegalEntityGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
+            .toMutableList()
+
+    fun toSiteGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<SiteGoldenRecordRelationDb> =
+        businessPartner.site?.goldenRecordRelations
+            .orEmpty()
+            .map { SiteGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
             .toMutableList()
 
     fun toAddressGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<AddressGoldenRecordRelationDb> =

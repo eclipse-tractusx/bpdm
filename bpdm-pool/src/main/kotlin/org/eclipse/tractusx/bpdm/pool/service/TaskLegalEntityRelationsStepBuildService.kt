@@ -42,7 +42,8 @@ class TaskLegalEntityRelationsStepBuildService(
     private val ownedByRelationService: OwnedByRelationUpsertService,
     private val isReplacedByRelationService: IsReplacedByRelationUpsertService,
     private val relationRepository: RelationRepository,
-    private val reasonCodeRepository: ReasonCodeRepository
+    private val reasonCodeRepository: ReasonCodeRepository,
+    private val relationValidityPeriodValidator: RelationValidityPeriodValidator
 ) {
     @Transactional
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
@@ -63,7 +64,7 @@ class TaskLegalEntityRelationsStepBuildService(
             reasonCodeRepository.findByTechnicalKey(it) ?: throw BpdmValidationException("Relation reason code '${relationDto.reasonCode}' not found")
         }
 
-        validateValidityPeriods(relationDto)
+        relationValidityPeriodValidator.validate(relationDto)
 
         // Map states from orchestrator
         val validityPeriods = relationDto.validityPeriods.map {
@@ -132,30 +133,6 @@ class TaskLegalEntityRelationsStepBuildService(
             LegalEntityRelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
             LegalEntityRelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
             LegalEntityRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
-        }
-    }
-
-    private fun validateValidityPeriods(relation: BusinessPartnerRelations) {
-        val orderedValidityPeriods = relation.validityPeriods.sortedBy { it.validFrom }
-
-        if(orderedValidityPeriods.isEmpty()){
-            throw BpdmValidationException("Relation validity periods cannot be empty, at least one validity needed.")
-        }
-
-        orderedValidityPeriods.first().let { state ->
-            if (state.validTo != null && state.validFrom.isAfter(state.validTo)) {
-                throw BpdmValidationException("Relation validity period validFrom '${state.validFrom}' cannot be after validTo '${state.validTo}'.")
-            }
-        }
-
-        val orderedTimePeriods = orderedValidityPeriods.map { RelationUpsertService.TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
-        val consecutiveTimePeriodPairs =  orderedTimePeriods.zip(orderedTimePeriods.drop(1))
-
-       val anyOverlap =  consecutiveTimePeriodPairs
-           .any { (state1, state2) -> state1.hasOverlap(state2) }
-
-        if(anyOverlap){
-            throw BpdmValidationException("Relation validity periods must not overlap.")
         }
     }
 }

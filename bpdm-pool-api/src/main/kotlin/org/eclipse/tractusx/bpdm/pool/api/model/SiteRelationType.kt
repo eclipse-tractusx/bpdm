@@ -17,37 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-data class LegalEntityGoldenRecordRelationDto(
-    val relationType: LegalEntityGoldenRecordRelationTypeDto,
-    val sourceBpn: String,
-    val targetBpn: String
-)
-
-enum class LegalEntityGoldenRecordRelationTypeDto {
-    IsAlternativeHeadquarterFor,
-    IsManagedBy,
-    IsOwnedBy,
-    IsReplacedBy
-}
-
-data class SiteGoldenRecordRelationDto(
-    val relationType: SiteGoldenRecordRelationTypeDto,
-    val sourceBpn: String,
-    val targetBpn: String
-)
-
-enum class SiteGoldenRecordRelationTypeDto {
-    IsReplacedBy
-}
-
-data class AddressGoldenRecordRelationDto(
-    val relationType: AddressGoldenRecordRelationTypeDto,
-    val sourceBpn: String,
-    val targetBpn: String
-)
-
-enum class AddressGoldenRecordRelationTypeDto {
+enum class SiteRelationType {
     IsReplacedBy
 }

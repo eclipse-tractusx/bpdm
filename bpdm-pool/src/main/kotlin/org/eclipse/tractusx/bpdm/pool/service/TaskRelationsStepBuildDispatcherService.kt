@@ -28,7 +28,8 @@ import org.springframework.stereotype.Service
 @Service
 class TaskRelationsStepBuildDispatcherService(
     private val taskLegalEntityRelationsStepBuildService: TaskLegalEntityRelationsStepBuildService,
-    private val taskAddressRelationsStepBuildService: TaskAddressRelationsStepBuildService
+    private val taskAddressRelationsStepBuildService: TaskAddressRelationsStepBuildService,
+    private val taskSiteRelationsStepBuildService: TaskSiteRelationsStepBuildService
 ) {
 
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto) : TaskRelationsStepResultEntryDto {
@@ -43,8 +44,14 @@ class TaskRelationsStepBuildDispatcherService(
             source.startsWith("BPNA", true) && target.startsWith("BPNA", true) && relationType in ADDRESS_RELATION_TYPES-> {
                 taskAddressRelationsStepBuildService.upsertAddressRelations(taskEntry)
             }
+            source.startsWith("BPNS", true) && target.startsWith("BPNS", true) && relationType in SITE_RELATION_TYPES-> {
+                taskSiteRelationsStepBuildService.upsertSiteRelations(taskEntry)
+            }
             else -> {
-                throw BpdmValidationException("Invalid relation: mixed legal entity or address types not allowed (source=$source, target=$target)")
+                throw BpdmValidationException(
+                    "Invalid relation: source and target must be of the same business partner type and carry a relation type " +
+                            "supported for it (source=$source, target=$target, relationType=$relationType)"
+                )
             }
         }
     }
@@ -57,6 +64,10 @@ class TaskRelationsStepBuildDispatcherService(
     )
 
     private val ADDRESS_RELATION_TYPES = setOf(
+        RelationType.IsReplacedBy
+    )
+
+    private val SITE_RELATION_TYPES = setOf(
         RelationType.IsReplacedBy
     )
 }

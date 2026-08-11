@@ -29,6 +29,10 @@ object GateTestTypes {
         IsReplacedBy(RelationType.IsReplacedBy)
     }
 
+    enum class SiteRelationType(val gateRelationType: RelationType){
+        IsReplacedBy(RelationType.IsReplacedBy)
+    }
+
     enum class AddressRelationType(val gateRelationType: RelationType){
         IsReplacedBy(RelationType.IsReplacedBy)
     }

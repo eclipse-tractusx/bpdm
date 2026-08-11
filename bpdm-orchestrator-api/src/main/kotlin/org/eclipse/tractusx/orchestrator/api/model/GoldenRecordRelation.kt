@@ -38,6 +38,20 @@ enum class LegalEntityGoldenRecordRelationType {
     IsReplacedBy
 }
 
+@Schema(description = "A golden record relation between sites, pointing from a source BPNS to a target BPNS")
+data class SiteGoldenRecordRelation(
+    @Schema(description = "The type of this relation")
+    val relationType: SiteGoldenRecordRelationType,
+    @Schema(description = "The BPNS of the source site")
+    val sourceBpn: String,
+    @Schema(description = "The BPNS of the target site")
+    val targetBpn: String
+)
+
+enum class SiteGoldenRecordRelationType {
+    IsReplacedBy
+}
+
 @Schema(description = "A golden record relation between addresses, pointing from a source BPNA to a target BPNA")
 data class AddressGoldenRecordRelation(
     @Schema(description = "The type of this relation")

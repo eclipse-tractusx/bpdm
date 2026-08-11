@@ -2,9 +2,10 @@
 # golden record(s) it is matched to. For any relation between two golden records, every record matched to
 # one of those golden records must surface that relation in its output.
 #
-# Relations are shown on two levels, independent of the record's own golden record type:
-#   - legal entity relations (IsOwnedBy, IsManagedBy, IsAlternativeHeadquarterFor) surface on the output's
-#     legal entity,
+# Relations are shown on three levels, independent of the record's own golden record type:
+#   - legal entity relations (IsOwnedBy, IsManagedBy, IsAlternativeHeadquarterFor, IsReplacedBy) surface on
+#     the output's legal entity,
+#   - site relations (IsReplacedBy) surface on the output's site,
 #   - address relations (IsReplacedBy) surface on the output's address.
 # All levels are shown regardless of what the record itself was refined to. In particular, a record refined
 # as an additional address still shows the relations of its parent legal entity, even though the record is
@@ -19,6 +20,10 @@
 #     currently valid. The Pool expects the legal address as the relation source and the additional address
 #     as the target, and reclassifies (swaps) the two addresses; this feature only asserts that the relation
 #     is reflected and accepts the swap.
+#   - IsReplacedBy between sites is between two sites of the SAME legal entity. Both records must be refined
+#     to a site whose main address is its own (a site sharing its legal entity's address is shared as a legal
+#     entity relation instead). Nothing is reclassified and nothing is inherited: the predecessor site keeps
+#     its addresses and its state.
 @CXTPM-1039
 Feature: Output Reflects Golden Record Relations
 
@@ -109,6 +114,28 @@ Feature: Output Reflects Golden Record Relations
     And the golden record process establishes relation "relocation"
     Then "branch-record" output reflects the address golden record relation "relocation"
     And "legal-address-record" output reflects the address golden record relation "relocation"
+
+  #h3. Test Objective:
+  #
+  #* Verify an established IsReplacedBy relation between two sites surfaces on the site output of both involved records.
+  #
+  #h3. Preconditions:
+  #
+  ## Two records each reflect a site of the same legal entity (predecessor and successor).
+  #
+  #h3. Description:
+  #
+  ## The sharing member shares an IsReplacedBy relation from the predecessor site record to the successor site record, effective immediately.
+  ## The golden record process establishes the relation between the two BPNS.
+  ## Both records' outputs reflect the relation on their site.
+  @BPDM
+  Scenario: IsReplacedBy Relation Between Sites Reflected In Site Outputs
+    Given record "predecessor-site-record" reflects site "predecessor-site" of legal entity "acme"
+    And record "successor-site-record" reflects site "successor-site" of legal entity "acme"
+    When the sharing member shares relation "site-succession" of type "IsReplacedBy" from "predecessor-site-record" to "successor-site-record" effective immediately
+    And the golden record process establishes relation "site-succession"
+    Then "predecessor-site-record" output reflects the site golden record relation "site-succession"
+    And "successor-site-record" output reflects the site golden record relation "site-succession"
 
   #h3. Test Objective:
   #
