@@ -28,7 +28,8 @@ data class LegalEntityGoldenRecordRelationDto(
 enum class LegalEntityGoldenRecordRelationTypeDto {
     IsAlternativeHeadquarterFor,
     IsManagedBy,
-    IsOwnedBy
+    IsOwnedBy,
+    IsReplacedBy
 }
 
 data class AddressGoldenRecordRelationDto(

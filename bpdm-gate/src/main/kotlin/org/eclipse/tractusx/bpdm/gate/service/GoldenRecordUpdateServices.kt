@@ -484,6 +484,7 @@ class GoldenRecordUpdateChunkService(
                 LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
                 LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
                 LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = poolDto.businessPartnerSourceBpnl,
             targetBpn = poolDto.businessPartnerTargetBpnl

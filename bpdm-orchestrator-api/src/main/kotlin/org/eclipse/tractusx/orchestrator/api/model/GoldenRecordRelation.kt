@@ -34,7 +34,8 @@ data class LegalEntityGoldenRecordRelation(
 enum class LegalEntityGoldenRecordRelationType {
     IsAlternativeHeadquarterFor,
     IsManagedBy,
-    IsOwnedBy
+    IsOwnedBy,
+    IsReplacedBy
 }
 
 @Schema(description = "A golden record relation between addresses, pointing from a source BPNA to a target BPNA")

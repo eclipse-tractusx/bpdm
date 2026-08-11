@@ -241,6 +241,7 @@ class TaskResolutionMapper {
                 LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
                 LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
                 LegalEntityRelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = relation.businessPartnerSourceBpnl,
             targetBpn = relation.businessPartnerTargetBpnl

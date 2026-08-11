@@ -867,6 +867,7 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
+            - IsReplacedBy
         sourceBpn:
           type: string
         targetBpn:

@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.RelationState
@@ -76,7 +77,7 @@ class GoldenRecordRelationsInOutputStepDefs(
     companion object {
         private val logger = KotlinLogging.logger { }
 
-        private val ADDRESS_RELATION_TYPES = setOf(GateRelationType.IsReplacedBy)
+        private val ADDRESS_CAPABLE_RELATION_TYPES = setOf(GateRelationType.IsReplacedBy)
 
         // A relocated address that became the headquarter may be a plain legal address or, for a site-based
         // legal entity, the combined legal and site main address.
@@ -231,10 +232,16 @@ class GoldenRecordRelationsInOutputStepDefs(
         taskReservationWatcher.waitForReservedRelationTask(taskId)
 
         // The relation connects golden records, so resolve it with the matched golden records' BPNs: the
-        // legal entity BPN for legal-entity relations and the address BPN for address relations.
-        val isAddressRelation = relationState.submittedEntry.relationType in ADDRESS_RELATION_TYPES
-        val sourceBpn = goldenRecordBpnOf(relationState.sourceRecordId, isAddressRelation)
-        val targetBpn = goldenRecordBpnOf(relationState.targetRecordId, isAddressRelation)
+        // legal entity BPN for legal-entity relations and the address BPN for address relations. IsReplacedBy
+        // holds between legal entities as well as between addresses, so the relation type alone does not decide
+        // which of the two it is - the additional address endpoint does, the same way the Gate routes the task.
+        val sourceOutput = goldenRecordOutputOf(relationState.sourceRecordId)
+        val targetOutput = goldenRecordOutputOf(relationState.targetRecordId)
+        val isAddressRelation = relationState.submittedEntry.relationType in ADDRESS_CAPABLE_RELATION_TYPES
+                && listOf(sourceOutput, targetOutput).any { it.address.addressType == AddressType.AdditionalAddress }
+
+        val sourceBpn = goldenRecordBpnOf(sourceOutput, isAddressRelation)
+        val targetBpn = goldenRecordBpnOf(targetOutput, isAddressRelation)
 
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(
             TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(
@@ -309,13 +316,15 @@ class GoldenRecordRelationsInOutputStepDefs(
         context.legalEntities[legalEntityId]?.header?.bpnl
             ?: error("legal entity '$legalEntityId' must be defined by an earlier refinement step")
 
-    private fun goldenRecordBpnOf(recordId: String, isAddressRelation: Boolean): String {
+    private fun goldenRecordOutputOf(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
         val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
         attachGateCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
-        val output = outputPage.content.single()
-        return if (isAddressRelation) output.address.addressBpn else output.legalEntity.legalEntityBpn
+        return outputPage.content.single()
     }
+
+    private fun goldenRecordBpnOf(output: BusinessPartnerOutputDto, isAddressRelation: Boolean): String =
+        if (isAddressRelation) output.address.addressBpn else output.legalEntity.legalEntityBpn
 
     private fun attachGateCall(method: String, path: String, request: Any? = null, response: Any? = null) {
         val content = buildMap {
