@@ -5,7 +5,9 @@
 # Relations are shown on two levels, independent of the record's own golden record type:
 #   - legal entity relations (IsOwnedBy, IsManagedBy, IsAlternativeHeadquarterFor) surface on the output's
 #     legal entity,
-#   - address relations (IsReplacedBy) surface on the output's address.
+#   - address relations (IsReplacedBy between addresses) surface on the output's address.
+# IsReplacedBy also exists between two legal entities, where it surfaces on the legal entity; that variant is
+# covered in legal_entity_succession.feature.
 # All levels are shown regardless of what the record itself was refined to. In particular, a record refined
 # as an additional address still shows the relations of its parent legal entity, even though the record is
 # technically the additional address and the legal entity is only its parent.
@@ -15,7 +17,7 @@
 #   - IsOwnedBy and IsAlternativeHeadquarterFor are relations between two legal entities.
 #   - IsManagedBy is between two legal entities; the managing entity must be a dataspace participant (own
 #     company data) and the validity must not start in the past.
-#   - IsReplacedBy is between a legal address and an additional address of the SAME legal entity and must be
+#   - IsReplacedBy at address level is between a legal address and an additional address of the SAME legal entity and must be
 #     currently valid. The Pool expects the legal address as the relation source and the additional address
 #     as the target, and reclassifies (swaps) the two addresses; this feature only asserts that the relation
 #     is reflected and accepts the swap.
