@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.GeoCoordinate
