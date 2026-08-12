@@ -52,7 +52,6 @@ class UltimateOwnerDistributionStepDefs(
      * The entity must already exist in the Pool.
      */
     @When("the (parent|grandparent|self-owner) entity {string} is marked as ownershipUltimate = true in the golden record")
-    @And("the (parent|grandparent|self-owner) entity {string} is marked as ownershipUltimate = true in the golden record")
     fun markEntityAsUltimateOwner(entityType: String, entityId: String) {
         logger.info { "Marking $entityType entity '$entityId' as ownershipUltimate = true" }
         
@@ -88,7 +87,6 @@ class UltimateOwnerDistributionStepDefs(
      * The value can be either a record ID (which will be resolved to a BPNL) or null.
      */
     @Then("{string} output reflects ultimateOwnerBpnl as {string}")
-    @And("{string} output reflects ultimateOwnerBpnl as {string}")
     fun assertUltimateOwnerBpnl(recordId: String, expectedOwnerRecordId: String) {
         logger.info { "Asserting that '$recordId' output reflects ultimateOwnerBpnl as '$expectedOwnerRecordId'" }
         
@@ -120,7 +118,6 @@ class UltimateOwnerDistributionStepDefs(
      * Asserts that a record's output reflects null as the ultimateOwnerBpnl value.
      */
     @Then("{string} output reflects ultimateOwnerBpnl as null")
-    @And("{string} output reflects ultimateOwnerBpnl as null")
     fun assertUltimateOwnerBpnlNull(recordId: String) {
         logger.info { "Asserting that '$recordId' output reflects ultimateOwnerBpnl as null" }
         
