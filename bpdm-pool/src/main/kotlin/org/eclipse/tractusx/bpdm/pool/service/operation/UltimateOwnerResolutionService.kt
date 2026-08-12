@@ -50,10 +50,22 @@ class UltimateOwnerResolutionService(
      */
     @Transactional(readOnly = true)
     fun resolve(legalEntity: LegalEntityDb): String? =
-        when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
+        resolveWithAlternativeGuard(legalEntity, mutableSetOf())
+
+    private fun resolveWithAlternativeGuard(legalEntity: LegalEntityDb, visited: MutableSet<String>): String? {
+        if (!visited.add(legalEntity.bpn)) {
+            logger.warn { "Cycle detected in alternative headquarter chain at BPNL: ${legalEntity.bpn}" }
+            return null
+        }
+        val alternativeMain = mainOfAlternative(legalEntity)
+        if (alternativeMain != null) {
+            return resolveWithAlternativeGuard(alternativeMain, visited)
+        }
+        return when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
             is Resolution.UltimateOwner -> resolution.bpnl
             Resolution.CycleDetected -> null
         }
+    }
 
     /**
      * Resolves [legalEntities] and every entity owned by them, transitively — the set whose ultimate owner can change
@@ -79,9 +91,26 @@ class UltimateOwnerResolutionService(
 
         resolved[legalEntity] = resolve(legalEntity)
 
+        if (mainOfAlternative(legalEntity) != null) {
+            return
+        }
+
+        currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
+            .forEach { alternativeRelation ->
+                val alternative = alternativeRelation.startNode
+                if (visited.add(alternative.bpn)) {
+                    resolved[alternative] = resolved[legalEntity]
+                }
+            }
+
         currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity))
             .forEach { collectWithDescendants(it.startNode, visited, resolved) }
     }
+
+    private fun mainOfAlternative(legalEntity: LegalEntityDb): LegalEntityDb? =
+        currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
+            .firstOrNull()
+            ?.endNode
 
     private fun resolveWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): Resolution {
         val currentBpn = legalEntity.bpn

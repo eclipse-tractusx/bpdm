@@ -416,6 +416,8 @@ data class Site(
     val hasChanged: Boolean?,
     val siteMainAddress: PostalAddress?,
     val scriptVariants: List<SiteScriptVariant>,
+    @Schema(description = "Golden record relations belonging to this site")
+    val goldenRecordRelations: List<SiteGoldenRecordRelation> = emptyList(),
     val updatedAt: Instant? = null
 ){
     companion object{
@@ -427,6 +429,7 @@ data class Site(
             hasChanged = null,
             siteMainAddress = PostalAddress.empty,
             scriptVariants = emptyList(),
+            goldenRecordRelations = emptyList(),
             updatedAt = null
         )
     }

@@ -23,10 +23,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGoldenRecordRelationTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGoldenRecordRelationTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import tools.jackson.databind.json.JsonMapper
@@ -71,6 +68,21 @@ class GoldenRecordRelationAssertHelper(
                 .describedAs("output legal entity BPN of '%s' must be its parent legal entity", recordId)
                 .isEqualTo(expectedParentBpnl)
         }
+    }
+
+    /**
+     * Asserts the [recordId] output's site reflects [relation] in its golden record relations.
+     */
+    fun assertSiteRelationReflected(recordId: String, relation: RelationState) {
+        val expectedType = SiteGoldenRecordRelationTypeDto.valueOf(toGateType(relation).name)
+        val expectedBpns = resolvedBpnPair(relation)
+
+        val output = fetchOutput(recordId)
+        val site = output.site ?: error("output of '$recordId' must have a site to reflect a site relation")
+
+        assertThat(site.goldenRecordRelations.map { setOf(it.sourceBpn, it.targetBpn) to it.relationType })
+            .describedAs("site output of '%s' must reflect a %s relation between BPNs %s", recordId, expectedType, expectedBpns)
+            .contains(expectedBpns to expectedType)
     }
 
     /**

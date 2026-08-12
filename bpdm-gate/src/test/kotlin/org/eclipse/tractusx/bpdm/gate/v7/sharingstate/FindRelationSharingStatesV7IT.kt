@@ -278,6 +278,34 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     }
 
     /**
+     * GIVEN an IsReplacedBy relation where both sides have a site output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Pending because a site can be replaced by another site
+     */
+    @Test
+    fun `IsReplacedBy between two site outputs leads to pending sharing state`() {
+        //GIVEN
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.businessPartner.refineToSite(it) },
+            { testDataClient.businessPartner.refineToSite(it) }
+        )
+        val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId, testName)
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = RelationSharingStateDto(
+            externalId = relation.externalId,
+            sharingStateType = RelationSharingStateType.Pending,
+            taskId = createdTask.taskId,
+            updatedAt = Instant.MIN
+        )
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
      * GIVEN an IsManagedBy relation where the source has a legal entity output and the target has a site output,
      *   and the golden record task creation has been triggered
      * WHEN input consumer searches for the relation sharing state
@@ -416,25 +444,26 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     }
 
     /**
-     * GIVEN an IsReplacedBy relation where both source and target have legal entity outputs,
-     *   and the golden record task creation has been triggered
+     * GIVEN an IsReplacedBy relation where both source and target have legal entity outputs
      * WHEN input consumer searches for the relation sharing state
-     * THEN the sharing state shows Error because IsReplacedBy requires one side to be a legal entity and the other an additional address
+     * THEN the sharing state shows Pending because IsReplacedBy is shared as a legal entity relation
      */
     @Test
-    fun `IsReplacedBy between two legal entities leads to sharing error`() {
+    fun `IsReplacedBy between two legal entities is shared as legal entity relation`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
-            { testDataClient.businessPartner.refineToLegalEntity(it) },
-            { testDataClient.businessPartner.refineToLegalEntity(it) }
-        )
-        relationTaskCreationService.sendTasks()
+        val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName, RelationType.IsReplacedBy)
+        val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId)
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = expectedErrorState(relation.externalId)
+        val expected = RelationSharingStateDto(
+            externalId = relation.externalId,
+            sharingStateType = RelationSharingStateType.Pending,
+            taskId = createdTask.taskId,
+            updatedAt = Instant.MIN
+        )
         assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
     }
 

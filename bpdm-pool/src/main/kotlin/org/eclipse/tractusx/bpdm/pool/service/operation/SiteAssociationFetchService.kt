@@ -33,14 +33,15 @@ class SiteAssociationFetchService(
 ) {
 
     /**
-     * Loads the addresses and states of the given sites into the persistence context, along with everything those
-     * addresses are rendered from.
+     * Loads the addresses, states and relations of the given sites into the persistence context, along with everything
+     * those addresses are rendered from.
      */
     fun fetch(sites: Set<SiteDb>) {
         if (sites.isEmpty()) return
 
         siteRepository.joinAddresses(sites)
         siteRepository.joinStates(sites)
+        siteRepository.joinRelations(sites)
         addressAssociationFetchService.fetch(sites.flatMap { it.addresses }.toSet())
     }
 }

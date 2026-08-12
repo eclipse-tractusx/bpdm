@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -193,6 +194,9 @@ class BusinessPartnerMappings {
                         "Missing site confidence criteria"
                     ),
                     states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    goldenRecordRelations = entity.siteGoldenRecordRelations.map { relation ->
+                        SiteGoldenRecordRelationDto(toSiteRelationType(relation.relationType), relation.sourceBpn, relation.targetBpn)
+                    },
                     updatedAt = entity.siteUpdatedAt ?: Instant.EPOCH
                 )
             }
@@ -423,6 +427,12 @@ class BusinessPartnerMappings {
             LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeDto.IsAlternativeHeadquarterFor
             LegalEntityGoldenRecordRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeDto.IsManagedBy
             LegalEntityGoldenRecordRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeDto.IsOwnedBy
+            LegalEntityGoldenRecordRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationTypeDto.IsReplacedBy
+        }
+
+    private fun toSiteRelationType(type: SiteGoldenRecordRelationType) =
+        when (type) {
+            SiteGoldenRecordRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeDto.IsReplacedBy
         }
 
     private fun toAddressRelationType(type: AddressGoldenRecordRelationType) =
