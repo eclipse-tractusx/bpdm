@@ -81,6 +81,27 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
     /**
      * GIVEN reserved task
+     * WHEN user resolves task as business partner data stating additional sites of its address but no site of its own
+     * THEN user sees 400 BAD REQUEST error
+     */
+    @Test
+    fun `try resolve reserved task with additional sites but no site`(){
+        //GIVEN
+        val createdTask = testDataClient.createBusinessPartnerTask(testName)
+        val reservedTask = testDataClient.reserveBusinessPartnerTasks(createdTask.processingState.step).reservedTasks.single()
+
+        //WHEN
+        val businessPartnerResult = requestFactory.buildSiteWithAdditionalSitesBusinessPartner("result $testName").copy(site = null)
+        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resolveRequest: () -> Unit = { orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest) }
+
+        //THEN
+        Assertions.assertThatThrownBy(resolveRequest).isInstanceOf(WebClientResponseException.BadRequest::class.java)
+    }
+
+    /**
+     * GIVEN reserved task
      * WHEN user resolves task as site
      * THEN user sees resolved task data in next step
      */

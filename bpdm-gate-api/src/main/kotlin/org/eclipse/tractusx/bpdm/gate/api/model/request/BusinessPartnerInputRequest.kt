@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
@@ -46,5 +47,8 @@ data class BusinessPartnerInputRequest(
     override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
     override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
     override val externalSequenceTimestamp: Instant? = null,
-    val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList()
+    val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList(),
+
+    @get:Schema(description = AdditionalSiteInputDto.collectionDescription)
+    val additionalSites: List<AdditionalSiteInputDto> = emptyList()
 ) : IBaseBusinessPartnerGateDto

@@ -119,7 +119,11 @@ class TaskStepBuildService(
         // runs after all three components.
         val recordAddressBpn = recordAddressBpn(businessPartnerDto.type!!, legalEntityResult, siteResult, addressResult)
         processAdditionalSites(businessPartnerDto, recordAddressBpn, taskEntryBpnMapping)
-        val additionalSiteResults = readAdditionalSites(recordAddressBpn, siteResult?.bpnReference?.referenceValue)
+        // Additional sites are the sites of the address next to the site this data is about, so business partner data
+        // without a site of its own reports none - the same rule the data has to satisfy on its way in.
+        val additionalSiteResults = siteResult
+            ?.let { readAdditionalSites(recordAddressBpn, it.bpnReference.referenceValue) }
+            .orEmpty()
 
         val (updatedLegalEntityResult, updatedSiteResult, updatedAddressResult) =
             updateConfidences(businessPartnerDto.type!!, taskEntry.recordId, legalEntityResult, siteResult, addressResult)
@@ -141,10 +145,14 @@ class TaskStepBuildService(
         recordAddressBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ) {
-        val (known, unknown) = businessPartner.additionalSites.partition { taskEntryBpnMapping.getBpn(it.bpnReference) != null }
+        // The same site stated twice is one statement written twice, not two memberships. An entry is identified by the
+        // reference it carries and, carrying none, by the name its site is to be created under - as far as identity goes
+        // here: resolving a name to an existing site is the refinement service's job, not this one's.
+        val statedOnce = businessPartner.additionalSites.distinctBy { it.bpnReference.referenceValue ?: it.siteName }
+        val (known, unknown) = statedOnce.partition { taskEntryBpnMapping.getBpn(it.bpnReference) != null }
 
         createAdditionalSites(unknown, businessPartner, recordAddressBpn, taskEntryBpnMapping)
-        linkAdditionalSites(known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }, recordAddressBpn)
+        linkAdditionalSites(known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }.distinct(), recordAddressBpn)
     }
 
     private fun createAdditionalSites(

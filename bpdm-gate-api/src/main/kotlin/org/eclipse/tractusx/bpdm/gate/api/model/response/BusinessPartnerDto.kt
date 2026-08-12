@@ -44,6 +44,9 @@ data class BusinessPartnerInputDto(
     override val externalSequenceTimestamp:Instant? = null,
     val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList(),
 
+    @get:Schema(description = AdditionalSiteInputDto.collectionDescription)
+    val additionalSites: List<AdditionalSiteInputDto> = emptyList(),
+
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
@@ -69,6 +72,22 @@ data class SiteRepresentationInputDto(
     override val name: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseSiteRepresentation
+
+@Schema(description = "A further site the business partner's address belongs to, next to the site in 'site'")
+data class AdditionalSiteInputDto(
+    @get:Schema(description = "The BPNS of the site, if it is known")
+    val siteBpn: String? = null,
+    @get:Schema(description = "The name of the site")
+    val name: String? = null
+) {
+    companion object {
+        const val collectionDescription =
+            "The further sites this business partner's address belongs to, next to the site in 'site'. " +
+                    "A site is identified by its BPNS or, where that is unknown, by its name, which the golden record " +
+                    "process resolves to an existing site or creates a new site for. " +
+                    "An address is never taken away from a site it already belongs to, so removing an entry here has no effect."
+    }
+}
 
 data class AddressRepresentationInputDto(
     override val addressBpn: String? = null,

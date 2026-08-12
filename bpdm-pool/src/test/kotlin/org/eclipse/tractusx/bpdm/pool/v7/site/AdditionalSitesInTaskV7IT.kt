@@ -59,6 +59,28 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
+     * GIVEN a golden record task for a site that states the same further site of its main address twice
+     * WHEN the task is processed
+     * THEN that site is created once and the main address belongs to it and to the site of the record itself
+     */
+    @Test
+    fun `create a stated additional site once when it is stated twice`() {
+        //GIVEN
+        val statedSite = AdditionalSite(bpnReference = BpnReference.empty, siteName = "Additional Site $testName")
+        val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner(testName)
+            .copyWithBpnRequests()
+            .copy(additionalSites = listOf(statedSite, statedSite))
+
+        //WHEN
+        val result = testDataClient.processTask(testName, businessPartner)
+
+        //THEN
+        val createdSite = result.additionalSites.single()
+        assertThat(createdSite.siteName).isEqualTo(statedSite.siteName)
+        assertThat(sitesOfMainAddress(result)).containsExactlyInAnyOrder(result.recordSiteBpn(), createdSite.bpn())
+    }
+
+    /**
      * GIVEN a golden record task for a site that states a further site of its main address which already exists
      * WHEN the task is processed
      * THEN the main address belongs to that existing site as well, and no second site of that name is created
@@ -121,6 +143,31 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         //THEN
         assertThat(result.additionalSites).isEmpty()
         assertThat(sitesOfMainAddress(result)).containsExactly(result.recordSiteBpn())
+    }
+
+    /**
+     * GIVEN a legal entity whose legal address is the main address of a site
+     * WHEN a golden record task without a site of its own is processed for that legal entity
+     * THEN no additional sites are reported back, since there is no site of its own for them to be additional to
+     */
+    @Test
+    fun `report no additional sites for a record without a site`() {
+        //GIVEN
+        val onLegalAddress = testDataClient.processTask(
+            "Site $testName",
+            orchestratorRequestFactory.buildLegalAddressSiteBusinessPartner("Site $testName").copyWithBpnRequests()
+        )
+        val legalEntityBpn = onLegalAddress.legalEntity.bpnReference.referenceValue!!
+
+        //WHEN
+        val businessPartner = orchestratorRequestFactory.buildLegalEntityBusinessPartner("Legal Entity $testName")
+            .copyWithBpnRequests()
+            .underLegalEntity(legalEntityBpn)
+        val result = testDataClient.processTask("Legal Entity $testName", businessPartner)
+
+        //THEN
+        assertThat(result.site).isNull()
+        assertThat(result.additionalSites).isEmpty()
     }
 
     private fun BusinessPartner.underLegalEntity(bpnL: String) =

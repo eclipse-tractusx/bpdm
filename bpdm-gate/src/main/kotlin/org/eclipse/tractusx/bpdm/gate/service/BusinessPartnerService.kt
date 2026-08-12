@@ -72,6 +72,8 @@ class BusinessPartnerService(
     fun upsertBusinessPartnersInput(requests: List<BusinessPartnerInputRequest>, tenantBpnl: String?): List<BusinessPartnerInputDto> {
         logger.debug { "Executing upsertBusinessPartnersInput() with parameters $requests" }
 
+        requests.forEach { assertAdditionalSitesHaveSite(it) }
+
         val sharingStates = sharingStateService.getOrCreateStates(requests.map { it.externalId }, tenantBpnl)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
         val existingInputs = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
@@ -120,6 +122,19 @@ class BusinessPartnerService(
         return upsertFromEntity(businessPartner, updatedData)
     }
 
+
+    /**
+     * Rejects a business partner that states further sites of its address without stating a site of its own, which those
+     * sites would be additional to.
+     */
+    private fun assertAdditionalSitesHaveSite(request: BusinessPartnerInputRequest) {
+        val statesSite = request.site.siteBpn != null || request.site.name != null
+        if (request.additionalSites.isNotEmpty() && !statesSite)
+            throw BpdmInvalidPartnerException(
+                request.externalId,
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
+    }
 
     private fun upsertFromEntity(existingPartner: BusinessPartnerDb?, upsertData: BusinessPartnerDb): UpsertResult {
         val sharingState = upsertData.sharingState

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
@@ -153,6 +152,21 @@ class OrchestratorMockDataFactory(
         )
 
         return mockedCreatedTask
+    }
+
+    fun resetRecordedRequests(){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+        WireMock.resetAllRequests()
+    }
+
+    fun getCreatedTaskBusinessPartners(): List<BusinessPartner>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val loggedRequests = WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_BUSINESS_PARTNERS)))
+
+        return loggedRequests
+            .map { jsonMapper.readValue(it.body, TaskCreateRequest::class.java) }
+            .flatMap { createRequest -> createRequest.requests.map { it.businessPartner } }
     }
 
     fun mockTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{
