@@ -30,7 +30,6 @@ Feature: Ultimate Owner Distribution
     When the sharing member shares relation "ownership" of type "IsOwnedBy" from "child-record" to "parent-record"
     And the golden record process establishes relation "ownership"
     And the parent entity "parent" is marked as ownershipUltimate = true in the golden record
-    And the golden record process processes the update
     Then "child-record" output reflects ultimateOwnerBpnl as "parent"
 
   #h3. Test Objective:
@@ -57,7 +56,6 @@ Feature: Ultimate Owner Distribution
     And the sharing member shares relation "child-ownership" of type "IsOwnedBy" from "child-record" to "parent-record"
     And the golden record process establishes relation "child-ownership"
     And the grandparent entity "grandparent" is marked as ownershipUltimate = true in the golden record
-    And the golden record process processes the update
     Then "parent-record" output reflects ultimateOwnerBpnl as "grandparent"
     And "child-record" output reflects ultimateOwnerBpnl as "grandparent"
 
@@ -101,7 +99,6 @@ Feature: Ultimate Owner Distribution
   Scenario: Entity marked as ultimate owner reports itself
     Given record "self-owner-record" reflects legal entity "self-owner"
     When the self-owner entity "self-owner" is marked as ownershipUltimate = true in the golden record
-    And the golden record process processes the update
     Then "self-owner-record" output reflects ultimateOwnerBpnl as "self-owner"
 
   #h3. Test Objective:
@@ -126,6 +123,5 @@ Feature: Ultimate Owner Distribution
     When the sharing member shares relation "ownership" of type "IsOwnedBy" from "child-record" to "parent-record"
     And the golden record process establishes relation "ownership"
     And the parent entity "parent" is marked as ownershipUltimate = true in the golden record
-    And the golden record process processes the update
     Then "child-record" output reflects ultimateOwnerBpnl as "parent"
     And "parent-record" output reflects ultimateOwnerBpnl as "parent"

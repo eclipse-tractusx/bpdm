@@ -26,6 +26,7 @@ import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import tools.jackson.databind.json.JsonMapper
@@ -57,10 +58,29 @@ class UltimateOwnerDistributionStepDefs(
         
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
-        // TODO: Implement actual update to mark entity as ultimate owner
-        // This requires converting the verbose DTOs from the Pool to non-verbose update request DTOs
-        // For now, just log the action
-        logger.info { "Entity '$entityId' would be marked as ultimate owner in the Pool" }
+        // Get the legal entity from context
+        val legalEntityWithAddress = context.legalEntities[entityId] 
+            ?: error("Legal entity '$entityId' not found in scenario context")
+        
+        // Convert verbose DTO to non-verbose DTO using JSON serialization
+        val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
+        val legalEntity = jsonMapper.readValue(verboseJson, LegalEntityDto::class.java)
+        
+        // Update the legal entity to mark it as ultimate owner
+        val updatedLegalEntity = legalEntity.copy(
+            header = legalEntity.header.copy(
+                ownershipUltimate = true
+            )
+        )
+        
+        // Update the legal entity in the Pool to mark it as ultimate owner
+        val updateRequest = LegalEntityPartnerUpdateRequest(
+            bpnl = legalEntityWithAddress.header.bpnl,
+            legalEntity = updatedLegalEntity
+        )
+        
+        poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+        logger.info { "Successfully marked $entityType entity '$entityId' as ownershipUltimate = true" }
     }
 
     /**
