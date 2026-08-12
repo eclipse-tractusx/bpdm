@@ -52,7 +52,7 @@ class AddressPayloadUpdateService(
     fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
         parsed.map { entry ->
             addressStagedUpdateService.stageUpdate(
-                AddressUpdate(entry.target, addressUpdateMapper.toFullUpdate(entry.address, entry.site))
+                AddressUpdate(entry.target, addressUpdateMapper.toFullUpdate(entry.address, listOfNotNull(entry.site)))
             )
         }
 

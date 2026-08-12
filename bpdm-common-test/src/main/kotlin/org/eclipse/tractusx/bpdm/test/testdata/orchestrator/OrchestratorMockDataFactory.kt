@@ -276,12 +276,20 @@ class OrchestratorMockDataFactory(
     }
 
     fun getBusinessPartnerResolution(): BusinessPartner{
+        return getBusinessPartnerResolutionEntry().businessPartner
+    }
+
+    fun getBusinessPartnerResolutionErrors(): List<TaskErrorDto>{
+        return getBusinessPartnerResolutionEntry().errors
+    }
+
+    private fun getBusinessPartnerResolutionEntry(): TaskStepResultEntryDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val loggedRequests = WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")))
         val postedResult =  jsonMapper.readValue(loggedRequests.first().body, TaskStepResultRequest::class.java)
 
-        return postedResult.results.first().businessPartner
+        return postedResult.results.first()
     }
 
     fun buildInitialTaskCreationResponse(seed: String): TaskCreateResponse{
