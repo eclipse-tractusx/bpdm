@@ -21,14 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -44,7 +43,7 @@ class LegalEntityCreateService(
     private val addressCreateService: AddressCreateService,
     private val legalEntityEntityMapper: LegalEntityEntityMapper,
     private val bpnIssueService: BpnIssueService,
-    private val changelogService: PartnerChangelogService,
+    private val changelogCreateService: ChangelogCreateService,
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
@@ -60,8 +59,8 @@ class LegalEntityCreateService(
 
         legalEntities.zip(stagedAddresses).forEach { (legalEntity, stagedAddress) -> legalEntity.legalAddress = stagedAddress.address }
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
         legalEntityRepository.saveAll(legalEntities)
+        changelogCreateService.record(legalEntities.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
 
         addressCreateService.commit(stagedAddresses)
 

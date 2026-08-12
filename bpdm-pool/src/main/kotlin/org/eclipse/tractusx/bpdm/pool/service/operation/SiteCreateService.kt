@@ -21,13 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,7 +40,7 @@ class SiteCreateService(
     private val addressCreateService: AddressCreateService,
     private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
     private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
 
     /**
@@ -57,7 +56,7 @@ class SiteCreateService(
         sites.zip(stagedAddresses).forEach { (site, stagedAddress) -> site.mainAddress = stagedAddress.address }
 
         siteRepository.saveAll(sites)
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
+        changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
 
         addressCreateService.commit(stagedAddresses)
 

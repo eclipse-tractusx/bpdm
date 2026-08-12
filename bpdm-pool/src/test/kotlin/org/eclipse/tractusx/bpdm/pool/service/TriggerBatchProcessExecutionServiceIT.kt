@@ -22,16 +22,17 @@ package org.eclipse.tractusx.bpdm.pool.service
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
@@ -65,6 +66,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     private val taskRelationsResolutionService: TaskRelationsResolutionService,
     private val triggerBatchProcessExecutionService: TriggerBatchProcessExecutionService,
     private val poolApiClient: PoolApiClient,
+    private val legalEntityRepository: LegalEntityRepository,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers,
     private val poolAssertHelper: PoolAssertHelper
@@ -145,6 +147,36 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val expectedLegalEntity = originalLegalEntity
 
         poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(Instant.now().minusSeconds(2), Instant.now()))
+    }
+
+    @Test
+    fun `alternative headquarter validity trigger recalculates ultimate owner on start date`() {
+        val alternative = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Alt", true))).entities.single()
+        val main = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Main", true))).entities.single()
+
+        val mainDb = legalEntityRepository.findByBpnIgnoreCase(main.legalEntity.header.bpnl)!!
+        mainDb.ownershipUltimate = true
+        legalEntityRepository.save(mainDb)
+
+        val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
+        val alternativeRelation = BusinessPartnerRelations(
+            RelationType.IsAlternativeHeadquarterFor,
+            alternative.legalEntity.header.bpnl,
+            main.legalEntity.header.bpnl,
+            activeLater,
+            anyReasonCode()
+        )
+
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", alternativeRelation)
+        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+
+        val alternativeBefore = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
+        assertThat(alternativeBefore.header.ultimateOwnerBpnl).isNull()
+
+        executeAtDate(LocalDate.now().plusDays(1)) { triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
+
+        val alternativeAfter = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
+        assertThat(alternativeAfter.header.ultimateOwnerBpnl).isEqualTo(main.legalEntity.header.bpnl)
     }
 
     private fun executeAtDate(executionDate: LocalDate, methodToExecute: () -> Unit){

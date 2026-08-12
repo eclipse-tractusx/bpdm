@@ -22,14 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.update.*
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,16 +38,13 @@ import org.springframework.transaction.annotation.Transactional
  * which may leave its side alone — and this service, not the caller, decides how each field is applied. It detects
  * whether the aggregate changed, persists it, and emits exactly one LEGAL_ENTITY changelog for those that did; every
  * writer reuses it, so none can forget to log.
- *
- * The parent LEGAL_ENTITY changelog is emitted before the legal address is committed, so the parent entry always precedes
- * the child.
  */
 @Service
 class LegalEntityUpdateService(
     private val addressUpdateService: AddressUpdateService,
     private val legalEntityEntityMapper: LegalEntityEntityMapper,
     private val repository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
 
     /**
@@ -58,9 +54,9 @@ class LegalEntityUpdateService(
     @Transactional
     fun update(requests: List<LegalEntityUpdate>): List<UpsertResult<LegalEntityDb>> {
         val headerUpdates = requests.map { updateHeader(it) }
-        val stagedLegalAddressUpdates = requests.map { addressUpdateService.stageUpdate(AddressUpdate(it.legalEntity.legalAddress, it.legalAddress)) }
+        val legalAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.legalEntity.legalAddress, it.legalAddress) })
 
-        val legalEntityChangeResults = headerUpdates.zip(stagedLegalAddressUpdates) { headerResult, legalAddressResult ->
+        val legalEntityChangeResults = headerUpdates.zip(legalAddressUpdates) { headerResult, legalAddressResult ->
             val hasChanged = headerResult.upsertType != UpsertType.NoChange || legalAddressResult.upsertType != UpsertType.NoChange
             UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
@@ -68,9 +64,7 @@ class LegalEntityUpdateService(
         val updatedLegalEntities = legalEntityChangeResults.filter { it.upsertType == UpsertType.Updated }
 
         repository.saveAll(updatedLegalEntities.map { it.value })
-        changelogService.createChangelogEntries(updatedLegalEntities.map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
-
-        addressUpdateService.commit(stagedLegalAddressUpdates)
+        changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
 
         return legalEntityChangeResults
     }

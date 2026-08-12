@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.service
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
@@ -125,58 +124,28 @@ class RelationTaskCreationService(
             //Determine which kind of golden record relation task we need
             val taskKind = determineTaskKind(sourceOutput.postalAddress.addressType, targetOutput.postalAddress.addressType, relationStage.relationType)
             if (taskKind == null) {
-                val message = "Unsupported relation combination for relation: relationType='${relationStage.relationType}', " +
-                        "sourceAddressType='${sourceOutput.postalAddress.addressType}', targetAddressType='${targetOutput.postalAddress.addressType}'"
-                logger.debug { message }
-                unstage(relation)
-                try {
-                    relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, message)
-                } catch (t: Throwable) {
-                    logger.debug(t) { "setError failed" }
-                }
+                failRelation(
+                    relation,
+                    "Unsupported relation combination for relation: relationType='${relationStage.relationType}', " +
+                            "sourceAddressType='${sourceOutput.postalAddress.addressType}', targetAddressType='${targetOutput.postalAddress.addressType}'"
+                )
                 return@map null
             }
 
             //Select BPN values strictly based on the determined task kind
             val (sourceBpn, targetBpn) = when (taskKind) {
-                BusinessPartnerType.LEGAL_ENTITY -> {
-                    val s = sourceOutput.bpnL
-                    val t = targetOutput.bpnL
-                    if (s.isNullOrBlank() || t.isNullOrBlank()) {
-                        val msg = "LEGAL task requires BPNL for both sides but missing for relation: sourceBpnL='$s', targetBpnL='$t'"
-                        logger.warn { msg }
-                        unstage(relation)
-                        try {
-                            relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, msg)
-                        } catch (t: Throwable) {
-                            logger.debug(t) { "setError failed" }
-                        }
-                        return@map null
-                    }
-                    s to t
-                }
+                RelationTaskKind.LegalEntity -> sourceOutput.bpnL to targetOutput.bpnL
+                RelationTaskKind.Site -> sourceOutput.bpnS to targetOutput.bpnS
+                RelationTaskKind.Address -> sourceOutput.bpnA to targetOutput.bpnA
+            }
 
-                BusinessPartnerType.ADDRESS -> {
-                    val s = sourceOutput.bpnA
-                    val t = targetOutput.bpnA
-                    if (s.isNullOrBlank() || t.isNullOrBlank()) {
-                        val msg = "ADDRESS task requires BPNA for both sides but missing for relation: sourceBpna='$s', targetBpna='$t'"
-                        logger.warn { msg }
-                        unstage(relation)
-                        try {
-                            relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, msg)
-                        } catch (t: Throwable) {
-                            logger.debug(t) { "setError failed" }
-                        }
-                        return@map null
-                    }
-                    s to t
-                }
-
-                else -> {
-                    return@map null
-                }
-
+            if (sourceBpn.isNullOrBlank() || targetBpn.isNullOrBlank()) {
+                failRelation(
+                    relation,
+                    "${taskKind.name} task requires ${taskKind.bpnType} for both sides but missing for relation: " +
+                            "source${taskKind.bpnType}='$sourceBpn', target${taskKind.bpnType}='$targetBpn'"
+                )
+                return@map null
             }
 
             val relationType = relationStage.relationType.toOrchestratorModel() ?: run {
@@ -215,7 +184,7 @@ class RelationTaskCreationService(
         sourceAddressType: AddressType?,
         targetAddressType: AddressType?,
         relationType: RelationType
-    ): BusinessPartnerType? {
+    ): RelationTaskKind? {
 
         fun isLegalEntityLike(t: AddressType?) = when (t) {
             AddressType.LegalAndSiteMainAddress,
@@ -224,13 +193,40 @@ class RelationTaskCreationService(
             else -> false
         }
 
+        // A site relation requires SiteMainAddress on both sides rather than everything a site can be reached through:
+        // LegalAndSiteMainAddress is a legal entity too, and IsReplacedBy between two of those already means the legal
+        // entities succeed each other. A site sharing its legal entity's address can therefore not be replaced.
+        fun isSiteMainOnly(t: AddressType?) = t == AddressType.SiteMainAddress
+
         fun isAdditional(t: AddressType?) = t == AddressType.AdditionalAddress
 
         return when {
-            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(RelationType.IsAlternativeHeadquarterFor, RelationType.IsOwnedBy, RelationType.IsManagedBy) -> BusinessPartnerType.LEGAL_ENTITY
-            ((isAdditional(sourceAddressType) && isLegalEntityLike(targetAddressType)) || (isLegalEntityLike(sourceAddressType) && isAdditional(targetAddressType))) && relationType == RelationType.IsReplacedBy -> BusinessPartnerType.ADDRESS
+            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(
+                RelationType.IsAlternativeHeadquarterFor,
+                RelationType.IsOwnedBy,
+                RelationType.IsManagedBy,
+                RelationType.IsReplacedBy
+            ) -> RelationTaskKind.LegalEntity
+            isSiteMainOnly(sourceAddressType) && isSiteMainOnly(targetAddressType) && relationType == RelationType.IsReplacedBy -> RelationTaskKind.Site
+            ((isAdditional(sourceAddressType) && isLegalEntityLike(targetAddressType)) || (isLegalEntityLike(sourceAddressType) && isAdditional(targetAddressType))) && relationType == RelationType.IsReplacedBy -> RelationTaskKind.Address
             else -> null
         }
+    }
+
+    private fun failRelation(relation: RelationDb, message: String) {
+        logger.warn { message }
+        unstage(relation)
+        try {
+            relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, message)
+        } catch (t: Throwable) {
+            logger.debug(t) { "setError failed" }
+        }
+    }
+
+    private enum class RelationTaskKind(val bpnType: String) {
+        LegalEntity("BPNL"),
+        Site("BPNS"),
+        Address("BPNA")
     }
 
     private fun sendTasks(taskCreateRequests: List<TaskCreateRelationsRequestEntry>): List<TaskClientRelationsStateDto?>{

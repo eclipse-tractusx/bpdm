@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
+import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation
 import java.time.Instant
 
 data class OutputUpsertData(
@@ -51,6 +52,7 @@ data class OutputUpsertData(
     val addressUpdatedAt: Instant?,
     val scriptVariants: List<BusinessPartnerScriptVariantDto>,
     val legalEntityGoldenRecordRelations: List<LegalEntityGoldenRecordRelation>,
+    val siteGoldenRecordRelations: List<SiteGoldenRecordRelation>,
     val addressGoldenRecordRelations: List<AddressGoldenRecordRelation>,
     val ownershipUltimate: Boolean? = null,
     val ultimateOwnerBpnl: String? = null,

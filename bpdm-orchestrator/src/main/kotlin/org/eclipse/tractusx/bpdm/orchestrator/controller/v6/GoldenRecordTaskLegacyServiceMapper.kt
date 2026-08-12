@@ -150,6 +150,7 @@ class GoldenRecordTaskLegacyServiceMapper(
                 legalEntityHeaderScriptVariants = mutableListOf(),
                 siteHeaderScriptVariants = mutableListOf(),
                 legalEntityGoldenRecordRelations = mutableListOf(),
+                siteGoldenRecordRelations = mutableListOf(),
                 addressGoldenRecordRelations = mutableListOf()
             )
         }

@@ -35,7 +35,8 @@ import org.springframework.stereotype.Component
 @Component
 class SiteResponseMapper(
     private val addressResponseMapper: AddressResponseMapper,
-    private val confidenceCriteriaResponseMapper: ConfidenceCriteriaResponseMapper
+    private val confidenceCriteriaResponseMapper: ConfidenceCriteriaResponseMapper,
+    private val relationResponseMapper: RelationResponseMapper
 ) {
 
     /**
@@ -53,6 +54,7 @@ class SiteResponseMapper(
                 scriptVariants = toScriptVariants(site),
                 createdAt = createdAt,
                 updatedAt = updatedAt,
+                relations = startSiteRelations.plus(endSiteRelations).map { relationResponseMapper.toSiteRelation(it) }
             )
         }
 

@@ -22,16 +22,23 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class AlternativeHeadquarterRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
-    private val relationRepository: RelationRepository
+    private val relationRepository: RelationRepository,
+    private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
+    private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
 ): IRelationUpsertStrategyService {
 
     @Transactional
@@ -54,7 +61,40 @@ class AlternativeHeadquarterRelationUpsertService(
             )
         )
 
+        ultimateOwnerRecalculationService.recalculate(listOf(alternative))
+        handleValidityBoundaryTriggers(result.value)
+
         return result
+    }
+
+    private fun handleValidityBoundaryTriggers(relation: RelationDb) {
+        val today = LocalDate.now()
+
+        val validFromDates = relation.validityPeriods
+            .map { it.validFrom }
+            .filter { it > today }
+
+        val expiryDates = relation.validityPeriods
+            .mapNotNull { it.validTo }
+            .map { it.plusDays(1) }
+            .filter { it > today }
+
+        val desiredTriggerDates = (validFromDates + expiryDates).toSet()
+
+        val existingUnprocessedTriggers = legalEntityRelationEventTriggerRepository
+            .findByRelationAndEventType(relation, TriggerEventType.AlternativeHeadquarterValidityBoundary)
+            .filterNot { it.isProcessed }
+        val existingTriggerDates = existingUnprocessedTriggers.map { it.triggerDate }.toSet()
+
+        val triggersToDelete = existingUnprocessedTriggers.filterNot { it.triggerDate in desiredTriggerDates }
+        val triggerDatesToCreate = desiredTriggerDates - existingTriggerDates
+
+        legalEntityRelationEventTriggerRepository.deleteAll(triggersToDelete)
+        legalEntityRelationEventTriggerRepository.saveAll(
+            triggerDatesToCreate.map {
+                LegalEntityRelationEventTriggerDb(it, false, TriggerEventType.AlternativeHeadquarterValidityBoundary, relation)
+            }
+        )
     }
 
 

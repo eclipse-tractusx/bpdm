@@ -690,6 +690,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
             LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
             LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 

@@ -2205,7 +2205,7 @@
         "properties" : {
           "relationType" : {
             "type" : "string",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
           "sourceBpn" : {
             "type" : "string"

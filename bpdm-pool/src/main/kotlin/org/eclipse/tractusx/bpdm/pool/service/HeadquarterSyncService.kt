@@ -23,7 +23,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -40,7 +41,7 @@ class HeadquarterSyncService(
     private val relationRepository: AddressRelationRepository,
     private val legalEntityRepository: LegalEntityRepository,
     private val scriptVariantCoverageService: ScriptVariantCoverageService,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -89,9 +90,9 @@ class HeadquarterSyncService(
 
             scriptVariantCoverageService.pruneUncoveredScriptVariants(legalEntityDb)
 
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(legalEntityDb.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(currentLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(newLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogRecord(legalEntityDb.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+            changelogCreateService.record(ChangelogRecord(currentLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogRecord(newLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
         }
     }
 

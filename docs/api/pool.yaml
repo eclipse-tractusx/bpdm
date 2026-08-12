@@ -6328,6 +6328,7 @@ components:
           - IsAlternativeHeadquarterFor
           - IsManagedBy
           - IsOwnedBy
+          - IsReplacedBy
         businessPartnerSourceBpnl:
           type: string
           description: BPN of partner from which the relation emerges (the source)

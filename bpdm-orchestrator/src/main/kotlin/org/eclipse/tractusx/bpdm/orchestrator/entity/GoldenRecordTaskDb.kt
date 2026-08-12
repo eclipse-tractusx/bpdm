@@ -92,6 +92,7 @@ class GoldenRecordTaskDb(
                 legalEntityHeaderScriptVariants = legalEntityHeaderScriptVariants.also { businessPartner.legalEntityHeaderScriptVariants.replace(it) },
                 siteHeaderScriptVariants = siteHeaderScriptVariants.also { businessPartner.siteHeaderScriptVariants.replace(it) },
                 legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.also { businessPartner.legalEntityGoldenRecordRelations.replace(it) },
+                siteGoldenRecordRelations = siteGoldenRecordRelations.also { businessPartner.siteGoldenRecordRelations.replace(it) },
                 addressGoldenRecordRelations = addressGoldenRecordRelations.also { businessPartner.addressGoldenRecordRelations.replace(it) }
             )
         }
@@ -238,6 +239,13 @@ class GoldenRecordTaskDb(
             indexes = [Index(name = "index_le_golden_record_relations_task_id", columnList = "task_id")]
         )
         val legalEntityGoldenRecordRelations: MutableList<LegalEntityGoldenRecordRelationDb>,
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(
+            name = "business_partner_site_golden_record_relations",
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_site_golden_record_relations_tasks"))],
+            indexes = [Index(name = "index_site_golden_record_relations_task_id", columnList = "task_id")]
+        )
+        val siteGoldenRecordRelations: MutableList<SiteGoldenRecordRelationDb>,
         @ElementCollection(fetch = FetchType.LAZY)
         @CollectionTable(
             name = "business_partner_address_golden_record_relations",

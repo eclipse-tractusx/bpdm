@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
 import org.springframework.stereotype.Service
@@ -30,12 +32,21 @@ class LegalEntityRelationTriggerExecutionService(
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
     private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
 ) : IsBatchProcessService {
+    private val logger = KotlinLogging.logger { }
+
     @Transactional
     override fun executeNextBatch(): Boolean {
         val nextUnprocessedTrigger = legalEntityRelationEventTriggerRepository.findNextUnprocessed(LocalDate.now())
             ?: return false
 
-        ultimateOwnerRecalculationService.recalculate(listOf(nextUnprocessedTrigger.relation.startNode))
+        when (nextUnprocessedTrigger.eventType) {
+            TriggerEventType.OwnershipValidityBoundary,
+            TriggerEventType.AlternativeHeadquarterValidityBoundary ->
+                ultimateOwnerRecalculationService.recalculate(listOf(nextUnprocessedTrigger.relation.startNode))
+
+            TriggerEventType.ReplacedAddress ->
+                logger.error { "Encountered ReplacedAddress trigger in legal entity relation trigger service. This should not happen. Trigger will be deactivated." }
+        }
 
         nextUnprocessedTrigger.isProcessed = true
         legalEntityRelationEventTriggerRepository.save(nextUnprocessedTrigger)

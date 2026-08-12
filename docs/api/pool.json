@@ -4486,7 +4486,7 @@
           "type" : {
             "type" : "string",
             "description" : "The type of relation between the Legal Entities",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceBpnl" : {
             "type" : "string",

@@ -44,6 +44,9 @@ class AddressRelationTriggerExecutionService(
             TriggerEventType.OwnershipValidityBoundary -> {
                 logger.error { "Encountered OwnershipValidityBoundary trigger in address relation trigger service. This should not happen as these triggers are handled by LegalEntityRelationTriggerExecutionService. Trigger will be deactivated." }
             }
+            TriggerEventType.AlternativeHeadquarterValidityBoundary -> {
+                logger.error { "Encountered AlternativeHeadquarterValidityBoundary trigger in address relation trigger service. This should not happen as these triggers are handled by LegalEntityRelationTriggerExecutionService. Trigger will be deactivated." }
+            }
         }
 
         nextUnprocessedTrigger.isProcessed = true

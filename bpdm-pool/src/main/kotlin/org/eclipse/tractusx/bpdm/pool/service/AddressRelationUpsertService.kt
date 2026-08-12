@@ -23,7 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -37,7 +38,7 @@ import java.time.LocalDate
 @Service
 class AddressRelationUpsertService(
     private val addressRelationRepository: AddressRelationRepository,
-    private val changelogService: PartnerChangelogService,
+    private val changelogCreateService: ChangelogCreateService,
     private val headquarterSyncService: HeadquarterSyncService,
     private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
 ): IAddressRelationUpsertStratergyService {
@@ -131,8 +132,8 @@ class AddressRelationUpsertService(
 
         addressRelationRepository.saveAndFlush(newRelation)
 
-        changelogService.createChangelogEntry(ChangelogEntryCreateRequest(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
-        changelogService.createChangelogEntry(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
 
         return newRelation
     }

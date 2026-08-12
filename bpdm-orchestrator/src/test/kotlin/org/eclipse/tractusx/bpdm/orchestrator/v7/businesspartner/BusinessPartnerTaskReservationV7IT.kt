@@ -21,10 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationResponse
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
@@ -47,6 +44,50 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //THEN
         val expectedEntry = TaskStepReservationEntryDto(taskId = createdTask.taskId, recordId = createdTask.recordId, businessPartner = createdTask.businessPartnerResult)
+        val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
+        assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = true)
+    }
+
+    /**
+     * GIVEN task in queue whose site carries golden record relations
+     * WHEN user requests reservation of new tasks for that step
+     * THEN user sees those relations on the reserved task's site
+     *
+     * The shared request factory does not populate golden record relations, so the relations are set on the
+     * request here; reserving reads the task back and therefore covers the whole persistence round trip.
+     */
+    @Test
+    fun `reserve queued task carrying site golden record relations`(){
+        //GIVEN
+        val siteRelation = SiteGoldenRecordRelation(
+            relationType = SiteGoldenRecordRelationType.IsReplacedBy,
+            sourceBpn = "BPNS0000000001XY",
+            targetBpn = "BPNS0000000002XY"
+        )
+        val entry = requestFactory.buildBusinessPartnerTaskCreateEntry(testName)
+        val entryWithSiteRelation = entry.copy(
+            recordId = null,
+            businessPartner = entry.businessPartner.copy(
+                site = entry.businessPartner.site?.copy(goldenRecordRelations = listOf(siteRelation))
+            )
+        )
+        val createdTask = orchestratorClient.goldenRecordTasks
+            .createTasks(TaskCreateRequest(TaskMode.UpdateFromSharingMember, listOf(entryWithSiteRelation)))
+            .createdTasks.single()
+
+        //WHEN
+        val reservedTasks = orchestratorClient.goldenRecordTasks
+            .reserveTasksForStep(TaskStepReservationRequest(step = createdTask.processingState.step))
+
+        //THEN
+        val createdBusinessPartner = createdTask.businessPartnerResult
+        val expectedEntry = TaskStepReservationEntryDto(
+            taskId = createdTask.taskId,
+            recordId = createdTask.recordId,
+            businessPartner = createdBusinessPartner.copy(
+                site = requireNotNull(createdBusinessPartner.site).copy(goldenRecordRelations = listOf(siteRelation))
+            )
+        )
         val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = true)
     }

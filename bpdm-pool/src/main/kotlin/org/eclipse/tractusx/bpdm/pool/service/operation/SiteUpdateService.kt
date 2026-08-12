@@ -22,19 +22,18 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,16 +42,13 @@ import org.springframework.transaction.annotation.Transactional
  * data — a header change plus a change for the main address, either of which may leave its side alone — and this
  * service, not the caller, decides how each field is applied. It detects whether the aggregate changed, persists it, and
  * emits exactly one SITE changelog for those that did; every writer reuses it, so none can forget to log.
- *
- * The parent SITE changelog is emitted before the main address is committed, so the parent entry always precedes the
- * child.
  */
 @Service
 class SiteUpdateService(
     private val addressUpdateService: AddressUpdateService,
     private val siteEntityMapper: SiteEntityMapper,
     private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
 
     /**
@@ -62,9 +58,9 @@ class SiteUpdateService(
     @Transactional
     fun update(requests: List<SiteUpdate>): List<UpsertResult<SiteDb>> {
         val headerUpdates = requests.map { updateHeader(it) }
-        val stagedMainAddressUpdates = requests.map { addressUpdateService.stageUpdate(AddressUpdate(it.site.mainAddress, it.mainAddress)) }
+        val mainAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.site.mainAddress, it.mainAddress) })
 
-        val siteChangeResults = headerUpdates.zip(stagedMainAddressUpdates) { headerResult, mainAddressResult ->
+        val siteChangeResults = headerUpdates.zip(mainAddressUpdates) { headerResult, mainAddressResult ->
             val hasChanged = headerResult.upsertType != UpsertType.NoChange || mainAddressResult.upsertType != UpsertType.NoChange
             UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
@@ -72,9 +68,7 @@ class SiteUpdateService(
         val updatedSites = siteChangeResults.filter { it.upsertType == UpsertType.Updated }
 
         siteRepository.saveAll(updatedSites.map { it.value })
-        changelogService.createChangelogEntries(updatedSites.map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
-
-        addressUpdateService.commit(stagedMainAddressUpdates)
+        changelogCreateService.record(updatedSites.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
 
         return siteChangeResults
     }

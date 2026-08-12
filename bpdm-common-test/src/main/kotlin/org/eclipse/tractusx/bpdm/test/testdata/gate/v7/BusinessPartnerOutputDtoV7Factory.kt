@@ -246,6 +246,15 @@ class BusinessPartnerOutputDtoV7Factory {
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
             states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            goldenRecordRelations = site.relations.map {
+                SiteGoldenRecordRelationDto(
+                    relationType = when (it.type) {
+                        SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeDto.IsReplacedBy
+                    },
+                    sourceBpn = it.businessPartnerSourceBpns,
+                    targetBpn = it.businessPartnerTargetBpns
+                )
+            },
             updatedAt = site.updatedAt
         )
     }

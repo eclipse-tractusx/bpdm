@@ -64,6 +64,9 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
     @Query("SELECT DISTINCT p FROM SiteDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<SiteDb>): Set<SiteDb>
 
+    @Query("SELECT DISTINCT s FROM SiteDb s LEFT JOIN FETCH s.startSiteRelations LEFT JOIN FETCH s.endSiteRelations WHERE s IN :sites")
+    fun joinRelations(sites: Set<SiteDb>): Set<SiteDb>
+
     fun findByBpn(bpn: String): SiteDb?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<SiteDb>

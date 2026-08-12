@@ -83,6 +83,7 @@ data class SiteRepresentationOutputDto(
     override val name: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    val goldenRecordRelations: List<SiteGoldenRecordRelationDto> = emptyList(),
 
     @get:Schema(description = "Timestamp when the associated site golden record was last updated")
     val updatedAt: Instant? = null

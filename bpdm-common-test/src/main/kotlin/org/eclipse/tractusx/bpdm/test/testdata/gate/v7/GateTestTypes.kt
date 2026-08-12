@@ -25,7 +25,12 @@ object GateTestTypes {
     enum class LegalEntityRelationType(val gateRelationType: RelationType){
         IsOwnedBy(RelationType.IsOwnedBy),
         IsAlternativeHeadquarterFor(RelationType.IsAlternativeHeadquarterFor),
-        IsManagedBy(RelationType.IsManagedBy)
+        IsManagedBy(RelationType.IsManagedBy),
+        IsReplacedBy(RelationType.IsReplacedBy)
+    }
+
+    enum class SiteRelationType(val gateRelationType: RelationType){
+        IsReplacedBy(RelationType.IsReplacedBy)
     }
 
     enum class AddressRelationType(val gateRelationType: RelationType){

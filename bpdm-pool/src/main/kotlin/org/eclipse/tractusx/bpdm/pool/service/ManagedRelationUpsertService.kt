@@ -23,11 +23,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.RelationUpsertService.TimePeriod
 import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantUpdateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -119,8 +119,8 @@ class ManagedRelationUpsertService(
     private fun validateNoHistoricChanges(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>){
         val nowTime = LocalDate.now()
 
-        val existingTimePeriods = existingValidityPeriods.map { TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
-        val newTimePeriods = newValidityPeriods.map { TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+        val existingTimePeriods = existingValidityPeriods.map { RelationTimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+        val newTimePeriods = newValidityPeriods.map { RelationTimePeriod.fromUnlimited(it.validFrom, it.validTo) }
 
         newTimePeriods
             .filter { it.validFrom < nowTime }

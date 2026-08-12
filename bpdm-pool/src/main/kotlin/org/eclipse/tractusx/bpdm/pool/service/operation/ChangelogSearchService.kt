@@ -55,7 +55,11 @@ class ChangelogSearchService(
             byIsDataSpaceParticipant(criteria.isDataSpaceParticipant)
         )
 
-        val chronologically = PageRequest.of(pageable.pageNumber, pageable.pageSize, Sort.by(PartnerChangelogEntryDb::updatedAt.name))
+        val chronologically = PageRequest.of(
+            pageable.pageNumber,
+            pageable.pageSize,
+            Sort.by(PartnerChangelogEntryDb::updatedAt.name).and(Sort.by(PartnerChangelogEntryDb::id.name))
+        )
 
         return partnerChangelogEntryRepository.findAll(specification, chronologically)
     }

@@ -37,7 +37,8 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorR
 class TaskAddressRelationsStepBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val addressRelationUpsertService: AddressRelationUpsertService,
-    private val reasonCodeRepository: ReasonCodeRepository
+    private val reasonCodeRepository: ReasonCodeRepository,
+    private val relationValidityPeriodValidator: RelationValidityPeriodValidator
 ) {
 
     @Transactional
@@ -60,7 +61,7 @@ class TaskAddressRelationsStepBuildService(
             reasonCodeRepository.findByTechnicalKey(it) ?: throw BpdmValidationException("Relation reason code '${addressRelationDto.reasonCode}' not found")
         }
 
-        validateValidityPeriods(addressRelationDto)
+        relationValidityPeriodValidator.validate(addressRelationDto)
 
         // Map states from orchestrator
         val validityPeriods = addressRelationDto.validityPeriods.map {
@@ -107,30 +108,6 @@ class TaskAddressRelationsStepBuildService(
     private fun AddressRelationType.toTaskDto(): OrchestratorRelationType{
         return when(this){
             AddressRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
-        }
-    }
-
-    private fun validateValidityPeriods(relation: BusinessPartnerRelations) {
-        val orderedValidityPeriods = relation.validityPeriods.sortedBy { it.validFrom }
-
-        if(orderedValidityPeriods.isEmpty()){
-            throw BpdmValidationException("Relation validity periods cannot be empty, at least one validity needed.")
-        }
-
-        orderedValidityPeriods.first().let { state ->
-            if (state.validTo != null && state.validFrom.isAfter(state.validTo)) {
-                throw BpdmValidationException("Relation validity period validFrom '${state.validFrom}' cannot be after validTo '${state.validTo}'.")
-            }
-        }
-
-        val orderedTimePeriods = orderedValidityPeriods.map { RelationUpsertService.TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
-        val consecutiveTimePeriodPairs =  orderedTimePeriods.zip(orderedTimePeriods.drop(1))
-
-        val anyOverlap =  consecutiveTimePeriodPairs
-            .any { (state1, state2) -> state1.hasOverlap(state2) }
-
-        if(anyOverlap){
-            throw BpdmValidationException("Relation validity periods must not overlap.")
         }
     }
 }

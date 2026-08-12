@@ -21,7 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SharingMemberRecordDb
@@ -35,7 +36,7 @@ class SharingMemberConfidenceService(
     private val sharingMemberRecordRepository: SharingMemberRecordRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val legalEntityRepository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService,
+    private val changelogCreateService: ChangelogCreateService,
 ) {
 
     fun updateGoldenRecordCounted(recordId: String, isGoldenRecordCounted: Boolean?): SharingMemberRecordDb?{
@@ -85,7 +86,7 @@ class SharingMemberConfidenceService(
         if(addressHasChanges){
             address.confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
             logisticAddressRepository.save(address)
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogRecord(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
         }
 
         val legalEntity = address.legalEntity!!
@@ -94,7 +95,7 @@ class SharingMemberConfidenceService(
             if(legalEntityHasChanges){
                 legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
                 legalEntityRepository.save(legalEntity)
-                changelogService.createChangelogEntry(ChangelogEntryCreateRequest(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+                changelogCreateService.record(ChangelogRecord(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
             }
         }
 

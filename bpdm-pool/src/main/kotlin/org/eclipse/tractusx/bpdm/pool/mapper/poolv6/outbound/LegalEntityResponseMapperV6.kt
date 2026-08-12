@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityRelationTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
@@ -56,7 +57,7 @@ class LegalEntityResponseMapperV6(
                 legalFormVerbose = legalForm?.let { legalFormResponseMapperV6.toLegalForm(it) },
                 identifiers = identifiers.map { toIdentifier(it) },
                 states = states.map { toState(it) },
-                relations = startNodeRelations.plus(endNodeRelations).map { toRelation(it) },
+                relations = startNodeRelations.plus(endNodeRelations).mapNotNull { toRelation(it) },
                 currentness = currentness,
                 confidenceCriteria = confidenceCriteriaResponseMapperV6.toConfidenceCriteria(confidenceCriteria),
                 isCatenaXMemberData = isDataSpaceParticipant,
@@ -95,10 +96,22 @@ class LegalEntityResponseMapperV6(
     private fun toState(state: LegalEntityStateDb): LegalEntityStateVerboseDtoV6 =
         LegalEntityStateVerboseDtoV6(state.validFrom, state.validTo, state.type.toDto())
 
-    private fun toRelation(relation: RelationDb): RelationVerboseDtoV6 =
-        RelationVerboseDtoV6(
-            LegalEntityRelationTypeV6.valueOf(relation.type.name),
-            relation.startNode.bpn,
-            relation.endNode.bpn
-        )
+    // Relation types introduced after v6 was frozen are omitted from v6 responses rather than added to its enum,
+    // which would change a deprecated contract. Mapping them exhaustively keeps a later type from silently reaching here.
+    private fun toRelation(relation: RelationDb): RelationVerboseDtoV6? =
+        toRelationType(relation.type)?.let {
+            RelationVerboseDtoV6(
+                it,
+                relation.startNode.bpn,
+                relation.endNode.bpn
+            )
+        }
+
+    private fun toRelationType(relationType: LegalEntityRelationType): LegalEntityRelationTypeV6? =
+        when (relationType) {
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV6.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityRelationTypeV6.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityRelationTypeV6.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> null
+        }
 }

@@ -125,6 +125,10 @@ class BusinessPartnerDb(
     val legalEntityGoldenRecordRelations: MutableList<LegalEntityGoldenRecordRelationDb> = mutableListOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "business_partners_site_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
+    val siteGoldenRecordRelations: MutableList<SiteGoldenRecordRelationDb> = mutableListOf(),
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_address_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
     val addressGoldenRecordRelations: MutableList<AddressGoldenRecordRelationDb> = mutableListOf(),
 
