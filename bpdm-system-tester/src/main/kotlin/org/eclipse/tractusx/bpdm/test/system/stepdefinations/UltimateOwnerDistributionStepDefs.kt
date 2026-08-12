@@ -51,8 +51,8 @@ class UltimateOwnerDistributionStepDefs(
      * Marks a parent, grandparent, or self-owner entity as ownershipUltimate = true in the golden record.
      * The entity must already exist in the Pool.
      */
-    @When("the {parent|grandparent|self-owner} entity {string} is marked as ownershipUltimate = true in the golden record")
-    @And("the {parent|grandparent|self-owner} entity {string} is marked as ownershipUltimate = true in the golden record")
+    @When("the (parent|grandparent|self-owner) entity {string} is marked as ownershipUltimate = true in the golden record")
+    @And("the (parent|grandparent|self-owner) entity {string} is marked as ownershipUltimate = true in the golden record")
     fun markEntityAsUltimateOwner(entityType: String, entityId: String) {
         logger.info { "Marking $entityType entity '$entityId' as ownershipUltimate = true" }
         
