@@ -17,16 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity.generic
+package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@Embeddable
-data class AdditionalSiteDb(
-    @Column(name = "bpn")
-    val bpn: String?,
-
-    @Column(name = "site_name")
-    val name: String?
-)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmInvalidBusinessPartnerException(
+    reason: String
+): RuntimeException("The given business partner data is invalid: $reason")

@@ -53,9 +53,15 @@ class RequestMapper {
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
                 legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
                 siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner)
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner),
+                additionalSites = toAdditionalSites(businessPartner)
             )
         }
+
+    fun toAdditionalSites(businessPartner: BusinessPartner) =
+        businessPartner.additionalSites
+            .map { AdditionalSiteDb(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
+            .toMutableList()
 
     fun toTaskError(error: TaskErrorDto) =
         with(error) {

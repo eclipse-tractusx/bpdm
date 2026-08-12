@@ -17,16 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity.generic
+package org.eclipse.tractusx.bpdm.pool.model.request
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
-
-@Embeddable
-data class AdditionalSiteDb(
-    @Column(name = "bpn")
-    val bpn: String?,
-
-    @Column(name = "site_name")
-    val name: String?
+data class AddressSiteAssignmentRequest(
+    val addressBpn: String,
+    val siteBpn: String
 )

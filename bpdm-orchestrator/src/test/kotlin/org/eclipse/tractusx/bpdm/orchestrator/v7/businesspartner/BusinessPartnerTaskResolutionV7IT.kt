@@ -55,6 +55,53 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
     /**
      * GIVEN reserved task
+     * WHEN user resolves task as site whose main address belongs to further sites
+     * THEN user sees those further sites in the resolved task data in the next step
+     */
+    @Test
+    fun `resolve reserved task as site with additional sites of its address`(){
+        //GIVEN
+        val createdTask = testDataClient.createBusinessPartnerTask(testName)
+        val reservedTask = testDataClient.reserveBusinessPartnerTasks(createdTask.processingState.step).reservedTasks.single()
+
+        //WHEN
+        val businessPartnerResult = requestFactory.buildSiteWithAdditionalSitesBusinessPartner("result $testName")
+        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
+
+        //THEN
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+
+        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+
+        assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
+    }
+
+    /**
+     * GIVEN reserved task
+     * WHEN user resolves task as business partner data stating additional sites of its address but no site of its own
+     * THEN user sees 400 BAD REQUEST error
+     */
+    @Test
+    fun `try resolve reserved task with additional sites but no site`(){
+        //GIVEN
+        val createdTask = testDataClient.createBusinessPartnerTask(testName)
+        val reservedTask = testDataClient.reserveBusinessPartnerTasks(createdTask.processingState.step).reservedTasks.single()
+
+        //WHEN
+        val businessPartnerResult = requestFactory.buildSiteWithAdditionalSitesBusinessPartner("result $testName").copy(site = null)
+        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resolveRequest: () -> Unit = { orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest) }
+
+        //THEN
+        Assertions.assertThatThrownBy(resolveRequest).isInstanceOf(WebClientResponseException.BadRequest::class.java)
+    }
+
+    /**
+     * GIVEN reserved task
      * WHEN user resolves task as site
      * THEN user sees resolved task data in next step
      */

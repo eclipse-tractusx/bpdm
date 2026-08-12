@@ -31,7 +31,9 @@ data class UnresolvableLegalEntity(val bpn: String) :
     SiteCreateParseError,
     LegalEntityUpdateParseError,
     DataSpaceParticipantUpdateParseError
-data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError
-data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError, SiteCreateParseError
+data class UnresolvableSite(val bpn: String) :
+    AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError, AddressSiteAssignmentParseError
+data class UnresolvableAddress(val bpn: String) :
+    AddressUpdateParseError, SiteCreateParseError, AddressSiteAssignmentParseError
 
 data class InvalidParentBpn(val bpn: String) : AddressCreateParseError

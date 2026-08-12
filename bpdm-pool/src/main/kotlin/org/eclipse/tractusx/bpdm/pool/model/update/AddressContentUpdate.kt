@@ -48,8 +48,8 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.PhysicalPostalAddressParsed
 /**
  * The change half of an [AddressUpdate]: each field is a [FieldUpdate] carrying domain values, applied by
  * `AddressUpdateService`. There are deliberately no default values — a full replace must address every field, so a
- * missing field can never silently become a no-op. [assignToSite] is add-only ([FieldUpdate.Set] adds the address to a
- * site's membership; there is no removal), mirroring the previous mutator's contract.
+ * missing field can never silently become a no-op. [assignToSites] is add-only ([FieldUpdate.Set] adds the address to
+ * those sites' membership; there is no removal), mirroring the previous mutator's contract.
  *
  * Build a targeted change by copying from [NoOp], for example
  * `AddressContentUpdate.NoOp.copy(name = FieldUpdate.Set("…"))`.
@@ -62,7 +62,7 @@ data class AddressContentUpdate(
     val identifiers: FieldUpdate<List<AddressIdentifierParsed>>,
     val states: FieldUpdate<List<AddressState>>,
     val scriptVariants: FieldUpdate<List<AddressScriptVariantParsed>>,
-    val assignToSite: FieldUpdate<SiteDb>
+    val assignToSites: FieldUpdate<List<SiteDb>>
 ) {
     companion object {
         val NoOp = AddressContentUpdate(
@@ -73,7 +73,7 @@ data class AddressContentUpdate(
             identifiers = FieldUpdate.NoOp,
             states = FieldUpdate.NoOp,
             scriptVariants = FieldUpdate.NoOp,
-            assignToSite = FieldUpdate.NoOp
+            assignToSites = FieldUpdate.NoOp
         )
     }
 }

@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
@@ -51,6 +52,8 @@ class GoldenRecordTaskService(
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
 
+        createRequest.requests.forEach { assertAdditionalSitesHaveSite(it.businessPartner) }
+
         val gateRecords = sharingMemberRecordService.getOrCreateGateRecords(createRequest.requests)
         abortOutdatedTasks(gateRecords.toSet())
 
@@ -58,6 +61,17 @@ class GoldenRecordTaskService(
             .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateResponse(createdTasks = it) }
+    }
+
+    /**
+     * Rejects business partner data that states further sites of its address without stating a site of its own, which
+     * those sites would be additional to.
+     */
+    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
+        if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null)
+            throw BpdmInvalidBusinessPartnerException(
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
     }
 
     fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
@@ -109,6 +123,8 @@ class GoldenRecordTaskService(
     @Transactional
     fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         logger.debug { "Step results for reserved golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
+        resultRequest.results.filter { it.errors.isEmpty() }.forEach { assertAdditionalSitesHaveSite(it.businessPartner) }
+
         val uuids = resultRequest.results.map { toUUID(it.taskId) }
         val foundTasks = taskRepository.findByUuidIn(uuids.toSet()).also { taskRepository.fetchBusinessPartnerData(it) }
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }

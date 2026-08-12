@@ -353,6 +353,7 @@ class GateAssertRepositoryV7(
             states = states.sortedBy { it.validFrom?.toString() },
             roles = roles.sortedBy { it.name },
             scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            additionalSites = additionalSites.sortedBy { it.siteBpn ?: it.name },
             legalEntity = legalEntity.sortContent(),
             site = site.sortContent(),
             address = address.sortContent()

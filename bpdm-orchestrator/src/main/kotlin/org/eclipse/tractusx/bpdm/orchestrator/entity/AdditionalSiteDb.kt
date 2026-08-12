@@ -17,16 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity.generic
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
+import jakarta.persistence.Embedded
 
 @Embeddable
 data class AdditionalSiteDb(
-    @Column(name = "bpn")
-    val bpn: String?,
+    @Embedded
+    val bpnReference: BpnReferenceDb,
 
     @Column(name = "site_name")
-    val name: String?
+    val siteName: String?
 )
