@@ -65,11 +65,11 @@ class UltimateOwnerDistributionStepDefs(
         // Create the Gate input representation with ultimate owner flag
         val legalEntityInput = LegalEntityRepresentationInputDto(
             legalEntityBpn = legalEntityWithAddress.header.bpnl,
-            legalName = legalEntityWithAddress.legalName,
-            shortName = legalEntityWithAddress.shortName,
-            legalForm = legalEntityWithAddress.legalForm,
+            legalName = legalEntityWithAddress.header.legalName,
+            shortName = legalEntityWithAddress.header.legalShortName,
+            legalForm = legalEntityWithAddress.header.legalFormVerbose?.technicalKey,
             ownershipUltimate = true,
-            states = legalEntityWithAddress.states
+            states = legalEntityWithAddress.header.states
         )
         
         // Upload to Gate via upsertBusinessPartnersInput
