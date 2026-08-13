@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressSearchRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressSearchParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityAddressSearchParser
 import org.springframework.stereotype.Service

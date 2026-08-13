@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntitySearchRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntitySearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntitySearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntitySearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

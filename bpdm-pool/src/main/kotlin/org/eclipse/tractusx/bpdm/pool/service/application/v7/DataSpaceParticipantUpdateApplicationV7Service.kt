@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantUpdateRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
-import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

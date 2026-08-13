@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressAssociationFetchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressAssociationFetchService
 import org.springframework.stereotype.Service
 
 @Service

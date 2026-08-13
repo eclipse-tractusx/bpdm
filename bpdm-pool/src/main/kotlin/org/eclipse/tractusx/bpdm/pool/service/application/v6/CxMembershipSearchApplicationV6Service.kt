@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.CxMembershipResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

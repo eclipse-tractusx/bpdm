@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate

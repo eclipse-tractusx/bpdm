@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantSearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.DataSpaceParticipantResponseMapper
-import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

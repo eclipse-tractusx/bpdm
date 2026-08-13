@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityGetRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityGetService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityGetService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

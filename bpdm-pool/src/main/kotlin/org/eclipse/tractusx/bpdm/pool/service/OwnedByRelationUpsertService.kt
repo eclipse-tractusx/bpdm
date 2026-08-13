@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.parser.UltimateOwnerUniquenessValidator
 import org.springframework.stereotype.Service
 import java.time.LocalDate

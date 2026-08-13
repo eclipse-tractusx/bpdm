@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressV
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteSearchRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntitySiteSearchParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteSearchParser
 import org.springframework.stereotype.Service

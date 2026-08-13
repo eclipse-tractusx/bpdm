@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalFormRequestMapp
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalFormParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalFormResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalFormCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.LegalFormCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalFormCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
