@@ -25,6 +25,7 @@ import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
@@ -61,21 +62,20 @@ class UltimateOwnerDistributionStepDefs(
         val legalEntityWithAddress = context.legalEntities[entityId] 
             ?: error("Legal entity '$entityId' not found in scenario context")
         
-        // Convert verbose DTO to non-verbose DTO using JSON serialization
-        val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
-        val legalEntity = jsonMapper.readValue(verboseJson, LegalEntityDto::class.java)
-        
-        // Update the legal entity to mark it as ultimate owner
-        val updatedLegalEntity = legalEntity.copy(
-            header = legalEntity.header.copy(
-                ownershipUltimate = true
-            )
+        // Create the Gate input representation with ultimate owner flag
+        val legalEntityInput = LegalEntityRepresentationInputDto(
+            legalEntityBpn = legalEntityWithAddress.header.bpnl,
+            legalName = legalEntityWithAddress.legalName,
+            shortName = legalEntityWithAddress.shortName,
+            legalForm = legalEntityWithAddress.legalForm,
+            ownershipUltimate = true,
+            states = legalEntityWithAddress.states
         )
         
         // Upload to Gate via upsertBusinessPartnersInput
         val inputRequest = context.inputData[entityId]?.copy(
             externalId = context.runId(entityId),
-            legalEntity = updatedLegalEntity
+            legalEntity = legalEntityInput
         ) ?: error("Input data for '$entityId' not found in scenario context")
         
         gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputRequest))
