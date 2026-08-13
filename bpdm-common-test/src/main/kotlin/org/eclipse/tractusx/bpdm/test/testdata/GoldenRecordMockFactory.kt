@@ -33,6 +33,11 @@ class GoldenRecordMockFactory(
         val taskState: TaskClientStateDto
     )
 
+    data class AdditionalAddressWithAdditionalSitesRefinement(
+        val poolResult: PoolMockDataFactory.AdditionalAddressWithAdditionalSitesResult,
+        val taskState: TaskClientStateDto
+    )
+
     fun mockLegalEntityRefinement(seed: String, owningCompany: String?, nameParts: List<String>): LegalEntityWithLegalAddressVerboseDto {
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, nameParts)
@@ -62,5 +67,18 @@ class GoldenRecordMockFactory(
             nameParts
         )
         return AdditionalAddressOfSiteRefinement(poolMockResult, taskState)
+    }
+
+    fun mockAdditionalAddressWithAdditionalSitesRefinement(seed: String, owningCompany: String?, nameParts: List<String>): AdditionalAddressWithAdditionalSitesRefinement {
+        val poolMockResult = poolMockDataFactory.mockAdditionalAddressWithAdditionalSitesSearchResult(seed)
+        val taskState = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
+            seed,
+            poolMockResult.legalEntityParent,
+            poolMockResult.siteParent,
+            poolMockResult.additionalAddress,
+            owningCompany,
+            nameParts
+        )
+        return AdditionalAddressWithAdditionalSitesRefinement(poolMockResult, taskState)
     }
 }

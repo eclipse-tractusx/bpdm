@@ -38,6 +38,7 @@ class BusinessPartnerInputDtoV7Factory {
             address = request.address,
             externalSequenceTimestamp = request.externalSequenceTimestamp,
             scriptVariants = request.scriptVariants,
+            additionalSites = request.additionalSites,
             createdAt = createdAt,
             updatedAt = updatedAt
         )

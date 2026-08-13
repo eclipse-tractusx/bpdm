@@ -38,6 +38,7 @@ import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.model.GoldenRecordType
 import org.springframework.stereotype.Service
 import java.time.ZoneOffset
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite as OutputAdditionalSite
 
 @Service
 class OrchestratorMappings(
@@ -92,7 +93,8 @@ class OrchestratorMappings(
                 siteMainAddress = postalAddress.takeIf { isMainAddress },
                 scriptVariants = entity.scriptVariants.takeIf { isMainAddress }?.map { toSiteScriptVariant(it) } ?:emptyList()
             ).takeIf { entity.bpnS != null || entity.siteName != null },
-            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants) }
+            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants) },
+            additionalSites = entity.additionalSites.map { AdditionalSite(bpnReference = toBpnReference(it.bpn), siteName = it.name) }
         )
     }
 
@@ -254,12 +256,19 @@ class OrchestratorMappings(
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
                 scriptVariants = toScriptVariants(addressType, dto),
                 legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
+                siteGoldenRecordRelations = site?.goldenRecordRelations.orEmpty(),
                 addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto),
                 ownershipUltimate = legalEntity.ownershipUltimate,
-                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
+                additionalSites = toOutputAdditionalSites(dto)
             )
         }
     }
+
+    private fun toOutputAdditionalSites(dto: BusinessPartner): List<OutputAdditionalSite> =
+        dto.additionalSites.mapNotNull { additionalSite ->
+            additionalSite.bpnReference.referenceValue?.let { OutputAdditionalSite(siteBpn = it, name = additionalSite.siteName) }
+        }
 
     private fun toAddressGoldenRecordRelations(addressType: AddressType, dto: BusinessPartner): List<AddressGoldenRecordRelation> =
         when (addressType) {
@@ -306,26 +315,20 @@ class OrchestratorMappings(
     private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariant) =
         with(dto){
             PhysicalAddressScriptVariantDto(
-                postalCode = postalCode,
                 city = city,
                 district = district,
                 street = toScriptVariantStreet(street),
-                companyPostalCode = companyPostalCode,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
 
     private fun toAlternativeAddressScriptVariant(dto: AlternativeAddressScriptVariant?) =
         dto?.let { with(it){
             AlternativeAddressScriptVariantDto(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
             )
         }
         }
@@ -406,18 +409,29 @@ class OrchestratorMappings(
             additionalNameSuffix = dto.additionalNameSuffix
         )
 
-    private fun toScriptVariantStreet(dto: Street) =
-        StreetDto(
+    private fun toScriptVariantStreet(dto: StreetScriptVariant) =
+        StreetScriptVariantDto(
             name = dto.name,
-            houseNumber = dto.houseNumber,
-            houseNumberSupplement = dto.houseNumberSupplement,
-            milestone = dto.milestone,
             direction = dto.direction,
             namePrefix = dto.namePrefix,
             additionalNamePrefix = dto.additionalNamePrefix,
             nameSuffix = dto.nameSuffix,
             additionalNameSuffix = dto.additionalNameSuffix
         )
+
+    private fun toScriptVariantStreet(street: StreetScriptVariantDb?) =
+        street?.let {
+            with(it){
+                StreetScriptVariant(
+                    name = name,
+                    direction = direction,
+                    namePrefix = namePrefix,
+                    additionalNamePrefix = additionalNamePrefix,
+                    nameSuffix = nameSuffix,
+                    additionalNameSuffix = additionalNameSuffix
+                )
+            }
+        } ?: StreetScriptVariant.empty
 
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
@@ -450,16 +464,13 @@ class OrchestratorMappings(
         scriptVariant?.let {
             with(it){
                 PhysicalAddressScriptVariant(
-                    postalCode = postalCode,
                     city = city,
                     district = district,
-                    street = toStreet(street),
-                    companyPostalCode = companyPostalCode,
+                    street = toScriptVariantStreet(street),
                     industrialZone = industrialZone,
                     building = building,
                     floor = floor,
-                    door = door,
-                    taxJurisdictionCode = taxJurisdictionCode)
+                    door = door)
             }
         } ?: PhysicalAddressScriptVariant.empty
 
@@ -468,10 +479,7 @@ class OrchestratorMappings(
         scriptVariant?.let {
             with(it){
                 AlternativeAddressScriptVariant(
-                    postalCode = postalCode,
-                    city = city,
-                    deliveryServiceQualifier = deliveryServiceQualifier,
-                    deliveryServiceNumber = deliveryServiceNumber
+                    city = city
                 )
             }
         }

@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityScriptVariantDto
@@ -128,7 +129,8 @@ class BusinessPartnerOutputDtoV7Factory {
         input: BusinessPartnerInputDto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
         site: SiteWithMainAddressVerboseDto,
-        additionalAddress: LogisticAddressVerboseDto
+        additionalAddress: LogisticAddressVerboseDto,
+        additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
     ): BusinessPartnerOutputDto{
         return BusinessPartnerOutputDto(
             externalId = input.externalId,
@@ -147,6 +149,7 @@ class BusinessPartnerOutputDtoV7Factory {
                 val addByCode = additionalAddress.scriptVariants.associateBy { it.scriptCode }
                 (leByCode.keys + siteByCode.keys + addByCode.keys).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code], siteByCode[code]) }
             },
+            additionalSites = additionalSites,
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
         )
@@ -226,12 +229,32 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
+    private fun buildScriptVariantStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetScriptVariantDto): StreetScriptVariantDto{
+        return StreetScriptVariantDto(
+            name = street.name,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
+        )
+    }
+
     private fun buildSiteRepresentation(site: SiteVerboseDto): SiteRepresentationOutputDto {
         return SiteRepresentationOutputDto(
             siteBpn = site.bpns,
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
             states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            goldenRecordRelations = site.relations.map {
+                SiteGoldenRecordRelationDto(
+                    relationType = when (it.type) {
+                        SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeDto.IsReplacedBy
+                    },
+                    sourceBpn = it.businessPartnerSourceBpns,
+                    targetBpn = it.businessPartnerTargetBpns
+                )
+            },
             updatedAt = site.updatedAt
         )
     }
@@ -295,24 +318,18 @@ class BusinessPartnerOutputDtoV7Factory {
             name = addressScriptVariant?.addressName,
             physicalAddress = addressScriptVariant?.physicalAddress?.let { p ->
                 PhysicalAddressScriptVariantDto(
-                    postalCode = p.postalCode,
                     city = p.city,
                     district = p.district,
-                    street = p.street?.let { buildStreet(it) } ?: StreetDto(),
-                    companyPostalCode = p.companyPostalCode,
+                    street = p.street?.let { buildScriptVariantStreet(it) } ?: StreetScriptVariantDto(),
                     industrialZone = p.industrialZone,
                     building = p.building,
                     floor = p.floor,
-                    door = p.door,
-                    taxJurisdictionCode = p.taxJurisdictionCode
+                    door = p.door
                 )
-            } ?: PhysicalAddressScriptVariantDto(null, null, null, StreetDto(), null, null, null, null, null, null),
+            } ?: PhysicalAddressScriptVariantDto(),
             alternativeAddress = addressScriptVariant?.alternativeAddress?.let { a ->
                 org.eclipse.tractusx.bpdm.gate.api.model.AlternativeAddressScriptVariantDto(
-                    postalCode = a.postalCode,
-                    city = a.city,
-                    deliveryServiceQualifier = a.deliveryServiceQualifier,
-                    deliveryServiceNumber = a.deliveryServiceNumber
+                    city = a.city
                 )
             }
         )

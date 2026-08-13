@@ -23,13 +23,15 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.ScriptVariantCoverageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -38,7 +40,8 @@ import java.time.LocalDate
 class HeadquarterSyncService(
     private val relationRepository: AddressRelationRepository,
     private val legalEntityRepository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService
+    private val scriptVariantCoverageService: ScriptVariantCoverageService,
+    private val changelogCreateService: ChangelogCreateService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -85,9 +88,11 @@ class HeadquarterSyncService(
             legalEntityRepository.save(legalEntityDb)
             logger.info { "Updated legal address of legal entity '${legalEntityDb.bpn}': From '${currentLegalAddress.bpn}' to '${newLegalAddress.bpn}'" }
 
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(legalEntityDb.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(currentLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(newLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            scriptVariantCoverageService.pruneUncoveredScriptVariants(legalEntityDb)
+
+            changelogCreateService.record(ChangelogRecord(legalEntityDb.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+            changelogCreateService.record(ChangelogRecord(currentLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogRecord(newLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
         }
     }
 

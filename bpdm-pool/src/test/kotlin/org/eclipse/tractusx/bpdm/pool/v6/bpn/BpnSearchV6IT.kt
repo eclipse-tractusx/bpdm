@@ -20,14 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.v6.bpn
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
 
+    private val searchRequestLimit = 100
 
     /**
      * GIVEN legal entity with identifier X
@@ -44,10 +46,10 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         val identifierX = legalEntityResponseA.legalEntity.identifiers.first()
 
         //WHEN
-        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))).body
+        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, legalEntityResponseA.legalEntity.bpnl))
+        val expectedBpns = setOf(BpnIdentifierMappingDtoV6(identifierX.value, legalEntityResponseA.legalEntity.bpnl))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -66,11 +68,31 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         val identifierX = legalEntityResponseA.legalAddress.identifiers.first()
 
         //WHEN
-        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, identifierX.type, listOf(identifierX.value))).body
+        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.ADDRESS, identifierX.type, listOf(identifierX.value))).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, legalEntityResponseA.legalAddress.bpna))
+        val expectedBpns = setOf(BpnIdentifierMappingDtoV6(identifierX.value, legalEntityResponseA.legalAddress.bpna))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
+    }
+
+    /**
+     * GIVEN a search request holding more identifier values than the search request limit allows
+     * WHEN sharing member search for BPNs by those identifier values
+     * THEN 400 bad request is returned
+     */
+    @Test
+    fun `search BPNs by too many identifier values returns 400 bad request`(){
+        //GIVEN
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val identifierX = legalEntityResponse.legalEntity.identifiers.first()
+        val tooManyIdentifierValues = (1..searchRequestLimit + 1).map { "Identifier Value $it" }
+
+        //WHEN / THEN
+        Assertions.assertThatThrownBy {
+            poolClient.bpns.findBpnsByIdentifiers(
+                IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, tooManyIdentifierValues)
+            )
+        }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
 }

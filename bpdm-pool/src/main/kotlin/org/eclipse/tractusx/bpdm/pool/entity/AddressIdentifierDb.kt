@@ -36,10 +36,12 @@ class AddressIdentifierDb(
 
     @ManyToOne
     @JoinColumn(name = "type_id", nullable = false)
-    var type: IdentifierTypeDb,
+    var type: IdentifierTypeDb
 
+) : BaseEntity() {
+    // Owned by its address; the back-reference is wired by the aggregate (create mapper / address mutator) right after
+    // construction, not passed in — this keeps the entity mapper a pure translation.
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    var address: LogisticAddressDb
-
-) : BaseEntity()
+    lateinit var address: LogisticAddressDb
+}

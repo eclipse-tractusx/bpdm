@@ -10,13 +10,51 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Breaking
 
+- BPDM Pool, Gate and Orchestrator: Removed fields from business partner script variants that are not written differently in another script.
+  A script variant no longer contains the physical address `postalCode`, `companyPostalCode` and `taxJurisdictionCode`, its street's `houseNumber`, `houseNumberSupplement` and `milestone`, or the alternative address `postalCode`, `deliveryServiceQualifier` and `deliveryServiceNumber` [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+- BPDM Pool: Removed script variants from the deprecated v6 API entirely. Script variants postdate the frozen v6 contract and should never have been added to it.
+  As a consequence a business partner written over the v6 API has no script variants, and a v6 update drops the script variants that business partner gained over the v7 API or through the golden record process.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+- BPDM Pool: Script variants now carry the same mandatory content as the invariant data they mirror, so requests that were previously accepted can be rejected.
+  A legal entity script variant needs a `legalName`, a site script variant a `name`, an address script variant the `physicalAddress.city` (and the `alternativeAddress.city` if it supplies an alternative address at all), and no two script variants of one business partner may share a script code.
+  These fields became non-null in the v7 API so the requirement is part of the schema, and a Flyway migration deletes stored script variants that do not meet it.
+  A legal entity or site script variant is also only valid where its legal address or site main address covers the same script code, which every create and update now rejects and a headquarter relocation now prunes.
+  For the same reason no write may take that coverage away from a business partner that still needs it: an address update, a site update, a legal entity update or a golden record task that drops a script code the address's legal entity or one of its sites is still named in is rejected with `ScriptVariantCoverageStillNeeded`.
+  A golden record task is judged as a whole here, so it may rewrite the business partners it carries itself and is only rejected for coverage it takes away from business partners it does not carry.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+
 ### Added
 
 - BPDM Pool: Added ultimate owner tracking fields to legal entities - `ownershipUltimate` flag and `ultimateOwnerBpnl` column - to support future ultimate owner resolution features [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
 - BPDM Gate: Added two new fields to business partner legal entity representation - `ownershipUltimate` to designate whether a legal entity is the ultimate owner in an ownership chain, and `ultimateOwnerBpnl` to hold the BPNL of the designated ultimate owner up in the ownership chain [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
+- BPDM Pool: Support multiple sites per address by merging incoming sites onto existing addresses instead of overwriting them; queries now return an address's main site plus all additional sites [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Gate: Business partner output now includes additional sites belonging to an address [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Pool, Gate and Orchestrator: A sharing member can now state further sites of its business partner's address itself, instead of relying on another record being refined to the same address. [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Pool, Gate and Orchestrator: `IsReplacedBy` is now also a valid relation between two legal entities (BPNL to BPNL), expressing that the source legal entity is succeeded by the target legal entity.
+  The Pool rejects a succession that gives a legal entity more than one successor in overlapping validity periods, and one that would close a cycle over overlapping validity periods; several legal entities may be succeeded by the same one, so mergers are accepted.
+  A succession carries no further consequences: nothing is inherited from the predecessor, its state is unchanged, and it stays free to participate in ownership.
+  A Gate relation between two legal entities of this type previously ended in a sharing error and is now shared as a legal entity relation.
+  Legal entity `IsReplacedBy` relations are omitted from the deprecated v6 API, whose relation types are frozen [#1680](https://github.com/eclipse-tractusx/bpdm/issues/1680)
+- BPDM Pool, Gate and Orchestrator: `IsReplacedBy` is now also a valid relation between two sites (BPNS to BPNS), expressing that the source site is succeeded by the target site.
+  Sites had no supported relations over the golden record process at all before, so the Pool now stores site relations, reports them on every site it returns, and the Gate surfaces them on the site of a business partner output.
+  Both sites must belong to the same legal entity. The Pool rejects a succession that gives a site more than one successor in overlapping validity periods, and one that would close a cycle over overlapping validity periods; several sites may be succeeded by the same one, so mergers are accepted.
+  A succession carries no further consequences: nothing is inherited from the predecessor, no addresses or site memberships move, and its state is unchanged.
+  A Gate relation of this type is shared as a site relation only when both business partners are refined to a site whose main address is its own; where a site shares its legal entity's address, `IsReplacedBy` continues to mean that the two legal entities succeed each other, so such a site cannot be replaced.
+  Because a site name is unique within its legal entity, a site and its successor always carry different names [#1676](https://github.com/eclipse-tractusx/bpdm/issues/1676)
 
 ### Changed
 
+- BPDM Pool: A golden record task that puts a new site on an already existing address now applies the site main address payload it carries to that address, instead of leaving the address content untouched.
+  This is what lets such a site be named in its own scripts; in exchange the payload has to keep covering the scripts the address's other business partners are named in [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Pool: IsAlternativeHeadquarterFor relations now carry semantic meaning through their direction: the relation starts at the alternative entity and ends at the main entity.
+  The Pool enforces star topology to keep ownership trees separate per real-world entity, and only the main entity can participate in IsOwnedBy relations or carry the `ownershipUltimate` flag.
+  An alternative entity attempting to violate these rules causes the task to fail. Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1764](https://github.com/eclipse-tractusx/bpdm/issues/1764)
+- BPDM Pool: Searching data space participants (`memberships` in the deprecated v6 API) by a BPNL that is no valid BPNL now returns an empty page instead of being rejected as a bad request.
+  Searching by BPNL is also case-insensitive now. This brings the endpoint in line with the legal entity, site, address and changelog searches, which have always treated an unmatchable filter value as matching nothing
+- BPDM Pool: Updating data space participants (`memberships` in the deprecated v6 API) with a BPNL that is no valid BPNL is now reported as an unknown legal entity (404) instead of as a bad request (400).
+  A BPNL that names no legal entity was already reported this way, and every other write treats a BPNL it cannot resolve the same
+- BPDM Pool: An update of data space participants (`memberships` in the deprecated v6 API) that names the same legal entity in more than one entry is now rejected as a bad request and nothing is written.
+  Such a request previously succeeded, silently applying the last of the conflicting entries
 
 ## [7.4.0] - 2026-06-10
 

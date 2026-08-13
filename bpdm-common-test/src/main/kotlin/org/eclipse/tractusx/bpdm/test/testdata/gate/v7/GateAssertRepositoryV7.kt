@@ -25,18 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.Instant
@@ -121,6 +110,7 @@ class GateAssertRepositoryV7(
             "site.${SiteRepresentationOutputDto::siteBpn.name}",
             "site.${SiteRepresentationOutputDto::confidenceCriteria.name}",
             "site.${SiteRepresentationOutputDto::states.name}",
+            "site.${SiteRepresentationOutputDto::goldenRecordRelations.name}",
             "site.${SiteRepresentationOutputDto::updatedAt.name}",
             // address: keep only name / addressType / physical & alternative postal address
             "address.${AddressComponentOutputDto::addressBpn.name}",
@@ -167,6 +157,22 @@ class GateAssertRepositoryV7(
     val outputScriptVariantsComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withComparedFields(
             BusinessPartnerOutputDto::scriptVariants.name
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
+    /**
+     * Compares ONLY the record's [BusinessPartnerOutputDto.additionalSites]: the further sites the
+     * record's address belongs to beyond the site the record itself follows, each surfaced as a
+     * BPNS/name pair. Everything else - master data, identifiers, states, BPNs, confidence criteria,
+     * relations, script variants and timestamps - is ignored on purpose and covered by its own tests,
+     * so additional-site assertions stay the single subject here. [sortContent] already sorts the
+     * additional sites by BPNS, so ordering does not affect the comparison.
+     */
+    val outputAdditionalSitesComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withComparedFields(
+            BusinessPartnerOutputDto::additionalSites.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
@@ -347,6 +353,7 @@ class GateAssertRepositoryV7(
             states = states.sortedBy { it.validFrom?.toString() },
             roles = roles.sortedBy { it.name },
             scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            additionalSites = additionalSites.sortedBy { it.siteBpn ?: it.name },
             legalEntity = legalEntity.sortContent(),
             site = site.sortContent(),
             address = address.sortContent()
@@ -367,6 +374,7 @@ class GateAssertRepositoryV7(
             states = states.sortedBy { it.validFrom?.toString() },
             roles = roles.sortedBy { it.name },
             scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            additionalSites = additionalSites.sortedBy { it.siteBpn },
             legalEntity = legalEntity.sortContent(),
             site = site?.sortContent(),
             address = address.sortContent()
@@ -379,7 +387,10 @@ class GateAssertRepositoryV7(
         )
 
     private fun SiteRepresentationOutputDto.sortContent() =
-        copy(states = states.sortedBy { it.validFrom?.toString() })
+        copy(
+            states = states.sortedBy { it.validFrom?.toString() },
+            goldenRecordRelations = goldenRecordRelations.sortedBy { it.sourceBpn }
+        )
 
     private fun AddressComponentOutputDto.sortContent() =
         copy(

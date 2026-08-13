@@ -22,23 +22,20 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class RelationUpsertService(
     private val relationRepository: RelationRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
     @Transactional
     fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
@@ -88,8 +85,8 @@ class RelationUpsertService(
 
         relationRepository.save(newRelation)
 
-        changelogService.createChangelogEntry(ChangelogEntryCreateRequest(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-        changelogService.createChangelogEntry(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
 
         return newRelation
     }
@@ -110,7 +107,8 @@ class RelationUpsertService(
 
 
     private fun isTheSameRelation(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
-        return relationToUpsert.source.bpn == relation.startNode.bpn && relationToUpsert.target.bpn == relation.endNode.bpn
+        val existingRelation = relationToUpsert.existingRelation ?: return false
+        return existingRelation.id == relation.id
     }
 
     private fun hasOverlap(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
@@ -119,8 +117,8 @@ class RelationUpsertService(
     }
 
     private fun hasOverlap(validity1: RelationValidityPeriodDb, validity2: RelationValidityPeriodDb): Boolean {
-        return TimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
-            .hasOverlap(TimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
+        return RelationTimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
+            .hasOverlap(RelationTimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
     }
 
     data class UpsertRequest(
@@ -131,21 +129,4 @@ class RelationUpsertService(
         val existingRelation: RelationDb?,
         val reasonCode: ReasonCodeDb?
     )
-
-    data class TimePeriod(
-        val validFrom: LocalDate,
-        val validTo: LocalDate
-    ){
-        companion object{
-            private val maxValidTo = LocalDate.parse("9999-01-01")
-
-            fun fromUnlimited(validFrom: LocalDate, validTo: LocalDate?): TimePeriod{
-                return TimePeriod(validFrom, validTo ?: maxValidTo)
-            }
-        }
-
-        fun hasOverlap(other: TimePeriod): Boolean{
-            return validFrom < other.validTo && validTo > other.validFrom
-        }
-    }
 }

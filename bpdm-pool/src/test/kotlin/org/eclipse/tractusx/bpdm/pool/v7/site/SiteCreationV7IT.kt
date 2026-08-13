@@ -19,15 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
+import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withAlternativeAdminArea
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withMainAddressIdentifiers
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withPhysicalAdminArea
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
@@ -74,25 +75,51 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN legal entity with legal address site
-     * WHEN operator tries to create a new legal address site
-     * THEN operator sees MainAddressDuplicateIdentifier error
+     * GIVEN legal entity with a site named X
+     * WHEN operator tries to create another site named X for the same legal entity
+     * THEN the request is rejected because site names must be unique within a legal entity
      */
     @Test
-    fun `try create duplicate legal address site`() {
+    fun `try create site with duplicate name for same legal entity`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
-        testDataClient.createLegalAddressSite(legalEntityResponse, testName)
+        val existingSiteRequest = requestFactory.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse)
+        poolClient.sites.createSite(listOf(existingSiteRequest))
+
+        //WHEN / THEN
+        // Reuse the existing site's name but keep the distinct main address identifiers of "Site 2" so the
+        // rejection is caused by the name uniqueness constraint and not by a duplicate address identifier.
+        val duplicateNameRequest = requestFactory.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse)
+            .let { it.copy(site = it.site.copy(name = existingSiteRequest.site.name)) }
+        Assertions.assertThatThrownBy { poolClient.sites.createSite(listOf(duplicateNameRequest)) }
+            .isInstanceOf(WebClientResponseException::class.java)
+    }
+
+    /**
+     * GIVEN two legal entities
+     * WHEN operator creates a site with the same name for each legal entity
+     * THEN both sites are created because uniqueness is scoped per legal entity
+     */
+    @Test
+    fun `create sites with same name for different legal entities`() {
+        //GIVEN
+        val legalEntityResponse1 = testDataClient.createParticipantLegalEntity("LE1 $testName")
+        val legalEntityResponse2 = testDataClient.createParticipantLegalEntity("LE2 $testName")
 
         //WHEN
-        val siteRequest = requestFactory.buildLegalAddressSiteCreateRequest("New Legal Address Site $testName", legalEntityResponse)
-        val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
+        // Distinct seeds keep the main address identifiers unique; only the site name is shared across both requests.
+        val siteRequest1 = requestFactory.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse1)
+        val siteRequest2 = requestFactory.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse2)
+            .let { it.copy(site = it.site.copy(name = siteRequest1.site.name)) }
+        val response1 = poolClient.sites.createSite(listOf(siteRequest1))
+        val response2 = poolClient.sites.createSite(listOf(siteRequest2))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.name)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedResponse1 = SitePartnerCreateResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest1)), emptyList())
+        val expectedResponse2 = SitePartnerCreateResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest2)), emptyList())
 
-        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response1, expectedResponse1)
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response2, expectedResponse2)
     }
 
     /**
@@ -247,4 +274,147 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new site with a script variant whose name is blank
+     * THEN operator sees ScriptVariantNameMissing error
+     */
+    @Test
+    fun `try create site with script variant with blank name`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
+            .withScriptVariantName("  ")
+        val response = poolClient.sites.createSite(listOf(siteRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNameMissing, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new site with a script variant whose main address city is blank
+     * THEN operator sees MainAddressScriptVariantCityMissing error
+     */
+    @Test
+    fun `try create site with script variant with blank main address city`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
+            .withScriptVariantPhysicalCity("  ")
+        val response = poolClient.sites.createSite(listOf(siteRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteCreateError.MainAddressScriptVariantCityMissing, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new site with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the site and its main address
+     */
+    @Test
+    fun `try create site with duplicate script codes`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
+            .withDuplicateScriptVariants()
+        val response = poolClient.sites.createSite(listOf(siteRequest))
+
+        //THEN
+        // One script variant carries both the site name and the main address in that script, so a duplicated script code is
+        // reported by the site and by the main address.
+        val expectedErrors = listOf(
+            ErrorInfo(SiteCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index),
+            ErrorInfo(SiteCreateError.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index)
+        )
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a legal address site with a script variant whose name is blank
+     * THEN operator sees ScriptVariantNameMissing error
+     */
+    @Test
+    fun `try create legal address site with script variant with blank name`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
+            .let { it.copy(scriptVariants = it.scriptVariants.take(1)) }
+            .withScriptVariantName("  ")
+        val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
+
+        //THEN
+        // This endpoint has no request index, so the entity key is the request's position.
+        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNameMissing, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a legal address site with two script variants of the same script code
+     * THEN operator sees ScriptVariantDuplicateScriptCode error
+     */
+    @Test
+    fun `try create legal address site with duplicate script codes`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
+            .let { it.copy(scriptVariants = it.scriptVariants.take(1)) }
+            .withDuplicateScriptVariants()
+        val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity whose legal address covers one script code
+     * WHEN operator tries to create a legal address site with a script variant of another script code
+     * THEN operator sees ScriptVariantNotCoveredByMainAddress error, because the site main address is the legal
+     * address and does not cover that script
+     */
+    @Test
+    fun `try create legal address site with script variant the legal address does not cover`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val uncoveredScriptCode = scriptCodeOtherThan(legalEntityResponse.scriptVariants.map { it.scriptCode }.toSet())
+        val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(uncoveredScriptCode, "Site Name $testName"))) }
+        val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNotCoveredByMainAddress, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
 }

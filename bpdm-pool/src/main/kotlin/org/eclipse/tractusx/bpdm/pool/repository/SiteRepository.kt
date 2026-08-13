@@ -21,8 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -52,10 +50,10 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<SiteDb> { root, _, builder ->
-                isCatenaXMemberData?.let {
-                    builder.equal(root.get<LegalEntityDb>(SiteDb::legalEntity.name).get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
+                isDataSpaceParticipant?.let {
+                    builder.equal(root.get<LegalEntityDb>(SiteDb::legalEntity.name).get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant)
                 }
             }
     }
@@ -66,7 +64,8 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
     @Query("SELECT DISTINCT p FROM SiteDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<SiteDb>): Set<SiteDb>
 
-    fun findByLegalEntity(legalEntity: LegalEntityDb, pageable: Pageable): Page<SiteDb>
+    @Query("SELECT DISTINCT s FROM SiteDb s LEFT JOIN FETCH s.startSiteRelations LEFT JOIN FETCH s.endSiteRelations WHERE s IN :sites")
+    fun joinRelations(sites: Set<SiteDb>): Set<SiteDb>
 
     fun findByBpn(bpn: String): SiteDb?
 

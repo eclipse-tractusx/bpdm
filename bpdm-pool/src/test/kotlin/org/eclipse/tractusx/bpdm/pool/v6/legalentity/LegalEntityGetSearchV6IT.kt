@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.legalentity
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -41,8 +41,8 @@ class LegalEntityGetSearchV6IT: UnscheduledPoolTestBaseV6()
         val legalEntityResponseD =  testDataClient.createLegalEntity("$testName D")
 
         //WHEN
-        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), PaginationRequest())
-        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), PaginationRequest())
+        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequestV6(), PaginationRequest())
+        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequestV6(), PaginationRequest())
 
         //THEN
         val expectedLegalEntities = listOf(legalEntityResponseA, legalEntityResponseB, legalEntityResponseC, legalEntityResponseD)
@@ -69,7 +69,7 @@ class LegalEntityGetSearchV6IT: UnscheduledPoolTestBaseV6()
         testDataClient.createLegalEntity("$testName D")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(bpnLs = listOf(legalEntityResponseA.legalEntity.bpnl, legalEntityResponseB.legalEntity.bpnl))
+        val searchRequest = LegalEntitySearchRequestV6(bpnLs = listOf(legalEntityResponseA.legalEntity.bpnl, legalEntityResponseB.legalEntity.bpnl))
         val searchResponseGet = poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(searchRequest, PaginationRequest())
 
@@ -97,7 +97,7 @@ class LegalEntityGetSearchV6IT: UnscheduledPoolTestBaseV6()
         testDataClient.createLegalEntity("$testName D")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(legalName = legalEntityResponseA.legalEntity.legalName)
+        val searchRequest = LegalEntitySearchRequestV6(legalName = legalEntityResponseA.legalEntity.legalName)
         val searchResponseGet = poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest())
 
@@ -124,8 +124,8 @@ class LegalEntityGetSearchV6IT: UnscheduledPoolTestBaseV6()
 
         //WHEN
         val paginationRequest = PaginationRequest(0, 2)
-        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequestV6(), paginationRequest)
+        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequestV6(), paginationRequest)
 
         //THEN
         val expectedLegalEntities = listOf(legalEntityResponseA, legalEntityResponseB).map { testDataFactory.result.buildExpectedLegalEntitySearchResponse(it) }

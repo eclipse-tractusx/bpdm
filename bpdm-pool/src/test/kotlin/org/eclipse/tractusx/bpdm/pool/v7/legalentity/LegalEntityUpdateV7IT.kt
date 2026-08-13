@@ -19,8 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
+import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
@@ -333,4 +336,297 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity
+     * WHEN operator tries to update the owned legal entity as ultimate owner too
+     * THEN operator sees MultipleUltimateOwnersInHierarchy error in response
+     */
+    @Test
+    fun `update legal entity as ultimate owner while its owner is ultimate owner`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owning an ultimate owner legal entity
+     * WHEN operator tries to update the owning legal entity as ultimate owner too
+     * THEN operator sees MultipleUltimateOwnersInHierarchy error in response
+     */
+    @Test
+    fun `update legal entity as ultimate owner while a legal entity it owns is ultimate owner`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(ownedLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owned").withOwnershipUltimate(true))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", owningLegalEntity.header.bpnl).withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity A and legal entity B, both owned by legal entity C
+     * WHEN operator tries to update A and B both as ultimate owner in the same request
+     * THEN operator sees MultipleUltimateOwnersInHierarchy error entries in response
+     */
+    @Test
+    fun `update two legal entities of same hierarchy as ultimate owner in same request`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val legalEntityA = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName A"))
+        val legalEntityB = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName B"))
+        testDataClient.createIsOwnedByRelation(legalEntityA.header.bpnl, owningLegalEntity.header.bpnl)
+        testDataClient.createIsOwnedByRelation(legalEntityB.header.bpnl, owningLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequestA = requestFactory.buildLegalEntityUpdateRequest("Updated $testName A", legalEntityA.header.bpnl).withOwnershipUltimate(true)
+        val updateRequestB = requestFactory.buildLegalEntityUpdateRequest("Updated $testName B", legalEntityB.header.bpnl).withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequestA, updateRequestB))
+
+        //THEN
+        val expectedErrors = listOf(updateRequestA, updateRequestB).map {
+            ErrorInfo(LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy, "IGNORED", it.bpnl)
+        }
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owning another legal entity, neither of them ultimate owner
+     * WHEN operator updates the owning legal entity as ultimate owner
+     * THEN legal entity is returned as ultimate owner without an ultimate owner of its own
+     */
+    @Test
+    fun `update legal entity as ultimate owner while no legal entity in its hierarchy is`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", owningLegalEntity.header.bpnl).withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, owningLegalEntity)
+            .withUltimateOwner(ownershipUltimate = true, ultimateOwnerBpnl = null)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity
+     * WHEN operator updates the owned legal entity as non-ultimate owner
+     * THEN legal entity is returned with the owning legal entity as its ultimate owner
+     */
+    @Test
+    fun `update legal entity as non-ultimate owner while its owner is ultimate owner`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN ultimate owner legal entity owning another legal entity
+     * WHEN operator moves the ultimate owner flag to the owned legal entity in one request
+     * THEN both legal entities are returned with the moved flag
+     */
+    @Test
+    fun `move ultimate owner flag within hierarchy in same request`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+
+        //WHEN
+        val owningUpdateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName owner", owningLegalEntity.header.bpnl)
+            .withOwnershipUltimate(false)
+        val ownedUpdateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName owned", ownedLegalEntity.header.bpnl)
+            .withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(owningUpdateRequest, ownedUpdateRequest))
+
+        //THEN
+        // The owned legal entity is now the flag holder of its hierarchy, and a flag holder carries no ultimate owner BPNL of its own.
+        val expectedLegalEntities = listOf(
+            resultFactory.buildLegalEntityUpdate(owningUpdateRequest, owningLegalEntity)
+                .withUltimateOwner(false, null)
+                .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl),
+            resultFactory.buildLegalEntityUpdate(ownedUpdateRequest, ownedLegalEntity)
+                .withUltimateOwner(true, null)
+                .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
+        )
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with a script variant whose legal name is blank
+     * THEN operator sees ScriptVariantLegalNameMissing error entry in response
+     */
+    @Test
+    fun `update legal entity with script variant with blank legal name`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantLegalName("  ")
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantLegalNameMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with a script variant whose legal address city is blank
+     * THEN operator sees LegalAddressScriptVariantCityMissing error entry in response
+     */
+    @Test
+    fun `update legal entity with script variant with blank legal address city`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantPhysicalCity("  ")
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the legal entity and its legal address
+     */
+    @Test
+    fun `update legal entity with duplicate script codes`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withDuplicateScriptVariants()
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedErrors = listOf(
+            ErrorInfo(LegalEntityUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl),
+            ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl)
+        )
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
+     * WHEN operator tries to update the legal entity with a script variant of another script code
+     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the site is still named in the script the
+     * update would stop covering on their shared address
+     */
+    @Test
+    fun `update legal entity into a script its site does not cover`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
+        val coveredScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
+        val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", givenLegalEntity)
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(coveredScriptCode, "Site Name $testName"))) }
+        val givenSite = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+        assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode })
+            .containsExactly(coveredScriptCode)
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of legal entity M
+     * WHEN operator tries to update A as ultimate owner
+     * THEN operator sees AlternativeHeadquarterCannotOwnUltimately error in response
+     */
+    @Test
+    fun `update alternative headquarter as ultimate owner`() {
+        //GIVEN
+        val mainLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName main"))
+        val alternativeLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName alternative"))
+        testDataClient.createIsAlternativeHeadquarterForRelation(alternativeLegalEntity.header.bpnl, mainLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", alternativeLegalEntity.header.bpnl)
+            .withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.AlternativeHeadquarterCannotOwnUltimately, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    // The v7 test metadata reads legal forms from the ELF code list, which is a superset of what the Pool's migration
+    // inserts, so a seeded pick can land on a legal form the Pool does not know. Take one the Pool actually has.
+    private fun anyKnownLegalForm(): String =
+        poolClient.metadata.getLegalForms(PaginationRequest()).content.first().technicalKey
 }

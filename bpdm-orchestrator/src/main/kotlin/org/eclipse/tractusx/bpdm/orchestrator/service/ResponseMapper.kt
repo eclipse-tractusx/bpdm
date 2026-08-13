@@ -65,9 +65,13 @@ class ResponseMapper {
                 uncategorized = toUncategorizedProperties(businessPartner),
                 legalEntity = toLegalEntity(businessPartner),
                 site = toSite(businessPartner),
-                additionalAddress = toAdditionalAddress(businessPartner)
+                additionalAddress = toAdditionalAddress(businessPartner),
+                additionalSites = toAdditionalSites(businessPartner)
             )
         }
+
+    fun toAdditionalSites(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.additionalSites.map { AdditionalSite(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
 
 
     fun toUncategorizedProperties(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
@@ -110,6 +114,7 @@ class ResponseMapper {
                     hasChanged = siteHasChanged,
                     siteMainAddress = toPostalAddress(businessPartner, PostalAddressDb.Scope.SiteMainAddress),
                     scriptVariants = toSiteScriptVariants(businessPartner),
+                    goldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
                     updatedAt = siteUpdatedAt?.instant
                 )
             }
@@ -277,26 +282,32 @@ class ResponseMapper {
     fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDb) =
         with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariant(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = toStreet(street),
-                companyPostalCode = companyPostalCode,
+                street = toScriptVariantStreet(street),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
 
     fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDb) =
         with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+
+    fun toScriptVariantStreet(street: StreetScriptVariantDb) =
+        with(street){
+            StreetScriptVariant(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
 
@@ -313,6 +324,10 @@ class ResponseMapper {
     fun toLegalEntityGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.legalEntityGoldenRecordRelations
             .map { LegalEntityGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
+
+    fun toSiteGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.siteGoldenRecordRelations
+            .map { SiteGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
 
     fun toAddressGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: AddressGoldenRecordRelationDb.Scope) =
         businessPartner.addressGoldenRecordRelations

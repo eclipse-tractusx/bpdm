@@ -91,7 +91,8 @@ class CleaningServiceDummy(
             owningCompany = businessPartner.owningCompany,
             legalEntity = cleanLegalEntity(businessPartner, sharedByOwner),
             site = cleanSite(businessPartner, sharedByOwner),
-            additionalAddress =  cleanAdditionalAddress(businessPartner, sharedByOwner)
+            additionalAddress =  cleanAdditionalAddress(businessPartner, sharedByOwner),
+            additionalSites = cleanAdditionalSites(businessPartner)
         )
 
         return TaskStepResultEntryDto(reservedTask.taskId, cleanedBusinessPartner)
@@ -152,7 +153,7 @@ class CleaningServiceDummy(
             PostalAddressWithScriptVariants(
                 postalProperties = cleanAddress(
                     it.postalProperties,
-                    it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.addressReference()),
+                    it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), null, businessPartner.addressReference()),
                     businessPartner.type == GoldenRecordType.Address,
                     sharedByOwner
                 ),
@@ -162,6 +163,19 @@ class CleaningServiceDummy(
         }
     }
 
+
+    private fun cleanAdditionalSites(businessPartner: BusinessPartner): List<AdditionalSite> {
+        return businessPartner.additionalSites.map { additionalSite ->
+            // An entry without a name offers nothing to derive a distinct reference from, and the record's name parts -
+            // the fallback the primary site reference uses - would alias the entry onto that primary site.
+            val siteReference = additionalSite.siteName?.let { siteReferenceOf(it) }
+                ?: return@map additionalSite
+
+            additionalSite.copy(
+                bpnReference = additionalSite.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), siteReference)
+            )
+        }
+    }
 
     private fun cleanAddress(addressToClean: PostalAddress, bpnReference: BpnReference, hasChanged: Boolean, sharedByOwner: Boolean): PostalAddress {
         return addressToClean.copy(
@@ -174,7 +188,9 @@ class CleaningServiceDummy(
     private fun BusinessPartner.legalEntityReference() =
         "LEGAL_ENTITY${legalEntity.legalName ?: namePartsName()}".toUUID()
 
-    private fun BusinessPartner.siteReference() = "S_${site?.siteName ?: namePartsName()}".toUUID()
+    private fun BusinessPartner.siteReference() = siteReferenceOf(site?.siteName ?: namePartsName())
+
+    private fun siteReferenceOf(siteName: String) = "S_$siteName".toUUID()
 
     private fun BusinessPartner.addressReference() = "A_${additionalAddress?.addressName ?: namePartsName()}".toUUID()
 

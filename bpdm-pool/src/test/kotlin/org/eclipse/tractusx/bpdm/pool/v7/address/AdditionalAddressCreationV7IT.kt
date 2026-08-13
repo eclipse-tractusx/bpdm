@@ -279,4 +279,70 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new additional address with a script variant whose physical city is blank
+     * THEN operator sees ScriptVariantCityMissing error
+     */
+    @Test
+    fun `try create additional address with script variant with blank physical city`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
+            .withScriptVariantPhysicalCity("  ")
+        val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressCreateError.ScriptVariantCityMissing, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new additional address with a script variant whose alternative address city is blank
+     * THEN operator sees ScriptVariantCityMissing error
+     */
+    @Test
+    fun `try create additional address with script variant with blank alternative city`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
+            .withScriptVariantAlternativeCity("  ")
+        val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressCreateError.ScriptVariantCityMissing, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new additional address with two script variants of the same script code
+     * THEN operator sees ScriptVariantDuplicateScriptCode error
+     */
+    @Test
+    fun `try create additional address with duplicate script codes`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
+            .withDuplicateScriptVariants()
+        val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
 }

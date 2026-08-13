@@ -52,9 +52,16 @@ class RequestMapper {
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
                 legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner)
+                siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner),
+                additionalSites = toAdditionalSites(businessPartner)
             )
         }
+
+    fun toAdditionalSites(businessPartner: BusinessPartner) =
+        businessPartner.additionalSites
+            .map { AdditionalSiteDb(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
+            .toMutableList()
 
     fun toTaskError(error: TaskErrorDto) =
         with(error) {
@@ -276,17 +283,13 @@ class RequestMapper {
     fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariant): PhysicalAddressScriptVariantDb{
         return with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariantDb(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = toStreet(street),
-                companyPostalCode = companyPostalCode,
+                street = toScriptVariantStreet(street),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
-
+                door = door
             )
         }
     }
@@ -294,10 +297,20 @@ class RequestMapper {
     fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariant): AlternativeAddressScriptVariantDb{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariantDb(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+    }
+
+    fun toScriptVariantStreet(street: StreetScriptVariant): StreetScriptVariantDb{
+        return with(street){
+            StreetScriptVariantDb(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
     }
@@ -305,6 +318,12 @@ class RequestMapper {
     fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<LegalEntityGoldenRecordRelationDb> =
         businessPartner.legalEntity.goldenRecordRelations
             .map { LegalEntityGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
+            .toMutableList()
+
+    fun toSiteGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<SiteGoldenRecordRelationDb> =
+        businessPartner.site?.goldenRecordRelations
+            .orEmpty()
+            .map { SiteGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
             .toMutableList()
 
     fun toAddressGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<AddressGoldenRecordRelationDb> =

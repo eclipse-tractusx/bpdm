@@ -1224,6 +1224,19 @@ paths:
                 format: binary
 components:
   schemas:
+    AdditionalSiteOutputDto:
+      type: object
+      description: "A further site a business partner's address belongs to, in addition\
+        \ to its primary site"
+      properties:
+        siteBpn:
+          type: string
+          description: The BPNS of the site
+        name:
+          type: string
+          description: The name of the site
+      required:
+        - siteBpn
     AddressComponentOutputDto:
       type: object
       description: Address properties of business partner output data
@@ -1881,6 +1894,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerScriptVariantDto"
+        additionalSites:
+          type: array
+          description: "The further sites this business partner's address belongs\
+            \ to, in addition to the primary 'site'."
+          items:
+            $ref: "#/components/schemas/AdditionalSiteOutputDto"
         createdAt:
           type: string
           format: date-time
@@ -2106,6 +2125,7 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
+            - IsReplacedBy
         sourceBpn:
           type: string
         targetBpn:

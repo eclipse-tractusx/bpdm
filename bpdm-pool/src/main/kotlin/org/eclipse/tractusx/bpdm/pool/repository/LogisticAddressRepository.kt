@@ -43,7 +43,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
         fun bySiteBpns(bpns: Collection<String>?) =
             Specification<LogisticAddressDb> { root, _, _ ->
                 bpns?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let {
-                    root.get<LegalEntityDb>(LogisticAddressDb::site.name).get<String>(SiteDb::bpn.name).`in`(bpns)
+                    root.join<LogisticAddressDb, SiteDb>(LogisticAddressDb::sites.name).get<String>(SiteDb::bpn.name).`in`(bpns)
                 }
             }
 
@@ -61,15 +61,20 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<LogisticAddressDb> { root, _, builder ->
-                isCatenaXMemberData?.let {
+                isDataSpaceParticipant?.let {
                     builder.equal(
                         root.get<LegalEntityDb>(LogisticAddressDb::legalEntity.name)
-                            .get<Boolean>(LegalEntityDb::isCatenaXMemberData.name),
-                        isCatenaXMemberData
+                            .get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name),
+                        isDataSpaceParticipant
                     )
                 }
+            }
+
+        fun withoutSites(excludesSiteAddresses: Boolean) =
+            Specification<LogisticAddressDb> { root, _, builder ->
+                if (excludesSiteAddresses) builder.isEmpty(root.get<MutableSet<SiteDb>>(LogisticAddressDb::sites.name)) else null
             }
 
     }
@@ -78,15 +83,10 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LogisticAddressDb>
 
-    fun findByLegalEntityAndSiteIsNull(legalEntityDb: LegalEntityDb, pageable: Pageable): Page<LogisticAddressDb>
-
-    @Query("SELECT a FROM LogisticAddressDb a WHERE LOWER(a.name) LIKE :addressName ORDER BY LENGTH(a.name)")
-    fun findByName(addressName: String, pageable: Pageable): Page<LogisticAddressDb>
-
     @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.legalEntity LEFT JOIN FETCH a.legalEntity.legalAddress WHERE a IN :addresses")
     fun joinLegalEntities(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb>
 
-    @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.site LEFT JOIN FETCH a.site.mainAddress WHERE a IN :addresses")
+    @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.sites s LEFT JOIN FETCH s.mainAddress WHERE a IN :addresses")
     fun joinSites(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb>
 
     @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.physicalPostalAddress.administrativeAreaLevel1 LEFT JOIN FETCH a.alternativePostalAddress.administrativeAreaLevel1 WHERE a IN :addresses")
@@ -104,7 +104,6 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
             SELECT DISTINCT la
             FROM LogisticAddressDb la
             JOIN la.legalEntity le
-            LEFT JOIN la.site s
             WHERE
                 (
                     CAST(:#{#searchRequest.legalName} AS text) IS NULL
@@ -160,12 +159,12 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                        )
                     OR (
                             CAST(:#{#isSite} AS boolean) = true
-                            AND s.mainAddress = la
+                            AND EXISTS (SELECT 1 FROM SiteDb s WHERE s.mainAddress = la)
                        )
                     OR (
                             CAST(:#{#isAdditionalAddress} AS boolean) = true
                             AND le.legalAddress <> la
-                            AND s is null
+                            AND NOT EXISTS (SELECT 1 FROM SiteDb s WHERE s.mainAddress = la)
                        )
                 )
             """

@@ -46,7 +46,7 @@ class LegalEntityDb(
     var confidenceCriteria: ConfidenceCriteriaDb,
 
     @Column(name = "is_catena_member", nullable = false)
-    var isCatenaXMemberData: Boolean,
+    var isDataSpaceParticipant: Boolean,
 
     @Column(name = "ownership_ultimate", nullable = false)
     var ownershipUltimate: Boolean = false,
@@ -80,4 +80,6 @@ class LegalEntityDb(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "legal_address_id", nullable = false)
     lateinit var legalAddress: LogisticAddressDb
+
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }

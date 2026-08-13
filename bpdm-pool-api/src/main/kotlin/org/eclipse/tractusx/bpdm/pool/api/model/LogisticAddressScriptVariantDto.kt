@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
+import io.swagger.v3.oas.annotations.media.Schema
 
+// `address` is unwrapped into this schema, so its own properties carry the requirement, not the wrapper field.
+@Schema(requiredProperties = ["scriptCode"])
 data class LogisticAddressScriptVariantDto(
     val scriptCode: String,
     @field:JsonUnwrapped

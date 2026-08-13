@@ -42,6 +42,10 @@ data class BusinessPartner(
     val legalEntity: LegalEntity,
     val site: Site?,
     val additionalAddress: PostalAddressWithScriptVariants?,
+    @Schema(description = "The further sites the address of this business partner data belongs to, next to the site in 'site'. " +
+            "An entry that resolves to an existing site links that site to the address; an entry that does not resolve creates a new site with this address as its main address. " +
+            "An already existing site is never updated through this field, and a site is never unlinked from an address.")
+    val additionalSites: List<AdditionalSite> = emptyList(),
 ){
     companion object{
         val empty = BusinessPartner(
@@ -50,7 +54,8 @@ data class BusinessPartner(
             uncategorized = UncategorizedProperties.empty,
             legalEntity = LegalEntity.empty,
             site = null,
-            additionalAddress = null
+            additionalAddress = null,
+            additionalSites = emptyList()
         )
     }
 
@@ -416,6 +421,8 @@ data class Site(
     val hasChanged: Boolean?,
     val siteMainAddress: PostalAddress?,
     val scriptVariants: List<SiteScriptVariant>,
+    @Schema(description = "Golden record relations belonging to this site")
+    val goldenRecordRelations: List<SiteGoldenRecordRelation> = emptyList(),
     val updatedAt: Instant? = null
 ){
     companion object{
@@ -427,6 +434,7 @@ data class Site(
             hasChanged = null,
             siteMainAddress = PostalAddress.empty,
             scriptVariants = emptyList(),
+            goldenRecordRelations = emptyList(),
             updatedAt = null
         )
     }
@@ -435,6 +443,15 @@ data class Site(
             "The address information therefore is stored in the legal address.")
     val siteMainIsLegalAddress = siteMainAddress == null
 }
+
+@Schema(description = "A further site an address belongs to. " +
+        "It carries only what identifies the site, because it is never the subject of the business partner data it appears in: " +
+        "the address it belongs to is the one stated by the surrounding business partner data.")
+data class AdditionalSite(
+    val bpnReference: BpnReference,
+    @Schema(description = "The name of this site")
+    val siteName: String?
+)
 
 @Schema(description = "Business partner data that has not yet or can not be categorized")
 data class UncategorizedProperties(
@@ -491,39 +508,43 @@ data class PostalAddressScriptVariant(
 }
 
 data class PhysicalAddressScriptVariant(
-    val postalCode: String?,
     val city: String?,
     val district: String?,
-    val street: Street,
-    val companyPostalCode: String?,
+    val street: StreetScriptVariant,
     val industrialZone: String?,
     val building: String?,
     val floor: String?,
     val door: String?,
-    val taxJurisdictionCode: String?,
 ){
     companion object{
         val empty = PhysicalAddressScriptVariant(
-            postalCode = null,
             city = null,
             district = null,
-            street = Street.empty,
-            companyPostalCode = null,
+            street = StreetScriptVariant.empty,
             industrialZone = null,
             building = null,
             floor = null,
-            door = null,
-            taxJurisdictionCode = null
+            door = null
         )
     }
 }
 
 data class AlternativeAddressScriptVariant(
-    val postalCode: String?,
-    val city: String?,
-    val deliveryServiceQualifier: String?,
-    val deliveryServiceNumber: String?
+    val city: String?
 )
+
+data class StreetScriptVariant(
+    val name: String?,
+    val direction: String?,
+    val namePrefix: String?,
+    val additionalNamePrefix: String?,
+    val nameSuffix: String?,
+    val additionalNameSuffix: String?
+){
+    companion object{
+        val empty = StreetScriptVariant(null, null, null, null, null, null)
+    }
+}
 
 enum class NamePartType{
     LegalName,

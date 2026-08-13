@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(requiredProperties = ["scriptCode", "name", "mainAddress"])
 data class SiteScriptVariantDto(
     val scriptCode: String,
     val name: String,

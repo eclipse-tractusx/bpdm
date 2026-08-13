@@ -1,6 +1,6 @@
 # A sharing member may attach script variants to a record. Each variant has a script code (the
 # available codes come from the Pool's script-code metadata) and carries alternative script
-# renderings of the record's text properties (legal entity, site and address text).
+# versions of the record's text properties (legal entity, site and address text).
 #
 # The golden record process refines the shared script variants onto the resulting golden record and
 # its parents. In these scenarios the process applies a variant to the matched entity AND to the

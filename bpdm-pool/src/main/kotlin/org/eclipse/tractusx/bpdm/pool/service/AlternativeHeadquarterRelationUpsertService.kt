@@ -22,64 +22,155 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class AlternativeHeadquarterRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
-    private val relationRepository: RelationRepository
+    private val relationRepository: RelationRepository,
+    private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
+    private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
 ): IRelationUpsertStrategyService {
 
     @Transactional
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb>{
-        val standardisedRequest = standardise(upsertRequest)
+        val alternative = upsertRequest.source
+        val main = upsertRequest.target
 
-        validateOnlyOneAlternative(standardisedRequest)
+        validateStarTopology(alternative, main, upsertRequest)
+        validateAlternativeNotInOwnership(alternative, upsertRequest)
+        validateAlternativeNotFlagged(alternative)
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
-                source = standardisedRequest.source,
-                target = standardisedRequest.target,
+                source = alternative,
+                target = main,
                 legalEntityRelationType = LegalEntityRelationType.IsAlternativeHeadquarterFor,
-                validityPeriods = standardisedRequest.validityPeriods,
-                existingRelation = standardisedRequest.existingRelation,
-                reasonCode = standardisedRequest.reasonCode
+                validityPeriods = upsertRequest.validityPeriods,
+                existingRelation = upsertRequest.existingRelation,
+                reasonCode = upsertRequest.reasonCode
             )
         )
+
+        ultimateOwnerRecalculationService.recalculate(listOf(alternative))
+        handleValidityBoundaryTriggers(result.value)
 
         return result
     }
 
-    private fun standardise(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): IRelationUpsertStrategyService.UpsertRequest{
-        val proposedSource = upsertRequest.source
-        val proposedTarget = upsertRequest.target
+    private fun handleValidityBoundaryTriggers(relation: RelationDb) {
+        val today = LocalDate.now()
 
-        val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
-        val standardisedUpsertRequest = if(sourceIsOlder) upsertRequest.copy(source = proposedTarget, target = proposedSource) else upsertRequest
+        val validFromDates = relation.validityPeriods
+            .map { it.validFrom }
+            .filter { it > today }
 
-        return standardisedUpsertRequest
+        val expiryDates = relation.validityPeriods
+            .mapNotNull { it.validTo }
+            .map { it.plusDays(1) }
+            .filter { it > today }
+
+        val desiredTriggerDates = (validFromDates + expiryDates).toSet()
+
+        val existingUnprocessedTriggers = legalEntityRelationEventTriggerRepository
+            .findByRelationAndEventType(relation, TriggerEventType.AlternativeHeadquarterValidityBoundary)
+            .filterNot { it.isProcessed }
+        val existingTriggerDates = existingUnprocessedTriggers.map { it.triggerDate }.toSet()
+
+        val triggersToDelete = existingUnprocessedTriggers.filterNot { it.triggerDate in desiredTriggerDates }
+        val triggerDatesToCreate = desiredTriggerDates - existingTriggerDates
+
+        legalEntityRelationEventTriggerRepository.deleteAll(triggersToDelete)
+        legalEntityRelationEventTriggerRepository.saveAll(
+            triggerDatesToCreate.map {
+                LegalEntityRelationEventTriggerDb(it, false, TriggerEventType.AlternativeHeadquarterValidityBoundary, relation)
+            }
+        )
     }
 
-    private fun validateOnlyOneAlternative(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
-        validateOnlyOneAlternative(upsertRequest.source, upsertRequest)
-        validateOnlyOneAlternative(upsertRequest.target, upsertRequest)
-    }
 
-    private fun validateOnlyOneAlternative(legalEntity: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
-        val relations =  relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity)
-        val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, relations)
+    private fun validateStarTopology(alternative: LegalEntityDb, main: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val allAltHqRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, alternative)
+        val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allAltHqRelations)
 
-        val otherRelations =  overlappingRelations.filterNot { it.startNode.bpn == upsertRequest.source.bpn && it.endNode.bpn == upsertRequest.target.bpn }
+        val otherRelations = overlappingRelations.filterNot { it.startNode.bpn == alternative.bpn && it.endNode.bpn == main.bpn }
 
-        if(otherRelations.isNotEmpty()){
-            val otherRelation = otherRelations.first()
-            val otherLegalEntity = if(otherRelation.startNode.bpn == legalEntity.bpn) otherRelation.endNode else otherRelation.startNode
+        for (relation in otherRelations) {
+            when {
+                relation.endNode.bpn == alternative.bpn && relation.startNode.bpn != main.bpn -> {
+                    throw BpdmValidationException(
+                        "Star topology violated: Legal entity '${alternative.bpn}' is already the main of an " +
+                        "alternative relation with '${relation.startNode.bpn}' in an overlapping period. " +
+                        "Cannot also be alternative to '${main.bpn}'."
+                    )
+                }
+                relation.startNode.bpn == main.bpn && relation.endNode.bpn != alternative.bpn -> {
+                    throw BpdmValidationException(
+                        "Star topology violated: Legal entity '${main.bpn}' is already alternative to " +
+                        "'${relation.endNode.bpn}' in an overlapping period. Cannot also be main to '${alternative.bpn}'."
+                    )
+                }
+                relation.startNode.bpn == alternative.bpn && relation.endNode.bpn != main.bpn -> {
+                    throw BpdmValidationException(
+                        "Star topology violated: Legal entity '${alternative.bpn}' is already alternative to " +
+                        "'${relation.endNode.bpn}' in an overlapping period. Cannot also be alternative to '${main.bpn}'."
+                    )
+                }
+            }
+        }
+
+        val allMainRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, main)
+        val overlappingMainRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allMainRelations)
+
+        val conflictingRelation = overlappingMainRelations.find {
+            it.startNode.bpn == main.bpn && it.endNode.bpn != alternative.bpn
+        }
+        if (conflictingRelation != null) {
             throw BpdmValidationException(
-                "Invalid 'IsAlternativeHeadquarter' relation: Legal Entity ${legalEntity.bpn} is already alternative headquarter to ${otherLegalEntity.bpn}"
+                "Star topology violated: Legal entity '${main.bpn}' is already alternative to '${conflictingRelation.endNode.bpn}' in an overlapping period. " +
+                        "Cannot also be main for '${alternative.bpn}'."
+            )
+        }
+
+        val reverseRelation = overlappingMainRelations.find { it.startNode.bpn == main.bpn && it.endNode.bpn == alternative.bpn }
+        if (reverseRelation != null) {
+            throw BpdmValidationException(
+                "Cannot reverse alternative headquarter relation: '${main.bpn}' cannot be alternative to '${alternative.bpn}' " +
+                "while the reverse relation ('${alternative.bpn}' alternative to '${main.bpn}') exists in an overlapping period. " +
+                "End the original relation first."
+            )
+        }
+    }
+
+
+    private fun validateAlternativeNotInOwnership(alternative: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val ownedByRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsOwnedBy, alternative)
+        val overlappingOwnedByRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, ownedByRelations)
+
+        if (overlappingOwnedByRelations.isNotEmpty()) {
+            val relation = overlappingOwnedByRelations.first()
+            val role = if (relation.startNode.bpn == alternative.bpn) "owned" else "owning"
+            throw BpdmValidationException(
+                "Invalid alternative headquarter relation: Legal entity '${alternative.bpn}' cannot be alternative " +
+                "because it participates in an overlapping IsOwnedBy relation (as $role entity with '${if (role == "owned") relation.endNode.bpn else relation.startNode.bpn}')."
+            )
+        }
+    }
+
+    private fun validateAlternativeNotFlagged(alternative: LegalEntityDb) {
+        if (alternative.ownershipUltimate) {
+            throw BpdmValidationException(
+                "Invalid alternative headquarter relation: Legal entity '${alternative.bpn}' cannot be alternative " +
+                "because it carries the ownershipUltimate flag."
             )
         }
     }

@@ -49,7 +49,7 @@ interface PoolChangelogApi {
         ]
     )
     @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.CHANGELOG_BASE_PATH_V6}/search", "${ApiCommons.CHANGELOG_BASE_PATH_V7}/search"])
+    @PostMapping(value = ["${ApiCommons.CHANGELOG_BASE_PATH_V7}/search"])
     fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

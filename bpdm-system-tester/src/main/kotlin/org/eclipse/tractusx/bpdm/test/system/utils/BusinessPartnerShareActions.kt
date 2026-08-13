@@ -22,18 +22,14 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 
 class BusinessPartnerShareActions(
@@ -51,8 +47,14 @@ class BusinessPartnerShareActions(
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
 
-    fun upload(recordId: String, isOwnCompanyData: Boolean, contentSeed: String = recordId) {
-        val inputData = testDataGenerator.buildInputData(contentSeed).copy(isOwnCompanyData = isOwnCompanyData)
+    fun upload(
+        recordId: String,
+        isOwnCompanyData: Boolean,
+        contentSeed: String = recordId,
+        additionalSites: List<AdditionalSiteInputDto> = emptyList()
+    ) {
+        val inputData = testDataGenerator.buildInputData(contentSeed)
+            .copy(isOwnCompanyData = isOwnCompanyData, additionalSites = additionalSites)
         val runId = context.runId(recordId)
         val request = listOf(inputData.copy(externalId = runId))
         val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
@@ -193,6 +195,40 @@ class BusinessPartnerShareActions(
         val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
         val siteResult = testDataGenerator.buildSite(masterDataSeed, parentResult.legalEntity)
         resolveTask(recordId, siteResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, siteLabel = siteLabel))
+        context.records[recordId] = state.copy(
+            legalEntity = siteResult.siteWithParent.legalEntity,
+            poolSite = siteResult.siteWithParent.site
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return siteResult.siteWithParent
+    }
+
+    /**
+     * Refines a record into a site exactly like the label overload above, but pins the site's MAIN ADDRESS
+     * to the shared [mainAddressLabel] instead of the site label. Two records refined to distinct
+     * [siteLabel]s under the same [legalEntityLabel] but the same [mainAddressLabel] therefore ask the Pool
+     * to make both sites share one main address. Their script codes follow [mainAddressLabel] too: one address
+     * covers every site on it, so all of them have to be named in the scripts it is written in. Returns the
+     * site together with its parent legal entity so the caller can store them as the current expectation.
+     */
+    fun refineAsSite(
+        recordId: String,
+        masterDataSeed: String,
+        siteLabel: String,
+        legalEntityLabel: String,
+        mainAddressLabel: String
+    ): SiteWithParent {
+        val state = context.records[recordId]!!
+        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
+        val siteResult = testDataGenerator.buildSite(masterDataSeed, parentResult.legalEntity, sharedMainAddressId = mainAddressLabel)
+        resolveTask(
+            recordId,
+            siteResult.taskData.withGoldenRecordRequestIdentifiers(
+                legalEntityLabel,
+                siteLabel = siteLabel,
+                siteMainAddressLabel = mainAddressLabel
+            )
+        )
         context.records[recordId] = state.copy(
             legalEntity = siteResult.siteWithParent.legalEntity,
             poolSite = siteResult.siteWithParent.site
@@ -369,9 +405,12 @@ class BusinessPartnerShareActions(
         val sharingStatePage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
         attachApiCall("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
         val taskId = sharingStatePage.content.single().taskId!!
-        taskReservationWatcher.waitForReservedTask(taskId)
+        val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
+        // The generated result describes the golden record this record is refined to; the sites the sharing
+        // member stated for its address are not part of that and are carried over as a refinement service does.
+        val result = taskData.copy(additionalSites = reservedTask.businessPartner.additionalSites)
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, result)))
         )
     }
 
@@ -418,7 +457,8 @@ class BusinessPartnerShareActions(
     private fun BusinessPartner.withGoldenRecordRequestIdentifiers(
         legalEntityLabel: String,
         siteLabel: String? = null,
-        additionalAddressLabel: String? = null
+        additionalAddressLabel: String? = null,
+        siteMainAddressLabel: String? = null
     ): BusinessPartner =
         copy(
             legalEntity = legalEntity.copy(
@@ -428,7 +468,10 @@ class BusinessPartnerShareActions(
             site = siteLabel?.let { label ->
                 site?.copy(
                     bpnReference = requestIdentifier("BPNS", label),
-                    siteMainAddress = site?.siteMainAddress?.copy(bpnReference = requestIdentifier("BPNA", label))
+                    // The site main address is keyed by [siteMainAddressLabel] when given, so two distinct sites
+                    // can point their main address at the SAME address request identifier (and thus share it);
+                    // it defaults to the site label, keeping each site's main address its own.
+                    siteMainAddress = site?.siteMainAddress?.copy(bpnReference = requestIdentifier("BPNA", siteMainAddressLabel ?: label))
                 )
             } ?: site,
             additionalAddress = additionalAddressLabel?.let { label ->

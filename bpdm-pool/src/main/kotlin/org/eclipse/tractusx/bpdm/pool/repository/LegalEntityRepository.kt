@@ -19,11 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -46,10 +44,10 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<LegalEntityDb> { root, _, builder ->
-                isCatenaXMemberData?.let {
-                    builder.equal(root.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
+                isDataSpaceParticipant?.let {
+                    builder.equal(root.get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name), isDataSpaceParticipant)
                 }
             }
     }
@@ -58,11 +56,15 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntityDb>
 
-    @Query("SELECT p FROM LegalEntityDb p WHERE LOWER(p.legalName.value) LIKE :value ORDER BY LENGTH(p.legalName.value)")
-    fun findByLegalNameValue(value: String, pageable: Pageable): Page<LegalEntityDb>
-
-    @Query("SELECT DISTINCT i.legalEntity FROM LegalEntityIdentifierDb i WHERE i.type = :type AND upper(i.value) = upper(:idValue)")
-    fun findByIdentifierTypeAndValueIgnoreCase(type: IdentifierTypeDb, idValue: String): LegalEntityDb?
+    @Query(
+        "SELECT DISTINCT i.legalEntity FROM LegalEntityIdentifierDb i " +
+                "WHERE i.type.businessPartnerType = :businessPartnerType AND i.type.technicalKey = :typeKey AND upper(i.value) = upper(:idValue)"
+    )
+    fun findByIdentifierTypeKeyAndValueIgnoreCase(
+        businessPartnerType: IdentifierBusinessPartnerType,
+        typeKey: String,
+        idValue: String
+    ): LegalEntityDb?
 
     @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
     fun joinLegalForm(partners: Set<LegalEntityDb>): Set<LegalEntityDb>

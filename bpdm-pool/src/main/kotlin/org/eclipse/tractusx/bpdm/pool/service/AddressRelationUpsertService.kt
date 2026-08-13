@@ -23,7 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -37,7 +38,7 @@ import java.time.LocalDate
 @Service
 class AddressRelationUpsertService(
     private val addressRelationRepository: AddressRelationRepository,
-    private val changelogService: PartnerChangelogService,
+    private val changelogCreateService: ChangelogCreateService,
     private val headquarterSyncService: HeadquarterSyncService,
     private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
 ): IAddressRelationUpsertStratergyService {
@@ -101,12 +102,12 @@ class AddressRelationUpsertService(
             throw BpdmValidationException("Invalid 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' and target address with BPNA '${target.bpn}' do not belong to the same Legal Entity (BPNL '${source.legalEntity!!.bpn}' and '${target.legalEntity!!.bpn}'). "
                     + "Both addresses must belong to the same Legal Entity to create an 'IsReplacedBy' relation.")
         }
-        if (getAddressType(source) != AddressType.LegalAddress) {
-            throw BpdmValidationException("Invalid source address type for 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' is of type '${getAddressType(source)}'. "
+        if (source.addressType != AddressType.LegalAddress) {
+            throw BpdmValidationException("Invalid source address type for 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' is of type '${source.addressType}'. "
                     + "Only addresses of type 'LegalAddress' can be the source of an 'IsReplacedBy' relation.")
         }
-        if (getAddressType(target) != AddressType.AdditionalAddress) {
-            throw BpdmValidationException("Invalid target address type for 'IsReplacedBy' relation: The target address with BPNA '${target.bpn}' is of type '${getAddressType(target)}'. "
+        if (target.addressType != AddressType.AdditionalAddress) {
+            throw BpdmValidationException("Invalid target address type for 'IsReplacedBy' relation: The target address with BPNA '${target.bpn}' is of type '${target.addressType}'. "
                     + "Only addresses of type 'AdditionalAddress' can be the target of an 'IsReplacedBy' relation.")
         }
     }
@@ -131,8 +132,8 @@ class AddressRelationUpsertService(
 
         addressRelationRepository.saveAndFlush(newRelation)
 
-        changelogService.createChangelogEntry(ChangelogEntryCreateRequest(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
-        changelogService.createChangelogEntry(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
 
         return newRelation
     }

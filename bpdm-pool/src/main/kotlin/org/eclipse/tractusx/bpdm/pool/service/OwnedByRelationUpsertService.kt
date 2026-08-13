@@ -28,6 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.parser.UltimateOwnerUniquenessValidator
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -35,7 +37,8 @@ import java.time.LocalDate
 class OwnedByRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
     private val relationRepository: RelationRepository,
-    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
+    private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
+    private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
     private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
 ): IRelationUpsertStrategyService {
 
@@ -46,10 +49,8 @@ class OwnedByRelationUpsertService(
 
         validateSingleParent(upsertRequest)
         validateNoCycles(upsertRequest)
-
-        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(proposedSource)
-        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(proposedTarget)
-
+        validateSingleUltimateOwner(upsertRequest)
+        validateNotAlternativeHeadquarter(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
@@ -62,11 +63,9 @@ class OwnedByRelationUpsertService(
             )
         )
 
-        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(proposedSource)
+        ultimateOwnerRecalculationService.recalculate(listOf(proposedSource))
 
-        ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(proposedSource)
-
-        handleValidityBoundaryTriggers(result.relation)
+        handleValidityBoundaryTriggers(result.value)
 
         return result
     }
@@ -110,6 +109,21 @@ class OwnedByRelationUpsertService(
         )
     }
 
+    // The rule itself lives in the parser layer, where the legal-entity write path applies it as a parse error. This path
+    // has no parser layer yet, so it calls the same validator and reports the violation the way its siblings do.
+    private fun validateSingleUltimateOwner(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        val child = upsertRequest.source
+        val parent = upsertRequest.target
+
+        ultimateOwnerUniquenessValidator.validateOwnershipEdge(child, parent).forEach { violation ->
+            throw BpdmValidationException(
+                "Multiple ultimate owners in entity hierarchy: legal entity '${child.bpn}' can't be owned by '${parent.bpn}' " +
+                        "as that would put more than one ultimate owner into one ownership hierarchy " +
+                        "(flagged: ${violation.conflictingBpnls.joinToString(", ")})."
+            )
+        }
+    }
+
     private fun validateSingleParent(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
         val child = upsertRequest.source
         val parent = upsertRequest.target
@@ -130,6 +144,36 @@ class OwnedByRelationUpsertService(
         val allOwningAncestors = getAllAncestors(upsertRequest)
         if(allOwningAncestors.contains(child))
             throw BpdmValidationException("Circular ownership detected in entity hierarchy: legal entity '${child.bpn}' is (transitively) owning '${parent.bpn}' and therefore can't be owned by '${parent.bpn}'.")
+    }
+
+    /**
+     * Either end of an IsOwnedBy relation cannot be an alternative headquarter in an overlapping period
+     */
+    private fun validateNotAlternativeHeadquarter(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+
+        // Check if source is an alternative (startNode in IsAlternativeHeadquarterFor)
+        val sourceAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, source)
+        val overlappingSourceAlternative = relationUpsertService.filterOverlappingRelations(upsertRequest, sourceAsAlternative)
+        if (overlappingSourceAlternative.isNotEmpty()) {
+            val relation = overlappingSourceAlternative.first()
+            throw BpdmValidationException(
+                "Invalid IsOwnedBy relation: Legal entity '${source.bpn}' cannot participate in ownership because " +
+                "it is an alternative headquarter to '${relation.endNode.bpn}' in an overlapping period."
+            )
+        }
+
+        // Check if target is an alternative (startNode in IsAlternativeHeadquarterFor)
+        val targetAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, target)
+        val overlappingTargetAlternative = relationUpsertService.filterOverlappingRelations(upsertRequest, targetAsAlternative)
+        if (overlappingTargetAlternative.isNotEmpty()) {
+            val relation = overlappingTargetAlternative.first()
+            throw BpdmValidationException(
+                "Invalid IsOwnedBy relation: Legal entity '${target.bpn}' cannot participate in ownership because " +
+                "it is an alternative headquarter to '${relation.endNode.bpn}' in an overlapping period."
+            )
+        }
     }
 
     /**

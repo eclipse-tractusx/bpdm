@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.Formula
 
 @Embeddable
 data class PostalAddressScriptVariantDb (
@@ -38,16 +39,12 @@ data class PostalAddressScriptVariantDb (
 
 @Embeddable
 data class PhysicalAddressScriptVariantDb(
-    @Column(name = "phy_postcode")
-    val postalCode: String?,
     @Column(name = "phy_city")
     val city: String?,
     @Column(name = "phy_district_l1")
     val district: String?,
     @Embedded
-    val street: PostalAddressDb.Street,
-    @Column(name = "phy_company_postcode")
-    val companyPostalCode: String?,
+    val street: StreetScriptVariantDb,
     @Column(name = "phy_industrial_zone")
     val industrialZone: String?,
     @Column(name = "phy_building")
@@ -55,19 +52,39 @@ data class PhysicalAddressScriptVariantDb(
     @Column(name = "phy_floor")
     val floor: String?,
     @Column(name = "phy_door")
-    val door: String?,
-    @Column(name = "phy_tax_jurisdiction")
-    val taxJurisdictionCode: String?
+    val door: String?
 )
 
 @Embeddable
 data class AlternativeAddressScriptVariantDb(
-    @Column(name = "alt_postcode")
-    val postalCode: String?,
     @Column(name = "alt_city")
-    val city: String?,
-    @Column(name = "alt_delivery_service_qualifier")
-    val deliveryServiceQualifier: String?,
-    @Column(name = "alt_delivery_service_number")
-    val deliveryServiceNumber: String?
-)
+    val city: String?
+){
+    /**
+     * Keeps Hibernate from reading an alternative variant whose only column is null as an absent variant.
+     */
+    @Formula("1")
+    private val isNonNull = 1
+}
+
+@Embeddable
+data class StreetScriptVariantDb(
+    @Column(name = "phy_street_name")
+    val name: String?,
+    @Column(name = "phy_direction")
+    val direction: String?,
+    @Column(name = "phy_street_name_prefix")
+    val namePrefix: String?,
+    @Column(name = "phy_street_name_additional_prefix")
+    val additionalNamePrefix: String?,
+    @Column(name = "phy_street_name_suffix")
+    val nameSuffix: String?,
+    @Column(name = "phy_street_name_additional_suffix")
+    val additionalNameSuffix: String?
+){
+    /**
+     * Keeps Hibernate from reading an all-null street as an absent street, which the non-null property forbids.
+     */
+    @Formula("1")
+    private val isNonNull = 1
+}

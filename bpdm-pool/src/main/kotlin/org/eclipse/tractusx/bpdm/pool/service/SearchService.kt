@@ -22,41 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
 
 /**
  * Provides search functionality on the Catena-x data for the BPDM system
  */
 interface SearchService {
-
-    /**
-     * Find legal entities by matching their field values to [searchRequest] field query texts
-     */
-    fun searchLegalEntities(
-        searchRequest: BusinessPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
-
-    /**
-     * Find addresses by matching their field values to [searchRequest] field query texts
-     */
-    fun searchAddresses(
-        searchRequest: AddressPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto>
-
-    /**
-     * Find sites by matching their field values to [searchRequest] field query texts
-     */
-    fun searchSites(
-        paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto>
 
     /**
      * Find business partner by matching their field values to [searchRequest] field query texts

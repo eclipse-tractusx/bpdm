@@ -69,6 +69,9 @@ class TaskResolutionMapper {
                 // and perform that last step to set this to null later on after we use this site main address to override the legal entities legal address
                 siteMainAddress = toTaskResult(siteMainAddress, hasChanged),
                 scriptVariants = scriptVariants.map { toTaskResult(it) },
+                goldenRecordRelations = relations
+                    .distinctBy { Triple(it.type, it.businessPartnerSourceBpns, it.businessPartnerTargetBpns) }
+                    .map { toTaskResult(it) },
                 updatedAt = updatedAt
             )
         }
@@ -204,26 +207,33 @@ class TaskResolutionMapper {
     fun toTaskResult(physicalAddress: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
         return with(physicalAddress){
             PhysicalAddressScriptVariant(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = street?.let { toTaskResult(it) } ?: Street.empty,
-                companyPostalCode = companyPostalCode,
+                street = street?.let { toTaskResult(it) } ?: StreetScriptVariant.empty,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode)
+                door = door)
         }
     }
 
     fun toTaskResult(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+    }
+
+    fun toTaskResult(street: StreetScriptVariantDto): StreetScriptVariant{
+        return with(street){
+            StreetScriptVariant(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
     }
@@ -234,9 +244,20 @@ class TaskResolutionMapper {
                 LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
                 LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
                 LegalEntityRelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = relation.businessPartnerSourceBpnl,
             targetBpn = relation.businessPartnerTargetBpnl
+        )
+    }
+
+    fun toTaskResult(relation: SiteRelationVerboseDto): SiteGoldenRecordRelation{
+        return SiteGoldenRecordRelation(
+            relationType = when (relation.type) {
+                SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = relation.businessPartnerSourceBpns,
+            targetBpn = relation.businessPartnerTargetBpns
         )
     }
 

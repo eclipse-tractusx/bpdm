@@ -47,10 +47,20 @@ class SiteDb(
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<SiteStateDb> = mutableSetOf()
 
-    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "startSite", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val startSiteRelations: MutableSet<SiteRelationDb> = mutableSetOf()
+
+    @OneToMany(mappedBy = "endSite", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val endSiteRelations: MutableSet<SiteRelationDb> = mutableSetOf()
+
+    // Inverse of LogisticAddressDb.sites. No cascade/orphanRemoval: addresses are shared across sites, so removing a
+    // site (or an address from a site) must not delete the address itself.
+    @ManyToMany(mappedBy = "sites")
     val addresses: MutableSet<LogisticAddressDb> = mutableSetOf()
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     lateinit var mainAddress: LogisticAddressDb
+
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }

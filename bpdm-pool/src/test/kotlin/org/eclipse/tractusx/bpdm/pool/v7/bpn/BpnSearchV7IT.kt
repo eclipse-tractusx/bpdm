@@ -29,15 +29,14 @@ import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalIdentifiers
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
-    @Autowired
-    private lateinit var orchestratorRequestFactory: OrchestratorRequestFactoryV7
+
+    private val searchRequestLimit = 100
 
     /**
      * GIVEN legal entity with identifier X
@@ -302,6 +301,42 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         //THEN
         val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
         Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN a search request holding more identifier values than the search request limit allows
+     * WHEN sharing member searches for BPNs by those identifier values
+     * THEN 400 bad request is returned
+     */
+    @Test
+    fun `search BPNs by too many identifier values returns 400 bad request`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val identifierX = legalEntityResponse.header.identifiers.first()
+        val tooManyIdentifierValues = (1..searchRequestLimit + 1).map { "Identifier Value $it" }
+
+        //WHEN / THEN
+        Assertions.assertThatThrownBy {
+            poolClient.bpns.findBpnsByIdentifiers(
+                IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierX.type, tooManyIdentifierValues)
+            )
+        }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
+    }
+
+    /**
+     * GIVEN a search request holding more request identifiers than the search request limit allows
+     * WHEN sharing member searches for BPNs by those request identifiers
+     * THEN 400 bad request is returned
+     */
+    @Test
+    fun `find bpn by too many requested identifiers returns 400 bad request`() {
+        //GIVEN
+        val tooManyRequestedIdentifiers = (1..searchRequestLimit + 1).map { "Request Identifier $it" }.toSet()
+
+        //WHEN / THEN
+        Assertions.assertThatThrownBy {
+            poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(tooManyRequestedIdentifiers))
+        }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
     /**

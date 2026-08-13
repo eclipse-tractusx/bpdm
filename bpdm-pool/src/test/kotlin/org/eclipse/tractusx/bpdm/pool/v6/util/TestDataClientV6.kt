@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.BusinessPartnerV6RequestFactory
 
 /**
@@ -35,10 +35,10 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.BusinessPartnerV6RequestF
  */
 class TestDataClientV6(
     private val requestFactory: BusinessPartnerV6RequestFactory,
-    private val poolClient: PoolApiClient
+    private val poolClient: PoolV6ApiClient
 ) {
 
-    fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto{
+    fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDtoV6{
         val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(seed)
         val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
@@ -48,49 +48,49 @@ class TestDataClientV6(
     fun createMemberLegalEntity(seed: String) = createLegalEntityWithMemberOverwrite(seed, true)
     fun createNonMemberLegalEntity(seed: String) = createLegalEntityWithMemberOverwrite(seed, false)
 
-    fun updateLegalEntity(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): LegalEntityPartnerCreateVerboseDto{
+    fun updateLegalEntity(legalEntity: LegalEntityPartnerCreateVerboseDtoV6, seed: String): LegalEntityPartnerCreateVerboseDtoV6{
         val legalEntityRequest = requestFactory.createLegalEntityUpdateRequest(seed, legalEntity.legalEntity.bpnl)
         val legalEntityResponse = poolClient.legalEntities.updateBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
         return legalEntityResponse
     }
 
-    fun createSiteFor(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto{
+    fun createSiteFor(legalEntity: LegalEntityPartnerCreateVerboseDtoV6, seed: String): SitePartnerCreateVerboseDtoV6{
         val siteRequest = requestFactory.buildSiteCreateRequest(seed, legalEntity.legalEntity.bpnl)
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest)).entities.single()
 
         return siteResponse
     }
 
-    fun updateSite(site: SitePartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto{
+    fun updateSite(site: SitePartnerCreateVerboseDtoV6, seed: String): SitePartnerCreateVerboseDtoV6{
         val siteRequest = requestFactory.createSiteUpdateRequest(seed, site.site.bpns)
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest)).entities.single()
 
         return siteResponse
     }
 
-    fun createLegalAddressSiteFor(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto{
+    fun createLegalAddressSiteFor(legalEntity: LegalEntityPartnerCreateVerboseDtoV6, seed: String): SitePartnerCreateVerboseDtoV6{
         val siteRequest = requestFactory.buildLegalAddressSiteCreateRequest(seed, legalEntity.legalEntity.bpnl)
         val siteResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest)).entities.single()
 
         return siteResponse
     }
 
-    fun createAdditionalAddressFor(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): AddressPartnerCreateVerboseDto{
+    fun createAdditionalAddressFor(legalEntity: LegalEntityPartnerCreateVerboseDtoV6, seed: String): AddressPartnerCreateVerboseDtoV6{
         val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest)).entities.single()
 
         return addressResponse
     }
 
-    fun createAdditionalAddressFor(site: SitePartnerCreateVerboseDto, seed: String): AddressPartnerCreateVerboseDto{
+    fun createAdditionalAddressFor(site: SitePartnerCreateVerboseDtoV6, seed: String): AddressPartnerCreateVerboseDtoV6{
         val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(seed, site.site.bpns)
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest)).entities.single()
 
         return addressResponse
     }
 
-    fun updateAddress(address: AddressPartnerCreateVerboseDto, seed: String): LogisticAddressVerboseDto{
+    fun updateAddress(address: AddressPartnerCreateVerboseDtoV6, seed: String): LogisticAddressVerboseDtoV6{
         val addressRequest = requestFactory.buildAddressUpdateRequest(seed, address.address.bpna)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest)).entities.single()
 
@@ -98,7 +98,7 @@ class TestDataClientV6(
     }
 
 
-    private fun createLegalEntityWithMemberOverwrite(seed: String, isMember: Boolean): LegalEntityPartnerCreateVerboseDto{
+    private fun createLegalEntityWithMemberOverwrite(seed: String, isMember: Boolean): LegalEntityPartnerCreateVerboseDtoV6{
         val request =  with(requestFactory.buildLegalEntityCreateRequest(seed))
         { copy(legalEntity = legalEntity.copy(isCatenaXMemberData = isMember)) }
 

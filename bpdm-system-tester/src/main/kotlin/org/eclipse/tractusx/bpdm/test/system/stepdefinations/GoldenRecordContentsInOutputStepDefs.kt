@@ -27,9 +27,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
@@ -133,6 +136,40 @@ class GoldenRecordContentsInOutputStepDefs(
         shareActions.upload(recordId, isOwnCompanyData = true)
     }
 
+    @When("the sharing member shares record {string} stating the site of record {string} as an additional site of its address")
+    fun `when shares record stating the site of another record`(recordId: String, otherRecordId: String) {
+        logger.info {
+            "[$scenarioName] When: the sharing member shares record '$recordId' stating the site of record " +
+                "'$otherRecordId' as an additional site of its address"
+        }
+        // The other record has already been refined, so its site exists as a golden record and the sharing
+        // member can name it by its BPNS - the case where a member knows the site it wants to join.
+        val statedSite = AdditionalSiteInputDto(siteBpn = siteBpnOf(otherRecordId), name = null)
+        shareActions.upload(recordId, isOwnCompanyData = true, additionalSites = listOf(statedSite))
+    }
+
+    @When("the sharing member shares record {string} stating a site named {string} as an additional site of its address")
+    fun `when shares record stating a site by name`(recordId: String, siteName: String) {
+        logger.info {
+            "[$scenarioName] When: the sharing member shares record '$recordId' stating a site named " +
+                "'$siteName' as an additional site of its address"
+        }
+        // No such site exists yet, so the member can only name it and the golden record process has to create it.
+        val statedSite = AdditionalSiteInputDto(siteBpn = null, name = context.runId(siteName))
+        shareActions.upload(recordId, isOwnCompanyData = true, additionalSites = listOf(statedSite))
+    }
+
+    @Then("{string} output lists a site named {string} as an additional site of its address")
+    fun `then output lists additional site by name`(recordId: String, siteName: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output lists a site named '$siteName' as an additional site of its address"
+        }
+        val additionalSites = outputOf(recordId).additionalSites
+        assertThat(additionalSites.map { it.name })
+            .describedAs("Additional sites of record '%s'", recordId)
+            .containsExactly(context.runId(siteName))
+    }
+
     @When("the sharing member updates record {string}")
     fun `when updates record`(recordId: String) {
         logger.info { "[$scenarioName] When: the sharing member updates record '$recordId'" }
@@ -172,6 +209,26 @@ class GoldenRecordContentsInOutputStepDefs(
         // Store the resulting site (and its parent legal entity) under their labels so the Then can assert by
         // reference and re-refinement automatically updates the expectation.
         val siteWithParent = shareActions.refineAsSite(recordId, masterDataSeed, siteId, legalEntityId)
+        context.legalEntities[legalEntityId] = siteWithParent.legalEntity
+        context.sites[siteId] = siteWithParent
+    }
+
+    @When("the golden record process refines record {string} to site {string} with shared main address {string} of legal entity {string} with master data {string}")
+    fun `when refines to site with shared main address`(
+        recordId: String,
+        siteId: String,
+        mainAddressId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] When: the golden record process refines record '$recordId' to site '$siteId' " +
+                "with shared main address '$mainAddressId' of legal entity '$legalEntityId' with master data '$masterDataSeed'"
+        }
+        // Pin the site's main address to the shared [mainAddressId] label so several records can refine to
+        // distinct sites that all point their main address at the same address - i.e. one address belonging
+        // to several sites as their main address.
+        val siteWithParent = shareActions.refineAsSite(recordId, masterDataSeed, siteId, legalEntityId, mainAddressId)
         context.legalEntities[legalEntityId] = siteWithParent.legalEntity
         context.sites[siteId] = siteWithParent
     }
@@ -507,8 +564,113 @@ class GoldenRecordContentsInOutputStepDefs(
     }
 
     // -------------------------------------------------------------------------
+    // Then - additional sites an address belongs to
+    //
+    // When several records refine the SAME additional address under DIFFERENT sites of the same legal
+    // entity, that address ends up belonging to all of those sites. Each record follows its own site, so
+    // its output's primary "site" is that site and the OTHER sites surface as the address's additional
+    // sites. The expected additional sites are read from the OTHER records' actual outputs (their primary
+    // "site"), which carry the real Pool-assigned BPNS/name - the context-stored entities only hold
+    // placeholder BPNs. The Pool address query independently proves the same membership.
+    // -------------------------------------------------------------------------
+
+    @Then("{string} output lists the site of record {string} as an additional site of its address")
+    fun `then output lists additional site`(recordId: String, otherRecordId: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output lists the site of record '$otherRecordId' as an additional site of its address"
+        }
+        assertOutputAdditionalSites(recordId, listOf(otherRecordId))
+    }
+
+    @Then("{string} output lists the sites of records {string} as additional sites of its address")
+    fun `then output lists additional sites`(recordId: String, otherRecordIds: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output lists the sites of records '$otherRecordIds' as additional sites of its address"
+        }
+        assertOutputAdditionalSites(recordId, otherRecordIds.splitRecordIds())
+    }
+
+    @Then("{string} output lists no additional sites")
+    fun `then output lists no additional sites`(recordId: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output lists no additional sites" }
+        assertOutputAdditionalSites(recordId, emptyList())
+    }
+
+    @Then("the Pool address of {string} belongs to the sites of records {string}")
+    fun `then pool address belongs to sites`(recordId: String, siteRecordIds: String) {
+        logger.info {
+            "[$scenarioName] Then: the Pool address of '$recordId' belongs to the sites of records '$siteRecordIds'"
+        }
+        val expectedMembership = siteRecordIds.splitRecordIds().map { siteBpnOf(it) }.toSet()
+        val poolAddress = poolAddressOf(recordId)
+        val actualMembership = (listOfNotNull(poolAddress.address.bpnSite) + poolAddress.address.additionalSites).toSet()
+        assertThat(actualMembership)
+            .describedAs("Pool address of '%s' must belong to exactly the sites of records %s", recordId, siteRecordIds)
+            .isEqualTo(expectedMembership)
+    }
+
+    @Then("the Pool address of {string} belongs to a single site")
+    fun `then pool address belongs to single site`(recordId: String) {
+        logger.info { "[$scenarioName] Then: the Pool address of '$recordId' belongs to a single site" }
+        val poolAddress = poolAddressOf(recordId)
+        assertThat(poolAddress.address.additionalSites)
+            .describedAs("Pool address of '%s' must not list any additional sites", recordId)
+            .isEmpty()
+        assertThat(poolAddress.address.bpnSite)
+            .describedAs("Pool address of '%s' must still belong to its single primary site", recordId)
+            .isEqualTo(siteBpnOf(recordId))
+    }
+
+    // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Asserts [recordId]'s Gate output surfaces exactly the primary sites of [otherRecordIds] as its
+     * address's additional sites (and nothing else). Expected additional sites are built from the other
+     * records' actual outputs so the BPNS/name are the real Pool-assigned ones; the comparison is
+     * restricted to the additionalSites field. Works regardless of what kind of record [recordId] is (an
+     * additional address of a site, or a site whose main address is shared) - it compares the actual output
+     * against itself with only the additionalSites replaced, so no reflected-entity lookup is needed.
+     */
+    private fun assertOutputAdditionalSites(recordId: String, otherRecordIds: List<String>) {
+        val expectedAdditionalSites = otherRecordIds.map { other ->
+            val otherSite = outputOf(other).site
+                ?: error("record '$other' output has no site to surface as an additional site")
+            AdditionalSiteOutputDto(otherSite.siteBpn, otherSite.name)
+        }
+
+        val actualOutput = outputOf(recordId)
+        assertRepository.assertBusinessPartnerOutput(
+            listOf(actualOutput),
+            listOf(actualOutput.copy(additionalSites = expectedAdditionalSites)),
+            assertRepository.outputAdditionalSitesComparisonConfig
+        )
+    }
+
+    /** Reads the single Gate output for [recordId], attaching the call for scenario diagnostics. */
+    private fun outputOf(recordId: String): BusinessPartnerOutputDto {
+        val runId = context.runId(recordId)
+        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
+        attachCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
+        return outputPage.content.single()
+    }
+
+    /** The real Pool-assigned BPNS of the primary site [recordId] was refined under, read from its output. */
+    private fun siteBpnOf(recordId: String): String =
+        outputOf(recordId).site?.siteBpn
+            ?: error("record '$recordId' output has no site")
+
+    /** The Pool golden record address [recordId]'s output references, fetched by its BPNA. */
+    private fun poolAddressOf(recordId: String): LogisticAddressVerboseDto {
+        val bpna = outputOf(recordId).address.addressBpn
+        val poolAddress = poolClient.addresses.getAddress(bpna)
+        attachCall("GET", "/v7/addresses/$bpna", response = poolAddress)
+        return poolAddress
+    }
+
+    private fun String.splitRecordIds(): List<String> =
+        split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
     private fun inputResponseOf(recordId: String): BusinessPartnerInputDto =
         testDataFactoryGate.businessPartner.input.response.fromRequest(context.records[recordId]!!.currentInput!!)

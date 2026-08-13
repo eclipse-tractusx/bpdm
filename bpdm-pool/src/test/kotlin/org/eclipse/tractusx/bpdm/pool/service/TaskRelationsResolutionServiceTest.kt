@@ -20,13 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.springframework.context.annotation.Import
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
@@ -42,6 +43,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDate
@@ -497,6 +499,132 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     /**
+     * GIVEN legal entity A is replaced by legal entity B
+     * WHEN trying to create relation 'legal entity A is replaced by legal entity C' in an overlapping validity period
+     * THEN return multiple successors error
+     */
+    @Test
+    fun `create IsReplacedBy relation - violate single successor`() {
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
+
+        val validReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID", validReplacedByB)
+
+        val violatingSingleSuccessor = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SINGLE_SUCCESSOR", violatingSingleSuccessor).single()
+
+        assertThat(result.errors.size).isEqualTo(1)
+    }
+
+    /**
+     * GIVEN legal entity A is replaced by legal entity C
+     * WHEN creating relation 'legal entity B is replaced by legal entity C' in an overlapping validity period
+     * THEN the merger of both predecessors into one successor is accepted
+     */
+    @Test
+    fun `create IsReplacedBy relation - allow merger into a shared successor`() {
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
+
+        val aReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_FIRST_PREDECESSOR", aReplacedByC)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_SECOND_PREDECESSOR", bReplacedByC).single()
+
+        assertThat(result.errors).isEmpty()
+    }
+
+    /**
+     * GIVEN legal entity A is replaced by legal entity B which is replaced by legal entity C
+     * WHEN trying to create relation 'legal entity C is replaced by legal entity A'
+     * THEN return found cycles error
+     */
+    @Test
+    fun `create IsReplacedBy relation - violate no cycles`() {
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", aReplacedByB)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", bReplacedByC)
+
+        val violatingNoCycles = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedC.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedA.legalEntity.header.bpnl
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_NO_CYCLES", violatingNoCycles).single()
+
+        assertThat(result.errors.size).isEqualTo(1)
+    }
+
+    /**
+     * GIVEN legal entity A is replaced by legal entity B
+     * WHEN creating relation 'legal entity B is replaced by legal entity C'
+     * THEN the succession chain is accepted and both relations are reported on B
+     */
+    @Test
+    fun `create IsReplacedBy relation - extend succession chain`() {
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", aReplacedByB)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_CHAIN_EXTENSION", bReplacedByC).single()
+
+        assertThat(result.errors).isEmpty()
+        val fetchedB = poolClient.legalEntities.getLegalEntity(changeCase(savedB.legalEntity.header.bpnl))
+        assertThat(fetchedB.header.relations.filter { it.type == LegalEntityRelationType.IsReplacedBy })
+            .hasSize(2)
+    }
+
+    /**
      * GIVEN relation golden record task with unknown reason code
      * WHEN trying to refine relation task
      * THEN sharing process error returned
@@ -523,7 +651,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
+    @EnumSource(value = LegalEntityRelationType::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
     fun `reject unsupported address relation type`(relationType: LegalEntityRelationType) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
@@ -538,26 +666,34 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).isEqualTo("Invalid relation: mixed legal entity or address types not allowed (source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn})")
+        assertThat(result[0].errors[0].description).isEqualTo(
+            "Invalid relation: source and target must be of the same business partner type and carry a relation type supported for it " +
+                    "(source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn}, " +
+                    "relationType=${createAddressRelationsRequest.relationType})"
+        )
     }
 
     @ParameterizedTest
     @EnumSource(AddressRelationType::class)
-    fun `reject unsupported legal entity relation type`(relationType: AddressRelationType) {
+    fun `reject relation between a legal entity and an address`(relationType: AddressRelationType) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
-        val legalEntity2 = createLegalEntity("$testName 2")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
             relationType = relationType,
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
-            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl
+            businessPartnerTargetBpn = additionalAddress1.address.bpna
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).isEqualTo("Invalid relation: mixed legal entity or address types not allowed (source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn})")
+        assertThat(result[0].errors[0].description).isEqualTo(
+            "Invalid relation: source and target must be of the same business partner type and carry a relation type supported for it " +
+                    "(source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn}, " +
+                    "relationType=${createAddressRelationsRequest.relationType})"
+        )
     }
 
     /**
@@ -614,6 +750,418 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors[0].description).contains("Invalid 'IsReplacedBy' relation:")
     }
 
+    /**
+     * GIVEN two sites of the same legal entity
+     * WHEN creating relation 'site A is replaced by site B'
+     * THEN the succession is accepted and reported back with both BPNS
+     */
+    @Test
+    fun `create site IsReplacedBy relation`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val siteA = createSite("$testName A", legalEntity)
+        val siteB = createSite("$testName B", legalEntity)
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteB.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_CREATE_SITE_SUCCESSION", aReplacedByB).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+        assertThat(result.businessPartnerRelations.relationType).isEqualTo(RelationType.IsReplacedBy)
+        assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(siteA.site.bpns)
+        assertThat(result.businessPartnerRelations.businessPartnerTargetBpn).isEqualTo(siteB.site.bpns)
+        assertThat(result.businessPartnerRelations.validityPeriods).isEqualTo(aReplacedByB.validityPeriods)
+    }
+
+    /**
+     * GIVEN a site relation request whose source and target BPNS were never issued
+     * WHEN trying to create the relation
+     * THEN return not found error
+     */
+    @Test
+    fun `create site IsReplacedBy relation - reject unknown sites`() {
+        //GIVEN
+        val unknownSiteRelation = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = "BPNS0000000000XY",
+            businessPartnerTargetBpn = "BPNS0000000000ZY"
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_UNKNOWN_SITES", unknownSiteRelation).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("Source site BPNS BPNS0000000000XY not found")
+    }
+
+    /**
+     * GIVEN a site
+     * WHEN trying to create relation 'the site is replaced by itself'
+     * THEN return self reference error
+     */
+    @Test
+    fun `create site IsReplacedBy relation - reject self reference`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val site = createSite("$testName A", legalEntity)
+
+        val siteReplacedByItself = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = site.site.bpns,
+            businessPartnerTargetBpn = site.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_SELF_REFERENCE", siteReplacedByItself).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("A site cannot have a relation to itself")
+    }
+
+    /**
+     * GIVEN site A of legal entity A and site B of legal entity B
+     * WHEN trying to create relation 'site A is replaced by site B'
+     * THEN return different legal entity error
+     */
+    @Test
+    fun `create site IsReplacedBy relation - violate same legal entity`() {
+        //GIVEN
+        val legalEntityA = createLegalEntity("$testName LE A")
+        val legalEntityB = createLegalEntity("$testName LE B")
+        val siteA = createSite("$testName A", legalEntityA)
+        val siteB = createSite("$testName B", legalEntityB)
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteB.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SAME_LEGAL_ENTITY", aReplacedByB).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("do not belong to the same Legal Entity")
+    }
+
+    /**
+     * GIVEN site A is replaced by site B
+     * WHEN trying to create relation 'site A is replaced by site C' in an overlapping validity period
+     * THEN return multiple successors error
+     */
+    @Test
+    fun `create site IsReplacedBy relation - violate single successor`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val siteA = createSite("$testName A", legalEntity)
+        val siteB = createSite("$testName B", legalEntity)
+        val siteC = createSite("$testName C", legalEntity)
+
+        val validReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteB.site.bpns
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID", validReplacedByB)
+
+        val violatingSingleSuccessor = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteC.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SINGLE_SUCCESSOR", violatingSingleSuccessor).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("Multiple successors assigned to the same site")
+    }
+
+    /**
+     * GIVEN site A is replaced by site C
+     * WHEN creating relation 'site B is replaced by site C' in an overlapping validity period
+     * THEN the merger of both predecessors into one successor is accepted
+     */
+    @Test
+    fun `create site IsReplacedBy relation - allow merger into a shared successor`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val siteA = createSite("$testName A", legalEntity)
+        val siteB = createSite("$testName B", legalEntity)
+        val siteC = createSite("$testName C", legalEntity)
+
+        val aReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteC.site.bpns
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_FIRST_PREDECESSOR", aReplacedByC)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteB.site.bpns,
+            businessPartnerTargetBpn = siteC.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_SECOND_PREDECESSOR", bReplacedByC).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+    }
+
+    /**
+     * GIVEN site A is replaced by site B which is replaced by site C
+     * WHEN trying to create relation 'site C is replaced by site A'
+     * THEN return circular replacement error
+     */
+    @Test
+    fun `create site IsReplacedBy relation - violate no cycles`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val siteA = createSite("$testName A", legalEntity)
+        val siteB = createSite("$testName B", legalEntity)
+        val siteC = createSite("$testName C", legalEntity)
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteB.site.bpns
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", aReplacedByB)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteB.site.bpns,
+            businessPartnerTargetBpn = siteC.site.bpns
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", bReplacedByC)
+
+        val violatingNoCycles = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteC.site.bpns,
+            businessPartnerTargetBpn = siteA.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_NO_CYCLES", violatingNoCycles).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("Circular replacement detected")
+    }
+
+    /**
+     * GIVEN site A is replaced by site B
+     * WHEN creating relation 'site B is replaced by site C'
+     * THEN the succession chain is accepted and both relations are reported on B
+     */
+    @Test
+    fun `create site IsReplacedBy relation - extend succession chain`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val siteA = createSite("$testName A", legalEntity)
+        val siteB = createSite("$testName B", legalEntity)
+        val siteC = createSite("$testName C", legalEntity)
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteA.site.bpns,
+            businessPartnerTargetBpn = siteB.site.bpns
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", aReplacedByB)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = siteB.site.bpns,
+            businessPartnerTargetBpn = siteC.site.bpns
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_CHAIN_EXTENSION", bReplacedByC).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+        val fetchedB = poolClient.sites.getSite(siteB.site.bpns)
+        assertThat(fetchedB.site.relations.filter { it.type == SiteRelationType.IsReplacedBy })
+            .hasSize(2)
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'B is alternative headquarter of A'
+     * THEN return star topology error because A is already an alternative (target cannot be alternative)
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject target already alternative`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+        val otherB = createLegalEntity("$testName B")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val bToA = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = otherB.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_B_TO_A", bToA)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Star topology violated")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'M is alternative headquarter of D'
+     * THEN return star topology error because M is already a main (source cannot be main)
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject source already main`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+        val otherD = createLegalEntity("$testName D")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val mToD = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = otherD.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_M_TO_D", mToD)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Star topology violated")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'A is alternative headquarter of D'
+     * THEN return star topology error because A is already alternative to M
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject source already alternative of different main`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+        val otherD = createLegalEntity("$testName D")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val aToD = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = otherD.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_A_TO_D", aToD)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Star topology violated")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'M is alternative headquarter of A'
+     * THEN return reverse relation error
+     */
+    @Test
+    fun `create IsAlternativeHeadquarterFor relation - reject reverse pair`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
+
+        val mToA = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_M_TO_A", mToA)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("Cannot reverse alternative headquarter relation")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'A is owned by M'
+     * THEN return error because alternative cannot participate in IsOwnedBy
+     */
+    @Test
+    fun `create IsOwnedBy relation - reject alternative as source`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_ALT", aToM)[0].errors).isEmpty()
+
+        val aOwnedByM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_OWNED", aOwnedByM)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("cannot participate in ownership")
+    }
+
+    /**
+     * GIVEN legal entity A is alternative headquarter of M
+     * WHEN trying to create relation 'M is owned by A'
+     * THEN return error because A is alternative and cannot be an owner
+     */
+    @Test
+    fun `create IsOwnedBy relation - reject alternative as target`() {
+        val alternativeA = createLegalEntity("$testName A")
+        val mainM = createLegalEntity("$testName M")
+
+        val aToM = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
+        )
+        assertThat(upsertRelationsGoldenRecordIntoPool("TASK_ALT", aToM)[0].errors).isEmpty()
+
+        val mOwnedByA = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
+        )
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_OWNED", mOwnedByA)[0]
+        assertThat(result.errors).hasSize(1)
+        assertThat(result.errors.first().description).contains("cannot participate in ownership")
+    }
+
 
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
@@ -623,6 +1171,11 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
+    }
+
+    private fun createSite(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.buildSiteCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
+        return poolClient.sites.createSite(listOf(request)).entities.single()
     }
 
     private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepResultEntryDto> {
@@ -636,6 +1189,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
             LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
             LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 
