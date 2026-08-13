@@ -22,13 +22,15 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 import org.springframework.stereotype.Component
 
 /**
- * Maps stored legal entity and address relations to the v7 API relation DTOs.
+ * Maps stored legal entity, site and address relations to the v7 API relation DTOs.
  */
 @Component
 class RelationResponseMapper {
@@ -53,6 +55,18 @@ class RelationResponseMapper {
             type = relation.type,
             businessPartnerSourceBpna = relation.startAddress.bpn,
             businessPartnerTargetBpna = relation.endAddress.bpn,
+            validityPeriods = toValidityPeriods(relation.validityPeriods),
+            reasonCode = relation.reasonCode?.technicalKey
+        )
+
+    /**
+     * Returns the given site relation as the API reports it.
+     */
+    fun toSiteRelation(relation: SiteRelationDb): SiteRelationVerboseDto =
+        SiteRelationVerboseDto(
+            type = relation.type,
+            businessPartnerSourceBpns = relation.startSite.bpn,
+            businessPartnerTargetBpns = relation.endSite.bpn,
             validityPeriods = toValidityPeriods(relation.validityPeriods),
             reasonCode = relation.reasonCode?.technicalKey
         )

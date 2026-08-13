@@ -27,6 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -133,6 +134,40 @@ class GoldenRecordContentsInOutputStepDefs(
     fun `when shares record`(recordId: String) {
         logger.info { "[$scenarioName] When: the sharing member shares record '$recordId'" }
         shareActions.upload(recordId, isOwnCompanyData = true)
+    }
+
+    @When("the sharing member shares record {string} stating the site of record {string} as an additional site of its address")
+    fun `when shares record stating the site of another record`(recordId: String, otherRecordId: String) {
+        logger.info {
+            "[$scenarioName] When: the sharing member shares record '$recordId' stating the site of record " +
+                "'$otherRecordId' as an additional site of its address"
+        }
+        // The other record has already been refined, so its site exists as a golden record and the sharing
+        // member can name it by its BPNS - the case where a member knows the site it wants to join.
+        val statedSite = AdditionalSiteInputDto(siteBpn = siteBpnOf(otherRecordId), name = null)
+        shareActions.upload(recordId, isOwnCompanyData = true, additionalSites = listOf(statedSite))
+    }
+
+    @When("the sharing member shares record {string} stating a site named {string} as an additional site of its address")
+    fun `when shares record stating a site by name`(recordId: String, siteName: String) {
+        logger.info {
+            "[$scenarioName] When: the sharing member shares record '$recordId' stating a site named " +
+                "'$siteName' as an additional site of its address"
+        }
+        // No such site exists yet, so the member can only name it and the golden record process has to create it.
+        val statedSite = AdditionalSiteInputDto(siteBpn = null, name = context.runId(siteName))
+        shareActions.upload(recordId, isOwnCompanyData = true, additionalSites = listOf(statedSite))
+    }
+
+    @Then("{string} output lists a site named {string} as an additional site of its address")
+    fun `then output lists additional site by name`(recordId: String, siteName: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output lists a site named '$siteName' as an additional site of its address"
+        }
+        val additionalSites = outputOf(recordId).additionalSites
+        assertThat(additionalSites.map { it.name })
+            .describedAs("Additional sites of record '%s'", recordId)
+            .containsExactly(context.runId(siteName))
     }
 
     @When("the sharing member updates record {string}")

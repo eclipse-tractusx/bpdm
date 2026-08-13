@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -52,6 +53,7 @@ class BusinessPartnerMappings {
             address = toAddressComponentInputDto(entity),
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
+            additionalSites = entity.additionalSites.map { AdditionalSiteInputDto(siteBpn = it.bpn, name = it.name) },
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -86,11 +88,22 @@ class BusinessPartnerMappings {
             address = toAddressComponentOutputDto(entity),
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
-            additionalSites = entity.additionalSites.map { AdditionalSiteOutputDto(siteBpn = it.bpn, name = it.name) },
+            additionalSites = entity.additionalSites.map { toAdditionalSiteOutputDto(it, entity) },
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
     }
+
+    private fun toAdditionalSiteOutputDto(additionalSite: AdditionalSiteDb, entity: BusinessPartnerDb) =
+        AdditionalSiteOutputDto(
+            siteBpn = additionalSite.bpn ?: throw BpdmNullMappingException(
+                AdditionalSiteDb::class,
+                BusinessPartnerOutputDto::class,
+                AdditionalSiteDb::bpn,
+                entity.sharingState.externalId
+            ),
+            name = additionalSite.name
+        )
 
     fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest, sharingState: SharingStateDb): BusinessPartnerDb {
         val businessPartner = BusinessPartnerDb(
@@ -123,6 +136,8 @@ class BusinessPartnerMappings {
         )
         val scriptVariants = dto.scriptVariants.map { variant ->  toScriptVariantDb(businessPartner, variant) }
         scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
+
+        dto.additionalSites.mapTo(businessPartner.additionalSites) { AdditionalSiteDb(bpn = it.siteBpn, name = it.name) }
 
         return businessPartner
     }
@@ -193,6 +208,9 @@ class BusinessPartnerMappings {
                         "Missing site confidence criteria"
                     ),
                     states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    goldenRecordRelations = entity.siteGoldenRecordRelations.map { relation ->
+                        SiteGoldenRecordRelationDto(toSiteRelationType(relation.relationType), relation.sourceBpn, relation.targetBpn)
+                    },
                     updatedAt = entity.siteUpdatedAt ?: Instant.EPOCH
                 )
             }
@@ -423,6 +441,12 @@ class BusinessPartnerMappings {
             LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeDto.IsAlternativeHeadquarterFor
             LegalEntityGoldenRecordRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeDto.IsManagedBy
             LegalEntityGoldenRecordRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeDto.IsOwnedBy
+            LegalEntityGoldenRecordRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationTypeDto.IsReplacedBy
+        }
+
+    private fun toSiteRelationType(type: SiteGoldenRecordRelationType) =
+        when (type) {
+            SiteGoldenRecordRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeDto.IsReplacedBy
         }
 
     private fun toAddressRelationType(type: AddressGoldenRecordRelationType) =

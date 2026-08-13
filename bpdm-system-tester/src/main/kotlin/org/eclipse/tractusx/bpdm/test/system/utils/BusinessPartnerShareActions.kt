@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -46,8 +47,14 @@ class BusinessPartnerShareActions(
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
 
-    fun upload(recordId: String, isOwnCompanyData: Boolean, contentSeed: String = recordId) {
-        val inputData = testDataGenerator.buildInputData(contentSeed).copy(isOwnCompanyData = isOwnCompanyData)
+    fun upload(
+        recordId: String,
+        isOwnCompanyData: Boolean,
+        contentSeed: String = recordId,
+        additionalSites: List<AdditionalSiteInputDto> = emptyList()
+    ) {
+        val inputData = testDataGenerator.buildInputData(contentSeed)
+            .copy(isOwnCompanyData = isOwnCompanyData, additionalSites = additionalSites)
         val runId = context.runId(recordId)
         val request = listOf(inputData.copy(externalId = runId))
         val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
@@ -398,9 +405,12 @@ class BusinessPartnerShareActions(
         val sharingStatePage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
         attachApiCall("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
         val taskId = sharingStatePage.content.single().taskId!!
-        taskReservationWatcher.waitForReservedTask(taskId)
+        val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
+        // The generated result describes the golden record this record is refined to; the sites the sharing
+        // member stated for its address are not part of that and are carried over as a refinement service does.
+        val result = taskData.copy(additionalSites = reservedTask.businessPartner.additionalSites)
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, result)))
         )
     }
 

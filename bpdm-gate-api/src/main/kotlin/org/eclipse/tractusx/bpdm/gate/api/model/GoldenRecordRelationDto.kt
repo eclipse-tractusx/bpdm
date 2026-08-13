@@ -28,7 +28,18 @@ data class LegalEntityGoldenRecordRelationDto(
 enum class LegalEntityGoldenRecordRelationTypeDto {
     IsAlternativeHeadquarterFor,
     IsManagedBy,
-    IsOwnedBy
+    IsOwnedBy,
+    IsReplacedBy
+}
+
+data class SiteGoldenRecordRelationDto(
+    val relationType: SiteGoldenRecordRelationTypeDto,
+    val sourceBpn: String,
+    val targetBpn: String
+)
+
+enum class SiteGoldenRecordRelationTypeDto {
+    IsReplacedBy
 }
 
 data class AddressGoldenRecordRelationDto(

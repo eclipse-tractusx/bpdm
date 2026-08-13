@@ -38,6 +38,7 @@ import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.model.GoldenRecordType
 import org.springframework.stereotype.Service
 import java.time.ZoneOffset
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite as OutputAdditionalSite
 
 @Service
 class OrchestratorMappings(
@@ -92,7 +93,8 @@ class OrchestratorMappings(
                 siteMainAddress = postalAddress.takeIf { isMainAddress },
                 scriptVariants = entity.scriptVariants.takeIf { isMainAddress }?.map { toSiteScriptVariant(it) } ?:emptyList()
             ).takeIf { entity.bpnS != null || entity.siteName != null },
-            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants) }
+            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants) },
+            additionalSites = entity.additionalSites.map { AdditionalSite(bpnReference = toBpnReference(it.bpn), siteName = it.name) }
         )
     }
 
@@ -254,12 +256,19 @@ class OrchestratorMappings(
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
                 scriptVariants = toScriptVariants(addressType, dto),
                 legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
+                siteGoldenRecordRelations = site?.goldenRecordRelations.orEmpty(),
                 addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto),
                 ownershipUltimate = legalEntity.ownershipUltimate,
-                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
+                additionalSites = toOutputAdditionalSites(dto)
             )
         }
     }
+
+    private fun toOutputAdditionalSites(dto: BusinessPartner): List<OutputAdditionalSite> =
+        dto.additionalSites.mapNotNull { additionalSite ->
+            additionalSite.bpnReference.referenceValue?.let { OutputAdditionalSite(siteBpn = it, name = additionalSite.siteName) }
+        }
 
     private fun toAddressGoldenRecordRelations(addressType: AddressType, dto: BusinessPartner): List<AddressGoldenRecordRelation> =
         when (addressType) {

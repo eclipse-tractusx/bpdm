@@ -100,6 +100,42 @@ Feature: Output Reflects Additional Sites Of Address
 
   #h3. Test Objective:
   #
+  #* Verify that a sharing member can state a further site of its address by BPNS, joining an existing site.
+  #
+  #h3. Preconditions:
+  #
+  ## A site of a legal entity has been shared and refined, so it exists as a golden record.
+  #
+  #h3. Description:
+  #
+  ## The sharing member shares a second record, stating the first record's site as an additional site of its address.
+  ## The golden record process refines the second record to an additional address of its own site of the same legal entity.
+  ## The second record's output lists the stated site as an additional site of its address.
+  @TEST_CXTPM-XXXX @BPDM
+  Scenario: Sharing Member States An Existing Site By BPNS
+    Given the sharing member shares record "werk-a-record"
+    And the golden record process refines record "werk-a-record" to site "werk-a" of legal entity "acme" with master data "werk-a-content"
+    When the sharing member shares record "werk-b-record" stating the site of record "werk-a-record" as an additional site of its address
+    And the golden record process refines record "werk-b-record" to additional address "werk-b-dock" of site "werk-b" of legal entity "acme" with master data "werk-b-content"
+    Then "werk-b-record" output lists the site of record "werk-a-record" as an additional site of its address
+
+  #h3. Test Objective:
+  #
+  #* Verify that a sharing member can state a further site of its address by name alone, and the golden record process creates it.
+  #
+  #h3. Description:
+  #
+  ## The sharing member shares a record stating a site that does not exist yet, by name.
+  ## The golden record process refines the record to an additional address of its own site.
+  ## The record's output lists the stated site, now created, as an additional site of its address.
+  @TEST_CXTPM-XXXX @BPDM
+  Scenario: Sharing Member States A New Site By Name
+    When the sharing member shares record "dock-record" stating a site named "werk-new" as an additional site of its address
+    And the golden record process refines record "dock-record" to additional address "shared-dock" of site "dock-site" of legal entity "acme" with master data "dock-content"
+    Then "dock-record" output lists a site named "werk-new" as an additional site of its address
+
+  #h3. Test Objective:
+  #
   #* Verify that when two sites share the same site main address, that address belongs to both sites: each site record's output lists the other site as an additional site, and the Pool address returns both sites.
   #
   #h3. Description:

@@ -25,8 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteAssignmentParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -54,6 +56,20 @@ class AddressUpdateService(
      */
     fun update(request: AddressUpdate): UpsertResult<LogisticAddressDb> =
         update(listOf(request)).single()
+
+    /**
+     * Adds the stated site memberships to their addresses and reports for each address whether it actually changed.
+     * Several memberships of one address are applied as a single write, so that address yields one result rather than
+     * one per membership.
+     */
+    @Transactional
+    fun assignToSites(assignments: List<AddressSiteAssignmentParsed>): List<UpsertResult<LogisticAddressDb>> =
+        update(assignments.groupBy { it.address.bpn }.map { (_, ofOneAddress) ->
+            AddressUpdate(
+                ofOneAddress.first().address,
+                AddressContentUpdate.NoOp.copy(assignToSites = FieldUpdate.Set(ofOneAddress.map { it.site }))
+            )
+        })
 
     /**
      * Applies one change in memory without persisting, so a caller can see whether the address changed — and wire it into
@@ -107,7 +123,7 @@ class AddressUpdateService(
             if (scriptVariantKeys(addressEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
         // Site membership is add-only, so assigning a site the address already belongs to changes nothing.
-        update.assignToSite.ifSet { site -> if (target.sites.none { it.bpn == site.bpn }) return true }
+        update.assignToSites.ifSet { sites -> if (sites.any { site -> target.sites.none { it.bpn == site.bpn } }) return true }
 
         return false
     }
@@ -157,6 +173,6 @@ class AddressUpdateService(
         update.states.ifSet { target.states.replace(addressEntityMapper.toStates(it).onEach { state -> state.address = target }) }
         update.scriptVariants.ifSet { target.scriptVariants.replace(addressEntityMapper.toScriptVariants(it)) }
         // Site membership is add-only; assigning is idempotent and never removes.
-        update.assignToSite.ifSet { target.sites.add(it) }
+        update.assignToSites.ifSet { target.sites.addAll(it) }
     }
 }

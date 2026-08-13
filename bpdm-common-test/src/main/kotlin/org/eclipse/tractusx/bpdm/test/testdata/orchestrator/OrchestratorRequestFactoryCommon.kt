@@ -54,6 +54,15 @@ class OrchestratorRequestFactoryCommon(
         )
     }
 
+    fun buildAdditionalSites(seed: String, count: Int = 2): List<AdditionalSite> {
+        return (1..count).map { index ->
+            AdditionalSite(
+                bpnReference = buildBpnSReference("$seed Additional $index"),
+                siteName = "Additional Site Name $index $seed"
+            )
+        }
+    }
+
     fun buildPostalAddressWithScripVariants(seed: String, addressType: AddressType?, random: Random = createRandomFromSeed(seed)): PostalAddressWithScriptVariants{
         return PostalAddressWithScriptVariants(buildPostalAddress(seed, addressType, random), listOf(buildAddressVariantWithScriptCode(seed, random)))
     }

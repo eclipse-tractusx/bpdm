@@ -110,6 +110,7 @@ class GateAssertRepositoryV7(
             "site.${SiteRepresentationOutputDto::siteBpn.name}",
             "site.${SiteRepresentationOutputDto::confidenceCriteria.name}",
             "site.${SiteRepresentationOutputDto::states.name}",
+            "site.${SiteRepresentationOutputDto::goldenRecordRelations.name}",
             "site.${SiteRepresentationOutputDto::updatedAt.name}",
             // address: keep only name / addressType / physical & alternative postal address
             "address.${AddressComponentOutputDto::addressBpn.name}",
@@ -352,6 +353,7 @@ class GateAssertRepositoryV7(
             states = states.sortedBy { it.validFrom?.toString() },
             roles = roles.sortedBy { it.name },
             scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            additionalSites = additionalSites.sortedBy { it.siteBpn ?: it.name },
             legalEntity = legalEntity.sortContent(),
             site = site.sortContent(),
             address = address.sortContent()
@@ -385,7 +387,10 @@ class GateAssertRepositoryV7(
         )
 
     private fun SiteRepresentationOutputDto.sortContent() =
-        copy(states = states.sortedBy { it.validFrom?.toString() })
+        copy(
+            states = states.sortedBy { it.validFrom?.toString() },
+            goldenRecordRelations = goldenRecordRelations.sortedBy { it.sourceBpn }
+        )
 
     private fun AddressComponentOutputDto.sortContent() =
         copy(

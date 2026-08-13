@@ -37,6 +37,7 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
+import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import java.util.UUID
 
@@ -146,5 +147,14 @@ class TestDataClientV7(
         taskBatchResolutionService.processTasks()
         val businessPartnerResult = orchestratorMockDataFactory.getBusinessPartnerResolution()
         return businessPartnerResult
+    }
+
+    fun processTaskToErrors(seed: String, businessPartner: BusinessPartner): List<TaskErrorDto>{
+        WireMock.reset()
+
+        orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
+
+        taskBatchResolutionService.processTasks()
+        return orchestratorMockDataFactory.getBusinessPartnerResolutionErrors()
     }
 }

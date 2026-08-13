@@ -24,8 +24,8 @@ import jakarta.persistence.Embeddable
 
 @Embeddable
 data class AdditionalSiteDb(
-    @Column(name = "bpn", nullable = false)
-    val bpn: String,
+    @Column(name = "bpn")
+    val bpn: String?,
 
     @Column(name = "site_name")
     val name: String?

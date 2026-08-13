@@ -31,6 +31,12 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.GeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Street
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -40,10 +46,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -195,9 +198,14 @@ class GoldenRecordUpdateChunkService(
 
         return businessPartnersToUpdate.mapNotNull { output ->
             val address = addressesByBpn[output.bpnA!!] ?: return@mapNotNull null
-            val upsertData = address.toUpsertData(output, siteNamesByBpn)
+            val upsertData = address.toUpsertData(output, siteNamesByBpn) ?: return@mapNotNull null
             businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
+    }
+
+    private fun fetchSite(siteBpn: String): SiteVerboseDto? {
+        val searchRequest = SiteSearchRequest(siteBpns = listOf(siteBpn))
+        return poolClient.sites.getSites(searchRequest, PaginationRequest(size = 1)).content.map { it.site }.firstOrNull()
     }
 
     private fun resolveSiteNames(siteBpns: Collection<String>): Map<String, String> {
@@ -226,7 +234,7 @@ class GoldenRecordUpdateChunkService(
         return copy.toUpsertData()
     }
 
-    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb, siteNamesByBpn: Map<String, String>): OutputUpsertData {
+    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb, siteNamesByBpn: Map<String, String>): OutputUpsertData? {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
         return update(copy, this, siteNamesByBpn)
@@ -261,10 +269,11 @@ class GoldenRecordUpdateChunkService(
             addressUpdatedAt = addressUpdatedAt,
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
+            siteGoldenRecordRelations = siteGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
             ownershipUltimate = ownershipUltimate,
             ultimateOwnerBpnl = ultimateOwnerBpnl,
-            additionalSites = additionalSites.map { AdditionalSite(it.bpn, it.name) }
+            additionalSites = additionalSites.map { AdditionalSite(it.bpn ?: throw createMappingException(AdditionalSiteDb::bpn, id), it.name) }
         )
     }
 
@@ -342,6 +351,10 @@ class GoldenRecordUpdateChunkService(
         return LegalEntityGoldenRecordRelation(relationType, sourceBpn, targetBpn)
     }
 
+    private fun SiteGoldenRecordRelationDb.toUpsertData(): SiteGoldenRecordRelation {
+        return SiteGoldenRecordRelation(relationType, sourceBpn, targetBpn)
+    }
+
     private fun AddressGoldenRecordRelationDb.toUpsertData(): AddressGoldenRecordRelation {
         return AddressGoldenRecordRelation(relationType, sourceBpn, targetBpn)
     }
@@ -376,6 +389,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.siteName = site.name
         businessPartner.siteUpdatedAt = site.updatedAt
         businessPartner.siteConfidence?.let { update(it,  site.confidenceCriteria) }
+        businessPartner.siteGoldenRecordRelations.replace(site.relations.map(::toEntity))
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 
@@ -387,7 +401,7 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto, siteNamesByBpn: Map<String, String>) : OutputUpsertData{
+    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto, siteNamesByBpn: Map<String, String>) : OutputUpsertData?{
         val addressProperties = address.address
 
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
@@ -424,20 +438,25 @@ class GoldenRecordUpdateChunkService(
         //Below code will be used when,
         //When addressType has been changed from LegalAddress to LegalAndSiteMainAddress
         //When addressType has been changed from AdditionalAddress to SiteMainAddress
-        if (addressProperties.bpnSite != null && businessPartner.bpnS == null) {
-            businessPartner.bpnS = addressProperties.bpnSite
-            val searchRequest = SiteSearchRequest(siteBpns = listOf(addressProperties.bpnSite!!))
-            val sites = if(searchRequest.siteBpns.isNotEmpty())
-                poolClient.sites.getSites(searchRequest, PaginationRequest(size = searchRequest.siteBpns.size)).content.map { it.site }
-            else
-                emptyList()
+        val bpnSiteToAdopt = addressProperties.bpnSite
+        if (bpnSiteToAdopt != null && businessPartner.bpnS == null) {
+            // The additional sites above are already resolved relative to this site, so a site the Pool does not return
+            // leaves nothing coherent to write: the output would carry neither that site nor it among its additional
+            // sites. Skip the whole update and let the address's next change carry it.
+            val siteToAdopt = fetchSite(bpnSiteToAdopt)
+            if (siteToAdopt == null) {
+                logger.warn {
+                    "Address '${addressProperties.bpna}' reports belonging to site '$bpnSiteToAdopt' which the Pool does not return. " +
+                            "Skipping the update of business partner output '${businessPartner.sharingState.externalId}'."
+                }
+                return null
+            }
+
+            businessPartner.bpnS = bpnSiteToAdopt
             //as addressType has been updated, so there is no siteConfidence criteria.
             //fill the fake confidence to prevent the error which will update in further steps.
             businessPartner.siteConfidence = ConfidenceCriteriaDb(false,false,0, LocalDateTime.now(), LocalDateTime.now(),0)
-            val sitesByBpn = sites.associateBy { it.bpns }
-            val site = sitesByBpn[businessPartner.bpnS!!]
-            val upsertData = site!!.toUpsertData(businessPartner)
-            return upsertData
+            return siteToAdopt.toUpsertData(businessPartner)
         }
 
         return businessPartner.toUpsertData()
@@ -484,11 +503,21 @@ class GoldenRecordUpdateChunkService(
                 LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
                 LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
                 LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = poolDto.businessPartnerSourceBpnl,
             targetBpn = poolDto.businessPartnerTargetBpnl
         )
 
+
+    private fun toEntity(poolDto: SiteRelationVerboseDto) =
+        SiteGoldenRecordRelationDb(
+            relationType = when (poolDto.type) {
+                SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = poolDto.businessPartnerSourceBpns,
+            targetBpn = poolDto.businessPartnerTargetBpns
+        )
 
     private fun toEntity(poolDto: AddressRelationVerboseDto) =
         AddressGoldenRecordRelationDb(

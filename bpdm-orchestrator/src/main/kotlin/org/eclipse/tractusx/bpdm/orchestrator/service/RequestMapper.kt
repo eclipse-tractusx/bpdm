@@ -52,9 +52,16 @@ class RequestMapper {
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
                 legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner)
+                siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner),
+                additionalSites = toAdditionalSites(businessPartner)
             )
         }
+
+    fun toAdditionalSites(businessPartner: BusinessPartner) =
+        businessPartner.additionalSites
+            .map { AdditionalSiteDb(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
+            .toMutableList()
 
     fun toTaskError(error: TaskErrorDto) =
         with(error) {
@@ -311,6 +318,12 @@ class RequestMapper {
     fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<LegalEntityGoldenRecordRelationDb> =
         businessPartner.legalEntity.goldenRecordRelations
             .map { LegalEntityGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
+            .toMutableList()
+
+    fun toSiteGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<SiteGoldenRecordRelationDb> =
+        businessPartner.site?.goldenRecordRelations
+            .orEmpty()
+            .map { SiteGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
             .toMutableList()
 
     fun toAddressGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<AddressGoldenRecordRelationDb> =

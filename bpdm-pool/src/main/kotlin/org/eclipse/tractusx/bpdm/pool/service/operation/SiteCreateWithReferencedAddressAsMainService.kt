@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,7 +40,8 @@ import org.springframework.transaction.annotation.Transactional
  * changelog for the re-parented address.
  *
  * A parse that states the referenced address's content also applies it: a site arriving with its own view of that
- * address is the current golden record for it. A parse without content leaves the address as it stands.
+ * address is the current golden record for it. A parse without content leaves the address as it stands. Several sites
+ * may be created on one address in a single call, in which case at most one of them may state that address's content.
  */
 @Service
 class SiteCreateWithReferencedAddressAsMainService(
@@ -49,7 +49,7 @@ class SiteCreateWithReferencedAddressAsMainService(
     private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
     private val addressUpdateMapper: AddressUpdateMapper,
     private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogCreateService: ChangelogCreateService
 ) {
 
     /**
@@ -60,21 +60,29 @@ class SiteCreateWithReferencedAddressAsMainService(
 
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
-        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) ->
-            addressUpdateService.stageUpdate(AddressUpdate(entry.mainAddress, mainAddressUpdate(entry, site)))
-        }
-        sites.zip(stagedAddressUpdates).forEach { (site, stagedAddressUpdate) -> site.mainAddress = stagedAddressUpdate.address }
+        // Several sites may name the same main address, so the address is staged once for all of them: staging it per
+        // site would write and log that one address several times over.
+        val stagedAddressUpdates = parsed.zip(sites)
+            .groupBy { (entry, _) -> entry.mainAddress.bpn }
+            .mapValues { (_, ofOneAddress) ->
+                addressUpdateService.stageUpdate(AddressUpdate(ofOneAddress.first().first.mainAddress, mainAddressUpdate(ofOneAddress)))
+            }
+        parsed.zip(sites).forEach { (entry, site) -> site.mainAddress = stagedAddressUpdates.getValue(entry.mainAddress.bpn).address }
 
         siteRepository.saveAll(sites)
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
+        changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
 
-        addressUpdateService.commit(stagedAddressUpdates)
+        addressUpdateService.commit(stagedAddressUpdates.values.toList())
 
         return sites
     }
 
-    private fun mainAddressUpdate(entry: SiteCreateWithReferencedAddressAsMainParsed, site: SiteDb): AddressContentUpdate =
-        entry.mainAddressContent
-            ?.let { addressUpdateMapper.toFullUpdate(it, assignToSite = site) }
-            ?: AddressContentUpdate.NoOp.copy(assignToSite = FieldUpdate.Set(site))
+    private fun mainAddressUpdate(ofOneAddress: List<Pair<SiteCreateWithReferencedAddressAsMainParsed, SiteDb>>): AddressContentUpdate {
+        val sites = ofOneAddress.map { (_, site) -> site }
+        val statedContent = ofOneAddress.mapNotNull { (entry, _) -> entry.mainAddressContent }.singleOrNull()
+
+        return statedContent
+            ?.let { addressUpdateMapper.toFullUpdate(it, assignToSites = sites) }
+            ?: AddressContentUpdate.NoOp.copy(assignToSites = FieldUpdate.Set(sites))
+    }
 }
