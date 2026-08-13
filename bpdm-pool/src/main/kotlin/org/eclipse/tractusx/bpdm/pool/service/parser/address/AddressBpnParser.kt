@@ -43,7 +43,7 @@ class AddressBpnParser(
 
         return addressBpns.map { bpn ->
             when (val address = addressesByBpn[bpn]) {
-                null -> ParseResult.Companion.ofSingleFailure(UnresolvableAddress(bpn))
+                null -> ParseResult.ofSingleFailure(UnresolvableAddress(bpn))
                 else -> ParseResult.Success(address)
             }
         }

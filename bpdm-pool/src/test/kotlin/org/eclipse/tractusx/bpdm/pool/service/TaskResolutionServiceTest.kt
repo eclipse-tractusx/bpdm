@@ -1488,9 +1488,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isFalse()
-        assertThat(persistedEntity!!.ultimateOwnerBpnl).isNull()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
 
-        persistedEntity!!.ultimateOwnerBpnl = targetBpnl
+        persistedEntity.ultimateOwnerBpnl = targetBpnl
         legalEntityRepository.save(persistedEntity)
 
         val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)

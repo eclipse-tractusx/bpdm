@@ -60,7 +60,7 @@ class SiteBpnParser(
 
     private fun resolveResult(bpn: String, sitesByBpn: Map<String, SiteDb>): ParseResult<SiteDb, UnresolvableSite> =
         when (val site = sitesByBpn[bpn]) {
-            null -> ParseResult.Companion.ofSingleFailure(UnresolvableSite(bpn))
+            null -> ParseResult.ofSingleFailure(UnresolvableSite(bpn))
             else -> ParseResult.Success(site)
         }
 }

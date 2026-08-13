@@ -63,12 +63,12 @@ class AddressParentResolutionParser(
                 BusinessPartnerType.LEGAL_ENTITY ->
                     if (parent in existingLegalEntityBpns)
                         ParseResult.Success(AddressCreateTypedParentsRequest(legalEntityBpn = parent, siteBpn = null, content = request.content))
-                    else ParseResult.Companion.ofSingleFailure(UnresolvableLegalEntity(parent))
+                    else ParseResult.ofSingleFailure(UnresolvableLegalEntity(parent))
                 BusinessPartnerType.SITE ->
                     sitesByBpn[parent]?.let {
                         ParseResult.Success(AddressCreateTypedParentsRequest(legalEntityBpn = it.legalEntity.bpn, siteBpn = parent, content = request.content))
-                    } ?: ParseResult.Companion.ofSingleFailure(UnresolvableSite(parent))
-                else -> ParseResult.Companion.ofSingleFailure(InvalidParentBpn(parent))
+                    } ?: ParseResult.ofSingleFailure(UnresolvableSite(parent))
+                else -> ParseResult.ofSingleFailure(InvalidParentBpn(parent))
             }
         }
     }

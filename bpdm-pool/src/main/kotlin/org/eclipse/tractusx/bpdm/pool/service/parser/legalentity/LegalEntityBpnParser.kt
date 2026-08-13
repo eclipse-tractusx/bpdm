@@ -43,7 +43,7 @@ class LegalEntityBpnParser(
 
         return legalEntityBpns.map { bpn ->
             when (val legalEntity = legalEntitiesByBpn[bpn]) {
-                null -> ParseResult.Companion.ofSingleFailure(UnresolvableLegalEntity(bpn))
+                null -> ParseResult.ofSingleFailure(UnresolvableLegalEntity(bpn))
                 else -> ParseResult.Success(legalEntity)
             }
         }

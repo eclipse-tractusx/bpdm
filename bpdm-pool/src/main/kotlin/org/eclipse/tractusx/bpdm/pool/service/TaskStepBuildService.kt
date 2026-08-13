@@ -48,7 +48,6 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityP
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.*
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteAssignmentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressCreateParser
