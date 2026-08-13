@@ -69,7 +69,7 @@ class UltimateOwnerDistributionStepDefs(
             shortName = legalEntityWithAddress.header.legalShortName,
             legalForm = legalEntityWithAddress.header.legalFormVerbose?.technicalKey,
             ownershipUltimate = true,
-            states = legalEntityWithAddress.header.states
+            states = emptyList()
         )
         
         // Upload to Gate via upsertBusinessPartnersInput
