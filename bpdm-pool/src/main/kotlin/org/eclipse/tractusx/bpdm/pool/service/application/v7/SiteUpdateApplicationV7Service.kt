@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

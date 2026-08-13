@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.IdentifierTypeRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.IdentifierTypeResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.IdentifierTypeSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.IdentifierTypeSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.IdentifierTypeSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

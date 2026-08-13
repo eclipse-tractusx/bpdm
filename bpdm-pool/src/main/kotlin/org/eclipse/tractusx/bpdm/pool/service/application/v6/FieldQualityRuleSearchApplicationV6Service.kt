@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.FieldQualityRuleResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.FieldQualityRuleSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.FieldQualityRuleSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.FieldQualityRuleSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

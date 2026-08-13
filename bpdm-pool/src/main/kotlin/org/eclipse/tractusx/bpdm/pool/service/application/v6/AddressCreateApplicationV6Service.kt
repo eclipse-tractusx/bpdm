@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapp
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

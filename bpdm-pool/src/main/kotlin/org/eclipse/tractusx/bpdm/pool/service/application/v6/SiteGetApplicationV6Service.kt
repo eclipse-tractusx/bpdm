@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressV
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteGetRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteGetService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteGetParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

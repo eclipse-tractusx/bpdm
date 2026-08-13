@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.BpnSearchParseError
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIdentifierSearchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnRequestIdentifierSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.BpnIdentifierSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.BpnRequestIdentifierSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnIdentifierSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnRequestIdentifierSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

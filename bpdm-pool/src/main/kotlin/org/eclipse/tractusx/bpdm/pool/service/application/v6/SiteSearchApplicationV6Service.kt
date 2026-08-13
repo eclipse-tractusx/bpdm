@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteSearchRequestMap
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntitySiteSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntitySiteSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
