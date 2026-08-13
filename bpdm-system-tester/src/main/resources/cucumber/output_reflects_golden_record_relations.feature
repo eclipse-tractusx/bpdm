@@ -8,7 +8,8 @@
 #   - site relations (IsReplacedBy between sites) surface on the output's site,
 #   - address relations (IsReplacedBy between addresses) surface on the output's address.
 # IsReplacedBy also exists between two legal entities, where it surfaces on the legal entity; that variant is
-# covered in legal_entity_succession.feature and the site variant in site_succession.feature.
+# covered in legal_entity_succession.feature, the site variant in site_succession.feature and the address
+# variant in address_succession.feature.
 # All levels are shown regardless of what the record itself was refined to. In particular, a record refined
 # as an additional address still shows the relations of its parent legal entity, even though the record is
 # technically the additional address and the legal entity is only its parent.
@@ -18,10 +19,9 @@
 #   - IsOwnedBy and IsAlternativeHeadquarterFor are relations between two legal entities.
 #   - IsManagedBy is between two legal entities; the managing entity must be a dataspace participant (own
 #     company data) and the validity must not start in the past.
-#   - IsReplacedBy at address level is between a legal address and an additional address of the SAME legal entity and must be
-#     currently valid. The Pool expects the legal address as the relation source and the additional address
-#     as the target, and reclassifies (swaps) the two addresses; this feature only asserts that the relation
-#     is reflected and accepts the swap.
+#   - IsReplacedBy at address level is between two addresses of the SAME legal entity. Where the relation
+#     source is the legal address and it is currently valid, the Pool reclassifies (swaps) the two addresses;
+#     this feature only asserts that the relation is reflected and accepts the swap.
 @CXTPM-1039
 Feature: Output Reflects Golden Record Relations
 

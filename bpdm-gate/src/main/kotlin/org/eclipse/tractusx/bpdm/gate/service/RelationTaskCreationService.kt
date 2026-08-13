@@ -186,7 +186,7 @@ class RelationTaskCreationService(
         relationType: RelationType
     ): RelationTaskKind? {
 
-        fun isLegalEntityLike(t: AddressType?) = when (t) {
+        fun isLegalEntityLike(t: AddressType) = when (t) {
             AddressType.LegalAndSiteMainAddress,
             AddressType.LegalAddress -> true
 
@@ -196,20 +196,24 @@ class RelationTaskCreationService(
         // A site relation requires SiteMainAddress on both sides rather than everything a site can be reached through:
         // LegalAndSiteMainAddress is a legal entity too, and IsReplacedBy between two of those already means the legal
         // entities succeed each other. A site sharing its legal entity's address can therefore not be replaced.
-        fun isSiteMainOnly(t: AddressType?) = t == AddressType.SiteMainAddress
+        fun isSiteMainOnly(t: AddressType) = t == AddressType.SiteMainAddress
 
-        fun isAdditional(t: AddressType?) = t == AddressType.AdditionalAddress
+        if (sourceAddressType == null || targetAddressType == null) return null
 
-        return when {
-            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(
-                RelationType.IsAlternativeHeadquarterFor,
-                RelationType.IsOwnedBy,
-                RelationType.IsManagedBy,
-                RelationType.IsReplacedBy
-            ) -> RelationTaskKind.LegalEntity
-            isSiteMainOnly(sourceAddressType) && isSiteMainOnly(targetAddressType) && relationType == RelationType.IsReplacedBy -> RelationTaskKind.Site
-            ((isAdditional(sourceAddressType) && isLegalEntityLike(targetAddressType)) || (isLegalEntityLike(sourceAddressType) && isAdditional(targetAddressType))) && relationType == RelationType.IsReplacedBy -> RelationTaskKind.Address
-            else -> null
+        val bothLegalEntityLike = isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType)
+
+        return when (relationType) {
+            RelationType.IsAlternativeHeadquarterFor,
+            RelationType.IsOwnedBy,
+            RelationType.IsManagedBy -> if (bothLegalEntityLike) RelationTaskKind.LegalEntity else null
+
+            // An address succession is what remains once neither higher level claims the pair: every refined record has
+            // a BPNA, so any other IsReplacedBy pair is a succession between the two addresses themselves.
+            RelationType.IsReplacedBy -> when {
+                bothLegalEntityLike -> RelationTaskKind.LegalEntity
+                isSiteMainOnly(sourceAddressType) && isSiteMainOnly(targetAddressType) -> RelationTaskKind.Site
+                else -> RelationTaskKind.Address
+            }
         }
     }
 

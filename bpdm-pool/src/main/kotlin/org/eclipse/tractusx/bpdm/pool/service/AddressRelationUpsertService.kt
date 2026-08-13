@@ -19,22 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
+/**
+ * Writes succession between two addresses of one legal entity, in which the source address is replaced by the target address.
+ */
 @Service
 class AddressRelationUpsertService(
     private val addressRelationRepository: AddressRelationRepository,
@@ -43,76 +45,141 @@ class AddressRelationUpsertService(
     private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
 ): IAddressRelationUpsertStratergyService {
 
+    /**
+     * Persists the succession and rejects it if the two addresses belong to different legal entities, if the predecessor
+     * already has a different successor in an overlapping validity period, or if it would close a replacement cycle over
+     * overlapping periods. A succession that starts at a legal entity's legal address also relocates that legal entity's
+     * headquarters to the successor.
+     */
     @Transactional
     override fun upsertRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): UpsertResult<AddressRelationDb> {
-        val sourceAddress = upsertRequest.source
-        val targetAddress = upsertRequest.target
-        val addressRelationType = AddressRelationType.IsReplacedBy //As of now, only IsReplacedBy is supported for address relations
-        val validityPeriods = upsertRequest.validityPeriods
+        validateNoSelfReference(upsertRequest)
+        validateSameLegalEntity(upsertRequest)
 
-        // Prevent self-referencing relations
-        if (sourceAddress == targetAddress) {
-            throw BpdmValidationException("A Address cannot have a relation to itself (BPNA: ${sourceAddress.bpn}).")
+        val existingRelation = findExistingRelation(upsertRequest)
+
+        validateSingleSuccessor(upsertRequest, existingRelation)
+        validateNoCycles(upsertRequest, existingRelation)
+
+        if (existingRelation == null) {
+            val newRelation = createRelation(upsertRequest)
+            handleHeadquarterSynchronization(newRelation)
+
+            return UpsertResult(newRelation, UpsertType.Created)
         }
 
-        validateSoureAndTargetAddress(sourceAddress, targetAddress)
+        if (!validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
+            return UpsertResult(existingRelation, UpsertType.NoChange)
+        }
 
-        val existingRelation = addressRelationRepository.findAll(
+        existingRelation.validityPeriods.clear()
+        existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
+        addressRelationRepository.saveAndFlush(existingRelation)
+
+        handleHeadquarterSynchronization(existingRelation)
+
+        return UpsertResult(existingRelation, UpsertType.Updated)
+    }
+
+    private fun findExistingRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): AddressRelationDb? =
+        addressRelationRepository.findAll(
             AddressRelationRepository.byRelation(
-                startAddress = sourceAddress,
-                endAddress = targetAddress,
-                type = addressRelationType
+                startAddress = upsertRequest.source,
+                endAddress = upsertRequest.target,
+                type = AddressRelationType.IsReplacedBy
             )
         ).singleOrNull()
 
-        val upsertResult = if (existingRelation != null) {
-            // Update validity periods if changed
-            if (validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
-                existingRelation.validityPeriods.clear()
-                existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
-                addressRelationRepository.saveAndFlush(existingRelation)
-
-                handleHeadquarterSynchronization(existingRelation)
-                UpsertResult(existingRelation, UpsertType.Updated)
-            } else {
-                UpsertResult(existingRelation, UpsertType.NoChange)
-            }
-        } else {
-            val newRelation = createNewAddressRelation(
-                UpsertRequest(
-                    source = sourceAddress,
-                    target = targetAddress,
-                    addressRelationType = addressRelationType,
-                    validityPeriods = validityPeriods,
-                    reasonCode = upsertRequest.reasonCode
-                )
-            )
-
-            handleHeadquarterSynchronization(newRelation)
-
-            UpsertResult(newRelation, UpsertType.Created)
-        }
-
-        return upsertResult
-
+    private fun validateNoSelfReference(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest) {
+        if (upsertRequest.source.bpn == upsertRequest.target.bpn)
+            throw BpdmValidationException("An address cannot have a relation to itself (BPNA: ${upsertRequest.source.bpn}).")
     }
 
-    private fun validateSoureAndTargetAddress(source: LogisticAddressDb, target: LogisticAddressDb) {
+    private fun validateSameLegalEntity(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest) {
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+
         if (source.legalEntity!!.bpn != target.legalEntity!!.bpn) {
             throw BpdmValidationException("Invalid 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' and target address with BPNA '${target.bpn}' do not belong to the same Legal Entity (BPNL '${source.legalEntity!!.bpn}' and '${target.legalEntity!!.bpn}'). "
                     + "Both addresses must belong to the same Legal Entity to create an 'IsReplacedBy' relation.")
         }
-        if (source.addressType != AddressType.LegalAddress) {
-            throw BpdmValidationException("Invalid source address type for 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' is of type '${source.addressType}'. "
-                    + "Only addresses of type 'LegalAddress' can be the source of an 'IsReplacedBy' relation.")
-        }
-        if (target.addressType != AddressType.AdditionalAddress) {
-            throw BpdmValidationException("Invalid target address type for 'IsReplacedBy' relation: The target address with BPNA '${target.bpn}' is of type '${target.addressType}'. "
-                    + "Only addresses of type 'AdditionalAddress' can be the target of an 'IsReplacedBy' relation.")
+    }
+
+    // Several predecessors may share one successor, so the mirror image of this check is deliberately absent: a merger
+    // of multiple addresses into one is a valid succession.
+    private fun validateSingleSuccessor(
+        upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest,
+        existingRelation: AddressRelationDb?
+    ) {
+        val predecessor = upsertRequest.source
+        val successor = upsertRequest.target
+
+        val existingSuccessions = addressRelationRepository.findByTypeAndStartAddress(AddressRelationType.IsReplacedBy, predecessor)
+
+        filterOverlappingRelations(upsertRequest, existingRelation, existingSuccessions).forEach { succession ->
+            if (succession.endAddress.bpn != successor.bpn)
+                throw BpdmValidationException(
+                    "Multiple successors assigned to the same address: address '${predecessor.bpn}' can't be replaced by " +
+                            "'${successor.bpn}' as it is already replaced by '${succession.endAddress.bpn}' in an overlapping validity period."
+                )
         }
     }
 
-    private fun createNewAddressRelation(upsertRequest: UpsertRequest): AddressRelationDb {
+    private fun validateNoCycles(
+        upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest,
+        existingRelation: AddressRelationDb?
+    ) {
+        val predecessor = upsertRequest.source
+        val successor = upsertRequest.target
+
+        if (getAllSuccessors(upsertRequest, existingRelation).contains(predecessor.bpn))
+            throw BpdmValidationException(
+                "Circular replacement detected: address '${predecessor.bpn}' is (transitively) replacing '${successor.bpn}' " +
+                        "and therefore can't be replaced by '${successor.bpn}'."
+            )
+    }
+
+    private fun getAllSuccessors(
+        upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest,
+        existingRelation: AddressRelationDb?
+    ): Set<String> {
+        val visitedBpns = mutableSetOf<String>()
+        val successorProcessingQueue = ArrayDeque<LogisticAddressDb>()
+
+        successorProcessingQueue.addFirst(upsertRequest.target)
+
+        while (successorProcessingQueue.isNotEmpty()) {
+            val currentSuccessor = successorProcessingQueue.removeFirst()
+
+            if (!visitedBpns.add(currentSuccessor.bpn))
+                continue
+
+            val successionsOfCurrent = addressRelationRepository.findByTypeAndStartAddress(AddressRelationType.IsReplacedBy, currentSuccessor)
+            filterOverlappingRelations(upsertRequest, existingRelation, successionsOfCurrent)
+                .forEach { successorProcessingQueue.addFirst(it.endAddress) }
+        }
+
+        return visitedBpns
+    }
+
+    private fun filterOverlappingRelations(
+        upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest,
+        existingRelation: AddressRelationDb?,
+        relations: Collection<AddressRelationDb>
+    ): Collection<AddressRelationDb> =
+        relations
+            .filterNot { relation -> existingRelation?.id == relation.id }
+            .filter { relation -> hasOverlap(upsertRequest.validityPeriods, relation.validityPeriods) }
+
+    private fun hasOverlap(validityPeriods: Collection<RelationValidityPeriodDb>, otherValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean =
+        validityPeriods.any { period ->
+            otherValidityPeriods.any { otherPeriod ->
+                RelationTimePeriod.fromUnlimited(period.validFrom, period.validTo)
+                    .hasOverlap(RelationTimePeriod.fromUnlimited(otherPeriod.validFrom, otherPeriod.validTo))
+            }
+        }
+
+    private fun createRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): AddressRelationDb {
         val source = upsertRequest.source
         val target = upsertRequest.target
         val validityPeriods = upsertRequest.validityPeriods.map {
@@ -123,7 +190,7 @@ class AddressRelationUpsertService(
         }.toMutableList()
 
         val newRelation = AddressRelationDb(
-            type = upsertRequest.addressRelationType,
+            type = AddressRelationType.IsReplacedBy,
             startAddress = source,
             endAddress = target,
             validityPeriods = validityPeriods,
@@ -138,6 +205,9 @@ class AddressRelationUpsertService(
         return newRelation
     }
 
+    // Every succession is synchronized and triggered, not only one starting at a legal address: the synchronization walks
+    // forward from the legal entity's legal address, so a succession off that chain reaches nothing. Which future-dated
+    // succession will be on the chain once it becomes active is not known when it is written.
     private fun handleHeadquarterSynchronization(relation: AddressRelationDb){
         val today = LocalDate.now()
 
@@ -157,14 +227,6 @@ class AddressRelationUpsertService(
 
         addressRelationEventTriggerRepository.saveAll(futureEventTriggers)
     }
-
-    data class UpsertRequest(
-        val source: LogisticAddressDb,
-        val target: LogisticAddressDb,
-        val addressRelationType: AddressRelationType,
-        val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val reasonCode: ReasonCodeDb?
-    )
 
     private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
         if (existingValidityPeriods.size != newValidityPeriods.size) return true

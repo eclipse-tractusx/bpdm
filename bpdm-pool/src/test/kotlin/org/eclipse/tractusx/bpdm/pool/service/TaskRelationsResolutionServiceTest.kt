@@ -697,30 +697,203 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     /**
-     * GIVEN an address relation upsert request
-     *   AND source address is of type AdditionalAddress
-     *   AND target address is of type AdditionalAddress
-     * WHEN trying to upsert an address relation
-     * THEN validation exception is thrown indicating invalid source address type
+     * GIVEN two additional addresses of the same legal entity
+     * WHEN creating relation 'address A is replaced by address B'
+     * THEN the succession is accepted and reported back with both BPNA
      */
-    @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `reject address relation when source is not LegalAddress `(relationType: AddressRelationType) {
-        //Given
-        val legalEntity1 = createLegalEntity("$testName 1")
-        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
-        val additionalAddress2 = createAdditionalAddress("$testName Addr 2", legalEntity1)
+    @Test
+    fun `create address IsReplacedBy relation between two additional addresses`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val addressA = createAdditionalAddress("$testName A", legalEntity)
+        val addressB = createAdditionalAddress("$testName B", legalEntity)
 
-        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
-            relationType = relationType,
-            businessPartnerSourceBpn = additionalAddress1.address.bpna,
-            businessPartnerTargetBpn = additionalAddress2.address.bpna
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressA.address.bpna,
+            businessPartnerTargetBpn = addressB.address.bpna
         )
 
-        val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).contains("Invalid source address type for 'IsReplacedBy' relation")
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_CREATE_ADDRESS_SUCCESSION", aReplacedByB).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+        assertThat(result.businessPartnerRelations.relationType).isEqualTo(RelationType.IsReplacedBy)
+        assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(addressA.address.bpna)
+        assertThat(result.businessPartnerRelations.businessPartnerTargetBpn).isEqualTo(addressB.address.bpna)
+        assertThat(result.businessPartnerRelations.validityPeriods).isEqualTo(aReplacedByB.validityPeriods)
+    }
+
+    /**
+     * GIVEN a site main address and an additional address of the same legal entity
+     * WHEN creating relation 'the site main address is replaced by the additional address'
+     * THEN the succession is accepted
+     */
+    @Test
+    fun `create address IsReplacedBy relation from site main address to additional address`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val site = createSite("$testName Site", legalEntity)
+        val additionalAddress = createAdditionalAddress("$testName Addr", legalEntity)
+
+        val mainAddressReplacedByAdditional = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = site.mainAddress.bpna,
+            businessPartnerTargetBpn = additionalAddress.address.bpna
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_SITE_MAIN_ADDRESS_SUCCESSION", mainAddressReplacedByAdditional).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+        assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(site.mainAddress.bpna)
+        assertThat(result.businessPartnerRelations.businessPartnerTargetBpn).isEqualTo(additionalAddress.address.bpna)
+    }
+
+    /**
+     * GIVEN address A is replaced by address B
+     * WHEN trying to create relation 'address A is replaced by address C' in an overlapping validity period
+     * THEN return multiple successors error
+     */
+    @Test
+    fun `create address IsReplacedBy relation - violate single successor`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val addressA = createAdditionalAddress("$testName A", legalEntity)
+        val addressB = createAdditionalAddress("$testName B", legalEntity)
+        val addressC = createAdditionalAddress("$testName C", legalEntity)
+
+        val validReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressA.address.bpna,
+            businessPartnerTargetBpn = addressB.address.bpna
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID", validReplacedByB)
+
+        val violatingSingleSuccessor = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressA.address.bpna,
+            businessPartnerTargetBpn = addressC.address.bpna
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SINGLE_SUCCESSOR", violatingSingleSuccessor).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("Multiple successors assigned to the same address")
+    }
+
+    /**
+     * GIVEN address A is replaced by address C
+     * WHEN creating relation 'address B is replaced by address C' in an overlapping validity period
+     * THEN the merger of both predecessors into one successor is accepted
+     */
+    @Test
+    fun `create address IsReplacedBy relation - allow merger into a shared successor`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val addressA = createAdditionalAddress("$testName A", legalEntity)
+        val addressB = createAdditionalAddress("$testName B", legalEntity)
+        val addressC = createAdditionalAddress("$testName C", legalEntity)
+
+        val aReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressA.address.bpna,
+            businessPartnerTargetBpn = addressC.address.bpna
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_FIRST_PREDECESSOR", aReplacedByC)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressB.address.bpna,
+            businessPartnerTargetBpn = addressC.address.bpna
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_SECOND_PREDECESSOR", bReplacedByC).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+    }
+
+    /**
+     * GIVEN address A is replaced by address B which is replaced by address C
+     * WHEN trying to create relation 'address C is replaced by address A'
+     * THEN return circular replacement error
+     */
+    @Test
+    fun `create address IsReplacedBy relation - violate no cycles`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val addressA = createAdditionalAddress("$testName A", legalEntity)
+        val addressB = createAdditionalAddress("$testName B", legalEntity)
+        val addressC = createAdditionalAddress("$testName C", legalEntity)
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressA.address.bpna,
+            businessPartnerTargetBpn = addressB.address.bpna
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", aReplacedByB)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressB.address.bpna,
+            businessPartnerTargetBpn = addressC.address.bpna
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", bReplacedByC)
+
+        val violatingNoCycles = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressC.address.bpna,
+            businessPartnerTargetBpn = addressA.address.bpna
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_NO_CYCLES", violatingNoCycles).single()
+
+        //THEN
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors[0].description).contains("Circular replacement detected")
+    }
+
+    /**
+     * GIVEN address A is replaced by address B
+     * WHEN creating relation 'address B is replaced by address C'
+     * THEN the succession chain is accepted and both relations are reported on B
+     */
+    @Test
+    fun `create address IsReplacedBy relation - extend succession chain`() {
+        //GIVEN
+        val legalEntity = createLegalEntity(testName)
+        val addressA = createAdditionalAddress("$testName A", legalEntity)
+        val addressB = createAdditionalAddress("$testName B", legalEntity)
+        val addressC = createAdditionalAddress("$testName C", legalEntity)
+
+        val aReplacedByB = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressA.address.bpna,
+            businessPartnerTargetBpn = addressB.address.bpna
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", aReplacedByB)
+
+        val bReplacedByC = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = addressB.address.bpna,
+            businessPartnerTargetBpn = addressC.address.bpna
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_CHAIN_EXTENSION", bReplacedByC).single()
+
+        //THEN
+        assertThat(result.errors).isEmpty()
+        val fetchedB = poolClient.addresses.getAddress(addressB.address.bpna)
+        assertThat(fetchedB.address.relations.filter { it.type == AddressRelationType.IsReplacedBy })
+            .hasSize(2)
     }
 
     /**
