@@ -48,12 +48,47 @@ class UltimateOwnerDistributionStepDefs(
     }
 
     /**
-     * Marks a parent, grandparent, or self-owner entity as ownershipUltimate = true in the golden record.
-     * The entity must already exist in the Pool.
+     * Sharing member marks an entity as the ultimate owner via the Gate.
+     * This uploads the ultimate owner flag to the Gate input.
      */
-    @When("the (parent|grandparent|self-owner) entity {string} is marked as ownershipUltimate = true in the golden record")
-    fun markEntityAsUltimateOwner(entityType: String, entityId: String) {
-        logger.info { "Marking $entityType entity '$entityId' as ownershipUltimate = true" }
+    @When("the sharing member marks {string} as the ultimate owner")
+    fun sharingMemberMarksAsUltimateOwner(entityId: String) {
+        logger.info { "Sharing member marks '$entityId' as the ultimate owner" }
+        
+        val context = ScenarioContext.current() ?: error("No active scenario context")
+        
+        // Get the legal entity from context
+        val legalEntityWithAddress = context.legalEntities[entityId] 
+            ?: error("Legal entity '$entityId' not found in scenario context")
+        
+        // Convert verbose DTO to non-verbose DTO using JSON serialization
+        val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
+        val legalEntity = jsonMapper.readValue(verboseJson, LegalEntityDto::class.java)
+        
+        // Update the legal entity to mark it as ultimate owner
+        val updatedLegalEntity = legalEntity.copy(
+            header = legalEntity.header.copy(
+                ownershipUltimate = true
+            )
+        )
+        
+        // Upload to Gate via upsertBusinessPartnersInput
+        val inputRequest = context.inputData[entityId]?.copy(
+            externalId = context.runId(entityId),
+            legalEntity = updatedLegalEntity
+        ) ?: error("Input data for '$entityId' not found in scenario context")
+        
+        gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputRequest))
+        logger.info { "Successfully uploaded '$entityId' as ultimate owner to Gate" }
+    }
+
+    /**
+     * Golden record process confirms an entity as the ultimate owner.
+     * This updates the Pool with the ultimate owner flag from the golden record.
+     */
+    @And("the golden record process confirms {string} as the ultimate owner")
+    fun goldenRecordConfirmsAsUltimateOwner(entityId: String) {
+        logger.info { "Golden record process confirms '$entityId' as the ultimate owner" }
         
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
@@ -79,16 +114,15 @@ class UltimateOwnerDistributionStepDefs(
         )
         
         poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
-        logger.info { "Successfully marked $entityType entity '$entityId' as ownershipUltimate = true" }
+        logger.info { "Successfully confirmed '$entityId' as ultimate owner in Pool" }
     }
 
     /**
-     * Asserts that a record's output reflects the correct ultimateOwnerBpnl value.
-     * The value can be either a record ID (which will be resolved to a BPNL) or null.
+     * Asserts that a record's output reflects a specific entity as the ultimate owner.
      */
-    @Then("{string} output reflects ultimateOwnerBpnl as {string}")
-    fun assertUltimateOwnerBpnl(recordId: String, expectedOwnerRecordId: String) {
-        logger.info { "Asserting that '$recordId' output reflects ultimateOwnerBpnl as '$expectedOwnerRecordId'" }
+    @Then("{string} output reflects {string} as the ultimate owner")
+    fun assertUltimateOwner(recordId: String, expectedOwnerRecordId: String) {
+        logger.info { "Asserting that '$recordId' output reflects '$expectedOwnerRecordId' as the ultimate owner" }
         
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
@@ -108,18 +142,18 @@ class UltimateOwnerDistributionStepDefs(
         
         // Assert the ultimateOwnerBpnl matches
         assertThat(output.legalEntity.ultimateOwnerBpnl)
-            .withFailMessage("Expected ultimateOwnerBpnl to be '$expectedBpnl' but was '${output.legalEntity.ultimateOwnerBpnl}'")
+            .withFailMessage("Expected '$recordId' to have ultimate owner '$expectedBpnl' but was '${output.legalEntity.ultimateOwnerBpnl}'")
             .isEqualTo(expectedBpnl)
         
-        logger.info { "Successfully asserted ultimateOwnerBpnl for '$recordId'" }
+        logger.info { "Successfully asserted '$recordId' has ultimate owner '$expectedOwnerRecordId'" }
     }
 
     /**
-     * Asserts that a record's output reflects null as the ultimateOwnerBpnl value.
+     * Asserts that a record's output has no ultimate owner (null).
      */
-    @Then("{string} output reflects ultimateOwnerBpnl as null")
-    fun assertUltimateOwnerBpnlNull(recordId: String) {
-        logger.info { "Asserting that '$recordId' output reflects ultimateOwnerBpnl as null" }
+    @Then("{string} output has no ultimate owner")
+    fun assertNoUltimateOwner(recordId: String) {
+        logger.info { "Asserting that '$recordId' output has no ultimate owner" }
         
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
@@ -131,9 +165,9 @@ class UltimateOwnerDistributionStepDefs(
         
         // Assert the ultimateOwnerBpnl is null
         assertThat(output.legalEntity.ultimateOwnerBpnl)
-            .withFailMessage("Expected ultimateOwnerBpnl to be null but was '${output.legalEntity.ultimateOwnerBpnl}'")
+            .withFailMessage("Expected '$recordId' to have no ultimate owner but was '${output.legalEntity.ultimateOwnerBpnl}'")
             .isNull()
         
-        logger.info { "Successfully asserted ultimateOwnerBpnl is null for '$recordId'" }
+        logger.info { "Successfully asserted '$recordId' has no ultimate owner" }
     }
 }
