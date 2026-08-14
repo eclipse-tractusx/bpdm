@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
@@ -47,16 +46,12 @@ class LegalEntityUpdateApplicationV6Service(
     private val legalEntityResponseMapperV6: LegalEntityResponseMapperV6
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Applies each request to the legal entity it addresses by BPN and returns, per request, either the updated legal
      * entity or the errors that stopped it.
      */
     @Transactional
     fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequestV6>): LegalEntityPartnerUpdateResponseWrapperV6 {
-        logger.info { "Update ${requests.size} legal entities" }
-
         val requestList = requests.toList()
         val updateRequests = requestList.map { legalEntityDtoRequestMapperV6.toUpdateRequest(it) }
 

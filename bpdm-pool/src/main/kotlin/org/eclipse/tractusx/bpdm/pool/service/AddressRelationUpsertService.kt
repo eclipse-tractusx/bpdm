@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
@@ -45,6 +46,8 @@ class AddressRelationUpsertService(
     private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
 ): IAddressRelationUpsertStratergyService {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Persists the succession and rejects it if the two addresses belong to different legal entities, if the predecessor
      * already has a different successor in an overlapping validity period, or if it would close a replacement cycle over
@@ -52,7 +55,10 @@ class AddressRelationUpsertService(
      * headquarters to the successor.
      */
     @Transactional
-    override fun upsertRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): UpsertResult<AddressRelationDb> {
+    override fun upsertRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): UpsertResult<AddressRelationDb> =
+        upsert(upsertRequest).also { logOutcome(it.upsertType, upsertRequest) }
+
+    private fun upsert(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): UpsertResult<AddressRelationDb> {
         validateNoSelfReference(upsertRequest)
         validateSameLegalEntity(upsertRequest)
 
@@ -79,6 +85,15 @@ class AddressRelationUpsertService(
         handleHeadquarterSynchronization(existingRelation)
 
         return UpsertResult(existingRelation, UpsertType.Updated)
+    }
+
+    private fun logOutcome(upsertType: UpsertType, upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest) {
+        val succession = "address succession from '${upsertRequest.source.bpn}' to '${upsertRequest.target.bpn}'"
+        when (upsertType) {
+            UpsertType.Created -> logger.info { "Created $succession" }
+            UpsertType.Updated -> logger.info { "Updated validity periods of $succession" }
+            UpsertType.NoChange -> logger.debug { "Left $succession unchanged" }
+        }
     }
 
     private fun findExistingRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): AddressRelationDb? =

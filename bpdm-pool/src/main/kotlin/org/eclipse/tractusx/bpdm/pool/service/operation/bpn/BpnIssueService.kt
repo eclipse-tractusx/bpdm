@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.repository.ConfigurationEntryRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.pow
-import kotlin.text.iterator
 
 /**
  * The single authority for issuing BPNs: advances the stored counter of the requested business partner kind and turns
@@ -71,7 +70,7 @@ class BpnIssueService(
     private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): List<String> {
         if (count == 0) return emptyList()
 
-        logger.info { "Issuing $count new BPNs of type $bpnChar" }
+        logger.debug { "Issuing $count new BPNs of type $bpnChar" }
 
         val counterEntry = getOrCreateCounter(bpnCounterKey)
         val startCounter = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)

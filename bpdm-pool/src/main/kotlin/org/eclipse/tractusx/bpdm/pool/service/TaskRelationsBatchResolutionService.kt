@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
@@ -44,9 +45,20 @@ class TaskRelationsBatchResolutionService(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Reports whether golden record relation task processing runs on a schedule in this deployment.
+     */
+    @PostConstruct
+    fun logScheduleActivation() {
+        if (goldenRecordTaskConfigProperties.cron == CRON_DISABLED)
+            logger.info { "Golden record relation task processing schedule is disabled" }
+        else
+            logger.info { "Golden record relation task processing scheduled with cron '${goldenRecordTaskConfigProperties.cron}'" }
+    }
+
     @Scheduled(cron = "#{${GoldenRecordTaskConfigProperties.GET_CRON}}", zone = "UTC")
     fun processTasks(){
-        logger.info { "Start Relations golden record task processing schedule..." }
+        logger.debug { "Start Relations golden record task processing schedule..." }
         reserveAndResolve()
         resolveUnresolved()
         deleteResolved()
@@ -74,7 +86,10 @@ class TaskRelationsBatchResolutionService(
             entityManager.clear()
         }while (taskStepReservation.reservedTasks.isNotEmpty())
 
-        logger.info { "Total of $totalTasksProcessed processed" }
+        if (totalTasksProcessed > 0)
+            logger.info { "Processed $totalTasksProcessed golden record relation tasks" }
+        else
+            logger.debug { "No golden record relation tasks to process" }
     }
 
     fun resolveUnresolved(){
@@ -109,8 +124,10 @@ class TaskRelationsBatchResolutionService(
             }
         }while (task != null)
 
-        logger.info { "Resolving tasks: Checked $processedTasks tasks and resolved $resolvedTasks tasks as errors" }
-
+        if (resolvedTasks > 0)
+            logger.info { "Resolved $resolvedTasks of $processedTasks checked relation tasks as errors" }
+        else
+            logger.debug { "Checked $processedTasks relation tasks, none needed resolving as errors" }
     }
 
     fun deleteResolved(){
@@ -123,9 +140,15 @@ class TaskRelationsBatchResolutionService(
             }
         }while (task != null)
 
-        logger.info { "Deleted $tasksDeleted resolved tasks" }
+        if (tasksDeleted > 0)
+            logger.info { "Deleted $tasksDeleted resolved relation tasks" }
+        else
+            logger.debug { "No resolved relation tasks to delete" }
     }
 
+    companion object {
+        private const val CRON_DISABLED = "-"
+    }
 }
 
 @Service
@@ -137,7 +160,7 @@ class TaskRelationsResolutionService(
     private val logger = KotlinLogging.logger { }
 
     fun resolveTasks(taskStepReservation: TaskRelationsStepReservationResponse) {
-        logger.info { "${taskStepReservation.reservedTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
+        logger.debug { "${taskStepReservation.reservedTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
         if (taskStepReservation.reservedTasks.isNotEmpty()) {
             val taskResults = upsertRelationsGoldenRecordIntoPool(taskStepReservation.reservedTasks)
@@ -150,7 +173,7 @@ class TaskRelationsResolutionService(
             }
             orchestrationClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(step = goldenRecordTaskConfigProperties.step, results = resultsWithSafeErrors))
         }
-        logger.info { "Cleaning tasks processing completed for this iteration." }
+        logger.debug { "Cleaning tasks processing completed for this iteration." }
     }
 
     fun upsertRelationsGoldenRecordIntoPool(taskEntries: List<TaskRelationsStepReservationEntryDto>) : List<TaskRelationsStepResultEntryDto> {

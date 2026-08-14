@@ -100,7 +100,7 @@ class ChangelogCreateService(
         override fun afterCompletion(status: Int) {
             val writtenPlan = plan
             if (status != TransactionSynchronization.STATUS_COMMITTED || writtenPlan == null) {
-                logger.info { "Discarded ${recorded.size} changelog records of '$origin': transaction did not commit" }
+                logger.debug { "Discarded ${recorded.size} changelog records of '$origin': transaction did not commit" }
                 return
             }
 

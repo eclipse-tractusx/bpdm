@@ -46,7 +46,7 @@ class TaskResolutionBatchService(
     private val logger = KotlinLogging.logger { }
 
     fun resolveTasks(){
-        logger.info { "Start batch process for resolving pending tasks..." }
+        logger.debug { "Start batch process for resolving pending tasks..." }
 
         var totalSuccesses = 0
         var totalErrors = 0
@@ -62,11 +62,14 @@ class TaskResolutionBatchService(
             entityManager.clear()
         }while (results.hasNextPage)
 
-        logger.debug { "Total Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+        if (totalSuccesses > 0 || totalErrors > 0)
+            logger.info { "Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+        else
+            logger.debug { "Resolved no tasks, $totalUnresolved still unresolved" }
     }
 
     fun healthCheck(){
-        logger.info { "Start process Task Health Check..." }
+        logger.debug { "Start process Task Health Check..." }
 
         var totalTaskMissing = 0
         var totalProcessed = 0
@@ -80,7 +83,10 @@ class TaskResolutionBatchService(
             entityManager.clear()
         }while (result.hasNextPage)
 
-        logger.info { "Finished process Task Health Check: Processed $totalProcessed tasks with unhealthy $totalTaskMissing tasks" }
+        if (totalTaskMissing > 0)
+            logger.info { "Task health check: processed $totalProcessed tasks, $totalTaskMissing of them unhealthy" }
+        else
+            logger.debug { "Task health check: processed $totalProcessed tasks, none unhealthy" }
     }
 }
 

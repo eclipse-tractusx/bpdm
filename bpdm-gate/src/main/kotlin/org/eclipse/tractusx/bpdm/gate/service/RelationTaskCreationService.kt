@@ -52,12 +52,15 @@ class RelationTaskCreationService(
     private val logger = KotlinLogging.logger { }
 
     fun sendTasks(): Int{
-        logger.info { "Started scheduled task to create golden record tasks from business partner relations" }
+        logger.debug { "Started scheduled task to create golden record tasks from business partner relations" }
 
         stageRelations()
         val totalSentCount = sendStagedRelations()
 
-        logger.debug { "Total created $totalSentCount new golden record tasks from business partner relations" }
+        if (totalSentCount > 0)
+            logger.info { "Created $totalSentCount new golden record tasks from business partner relations" }
+        else
+            logger.debug { "No business partner relations to create golden record tasks from" }
 
         return totalSentCount
     }

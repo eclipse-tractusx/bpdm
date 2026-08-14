@@ -50,7 +50,7 @@ class RelationTaskResolutionService(
     private val logger = KotlinLogging.logger { }
 
     fun checkResolveTasks(){
-        logger.info { "Start batch process for resolving pending relation tasks..." }
+        logger.debug { "Start batch process for resolving pending relation tasks..." }
 
         var totalSuccesses = 0
         var totalErrors = 0
@@ -69,7 +69,10 @@ class RelationTaskResolutionService(
             hasNextPage = results.hasNextPage
         }while (hasNextPage)
 
-        logger.debug { "Total Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+        if (totalSuccesses > 0 || totalErrors > 0)
+            logger.info { "Resolved $totalSuccesses relation tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+        else
+            logger.debug { "Resolved no relation tasks, $totalUnresolved still unresolved" }
     }
 
     fun checkResolveTasks(batchSize: Int): ResolutionStats{

@@ -35,6 +35,11 @@ class UserLoggingFilter(
     private val logConfigProperties: LogConfigProperties
 ) : OncePerRequestFilter() {
 
+    // Health and metrics endpoints are polled by Kubernetes probes and by the services' own dependency checks, at a
+    // rate that drowns out every other request in the log.
+    override fun shouldNotFilter(request: HttpServletRequest) =
+        request.requestURI.startsWith(ACTUATOR_PATH)
+
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val userName = request.userPrincipal?.name ?: logConfigProperties.unknownUser
         val escapedUserName = HtmlUtils.htmlEscape(userName)
@@ -44,10 +49,23 @@ class UserLoggingFilter(
         withLoggingContext(
             "user" to escapedUserName,
         ) {
-            logger.info("User '$escapedUserName' requests $escapedMethod $escapedRequest...")
-            filterChain.doFilter(request, response)
-            logger.info("Response with status ${response.status}")
+            val startedAt = System.nanoTime()
+            try {
+                filterChain.doFilter(request, response)
+            } finally {
+                if (logger.isDebugEnabled) {
+                    val durationMillis = (System.nanoTime() - startedAt) / 1_000_000
+                    logger.debug(
+                        "User '$escapedUserName' requested $escapedMethod $escapedRequest: " +
+                                "${response.status} in ${durationMillis}ms"
+                    )
+                }
+            }
         }
+    }
+
+    companion object {
+        private const val ACTUATOR_PATH = "/actuator"
     }
 }
 

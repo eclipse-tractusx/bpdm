@@ -45,7 +45,7 @@ class TaskCreationBatchService(
 
 
     fun createTasksForReadyBusinessPartners(){
-        logger.info { "Started scheduled task to create golden record tasks from ready business partners" }
+        logger.debug { "Started scheduled task to create golden record tasks from ready business partners" }
 
         var totalCreatedTasks = 0
         do {
@@ -55,8 +55,10 @@ class TaskCreationBatchService(
             entityManager.clear()
         }while (createdTasks != 0)
 
-        logger.debug { "Total created $totalCreatedTasks new golden record tasks from ready business partners" }
-
+        if (totalCreatedTasks > 0)
+            logger.info { "Created $totalCreatedTasks new golden record tasks from ready business partners" }
+        else
+            logger.debug { "No ready business partners to create golden record tasks from" }
     }
 }
 
@@ -73,7 +75,7 @@ class TaskCreationChunkService(
 
     @Transactional
     fun createTasksForReadyBusinessPartners(): Int {
-        logger.info { "Create next chunk of golden record tasks from ready business partners" }
+        logger.debug { "Create next chunk of golden record tasks from ready business partners" }
 
         val pageRequest = Pageable.ofSize(properties.creation.fromSharingMember.batchSize)
         val foundStates = sharingStateRepository.findBySharingStateType(SharingStateType.Ready, pageRequest).content

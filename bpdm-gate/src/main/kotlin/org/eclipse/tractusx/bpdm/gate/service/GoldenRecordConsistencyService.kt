@@ -51,7 +51,7 @@ class GoldenRecordConsistencyService(
     private val logger = KotlinLogging.logger { }
 
     fun check(){
-        logger.info { "Start checking business partner BPNs for consistency with the golden record pool..." }
+        logger.debug { "Start checking business partner BPNs for consistency with the golden record pool..." }
 
         var currentPageNumber = 0
         var totalCheckBusinessPartners = 0
