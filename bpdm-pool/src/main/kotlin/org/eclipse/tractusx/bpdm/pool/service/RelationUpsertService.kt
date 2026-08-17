@@ -23,13 +23,13 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

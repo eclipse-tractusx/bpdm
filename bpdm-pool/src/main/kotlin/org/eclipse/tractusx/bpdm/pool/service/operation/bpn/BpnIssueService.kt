@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.ConfigurationEntryRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.pow
+import kotlin.text.iterator
 
 /**
  * The single authority for issuing BPNs: advances the stored counter of the requested business partner kind and turns
