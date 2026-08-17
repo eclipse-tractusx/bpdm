@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.util.parenthesizeIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
@@ -52,25 +53,28 @@ class RelationTaskResolutionService(
     fun checkResolveTasks(){
         logger.debug { "Start batch process for resolving pending relation tasks..." }
 
-        var totalSuccesses = 0
-        var totalErrors = 0
+        val totalSuccesses = mutableListOf<String>()
+        val totalErrors = mutableListOf<String>()
         var totalUnresolved = 0
         var hasNextPage = false
         do{
             val results = transactionTemplate.execute {
                 checkResolveTasks(taskConfigProperties.relationCheck.batchSize)
-            } ?: ResolutionStats(0, 0, 0, false)
+            } ?: ResolutionStats(emptyList(), emptyList(), 0, false)
 
             entityManager.clear()
 
-            totalSuccesses += results.resolvedAsSuccess
-            totalErrors += results.resolvedAsError
+            totalSuccesses.addAll(results.resolvedAsSuccess)
+            totalErrors.addAll(results.resolvedAsError)
             totalUnresolved += results.unresolved
             hasNextPage = results.hasNextPage
         }while (hasNextPage)
 
-        if (totalSuccesses > 0 || totalErrors > 0)
-            logger.info { "Resolved $totalSuccesses relation tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+        if (totalSuccesses.isNotEmpty() || totalErrors.isNotEmpty())
+            logger.info {
+                "Resolved ${totalSuccesses.size} relation tasks as successful${totalSuccesses.parenthesizeIdentifiersForLog()}, " +
+                        "${totalErrors.size} as errors${totalErrors.parenthesizeIdentifiersForLog()} and $totalUnresolved still unresolved"
+            }
         else
             logger.debug { "Resolved no relation tasks, $totalUnresolved still unresolved" }
     }
@@ -95,7 +99,12 @@ class RelationTaskResolutionService(
         syncRecordService.updateRecord(syncRecord,  events.content.lastOrNull()?.timestamp)
 
         val unresolvedSize = tasks.size - successfulTasks.size - errorTasks.size
-        return ResolutionStats(successfulTasks.size, errorTasks.size, unresolvedSize, events.totalPages > 1)
+        return ResolutionStats(
+            successfulTasks.mapNotNull { pendingRelationsById[it.taskId]?.externalId },
+            errorTasks.mapNotNull { pendingRelationsById[it.taskId]?.externalId },
+            unresolvedSize,
+            events.totalPages > 1
+        )
     }
 
     private fun resolveAsSuccesses(tasks: List<TaskClientRelationsStateDto>, pendingRelationsById: Map<String, RelationDb>){
@@ -152,8 +161,8 @@ class RelationTaskResolutionService(
 
 
     data class ResolutionStats(
-        val resolvedAsSuccess: Int,
-        val resolvedAsError: Int,
+        val resolvedAsSuccess: List<String>,
+        val resolvedAsError: List<String>,
         val unresolved: Int,
         val hasNextPage: Boolean
     )

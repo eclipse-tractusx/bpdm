@@ -47,16 +47,16 @@ class TaskCreationBatchService(
     fun createTasksForReadyBusinessPartners(){
         logger.debug { "Started scheduled task to create golden record tasks from ready business partners" }
 
-        var totalCreatedTasks = 0
+        val totalCreatedTasks = mutableListOf<CreatedGoldenRecordTask>()
         do {
             val createdTasks = taskCreationService.createTasksForReadyBusinessPartners()
-            totalCreatedTasks += createdTasks
+            totalCreatedTasks.addAll(createdTasks)
 
             entityManager.clear()
-        }while (createdTasks != 0)
+        }while (createdTasks.isNotEmpty())
 
-        if (totalCreatedTasks > 0)
-            logger.info { "Created $totalCreatedTasks new golden record tasks from ready business partners" }
+        if (totalCreatedTasks.isNotEmpty())
+            logger.info { "Created ${totalCreatedTasks.size} new golden record tasks from ready business partners: ${totalCreatedTasks.toLogIdentifiers()}" }
         else
             logger.debug { "No ready business partners to create golden record tasks from" }
     }
@@ -74,7 +74,7 @@ class TaskCreationChunkService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createTasksForReadyBusinessPartners(): Int {
+    fun createTasksForReadyBusinessPartners(): List<CreatedGoldenRecordTask> {
         logger.debug { "Create next chunk of golden record tasks from ready business partners" }
 
         val pageRequest = Pageable.ofSize(properties.creation.fromSharingMember.batchSize)
@@ -86,12 +86,12 @@ class TaskCreationChunkService(
         val orchestratorBusinessPartnersDto = foundPartners.map { orchestratorMappings.toCreateRequest(it) }
         val createdTasks = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto)
 
-        foundPartners.zip(createdTasks).forEach { (partner, task) ->
+        return foundPartners.zip(createdTasks).map { (partner, task) ->
             if(partner.sharingState.orchestratorRecordId == null) partner.sharingState.orchestratorRecordId = UUID.fromString(task.recordId)
             sharingStateService.setPending(partner.sharingState, task.taskId)
-        }
 
-        return createdTasks.size
+            CreatedGoldenRecordTask(partner.sharingState.externalId, task.taskId)
+        }
     }
 
     private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<TaskCreateRequestEntry>): List<TaskClientStateDto> {

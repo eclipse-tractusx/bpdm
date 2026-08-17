@@ -95,9 +95,10 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 ## 2.4 Where a line lives
 
 - A persisted-change line MUST be emitted by the **write authority** for that subject — the operation service that persists it. This is the same single-authority rule as [`application-code-guide.md` §2.4](application-code-guide.md#24-operation-layer), read as a logging rule.
+- Where the write authority persists one entry at a time and its caller drives the batch — the Orchestrator's task state machine and the services that call it — the batch line MUST be emitted by that caller instead. It is the closest place to the write that can still satisfy the one-line-per-batch rule of [2.1](#21-info); the write authority reports the entry at DEBUG.
 - Application services MUST NOT log at INFO. They are per API version, so a line there is duplicated across v6 and v7, and they are bypassed entirely by the golden record task path — a line there would miss most production writes.
 - Parsers MUST NOT log at INFO. They decide; they never persist.
-- A subject whose write emits a changelog entry SHOULD rely on `ChangelogCreateService` for its INFO line rather than adding its own. A subject with no changelog — relations, metadata, tasks — MUST log its own.
+- A subject whose write emits a changelog entry SHOULD rely on its service's `ChangelogCreateService` for its INFO line rather than adding its own — Pool's for business partners, Gate's for business partner and relation stages. A subject with no changelog — Pool relations, metadata, tasks — MUST log its own.
 - Logging MUST NOT be routed through `ChangelogCreateService.record(...)` by subjects that do not belong in the changelog. The changelog is a domain artifact with its own emission policy; coupling observability to it makes a business decision silently change the logs.
 
 ## 2.5 Schedules
@@ -122,6 +123,8 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 - **Inline lines can lie on rollback.** Relation and metadata INFO lines are written inside the transaction, so a rollback leaves a line claiming a change that did not happen. There is always an ERROR alongside it. Business partner lines come from `ChangelogCreateService`, which logs on commit and is therefore exact. Making the rest exact needs a transaction-scoped commit hook; it was deliberately deferred.
 - **Aspects are not reported for business partner writes.** `ChangelogRecord` carries no aspect, so those lines name the subject and change type only.
 - **Not every write reports a count.** `GoldenRecordConsistencyService` and the Pool trigger batch plumbing return no number of changes, so their runs stay silent at DEBUG rather than reporting an outcome.
+- **The Orchestrator's v6 task lines are duplicated.** `GoldenRecordTaskLegacyServiceMapper` re-implements task creation and step success instead of delegating to the state machine, so those two lines exist twice. They stay in step only by review until that duplication is removed.
+- **A batch line names at most twenty subjects.** `joinIdentifiersForLog` counts the remainder rather than listing it, so a large upload names a sample of its external IDs, not all of them. Pool and Gate report every changelog entry at DEBUG; the Orchestrator's task lines have no per-task counterpart.
 
 ---
 

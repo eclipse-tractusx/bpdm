@@ -34,7 +34,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
@@ -49,7 +48,7 @@ class BusinessPartnerService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val businessPartnerMappings: BusinessPartnerMappings,
     private val sharingStateService: SharingStateService,
-    private val changelogRepository: ChangelogRepository,
+    private val changelogCreateService: ChangelogCreateService,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val compareUtil: BusinessPartnerComparisonUtil,
     private val outputUpsertMappings: OutputUpsertMappings
@@ -150,13 +149,21 @@ class BusinessPartnerService(
         }
 
         if (hasChanges && shouldUpdate) {
-                changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner))
+                changelogCreateService.record(
+                    ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner),
+                    identifier = upsertData.toLogIdentifier()
+                )
 
                 copyUtil.copyValues(upsertData, partnerToUpsert)
                 businessPartnerRepository.save(partnerToUpsert)
         }
 
         return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)
+    }
+
+    private fun BusinessPartnerDb.toLogIdentifier(): String {
+        val bpns = listOfNotNull(bpnL, bpnS, bpnA)
+        return if (bpns.isEmpty()) sharingState.externalId else "${sharingState.externalId} (${bpns.joinToString("/")})"
     }
 
     private fun getBusinessPartners(

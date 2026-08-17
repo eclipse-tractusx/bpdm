@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.exception.*
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
@@ -45,7 +44,7 @@ class RelationService(
     private val relationStageRepository: RelationStageRepository,
     private val sharingStateRepository: SharingStateRepository,
     private val relationSharingStateService: RelationSharingStateService,
-    private val changelogRepository: ChangelogRepository
+    private val changelogCreateService: ChangelogCreateService
 ): IRelationService {
 
     override fun findInputRelations(
@@ -216,7 +215,10 @@ class RelationService(
         )
         relationSharingStateService.setSuccess(relation)
 
-        changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changelogType, StageType.Output, GoldenRecordType.Relation))
+        changelogCreateService.record(
+            ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changelogType, StageType.Output, GoldenRecordType.Relation),
+            identifier = "${relation.externalId} ($sourceBpnL -> $targetBpnL)"
+        )
         return relationRepository.save(relation)
     }
 
@@ -258,7 +260,7 @@ class RelationService(
         )
 
         relationStageRepository.save(relationStage)
-        changelogRepository.save(ChangelogEntryDb(relation.externalId, tenantBpnL.value, ChangelogType.CREATE, StageType.Input, GoldenRecordType.Relation))
+        changelogCreateService.record(ChangelogEntryDb(relation.externalId, tenantBpnL.value, ChangelogType.CREATE, StageType.Input, GoldenRecordType.Relation))
 
         return relationStage
     }
@@ -320,7 +322,7 @@ class RelationService(
 
 
             relationStageRepository.save(existingStage)
-            changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, ChangelogType.UPDATE, StageType.Input, GoldenRecordType.Relation))
+            changelogCreateService.record(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, ChangelogType.UPDATE, StageType.Input, GoldenRecordType.Relation))
         }
 
         if(hasChanges || isInErrorState){
