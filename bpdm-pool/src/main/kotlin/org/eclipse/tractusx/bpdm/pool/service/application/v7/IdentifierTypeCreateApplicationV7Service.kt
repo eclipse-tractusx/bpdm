@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.IdentifierTypeReques
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.IdentifierTypeParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.IdentifierTypeCreateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.IdentifierTypeCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.IdentifierTypeCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.IdentifierTypeCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

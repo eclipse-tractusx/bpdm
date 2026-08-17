@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

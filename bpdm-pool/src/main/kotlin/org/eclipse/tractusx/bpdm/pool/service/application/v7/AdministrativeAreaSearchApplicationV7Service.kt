@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AdministrativeAreaResponseMapper
-import org.eclipse.tractusx.bpdm.pool.service.operation.AdministrativeAreaSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.AdministrativeAreaSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

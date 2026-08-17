@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateReq
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
-import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.DataSpaceParticipantUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.participation.DataSpaceParticipantUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

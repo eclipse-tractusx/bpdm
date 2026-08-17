@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*

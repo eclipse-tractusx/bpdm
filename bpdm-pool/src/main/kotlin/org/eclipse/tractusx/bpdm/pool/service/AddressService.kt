@@ -22,21 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressAssociationFetchService
 import org.springframework.stereotype.Service
 
 @Service
 class AddressService(
-    private val logisticAddressRepository: LogisticAddressRepository,
-    private val addressAssociationFetchService: AddressAssociationFetchService
+    private val logisticAddressRepository: LogisticAddressRepository
 ) {
     private val logger = KotlinLogging.logger { }
-
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
-        addressAssociationFetchService.fetch(addresses)
-
-        return addresses
-    }
 
     fun findAddressByBpn(bpn: String): LogisticAddressDb? {
         logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
