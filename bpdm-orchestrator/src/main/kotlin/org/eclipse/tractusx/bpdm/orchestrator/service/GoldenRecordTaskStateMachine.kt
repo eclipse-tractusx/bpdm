@@ -82,11 +82,15 @@ class GoldenRecordTaskStateMachine(
         return taskRepository.save(task)
     }
 
+    /**
+     * Resolves the given step of the task as successful, moving the task to its next step or to overall success, and
+     * answers with null where the step was already resolved and the result is therefore ignored.
+     */
     fun resolveTaskStepToSuccess(
         task: GoldenRecordTaskDb,
         step: TaskStep,
         resultBusinessPartner: BusinessPartner
-    ): GoldenRecordTaskDb {
+    ): GoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
 
@@ -94,7 +98,7 @@ class GoldenRecordTaskStateMachine(
             if(hasAlreadyResolvedStep(state, step))
             {
                 logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
-                return task
+                return null
             }else{
                 throw BpdmIllegalStateException(task.uuid, state)
             }
@@ -116,7 +120,11 @@ class GoldenRecordTaskStateMachine(
         return taskRepository.save(task)
     }
 
-    fun doResolveTaskToError(task: GoldenRecordTaskDb, step: TaskStep, errors: List<TaskErrorDto>): GoldenRecordTaskDb {
+    /**
+     * Resolves the given step of the task as failed and answers with null where the step was already resolved and the
+     * errors are therefore ignored.
+     */
+    fun doResolveTaskToError(task: GoldenRecordTaskDb, step: TaskStep, errors: List<TaskErrorDto>): GoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
@@ -124,7 +132,7 @@ class GoldenRecordTaskStateMachine(
             if(hasAlreadyResolvedStep(state, step))
             {
                 logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
-                return task
+                return null
             }else{
                 throw BpdmIllegalStateException(task.uuid, state)
             }

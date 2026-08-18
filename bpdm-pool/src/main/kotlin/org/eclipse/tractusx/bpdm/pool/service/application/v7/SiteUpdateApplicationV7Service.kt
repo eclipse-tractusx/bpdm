@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
@@ -47,16 +46,12 @@ class SiteUpdateApplicationV7Service(
     private val siteResponseMapper: SiteResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Applies each request to the site it addresses by BPN and returns, per request, either the updated site or the
      * errors that stopped it.
      */
     @Transactional
     fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
-        logger.info { "Update ${requests.size} sites" }
-
         val requestList = requests.toList()
         val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it) }
 

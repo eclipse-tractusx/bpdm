@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
@@ -48,16 +47,12 @@ class AddressCreateApplicationV7Service(
     private val addressResponseMapper: AddressResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Creates the requested addresses under their parent business partners and returns, per request, either the created
      * address or the errors that stopped it.
      */
     @Transactional
     fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new addresses" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map {
             AddressCreateUntypedParentRequest(it.bpnParent, addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))

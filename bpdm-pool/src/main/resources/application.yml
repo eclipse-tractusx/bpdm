@@ -140,12 +140,6 @@ logging:
   level:
     # On default show only logs from INFO and above
     root: INFO
-    org:
-      eclipse:
-        tractusx:
-          bpdm:
-            # Logs from this application's package should be DEBUG and above
-            pool: DEBUG
 management:
   endpoint:
     health:

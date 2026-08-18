@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
@@ -57,8 +58,13 @@ class GoldenRecordTaskService(
         val gateRecords = sharingMemberRecordService.getOrCreateGateRecords(createRequest.requests)
         abortOutdatedTasks(gateRecords.toSet())
 
-        return createRequest.requests.zip(gateRecords)
+        val createdTasks = createRequest.requests.zip(gateRecords)
             .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
+
+        if (createdTasks.isNotEmpty())
+            logger.info { "Created ${createdTasks.size} golden record tasks in mode ${createRequest.mode}: ${createdTasks.toLogIdentifiers()}" }
+
+        return createdTasks
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateResponse(createdTasks = it) }
     }
@@ -109,6 +115,8 @@ class GoldenRecordTaskService(
         val reservedTasks = foundTasks.map { goldenRecordTaskStateMachine.doReserve(it) }
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
+        logger.debug { "Reserved ${reservedTasks.size} golden record tasks for step ${reservationRequest.step}: ${reservedTasks.toLogIdentifiers()}" }
+
         return reservedTasks
             .map { task ->
                 TaskStepReservationEntryDto(
@@ -129,10 +137,10 @@ class GoldenRecordTaskService(
         val foundTasks = taskRepository.findByUuidIn(uuids.toSet()).also { taskRepository.fetchBusinessPartnerData(it) }
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
 
-        resultRequest.results
+        val resolvedTasks = resultRequest.results
             .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
             .filterNot { (task, _) -> task.processingState.resultState == GoldenRecordTaskDb.ResultState.Aborted }
-            .forEach { (task, resultEntry) ->
+            .mapNotNull { (task, resultEntry) ->
                 val step = resultRequest.step
                 val errors = resultEntry.errors
                 val resultBusinessPartner = resultEntry.businessPartner
@@ -142,28 +150,54 @@ class GoldenRecordTaskService(
                     else ->  goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartner)
                 }
             }
+
+        logResolvedTasks(resolvedTasks, resultRequest.step)
+    }
+
+    private fun logResolvedTasks(resolvedTasks: List<GoldenRecordTaskDb>, step: TaskStep) {
+        val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }
+
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Pending]
+            ?.groupBy { it.processingState.step }
+            ?.forEach { (nextStep, tasks) ->
+                logger.info { "Advanced ${tasks.size} golden record tasks from step $step to step $nextStep: ${tasks.toLogIdentifiers()}" }
+            }
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Success]
+            ?.let { tasks -> logger.info { "Completed ${tasks.size} golden record tasks after step $step: ${tasks.toLogIdentifiers()}" } }
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Error]
+            ?.let { tasks -> logger.info { "Failed ${tasks.size} golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
     }
 
     @Transactional
     fun processPendingTimeouts(pageSize: Int): PaginationInfo {
+        val timedOutTasks = mutableListOf<GoldenRecordTaskDb>()
+
         return batchProcessTasks(pageSize,
             fetchPage = { pageable -> taskRepository.findByProcessingStatePendingTimeoutBefore(DbTimestamp.now(), pageable) },
             processTask = { task ->
-                logger.info { "Setting timeout for task ${task.uuid} after reaching pending timeout" }
                 goldenRecordTaskStateMachine.doResolveTaskToTimeout(task)
+                timedOutTasks.add(task)
             }
-        )
+        ).also {
+            if (timedOutTasks.isNotEmpty())
+                logger.info { "Timed out ${timedOutTasks.size} golden record tasks: ${timedOutTasks.toLogIdentifiers()}" }
+        }
     }
 
     @Transactional
     fun processRetentionTimeouts(pageSize: Int): PaginationInfo {
+        val deletedTasks = mutableListOf<GoldenRecordTaskDb>()
+
         return batchProcessTasks(pageSize,
             fetchPage = { pageable -> taskRepository.findByProcessingStateRetentionTimeoutBefore(DbTimestamp.now(), pageable) },
             processTask = { task ->
-                logger.info { "Removing task ${task.uuid} after reaching retention timeout" }
                 taskRepository.delete(task)
+                deletedTasks.add(task)
             }
-        )
+        ).also {
+            if (deletedTasks.isNotEmpty())
+                logger.info { "Deleted ${deletedTasks.size} golden record tasks after their retention timeout: ${deletedTasks.toLogIdentifiers()}" }
+        }
     }
 
     private fun batchProcessTasks(
@@ -203,10 +237,16 @@ class GoldenRecordTaskService(
         }
 
     private fun abortOutdatedTasks(records: Set<SharingMemberRecordDb>){
-        return taskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, GoldenRecordTaskDb.ResultState.Pending)
-            .forEach { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
+        val abortedTasks = taskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, GoldenRecordTaskDb.ResultState.Pending)
+            .map { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
+
+        if (abortedTasks.isNotEmpty())
+            logger.info { "Aborted ${abortedTasks.size} outdated golden record tasks: ${abortedTasks.toLogIdentifiers()}" }
     }
 }
+
+private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =
+    map { it.uuid.toString() }.joinIdentifiersForLog()
 
 data class PaginationInfo(
     val hasProcessedTasks: Boolean,

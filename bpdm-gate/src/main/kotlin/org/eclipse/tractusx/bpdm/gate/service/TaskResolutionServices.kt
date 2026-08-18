@@ -23,6 +23,8 @@ import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
+import org.eclipse.tractusx.bpdm.common.util.parenthesizeIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
@@ -46,41 +48,52 @@ class TaskResolutionBatchService(
     private val logger = KotlinLogging.logger { }
 
     fun resolveTasks(){
-        logger.info { "Start batch process for resolving pending tasks..." }
+        logger.debug { "Start batch process for resolving pending tasks..." }
 
-        var totalSuccesses = 0
-        var totalErrors = 0
+        val totalSuccesses = mutableListOf<String>()
+        val totalErrors = mutableListOf<String>()
         var totalUnresolved = 0
         do{
 
             val results = taskResolutionService.resolveTasks()
 
-            totalSuccesses += results.resolvedAsSuccess
-            totalErrors += results.resolvedAsError
+            totalSuccesses.addAll(results.resolvedAsSuccess)
+            totalErrors.addAll(results.resolvedAsError)
             totalUnresolved += results.unresolved
 
             entityManager.clear()
         }while (results.hasNextPage)
 
-        logger.debug { "Total Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+        if (totalSuccesses.isNotEmpty() || totalErrors.isNotEmpty())
+            logger.info {
+                "Resolved ${totalSuccesses.size} tasks as successful${totalSuccesses.parenthesizeIdentifiersForLog()}, " +
+                        "${totalErrors.size} as errors${totalErrors.parenthesizeIdentifiersForLog()} and $totalUnresolved still unresolved"
+            }
+        else
+            logger.debug { "Resolved no tasks, $totalUnresolved still unresolved" }
     }
 
     fun healthCheck(){
-        logger.info { "Start process Task Health Check..." }
+        logger.debug { "Start process Task Health Check..." }
 
-        var totalTaskMissing = 0
+        val totalTaskMissing = mutableListOf<String>()
         var totalProcessed = 0
         var pageToQuery = 0
         do{
             val result = taskResolutionService.healthCheck(pageToQuery)
             totalProcessed += result.processed
-            totalTaskMissing += result.missing
+            totalTaskMissing.addAll(result.missing)
             pageToQuery++
 
             entityManager.clear()
         }while (result.hasNextPage)
 
-        logger.info { "Finished process Task Health Check: Processed $totalProcessed tasks with unhealthy $totalTaskMissing tasks" }
+        if (totalTaskMissing.isNotEmpty())
+            logger.info {
+                "Task health check: processed $totalProcessed tasks, ${totalTaskMissing.size} of them unhealthy: ${totalTaskMissing.joinIdentifiersForLog()}"
+            }
+        else
+            logger.debug { "Task health check: processed $totalProcessed tasks, none unhealthy" }
     }
 }
 
@@ -114,7 +127,7 @@ class TaskResolutionChunkService(
 
         sharingStatesMissingTask.forEach { sharingStateService.setError(it, BusinessPartnerSharingError.MissingTaskID, "Missing Task in Orchestrator") }
 
-        return HealthCheckResult(pendingSharingStates.size, sharingStatesMissingTask.size, pendingSharingStatePage.hasNext())
+        return HealthCheckResult(pendingSharingStates.size, sharingStatesMissingTask.map { it.externalId }, pendingSharingStatePage.hasNext())
     }
 
 
@@ -153,7 +166,12 @@ class TaskResolutionChunkService(
 
         logger.debug { "Resolved ${successes.size} tasks as successful, ${errors.size} as errors and ${unresolved.size} still unresolved" }
 
-        return ResolutionStats(successes.size, errors.size, unresolved.size, events.totalPages > 1)
+        return ResolutionStats(
+            successes.map { it.sharingState.externalId },
+            errors.map { it.sharingState.externalId },
+            unresolved.size,
+            events.totalPages > 1
+        )
     }
 
     private fun tryCreateUpsertRequest(sharingState: SharingStateDb, task: TaskClientStateDto?, input: BusinessPartnerDb?): RequestCreationResult {
@@ -271,15 +289,15 @@ class TaskResolutionChunkService(
     }
 
     data class ResolutionStats(
-        val resolvedAsSuccess: Int,
-        val resolvedAsError: Int,
+        val resolvedAsSuccess: List<String>,
+        val resolvedAsError: List<String>,
         val unresolved: Int,
         val hasNextPage: Boolean
     )
 
     data class HealthCheckResult(
         val processed: Int,
-        val missing: Int,
+        val missing: List<String>,
         val hasNextPage: Boolean
     )
 

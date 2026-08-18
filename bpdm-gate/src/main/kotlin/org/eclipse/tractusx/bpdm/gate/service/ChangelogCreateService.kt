@@ -17,28 +17,29 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.util
-import io.swagger.v3.oas.models.OpenAPI
+package org.eclipse.tractusx.bpdm.gate.service
+
 import mu.KotlinLogging
-import org.springdoc.core.customizers.OpenApiCustomizer
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.springframework.stereotype.Service
 
-class OpenApiExampleCustomizer(
-    private val examples: List<OpenApiSchemaExample>
-) : OpenApiCustomizer {
-
+/**
+ * The single authority for writing changelog entries of business partners and relations.
+ */
+@Service
+class ChangelogCreateService(
+    private val changelogRepository: ChangelogRepository
+) {
     private val logger = KotlinLogging.logger { }
 
-
-    override fun customise(openApi: OpenAPI) {
-        logger.debug { "Examples size: ${examples.size}" }
-        examples.forEach { schemaExample ->
-            val schema = openApi.components?.schemas?.get(schemaExample.schemaName)
-            if (schema != null) {
-                schema.example = schemaExample.example
-                logger.debug { "Example attached to schema: ${schemaExample.schemaName}" }
-            } else {
-                logger.warn { "Schema not found: ${schemaExample.schemaName}" }
-            }
+    /**
+     * Writes the given changelog entry.
+     */
+    fun record(entry: ChangelogEntryDb) {
+        changelogRepository.save(entry)
+        logger.debug {
+            "Created ${entry.changelogType} changelog entry for ${entry.goldenRecordType} ${entry.stage} '${entry.externalId}'"
         }
     }
 }

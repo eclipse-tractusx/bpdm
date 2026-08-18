@@ -18,27 +18,27 @@
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.common.util
-import io.swagger.v3.oas.models.OpenAPI
-import mu.KotlinLogging
-import org.springdoc.core.customizers.OpenApiCustomizer
 
-class OpenApiExampleCustomizer(
-    private val examples: List<OpenApiSchemaExample>
-) : OpenApiCustomizer {
+private const val MAX_LISTED_IDENTIFIERS = 20
 
-    private val logger = KotlinLogging.logger { }
+/**
+ * Names the given identifiers in a log message, listing at most twenty of them and counting the remainder.
+ */
+fun Collection<String>.joinIdentifiersForLog(): String =
+    if (size <= MAX_LISTED_IDENTIFIERS)
+        joinToString(", ")
+    else
+        take(MAX_LISTED_IDENTIFIERS).joinToString(", ", postfix = " and ${size - MAX_LISTED_IDENTIFIERS} more")
 
+/**
+ * Counts the given subjects for a log message, using the singular noun for a single subject and the plural for any other
+ * number.
+ */
+fun countForLog(count: Int, singular: String, plural: String): String =
+    "$count ${if (count == 1) singular else plural}"
 
-    override fun customise(openApi: OpenAPI) {
-        logger.debug { "Examples size: ${examples.size}" }
-        examples.forEach { schemaExample ->
-            val schema = openApi.components?.schemas?.get(schemaExample.schemaName)
-            if (schema != null) {
-                schema.example = schemaExample.example
-                logger.debug { "Example attached to schema: ${schemaExample.schemaName}" }
-            } else {
-                logger.warn { "Schema not found: ${schemaExample.schemaName}" }
-            }
-        }
-    }
-}
+/**
+ * Names the given identifiers in parentheses behind a count, contributing nothing where there are none.
+ */
+fun Collection<String>.parenthesizeIdentifiersForLog(): String =
+    if (isEmpty()) "" else " (${joinIdentifiersForLog()})"

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
@@ -48,16 +47,12 @@ class AddressUpdateApplicationV7Service(
     private val addressResponseMapper: AddressResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Applies each request to the address it addresses by BPN and returns, per request, either the updated address or
      * the errors that stopped it.
      */
     @Transactional
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
-        logger.info { "Update ${requests.size} business partner addresses" }
-
         val requestList = requests.toList()
         val updateRequests = requestList.map {
             AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantUpdateRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
@@ -40,16 +39,12 @@ class DataSpaceParticipantUpdateApplicationV7Service(
     private val dataSpaceParticipantParseErrorMapper: DataSpaceParticipantParseErrorMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Sets the data space participation of every legal entity the request names, and changes none of them when a single
      * entry cannot be applied.
      */
     @Transactional
     fun updateParticipants(updateRequest: DataSpaceParticipantUpdateRequestDto) {
-        logger.info { "Update participation of ${updateRequest.participants.size} legal entities" }
-
         parseAndExecuteAllOrNone(
             dataSpaceParticipantUpdateRequestMapper.toUpdateRequests(updateRequest),
             dataSpaceParticipantUpdateParser::parse,

@@ -39,7 +39,7 @@ class RelationCleaningServiceDummy(
 
     private fun processRelationPollingTasks(step: TaskStep) {
         try {
-            logger.info { "Starting polling for relation cleaning tasks from Orchestrator... TaskStep ${step.name}" }
+            logger.debug { "Starting polling for relation cleaning tasks from Orchestrator... TaskStep ${step.name}" }
 
             do {
                 val cleaningRelationRequest =
@@ -47,7 +47,7 @@ class RelationCleaningServiceDummy(
 
                 val cleaningRelationTasks = cleaningRelationRequest.reservedTasks
 
-                logger.info { "${cleaningRelationTasks.size} relation tasks found for cleaning. Proceeding with cleaning..." }
+                logger.debug { "${cleaningRelationTasks.size} relation tasks found for cleaning. Proceeding with cleaning..." }
 
                 if (cleaningRelationTasks.isNotEmpty()) {
                     val cleaningRelationResults = cleaningRelationTasks.map { reservedTask ->
@@ -55,7 +55,7 @@ class RelationCleaningServiceDummy(
                     }
 
                     orchestrationApiClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(step, cleaningRelationResults))
-                    logger.info { "Relation cleaning tasks processing completed for this iteration." }
+                    logger.debug { "Relation cleaning tasks processing completed for this iteration." }
                 }
             } while (cleaningRelationRequest.reservedTasks.isNotEmpty())
         } catch (e: Exception) {

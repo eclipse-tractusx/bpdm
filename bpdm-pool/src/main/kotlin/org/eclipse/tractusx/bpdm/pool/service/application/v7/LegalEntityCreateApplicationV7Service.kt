@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
@@ -47,16 +46,12 @@ class LegalEntityCreateApplicationV7Service(
     private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Creates the requested legal entities with their legal addresses and returns, per request, either the created legal
      * entity or the errors that stopped it.
      */
     @Transactional
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new legal entities" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map { legalEntityDtoRequestMapper.toCreateRequest(it) }
 

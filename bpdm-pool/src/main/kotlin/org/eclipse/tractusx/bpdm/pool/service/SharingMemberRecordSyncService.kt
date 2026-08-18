@@ -19,9 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import jakarta.annotation.PostConstruct
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
@@ -35,8 +40,22 @@ class SharingMemberRecordSyncService(
     private val syncRecordService: SyncRecordService,
     private val transactionTemplate: TransactionTemplate,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
-    private val syncRecordRepository: SyncRecordRepository
+    private val syncRecordRepository: SyncRecordRepository,
+    private val syncConfigProperties: SharingMemberRecordSyncConfigProperties
 ){
+    private val logger = KotlinLogging.logger { }
+
+    /**
+     * Reports whether sharing member record synchronization runs on a schedule in this deployment.
+     */
+    @PostConstruct
+    fun logScheduleActivation() {
+        if (syncConfigProperties.cron == CRON_DISABLED)
+            logger.info { "Sharing member record synchronization schedule is disabled" }
+        else
+            logger.info { "Sharing member record synchronization scheduled with cron '${syncConfigProperties.cron}'" }
+    }
+
     @Scheduled(cron = "#{${SharingMemberRecordSyncConfigProperties.GET_CRON}}", zone = "UTC")
     fun synchronize(){
         var hasMore = false
@@ -53,8 +72,16 @@ class SharingMemberRecordSyncService(
         val queryRequest = SharingMemberRecordQueryRequest(syncRecord.fromTime)
         val updatedSharingMemberRecords = orchestrationApiClient.sharingMemberRecords.queryRecords(queryRequest, PaginationRequest())
 
-        updatedSharingMemberRecords.content
-            .forEach { sharingMemberConfidenceService.updateGoldenRecordCounted(it.recordId, it.isGoldenRecordCounted) }
+        val changedRecords = updatedSharingMemberRecords.content
+            .mapNotNull { sharingMemberConfidenceService.updateGoldenRecordCounted(it.recordId, it.isGoldenRecordCounted) }
+            .filter { it.upsertType == UpsertType.Updated }
+            .map { it.value }
+
+        if (changedRecords.isNotEmpty())
+            logger.info {
+                "Updated golden record counted flag of ${countForLog(changedRecords.size, "sharing member record", "sharing member records")}: " +
+                        changedRecords.map { "${it.recordId} (${it.address.bpn})" }.joinIdentifiersForLog()
+            }
 
         syncRecord.fromTime =  updatedSharingMemberRecords.content.lastOrNull()?.updatedAt ?: syncRecord.fromTime
         syncRecordRepository.save(syncRecord)
@@ -62,4 +89,7 @@ class SharingMemberRecordSyncService(
         return updatedSharingMemberRecords.totalElements > updatedSharingMemberRecords.contentSize
     }
 
+    companion object {
+        private const val CRON_DISABLED = "-"
+    }
 }

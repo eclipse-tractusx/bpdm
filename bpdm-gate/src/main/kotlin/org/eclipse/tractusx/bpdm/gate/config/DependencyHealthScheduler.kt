@@ -50,7 +50,7 @@ class DependencyHealthScheduler(
         if (unhealthyDependencies.isNotEmpty()) {
             logger.error("Dependencies not ready: ${unhealthyDependencies.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
         } else {
-            logger.info("All dependencies are healthy: ${healthStatus.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
+            logger.debug("All dependencies are healthy: ${healthStatus.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
         }
     }
 

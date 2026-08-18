@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
@@ -53,8 +54,13 @@ class RelationsGoldenRecordTaskService(
         val gateRecords = getOrCreateGateRecords(createRequest.requests)
         abortOutdatedTasks(gateRecords.toSet())
 
-        return createRequest.requests.zip(gateRecords)
+        val createdTasks = createRequest.requests.zip(gateRecords)
             .map { (request, record) -> relationsGoldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartnerRelations, record) }
+
+        if (createdTasks.isNotEmpty())
+            logger.info { "Created ${createdTasks.size} relation golden record tasks in mode ${createRequest.mode}: ${createdTasks.toLogIdentifiers()}" }
+
+        return createdTasks
             .map { task -> relationsResponseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateRelationsResponse(createdTasks = it) }
     }
@@ -94,6 +100,8 @@ class RelationsGoldenRecordTaskService(
         val reservedTasks = foundTasks.map { relationsGoldenRecordTaskStateMachine.doReserve(it) }
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
+        logger.debug { "Reserved ${reservedTasks.size} relation golden record tasks for step ${reservationRequest.step}: ${reservedTasks.toLogIdentifiers()}" }
+
         return reservedTasks
             .map { task ->
                 TaskRelationsStepReservationEntryDto(
@@ -112,10 +120,10 @@ class RelationsGoldenRecordTaskService(
         val foundTasks = relationsTaskRepository.findByUuidIn(uuids.toSet()).also { relationsTaskRepository.fetchRelationsData(it) }
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
 
-        resultRequest.results
+        val resolvedTasks = resultRequest.results
             .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
             .filterNot { (task, _) -> task.processingState.resultState == RelationsGoldenRecordTaskDb.ResultState.Aborted }
-            .forEach { (task, resultEntry) ->
+            .mapNotNull { (task, resultEntry) ->
                 val step = resultRequest.step
                 val errors = resultEntry.errors
                 val resultBusinessPartnerRelaitons = resultEntry.businessPartnerRelations
@@ -125,6 +133,22 @@ class RelationsGoldenRecordTaskService(
                     else ->  relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartnerRelaitons)
                 }
             }
+
+        logResolvedTasks(resolvedTasks, resultRequest.step)
+    }
+
+    private fun logResolvedTasks(resolvedTasks: List<RelationsGoldenRecordTaskDb>, step: TaskStep) {
+        val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }
+
+        tasksByResultState[RelationsGoldenRecordTaskDb.ResultState.Pending]
+            ?.groupBy { it.processingState.step }
+            ?.forEach { (nextStep, tasks) ->
+                logger.info { "Advanced ${tasks.size} relation golden record tasks from step $step to step $nextStep: ${tasks.toLogIdentifiers()}" }
+            }
+        tasksByResultState[RelationsGoldenRecordTaskDb.ResultState.Success]
+            ?.let { tasks -> logger.info { "Completed ${tasks.size} relation golden record tasks after step $step: ${tasks.toLogIdentifiers()}" } }
+        tasksByResultState[RelationsGoldenRecordTaskDb.ResultState.Error]
+            ?.let { tasks -> logger.info { "Failed ${tasks.size} relation golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
     }
 
     private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntry>): List<SharingMemberRecordDb> {
@@ -152,8 +176,11 @@ class RelationsGoldenRecordTaskService(
         }
 
     private fun abortOutdatedTasks(records: Set<SharingMemberRecordDb>){
-        return relationsTaskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, RelationsGoldenRecordTaskDb.ResultState.Pending)
-            .forEach { task -> relationsGoldenRecordTaskStateMachine.doAbortTask(task) }
+        val abortedTasks = relationsTaskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, RelationsGoldenRecordTaskDb.ResultState.Pending)
+            .map { task -> relationsGoldenRecordTaskStateMachine.doAbortTask(task) }
+
+        if (abortedTasks.isNotEmpty())
+            logger.info { "Aborted ${abortedTasks.size} outdated relation golden record tasks: ${abortedTasks.toLogIdentifiers()}" }
     }
 
     private fun calculateTaskRetentionTimeout(task: RelationsGoldenRecordTaskDb) =
@@ -163,3 +190,6 @@ class RelationsGoldenRecordTaskService(
         task.createdAt.instant.plus(taskConfigProperties.taskPendingTimeout)
 
 }
+
+private fun Collection<RelationsGoldenRecordTaskDb>.toLogIdentifiers() =
+    map { it.uuid.toString() }.joinIdentifiersForLog()
