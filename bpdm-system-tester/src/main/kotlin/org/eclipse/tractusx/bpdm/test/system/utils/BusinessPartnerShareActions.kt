@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
@@ -41,10 +40,6 @@ class BusinessPartnerShareActions(
     private val jsonMapper: JsonMapper
 ) {
 
-    companion object {
-        private val logger = KotlinLogging.logger { }
-    }
-
     private val context: ScenarioContext get() = ScenarioContext.current()!!
 
     fun upload(
@@ -63,13 +58,6 @@ class BusinessPartnerShareActions(
             contentSeed = contentSeed,
             currentInput = inputData
         )
-    }
-
-    fun refineAsLegalEntity(recordId: String, verified: Boolean) {
-        val state = context.records[recordId]!!
-        val entityResult = testDataGenerator.buildLegalEntity(state.contentSeed!!, givenConfidence(state, verified))
-        resolveTask(recordId, entityResult.taskData)
-        context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
     }
 
     /**
@@ -121,19 +109,6 @@ class BusinessPartnerShareActions(
         return entityResult.legalEntity
     }
 
-    fun refineAsSiteBasedLegalEntity(recordId: String, verified: Boolean) {
-        val state = context.records[recordId]!!
-        val entityResult = testDataGenerator.buildSiteBasedLegalEntity(state.contentSeed!!, givenConfidence(state, verified))
-        resolveTask(recordId, entityResult.taskData)
-        context.records[recordId] = state.copy(
-            legalEntity = entityResult.siteBasedLegalEntity.legalEntity,
-            poolSite = SiteWithMainAddressVerboseDto(
-                entityResult.siteBasedLegalEntity.site,
-                entityResult.siteBasedLegalEntity.legalEntity.legalAddress
-            )
-        )
-    }
-
     /**
      * Refines a record into a site-based legal entity (a legal entity whose legal address is also its site's main
      * address) whose master data is built from [masterDataSeed], independent of the seed the record was shared
@@ -162,18 +137,6 @@ class BusinessPartnerShareActions(
         )
         sharingStateWatcher.waitForCompletedState(recordId)
         return entityResult.siteBasedLegalEntity
-    }
-
-    fun refineAsSite(recordId: String) {
-        val state = context.records[recordId]!!
-        val contentSeed = state.contentSeed!!
-        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent")
-        val siteResult = testDataGenerator.buildSite(contentSeed, parentResult.legalEntity)
-        resolveTask(recordId, siteResult.taskData)
-        context.records[recordId] = state.copy(
-            legalEntity = siteResult.siteWithParent.legalEntity,
-            poolSite = siteResult.siteWithParent.site
-        )
     }
 
     /**
@@ -235,20 +198,6 @@ class BusinessPartnerShareActions(
         )
         sharingStateWatcher.waitForCompletedState(recordId)
         return siteResult.siteWithParent
-    }
-
-    fun refineAsAdditionalAddressOfLegalEntity(recordId: String, verified: Boolean) {
-        val state = context.records[recordId]!!
-        val contentSeed = state.contentSeed!!
-        // The parent legal entity is determined by the golden record process, not shared by the owner, so it
-        // is built without the owner signal. Only the resulting additional address carries it.
-        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent", TestDataV7.NotCheckedNotOwned)
-        val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(contentSeed, parentResult.legalEntity, givenConfidence(state, verified))
-        resolveTask(recordId, addressResult.taskData)
-        context.records[recordId] = state.copy(
-            legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
-            poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
-        )
     }
 
     /**
@@ -323,23 +272,6 @@ class BusinessPartnerShareActions(
         return addressResult.additionalLegalEntityAddressWithParent
     }
 
-    fun refineAsAdditionalAddressOfSite(recordId: String, verified: Boolean) {
-        val state = context.records[recordId]!!
-        val contentSeed = state.contentSeed!!
-        // The parent legal entity is determined by the golden record process, not shared by the owner, so it
-        // is built without the owner signal. Only the resulting additional address carries it (the site keeps
-        // its own always-OwnerShared confidence).
-        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent", TestDataV7.NotCheckedNotOwned)
-        val siteResult = testDataGenerator.buildSite("${contentSeed}Site", parentResult.legalEntity)
-        val addressResult = testDataGenerator.buildAdditionalSiteAddress(contentSeed, siteResult.siteWithParent, givenConfidence(state, verified))
-        resolveTask(recordId, addressResult.taskData)
-        context.records[recordId] = state.copy(
-            legalEntity = addressResult.additionalSiteAddressWithParent.siteWithParent.legalEntity,
-            poolSite = addressResult.additionalSiteAddressWithParent.siteWithParent.site,
-            poolAddress = addressResult.additionalSiteAddressWithParent.address
-        )
-    }
-
     /**
      * Refines a record into an additional address of a site (and its parent site and legal entity) whose
      * master data is built from [masterDataSeed], independent of the seed the record was shared with, and waits
@@ -378,25 +310,6 @@ class BusinessPartnerShareActions(
         )
         sharingStateWatcher.waitForCompletedState(recordId)
         return addressResult.additionalSiteAddressWithParent
-    }
-
-    fun completeShare(recordId: String, refine: (String) -> Unit) {
-        refine(recordId)
-        sharingStateWatcher.waitForCompletedState(recordId)
-    }
-
-    fun completeShareAsAdditionalAddressOf(
-        recordId: String,
-        parentLegalEntity: LegalEntityWithLegalAddressVerboseDto
-    ) {
-        val state = context.records[recordId]!!
-        val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(state.contentSeed!!, parentLegalEntity, givenConfidence(state, verified = false))
-        resolveTask(recordId, addressResult.taskData)
-        context.records[recordId] = state.copy(
-            legalEntity = parentLegalEntity,
-            poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
-        )
-        sharingStateWatcher.waitForCompletedState(recordId)
     }
 
     private fun resolveTask(recordId: String, taskData: BusinessPartner) {
