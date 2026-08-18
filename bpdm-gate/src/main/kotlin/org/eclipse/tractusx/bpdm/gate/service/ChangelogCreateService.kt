@@ -20,21 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
-import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.support.TransactionSynchronization
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * The single authority for writing changelog entries of business partners and relations.
- *
- * An entry is written straight away but only reported once the transaction commits, so a write that is rolled back is
- * never reported as one.
  */
 @Service
 class ChangelogCreateService(
@@ -43,73 +34,12 @@ class ChangelogCreateService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Writes the given changelog entry, reporting the change under the given identifier once the transaction commits.
+     * Writes the given changelog entry.
      */
-    fun record(entry: ChangelogEntryDb, identifier: String = entry.externalId) {
+    fun record(entry: ChangelogEntryDb) {
         changelogRepository.save(entry)
-        buffer().add(RecordedChange(entry.goldenRecordType, entry.stage, entry.changelogType, identifier))
-    }
-
-    private fun buffer(): MutableList<RecordedChange> {
-        openBuffer()?.let { return it }
-
-        check(TransactionSynchronizationManager.isActualTransactionActive()) {
-            "Changelog entries can only be recorded within an active transaction"
-        }
-
-        val buffer = mutableListOf<RecordedChange>()
-
-        TransactionSynchronizationManager.bindSynchronizedResource(this, buffer)
-        TransactionSynchronizationManager.registerSynchronization(ChangeReport(buffer))
-
-        return buffer
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun openBuffer(): MutableList<RecordedChange>? =
-        TransactionSynchronizationManager.getResource(this) as MutableList<RecordedChange>?
-
-    private fun summarize(changes: List<RecordedChange>): String {
-        val subject = changes.first()
-        val verb = when (subject.changelogType) {
-            ChangelogType.CREATE -> "Created"
-            ChangelogType.UPDATE -> "Updated"
-        }
-        val noun = when (subject.goldenRecordType) {
-            GoldenRecordType.BusinessPartner -> "business partner"
-            GoldenRecordType.Relation -> "relation"
-        }
-        val stage = when (subject.stage) {
-            StageType.Input -> "input"
-            StageType.Output -> "output"
-        }
-        val plural = if (changes.size > 1) "s" else ""
-
-        return "$verb ${changes.size} $noun $stage$plural: ${changes.map { it.identifier }.joinIdentifiersForLog()}"
-    }
-
-    private data class RecordedChange(
-        val goldenRecordType: GoldenRecordType,
-        val stage: StageType,
-        val changelogType: ChangelogType,
-        val identifier: String
-    )
-
-    private inner class ChangeReport(
-        private val recorded: List<RecordedChange>
-    ) : TransactionSynchronization {
-
-        override fun afterCompletion(status: Int) {
-            if (status != TransactionSynchronization.STATUS_COMMITTED) {
-                logger.debug { "Discarded ${recorded.size} changelog entries: transaction did not commit" }
-                return
-            }
-
-            recorded.groupBy { Triple(it.goldenRecordType, it.stage, it.changelogType) }
-                .forEach { (_, changes) -> logger.info { summarize(changes) } }
-            recorded.forEach {
-                logger.debug { "Created ${it.changelogType} changelog entry for ${it.goldenRecordType} ${it.stage} ${it.identifier}" }
-            }
+        logger.debug {
+            "Created ${entry.changelogType} changelog entry for ${entry.goldenRecordType} ${entry.stage} '${entry.externalId}'"
         }
     }
 }

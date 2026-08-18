@@ -80,7 +80,7 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 
 ## 2.2 DEBUG
 
-- Everything that is not INFO, WARN or ERROR is DEBUG. There is no volume budget; DEBUG is off in production.
+- Everything that is not INFO, WARN or ERROR MUST be DEBUG. There is no volume budget; DEBUG is off in production.
 - A DEBUG statement MUST use the lazy lambda form `logger.debug { … }` so a disabled level costs nothing. Where the logger is not `KLogger` — the inherited `logger` in a Spring filter, for instance — the call MUST be guarded with `isDebugEnabled`.
 - Full business partner payloads MUST NOT be logged. Company data is largely not personal, but sole-proprietor names and addresses are, and DEBUG lands in the same sink.
 - Recurring machinery — every scheduler tick, every poll, every health check, every request — MUST be DEBUG regardless of how useful it looks.
@@ -95,24 +95,26 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 ## 2.4 Where a line lives
 
 - A persisted-change line MUST be emitted by the **write authority** for that subject — the operation service that persists it. This is the same single-authority rule as [`application-code-guide.md` §2.4](application-code-guide.md#24-operation-layer), read as a logging rule.
-- Where the write authority persists one entry at a time and its caller drives the batch — the Orchestrator's task state machine and the services that call it — the batch line MUST be emitted by that caller instead. It is the closest place to the write that can still satisfy the one-line-per-batch rule of [2.1](#21-info); the write authority reports the entry at DEBUG.
+- Where the write authority persists one entry at a time and its caller drives the batch, that caller MUST emit the batch line and the write authority MUST report its entry at DEBUG. The Orchestrator's task state machine and its callers are the reference.
 - Application services MUST NOT log at INFO. They are per API version, so a line there is duplicated across v6 and v7, and they are bypassed entirely by the golden record task path — a line there would miss most production writes.
 - Parsers MUST NOT log at INFO. They decide; they never persist.
-- A subject whose write emits a changelog entry SHOULD rely on its service's `ChangelogCreateService` for its INFO line rather than adding its own — Pool's for business partners, Gate's for business partner and relation stages. A subject with no changelog — Pool relations, metadata, tasks — MUST log its own.
-- Logging MUST NOT be routed through `ChangelogCreateService.record(...)` by subjects that do not belong in the changelog. The changelog is a domain artifact with its own emission policy; coupling observability to it makes a business decision silently change the logs.
+- Every subject MUST log its own persisted-change line, whether or not that write also emits a changelog entry. Business partners, relations, metadata and tasks then all read the same way.
+- A changelog write MUST NOT stand in for that line, and `ChangelogCreateService` MUST report the entries it writes at DEBUG only. The changelog dedupes per subject and covers only some of them, so reporting through it would let a business decision change the logs.
+- A line MUST name its subject by the identifier its readers search on — the BPN for a business partner, the external ID for a Gate record, the task ID for a task — and MUST name all of them where a subject carries several.
 
 ## 2.5 Schedules
 
 - Every schedule MUST log its activation once at startup, at INFO, naming the schedule and its cron — or stating that it is disabled. This is the configuration case of [2.1](#21-info) and it is what replaces per-tick narration.
 - A scheduled run MUST log at INFO only when it changed something, and MUST report what it changed. Every other part of the run is DEBUG.
 - Where a service schedules through one central helper, the activation line SHOULD live in that helper rather than being repeated per schedule. `GoldenRecordTaskConfiguration.scheduleIfEnabled` in Gate is the reference.
+- A schedule MUST be registered against the injected `TaskScheduler` or with `@Scheduled`, never on a scheduler of its own. Both resolve `RequestIdTaskScheduler`, which is what gives each execution its `request` id.
 
 ## 2.6 Mechanics
 
 - Message text MUST distinguish schedules and subjects that would otherwise be indistinguishable at INFO. Two schedulers logging `Total of 0 processed` are two lines nobody can act on.
 - Message text MUST NOT be assembled from lazily-loaded entity state outside an open persistence context.
 - A log line MUST NOT be relied on as a test assertion target unless the test commits — lines emitted on transaction commit never fire in `@Transactional` rollback-style tests.
-- Log correlation MUST come from the MDC (`%X{user}`, `%X{request}`) rather than from repeating identifiers in every message.
+- Log correlation MUST come from the MDC (`%X{user}`, `%X{request}`) rather than from repeating identifiers in every message. API requests and scheduled executions each carry their own `request` id.
 
 ---
 
@@ -120,11 +122,13 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 
 *Accepted, not oversights. Each is a candidate for a later contribution.*
 
-- **Inline lines can lie on rollback.** Relation and metadata INFO lines are written inside the transaction, so a rollback leaves a line claiming a change that did not happen. There is always an ERROR alongside it. Business partner lines come from `ChangelogCreateService`, which logs on commit and is therefore exact. Making the rest exact needs a transaction-scoped commit hook; it was deliberately deferred.
-- **Aspects are not reported for business partner writes.** `ChangelogRecord` carries no aspect, so those lines name the subject and change type only.
+- **Inline lines can lie on rollback.** Persisted-change lines are written inside the transaction, so a rollback leaves a line claiming a change that did not happen; there is always an ERROR alongside it. Making them exact needs a transaction-scoped commit hook; it was deliberately deferred.
+- **Aspects are not reported for business partner writes.** The write services hold the `FieldUpdate` masks but report subject and change type only, so the aspect rule in [2.1](#21-info) is unmet there.
+- **A request id stops at the service boundary.** `RequestLoggingFilter` ignores any inbound header and the BPDM clients send none, so one golden record flow appears under a different id in each service.
+- **Derived sharing member counts are DEBUG.** `SharingMemberConfidenceService` recalculates one address and its legal entity per call, so an INFO line there would be one per entry; the scheduled sync reports the records it changed instead.
 - **Not every write reports a count.** `GoldenRecordConsistencyService` and the Pool trigger batch plumbing return no number of changes, so their runs stay silent at DEBUG rather than reporting an outcome.
-- **The Orchestrator's v6 task lines are duplicated.** `GoldenRecordTaskLegacyServiceMapper` re-implements task creation and step success instead of delegating to the state machine, so those two lines exist twice. They stay in step only by review until that duplication is removed.
-- **A batch line names at most twenty subjects.** `joinIdentifiersForLog` counts the remainder rather than listing it, so a large upload names a sample of its external IDs, not all of them. Pool and Gate report every changelog entry at DEBUG; the Orchestrator's task lines have no per-task counterpart.
+- **The Orchestrator's v6 task lines are duplicated.** `GoldenRecordTaskLegacyServiceMapper` re-implements task creation and step success instead of delegating to the state machine, so those two lines exist twice.
+- **A batch line names at most twenty subjects.** `joinIdentifiersForLog` counts the remainder rather than listing it, so a large batch names a sample of its identifiers; only subjects with a changelog recover the rest at DEBUG.
 
 ---
 

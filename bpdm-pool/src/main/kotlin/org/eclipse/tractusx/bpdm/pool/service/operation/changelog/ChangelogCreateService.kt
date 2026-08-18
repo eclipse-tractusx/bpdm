@@ -104,7 +104,7 @@ class ChangelogCreateService(
                 return
             }
 
-            logger.info { "Created ${writtenPlan.emitted.size} changelog entries of '$origin': ${summarize(writtenPlan.emitted)}" }
+            logger.debug { "Created ${writtenPlan.emitted.size} changelog entries of '$origin': ${summarize(writtenPlan.emitted)}" }
             writtenPlan.emitted.forEach {
                 logger.debug { "Created ${it.changelogType} changelog entry for ${it.businessPartnerType} ${it.bpn}" }
             }

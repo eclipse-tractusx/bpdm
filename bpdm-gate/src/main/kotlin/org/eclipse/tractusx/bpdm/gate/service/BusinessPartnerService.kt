@@ -23,6 +23,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -78,7 +80,7 @@ class BusinessPartnerService(
         val existingInputs = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
         val existingInputsByExternalId = existingInputs.associateBy { it.sharingState.externalId }
 
-        val updatedEntities = requests.mapNotNull { request ->
+        val upsertResults = requests.mapNotNull { request ->
             val sharingState = sharingStatesByExternalId[request.externalId]!!
             val updatedData = businessPartnerMappings.toBusinessPartnerInput(request, sharingState)
             val existingInput = existingInputsByExternalId[request.externalId]
@@ -87,10 +89,11 @@ class BusinessPartnerService(
             upsertFromEntity(existingInput, updatedData)
                 .takeIf {  it.shouldUpdate && (it.hadChanges || sharingState.sharingStateType == SharingStateType.Error) }
                 ?.also { sharingStateService.setInitial(sharingState) }
-                ?.businessPartner
         }
 
-        return updatedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)
+        reportWrites(upsertResults, StageType.Input)
+
+        return upsertResults.map { businessPartnerMappings.toBusinessPartnerInputDto(it.businessPartner) }
     }
 
     @Transactional
@@ -106,6 +109,8 @@ class BusinessPartnerService(
 
             upsertFromEntity(existingOutput, updatedData)
         }
+
+        reportWrites(updatedEntities, StageType.Output)
 
         return updatedEntities
     }
@@ -150,8 +155,7 @@ class BusinessPartnerService(
 
         if (hasChanges && shouldUpdate) {
                 changelogCreateService.record(
-                    ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner),
-                    identifier = upsertData.toLogIdentifier()
+                    ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner)
                 )
 
                 copyUtil.copyValues(upsertData, partnerToUpsert)
@@ -159,6 +163,30 @@ class BusinessPartnerService(
         }
 
         return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)
+    }
+
+    /**
+     * Reports the business partners the given results actually wrote, as one line per change type.
+     */
+    fun reportWrites(results: List<UpsertResult>, stage: StageType) {
+        val stageName = when (stage) {
+            StageType.Input -> "business partner input"
+            StageType.Output -> "business partner output"
+        }
+
+        results.filter { it.hadChanges && it.shouldUpdate }
+            .groupBy { it.type }
+            .forEach { (changeType, written) ->
+                val verb = when (changeType) {
+                    ChangelogType.CREATE -> "Created"
+                    ChangelogType.UPDATE -> "Updated"
+                }
+
+                logger.info {
+                    "$verb ${countForLog(written.size, stageName, "${stageName}s")}: " +
+                            written.map { it.businessPartner.toLogIdentifier() }.joinIdentifiersForLog()
+                }
+            }
     }
 
     private fun BusinessPartnerDb.toLogIdentifier(): String {

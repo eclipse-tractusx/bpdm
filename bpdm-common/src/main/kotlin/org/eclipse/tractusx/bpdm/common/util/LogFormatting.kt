@@ -31,6 +31,13 @@ fun Collection<String>.joinIdentifiersForLog(): String =
         take(MAX_LISTED_IDENTIFIERS).joinToString(", ", postfix = " and ${size - MAX_LISTED_IDENTIFIERS} more")
 
 /**
+ * Counts the given subjects for a log message, using the singular noun for a single subject and the plural for any other
+ * number.
+ */
+fun countForLog(count: Int, singular: String, plural: String): String =
+    "$count ${if (count == 1) singular else plural}"
+
+/**
  * Names the given identifiers in parentheses behind a count, contributing nothing where there are none.
  */
 fun Collection<String>.parenthesizeIdentifiersForLog(): String =

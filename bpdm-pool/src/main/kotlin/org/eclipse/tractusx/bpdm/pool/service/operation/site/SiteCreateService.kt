@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
@@ -27,8 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -45,6 +48,8 @@ class SiteCreateService(
     private val changelogCreateService: ChangelogCreateService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Creates the given sites together with their main addresses and returns the persisted entities.
      */
@@ -59,6 +64,9 @@ class SiteCreateService(
 
         siteRepository.saveAll(sites)
         changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
+
+        if (sites.isNotEmpty())
+            logger.info { "Created ${countForLog(sites.size, "site", "sites")}: ${sites.map { it.bpn }.joinIdentifiersForLog()}" }
 
         addressCreateService.commit(stagedAddresses)
 
