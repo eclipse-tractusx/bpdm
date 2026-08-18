@@ -24,8 +24,8 @@ type: application
 description: |
   Deploys the full BPDM application stack as a single release and configures it end to
   end, showcasing how a golden record process is realized for a single sharing member.
-version: 7.1.0-SNAPSHOT
-appVersion: "7.5.0-SNAPSHOT"
+version: 7.1.0-rc1
+appVersion: "7.5.0-rc1"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
   - https://github.com/eclipse-tractusx/bpdm
@@ -34,19 +34,19 @@ maintainers:
 
 dependencies:
   - name: bpdm-gate
-    version: 8.1.0-SNAPSHOT
+    version: 8.1.0-rc1
     alias: bpdm-gate
     condition: bpdm-gate.enabled
   - name: bpdm-pool
-    version: 9.1.0-SNAPSHOT
+    version: 9.1.0-rc1
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-cleaning-service-dummy
-    version: 5.1.0-SNAPSHOT
+    version: 5.1.0-rc1
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
   - name: bpdm-orchestrator
-    version: 5.1.0-SNAPSHOT
+    version: 5.1.0-rc1
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
