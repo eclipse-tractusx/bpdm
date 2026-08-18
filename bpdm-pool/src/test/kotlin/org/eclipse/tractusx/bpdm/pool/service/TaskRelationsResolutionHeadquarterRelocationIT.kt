@@ -119,6 +119,36 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     }
 
     /**
+     * GIVEN a legal entity and a site whose main address is its own
+     * WHEN the site main address replaces the legal address effective immediately
+     * THEN user sees the site main address as new legal address, now serving both roles
+     */
+    @Test
+    fun `legal address replaced by site main address changes headquarter`(){
+        //GIVEN
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+
+        val siteRequest = requestFactory.buildSiteCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl)
+        val createdSite = poolApiClient.sites.createSite(listOf(siteRequest)).entities.single()
+
+        //WHEN
+        val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
+        val replacedByRelation = BusinessPartnerRelations(
+            RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdSite.mainAddress.bpna, activeNow, anyReasonCode()
+        )
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        val results = taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+
+        //THEN
+        assertThat(results.single().errors).isEmpty()
+
+        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
+        assertThat(actualLegalEntity.legalAddress.bpna).isEqualTo(createdSite.mainAddress.bpna)
+        assertThat(actualLegalEntity.legalAddress.addressType).isEqualTo(AddressType.LegalAndSiteMainAddress)
+    }
+
+    /**
      * GIVEN a legal entity and an additional address
      * WHEN additional address replaces legal address effective some point in the future
      * THEN user sees legal address of legal entity did not change

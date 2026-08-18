@@ -41,6 +41,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
   A succession carries no further consequences: nothing is inherited from the predecessor, no addresses or site memberships move, and its state is unchanged.
   A Gate relation of this type is shared as a site relation only when both business partners are refined to a site whose main address is its own; where a site shares its legal entity's address, `IsReplacedBy` continues to mean that the two legal entities succeed each other, so such a site cannot be replaced.
   Because a site name is unique within its legal entity, a site and its successor always carry different names [#1676](https://github.com/eclipse-tractusx/bpdm/issues/1676)
+- BPDM Pool and Gate: `IsReplacedBy` between two addresses (BPNA to BPNA) is now valid in every constellation, not only where a legal entity relocates its headquarters from its legal address to one of its additional addresses [#1787](https://github.com/eclipse-tractusx/bpdm/issues/1787)
 
 ### Changed
 

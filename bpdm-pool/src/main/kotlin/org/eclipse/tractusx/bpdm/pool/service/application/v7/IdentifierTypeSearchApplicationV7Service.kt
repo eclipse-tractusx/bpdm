@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.IdentifierTypeRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeResponseMapper
-import org.eclipse.tractusx.bpdm.pool.service.operation.IdentifierTypeSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.IdentifierTypeSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.IdentifierTypeSearchService
+import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.IdentifierTypeSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

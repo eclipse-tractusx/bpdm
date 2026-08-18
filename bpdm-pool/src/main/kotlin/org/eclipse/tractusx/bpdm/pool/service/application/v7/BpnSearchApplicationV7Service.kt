@@ -26,10 +26,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.BpnSearchRequestMapp
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.BpnSearchResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.BpnSearchParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.BpnIdentifierSearchService
-import org.eclipse.tractusx.bpdm.pool.service.operation.BpnRequestIdentifierSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.BpnIdentifierSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.BpnRequestIdentifierSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIdentifierSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnRequestIdentifierSearchService
+import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnIdentifierSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnRequestIdentifierSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest as BpnRequestIdentifierSearchRequestDto

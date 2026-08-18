@@ -32,8 +32,8 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
-import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerResolutionService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
@@ -1488,9 +1488,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isFalse()
-        assertThat(persistedEntity!!.ultimateOwnerBpnl).isNull()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
 
-        persistedEntity!!.ultimateOwnerBpnl = targetBpnl
+        persistedEntity.ultimateOwnerBpnl = targetBpnl
         legalEntityRepository.save(persistedEntity)
 
         val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)

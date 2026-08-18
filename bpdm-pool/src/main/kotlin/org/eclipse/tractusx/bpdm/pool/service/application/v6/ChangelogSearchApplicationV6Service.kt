@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.ChangelogSearchReque
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.ChangelogResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.ChangelogParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.ChangelogSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.ChangelogSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

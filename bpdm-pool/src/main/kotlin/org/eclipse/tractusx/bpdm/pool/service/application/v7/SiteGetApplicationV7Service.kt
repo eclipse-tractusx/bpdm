@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteGetRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteGetService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteGetParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteGetService
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

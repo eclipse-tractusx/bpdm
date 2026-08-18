@@ -32,10 +32,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithLegalAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

@@ -29,9 +29,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteSearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntitySiteSearchParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteSearchService
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntitySiteSearchParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest as SiteSearchRequestDto

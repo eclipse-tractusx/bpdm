@@ -30,8 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErr
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressGetRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressGetService
-import org.eclipse.tractusx.bpdm.pool.service.parser.AddressGetParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressGetService
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

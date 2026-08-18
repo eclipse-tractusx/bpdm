@@ -308,14 +308,6 @@ class GoldenRecordRelationsInOutputStepDefs(
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private fun addressBpnOf(addressId: String): String =
-        context.addressBpnByLabel[addressId]
-            ?: error("address '$addressId' must be named by an earlier refinement step")
-
-    private fun bpnlOf(legalEntityId: String): String =
-        context.legalEntities[legalEntityId]?.header?.bpnl
-            ?: error("legal entity '$legalEntityId' must be defined by an earlier refinement step")
-
     private fun goldenRecordOutputOf(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
         val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
@@ -334,18 +326,16 @@ class GoldenRecordRelationsInOutputStepDefs(
         targetOutput: BusinessPartnerOutputDto
     ): Pair<String, String> {
         val outputs = listOf(sourceOutput, targetOutput)
+        val bothLegalEntities = outputs.all { it.address.addressType in LEGAL_ADDRESS_TYPES }
         val bothSiteMain = outputs.all { it.address.addressType == AddressType.SiteMainAddress }
-        val anyAdditional = outputs.any { it.address.addressType == AddressType.AdditionalAddress }
 
         return when {
-            relationType !in ADDRESS_CAPABLE_RELATION_TYPES ->
+            relationType !in ADDRESS_CAPABLE_RELATION_TYPES || bothLegalEntities ->
                 sourceOutput.legalEntity.legalEntityBpn to targetOutput.legalEntity.legalEntityBpn
             bothSiteMain ->
                 siteBpnOf(sourceOutput) to siteBpnOf(targetOutput)
-            anyAdditional ->
-                sourceOutput.address.addressBpn to targetOutput.address.addressBpn
             else ->
-                sourceOutput.legalEntity.legalEntityBpn to targetOutput.legalEntity.legalEntityBpn
+                sourceOutput.address.addressBpn to targetOutput.address.addressBpn
         }
     }
 

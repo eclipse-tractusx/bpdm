@@ -40,8 +40,24 @@ import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.*
-import org.eclipse.tractusx.bpdm.pool.service.parser.*
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteAssignmentParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnAddressParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithReferencedAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
