@@ -112,7 +112,10 @@ class ScriptVariantStepDefs(
     fun `given reflects legal entity with script code`(recordId: String, legalEntityId: String, scriptCode: String) {
         logger.info { "[$scenarioName] Given: record '$recordId' reflects legal entity '$legalEntityId' with script code '$scriptCode'" }
         share(recordId)
-        `when refines to legal entity with script code`(recordId, legalEntityId, scriptCode)
+        val legalEntity = shareActions.refineAsLegalEntity(
+            recordId, masterDataSeed = legalEntityId, legalEntityLabel = legalEntityId, verified = false, scriptCode = scriptCode
+        )
+        context.legalEntities[legalEntityId] = legalEntity
     }
 
     // -------------------------------------------------------------------------
@@ -152,13 +155,6 @@ class ScriptVariantStepDefs(
     fun `when refines to additional address of site`(recordId: String, addressId: String, siteId: String, legalEntityId: String, scriptVariantSeed: String) {
         logger.info { "[$scenarioName] When: refines '$recordId' to additional address '$addressId' of site '$siteId' of legal entity '$legalEntityId' with script variant '$scriptVariantSeed'" }
         shareActions.refineAsAdditionalAddressOfSite(recordId, masterDataSeed = scriptVariantSeed, additionalAddressLabel = addressId, siteLabel = siteId, legalEntityLabel = legalEntityId)
-    }
-
-    @When("the golden record process refines record {string} to legal entity {string} with script code {string}")
-    fun `when refines to legal entity with script code`(recordId: String, legalEntityId: String, scriptCode: String) {
-        logger.info { "[$scenarioName] When: refines '$recordId' to legal entity '$legalEntityId' with script code '$scriptCode'" }
-        val legalEntity = shareActions.refineAsLegalEntity(recordId, masterDataSeed = legalEntityId, legalEntityLabel = legalEntityId, verified = false, scriptCode = scriptCode)
-        context.legalEntities[legalEntityId] = legalEntity
     }
 
     @When("the golden record process refines record {string} to additional address {string} with script code {string} of existing legal entity {string}")
