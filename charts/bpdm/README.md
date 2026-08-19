@@ -1,6 +1,6 @@
 # bpdm
 
-![Version: 7.1.0-SNAPSHOT](https://img.shields.io/badge/Version-7.1.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.5.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.5.0--SNAPSHOT-informational?style=flat-square)
+![Version: 7.1.0-rc1](https://img.shields.io/badge/Version-7.1.0--rc1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.5.0-rc1](https://img.shields.io/badge/AppVersion-7.5.0--rc1-informational?style=flat-square)
 
 Deploys the full BPDM application stack as a single release and configures it end to
 end, showcasing how a golden record process is realized for a single sharing member.
@@ -44,11 +44,11 @@ secrets and the `postgres`/`keycloak` toggles for running against external infra
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 5.1.0-SNAPSHOT |
+|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 5.1.0-rc1 |
 |  | bpdm-common | 2.0.0 |
-|  | bpdm-gate(bpdm-gate) | 8.1.0-SNAPSHOT |
-|  | bpdm-orchestrator(bpdm-orchestrator) | 5.1.0-SNAPSHOT |
-|  | bpdm-pool(bpdm-pool) | 9.1.0-SNAPSHOT |
+|  | bpdm-gate(bpdm-gate) | 8.1.0-rc1 |
+|  | bpdm-orchestrator(bpdm-orchestrator) | 5.1.0-rc1 |
+|  | bpdm-pool(bpdm-pool) | 9.1.0-rc1 |
 | oci://registry-1.docker.io/cloudpirates | keycloak | 0.21.10 |
 | oci://registry-1.docker.io/cloudpirates | postgres(postgres) | 0.11.0 |
 
@@ -105,6 +105,7 @@ secrets and the `postgres`/`keycloak` toggles for running against external infra
 | postgres.enabled | bool | `true` |  |
 | postgres.nameOverride | string | `"bpdm-postgres"` |  |
 | tests.enabled | bool | `false` |  |
+| tests.filterTags | string | `""` |  |
 | tests.image.pullPolicy | string | `"IfNotPresent"` |  |
 | tests.image.registry | string | `"docker.io"` |  |
 | tests.image.repository | string | `"tractusx/bpdm-system-tester"` |  |
