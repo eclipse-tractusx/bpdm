@@ -66,11 +66,10 @@ class UltimateOwnerDistributionStepDefs(
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
         // Get the input data from context and update it with ultimate owner flag
-        val inputData = context.inputData[entityId] ?: error("Input data for '$entityId' not found in scenario context")
+        val inputData = context.inputData[entityId]!!
         
         // Create updated input with ultimate owner flag
         val updatedLegalEntity = inputData.legalEntity.copy(ownershipUltimate = true)
-        
         val updatedInput = inputData.copy(
             externalId = context.runId(entityId),
             legalEntity = updatedLegalEntity
@@ -83,7 +82,7 @@ class UltimateOwnerDistributionStepDefs(
 
     /**
      * Golden record process confirms an entity as the ultimate owner.
-     * This updates the Pool with the ultimate owner flag from the golden record.
+     * This triggers the golden record processing through the orchestrator.
      */
     @And("the golden record process confirms {string} as the ultimate owner")
     fun goldenRecordConfirmsAsUltimateOwner(entityId: String) {
@@ -104,7 +103,7 @@ class UltimateOwnerDistributionStepDefs(
         taskReservationWatcher.waitForReservedTask(taskId)
         
         // Get the task data from context
-        val taskData = context.taskData[entityId] ?: error("No task data found for entity '$entityId'")
+        val taskData = context.taskData[entityId]!!
         
         // Resolve the task to trigger the golden record processing
         orchestratorClient.goldenRecordTasks.resolveStepResults(
