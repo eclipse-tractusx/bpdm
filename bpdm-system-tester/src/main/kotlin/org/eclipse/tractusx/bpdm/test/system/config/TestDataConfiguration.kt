@@ -23,14 +23,11 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
-import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerRelationTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
-import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
 import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
-import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
@@ -80,18 +77,8 @@ class TestDataConfiguration {
     }
 
     @Bean
-    fun gateOutputFactory(gateInputDataFactory: GateInputFactory): GateOutputFactory {
-        return GateOutputFactory(gateInputDataFactory)
-    }
-
-    @Bean
     fun testRunData(): TestRunData {
         return TestRunData(Instant.now())
-    }
-
-    @Bean
-    fun stepUtils(testRunData: TestRunData, gateClient: GateClient): StepUtils{
-        return StepUtils(gateClient)
     }
 
     @Bean
@@ -200,13 +187,6 @@ class TestDataConfiguration {
             refinementTestDataFactory,
             testDataFactoryGateV7
         )
-    }
-
-    @Bean
-    fun businessPartnerRelationTestDataGenerator(
-        testDataFactoryGateV7: TestDataFactoryGateV7
-    ): BusinessPartnerRelationTestDataGenerator {
-        return BusinessPartnerRelationTestDataGenerator(testDataFactoryGateV7)
     }
 
     @Bean

@@ -71,7 +71,7 @@ class BpnIssueService(
     private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): List<String> {
         if (count == 0) return emptyList()
 
-        logger.info { "Issuing $count new BPNs of type $bpnChar" }
+        logger.debug { "Issuing $count new BPNs of type $bpnChar" }
 
         val counterEntry = getOrCreateCounter(bpnCounterKey)
         val startCounter = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)

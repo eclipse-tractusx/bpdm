@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import io.cucumber.java.Scenario
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -44,7 +43,6 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
 
     private val timeSuffix = timeSuffix.truncatedTo(ChronoUnit.SECONDS)
 
-    val siteLegalEntities: MutableMap<String, SiteBasedLegalEntity> = mutableMapOf()
     val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseDto> = mutableMapOf()
     val sites: MutableMap<String, SiteWithParent> = mutableMapOf()
     val additionalSiteAddresses: MutableMap<String, AdditionalSiteAddressWithParent> = mutableMapOf()
@@ -52,11 +50,6 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
     // BPNA of an address remembered under the label a scenario refers to it by, so an assertion can name a
     // specific address (e.g. the relocation source/target) independent of how the record was refined.
     val addressBpnByLabel: MutableMap<String, String> = mutableMapOf()
-    val taskData: MutableMap<String, BusinessPartner> = mutableMapOf()
-    val inputData: MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
-    val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
-    val relationInputData: MutableMap<String, RelationPutEntry> = mutableMapOf()
-    val relationOutputData: MutableMap<String, RelationOutputContext> = mutableMapOf()
     val records: MutableMap<String, RecordState> = mutableMapOf()
     val relations: MutableMap<String, RelationState> = mutableMapOf()
 
@@ -82,12 +75,6 @@ data class AdditionalSiteAddressWithParent(
 data class AdditionalLegalEntityAddressWithParent(
     val legalEntity: LegalEntityWithLegalAddressVerboseDto,
     val address: LogisticAddressVerboseDto
-)
-
-data class RelationOutputContext(
-    val outputDto: RelationOutputDto,
-    val sourceExternalId: String,
-    val targetExternalId: String
 )
 
 data class RecordState(

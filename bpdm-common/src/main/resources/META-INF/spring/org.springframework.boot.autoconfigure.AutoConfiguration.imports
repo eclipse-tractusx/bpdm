@@ -1,1 +1,2 @@
 org.eclipse.tractusx.bpdm.common.config.BpdmCommonAutoConfiguration
+org.eclipse.tractusx.bpdm.common.config.SchedulerLoggingAutoConfiguration

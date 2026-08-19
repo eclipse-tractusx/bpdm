@@ -56,7 +56,7 @@ class CleaningServiceDummy(
 
     private fun processPollingTasks(step: TaskStep) {
         try {
-            logger.info { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
+            logger.debug { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
 
             do{
                 val cleaningRequest = orchestrationApiClient.goldenRecordTasks
@@ -64,7 +64,7 @@ class CleaningServiceDummy(
 
                 val cleaningTasks = cleaningRequest.reservedTasks
 
-                logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
+                logger.debug { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
                 if (cleaningTasks.isNotEmpty()) {
                     val cleaningResults = cleaningTasks.map { reservedTask ->
@@ -72,7 +72,7 @@ class CleaningServiceDummy(
                     }
 
                     orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
-                    logger.info { "Cleaning tasks processing completed for this iteration." }
+                    logger.debug { "Cleaning tasks processing completed for this iteration." }
                 }
             }while (cleaningRequest.reservedTasks.isNotEmpty())
         } catch (e: Exception) {

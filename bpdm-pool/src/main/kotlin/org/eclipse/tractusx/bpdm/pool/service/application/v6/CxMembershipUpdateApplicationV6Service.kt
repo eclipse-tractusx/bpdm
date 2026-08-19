@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
@@ -40,16 +39,12 @@ class CxMembershipUpdateApplicationV6Service(
     private val dataSpaceParticipantParseErrorMapper: DataSpaceParticipantParseErrorMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Sets the Catena-X membership of every legal entity the request names, and changes none of them when a single entry
      * cannot be applied.
      */
     @Transactional
     fun updateMemberships(updateRequest: CxMembershipUpdateRequestV6) {
-        logger.info { "Update membership of ${updateRequest.memberships.size} legal entities" }
-
         parseAndExecuteAllOrNone(
             cxMembershipRequestMapperV6.toUpdateRequests(updateRequest),
             dataSpaceParticipantUpdateParser::parse,

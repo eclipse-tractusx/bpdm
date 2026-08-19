@@ -263,17 +263,6 @@ class GoldenRecordRelationsInOutputStepDefs(
         assertHelper.assertLegalEntityRelationReflected(recordId, context.relations[relationId]!!)
     }
 
-    @Then("{string} output reflects the legal entity golden record relation {string} through its parent legal entity {string}")
-    fun `then output reflects parent legal entity relation`(recordId: String, relationId: String, parentLegalEntityId: String) {
-        logger.info {
-            "[$scenarioName] Then: '$recordId' output reflects the legal entity golden record relation '$relationId' " +
-                "through its parent legal entity '$parentLegalEntityId'"
-        }
-        val parentBpnl = context.legalEntities[parentLegalEntityId]?.header?.bpnl
-            ?: error("legal entity '$parentLegalEntityId' must be defined by an earlier golden record refinement step")
-        assertHelper.assertLegalEntityRelationReflected(recordId, context.relations[relationId]!!, expectedParentBpnl = parentBpnl)
-    }
-
     @Then("{string} output reflects the site golden record relation {string}")
     fun `then output reflects site relation`(recordId: String, relationId: String) {
         logger.info { "[$scenarioName] Then: '$recordId' output reflects the site golden record relation '$relationId'" }

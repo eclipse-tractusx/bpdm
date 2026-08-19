@@ -17,28 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.util
-import io.swagger.v3.oas.models.OpenAPI
-import mu.KotlinLogging
-import org.springdoc.core.customizers.OpenApiCustomizer
+package org.eclipse.tractusx.bpdm.gate.service
 
-class OpenApiExampleCustomizer(
-    private val examples: List<OpenApiSchemaExample>
-) : OpenApiCustomizer {
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 
-    private val logger = KotlinLogging.logger { }
+data class CreatedGoldenRecordTask(
+    val externalId: String,
+    val taskId: String
+)
 
-
-    override fun customise(openApi: OpenAPI) {
-        logger.debug { "Examples size: ${examples.size}" }
-        examples.forEach { schemaExample ->
-            val schema = openApi.components?.schemas?.get(schemaExample.schemaName)
-            if (schema != null) {
-                schema.example = schemaExample.example
-                logger.debug { "Example attached to schema: ${schemaExample.schemaName}" }
-            } else {
-                logger.warn { "Schema not found: ${schemaExample.schemaName}" }
-            }
-        }
-    }
-}
+internal fun Collection<CreatedGoldenRecordTask>.toLogIdentifiers() =
+    map { "${it.externalId} (${it.taskId})" }.joinIdentifiersForLog()

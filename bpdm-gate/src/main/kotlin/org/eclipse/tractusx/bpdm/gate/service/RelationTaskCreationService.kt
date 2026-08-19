@@ -52,14 +52,17 @@ class RelationTaskCreationService(
     private val logger = KotlinLogging.logger { }
 
     fun sendTasks(): Int{
-        logger.info { "Started scheduled task to create golden record tasks from business partner relations" }
+        logger.debug { "Started scheduled task to create golden record tasks from business partner relations" }
 
         stageRelations()
-        val totalSentCount = sendStagedRelations()
+        val sentTasks = sendStagedRelations()
 
-        logger.debug { "Total created $totalSentCount new golden record tasks from business partner relations" }
+        if (sentTasks.isNotEmpty())
+            logger.info { "Created ${sentTasks.size} new golden record tasks from business partner relations: ${sentTasks.toLogIdentifiers()}" }
+        else
+            logger.debug { "No business partner relations to create golden record tasks from" }
 
-        return totalSentCount
+        return sentTasks.size
     }
 
     private fun stageRelations(){
@@ -71,16 +74,16 @@ class RelationTaskCreationService(
         }while (stagedCount > 0)
     }
 
-    private fun sendStagedRelations(): Int{
-        var totalSentCount = 0
-        var sentCount = 0
+    private fun sendStagedRelations(): List<CreatedGoldenRecordTask>{
+        val totalSentTasks = mutableListOf<CreatedGoldenRecordTask>()
+        var sentTasks: List<CreatedGoldenRecordTask>
         do{
-            sentCount = transactionTemplate.execute { sendTaskBatch(taskConfigProperties.relationCreation.batchSize) } ?: 0
-            totalSentCount += sentCount
+            sentTasks = transactionTemplate.execute { sendTaskBatch(taskConfigProperties.relationCreation.batchSize) } ?: emptyList()
+            totalSentTasks.addAll(sentTasks)
             entityManager.clear()
-        }while (sentCount > 0)
+        }while (sentTasks.isNotEmpty())
 
-        return totalSentCount
+        return totalSentTasks
     }
 
     fun stageRelationsForSending(batchSize: Int): Int{
@@ -89,10 +92,10 @@ class RelationTaskCreationService(
         return toStagePage.content.size
     }
 
-    fun sendTaskBatch(batchSize: Int): Int{
+    fun sendTaskBatch(batchSize: Int): List<CreatedGoldenRecordTask>{
         val toSendPage = relationRepository.findBySharingStateAndStaged(RelationSharingStateType.Ready, true, PageRequest.ofSize(batchSize))
         val toSendRelations = toSendPage.content
-        if (toSendRelations.isEmpty()) return 0
+        if (toSendRelations.isEmpty()) return emptyList()
 
         val toSendStages = relationStageRepository.findByRelationInAndStage(toSendRelations.toSet(), StageType.Input)
         val stagesByRelation = toSendStages.associateBy { it.relation.id }
@@ -169,15 +172,15 @@ class RelationTaskCreationService(
 
         val createdTasks = taskCreateRequests.letNonNull { sendTasks(it) }
 
-        toSendRelations.zip(createdTasks){ relation, createdTask ->
+        return toSendRelations.zip(createdTasks){ relation, createdTask ->
             if (createdTask != null){
                 relationSharingStateService.setPending(relation, createdTask.taskId, createdTask.recordId)
+                CreatedGoldenRecordTask(relation.externalId, createdTask.taskId)
             }else{
                 unstage(relation)
+                null
             }
-        }
-
-        return createdTasks.filterNotNull().size
+        }.filterNotNull()
     }
 
     private fun determineTaskKind(

@@ -51,7 +51,7 @@ class ScriptVariantCoverageService(
 
         legalEntity.scriptVariants.removeAll(uncovered)
         legalEntityRepository.save(legalEntity)
-        logger.info {
+        logger.debug {
             "Removed script variants of legal entity '${legalEntity.bpn}' that its legal address does not cover: " +
                     uncovered.joinToString(", ") { it.scriptCode.technicalKey }
         }

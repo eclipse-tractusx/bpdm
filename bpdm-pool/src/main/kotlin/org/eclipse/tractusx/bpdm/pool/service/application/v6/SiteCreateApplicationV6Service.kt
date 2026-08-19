@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
@@ -54,16 +53,12 @@ class SiteCreateApplicationV6Service(
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Creates the requested sites, each with a main address of its own, and returns, per request, either the created
      * site or the errors that stopped it.
      */
     @Transactional
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequestV6>): SitePartnerCreateResponseWrapperV6 {
-        logger.info { "Create ${requests.size} new sites" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map { siteDtoRequestMapperV6.toCreateRequest(it) }
 
@@ -88,8 +83,6 @@ class SiteCreateApplicationV6Service(
      */
     @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMainV6>): SitePartnerCreateResponseWrapperV6 {
-        logger.info { "Create ${requests.size} new sites with legal address as site main address" }
-
         val requestList = requests.toList()
         val legalEntitiesByBpn = legalEntityRepository.findDistinctByBpnIn(requestList.map { it.bpnLParent }).associateBy { it.bpn }
 

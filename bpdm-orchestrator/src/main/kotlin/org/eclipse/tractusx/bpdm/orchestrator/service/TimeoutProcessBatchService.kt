@@ -19,17 +19,31 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
+import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
 class TimeoutProcessBatchService(
     private val goldenRecordTaskService: GoldenRecordTaskService,
+    private val taskConfigProperties: TaskConfigProperties,
     private val entityManager: EntityManager
 ) {
     private val logger = KotlinLogging.logger { }
+
+    /**
+     * Reports whether task timeout processing runs on a schedule in this deployment.
+     */
+    @PostConstruct
+    fun logScheduleActivation() {
+        if (taskConfigProperties.timeoutCheckCron == CRON_DISABLED)
+            logger.info { "Task timeout processing schedule is disabled" }
+        else
+            logger.info { "Task timeout processing scheduled with cron '${taskConfigProperties.timeoutCheckCron}'" }
+    }
 
     @Scheduled(cron = "\${bpdm.task.timeoutCheckCron}")
     fun processForTimeouts() {
@@ -41,7 +55,7 @@ class TimeoutProcessBatchService(
             totalProcessedTasks += processTimeouts(goldenRecordTaskService::processPendingTimeouts)
             // Process retention timeouts
             totalProcessedTasks += processTimeouts(goldenRecordTaskService::processRetentionTimeouts)
-            logger.info { "Finished processing timeouts. Total processed tasks: $totalProcessedTasks" }
+            logger.debug { "Finished processing timeouts. Total processed tasks: $totalProcessedTasks" }
         } catch (err: RuntimeException) {
             logger.error(err) { "Error checking for timeouts" }
         }
@@ -57,5 +71,9 @@ class TimeoutProcessBatchService(
             entityManager.clear() // Clear the persistence context to free memory
         } while (paginationInfo.hasNextPage)
         return processedTasks
+    }
+
+    companion object {
+        private const val CRON_DISABLED = "-"
     }
 }

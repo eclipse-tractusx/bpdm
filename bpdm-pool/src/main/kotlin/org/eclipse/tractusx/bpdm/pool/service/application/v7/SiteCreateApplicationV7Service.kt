@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
@@ -52,16 +51,12 @@ class SiteCreateApplicationV7Service(
     private val siteResponseMapper: SiteResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Creates the requested sites, each with a main address of its own, and returns, per request, either the created
      * site or the errors that stopped it.
      */
     @Transactional
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new sites" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map { siteDtoRequestMapper.toCreateRequest(it) }
 
@@ -83,8 +78,6 @@ class SiteCreateApplicationV7Service(
      */
     @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new sites with legal address as site main address" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map { siteDtoRequestMapper.toCreateWithLegalAddressAsMainRequest(it) }
 
