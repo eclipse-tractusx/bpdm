@@ -65,27 +65,20 @@ class UltimateOwnerDistributionStepDefs(
         
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
-        // Get the legal entity from context
-        val legalEntityWithAddress = context.legalEntities[entityId] 
-            ?: error("Legal entity '$entityId' not found in scenario context")
+        // Get the input data from context and update it with ultimate owner flag
+        val inputData = context.inputData[entityId] ?: error("Input data for '$entityId' not found in scenario context")
         
-        // Create the Gate input representation with ultimate owner flag
-        val legalEntityInput = LegalEntityRepresentationInputDto(
-            legalEntityBpn = legalEntityWithAddress.header.bpnl,
-            legalName = legalEntityWithAddress.header.legalName,
-            shortName = legalEntityWithAddress.header.legalShortName,
-            legalForm = legalEntityWithAddress.header.legalFormVerbose?.technicalKey,
-            ownershipUltimate = true,
-            states = emptyList()
+        // Create updated input with ultimate owner flag
+        val updatedLegalEntity = inputData.legalEntity?.copy(ownershipUltimate = true) 
+            ?: error("Legal entity data not found in input data for '$entityId'")
+        
+        val updatedInput = inputData.copy(
+            externalId = context.runId(entityId),
+            legalEntity = updatedLegalEntity
         )
         
         // Upload to Gate via upsertBusinessPartnersInput
-        val inputRequest = context.inputData[entityId]?.copy(
-            externalId = context.runId(entityId),
-            legalEntity = legalEntityInput
-        ) ?: error("Input data for '$entityId' not found in scenario context")
-        
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputRequest))
+        gateClient.businessParters.upsertBusinessPartnersInput(listOf(updatedInput))
         logger.info { "Successfully uploaded '$entityId' as ultimate owner to Gate" }
     }
 
@@ -117,12 +110,12 @@ class UltimateOwnerDistributionStepDefs(
             val legalEntityWithAddress = context.legalEntities[entityId] 
                 ?: error("Legal entity '$entityId' not found in scenario context")
             val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
-            jsonMapper.readValue(verboseJson, BusinessPartner::class.java)
+            jsonMapper.readValue(verboseJson, BusinessPartner::class.java) as BusinessPartner
         }
         
         // Resolve the task to trigger the golden record processing
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData as BusinessPartner)))
         )
         
         logger.info { "Successfully triggered golden record processing for '$entityId'" }
