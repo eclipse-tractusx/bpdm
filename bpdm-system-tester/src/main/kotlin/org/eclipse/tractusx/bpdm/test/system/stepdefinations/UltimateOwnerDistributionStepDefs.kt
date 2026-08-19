@@ -34,6 +34,8 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import tools.jackson.databind.json.JsonMapper
 
 /**
  * Steps for the "Ultimate Owner Distribution" feature.
@@ -46,6 +48,7 @@ class UltimateOwnerDistributionStepDefs(
     private val gateClient: GateClient,
     private val taskReservationWatcher: TaskReservationWatcher,
     private val sharingStateWatcher: SharingStateWatcher,
+    private val jsonMapper: JsonMapper
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -108,8 +111,14 @@ class UltimateOwnerDistributionStepDefs(
         // Wait for the task to be reserved
         taskReservationWatcher.waitForReservedTask(taskId)
         
-        // Get the task data from context
-        val taskData = context.taskData[entityId] ?: error("No task data found for entity '$entityId'")
+        // Get the task data from context, or use the existing entity data if not found
+        val taskData = context.taskData[entityId] ?: run {
+            // If no task data exists, construct it from the existing entity
+            val legalEntityWithAddress = context.legalEntities[entityId] 
+                ?: error("Legal entity '$entityId' not found in scenario context")
+            val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
+            jsonMapper.readValue(verboseJson, BusinessPartner::class.java)
+        }
         
         // Resolve the task to trigger the golden record processing
         orchestratorClient.goldenRecordTasks.resolveStepResults(
