@@ -26,7 +26,6 @@ import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
@@ -34,7 +33,6 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import tools.jackson.databind.json.JsonMapper
 
 /**
@@ -66,7 +64,8 @@ class UltimateOwnerDistributionStepDefs(
         val context = ScenarioContext.current() ?: error("No active scenario context")
         
         // Get the input data from context and update it with ultimate owner flag
-        val inputData = context.inputData[entityId]!!
+        val inputData = context.records[entityId]?.currentInput
+            ?: error("No shared input found for entity '$entityId'")
         
         // Create updated input with ultimate owner flag
         val updatedLegalEntity = inputData.legalEntity.copy(ownershipUltimate = true)
@@ -100,14 +99,11 @@ class UltimateOwnerDistributionStepDefs(
             ?: error("No task ID found for entity '$entityId'")
         
         // Wait for the task to be reserved
-        taskReservationWatcher.waitForReservedTask(taskId)
-        
-        // Get the task data from context
-        val taskData = context.taskData[entityId]!!
+        val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
         
         // Resolve the task to trigger the golden record processing
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, reservedTask.businessPartner)))
         )
         
         logger.info { "Successfully triggered golden record processing for '$entityId'" }
