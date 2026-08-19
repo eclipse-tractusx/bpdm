@@ -1,0 +1,212 @@
+################################################################################
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+postgres:
+  fullnameOverride: &bpdmPostgres "bpdm-hq-relocation-postgres"
+  auth:
+    postgresPassword: <path:bpdm/data/int/bpdm/postgresql#postgres-password>
+    password: <path:bpdm/data/int/bpdm/postgresql#password>
+
+centralidp:
+  enabled: false
+
+bpdm-gate:
+  image:
+    tag: "feat-headquarter-relocation"
+    pullPolicy: Always
+  startupDelaySeconds: 1
+  ingress:
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    enabled: true
+    hosts:
+      - host: business-partners-hq-relocation.int.catena-x.net
+        paths:
+          - path: "/companies/test-company"
+            pathType: Prefix
+    tls:
+      - secretName: tls-secret-bpdm-gate-hq-relocation
+        hosts:
+          - business-partners-hq-relocation.int.catena-x.net
+  livenessProbe:
+    httpGet:
+      path: "/companies/test-company/actuator/health/liveness"
+  readinessProbe:
+    httpGet:
+      path: "/companies/test-company/actuator/health/readiness"
+  startupProbe:
+    httpGet:
+      path: "/companies/test-company/actuator/health/readiness"
+  configMountSecurity:
+    recursiveReadOnly: Disabled
+  applicationConfig:
+    server:
+      servlet:
+        context-path: "/companies/test-company"
+    bpdm:
+      datasource:
+        host: *bpdmPostgres
+      client:
+        pool:
+          base-url: "https://business-partners-hq-relocation.int.catena-x.net/pool"
+          registration:
+            client-id: <path:bpdm/data/int/bpdm/gate/pool-client#client-id>
+        orchestrator:
+          base-url: "https://business-partners-hq-relocation.int.catena-x.net/orchestrator"
+          registration:
+            client-id: <path:bpdm/data/int/bpdm/gate/orchestrator-client#client-id>
+      security:
+        auth-server-url: https://centralidp.int.catena-x.net/auth
+        permissions:
+          uploadInputPartner: write_input_partner
+  applicationSecrets:
+    spring:
+      datasource:
+        password: <path:bpdm/data/int/bpdm/postgresql#password>
+    bpdm:
+      client:
+        pool:
+          registration:
+            client-secret: <path:bpdm/data/int/bpdm/gate/pool-client#client-secret>
+        orchestrator:
+          registration:
+            client-secret: <path:bpdm/data/int/bpdm/gate/orchestrator-client#client-secret>
+
+bpdm-pool:
+  image:
+    tag: "feat-headquarter-relocation"
+    pullPolicy: Always
+  startupDelaySeconds: 1
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    hosts:
+      - host: business-partners-hq-relocation.int.catena-x.net
+        paths:
+          - path: /pool
+            pathType: Prefix
+    tls:
+      - secretName: tls-secret-bpdm-pool-hq-relocation
+        hosts:
+          - business-partners-hq-relocation.int.catena-x.net
+  livenessProbe:
+    httpGet:
+      path: "/pool/actuator/health/liveness"
+  readinessProbe:
+    httpGet:
+      path: "/pool/actuator/health/readiness"
+  startupProbe:
+    httpGet:
+      path: "/pool/actuator/health/readiness"
+  configMountSecurity:
+    recursiveReadOnly: Disabled
+  applicationConfig:
+    server:
+      servlet:
+        context-path: "/pool"
+    bpdm:
+      datasource:
+        host: *bpdmPostgres
+      client:
+        orchestrator:
+          base-url: "https://business-partners-hq-relocation.int.catena-x.net/orchestrator"
+          registration:
+            client-id: <path:bpdm/data/int/bpdm/pool/orchestrator-client#client-id>
+      security:
+        auth-server-url: https://centralidp.int.catena-x.net/auth
+  applicationSecrets:
+    spring:
+      datasource:
+        password: <path:bpdm/data/int/bpdm/postgresql#password>
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: <path:bpdm/data/int/bpdm/pool/orchestrator-client#client-secret>
+
+bpdm-orchestrator:
+  image:
+    tag: "feat-headquarter-relocation"
+    pullPolicy: Always
+  startupDelaySeconds: 1
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    hosts:
+      - host: business-partners-hq-relocation.int.catena-x.net
+        paths:
+          - path: /orchestrator
+            pathType: Prefix
+    tls:
+      - secretName: tls-secret-bpdm-orchestrator-hq-relocation
+        hosts:
+          - business-partners-hq-relocation.int.catena-x.net
+  livenessProbe:
+    httpGet:
+      path: "orchestrator/actuator/health/liveness"
+  readinessProbe:
+    httpGet:
+      path: "orchestrator/actuator/health/readiness"
+  startupProbe:
+    httpGet:
+      path: "orchestrator/actuator/health/readiness"
+  configMountSecurity:
+    recursiveReadOnly: Disabled
+  applicationConfig:
+    server:
+      servlet:
+        context-path: "/orchestrator"
+    bpdm:
+      datasource:
+        host: *bpdmPostgres
+      security:
+        auth-server-url: https://centralidp.int.catena-x.net/auth
+  applicationSecrets:
+    spring:
+      datasource:
+        password: <path:bpdm/data/int/bpdm/postgresql#password>
+
+bpdm-cleaning-service-dummy:
+  image:
+    tag: "feat-headquarter-relocation"
+    pullPolicy: Always
+  startupDelaySeconds: 1
+  configMountSecurity:
+    recursiveReadOnly: Disabled
+  applicationConfig:
+    bpdm:
+      client:
+        orchestrator:
+          base-url: "https://business-partners-hq-relocation.int.catena-x.net/orchestrator"
+          provider:
+            issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+          registration:
+            client-id: <path:bpdm/data/int/bpdm/cleaning-service/orchestrator-client#client-id>
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret:  <path:bpdm/data/int/bpdm/cleaning-service/orchestrator-client#client-secret>

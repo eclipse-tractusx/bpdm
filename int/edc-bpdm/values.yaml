@@ -1,0 +1,120 @@
+################################################################################
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+install:
+  postgresql: true
+  vault: false
+
+participant:
+  id: "BPNL00000003CRHK"
+
+iatp:
+  # Decentralized Identifier
+  id: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
+  trustedIssuers:
+    - "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
+  sts:
+    dim:
+      url: "https://dis-integration-service-prod.eu10.dim.cloud.sap/api/v2.0.0/iatp/catena-x-portal"
+    oauth:
+      token_url: "https://5c9a4f56-0609-49a5-ab86-dd8f93dfd3fa-mak75wiz.authentication.eu10.hana.ondemand.com/oauth/token"
+      client:
+        id: "sb-311d1dba-dccb-465d-b4e0-3616031d4a1f!b514595|ica-production-dim-prod-eu10-004-prod-dis-cloud-approuter!b174292"
+        secret_alias: "wallet-client-secret"
+
+controlplane:
+  env:
+    EDC_IAM_TRUSTED-ISSUER_ISSUER1_ID: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
+  endpoints:
+    # -- data management api, used by internal users, can be added to an ingress and must not be internet facing
+    management:
+      # -- authentication key, must be attached to each 'X-Api-Key' request header
+      authKey: <path:bpdm/data/int/edc-bpdm/api#management-key>
+  bdrs:
+    server:
+      url: "https://bpn-did-resolution-service.int.catena-x.net/api/directory"
+  ## Ingress declaration to expose the network service.
+  ingresses:
+    ## Public / Internet facing Ingress
+    - enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      # -- The hostname to be used to precisely map incoming traffic onto the underlying network service
+      hostname: "bpdm-edc.int.catena-x.net"
+      className: "nginx"
+      # -- EDC endpoints exposed by this ingress resource
+      endpoints:
+        - management
+        - control
+        - protocol
+      # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
+      tls:
+        # -- Enables TLS on the ingress resource
+        enabled: true
+        # -- If present overwrites the default secret name
+        secretName: tls-secret-edc-bpdm-controlplane
+
+dataplane:
+  env:
+    EDC_IAM_TRUSTED-ISSUER_ISSUER1_ID: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
+  endpoints:
+    proxy:
+      authKey: <path:bpdm/data/int/edc-bpdm/api#proxy-key>
+  ## Ingress declaration to expose the network service.
+  ingresses:
+    ## Public / Internet facing Ingress
+    - enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      # -- The hostname to be used to precisely map incoming traffic onto the underlying network service
+      hostname: "bpdm-edc.int.catena-x.net"
+      # -- EDC endpoints exposed by this ingress resource
+      endpoints:
+        - public
+      # -- Defines the [ingress class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)  to use
+      className: "nginx"
+      # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
+      tls:
+        # -- Enables TLS on the ingress resource
+        enabled: true
+        # -- If present overwrites the default secret name
+        secretName: tls-secret-edc-bpdm-dataplane
+  token:
+    signer:
+      privatekey_alias: "token-private-key"
+    verifier:
+      publickey_alias: "token-public-key"
+
+postgresql:
+  jdbcUrl: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/edc"
+  primary:
+    persistence:
+      enabled: true
+  auth:
+    database: "edc"
+    username: "user"
+    password: <path:bpdm/data/int/edc-bpdm/postgres#password>
+
+vault:
+  hashicorp:
+    url: "https://vault.core.catena-x.net"
+    token: <path:bpdm/data/int/edc-bpdm/vault#token>
+    paths:
+      secret: /v1/bpdm
+      folder: "int/edc-bpdm"
