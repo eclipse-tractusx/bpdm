@@ -24,13 +24,16 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
-import tools.jackson.databind.json.JsonMapper
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
+import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 
 /**
  * Steps for the "Ultimate Owner Distribution" feature.
@@ -39,9 +42,10 @@ import tools.jackson.databind.json.JsonMapper
  * ultimateOwnerBpnl is correctly reflected in the output of owned entities.
  */
 class UltimateOwnerDistributionStepDefs(
+    private val orchestratorClient: OrchestrationApiClient,
     private val gateClient: GateClient,
-    private val poolClient: PoolApiClient,
-    private val jsonMapper: JsonMapper
+    private val taskReservationWatcher: TaskReservationWatcher,
+    private val sharingStateWatcher: SharingStateWatcher,
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -91,30 +95,28 @@ class UltimateOwnerDistributionStepDefs(
         logger.info { "Golden record process confirms '$entityId' as the ultimate owner" }
         
         val context = ScenarioContext.current() ?: error("No active scenario context")
+        val recordRunId = context.runId(entityId)
         
-        // Get the legal entity from context
-        val legalEntityWithAddress = context.legalEntities[entityId] 
-            ?: error("Legal entity '$entityId' not found in scenario context")
+        // Wait for the golden record task to be created
+        sharingStateWatcher.waitForTaskId(entityId)
         
-        // Convert verbose DTO to non-verbose DTO using JSON serialization
-        val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
-        val legalEntity = jsonMapper.readValue(verboseJson, LegalEntityDto::class.java)
+        // Get the sharing state to retrieve the task ID
+        val sharingStatesPage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId))
+        val taskId = sharingStatesPage.content.singleOrNull()?.taskId
+            ?: error("No task ID found for entity '$entityId'")
         
-        // Update the legal entity to mark it as ultimate owner
-        val updatedLegalEntity = legalEntity.copy(
-            header = legalEntity.header.copy(
-                ownershipUltimate = true
-            )
+        // Wait for the task to be reserved
+        taskReservationWatcher.waitForReservedTask(taskId)
+        
+        // Get the task data from context
+        val taskData = context.taskData[entityId] ?: error("No task data found for entity '$entityId'")
+        
+        // Resolve the task to trigger the golden record processing
+        orchestratorClient.goldenRecordTasks.resolveStepResults(
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
         )
         
-        // Update the legal entity in the Pool to mark it as ultimate owner
-        val updateRequest = LegalEntityPartnerUpdateRequest(
-            bpnl = legalEntityWithAddress.header.bpnl,
-            legalEntity = updatedLegalEntity
-        )
-        
-        poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
-        logger.info { "Successfully confirmed '$entityId' as ultimate owner in Pool" }
+        logger.info { "Successfully triggered golden record processing for '$entityId'" }
     }
 
     /**
