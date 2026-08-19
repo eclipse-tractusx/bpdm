@@ -69,8 +69,7 @@ class UltimateOwnerDistributionStepDefs(
         val inputData = context.inputData[entityId] ?: error("Input data for '$entityId' not found in scenario context")
         
         // Create updated input with ultimate owner flag
-        val updatedLegalEntity = inputData.legalEntity?.copy(ownershipUltimate = true) 
-            ?: error("Legal entity data not found in input data for '$entityId'")
+        val updatedLegalEntity = inputData.legalEntity.copy(ownershipUltimate = true)
         
         val updatedInput = inputData.copy(
             externalId = context.runId(entityId),
@@ -104,18 +103,12 @@ class UltimateOwnerDistributionStepDefs(
         // Wait for the task to be reserved
         taskReservationWatcher.waitForReservedTask(taskId)
         
-        // Get the task data from context, or use the existing entity data if not found
-        val taskData = context.taskData[entityId] ?: run {
-            // If no task data exists, construct it from the existing entity
-            val legalEntityWithAddress = context.legalEntities[entityId] 
-                ?: error("Legal entity '$entityId' not found in scenario context")
-            val verboseJson = jsonMapper.writeValueAsString(legalEntityWithAddress)
-            jsonMapper.readValue(verboseJson, BusinessPartner::class.java) as BusinessPartner
-        }
+        // Get the task data from context
+        val taskData = context.taskData[entityId] ?: error("No task data found for entity '$entityId'")
         
         // Resolve the task to trigger the golden record processing
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData as BusinessPartner)))
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
         )
         
         logger.info { "Successfully triggered golden record processing for '$entityId'" }
