@@ -247,12 +247,6 @@ Chart from the feature branch with images left at `latest-SNAPSHOT` validates no
 
 These are temporary. When the feature is merged, remove the directory and the ArgoCD app.
 
-## Open Items
-
-- **The live ArgoCD apps still load their values from personal accounts.** The checked-in specs all resolve against this repository, but each running app holds its own copy of the `helm_args` URL from when it was created. Update that URL in ArgoCD, per app.
-- **The test sharing member EDC changes identity on its next synchronization.** `int/edc-test-sharing-member/spec.yaml` now loads its own values file instead of the second member's. The running deployment keeps the wrong participant identity until it is synchronized — do that deliberately, then re-run the [EDC BPDM Consumer collection](../postman) against it.
-- **TruffleHog and KICS do not scan the `environments` branch.** The change adding the triggers is ready on `chore/scan-environments-branch`, held back until 7.5.0 is released. Merge it then.
-
 ---
 
 ## NOTICE
