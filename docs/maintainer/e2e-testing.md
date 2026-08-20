@@ -10,10 +10,23 @@ This guide covers the maintainer's three duties around that: keeping the test de
   * [Jira and Xray](#jira-and-xray)
   * [How Tests Map to Jira](#how-tests-map-to-jira)
   * [1. Upsert the Tests, Then Tag the New Ones](#1-upsert-the-tests-then-tag-the-new-ones)
+    * [Pass 1 — upsert](#pass-1--upsert)
+    * [Pass 2 — assign the new keys back to their scenarios](#pass-2--assign-the-new-keys-back-to-their-scenarios)
+    * [Verify the loop closed](#verify-the-loop-closed)
   * [2. Run the Suite Against INT](#2-run-the-suite-against-int)
+    * [Build the JAR](#build-the-jar)
+    * [Run](#run)
+    * [Testing another deployment](#testing-another-deployment)
+    * [Test data is not cleaned up](#test-data-is-not-cleaned-up)
   * [3. Upload the Test Execution](#3-upload-the-test-execution)
+    * [The release's Test Execution](#the-releases-test-execution)
+    * [Upload](#upload)
+    * [Link the execution in the release check issue](#link-the-execution-in-the-release-check-issue)
+    * [What the execution records in Jira](#what-the-execution-records-in-jira)
+    * [Automating the upload](#automating-the-upload)
   * [Relation to the CI Smoke Run](#relation-to-the-ci-smoke-run)
   * [Xray Reference](#xray-reference)
+  * [NOTICE](#notice)
 <!-- TOC -->
 
 ## The Test Suite

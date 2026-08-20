@@ -9,6 +9,7 @@ Contributors do not need this view; see the [developer view](../developer/README
   * [Release Process](#release-process)
   * [End-to-End Testing](#end-to-end-testing)
   * [Association Environments](#association-environments)
+  * [NOTICE](#notice)
 <!-- TOC -->
 
 ## Responsibilities

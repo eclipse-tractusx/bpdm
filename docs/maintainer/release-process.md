@@ -10,16 +10,21 @@ It is the ordering narrative: each step links to the checklist, template or guid
   * [The Two Tracking Issues](#the-two-tracking-issues)
   * [Cycle Overview](#cycle-overview)
   * [1. Open the Release Check Issue](#1-open-the-release-check-issue)
+    * [Deadlines](#deadlines)
   * [2. Development Phase](#2-development-phase)
   * [3. Cut a Release Candidate](#3-cut-a-release-candidate)
   * [4. Deploy the Release Candidate to INT](#4-deploy-the-release-candidate-to-int)
   * [5. Run the End-to-End Tests](#5-run-the-end-to-end-tests)
   * [6. Quality Gate Assessment](#6-quality-gate-assessment)
   * [7. Cut the Release](#7-cut-the-release)
+    * [Tag the application release by hand](#tag-the-application-release-by-hand)
+    * [Write the release entries](#write-the-release-entries)
   * [8. Update INT to the Release](#8-update-int-to-the-release)
   * [9. Post-Release Switch](#9-post-release-switch)
+    * [Release branches are kept](#release-branches-are-kept)
   * [10. Sign-Off](#10-sign-off)
   * [STABLE](#stable)
+  * [NOTICE](#notice)
 <!-- TOC -->
 
 ## The Release Guidelines Come First

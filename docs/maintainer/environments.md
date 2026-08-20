@@ -9,14 +9,24 @@ This guide describes what runs where and how it is deployed; the deployment conf
 <!-- TOC -->
 * [Association Environments](#association-environments)
   * [What Runs Where](#what-runs-where)
+    * [INT — argocd.int.catena-x.net](#int--argocdintcatena-xnet)
+    * [STABLE — argocd.stable.catena-x.net](#stable--argocdstablecatena-xnet)
   * [How a Deployment Is Defined](#how-a-deployment-is-defined)
+    * [Why the configuration lives on its own branch](#why-the-configuration-lives-on-its-own-branch)
   * [Secret Management](#secret-management)
   * [Setting Up the Golden Record Process](#setting-up-the-golden-record-process)
+    * [1. Gather the client credentials](#1-gather-the-client-credentials)
+    * [2. Create the vault secrets](#2-create-the-vault-secrets)
+    * [3. Deploy](#3-deploy)
   * [Operator API Access](#operator-api-access)
   * [Setting Up a Sharing Member Gate](#setting-up-a-sharing-member-gate)
   * [Setting Up the EDC](#setting-up-the-edc)
+    * [The operator EDC](#the-operator-edc)
+    * [Creating the assets](#creating-the-assets)
+    * [The consumer EDC](#the-consumer-edc)
   * [Feature Branch Deployments](#feature-branch-deployments)
   * [Open Items](#open-items)
+  * [NOTICE](#notice)
 <!-- TOC -->
 
 ## What Runs Where
