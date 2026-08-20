@@ -25,7 +25,6 @@ This guide describes what runs where and how it is deployed; the deployment conf
     * [Creating the assets](#creating-the-assets)
     * [The consumer EDC](#the-consumer-edc)
   * [Feature Branch Deployments](#feature-branch-deployments)
-  * [Open Items](#open-items)
   * [NOTICE](#notice)
 <!-- TOC -->
 
@@ -84,7 +83,7 @@ Four rules follow:
 - **Change a `values.yaml` only when its deployment is being upgraded** — during the release cycle for INT, on announcement for STABLE. If a chart change alters a values key, record it in the [migration guide](../admin/MIGRATION_GUIDE.md) and apply it to the values when the chart version in `spec.yaml` moves.
 - **Read the chart, not its changelog**, before deciding what a chart change requires here. Chart 7.0.0 added generated Secrets behind `externalApplicationConfig` but kept `applicationConfig` / `applicationSecrets` in the subcharts, where they still take precedence. Every `values.yaml` sets them deliberately — do not migrate them to the new structure.
 - **Never add `syncPolicy.automated`.** No `spec.yaml` declares a sync policy, so a merge changes only what *would* be deployed and the maintainer decides when it is. Automating it turns every merge into a live change on an association environment.
-- **Scan a `values.yaml` by hand before merging it.** The branch sits outside the TruffleHog and KICS triggers, which name `main` only — [still outstanding](#open-items).
+- **Scan a `values.yaml` by hand before merging it.**
 
 ## Secret Management
 
