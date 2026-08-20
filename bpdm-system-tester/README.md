@@ -16,6 +16,18 @@ mvn -B -U clean package -pl bpdm-system-tester -am -DskipTests
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar
 ```
 
+To run against the BPDM deployment on the Catena-X association INT environment, activate the checked-in `int`
+profile and supply the credentials of a technical user that has Pool, Gate and Orchestrator permissions:
+
+```bash
+SPRING_PROFILES_ACTIVE=int BPDM_INT_CLIENT_ID=<id> BPDM_INT_CLIENT_SECRET=<secret> \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+```
+
+Note that the profile has to come from the environment — `--spring.profiles.active` is forwarded to the
+Cucumber CLI, not to Spring, and aborts the run. The full release procedure is in the
+[end-to-end testing guide](../docs/maintainer/e2e-testing.md).
+
 To run only the fast round-trip smoke scenarios (as the daily CI does), filter by tag:
 ```bash
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @Smoke
