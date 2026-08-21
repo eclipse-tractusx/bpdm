@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class RelationsResponseMapper {
+class RelationsGoldenRecordTaskResponseParser {
 
     fun toClientState(task: RelationsGoldenRecordTaskDb, timeout: Instant) =
         with(task) {

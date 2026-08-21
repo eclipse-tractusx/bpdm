@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskApplicationService
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.HttpStatus
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class GoldenRecordTaskController(
     val apiConfigProperties: ApiConfigProperties,
-    val goldenRecordTaskService: GoldenRecordTaskService
+    val goldenRecordTaskService: GoldenRecordTaskApplicationService
 ) : GoldenRecordTaskApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")

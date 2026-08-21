@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.replace
@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.RelationsGoldenRecordTaskRequestParser
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
@@ -37,7 +38,7 @@ import java.time.Instant
 class RelationsGoldenRecordTaskStateMachine(
     private val taskConfigProperties: TaskConfigProperties,
     private val relationsTaskRepository: RelationsGoldenRecordTaskRepository,
-    private val relationsRequestMapper: RelationsRequestMapper,
+    private val relationsRequestMapper: RelationsGoldenRecordTaskRequestParser,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 

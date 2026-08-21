@@ -17,14 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
 @Service
-class RequestMapper {
+class GoldenRecordTaskRequestParser {
 
     fun toBusinessPartner(businessPartner: BusinessPartner) =
         with(businessPartner){

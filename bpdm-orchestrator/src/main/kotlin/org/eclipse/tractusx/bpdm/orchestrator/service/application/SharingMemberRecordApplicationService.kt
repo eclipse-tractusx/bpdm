@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -36,7 +36,7 @@ import java.time.Instant
 import java.util.*
 
 @Service
-class SharingMemberRecordService(
+class SharingMemberRecordApplicationService(
     private val sharingMemberRecordRepository: SharingMemberRecordRepository
 ) {
 

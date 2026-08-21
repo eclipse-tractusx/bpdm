@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.replace
@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskRequestParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -34,7 +35,7 @@ import java.time.Instant
 class GoldenRecordTaskStateMachine(
     private val taskConfigProperties: TaskConfigProperties,
     private val taskRepository: GoldenRecordTaskRepository,
-    private val requestMapper: RequestMapper,
+    private val requestMapper: GoldenRecordTaskRequestParser,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 

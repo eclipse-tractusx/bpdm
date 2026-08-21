@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
@@ -29,6 +29,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundExceptio
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchRelationsData
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskStateMachine
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.RelationsGoldenRecordTaskResponseParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -37,10 +39,10 @@ import java.time.Instant
 import java.util.*
 
 @Service
-class RelationsGoldenRecordTaskService(
+class RelationsGoldenRecordTaskApplicationService(
     private val relationsGoldenRecordTaskStateMachine: RelationsGoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
-    private val relationsResponseMapper: RelationsResponseMapper,
+    private val relationsResponseMapper: RelationsGoldenRecordTaskResponseParser,
     private val relationsTaskRepository: RelationsGoldenRecordTaskRepository,
     private val sharingMemberRecordRepository: SharingMemberRecordRepository,
 ) {

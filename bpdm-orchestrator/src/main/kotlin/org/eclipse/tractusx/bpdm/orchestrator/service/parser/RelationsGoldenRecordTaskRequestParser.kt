@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
@@ -28,7 +28,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
 import org.springframework.stereotype.Service
 
 @Service
-class RelationsRequestMapper {
+class RelationsGoldenRecordTaskRequestParser {
 
     fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelations) =
         with(businessPartnerRelations){

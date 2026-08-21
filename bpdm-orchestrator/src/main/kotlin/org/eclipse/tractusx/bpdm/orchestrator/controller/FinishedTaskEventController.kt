@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskEventService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskEventApplicationService
 import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.security.access.prepost.PreAuthorize
@@ -30,7 +30,7 @@ import java.time.Instant
 
 @RestController
 class FinishedTaskEventController(
-    private val taskEventService: GoldenRecordTaskEventService
+    private val taskEventService: GoldenRecordTaskEventApplicationService
 ): FinishedTaskEventApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")

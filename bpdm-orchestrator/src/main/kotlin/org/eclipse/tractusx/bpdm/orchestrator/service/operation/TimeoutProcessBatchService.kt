@@ -17,18 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskApplicationService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
 class TimeoutProcessBatchService(
-    private val goldenRecordTaskService: GoldenRecordTaskService,
+    private val goldenRecordTaskService: GoldenRecordTaskApplicationService,
     private val taskConfigProperties: TaskConfigProperties,
     private val entityManager: EntityManager
 ) {
@@ -76,4 +77,12 @@ class TimeoutProcessBatchService(
     companion object {
         private const val CRON_DISABLED = "-"
     }
+}
+
+data class PaginationInfo(
+    val hasProcessedTasks: Boolean,
+    val hasNextPage: Boolean,
+    val processedTaskCount: Int
+) {
+    fun countProcessedTasks(): Int = processedTaskCount
 }
