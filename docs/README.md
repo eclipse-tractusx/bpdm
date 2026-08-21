@@ -7,4 +7,5 @@ A good entrypoint are the `views` providing guidance for different interest grou
 - [API](api/README.md): You want to integrate BPDM APIs
 - [Installation](../INSTALL.md): You want to install and operate BPDM applications
 - [Development](developer/README.md): You want to contribute to the development of BPDM
+- [Maintenance](maintainer/README.md): You maintain this repository, its releases and its deployments
 - [Architecture](architecture): You are interested in the general architecture of BPDM

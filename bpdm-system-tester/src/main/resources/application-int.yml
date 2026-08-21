@@ -1,0 +1,62 @@
+################################################################################
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+# Runs the system tester against the BPDM deployment on the Catena-X association INT environment.
+#
+#   SPRING_PROFILES_ACTIVE=int BPDM_INT_CLIENT_ID=... BPDM_INT_CLIENT_SECRET=... \
+#     java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
+#     --plugin json:target/cucumber-report.json
+#
+# The profile has to be activated through the environment. Passing --spring.profiles.active as a
+# program argument does not work: main() forwards its arguments to the Cucumber CLI, which rejects
+# the unknown option, prints its usage text and runs no scenarios.
+#
+# The credentials are a Central-IDP technical user of the Cx-Operator company holding the Pool, Gate
+# and Orchestrator permissions; one user serves all three clients. They are deliberately not checked
+# in. Leaving the variables unset does not fail fast — Spring's binder passes an unresolved
+# placeholder through as a literal, so the run fails on the first token request with
+# "401 invalid_client / Invalid client or Invalid client credentials" from Central-IDP.
+#
+# Everything not set here — securityEnabled, the client_credentials grant — comes from application.yml.
+
+bpdm:
+  client:
+    pool:
+      base-url: https://business-partners.int.catena-x.net/pool
+      provider:
+        issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+      registration:
+        client-id: ${BPDM_INT_CLIENT_ID}
+        client-secret: ${BPDM_INT_CLIENT_SECRET}
+    gate:
+      # The Gate of the golden record core deployment. To test through a sharing member's own Gate
+      # instead, point this at that member's context path, e.g. /companies/test-sharing-member.
+      base-url: https://business-partners.int.catena-x.net/companies/test-company
+      provider:
+        issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+      registration:
+        client-id: ${BPDM_INT_CLIENT_ID}
+        client-secret: ${BPDM_INT_CLIENT_SECRET}
+    orchestrator:
+      base-url: https://business-partners.int.catena-x.net/orchestrator
+      provider:
+        issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+      registration:
+        client-id: ${BPDM_INT_CLIENT_ID}
+        client-secret: ${BPDM_INT_CLIENT_SECRET}
