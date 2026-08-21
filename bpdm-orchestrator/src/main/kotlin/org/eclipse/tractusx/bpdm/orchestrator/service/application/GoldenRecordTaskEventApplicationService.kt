@@ -17,12 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.toTimestamp
-import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskResponseParser
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -30,22 +31,23 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class RelationsGoldenRecordTaskEventService(
-    private val relationsTaskRepository: RelationsGoldenRecordTaskRepository,
-    private val relationsResponseMapper: RelationsResponseMapper
+class GoldenRecordTaskEventApplicationService(
+    private val taskRepository: GoldenRecordTaskRepository,
+    private val responseMapper: GoldenRecordTaskResponseParser
 ) {
-    private val finishedTaskStates = setOf(RelationsGoldenRecordTaskDb.ResultState.Success, RelationsGoldenRecordTaskDb.ResultState.Error)
+    private val finishedTaskStates = setOf(GoldenRecordTaskDb.ResultState.Success,GoldenRecordTaskDb.ResultState.Error)
 
-    fun getRelationsFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse{
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size, Sort.Direction.ASC, "updatedAt")
-        val finishedTasksPage = relationsTaskRepository.findByProcessingStateResultStateInAndUpdatedAtAfter(finishedTaskStates, timestamp.toTimestamp(), pageRequest )
+        val finishedTasksPage = taskRepository.findByProcessingStateResultStateInAndUpdatedAtAfter(finishedTaskStates, timestamp.toTimestamp(), pageRequest )
 
         return FinishedTaskEventsResponse(
             totalElements = finishedTasksPage.totalElements,
             totalPages = finishedTasksPage.totalPages,
             page = finishedTasksPage.number,
             contentSize = finishedTasksPage.content.size,
-            content = finishedTasksPage.content.map { FinishedTaskEventsResponse.Event(it.updatedAt.instant, relationsResponseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
+            content = finishedTasksPage.content.map { FinishedTaskEventsResponse.Event(it.updatedAt.instant,responseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
         )
     }
 }

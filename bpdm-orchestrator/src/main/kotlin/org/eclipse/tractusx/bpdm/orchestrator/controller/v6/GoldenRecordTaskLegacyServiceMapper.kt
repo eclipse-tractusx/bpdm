@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundExceptio
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
-import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskStateMachine
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity

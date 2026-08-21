@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
@@ -29,6 +29,9 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartn
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskStateMachine
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.PaginationInfo
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskResponseParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -39,12 +42,12 @@ import java.time.Instant
 import java.util.*
 
 @Service
-class GoldenRecordTaskService(
+class GoldenRecordTaskApplicationService(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
-    private val responseMapper: ResponseMapper,
+    private val responseParser: GoldenRecordTaskResponseParser,
     private val taskRepository: GoldenRecordTaskRepository,
-    private val sharingMemberRecordService: SharingMemberRecordService
+    private val sharingMemberRecordService: SharingMemberRecordApplicationService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -65,7 +68,7 @@ class GoldenRecordTaskService(
             logger.info { "Created ${createdTasks.size} golden record tasks in mode ${createRequest.mode}: ${createdTasks.toLogIdentifiers()}" }
 
         return createdTasks
-            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
+            .map { task -> responseParser.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateResponse(createdTasks = it) }
     }
 
@@ -88,7 +91,7 @@ class GoldenRecordTaskService(
 
         return TaskResultStateSearchResponse(uuidsToSearch
             .map { tasksByUuid[it]?.processingState?.resultState }
-            .map { it?.let { responseMapper.toResultState(it) }
+            .map { it?.let { responseParser.toResultState(it) }
             })
     }
 
@@ -100,7 +103,7 @@ class GoldenRecordTaskService(
             .let { uuids -> taskRepository.findByUuidIn(uuids.toSet()) }
             .also { tasks -> taskRepository.fetchBusinessPartnerData(tasks) }
             .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
-            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
+            .map { task -> responseParser.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskStateResponse(tasks = it) }
     }
 
@@ -122,7 +125,7 @@ class GoldenRecordTaskService(
                 TaskStepReservationEntryDto(
                     task.uuid.toString(),
                     task.gateRecord.publicId.toString(),
-                    responseMapper.toBusinessPartnerResult(task.businessPartner)
+                    responseParser.toBusinessPartnerResult(task.businessPartner)
                 )
             }
             .let { reservations -> TaskStepReservationResponse(reservations, pendingTimeout) }
@@ -247,11 +250,3 @@ class GoldenRecordTaskService(
 
 private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =
     map { it.uuid.toString() }.joinIdentifiersForLog()
-
-data class PaginationInfo(
-    val hasProcessedTasks: Boolean,
-    val hasNextPage: Boolean,
-    val processedTaskCount: Int
-) {
-    fun countProcessedTasks(): Int = processedTaskCount
-}
