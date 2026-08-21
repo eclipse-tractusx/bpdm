@@ -33,11 +33,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import tools.jackson.databind.json.JsonMapper
 
 class GoldenRecordContentsInOutputStepDefs(
     private val gateClient: GateClient,
@@ -45,7 +45,7 @@ class GoldenRecordContentsInOutputStepDefs(
     private val shareActions: BusinessPartnerShareActions,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertRepository: GateAssertRepositoryV7,
-    private val jsonMapper: JsonMapper
+    private val apiCallEvidence: ApiCallEvidence
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -297,7 +297,7 @@ class GoldenRecordContentsInOutputStepDefs(
         // Pool legal entity through the same output factory so we can reuse the master-data comparison.
         val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
-        attachCall("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolAsOutput = outputFactory.fromLegalEntity(inputResponse, poolLegalEntity).copy(externalId = runId)
         assertPoolGoldenRecordReflectsMasterData(expectedOutput, poolAsOutput)
 
@@ -342,9 +342,9 @@ class GoldenRecordContentsInOutputStepDefs(
         val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
         val referencedBpns = actualOutput.site!!.siteBpn
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
-        attachCall("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(referencedBpns)
-        attachCall("GET", "/v7/sites/$referencedBpns", response = poolSite)
+        apiCallEvidence.attach("GET", "/v7/sites/$referencedBpns", response = poolSite)
         val poolAsOutput = outputFactory
             .fromSite(inputResponse, poolLegalEntity, poolSite)
             .copy(externalId = runId)
@@ -393,9 +393,9 @@ class GoldenRecordContentsInOutputStepDefs(
         val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
         val referencedBpna = actualOutput.address.addressBpn
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
-        attachCall("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolAddress = poolClient.addresses.getAddress(referencedBpna)
-        attachCall("GET", "/v7/addresses/$referencedBpna", response = poolAddress)
+        apiCallEvidence.attach("GET", "/v7/addresses/$referencedBpna", response = poolAddress)
         val poolAsOutput = outputFactory
             .fromAdditionalAddressOnLegalEntity(inputResponse, poolLegalEntity, poolAddress)
             .copy(externalId = runId)
@@ -447,11 +447,11 @@ class GoldenRecordContentsInOutputStepDefs(
         val referencedBpns = actualOutput.site!!.siteBpn
         val referencedBpna = actualOutput.address.addressBpn
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
-        attachCall("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(referencedBpns)
-        attachCall("GET", "/v7/sites/$referencedBpns", response = poolSite)
+        apiCallEvidence.attach("GET", "/v7/sites/$referencedBpns", response = poolSite)
         val poolAddress = poolClient.addresses.getAddress(referencedBpna)
-        attachCall("GET", "/v7/addresses/$referencedBpna", response = poolAddress)
+        apiCallEvidence.attach("GET", "/v7/addresses/$referencedBpna", response = poolAddress)
         val poolAsOutput = outputFactory
             .fromAdditionalAddressOnSite(inputResponse, poolLegalEntity, poolSite, poolAddress)
             .copy(externalId = runId)
@@ -652,7 +652,7 @@ class GoldenRecordContentsInOutputStepDefs(
     private fun outputOf(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
         val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
         return outputPage.content.single()
     }
 
@@ -665,7 +665,7 @@ class GoldenRecordContentsInOutputStepDefs(
     private fun poolAddressOf(recordId: String): LogisticAddressVerboseDto {
         val bpna = outputOf(recordId).address.addressBpn
         val poolAddress = poolClient.addresses.getAddress(bpna)
-        attachCall("GET", "/v7/addresses/$bpna", response = poolAddress)
+        apiCallEvidence.attach("GET", "/v7/addresses/$bpna", response = poolAddress)
         return poolAddress
     }
 
@@ -681,7 +681,7 @@ class GoldenRecordContentsInOutputStepDefs(
      */
     private fun assertGateOutputCarriesMasterData(runId: String, expectedOutput: BusinessPartnerOutputDto): BusinessPartnerOutputDto {
         val actualOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
         assertRepository.assertBusinessPartnerOutput(
             actualOutputPage,
             PageDto(1, 1, 0, 1, listOf(expectedOutput)),
@@ -697,7 +697,7 @@ class GoldenRecordContentsInOutputStepDefs(
      */
     private fun assertGateOutputTopLevelIdentifiersAndStates(runId: String, expectedOutput: BusinessPartnerOutputDto) {
         val actualOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
         assertRepository.assertBusinessPartnerOutput(
             actualOutputPage,
             PageDto(1, 1, 0, 1, listOf(expectedOutput)),
@@ -715,19 +715,6 @@ class GoldenRecordContentsInOutputStepDefs(
             listOf(poolAsOutput),
             listOf(expectedOutput),
             assertRepository.outputMasterDataComparisonConfig
-        )
-    }
-
-    private fun attachCall(method: String, path: String, request: Any? = null, response: Any? = null) {
-        val content = buildMap {
-            put("uri", "$method $path")
-            if (request != null) put("request", request)
-            if (response != null) put("response", response)
-        }
-        context.scenario.attach(
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
-            "application/json",
-            "$method $path"
         )
     }
 }

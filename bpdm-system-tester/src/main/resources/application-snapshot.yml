@@ -1,0 +1,59 @@
+################################################################################
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+# Runs the system tester against the bpdm-snapshot deployment, which follows the development state of
+# the main branch on the Catena-X association INT environment.
+#
+#   SPRING_PROFILES_ACTIVE=snapshot BPDM_INT_CLIENT_ID=... BPDM_INT_CLIENT_SECRET=... \
+#     java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
+#     --plugin json:target/cucumber-report.json
+#
+# Use this to try the suite out before validating a release candidate: the deployment runs unreleased
+# code, so a failure here is as likely to be a genuine finding as a broken test.
+#
+# The deployment sits on the INT environment behind the same Central-IDP realm as the released one, so
+# it takes the same credentials — hence the BPDM_INT_* variable names. See the int profile for what
+# those credentials are and how an unset variable surfaces.
+#
+# Everything not set here — securityEnabled, the client_credentials grant — comes from application.yml.
+
+bpdm:
+  client:
+    pool:
+      base-url: https://business-partners-snapshot.int.catena-x.net/pool
+      provider:
+        issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+      registration:
+        client-id: ${BPDM_INT_CLIENT_ID}
+        client-secret: ${BPDM_INT_CLIENT_SECRET}
+    gate:
+      # The Gate of the snapshot deployment itself; it has no sharing-member Gates of its own.
+      base-url: https://business-partners-snapshot.int.catena-x.net/companies/test-company
+      provider:
+        issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+      registration:
+        client-id: ${BPDM_INT_CLIENT_ID}
+        client-secret: ${BPDM_INT_CLIENT_SECRET}
+    orchestrator:
+      base-url: https://business-partners-snapshot.int.catena-x.net/orchestrator
+      provider:
+        issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
+      registration:
+        client-id: ${BPDM_INT_CLIENT_ID}
+        client-secret: ${BPDM_INT_CLIENT_SECRET}

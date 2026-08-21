@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
+import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHelper
@@ -197,19 +198,24 @@ class TestDataConfiguration {
     }
 
     @Bean
+    fun apiCallEvidence(jsonMapper: JsonMapper): ApiCallEvidence {
+        return ApiCallEvidence(jsonMapper)
+    }
+
+    @Bean
     fun confidenceAssertHelper(
         gateClient: GateClient,
-        jsonMapper: JsonMapper
+        apiCallEvidence: ApiCallEvidence
     ): ConfidenceAssertHelper {
-        return ConfidenceAssertHelper(gateClient, jsonMapper)
+        return ConfidenceAssertHelper(gateClient, apiCallEvidence)
     }
 
     @Bean
     fun goldenRecordRelationAssertHelper(
         gateClient: GateClient,
-        jsonMapper: JsonMapper
+        apiCallEvidence: ApiCallEvidence
     ): GoldenRecordRelationAssertHelper {
-        return GoldenRecordRelationAssertHelper(gateClient, jsonMapper)
+        return GoldenRecordRelationAssertHelper(gateClient, apiCallEvidence)
     }
 
     @Bean
@@ -219,7 +225,7 @@ class TestDataConfiguration {
         testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
         sharingStateWatcher: SharingStateWatcher,
         taskReservationWatcher: TaskReservationWatcher,
-        jsonMapper: JsonMapper
+        apiCallEvidence: ApiCallEvidence
     ): BusinessPartnerShareActions{
         return BusinessPartnerShareActions(
             gateClient,
@@ -227,7 +233,7 @@ class TestDataConfiguration {
             testDataGenerator,
             sharingStateWatcher,
             taskReservationWatcher,
-            jsonMapper
+            apiCallEvidence
         )
     }
 }

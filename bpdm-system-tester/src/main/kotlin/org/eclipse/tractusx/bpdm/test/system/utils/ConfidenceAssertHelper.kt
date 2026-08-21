@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
-import tools.jackson.databind.json.JsonMapper
 
 enum class OutputComponent { LEGAL_ENTITY, LEGAL_ADDRESS, ADDITIONAL_ADDRESS, SITE }
 
@@ -35,7 +34,7 @@ enum class ConfidenceLevel(val sharedByOwner: Boolean, val checkedByExternalData
 
 class ConfidenceAssertHelper(
     private val gateClient: GateClient,
-    private val jsonMapper: JsonMapper
+    private val apiCallEvidence: ApiCallEvidence
 ) {
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
@@ -43,7 +42,7 @@ class ConfidenceAssertHelper(
     fun assertConfidence(recordId: String, component: OutputComponent, level: ConfidenceLevel) {
         val runId = context.runId(recordId)
         val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachApiCall("POST", "/v7/output/business-partners/search", listOf(runId), outputPage)
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", listOf(runId), outputPage)
         val output = outputPage.content.single()
 
         val actual: ConfidenceCriteriaDto = when (component) {
@@ -59,18 +58,5 @@ class ConfidenceAssertHelper(
         assertThat(actual.checkedByExternalDataSource)
             .describedAs("$component of '$recordId': checkedByExternalDataSource")
             .isEqualTo(level.checkedByExternalDataSource)
-    }
-
-    private fun attachApiCall(method: String, path: String, request: Any? = null, response: Any? = null) {
-        val content = buildMap {
-            put("uri", "$method $path")
-            if (request != null) put("request", request)
-            if (response != null) put("response", response)
-        }
-        context.scenario.attach(
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
-            "application/json",
-            "$method $path"
-        )
     }
 }

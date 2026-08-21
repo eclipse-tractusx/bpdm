@@ -28,6 +28,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.reactive.ClientHttpConnector
 
 @ConfigurationProperties(prefix = GateClientConfigProperties.PREFIX)
 data class GateClientConfigProperties(
@@ -48,7 +49,11 @@ data class GateClientConfigProperties(
 class GateClientConfig{
 
     @Bean
-    fun gateClient(webClientProvider: BpdmWebClientProvider, properties: GateClientConfigProperties): GateClient {
-        return GateClientImpl { webClientProvider.builder(properties).build() }
+    fun gateClient(
+        webClientProvider: BpdmWebClientProvider,
+        properties: GateClientConfigProperties,
+        clientConnector: ClientHttpConnector
+    ): GateClient {
+        return GateClientImpl { webClientProvider.builder(properties).clientConnector(clientConnector).build() }
     }
 }

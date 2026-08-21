@@ -9,6 +9,7 @@ This guide covers the maintainer's three duties around that: keeping the test de
   * [The Test Suite](#the-test-suite)
   * [Jira and Xray](#jira-and-xray)
   * [How Tests Map to Jira](#how-tests-map-to-jira)
+    * [The description block](#the-description-block)
   * [1. Upsert the Tests, Then Tag the New Ones](#1-upsert-the-tests-then-tag-the-new-ones)
     * [Pass 1 — upsert](#pass-1--upsert)
     * [Pass 2 — assign the new keys back to their scenarios](#pass-2--assign-the-new-keys-back-to-their-scenarios)
@@ -16,6 +17,7 @@ This guide covers the maintainer's three duties around that: keeping the test de
   * [2. Run the Suite Against INT](#2-run-the-suite-against-int)
     * [Build the JAR](#build-the-jar)
     * [Run](#run)
+    * [Trying the suite on the snapshot deployment first](#trying-the-suite-on-the-snapshot-deployment-first)
     * [Testing another deployment](#testing-another-deployment)
     * [Test data is not cleaned up](#test-data-is-not-cleaned-up)
   * [3. Upload the Test Execution](#3-upload-the-test-execution)
@@ -59,7 +61,7 @@ XRAY_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST \
 The mapping is carried entirely by tags in the feature files, which Xray reads on both the import and the upload direction.
 
 ```gherkin
-@CXTPM-1039
+@CXTPM-1043
 Feature: Output Reflects Own Shared Master Data
 
   #h3. Test Objective:
@@ -72,14 +74,34 @@ Feature: Output Reflects Own Shared Master Data
 
 | Element                 | Meaning                                                                                                                  |
 |-------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| `@CXTPM-1039` on Feature| The **Test Execution** issue the results are reported into. A bare issue key on the Feature is how Xray routes a Cucumber import into an existing Test Execution instead of creating a new one. Every feature file carries the same key, and it is [replaced once per release](#the-releases-test-execution). |
+| `@CXTPM-1043` on Feature| The **Test Execution** issue the results are reported into. A bare issue key on the Feature is how Xray routes a Cucumber import into an existing Test Execution instead of creating a new one. Every feature file carries the same key, and it is [replaced once per release](#the-releases-test-execution). |
 | `@TEST_CXTPM-<n>`       | The **Test** issue this scenario is. `TEST_` is the Xray Cucumber tag prefix.                                              |
 | `@BPDM`                 | Product marker, on every scenario. Tags also become labels on the Test issue.                                              |
 | `@Smoke`                | Part of the fast round-trip subset the daily CI run executes.                                                              |
-| `#h3. …` comments       | The Test issue's description in Jira wiki markup, kept next to the scenario it documents.                                  |
+| `#h3. …` comments       | The Test issue's description in Jira wiki markup, kept next to the scenario it documents. The comment block belongs directly above the scenario's tag line — see [the description block](#the-description-block) for the shapes that survive the import. |
 
 To find the key in use, read the feature-level tag of any feature file.
 The [feature import](#1-upsert-the-tests-then-tag-the-new-ones) ignores it: requirement linking needs an explicit `@REQ_` prefix.
+
+### The description block
+
+The block is Jira wiki markup, one line per source line, with the Gherkin `#` stripped and **no space after it** — `#h3.` and not `# h3.`, since a space would land in the markup and stop `h3.` from being read as a heading.
+
+Only part of the markup survives the round trip, and a line Xray cannot use is dropped silently:
+
+| In the feature file | In Jira |
+|---|---|
+| `#h3. Test Objective:` | heading |
+| `#* Verify …` | bullet |
+| `#` | blank line |
+| `#Plain sentence.` | paragraph text |
+| `## Numbered item` | **nothing — the line is lost** |
+
+`##` is the natural way to write a Jira numbered list through a Gherkin comment, and it is the one shape that does not arrive; every ordered list in this suite is therefore a `#*` bullet list.
+The suite carried `##` list items for two releases before anyone noticed that every Test's *Preconditions* and *Description* section was empty in Jira, so treat an unexplained gap as a markup problem first.
+
+To check what a Test actually holds, export it to a `.feature` file from the Xray UI with the Test issue's *Export to Cucumber* action.
+The export is written in the same convention the import reads, so it is also the reference for what a description block should look like — and comparing it against the feature file shows line by line what arrived.
 
 ## 1. Upsert the Tests, Then Tag the New Ones
 
@@ -181,9 +203,24 @@ Missing credentials do not fail fast: Spring passes the unresolved placeholder t
 
 The suite runs on 32 threads unless `--threads <n>` says otherwise, which puts a full run in the twenty-minute range.
 
+### Trying the suite on the snapshot deployment first
+
+The `snapshot` profile targets the [`bpdm-snapshot` deployment](environments.md#int--argocdintcatena-xnet), which runs the development state of `main`.
+It sits on the INT environment behind the same Central-IDP realm, so it takes the same credentials as the `int` profile and the variable names are shared:
+
+```bash
+SPRING_PROFILES_ACTIVE=snapshot \
+BPDM_INT_CLIENT_ID=<client id> \
+BPDM_INT_CLIENT_SECRET=<client secret> \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
+  --plugin json:target/cucumber-report.json
+```
+
+Use it to shake the suite out before a release run — but do not report its results: the deployment runs unreleased code, so a failure there is as likely to be a real finding as a broken test, and the release is judged on INT.
+
 ### Testing another deployment
 
-For a deployment other than INT — a sharing member's own Gate, a feature branch deployment, STABLE — copy the `int` profile's shape into `application-developer.yml`. That filename is gitignored, so it takes credentials inline without risking them reaching the repository; build the JAR afterwards so the file is packaged, and activate it with `SPRING_PROFILES_ACTIVE=developer`.
+For a deployment with no profile of its own — a sharing member's own Gate, a feature branch deployment, STABLE — copy the `int` profile's shape into `application-developer.yml`. That filename is gitignored, so it takes credentials inline without risking them reaching the repository; build the JAR afterwards so the file is packaged, and activate it with `SPRING_PROFILES_ACTIVE=developer`.
 
 Base URLs always follow the ingress paths of that deployment's [`values.yaml`](https://github.com/eclipse-tractusx/bpdm/tree/environments).
 

@@ -15,7 +15,7 @@
 # legal name, short name, legal form, site name, address name, address type and postal addresses.
 # It deliberately excludes identifiers, states, BPNs, confidence criteria and golden record
 # relations, which are covered by dedicated tests.
-@CXTPM-1039
+@CXTPM-1043
 Feature: Output Reflects Golden Record Master Data Changes
 
   #h3. Test Objective:
@@ -24,13 +24,13 @@ Feature: Output Reflects Golden Record Master Data Changes
   #
   #h3. Preconditions:
   #
-  ## A record already reflects a legal entity with its master data.
+  #* A record already reflects a legal entity with its master data.
   #
   #h3. Description:
   #
-  ## The sharing member shares a second driver record.
-  ## The golden record process refines it to the same legal entity with new master data.
-  ## Both records' outputs reflect the updated legal entity master data.
+  #* The sharing member shares a second driver record.
+  #* The golden record process refines it to the same legal entity with new master data.
+  #* Both records' outputs reflect the updated legal entity master data.
   @TEST_CXTPM-1005 @BPDM
   Scenario: Legal Entity Master Data Change Reflected In Output
     Given record "acme-record" reflects legal entity "acme" with master data "acme-content"
@@ -45,13 +45,13 @@ Feature: Output Reflects Golden Record Master Data Changes
   #
   #h3. Preconditions:
   #
-  ## A record already reflects a site of a legal entity with its master data.
+  #* A record already reflects a site of a legal entity with its master data.
   #
   #h3. Description:
   #
-  ## The sharing member shares a second driver record.
-  ## The golden record process refines it to the same site with new master data.
-  ## Both records' outputs reflect the updated site master data.
+  #* The sharing member shares a second driver record.
+  #* The golden record process refines it to the same site with new master data.
+  #* Both records' outputs reflect the updated site master data.
   @TEST_CXTPM-1006 @BPDM
   Scenario: Site Master Data Change Reflected In Output
     Given record "acme-site-record" reflects site "acme-site" of legal entity "acme" with master data "acme-site-content"
@@ -66,13 +66,13 @@ Feature: Output Reflects Golden Record Master Data Changes
   #
   #h3. Preconditions:
   #
-  ## A record already reflects an additional address of a legal entity with its master data.
+  #* A record already reflects an additional address of a legal entity with its master data.
   #
   #h3. Description:
   #
-  ## The sharing member shares a second driver record.
-  ## The golden record process refines it to the same additional address with new master data.
-  ## Both records' outputs reflect the updated additional address master data.
+  #* The sharing member shares a second driver record.
+  #* The golden record process refines it to the same additional address with new master data.
+  #* Both records' outputs reflect the updated additional address master data.
   @TEST_CXTPM-1004 @BPDM
   Scenario: Additional Address Of Legal Entity Master Data Change Reflected In Output
     Given record "acme-address-record" reflects additional address "acme-branch" of legal entity "acme" with master data "acme-address-content"
@@ -87,13 +87,13 @@ Feature: Output Reflects Golden Record Master Data Changes
   #
   #h3. Preconditions:
   #
-  ## A record already reflects an additional address of a site with its master data.
+  #* A record already reflects an additional address of a site with its master data.
   #
   #h3. Description:
   #
-  ## The sharing member shares a second driver record.
-  ## The golden record process refines it to the same additional address with new master data.
-  ## Both records' outputs reflect the updated additional address master data.
+  #* The sharing member shares a second driver record.
+  #* The golden record process refines it to the same additional address with new master data.
+  #* Both records' outputs reflect the updated additional address master data.
   @TEST_CXTPM-1003 @BPDM
   Scenario: Additional Address Of Site Master Data Change Reflected In Output
     Given record "acme-site-address-record" reflects additional address "acme-dock" of site "acme-site" of legal entity "acme" with master data "acme-site-address-content"
