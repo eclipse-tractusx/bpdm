@@ -42,14 +42,20 @@ bpdm:
       registration:
         client-id: ${BPDM_INT_CLIENT_ID}
         client-secret: ${BPDM_INT_CLIENT_SECRET}
-    gate:
-      # The Gate of the snapshot deployment itself; it has no sharing-member Gates of its own.
+    gate-input:
+      # The Gate of the snapshot deployment itself; it has no sharing-member Gates of its own, so the
+      # per-role Gate users of the int profile are honoured here but normally left unset.
       base-url: https://business-partners-snapshot.int.catena-x.net/companies/test-company
       provider:
         issuer-uri: https://centralidp.int.catena-x.net/auth/realms/CX-Central
       registration:
-        client-id: ${BPDM_INT_CLIENT_ID}
-        client-secret: ${BPDM_INT_CLIENT_SECRET}
+        client-id: ${BPDM_INT_GATE_INPUT_CLIENT_ID:${BPDM_INT_CLIENT_ID}}
+        client-secret: ${BPDM_INT_GATE_INPUT_CLIENT_SECRET:${BPDM_INT_CLIENT_SECRET}}
+    # Base-url and issuer come from the gate-input client through application.yml.
+    gate-output:
+      registration:
+        client-id: ${BPDM_INT_GATE_OUTPUT_CLIENT_ID:${BPDM_INT_CLIENT_ID}}
+        client-secret: ${BPDM_INT_GATE_OUTPUT_CLIENT_SECRET:${BPDM_INT_CLIENT_SECRET}}
     orchestrator:
       base-url: https://business-partners-snapshot.int.catena-x.net/orchestrator
       provider:

@@ -192,7 +192,7 @@ BPDM_INT_CLIENT_SECRET=<client secret> \
   --plugin json:target/cucumber-report.json
 ```
 
-The credentials are a Central-IDP technical user of the `Cx-Operator` company holding the Pool, Gate and Orchestrator permissions — one user serves all three clients. See [operator API access](environments.md#operator-api-access) for how to create one.
+The credentials are a Central-IDP technical user of the `Cx-Operator` company holding the Pool, Gate and Orchestrator permissions — one user serves all four clients. See [operator API access](environments.md#operator-api-access) for how to create one. A sharing member's own Gate needs two Gate users instead; see [testing through a sharing member's Gate](#testing-through-a-sharing-members-gate).
 
 Two things about this invocation are easy to get wrong:
 
@@ -218,9 +218,33 @@ BPDM_INT_CLIENT_SECRET=<client secret> \
 
 Use it to shake the suite out before a release run — but do not report its results: the deployment runs unreleased code, so a failure there is as likely to be a real finding as a broken test, and the release is judged on INT.
 
+### Testing through a sharing member's Gate
+
+A Gate whose users the Portal manages cannot be driven by one credential. The Portal issues its technical users one role each, and the suite needs both sides of the Gate API: sharing input data and driving the sharing process is an **input manager**, reading the resulting golden records is an **output consumer**. The tester therefore configures two Gate clients — `bpdm.client.gate-input` for input and the sharing process, `bpdm.client.gate-output` for the output — and sends each call with the credential permitted to make it.
+
+Everything but the credentials defaults from the input client, so the `int` profile takes only the two users:
+
+```bash
+SPRING_PROFILES_ACTIVE=int \
+BPDM_INT_CLIENT_ID=<operator client id> \
+BPDM_INT_CLIENT_SECRET=<operator client secret> \
+BPDM_INT_GATE_INPUT_CLIENT_ID=<input manager client id> \
+BPDM_INT_GATE_INPUT_CLIENT_SECRET=<input manager client secret> \
+BPDM_INT_GATE_OUTPUT_CLIENT_ID=<output consumer client id> \
+BPDM_INT_GATE_OUTPUT_CLIENT_SECRET=<output consumer client secret> \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
+  --plugin json:target/cucumber-report.json
+```
+
+Point the Gate at that member's context path as well — `BPDM_CLIENT_GATE_INPUT_BASE_URL=https://business-partners.int.catena-x.net/companies/<member>`, which the output client follows. Pool and Orchestrator keep the operator user: the tester writes Pool metadata and acts as the cleaning service against the Orchestrator, which no sharing member user may do.
+
+Both Gate users have to belong to the same company. The Gate scopes what a read returns by the BPNL of the token that made it, so an output consumer from another company reads an empty output rather than a `403`. The tester fetches a token for each Gate credential before the first scenario and refuses to run when the two name different companies, naming both in the message — without that check the run would fail much later, in the wait for the golden record output, with nothing pointing at the credentials. It logs the company it verified, and where it cannot decide — one credential in both roles, or a token carrying no BPNL — it says so and continues.
+
+Leaving the two pairs unset falls back to `BPDM_INT_CLIENT_ID`/`BPDM_INT_CLIENT_SECRET` for both clients, which is how the Gate of the golden record core deployment is tested.
+
 ### Testing another deployment
 
-For a deployment with no profile of its own — a sharing member's own Gate, a feature branch deployment, STABLE — copy the `int` profile's shape into `application-developer.yml`. That filename is gitignored, so it takes credentials inline without risking them reaching the repository; build the JAR afterwards so the file is packaged, and activate it with `SPRING_PROFILES_ACTIVE=developer`.
+For a deployment with no profile of its own — a feature branch deployment, STABLE — copy the `int` profile's shape into `application-developer.yml`. That filename is gitignored, so it takes credentials inline without risking them reaching the repository; build the JAR afterwards so the file is packaged, and activate it with `SPRING_PROFILES_ACTIVE=developer`.
 
 Base URLs always follow the ingress paths of that deployment's [`values.yaml`](https://github.com/eclipse-tractusx/bpdm/tree/environments).
 

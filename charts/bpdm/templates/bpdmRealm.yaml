@@ -4617,7 +4617,7 @@ stringData:
   application.yml: |-
     bpdm:
       client:
-        gate:
+        gate-input:
           provider:
             issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
           registration:

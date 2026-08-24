@@ -40,5 +40,5 @@ stringData:
           base-url: {{ include "bpdm.orchestratorUrl" . | quote }}
         pool:
           base-url: {{ include "bpdm.poolUrl" . | quote }}
-        gate:
+        gate-input:
           base-url: {{ include "bpdm.gateUrl" . | quote }}

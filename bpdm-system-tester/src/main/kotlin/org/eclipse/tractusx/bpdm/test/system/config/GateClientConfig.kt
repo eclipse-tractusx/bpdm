@@ -29,9 +29,10 @@ import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2Clien
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ClientHttpConnector
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
-@ConfigurationProperties(prefix = GateClientConfigProperties.PREFIX)
-data class GateClientConfigProperties(
+@ConfigurationProperties(prefix = GateInputClientConfigProperties.PREFIX)
+data class GateInputClientConfigProperties(
     override val baseUrl: String = "http://localhost:8081",
     val searchChangelogPageSize: Int = 100,
     override val securityEnabled: Boolean = false,
@@ -39,7 +40,21 @@ data class GateClientConfigProperties(
     override val provider: OAuth2ClientProperties.Provider
 ) : BpdmClientProperties {
     companion object {
-        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate"
+        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-input"
+    }
+
+    override fun getId() = PREFIX
+}
+
+@ConfigurationProperties(prefix = GateOutputClientConfigProperties.PREFIX)
+data class GateOutputClientConfigProperties(
+    override val baseUrl: String = "http://localhost:8081",
+    override val securityEnabled: Boolean = false,
+    override val registration: OAuth2ClientProperties.Registration,
+    override val provider: OAuth2ClientProperties.Provider
+) : BpdmClientProperties {
+    companion object {
+        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-output"
     }
 
     override fun getId() = PREFIX
@@ -49,11 +64,25 @@ data class GateClientConfigProperties(
 class GateClientConfig{
 
     @Bean
+    fun gateCredentialCompanyCheck(
+        inputProperties: GateInputClientConfigProperties,
+        outputProperties: GateOutputClientConfigProperties,
+        clientRegistrations: ClientRegistrationRepository?
+    ): GateCredentialCompanyCheck {
+        return GateCredentialCompanyCheck(inputProperties, outputProperties, clientRegistrations)
+    }
+
+    @Bean
     fun gateClient(
         webClientProvider: BpdmWebClientProvider,
-        properties: GateClientConfigProperties,
-        clientConnector: ClientHttpConnector
+        inputProperties: GateInputClientConfigProperties,
+        outputProperties: GateOutputClientConfigProperties,
+        clientConnector: ClientHttpConnector,
+        credentialCompanyCheck: GateCredentialCompanyCheck
     ): GateClient {
-        return GateClientImpl { webClientProvider.builder(properties).clientConnector(clientConnector).build() }
+        credentialCompanyCheck.verify()
+        val inputCredential = GateClientImpl { webClientProvider.builder(inputProperties).clientConnector(clientConnector).build() }
+        val outputCredential = GateClientImpl { webClientProvider.builder(outputProperties).clientConnector(clientConnector).build() }
+        return RoleSplitGateClient(inputCredential, outputCredential)
     }
 }

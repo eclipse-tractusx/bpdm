@@ -31,9 +31,10 @@ bpdm:
         client-id: BPDM_POOL
         # Please provide a secret here
         client-secret: "**********"
-    gate:
+    # Shares business partner input data and drives the sharing process.
+    gate-input:
       securityEnabled: true
-      # The base-url of the Pool-API
+      # The base-url of the Gate-API
       base-url: http://localhost:8081
       provider:
         issuer-uri: http://localhost:8180/realms/BPDM
@@ -43,6 +44,17 @@ bpdm:
         client-id: BPDM_GATE
         # Please provide secret here
         client-secret: "**********"
+    # Reads the golden record output. Defaults to the gate-input client in every setting; where both are secured
+    # with credentials of their own, the two tokens have to carry the same BPNL.
+    gate-output:
+      securityEnabled: ${bpdm.client.gate-input.securityEnabled}
+      base-url: ${bpdm.client.gate-input.base-url}
+      provider:
+        issuer-uri: ${bpdm.client.gate-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: ${bpdm.client.gate-input.registration.client-id}
+        client-secret: ${bpdm.client.gate-input.registration.client-secret}
     orchestrator:
       securityEnabled: true
       # The base-url of the Pool-API
