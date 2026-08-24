@@ -33,7 +33,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <cucumber.version>7.34.6</cucumber.version>
+        <cucumber.version>7.34.7</cucumber.version>
     </properties>
 
     <dependencies>
