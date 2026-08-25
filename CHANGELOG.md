@@ -57,6 +57,11 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: An update of data space participants (`memberships` in the deprecated v6 API) that names the same legal entity in more than one entry is now rejected as a bad request and nothing is written.
   Such a request previously succeeded, silently applying the last of the conflicting entries
 
+### Fixed
+
+- BPDM Orchestrator and Pool: The sharing member count of a golden record stopped rising when a further sharing member shared it, leaving the count and the derived confidence level permanently too low.
+  The Pool reads sharing member record updates from the Orchestrator as a timestamp cursor, but they were returned unordered, so updates beyond the first page could be skipped and were never re-sent [#1810](https://github.com/eclipse-tractusx/bpdm/issues/1810)
+
 ## [7.4.0] - 2026-06-10
 
 ### Breaking

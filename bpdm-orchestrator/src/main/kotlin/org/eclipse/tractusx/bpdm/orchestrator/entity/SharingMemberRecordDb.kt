@@ -29,7 +29,8 @@ import java.util.*
 @Table(
     name = "gate_records",
     indexes = [
-        Index(name = "index_gate_records_private_uuid", columnList = "private_uuid")
+        Index(name = "index_gate_records_private_uuid", columnList = "private_uuid"),
+        Index(name = "index_gate_records_updated_at", columnList = "updated_at")
     ]
 )
 class SharingMemberRecordDb (
