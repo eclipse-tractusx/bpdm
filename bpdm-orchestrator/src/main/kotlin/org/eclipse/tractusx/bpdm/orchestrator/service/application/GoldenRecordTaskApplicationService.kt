@@ -26,11 +26,19 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidTaskCreateRequestException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
+import org.eclipse.tractusx.bpdm.orchestrator.mapper.GoldenRecordTaskCreateInboundMapper
+import org.eclipse.tractusx.bpdm.orchestrator.mapper.GoldenRecordTaskCreateOutboundMapper
+import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskCreateParseError
+import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskCreateParsed
+import org.eclipse.tractusx.bpdm.orchestrator.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskStateMachine
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.PaginationInfo
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskResponseParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
@@ -47,7 +55,11 @@ class GoldenRecordTaskApplicationService(
     private val taskConfigProperties: TaskConfigProperties,
     private val responseParser: GoldenRecordTaskResponseParser,
     private val taskRepository: GoldenRecordTaskRepository,
-    private val sharingMemberRecordService: SharingMemberRecordApplicationService
+    private val sharingMemberRecordService: SharingMemberRecordApplicationService,
+    private val createParser: GoldenRecordTaskCreateParser,
+    private val createOperation: GoldenRecordTaskCreateOperation,
+    private val createInboundMapper: GoldenRecordTaskCreateInboundMapper,
+    private val createOutboundMapper: GoldenRecordTaskCreateOutboundMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -55,21 +67,16 @@ class GoldenRecordTaskApplicationService(
     @Transactional
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
+        val parseResults = createParser.parse(createInboundMapper.toRequests(createRequest))
+        val parseErrors = parseResults.filterIsInstance<ParseResult.Failure<GoldenRecordTaskCreateParseError>>().flatMap { it.errors }
 
-        createRequest.requests.forEach { assertAdditionalSitesHaveSite(it.businessPartner) }
+        if (parseErrors.isNotEmpty())
+            throw BpdmInvalidTaskCreateRequestException(parseErrors.joinToString("; ") { it.toMessage() })
 
-        val gateRecords = sharingMemberRecordService.getOrCreateGateRecords(createRequest.requests)
-        abortOutdatedTasks(gateRecords.toSet())
-
-        val createdTasks = createRequest.requests.zip(gateRecords)
-            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
-
-        if (createdTasks.isNotEmpty())
-            logger.info { "Created ${createdTasks.size} golden record tasks in mode ${createRequest.mode}: ${createdTasks.toLogIdentifiers()}" }
-
-        return createdTasks
-            .map { task -> responseParser.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateResponse(createdTasks = it) }
+        val parsedEntries = parseResults.filterIsInstance<ParseResult.Success<GoldenRecordTaskCreateParsed>>()
+            .map { it.parsed }
+        val createdTasks = createOperation.create(parsedEntries)
+        return createOutboundMapper.toResponse(createdTasks) { task -> calculateTaskRetentionTimeout(task) }
     }
 
     /**
@@ -246,6 +253,13 @@ class GoldenRecordTaskApplicationService(
         if (abortedTasks.isNotEmpty())
             logger.info { "Aborted ${abortedTasks.size} outdated golden record tasks: ${abortedTasks.toLogIdentifiers()}" }
     }
+}
+
+private fun GoldenRecordTaskCreateParseError.toMessage() = when (this) {
+    is GoldenRecordTaskCreateParseError.InvalidRecordId -> "Invalid UUID in '$path': '$value'"
+    is GoldenRecordTaskCreateParseError.RecordNotFound -> "Record ID in '$path' was not found: '$value'"
+    is GoldenRecordTaskCreateParseError.AdditionalSitesWithoutMainSite ->
+        "At '$path': additional sites are stated but no site of its own is stated"
 }
 
 private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =
