@@ -62,6 +62,30 @@ bpdm:
       registration:
         client-id: ${BPDM_INT_GATE_OUTPUT_CLIENT_ID:${BPDM_INT_CLIENT_ID}}
         client-secret: ${BPDM_INT_GATE_OUTPUT_CLIENT_SECRET:${BPDM_INT_CLIENT_SECRET}}
+    # A second sharing member, for the scenarios in which two sharing members share the same golden record.
+    # Naming its Gate is what marks this run as having one; leaving the base-url unset makes the run act for
+    # a single sharing member and skip those scenarios. The two credentials are that member's own technical
+    # users, and their BPNL has to differ from the first member's.
+    gate-2-input:
+      base-url: ${BPDM_INT_GATE_2_BASE_URL:}
+      registration:
+        client-id: ${BPDM_INT_GATE_2_INPUT_CLIENT_ID:}
+        client-secret: ${BPDM_INT_GATE_2_INPUT_CLIENT_SECRET:}
+    gate-2-output:
+      registration:
+        client-id: ${BPDM_INT_GATE_2_OUTPUT_CLIENT_ID:}
+        client-secret: ${BPDM_INT_GATE_2_OUTPUT_CLIENT_SECRET:}
+    # A third sharing member, for the scenario in which the confidence level of a golden record rises with
+    # the third member sharing it. Same shape as the second member's variables.
+    gate-3-input:
+      base-url: ${BPDM_INT_GATE_3_BASE_URL:}
+      registration:
+        client-id: ${BPDM_INT_GATE_3_INPUT_CLIENT_ID:}
+        client-secret: ${BPDM_INT_GATE_3_INPUT_CLIENT_SECRET:}
+    gate-3-output:
+      registration:
+        client-id: ${BPDM_INT_GATE_3_OUTPUT_CLIENT_ID:}
+        client-secret: ${BPDM_INT_GATE_3_OUTPUT_CLIENT_SECRET:}
     orchestrator:
       base-url: https://business-partners.int.catena-x.net/orchestrator
       provider:

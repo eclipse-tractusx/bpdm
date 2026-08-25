@@ -25,7 +25,6 @@ import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -49,10 +48,9 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorR
  * because the relation propagates into already-shared outputs asynchronously.
  */
 class GoldenRecordRelationsInOutputStepDefs(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val orchestratorClient: OrchestrationApiClient,
     private val shareActions: BusinessPartnerShareActions,
-    private val sharingStateWatcher: SharingStateWatcher,
     private val taskReservationWatcher: TaskReservationWatcher,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertHelper: GoldenRecordRelationAssertHelper,
@@ -70,6 +68,8 @@ class GoldenRecordRelationsInOutputStepDefs(
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
     private val scenarioName: String get() = context.scenarioName
 
     // -------------------------------------------------------------------------
@@ -210,7 +210,7 @@ class GoldenRecordRelationsInOutputStepDefs(
             baseEntry
 
         val request = RelationPutRequest(listOf(entry))
-        val response = gateClient.relation.put(true, request)
+        val response = gateOf(sourceRecordId).relation.put(true, request)
         apiCallEvidence.attach("PUT", "/v7/input/relations", request = request, response = response)
         context.relations[relationId] = RelationState(
             submittedEntry = entry,
@@ -225,8 +225,9 @@ class GoldenRecordRelationsInOutputStepDefs(
         val relationState = context.relations[relationId]!!
         val runId = context.runId(relationId)
 
-        sharingStateWatcher.waitForRelationTaskId(relationId)
-        val relationSharingStatePage = gateClient.relationSharingState.get(
+        val gate = gateOf(relationState.sourceRecordId)
+        gate.sharingStates.waitForRelationTaskId(relationId)
+        val relationSharingStatePage = gate.relationSharingState.get(
             externalIds = listOf(runId), sharingStateTypes = null, updatedAfter = null, paginationRequest = PaginationRequest()
         )
         apiCallEvidence.attach("GET", "/v7/relations/sharing-state", request = mapOf("externalIds" to listOf(runId)), response = relationSharingStatePage)
@@ -249,7 +250,7 @@ class GoldenRecordRelationsInOutputStepDefs(
             ))
         )
 
-        sharingStateWatcher.waitForRelationCompletedState(relationId)
+        gate.sharingStates.waitForRelationCompletedState(relationId)
         context.relations[relationId] = relationState.copy(resolvedSourceBpn = sourceBpn, resolvedTargetBpn = targetBpn)
     }
 
@@ -299,7 +300,7 @@ class GoldenRecordRelationsInOutputStepDefs(
 
     private fun goldenRecordOutputOf(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
         return outputPage.content.single()
     }

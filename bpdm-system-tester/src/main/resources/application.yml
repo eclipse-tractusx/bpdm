@@ -55,6 +55,46 @@ bpdm:
         authorization-grant-type: client_credentials
         client-id: ${bpdm.client.gate-input.registration.client-id}
         client-secret: ${bpdm.client.gate-input.registration.client-secret}
+    # The Gate of a second sharing member, for the scenarios in which two sharing members share the same
+    # golden record. A blank base-url means this run acts for a single sharing member and those scenarios are
+    # skipped; the second Gate of a local installation is configured by the checked-in `gate-2` profile.
+    # Unlike the clients above, these two are secured exactly when they are configured at all.
+    gate-2-input:
+      base-url: ""
+      provider:
+        issuer-uri: ${bpdm.client.gate-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: ""
+        client-secret: ""
+    # Reads the second sharing member's golden record output. Defaults to its gate-2-input client, which the
+    # two tokens have to agree with on the BPNL - a different one than the first sharing member's.
+    gate-2-output:
+      base-url: ${bpdm.client.gate-2-input.base-url}
+      provider:
+        issuer-uri: ${bpdm.client.gate-2-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: ${bpdm.client.gate-2-input.registration.client-id}
+        client-secret: ${bpdm.client.gate-2-input.registration.client-secret}
+    # A third sharing member, needed only where the confidence level itself has to move: the number of
+    # sharing members counts towards it from three of them on. Configured exactly like the second member.
+    gate-3-input:
+      base-url: ""
+      provider:
+        issuer-uri: ${bpdm.client.gate-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: ""
+        client-secret: ""
+    gate-3-output:
+      base-url: ${bpdm.client.gate-3-input.base-url}
+      provider:
+        issuer-uri: ${bpdm.client.gate-3-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: ${bpdm.client.gate-3-input.registration.client-id}
+        client-secret: ${bpdm.client.gate-3-input.registration.client-secret}
     orchestrator:
       securityEnabled: true
       # The base-url of the Pool-API

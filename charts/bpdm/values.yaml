@@ -41,6 +41,13 @@ bpdmRealm:
       secret: ""
     gateOutputConsumer:
       secret: ""
+    # Technical users of the second sharing member, acting on the second Gate. They differ from the
+    # pair above only in the company they belong to: their tokens carry that member's BPNL, which is
+    # what a Gate scopes its data by.
+    gate2InputManager:
+      secret: ""
+    gate2OutputConsumer:
+      secret: ""
     participant:
       secret: ""
     sharingMember:
@@ -66,6 +73,26 @@ bpdm-gate:
     - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
     - '{{ include "bpdm.gateKeycloakConfig.name" . }}'
     - '{{ include "bpdm.clientUrlConfig.name" . }}'
+
+# A second Gate, for a second sharing member. Disabled by default: the showcase is a golden record process
+# for one sharing member, and a second Gate only earns its resources where two of them have to share the same
+# golden records - as the end-to-end scenarios tagged @TwoSharingMembers do.
+#
+# It runs against the same database as the first Gate under a schema of its own, and is owned by the BPNL of
+# the bundled realm's second sharing member: that BPNL is attached to the data shared here, and tokens naming
+# another company are not authorized at all. Point both at the member you mean when adding a real one.
+bpdm-gate-2:
+  enabled: false
+  externalApplicationConfig:
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.gateKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
+  applicationConfig:
+    bpdm:
+      bpn:
+        owner-bpn-l: BPNL000000000002
+      datasource:
+        schema: bpdmgate2
 
 bpdm-pool:
   enabled: true

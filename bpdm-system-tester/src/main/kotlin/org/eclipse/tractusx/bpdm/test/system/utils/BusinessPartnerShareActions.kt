@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
@@ -33,29 +32,40 @@ import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.Instant
 
 class BusinessPartnerShareActions(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val orchestratorClient: OrchestrationApiClient,
     private val testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
-    private val sharingStateWatcher: SharingStateWatcher,
     private val taskReservationWatcher: TaskReservationWatcher,
     private val apiCallEvidence: ApiCallEvidence
 ) {
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
 
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
+
+    /**
+     * Shares the record's input data through [member]'s Gate, which every later step on that record then acts
+     * through as well. Scenarios that name no sharing member are read as sharing through the first one.
+     */
     fun upload(
         recordId: String,
         isOwnCompanyData: Boolean,
         contentSeed: String = recordId,
-        additionalSites: List<AdditionalSiteInputDto> = emptyList()
+        additionalSites: List<AdditionalSiteInputDto> = emptyList(),
+        member: SharingMember = SharingMember.FIRST
     ) {
+        val existingState = context.records[recordId]
+        check(existingState == null || existingState.member == member) {
+            "record '$recordId' was already shared by the ${existingState!!.member.name.lowercase()} sharing member"
+        }
+
         val inputData = testDataGenerator.buildInputData(contentSeed)
             .copy(isOwnCompanyData = isOwnCompanyData, additionalSites = additionalSites)
         val runId = context.runId(recordId)
         val request = listOf(inputData.copy(externalId = runId))
-        val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
+        val response = sharingMemberGates.of(member).businessParters.upsertBusinessPartnersInput(request)
         apiCallEvidence.attach("PUT", "/v7/input/business-partners", request, response.body)
-        context.records[recordId] = (context.records[recordId] ?: RecordState()).copy(
+        context.records[recordId] = (existingState ?: RecordState(member)).copy(
             contentSeed = contentSeed,
             currentInput = inputData
         )
@@ -75,7 +85,7 @@ class BusinessPartnerShareActions(
             externalSequenceTimestamp = Instant.now()
         )
         val request = listOf(inputData.copy(externalId = context.runId(recordId)))
-        val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
+        val response = gateOf(recordId).businessParters.upsertBusinessPartnersInput(request)
         apiCallEvidence.attach("PUT", "/v7/input/business-partners", request, response.body)
         context.records[recordId] = state.copy(currentInput = inputData)
     }
@@ -98,7 +108,7 @@ class BusinessPartnerShareActions(
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified))
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.legalEntity
     }
 
@@ -125,7 +135,7 @@ class BusinessPartnerShareActions(
         }
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.legalEntity
     }
 
@@ -152,7 +162,7 @@ class BusinessPartnerShareActions(
         }
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.legalEntity
     }
 
@@ -182,7 +192,7 @@ class BusinessPartnerShareActions(
                 entityResult.siteBasedLegalEntity.legalEntity.legalAddress
             )
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.siteBasedLegalEntity
     }
 
@@ -209,7 +219,7 @@ class BusinessPartnerShareActions(
             legalEntity = siteResult.siteWithParent.legalEntity,
             poolSite = siteResult.siteWithParent.site
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return siteResult.siteWithParent
     }
 
@@ -243,7 +253,7 @@ class BusinessPartnerShareActions(
             legalEntity = siteResult.siteWithParent.legalEntity,
             poolSite = siteResult.siteWithParent.site
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return siteResult.siteWithParent
     }
 
@@ -273,7 +283,7 @@ class BusinessPartnerShareActions(
             legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
             poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return addressResult.additionalLegalEntityAddressWithParent
     }
 
@@ -315,7 +325,7 @@ class BusinessPartnerShareActions(
             legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
             poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return addressResult.additionalLegalEntityAddressWithParent
     }
 
@@ -355,7 +365,7 @@ class BusinessPartnerShareActions(
             poolSite = addressResult.additionalSiteAddressWithParent.siteWithParent.site,
             poolAddress = addressResult.additionalSiteAddressWithParent.address
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return addressResult.additionalSiteAddressWithParent
     }
 
@@ -368,8 +378,9 @@ class BusinessPartnerShareActions(
 
     private fun resolveReservedTask(recordId: String, result: (BusinessPartner) -> BusinessPartner) {
         val runId = context.runId(recordId)
-        sharingStateWatcher.waitForTaskId(recordId)
-        val sharingStatePage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
+        val gate = gateOf(recordId)
+        gate.sharingStates.waitForTaskId(recordId)
+        val sharingStatePage = gate.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
         apiCallEvidence.attach("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
         val taskId = sharingStatePage.content.single().taskId!!
         val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)

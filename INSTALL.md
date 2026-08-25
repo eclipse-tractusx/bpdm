@@ -67,6 +67,26 @@ bpdm:
 If it is set with a BPNL only users belonging to that company can access the Gate.
 If it is not set or set to null a user from any company can use the Gate, albeit the user can only see its own company shared business partner data.
 
+#### Further Gates for Further Sharing Members
+
+Some behaviour of the golden record process only shows when more than one sharing member shares the same golden record: each member reflecting the other's master data changes, and the sharing member count of the golden record rising.
+A third member shows one more thing — the confidence level itself, which the sharing member count only raises from three members on.
+Observing that locally takes further Gates, which the `gate-2` and `gate-3` profiles provide.
+Start them once the rest of the stack is up — like any Gate, they refuse to start while Pool or Orchestrator are unreachable:
+
+```console
+cd bpdm-gate
+mvn spring-boot:run -Dspring.profiles.active=gate-2
+mvn spring-boot:run -Dspring.profiles.active=gate-3
+```
+
+They run on ports 8082 and 8083 against their own `bpdm_gate_2` and `bpdm_gate_3` databases (created by the Docker Compose file above) and are owned by `BPNL000000000002` and `BPNL000000000003`, so each serves only its own member.
+Their technical users in the `BPDM` realm are `BPDM_GATE_2_INPUT_MANAGER` / `BPDM_GATE_2_OUTPUT_CONSUMER` and `BPDM_GATE_3_INPUT_MANAGER` / `BPDM_GATE_3_OUTPUT_CONSUMER`; the first Gate's `BPDM_GATE`, `BPDM_GATE_INPUT_MANAGER` and `BPDM_GATE_OUTPUT_CONSUMER` belong to `BPNL000000000001` and are not authorized on either.
+All Gates share the one Orchestrator and Pool: which member a Gate acts for travels in the golden record task, not in the credentials the Gate calls them with.
+
+A single Gate cannot stand in for several.
+It does keep the members' data apart by the BPNL in the token, but it decides which of its records count towards a golden record's sharing member count across all of them, so a further member sharing through the same Gate would not be counted.
+
 #### Manual Sharing
 
 On default, the BPDM Gate automatically starts the golden record process for uploaded business partner data.
@@ -153,7 +173,7 @@ bpdmRealm:
       secret: $CLEANING_DUMMY_SECRET
 ```
 
-The available client keys are `admin`, `gate`, `pool`, `orchestrator`, `cleaningDummy`, `gateInputConsumer`, `gateInputManager`, `gateOutputConsumer`, `participant`, `sharingMember`, `taskCreator`, `refinerClean`, `refinerCleanAndSync` and `refinerPoolSync`.
+The available client keys are `admin`, `gate`, `pool`, `orchestrator`, `cleaningDummy`, `gateInputConsumer`, `gateInputManager`, `gateOutputConsumer`, `gate2InputManager`, `gate2OutputConsumer`, `participant`, `sharingMember`, `taskCreator`, `refinerClean`, `refinerCleanAndSync` and `refinerPoolSync`.
 The umbrella wires each application to its client automatically, so no per-service client configuration is needed when using the bundled Keycloak.
 
 #### Insecure Installation

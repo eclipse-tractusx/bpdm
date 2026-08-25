@@ -17,32 +17,27 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-# Runs a second Gate next to the default one, acting for a second sharing member:
+# Runs a third Gate next to the default one and the second, acting for a third sharing member:
 #
-#   mvn spring-boot:run -Dspring.profiles.active=gate-2
+#   mvn spring-boot:run -Dspring.profiles.active=gate-3
 #
-# Two Gates are what it takes to observe a golden record shared by more than one sharing member -
-# both members reflecting each other's master data changes, and the sharing member count of the
-# golden record rising. One Gate cannot stand in for two: it keeps the members' data apart by the
-# BPNL in the token, but decides which of its records count towards a golden record's sharing member
-# count across all of them (see GoldenRecordCountedService), so a second member inside the same Gate
-# would not be counted.
+# A third sharing member is what it takes to observe the confidence level of a golden record rise: the
+# number of sharing members only counts towards that level from three of them on (see
+# ConfidenceCriteriaDb). Why each member needs a Gate of its own is described in the gate-2 profile.
 #
 # The database is a separate one, created by docker/compose/dependencies/postgres-init.sh.
 #
-# Setting the owner BPNL makes this Gate serve that one member: it is attached to the data shared
-# here, and a token naming a different company is not authorized at all. The default Gate leaves the
-# BPNL unset and so follows whatever the token names - BPNL000000000001 for the service accounts of
-# the local realm's Operator group.
+# Setting the owner BPNL makes this Gate serve that one member: it is attached to the data shared here,
+# and a token naming a different company is not authorized at all.
 #
 # The outbound clients stay the ones from application.yml: which member a Gate acts for travels in
 # the golden record task, not in the credentials the Gate itself calls Orchestrator and Pool with.
 
 server:
-  port: 8082
+  port: 8083
 spring:
   datasource:
-    url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm_gate_2
+    url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm_gate_3
 bpdm:
   bpn:
-    owner-bpn-l: BPNL000000000002
+    owner-bpn-l: BPNL000000000003

@@ -24,13 +24,13 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 
@@ -53,7 +53,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
  * addresses get explicit, distinct script codes so the merged output provably contains both.
  */
 class ScriptVariantStepDefs(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val poolClient: PoolApiClient,
     private val shareActions: BusinessPartnerShareActions,
     private val testDataFactoryGate: TestDataFactoryGateV7,
@@ -66,6 +66,8 @@ class ScriptVariantStepDefs(
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
     private val scenarioName: String get() = context.scenarioName
 
     // -------------------------------------------------------------------------
@@ -280,7 +282,7 @@ class ScriptVariantStepDefs(
      */
     private fun assertGateOutputScriptVariants(recordId: String, expected: BusinessPartnerOutputDto): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
         assertRepository.assertBusinessPartnerOutput(
             outputPage,

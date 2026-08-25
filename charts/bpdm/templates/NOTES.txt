@@ -1,4 +1,4 @@
-{{/*
+﻿{{/*
 Copyright (c) 2021 Contributors to the Eclipse Foundation
 
 See the NOTICE file(s) distributed with this work for additional
@@ -18,6 +18,7 @@ SPDX-License-Identifier: Apache-2.0
 */}}
 {{- $ns := .Release.Namespace -}}
 {{- $gate := index .Values "bpdm-gate" | default dict -}}
+{{- $gate2 := index .Values "bpdm-gate-2" | default dict -}}
 {{- $pool := index .Values "bpdm-pool" | default dict -}}
 {{- $orchestrator := index .Values "bpdm-orchestrator" | default dict -}}
 {{- $cleaning := index .Values "bpdm-cleaning-service-dummy" | default dict -}}
@@ -26,9 +27,11 @@ Thank you for installing {{ .Chart.Name }}-{{ .Chart.Version }} (app version {{ 
 
 Release "{{ .Release.Name }}" is deployed in namespace "{{ $ns }}".
 
-The deployed components form a complete golden record process for a single sharing member:
+The deployed components form a complete golden record process{{ if $gate2.enabled }} for two sharing members{{ else }} for a single sharing member{{ end }}:
 {{- if $gate.enabled }}
   - Gate           — a sharing member uploads and downloads business partner data here{{ end }}
+{{- if $gate2.enabled }}
+  - Gate 2         — the same, for a second sharing member of its own{{ end }}
 {{- if $orchestrator.enabled }}
   - Orchestrator   — coordinates cleaning and golden record creation{{ end }}
 {{- if $cleaning.enabled }}
@@ -46,6 +49,11 @@ http://localhost:8080/ui/swagger-ui :
 {{ if $gate.enabled }}
   # Gate
   kubectl -n {{ $ns }} port-forward svc/{{ include "bpdm.dependencyFullname" (list . $gate "bpdm-gate") }} 8080:{{ ($gate.service | default dict).port | default 80 }}
+{{- end }}
+{{- if $gate2.enabled }}
+
+  # Gate of the second sharing member
+  kubectl -n {{ $ns }} port-forward svc/{{ include "bpdm.dependencyFullname" (list . $gate2 "bpdm-gate-2") }} 8080:{{ ($gate2.service | default dict).port | default 80 }}
 {{- end }}
 {{- if $pool.enabled }}
 
@@ -66,13 +74,15 @@ http://localhost:8080/ui/swagger-ui :
 In-cluster, the services call each other under these base URLs:
 {{- if $gate.enabled }}
   - Gate:         {{ include "bpdm.gateUrl" . }}{{ end }}
+{{- if $gate2.enabled }}
+  - Gate 2:       {{ include "bpdm.gate2Url" . }}{{ end }}
 {{- if $pool.enabled }}
   - Pool:         {{ include "bpdm.poolUrl" . }}{{ end }}
 {{- if $orchestrator.enabled }}
   - Orchestrator: {{ include "bpdm.orchestratorUrl" . }}{{ end }}
 {{- if $keycloak.enabled }}
   - Keycloak:     {{ include "bpdm.keycloakUrl" . }}{{ end }}
-{{- range $svc := list $gate $pool $orchestrator $cleaning }}
+{{- range $svc := list $gate $gate2 $pool $orchestrator $cleaning }}
 {{- if and $svc.enabled ($svc.ingress | default dict).enabled }}
 {{- range $h := $svc.ingress.hosts }}
 NOTE: An Ingress is enabled — the service is also reachable at http://{{ $h.host }}

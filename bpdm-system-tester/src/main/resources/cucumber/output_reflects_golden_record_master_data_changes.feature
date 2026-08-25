@@ -11,6 +11,11 @@
 # Pool matches it to the same golden record and updates that record's master data. The record under test
 # is never touched, yet its output must reflect the updated master data.
 #
+# Most scenarios here drive that change with a second record of the SAME sharing member, which keeps them
+# runnable against a single Gate. The last one has the driver record belong to ANOTHER sharing member, the
+# case the golden record process exists for: what one member shares becomes visible to the others. It needs
+# a second Gate to share through and is skipped when the run has only one sharing member.
+#
 # "master data" here means the descriptive legal entity, site and address attributes:
 # legal name, short name, legal form, site name, address name, address type and postal addresses.
 # It deliberately excludes identifiers, states, BPNs, confidence criteria and golden record
@@ -101,3 +106,26 @@ Feature: Output Reflects Golden Record Master Data Changes
     And the golden record process refines record "acme-site-address-other-record" to additional address "acme-dock" of site "acme-site" of legal entity "acme" with master data "acme-site-address-updated-content"
     Then "acme-site-address-record" output reflects additional address "acme-dock" of site "acme-site" of legal entity "acme" in its master data
     And "acme-site-address-other-record" output reflects additional address "acme-dock" of site "acme-site" of legal entity "acme" in its master data
+
+  # -- The change originates at another sharing member --
+
+  #h3. Test Objective:
+  #
+  #* Verify a record reflects updated legal entity master data when the golden record is changed by a record of a different sharing member.
+  #
+  #h3. Preconditions:
+  #
+  #* A record of the first sharing member already reflects a legal entity with its master data.
+  #
+  #h3. Description:
+  #
+  #* The second sharing member shares a record of its own.
+  #* The golden record process refines it to the same legal entity with new master data.
+  #* Both sharing members' outputs reflect the updated legal entity master data.
+  @TwoSharingMembers @BPDM
+  Scenario: Legal Entity Master Data Change By Another Sharing Member Reflected In Output
+    Given record "acme-record" of the first sharing member reflects legal entity "acme" with master data "acme-content"
+    When the second sharing member shares record "acme-other-record"
+    And the golden record process refines record "acme-other-record" to legal entity "acme" with master data "acme-updated-content"
+    Then "acme-record" output reflects legal entity "acme" in its master data
+    And "acme-other-record" output reflects legal entity "acme" in its master data

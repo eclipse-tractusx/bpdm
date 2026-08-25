@@ -27,6 +27,18 @@ The tester talks to four clients: Pool, Orchestrator, and one Gate client per si
 golden record output. The output client defaults to the input client in every setting, so how many credentials
 you need depends on the Gate.
 
+A few scenarios need *further* sharing members, each sharing through a Gate of its own. Two of them show what
+members see of a golden record they share — the other's master data changes, and the sharing member count
+rising. A third is what makes the confidence level itself move, since the count only counts towards that level
+from three members on. Each further member takes a pair of clients, `bpdm.client.gate-2-input` /
+`gate-2-output` and `bpdm.client.gate-3-input` / `gate-3-output`, configured through the `BPDM_INT_GATE_2_*`
+and `BPDM_INT_GATE_3_*` variables below. Naming a Gate is what marks a run as having that member.
+
+Leave them unset and the run acts for a single sharing member: the scenarios tagged `@TwoSharingMembers` and
+`@ThreeSharingMembers` are then reported as skipped instead of failing, and the run's exit code stays
+unaffected. They are also excluded from the `@Smoke` subset, since each drives two or three golden record round
+trips.
+
 **One technical user for everything.** A Central-IDP user holding the Pool, Gate and Orchestrator permissions
 serves all four clients; this is how the Gate of the golden record core deployment is tested:
 
@@ -54,6 +66,26 @@ the output client follows it. Both Gate users have to belong to the same company
 in the two tokens before the first scenario and refuses to run on a mismatch, because the Gate would otherwise
 answer every output read with an empty page.
 
+**A second sharing member.** Add the Gate and the two users of another sharing member to also run the scenarios
+that need two of them. The tester checks before the first scenario that the second member's BPNL differs from
+the first's, since two members from one company would neither be told apart by their Gates nor counted as two:
+
+```bash
+SPRING_PROFILES_ACTIVE=int \
+BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
+BPDM_INT_GATE_2_BASE_URL=https://business-partners.int.catena-x.net/companies/<other member> \
+BPDM_INT_GATE_2_INPUT_CLIENT_ID=<input manager id> BPDM_INT_GATE_2_INPUT_CLIENT_SECRET=<input manager secret> \
+BPDM_INT_GATE_2_OUTPUT_CLIENT_ID=<output consumer id> BPDM_INT_GATE_2_OUTPUT_CLIENT_SECRET=<output consumer secret> \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+```
+
+A third member follows the same shape, with `BPDM_INT_GATE_3_BASE_URL` and the four
+`BPDM_INT_GATE_3_*_CLIENT_*` variables; every member has to act for a company of its own.
+
+Locally, the checked-in `gate-2` and `gate-3` profiles name the further Gates of a local installation instead:
+`SPRING_PROFILES_ACTIVE=gate-2,gate-3`. See
+[INSTALL.md](../INSTALL.md#further-gates-for-further-sharing-members) for how to run those Gates.
+
 Note that the profile has to come from the environment — `--spring.profiles.active` is forwarded to the
 Cucumber CLI, not to Spring, and aborts the run. The full release procedure is in the
 [end-to-end testing guide](../docs/maintainer/e2e-testing.md), including
@@ -69,7 +101,7 @@ The plugin is off by default, because the CI helm-test pod runs on a read-only f
 so a run against a deployed environment has to ask for it. The upload is described in
 [upload the test execution](../docs/maintainer/e2e-testing.md#3-upload-the-test-execution).
 
-To run only the fast round-trip smoke scenarios (as the daily CI does), filter by tag:
+To run only the fast round-trip smoke scenarios (as CI does on a pull request; its nightly run takes the whole suite), filter by tag:
 ```bash
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @Smoke
 ```

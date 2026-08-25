@@ -23,11 +23,11 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 
 /**
  * Steps for the "Ultimate Owner Distribution" feature.
@@ -36,7 +36,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
  * refinement generated, because the generated BPNs are placeholders the Pool replaces with the ones it assigns.
  */
 class UltimateOwnerDistributionStepDefs(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val shareActions: BusinessPartnerShareActions,
     private val apiCallEvidence: ApiCallEvidence
 ) : SpringTestRunConfiguration() {
@@ -46,6 +46,8 @@ class UltimateOwnerDistributionStepDefs(
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
     private val scenarioName: String get() = context.scenarioName
 
     // -------------------------------------------------------------------------
@@ -114,7 +116,7 @@ class UltimateOwnerDistributionStepDefs(
 
     private fun outputOf(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
         return outputPage.content.singleOrNull() ?: error("no output for record '$recordId'")
     }

@@ -232,6 +232,23 @@ Usage: include "bpdm.gateUrl" .
 {{- end -}}
 {{- end -}}
 
+{{/*
+Compute the base HTTP URL of the second bundled bpdm-gate dependency, the Gate of the second sharing
+member. Incorporates a non-80 service.port when set; otherwise omits the port for a clean URL.
+
+Usage: include "bpdm.gate2Url" .
+*/}}
+{{- define "bpdm.gate2Url" -}}
+{{- $values := index .Values "bpdm-gate-2" | default dict -}}
+{{- $host := include "bpdm.dependencyFullname" (list . $values "bpdm-gate-2") -}}
+{{- $port := ($values.service | default dict).port | default 80 -}}
+{{- if eq ($port | toString) "80" -}}
+{{- printf "http://%s" $host -}}
+{{- else -}}
+{{- printf "http://%s:%v" $host $port -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "bpdm.externalApplicationConfig.names" -}}
 {{- $ctx := . -}}
 {{- $names := list -}}

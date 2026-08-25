@@ -3,6 +3,13 @@
 # (OwnerShared signal) and whether the golden record process provider verified it against an external data
 # source (Verified signal, set by refining with vs. without external verification).
 #
+# A third criterion, the number of sharing members, is not a signal a refinement carries: the Pool counts
+# the sharing members that share a golden record. The count is held on the address and mirrored onto the legal
+# entity whose legal address it is, which is why both are asserted. It only counts towards the confidence
+# LEVEL from three sharing members on, so the scenarios at the end of this feature cover it in three steps:
+# the count of a single member, its rise to two, and the level rising with the third. Each of the latter two
+# needs a Gate per sharing member to share through and is skipped when the run has fewer of them.
+#
 # The OwnerShared signal is only *requested* by the sharing member (by sharing as own vs. third-party data);
 # it is the golden record process refinement step that *finally assigns* it. The owner can signal intent, but
 # the refinement determines what the record actually is, and it assigns the signal only to the entity the
@@ -179,3 +186,70 @@ Feature: Output Reflects Golden Record Confidence Criteria
     Then "acme-site-address-record" output reflects OwnerShared confidence for its site
     And "acme-site-address-record" output reflects NoConfidence for its legal entity
     And "acme-site-address-record" output reflects OwnerShared confidence for its additional address
+
+  # -- Sharing member count --
+
+  #h3. Test Objective:
+  #
+  #* Verify the sharing member count of a golden record shared by a single sharing member is one.
+  #
+  #h3. Description:
+  #
+  #* The sharing member shares an own company record.
+  #* The golden record process refines it to a legal entity.
+  #* The output reflects a sharing member count of one for the legal entity and the legal address.
+  @BPDM
+  Scenario: Legal Entity Shared By One Sharing Member
+    When the sharing member shares own company record "acme-record"
+    And the golden record process refines record "acme-record" to a legal entity without external verification
+    Then "acme-record" output reflects a sharing member count of 1 for its legal entity
+    And "acme-record" output reflects a sharing member count of 1 for its legal address
+
+  #h3. Test Objective:
+  #
+  #* Verify the sharing member count of a golden record rises when a second sharing member shares the same golden record, for both members.
+  #
+  #h3. Preconditions:
+  #
+  #* A record of the first sharing member reflects a legal entity with a sharing member count of one.
+  #
+  #h3. Description:
+  #
+  #* The second sharing member shares an own company record.
+  #* The golden record process refines it to the same legal entity.
+  #* Both sharing members' outputs reflect a sharing member count of two for the legal entity and the legal address.
+  @TwoSharingMembers @BPDM
+  Scenario: Legal Entity Shared By Two Sharing Members
+    Given record "acme-record" of the first sharing member reflects legal entity "acme" with master data "acme-content"
+    And "acme-record" output reflects a sharing member count of 1 for its legal entity
+    When the second sharing member shares own company record "acme-other-record"
+    And the golden record process refines record "acme-other-record" to legal entity "acme" with master data "acme-content"
+    Then "acme-record" output reflects a sharing member count of 2 for its legal entity
+    And "acme-record" output reflects a sharing member count of 2 for its legal address
+    And "acme-other-record" output reflects a sharing member count of 2 for its legal entity
+    And "acme-other-record" output reflects a sharing member count of 2 for its legal address
+
+  #h3. Test Objective:
+  #
+  #* Verify the confidence level of a golden record rises once a third sharing member shares it.
+  #
+  #h3. Description:
+  #
+  #* Three sharing members each share a third-party record of their own.
+  #* The golden record process refines both to the same legal entity.
+  #* Only from the third sharing member on does the sharing member count raise the confidence level, from zero to one.
+  @ThreeSharingMembers @BPDM
+  Scenario: Legal Entity Shared By Three Sharing Members
+    When the first sharing member shares third-party record "acme-record"
+    And the golden record process refines record "acme-record" to legal entity "acme" with master data "acme-content"
+    Then "acme-record" output reflects a sharing member count of 1 for its legal entity
+    And "acme-record" output reflects a confidence level of 0 for its legal entity
+    When the second sharing member shares third-party record "acme-second-record"
+    And the golden record process refines record "acme-second-record" to legal entity "acme" with master data "acme-content"
+    Then "acme-record" output reflects a sharing member count of 2 for its legal entity
+    And "acme-record" output reflects a confidence level of 0 for its legal entity
+    When the third sharing member shares third-party record "acme-third-record"
+    And the golden record process refines record "acme-third-record" to legal entity "acme" with master data "acme-content"
+    Then "acme-record" output reflects a sharing member count of 3 for its legal entity
+    And "acme-record" output reflects a confidence level of 1 for its legal entity
+    And "acme-third-record" output reflects a confidence level of 1 for its legal entity

@@ -1,4 +1,3 @@
-#!/bin/sh
 ################################################################################
 # Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
@@ -18,9 +17,23 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-psql -U postgres -c "CREATE USER bpdm" -c "CREATE DATABASE bpdm" -c "GRANT ALL PRIVILEGES ON DATABASE bpdm TO bpdm"
-psql -U postgres -c "CREATE USER keycloak" -c "CREATE DATABASE keycloak"  -c "GRANT ALL PRIVILEGES ON DATABASE keycloak TO keycloak"
-psql -U postgres -d keycloak -c "GRANT ALL PRIVILEGES ON SCHEMA public TO keycloak"
+# Runs the chart tests once a night with the entire system-tester suite instead of the smoke subset a pull
+# request gets. That scope is also the only one that deploys a second Gate, so the scenarios asserting what
+# two sharing members see of the same golden record run here and nowhere else in CI.
+#
+# It is a deployment check on a throwaway cluster, not the release validation: that one is the manual run
+# against the INT deployment, described in docs/maintainer/e2e-testing.md.
 
-psql -U postgres -c "CREATE DATABASE bpdm_gate_2" -c "GRANT ALL PRIVILEGES ON DATABASE bpdm_gate_2 TO bpdm"
-psql -U postgres -c "CREATE DATABASE bpdm_gate_3" -c "GRANT ALL PRIVILEGES ON DATABASE bpdm_gate_3 TO bpdm"
+name: Perform Nightly Chart Tests
+
+on:
+  schedule:
+    # Not on the hour, where scheduled workflows queue up, and after the daily scanning jobs at midnight.
+    - cron: "20 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  full-suite:
+    uses: ./.github/workflows/app-test-charts.yaml
+    with:
+      test_scope: full

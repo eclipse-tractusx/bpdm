@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -41,11 +40,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDt
  * which also makes it robust against the address-type swap an IsReplacedBy relation triggers.
  */
 class GoldenRecordRelationAssertHelper(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val apiCallEvidence: ApiCallEvidence
 ) {
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
 
     /**
      * Asserts the [recordId] output's legal entity reflects [relation] in its golden record relations. When
@@ -113,7 +114,7 @@ class GoldenRecordRelationAssertHelper(
         val expectedBpns = resolvedBpnPair(relation)
 
         val searchRequest = RelationOutputSearchRequest(externalIds = listOf(runId))
-        val outputPage = gateClient.relationOutput.postSearch(searchRequest, PaginationRequest())
+        val outputPage = gateOf(relation.sourceRecordId).relationOutput.postSearch(searchRequest, PaginationRequest())
         apiCallEvidence.attach("POST", "/v7/output/relations/search", searchRequest, outputPage)
 
         val output = outputPage.content.singleOrNull()
@@ -153,7 +154,7 @@ class GoldenRecordRelationAssertHelper(
 
     private fun fetchOutput(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", listOf(runId), outputPage)
         return outputPage.content.single()
     }
