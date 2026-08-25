@@ -11,9 +11,18 @@ For a local execution you can follow the following steps:
 mvn -B -U clean package -pl bpdm-system-tester -am -DskipTests
 ```
 2. Install and run the BPDM applications, make sure to use the `system-tester` configuration wherever available.
+   That includes the [further Gates](../INSTALL.md#further-gates-for-further-sharing-members) of the second and
+   third sharing member: a run with no configuration acts for all three, so a stack running only the first Gate
+   fails the scenarios that need the others rather than skipping them.
 3. Run the JAR file so the tests will be executed:
 ```bash
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+```
+
+To act for fewer sharing members, clear the base-url of the Gates to leave out — that is what marks a member as
+absent, and its scenarios are then reported as skipped:
+```bash
+BPDM_CLIENT_GATE_3_INPUT_BASE_URL= java -jar bpdm-system-tester/target/bpdm-system-tester.jar
 ```
 
 ## Running against a deployed environment
@@ -82,9 +91,8 @@ BPDM_INT_GATE_2_OUTPUT_CLIENT_ID=<output consumer id> BPDM_INT_GATE_2_OUTPUT_CLI
 A third member follows the same shape, with `BPDM_INT_GATE_3_BASE_URL` and the four
 `BPDM_INT_GATE_3_*_CLIENT_*` variables; every member has to act for a company of its own.
 
-Locally, the checked-in `gate-2` and `gate-3` profiles name the further Gates of a local installation instead:
-`SPRING_PROFILES_ACTIVE=gate-2,gate-3`. See
-[INSTALL.md](../INSTALL.md#further-gates-for-further-sharing-members) for how to run those Gates.
+Locally no such variables are needed: the further Gates of a local installation are checked in as the default
+configuration. See [INSTALL.md](../INSTALL.md#further-gates-for-further-sharing-members) for how to run them.
 
 Note that the profile has to come from the environment — `--spring.profiles.active` is forwarded to the
 Cucumber CLI, not to Spring, and aborts the run. The full release procedure is in the

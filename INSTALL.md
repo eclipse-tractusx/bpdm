@@ -84,6 +84,8 @@ They run on ports 8082 and 8083 against their own `bpdm_gate_2` and `bpdm_gate_3
 Their technical users in the `BPDM` realm are `BPDM_GATE_2_INPUT_MANAGER` / `BPDM_GATE_2_OUTPUT_CONSUMER` and `BPDM_GATE_3_INPUT_MANAGER` / `BPDM_GATE_3_OUTPUT_CONSUMER`; the first Gate's `BPDM_GATE`, `BPDM_GATE_INPUT_MANAGER` and `BPDM_GATE_OUTPUT_CONSUMER` belong to `BPNL000000000001` and are not authorized on either.
 All Gates share the one Orchestrator and Pool: which member a Gate acts for travels in the golden record task, not in the credentials the Gate calls them with.
 
+The system tester names all three of them in its default configuration, so a local run of the end-to-end suite expects them to be up; see its [README](bpdm-system-tester/README.md) for how to act for fewer sharing members instead.
+
 A single Gate cannot stand in for several.
 It does keep the members' data apart by the BPNL in the token, but it decides which of its records count towards a golden record's sharing member count across all of them, so a further member sharing through the same Gate would not be counted.
 
