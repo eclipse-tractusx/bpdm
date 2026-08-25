@@ -30,16 +30,21 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidTaskCreateReq
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.GoldenRecordTaskCreateInboundMapper
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.GoldenRecordTaskCreateOutboundMapper
+import org.eclipse.tractusx.bpdm.orchestrator.mapper.GoldenRecordTaskSearchResultStatesInboundMapper
+import org.eclipse.tractusx.bpdm.orchestrator.mapper.GoldenRecordTaskSearchResultStatesOutboundMapper
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskCreateParseError
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskCreateParsed
+import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskSearchResultStatesParseError
 import org.eclipse.tractusx.bpdm.orchestrator.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskSearchResultStatesOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskStateMachine
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.PaginationInfo
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskResponseParser
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskSearchResultStatesParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -59,7 +64,11 @@ class GoldenRecordTaskApplicationService(
     private val createParser: GoldenRecordTaskCreateParser,
     private val createOperation: GoldenRecordTaskCreateOperation,
     private val createInboundMapper: GoldenRecordTaskCreateInboundMapper,
-    private val createOutboundMapper: GoldenRecordTaskCreateOutboundMapper
+    private val createOutboundMapper: GoldenRecordTaskCreateOutboundMapper,
+    private val searchResultStatesParser: GoldenRecordTaskSearchResultStatesParser,
+    private val searchResultStatesOperation: GoldenRecordTaskSearchResultStatesOperation,
+    private val searchResultStatesInboundMapper: GoldenRecordTaskSearchResultStatesInboundMapper,
+    private val searchResultStatesOutboundMapper: GoldenRecordTaskSearchResultStatesOutboundMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -92,14 +101,16 @@ class GoldenRecordTaskApplicationService(
 
     fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
         logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
+        val parseResults = searchResultStatesParser.parse(searchResultStatesInboundMapper.toRequests(stateRequest))
+        val parseErrors = parseResults.filterIsInstance<ParseResult.Failure<GoldenRecordTaskSearchResultStatesParseError>>().flatMap { it.errors }
 
-        val uuidsToSearch = stateRequest.taskIds.map { toUUID(it) }.toSet()
-        val tasksByUuid  = taskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
+        if (parseErrors.isNotEmpty())
+            throw BpdmTaskNotFoundException(parseErrors.joinToString("; ") { it.toMessage() })
 
-        return TaskResultStateSearchResponse(uuidsToSearch
-            .map { tasksByUuid[it]?.processingState?.resultState }
-            .map { it?.let { responseParser.toResultState(it) }
-            })
+        val parsedEntries = parseResults.filterIsInstance<ParseResult.Success<*>>()
+            .map { (it as ParseResult.Success<*>).parsed as org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskSearchResultStatesParsed }
+        val resultStates = searchResultStatesOperation.search(parsedEntries)
+        return searchResultStatesOutboundMapper.toResponse(resultStates)
     }
 
     fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
@@ -260,6 +271,11 @@ private fun GoldenRecordTaskCreateParseError.toMessage() = when (this) {
     is GoldenRecordTaskCreateParseError.RecordNotFound -> "Record ID in '$path' was not found: '$value'"
     is GoldenRecordTaskCreateParseError.AdditionalSitesWithoutMainSite ->
         "At '$path': additional sites are stated but no site of its own is stated"
+}
+
+private fun GoldenRecordTaskSearchResultStatesParseError.toMessage() = when (this) {
+    is GoldenRecordTaskSearchResultStatesParseError.InvalidTaskId -> "Invalid UUID in '$path': '$value'"
+    is GoldenRecordTaskSearchResultStatesParseError.TaskNotFound -> "Task ID in '$path' was not found: '$value'"
 }
 
 private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =

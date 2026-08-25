@@ -1,0 +1,50 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.orchestrator.mapper
+
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTaskSearchResultStatesRequest
+import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskResponseParser
+import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchResponse
+import org.springframework.stereotype.Component
+
+@Component
+class GoldenRecordTaskSearchResultStatesInboundMapper {
+    fun toRequests(searchRequest: TaskResultStateSearchRequest): List<GoldenRecordTaskSearchResultStatesRequest> {
+        return searchRequest.taskIds.mapIndexed { index, taskId ->
+            GoldenRecordTaskSearchResultStatesRequest(
+                index = index,
+                taskId = taskId
+            )
+        }
+    }
+}
+
+@Component
+class GoldenRecordTaskSearchResultStatesOutboundMapper(
+    private val responseParser: GoldenRecordTaskResponseParser
+) {
+    fun toResponse(resultStates: List<GoldenRecordTaskDb.ResultState?>): TaskResultStateSearchResponse {
+        return resultStates
+            .map { it?.let { responseParser.toResultState(it) } }
+            .let { TaskResultStateSearchResponse(it) }
+    }
+}
