@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
@@ -205,7 +206,9 @@ class GoldenRecordTaskService(
     private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
         val hasSite = businessPartner.site?.bpnReference?.referenceValue != null || businessPartner.site?.siteName != null
         if (businessPartner.additionalSites.isNotEmpty() && !hasSite) {
-            logger.warn { "Business partner has additional sites but no main site" }
+            throw BpdmInvalidBusinessPartnerException(
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
         }
     }
 }

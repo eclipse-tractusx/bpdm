@@ -61,7 +61,7 @@ class GoldenRecordTaskCreateApplicationService(
     @Transactional
     fun createTasksV7(createRequest: TaskCreateRequest): TaskCreateResponse {
         val requests = createRequest.requests.map { inboundMapperV7.toRequest(it) }
-        val createdTasks = createTasks(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = true)
+        val createdTasks = createTasks(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = null)
 
         return createdTasks
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
