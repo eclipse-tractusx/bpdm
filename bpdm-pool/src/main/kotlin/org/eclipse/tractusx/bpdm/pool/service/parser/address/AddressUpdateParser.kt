@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed

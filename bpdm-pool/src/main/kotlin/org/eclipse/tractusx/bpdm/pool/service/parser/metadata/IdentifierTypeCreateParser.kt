@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError.TechnicalKeyAlreadyTaken
 import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeCreateParsed

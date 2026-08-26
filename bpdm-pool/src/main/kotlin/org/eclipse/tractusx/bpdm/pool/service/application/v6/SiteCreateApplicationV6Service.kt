@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVer
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
