@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
