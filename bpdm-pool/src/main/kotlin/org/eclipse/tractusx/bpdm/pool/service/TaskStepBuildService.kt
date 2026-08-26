@@ -185,7 +185,7 @@ class TaskStepBuildService(
         val createdSites = parseAndExecuteAllOrNone(
             requests,
             siteCreateOnAddressParser::parse,
-            { errors -> BpdmMultiValidationException(errors.map { renderError(it) }) },
+            { errors -> BpdmMultiValidationException(errors.map { renderSiteCreateError(it) }) },
             siteCreateWithReferencedAddressAsMainService::create
         )
 
@@ -202,7 +202,7 @@ class TaskStepBuildService(
         parseAndExecuteAllOrNone(
             requests,
             addressSiteAssignmentParser::parse,
-            { errors -> BpdmMultiValidationException(errors.map { renderError(it) }) },
+            { errors -> BpdmMultiValidationException(errors.map { renderAddressSiteAssignmentError(it) }) },
             addressUpdateService::assignToSites
         )
     }
@@ -278,7 +278,7 @@ class TaskStepBuildService(
         val request = taskLegalEntityRequestMapper.toCreateRequest(legalEntity)
         return when (val result = parseAndExecute(listOf(request), legalEntityCreateParser::parse, legalEntityCreateService::create).single()) {
             is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityCreateError(it) })
         }
     }
 
@@ -286,7 +286,7 @@ class TaskStepBuildService(
         val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
         return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parseWithoutCoverageCheck, legalEntityPayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityUpdateError(it) })
         }
     }
 
@@ -358,7 +358,7 @@ class TaskStepBuildService(
         val request = taskSiteRequestMapper.toCreateWithReferencedAddressAsMainRequest(existingAddress.bpn, mergedSite, siteMainAddress)
         val createdSite = when (val result = parseAndExecute(listOf(request), siteCreateWithReferencedAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).single()) {
             is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteCreateError(it) })
         }
 
         taskEntryBpnMapping.addMapping(bpnSReference, createdSite.bpn)
@@ -411,7 +411,7 @@ class TaskStepBuildService(
 
         return when (result) {
             is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteCreateError(it) })
         }
     }
 
@@ -424,7 +424,7 @@ class TaskStepBuildService(
         val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress, additionalMainAddressScriptVariants)
         return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parseWithoutCoverageCheck, sitePayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteUpdateError(it) })
         }
     }
 
@@ -493,7 +493,7 @@ class TaskStepBuildService(
         val result = parseAndExecute(listOf(request), typedParentAddressCreateParser::parse, addressCreateService::create).single()
         return when (result) {
             is ParseResult.Success -> result.parsed.bpn
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderError(it)}" })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderAddressCreateError(it)}" })
         }
     }
 
@@ -511,47 +511,50 @@ class TaskStepBuildService(
         val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressPayloadUpdateService::update).single()
         return when (result) {
             is ParseResult.Success -> result.parsed.value.bpn
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderAddressUpdateError(it)}" })
         }
     }
 
     // Address parse errors are rendered to messages here (caller-local) so the task path keeps its existing error wording;
     // the field errors reuse the CleaningError texts the old throwing translation produced.
-    private fun renderError(error: AddressCreateParseError): String =
+    // Each renderer is named after the error type it takes rather than overloading one name: the content and coverage errors
+    // subtype several operation error interfaces each, so overloads would resolve on static type alone and a branch delegating
+    // to the wrong one would still compile, silently emitting another operation's wording.
+    private fun renderAddressCreateError(error: AddressCreateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
             // Unreachable on the task path: parents arrive already typed, so the untyped-stage InvalidParentBpn never occurs here.
             is InvalidParentBpn -> "Parent ${error.bpn} is not a valid BPNL/BPNS"
-            is AddressContentParseError -> renderError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: AddressSiteAssignmentParseError): String =
+    private fun renderAddressSiteAssignmentError(error: AddressSiteAssignmentParseError): String =
         when (error) {
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
         }
 
-    private fun renderError(error: AddressUpdateParseError): String =
+    private fun renderAddressUpdateError(error: AddressUpdateParseError): String =
         when (error) {
-            is ScriptVariantCoverageParseError -> renderError(error)
+            is ScriptVariantCoverageParseError -> renderScriptVariantCoverageError(error)
             is UnresolvableAddress -> "Address ${error.bpn} not found"
-            is AddressContentParseError -> renderError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
         }
 
-    private fun renderError(error: AddressContentParseError): String =
+    private fun renderAddressContentError(error: AddressContentParseError): String =
         when (error) {
-            is AddressFieldParseError -> renderFieldError(error)
-            is AddressMetadataParseError -> renderMetadataError(error)
-            is AddressConstraintParseError -> renderConstraintError(error)
-            is AddressScriptVariantParseError -> renderScriptVariantError(error)
+            is AddressFieldParseError -> renderAddressFieldError(error)
+            is AddressMetadataParseError -> renderAddressMetadataError(error)
+            is AddressConstraintParseError -> renderAddressConstraintError(error)
+            is AddressScriptVariantParseError -> renderAddressScriptVariantError(error)
         }
 
-    private fun renderFieldError(error: AddressFieldParseError): String =
+    private fun renderAddressFieldError(error: AddressFieldParseError): String =
         when (error) {
             AddressFieldParseError.PhysicalCountryMissing -> CleaningError.PHYSICAL_ADDRESS_COUNTRY_MISSING.message
             AddressFieldParseError.PhysicalCityMissing -> CleaningError.PHYSICAL_ADDRESS_CITY_MISSING.message
@@ -566,7 +569,7 @@ class TaskStepBuildService(
             is AddressFieldParseError.StateTypeMissing -> "Business Partner state type is null"
         }
 
-    private fun renderMetadataError(error: AddressMetadataParseError): String =
+    private fun renderAddressMetadataError(error: AddressMetadataParseError): String =
         when (error) {
             is AddressMetadataParseError.IdentifierTypeNotFound -> "Address identifier type '${error.type}' is not known"
             is AddressMetadataParseError.PhysicalRegionNotFound -> "Region '${error.regionCode}' in physical address is not known"
@@ -574,27 +577,27 @@ class TaskStepBuildService(
             is AddressMetadataParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
         }
 
-    private fun renderConstraintError(error: AddressConstraintParseError): String =
+    private fun renderAddressConstraintError(error: AddressConstraintParseError): String =
         when (error) {
             is AddressConstraintParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
             is AddressConstraintParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
         }
 
-    private fun renderScriptVariantError(error: AddressScriptVariantParseError): String =
+    private fun renderAddressScriptVariantError(error: AddressScriptVariantParseError): String =
         when (error) {
             is AddressScriptVariantParseError.PhysicalCityMissing -> "Script variant ${error.index} has no city in its physical address"
             is AddressScriptVariantParseError.AlternativeCityMissing -> "Script variant ${error.index} has no city in its alternative address"
             is AddressScriptVariantParseError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
         }
 
-    private fun renderError(error: LegalEntityCreateParseError): String =
+    private fun renderLegalEntityCreateError(error: LegalEntityCreateParseError): String =
         when (error) {
             is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
-            is LegalEntityContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is LegalEntityContentParseError -> renderLegalEntityContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: LegalEntityUpdateParseError): String =
+    private fun renderLegalEntityUpdateError(error: LegalEntityUpdateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is MultipleUltimateOwnersInHierarchy ->
@@ -603,11 +606,11 @@ class TaskStepBuildService(
             is AlternativeHeadquarterCannotOwnUltimately ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
             is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
-            is LegalEntityContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is LegalEntityContentParseError -> renderLegalEntityContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: LegalEntityContentParseError): String =
+    private fun renderLegalEntityContentError(error: LegalEntityContentParseError): String =
         when (error) {
             LegalEntityContentParseError.NameMissing -> CleaningError.LEGAL_NAME_IS_NULL.message
             LegalEntityContentParseError.ConfidenceCriteriaMissing -> CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message
@@ -623,25 +626,25 @@ class TaskStepBuildService(
                 "Duplicate legal entity script variant for script code '${error.scriptCode}'"
         }
 
-    private fun renderError(error: SiteCreateParseError): String =
+    private fun renderSiteCreateError(error: SiteCreateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
             is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
-            is SiteContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is SiteContentParseError -> renderSiteContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: SiteUpdateParseError): String =
+    private fun renderSiteUpdateError(error: SiteUpdateParseError): String =
         when (error) {
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
-            is SiteContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is SiteContentParseError -> renderSiteContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: ScriptVariantCoverageParseError): String =
+    private fun renderScriptVariantCoverageError(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"
             is ScriptVariantCoverageStillNeeded ->
@@ -651,16 +654,16 @@ class TaskStepBuildService(
     private fun renderLegalAddressCoverageError(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the legal address"
-            is ScriptVariantCoverageStillNeeded -> renderError(error)
+            is ScriptVariantCoverageStillNeeded -> renderScriptVariantCoverageError(error)
         }
 
     private fun renderMainAddressCoverageError(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
-            is ScriptVariantCoverageStillNeeded -> renderError(error)
+            is ScriptVariantCoverageStillNeeded -> renderScriptVariantCoverageError(error)
         }
 
-    private fun renderError(error: SiteContentParseError): String =
+    private fun renderSiteContentError(error: SiteContentParseError): String =
         when (error) {
             SiteContentParseError.NameMissing -> CleaningError.SITE_NAME_MISSING.message
             SiteContentParseError.ConfidenceCriteriaMissing -> CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message
@@ -772,7 +775,7 @@ class TaskStepBuildService(
 
     private fun assertScriptVariantCoverage(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
         val violations = coverageValidator.validate(businessPartner, taskEntryBpnMapping)
-        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { renderError(it) })
+        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { renderScriptVariantCoverageError(it) })
     }
 
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {
