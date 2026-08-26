@@ -33,7 +33,6 @@ import org.springframework.scheduling.Trigger
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import org.springframework.web.util.HtmlUtils
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -51,13 +50,10 @@ class UserLoggingFilter(
         request.requestURI.startsWith(ACTUATOR_PATH)
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-        val userName = request.userPrincipal?.name ?: logConfigProperties.unknownUser
-        val escapedUserName = HtmlUtils.htmlEscape(userName)
-        val escapedRequest = HtmlUtils.htmlEscape(request.requestURI)
-        val escapedMethod = HtmlUtils.htmlEscape(request.method)
+        val userName = sanitize(request.userPrincipal?.name ?: logConfigProperties.unknownUser)
 
         withLoggingContext(
-            "user" to escapedUserName,
+            "user" to userName,
         ) {
             val startedAt = System.nanoTime()
             try {
@@ -66,7 +62,7 @@ class UserLoggingFilter(
                 if (logger.isDebugEnabled) {
                     val durationMillis = (System.nanoTime() - startedAt) / 1_000_000
                     logger.debug(
-                        "User '$escapedUserName' requested $escapedMethod $escapedRequest: " +
+                        "User '$userName' requested ${request.method} ${request.requestURI}: " +
                                 "${response.status} in ${durationMillis}ms"
                     )
                 }
@@ -74,8 +70,18 @@ class UserLoggingFilter(
         }
     }
 
+    // The name comes from a token claim, and the logging context puts it on every line the request writes: a line
+    // break in it would forge a log record. The request method and URI need no such treatment, as the servlet
+    // container already rejects control characters in the request line.
+    private fun sanitize(userName: String) =
+        userName.asSequence()
+            .map { if (it.isISOControl()) CONTROL_CHARACTER_REPLACEMENT else it }
+            .take(logConfigProperties.userMaxLength)
+            .joinToString("")
+
     companion object {
         private const val ACTUATOR_PATH = "/actuator"
+        private const val CONTROL_CHARACTER_REPLACEMENT = '_'
     }
 }
 
