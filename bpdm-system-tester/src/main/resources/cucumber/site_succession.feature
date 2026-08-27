@@ -6,7 +6,7 @@
 # succession has no side effects on the involved sites: nothing is reclassified, nothing is inherited and no
 # state changes, so the predecessor site keeps its addresses and its state. This feature gathers the scenarios
 # for site successions.
-@CXTPM-1039
+@CXTPM-1043
 Feature: Site Succession
 
   #h3. Test Objective:
@@ -15,14 +15,14 @@ Feature: Site Succession
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect a site of the same legal entity (predecessor and successor).
+  #* Two records each reflect a site of the same legal entity (predecessor and successor).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the predecessor site record to the successor site record, effective immediately.
-  ## The golden record process establishes the relation between the two BPNS.
-  ## The relation output reflects the established golden record relation.
-  @BPDM
+  #* The sharing member shares an IsReplacedBy relation from the predecessor site record to the successor site record, effective immediately.
+  #* The golden record process establishes the relation between the two BPNS.
+  #* The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1056 @BPDM
   Scenario: IsReplacedBy Relation Between Sites Reflected In Sharing Member Relation Output
     Given record "predecessor-site-record" reflects site "predecessor-site" of legal entity "acme"
     And record "successor-site-record" reflects site "successor-site" of legal entity "acme"
@@ -36,14 +36,14 @@ Feature: Site Succession
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect a site of the same legal entity (predecessor and successor).
+  #* Two records each reflect a site of the same legal entity (predecessor and successor).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the predecessor site record to the successor site record, effective immediately.
-  ## The golden record process establishes the relation between the two BPNS.
-  ## Both records' outputs reflect the relation on their site.
-  @BPDM
+  #* The sharing member shares an IsReplacedBy relation from the predecessor site record to the successor site record, effective immediately.
+  #* The golden record process establishes the relation between the two BPNS.
+  #* Both records' outputs reflect the relation on their site.
+  @TEST_CXTPM-1055 @BPDM
   Scenario: IsReplacedBy Relation Between Sites Reflected In Site Outputs
     Given record "predecessor-site-record" reflects site "predecessor-site" of legal entity "acme"
     And record "successor-site-record" reflects site "successor-site" of legal entity "acme"

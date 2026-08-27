@@ -60,6 +60,10 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
 
     fun scenarioId() = "$scenarioSuffix-$timeSuffix"
     fun runId(id: String) = "$id-${scenarioId()}"
+
+    /** Returns the sharing member that shared the record, whose Gate every later step on it acts through. */
+    fun memberOf(recordId: String): SharingMember =
+        records[recordId]?.member ?: error("record '$recordId' must be shared by an earlier step")
 }
 
 data class SiteBasedLegalEntity(
@@ -83,6 +87,7 @@ data class AdditionalLegalEntityAddressWithParent(
 )
 
 data class RecordState(
+    val member: SharingMember,
     val contentSeed: String? = null,
     val currentInput: BusinessPartnerInputRequest? = null,
     val legalEntity: LegalEntityWithLegalAddressVerboseDto? = null,

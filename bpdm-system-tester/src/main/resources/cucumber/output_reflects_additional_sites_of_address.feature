@@ -22,10 +22,7 @@
 # The shared address can be an ADDITIONAL address of the sites (first scenarios) or the sites' MAIN
 # address (last scenario): the golden record flow lets a new site adopt an already-existing address as
 # its main address, so several sites can share one main address.
-#
-# TODO: replace the placeholder @CXTPM-XXXX / @TEST_CXTPM-XXXX tags with the real Jira issue and
-# test-case ids once they exist.
-@CXTPM-XXXX
+@CXTPM-1043
 Feature: Output Reflects Additional Sites Of Address
 
   #h3. Test Objective:
@@ -34,10 +31,10 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Description:
   #
-  ## The sharing member shares two records.
-  ## The golden record process refines both to the same additional address, each under a different site of the same legal entity.
-  ## Each record's output reflects its own site and lists the other record's site as an additional site of the shared address.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares two records.
+  #* The golden record process refines both to the same additional address, each under a different site of the same legal entity.
+  #* Each record's output reflects its own site and lists the other record's site as an additional site of the shared address.
+  @TEST_CXTPM-1050 @BPDM
   Scenario: Additional Sites Of Shared Address In Output
     When the sharing member shares record "dock-a-record"
     And the golden record process refines record "dock-a-record" to additional address "shared-dock" of site "site-a" of legal entity "acme" with master data "dock-a-content"
@@ -52,10 +49,10 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Description:
   #
-  ## The sharing member shares three records.
-  ## The golden record process refines all three to the same additional address, each under a different site of the same legal entity.
-  ## The Pool address query for that address returns all three sites it belongs to.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares three records.
+  #* The golden record process refines all three to the same additional address, each under a different site of the same legal entity.
+  #* The Pool address query for that address returns all three sites it belongs to.
+  @TEST_CXTPM-1054 @BPDM
   Scenario: Pool Address Returns All Sites It Belongs To
     When the sharing member shares record "dock-a-record"
     And the golden record process refines record "dock-a-record" to additional address "shared-dock" of site "site-a" of legal entity "acme" with master data "dock-a-content"
@@ -71,14 +68,14 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Preconditions:
   #
-  ## An additional address already belongs to two sites of a legal entity.
+  #* An additional address already belongs to two sites of a legal entity.
   #
   #h3. Description:
   #
-  ## The sharing member shares a third record.
-  ## The golden record process refines it to the same additional address under a third site of the same legal entity.
-  ## The first record's output lists both the second and the third site as additional sites of the shared address.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares a third record.
+  #* The golden record process refines it to the same additional address under a third site of the same legal entity.
+  #* The first record's output lists both the second and the third site as additional sites of the shared address.
+  @TEST_CXTPM-1049 @BPDM
   Scenario: New Site Joins The Sites Of An Address
     Given the sharing member shares record "dock-a-record"
     And the sharing member shares record "dock-b-record"
@@ -94,13 +91,13 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Preconditions:
   #
-  ## An additional address already belongs to two sites of a legal entity.
+  #* An additional address already belongs to two sites of a legal entity.
   #
   #h3. Description:
   #
-  ## The sharing member updates the second record.
-  ## The golden record process refines it to the same additional address, but under a different site than before.
-  ## The address belongs to the first record's site and to the second record's new site alone - the site it no longer uses is gone.
+  #* The sharing member updates the second record.
+  #* The golden record process refines it to the same additional address, but under a different site than before.
+  #* The address belongs to the first record's site and to the second record's new site alone - the site it no longer uses is gone.
   @TEST_CXTPM-XXXX @BPDM
   Scenario: Site No Longer Stated Comes Off The Address
     Given the sharing member shares record "dock-a-record"
@@ -118,10 +115,10 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Description:
   #
-  ## The sharing member shares a record.
-  ## The golden record process refines it to an additional address of a single site.
-  ## The record's output lists no additional sites and the Pool address belongs to just that one site.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares a record.
+  #* The golden record process refines it to an additional address of a single site.
+  #* The record's output lists no additional sites and the Pool address belongs to just that one site.
+  @TEST_CXTPM-1048 @BPDM
   Scenario: Single Site Address Has No Additional Sites
     When the sharing member shares record "solo-dock-record"
     And the golden record process refines record "solo-dock-record" to additional address "solo-dock" of site "solo-site" of legal entity "acme" with master data "solo-dock-content"
@@ -134,14 +131,14 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Preconditions:
   #
-  ## A site of a legal entity has been shared and refined, so it exists as a golden record.
+  #* A site of a legal entity has been shared and refined, so it exists as a golden record.
   #
   #h3. Description:
   #
-  ## The sharing member shares a second record, stating the first record's site as an additional site of its address.
-  ## The golden record process refines the second record to an additional address of its own site of the same legal entity.
-  ## The second record's output lists the stated site as an additional site of its address.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares a second record, stating the first record's site as an additional site of its address.
+  #* The golden record process refines the second record to an additional address of its own site of the same legal entity.
+  #* The second record's output lists the stated site as an additional site of its address.
+  @TEST_CXTPM-1051 @BPDM
   Scenario: Sharing Member States An Existing Site By BPNS
     Given the sharing member shares record "werk-a-record"
     And the golden record process refines record "werk-a-record" to site "werk-a" of legal entity "acme" with master data "werk-a-content"
@@ -155,10 +152,10 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Description:
   #
-  ## The sharing member shares a record stating a site that does not exist yet, by name.
-  ## The golden record process refines the record to an additional address of its own site.
-  ## The record's output lists the stated site, now created, as an additional site of its address.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares a record stating a site that does not exist yet, by name.
+  #* The golden record process refines the record to an additional address of its own site.
+  #* The record's output lists the stated site, now created, as an additional site of its address.
+  @TEST_CXTPM-1053 @BPDM
   Scenario: Sharing Member States A New Site By Name
     When the sharing member shares record "dock-record" stating a site named "werk-new" as an additional site of its address
     And the golden record process refines record "dock-record" to additional address "shared-dock" of site "dock-site" of legal entity "acme" with master data "dock-content"
@@ -170,10 +167,10 @@ Feature: Output Reflects Additional Sites Of Address
   #
   #h3. Description:
   #
-  ## The sharing member shares two records.
-  ## The golden record process refines both to distinct sites of the same legal entity that share one main address.
-  ## Each record's output lists the other record's site as an additional site of the shared main address, and the Pool address belongs to both sites.
-  @TEST_CXTPM-XXXX @BPDM
+  #* The sharing member shares two records.
+  #* The golden record process refines both to distinct sites of the same legal entity that share one main address.
+  #* Each record's output lists the other record's site as an additional site of the shared main address, and the Pool address belongs to both sites.
+  @TEST_CXTPM-1047 @BPDM
   Scenario: Sites Sharing A Main Address Belong To Each Other
     When the sharing member shares record "hq-site-a-record"
     And the golden record process refines record "hq-site-a-record" to site "hq-site-a" with shared main address "shared-hq" of legal entity "acme" with master data "hq-a-content"

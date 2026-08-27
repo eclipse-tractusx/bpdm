@@ -28,6 +28,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.reactive.ClientHttpConnector
 
 
 @ConfigurationProperties(prefix = PoolClientConfigurationProperties.PREFIX)
@@ -49,8 +50,12 @@ data class PoolClientConfigurationProperties(
 class PoolClientConfiguration{
 
     @Bean
-    fun poolClient(webClientProvider: BpdmWebClientProvider, properties: PoolClientConfigurationProperties): PoolApiClient{
-     return PoolClientImpl { webClientProvider.builder(properties).build() }
+    fun poolClient(
+        webClientProvider: BpdmWebClientProvider,
+        properties: PoolClientConfigurationProperties,
+        clientConnector: ClientHttpConnector
+    ): PoolApiClient {
+        return PoolClientImpl { webClientProvider.builder(properties).clientConnector(clientConnector).build() }
     }
 }
 
