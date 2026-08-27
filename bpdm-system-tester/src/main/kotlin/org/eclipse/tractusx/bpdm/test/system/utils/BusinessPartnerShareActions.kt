@@ -319,13 +319,33 @@ class BusinessPartnerShareActions(
         attachApiCall("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
         val taskId = sharingStatePage.content.single().taskId!!
         val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
-        // The generated result describes the golden record this record is refined to; the sites the sharing
-        // member stated for its address are not part of that and are carried over as a refinement service does.
-        val result = taskData.copy(additionalSites = reservedTask.businessPartner.additionalSites)
+        val result = taskData.copy(additionalSites = consolidatedSites(recordId, taskData, reservedTask.businessPartner.additionalSites))
         orchestratorClient.goldenRecordTasks.resolveStepResults(
             TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, result)))
         )
     }
+
+    // The sites of the address this record is refined to, next to the record's own site - what the Pool applies as that
+    // address's complete membership. Consolidating this is the refinement service's job and it takes more than the
+    // record at hand: every other record refined to the same address contributes its site, and a record that moves away
+    // takes its site off the address. The scenario's records stand in for the stream a real service would keep a ledger
+    // of; on top of them come the sites the sharing member stated itself.
+    private fun consolidatedSites(recordId: String, taskData: BusinessPartner, statedBySharingMember: List<AdditionalSite>): List<AdditionalSite> {
+        context.sitesByAddressReference.values.forEach { it.remove(recordId) }
+
+        val site = taskData.site ?: return emptyList()
+        val addressReference = recordAddressReference(taskData)
+        context.sitesByAddressReference.getOrPut(addressReference) { mutableMapOf() }[recordId] =
+            AdditionalSite(site.bpnReference, site.siteName)
+
+        val ofOtherRecords = context.sitesByAddressReference.getValue(addressReference).filterKeys { it != recordId }.values
+
+        return (ofOtherRecords + statedBySharingMember).distinctBy { it.bpnReference.referenceValue ?: it.siteName }
+    }
+
+    private fun recordAddressReference(taskData: BusinessPartner): String =
+        with(taskData) { additionalAddress?.bpnReference ?: site?.siteMainAddress?.bpnReference ?: legalEntity.legalAddress.bpnReference }
+            .referenceValue!!
 
     private fun givenConfidence(state: RecordState, verified: Boolean): GivenConfidence =
         GivenConfidence(

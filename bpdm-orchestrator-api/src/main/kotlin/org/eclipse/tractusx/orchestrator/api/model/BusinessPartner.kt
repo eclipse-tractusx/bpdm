@@ -43,8 +43,10 @@ data class BusinessPartner(
     val site: Site?,
     val additionalAddress: PostalAddressWithScriptVariants?,
     @Schema(description = "The further sites the address of this business partner data belongs to, next to the site in 'site'. " +
+            "Together with 'site' this states the address's complete site membership: a site the address currently belongs to but this field leaves out is unlinked from it. " +
+            "Consolidating the records that share an address into that complete list is the golden record process's responsibility, not the Pool's. " +
             "An entry that resolves to an existing site links that site to the address; an entry that does not resolve creates a new site with this address as its main address. " +
-            "An already existing site is never updated through this field, and a site is never unlinked from an address.")
+            "An already existing site is never updated through this field. A site the address is the main address of cannot be unlinked and has to be stated.")
     val additionalSites: List<AdditionalSite> = emptyList(),
 ){
     companion object{

@@ -35,7 +35,14 @@ data class AddressPartnerUpdateRequest(
     @field:JsonUnwrapped
     val address: LogisticAddressDto,
 
-    val scriptVariants: List<LogisticAddressScriptVariantDto> = emptyList()
+    val scriptVariants: List<LogisticAddressScriptVariantDto> = emptyList(),
+
+    @Schema(
+        description = "The BPNS of every site this address belongs to. Stating them replaces the address's current " +
+                "site membership, so a site left out is unlinked; a site whose main address this address is must be " +
+                "stated. Omitting the field leaves the membership untouched."
+    )
+    val bpnSites: List<String>? = null
 
 ): RequestWithKey {
     override fun getRequestKey(): String {

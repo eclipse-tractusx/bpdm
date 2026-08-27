@@ -47,7 +47,7 @@ class AddressDtoRequestMapperV6 {
      * Returns the update request for the address a client sent, addressed by its BPN.
      */
     fun toUpdateRequest(request: AddressPartnerUpdateRequestV6): AddressUpdateRequest =
-        AddressUpdateRequest(addressBpn = request.bpna, siteBpn = null, content = toContentRequest(request.address))
+        AddressUpdateRequest(addressBpn = request.bpna, siteBpns = null, content = toContentRequest(request.address))
 
     /**
      * Returns the content of the given address as the shared loose request model.

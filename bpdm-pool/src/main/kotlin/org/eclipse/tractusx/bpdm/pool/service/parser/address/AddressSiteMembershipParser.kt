@@ -22,41 +22,46 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressSiteAssignmentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteAssignmentParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteAssignmentRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressSiteMembershipParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates requests to add an address to a site's membership: both partners must resolve and must share a legal entity.
+ * Validates requests stating the complete site membership of an address: every partner must resolve, every stated site
+ * must share the address's legal entity, and no site the address is the main address of may be left out.
  *
  * The address's own content is not part of such a request, so no content or script-variant coverage is judged here.
  */
 @Service
-class AddressSiteAssignmentParser(
+class AddressSiteMembershipParser(
     private val addressBpnParser: AddressBpnParser,
     private val siteBpnParser: SiteBpnParser,
-    private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator
+    private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator,
+    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator
 ) {
 
     /**
-     * Validates each request and reports either the resolved address and site or every problem found in that entry.
+     * Validates each request and reports either the resolved address with its stated sites or every problem found in
+     * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<AddressSiteAssignmentRequest>): List<ParseResult<AddressSiteAssignmentParsed, AddressSiteAssignmentParseError>> {
+    fun parse(requests: List<AddressSiteMembershipRequest>): List<ParseResult<AddressSiteMembershipParsed, AddressSiteMembershipParseError>> {
         val addressResults = addressBpnParser.parse(requests.map { it.addressBpn })
-        val siteResults = siteBpnParser.parseRequired(requests.map { it.siteBpn })
-        val consistentSiteResults: List<ParseResult<SiteDb, AddressSiteAssignmentParseError>> =
-            crossValidateParseResults(addressResults, siteResults) { address, site ->
-                siteLegalEntityConsistencyValidator.check(address.legalEntity, site)
+        val siteResults = siteBpnParser.parseAllRequired(requests.map { it.siteBpns })
+        val consistentSiteResults: List<ParseResult<List<SiteDb>, AddressSiteMembershipParseError>> =
+            crossValidateParseResults(addressResults, siteResults) { address, sites ->
+                sites.flatMap { siteLegalEntityConsistencyValidator.check(address.legalEntity, it) } +
+                        siteMainAddressConsistencyValidator.check(address, sites)
             }
 
-        return zipParseResults(addressResults, consistentSiteResults) { address, site ->
-            AddressSiteAssignmentParsed(address, site)
+        return zipParseResults(addressResults, consistentSiteResults) { address, sites ->
+            AddressSiteMembershipParsed(address, sites)
         }
     }
 }

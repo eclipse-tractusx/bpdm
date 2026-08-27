@@ -1234,12 +1234,17 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(addressAfterA.additionalSites).isEmpty()
 
         // Task 2: create a distinct site B whose main address references the SAME address as site A's. Site B states the
-        // content of that address, so it has to cover site A's scripts as well as its own.
+        // content of that address, so it has to cover site A's scripts as well as its own, and it states site A as a
+        // further site of that address - the address's membership is written as stated, so leaving A out would ask for
+        // it to be unlinked from its own main address.
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences(siteBRef.toBpnRequest(), sharedMainAddressRef.toBpnRequest())
             .withSiteScriptVariantsAlsoCovering(sharedAddressBpn)
-            .copy(additionalAddress = null)
+            .copy(
+                additionalAddress = null,
+                additionalSites = listOf(AdditionalSite(BpnReference(siteABpns, null, BpnReferenceType.Bpn), null))
+            )
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
         val siteBBpns = resultB[0].businessPartner.site?.bpnReference?.referenceValue!!
 
@@ -1289,6 +1294,35 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         assertThat(resultB.single().errors.map { it.description })
             .anyMatch { it.contains(siteABpns) && it.contains("must stay covered") }
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
+    }
+
+    @Test
+    fun `try create second site sharing an existing site main address without stating the first site`() {
+        val leRef = "le-unstated"
+        val leAddressRef = "le-addr-unstated"
+        val sharedMainAddressRef = "shared-unstated-addr"
+
+        val createSiteA = orchTestDataFactory.createFullBusinessPartner("siteA")
+            .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
+            .withSiteReferences("site-a-unstated".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+        val resultA = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteA)
+        val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
+        val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
+
+        // Site B takes over the same address without saying that site A still uses it, which would take the address away
+        // from the site it is the main address of.
+        val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
+            .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
+            .withSiteReferences("site-b-unstated".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .withSiteScriptVariantsAlsoCovering(sharedAddressBpn)
+            .copy(additionalAddress = null)
+
+        val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
+
+        assertThat(resultB.single().errors.map { it.description })
+            .anyMatch { it.contains(siteABpns) && it.contains("must be stated") }
         assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
     }
 

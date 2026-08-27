@@ -55,7 +55,7 @@ class AddressUpdateApplicationV7Service(
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
         val requestList = requests.toList()
         val updateRequests = requestList.map {
-            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
+            AddressUpdateRequest(addressBpn = it.bpna, siteBpns = it.bpnSites, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
         }
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()

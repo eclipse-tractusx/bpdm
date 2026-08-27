@@ -1,17 +1,23 @@
 # This feature covers the "multiple sites per address" capability: a single additional address can
 # belong to more than one site. When several records refine the SAME additional address, each under a
-# DIFFERENT site of the SAME legal entity, the Pool merges the site memberships onto that one address
-# instead of duplicating it. Each record still follows its own site, so its output's primary "site" is
-# that site and the OTHER sites the address belongs to surface in the output's additional sites. The
-# Pool address query independently returns the address's full site membership (its primary site plus the
-# additional sites).
+# DIFFERENT site of the SAME legal entity, that one address belongs to all of those sites instead of
+# being duplicated. Each record still follows its own site, so its output's primary "site" is that site
+# and the OTHER sites the address belongs to surface in the output's additional sites. The Pool address
+# query independently returns the address's full site membership (its primary site plus the additional
+# sites).
+#
+# The site memberships of an address are a full upsert: the golden record process hands the Pool the
+# COMPLETE set of sites of the address and the Pool applies exactly that, so a site the set leaves out is
+# unlinked. Building that set is the process's job, not the Pool's - it is the one that sees the whole
+# stream of records. The test's refinement stands in for that: it keeps a ledger of which record puts
+# which site on which address and consolidates it per task.
 #
 # The shape is driven with the established share -> refine flow: two (or more) records are refined to the
 # same address label but distinct site labels under one legal entity label. Sharing the address label
-# assigns the same BPN request identifier, so the Pool matches the same address golden record and adds
-# each new site to it. Distinct site labels give distinct sites (and distinct site names, satisfying the
-# Pool's duplicate-site-name constraint); the shared legal entity label keeps all sites under one legal
-# entity, satisfying the Pool's same-legal-entity constraint for shared addresses.
+# assigns the same BPN request identifier, so the Pool matches the same address golden record. Distinct
+# site labels give distinct sites (and distinct site names, satisfying the Pool's duplicate-site-name
+# constraint); the shared legal entity label keeps all sites under one legal entity, satisfying the
+# Pool's same-legal-entity constraint for shared addresses.
 #
 # The shared address can be an ADDITIONAL address of the sites (first scenarios) or the sites' MAIN
 # address (last scenario): the golden record flow lets a new site adopt an already-existing address as
@@ -61,7 +67,7 @@ Feature: Output Reflects Additional Sites Of Address
 
   #h3. Test Objective:
   #
-  #* Verify that refining a new site onto an address that already belongs to sites adds the new site without removing the existing ones.
+  #* Verify that a new site on an address that already belongs to sites joins them, because the complete set the golden record process states keeps the sites already there.
   #
   #h3. Preconditions:
   #
@@ -71,9 +77,9 @@ Feature: Output Reflects Additional Sites Of Address
   #
   ## The sharing member shares a third record.
   ## The golden record process refines it to the same additional address under a third site of the same legal entity.
-  ## The first record's output still lists both the second and the third site as additional sites of the shared address.
+  ## The first record's output lists both the second and the third site as additional sites of the shared address.
   @TEST_CXTPM-XXXX @BPDM
-  Scenario: New Site Merges Without Removing Existing Sites
+  Scenario: New Site Joins The Sites Of An Address
     Given the sharing member shares record "dock-a-record"
     And the sharing member shares record "dock-b-record"
     And the golden record process refines record "dock-a-record" to additional address "shared-dock" of site "site-a" of legal entity "acme" with master data "dock-a-content"
@@ -81,6 +87,30 @@ Feature: Output Reflects Additional Sites Of Address
     When the sharing member shares record "dock-c-record"
     And the golden record process refines record "dock-c-record" to additional address "shared-dock" of site "site-c" of legal entity "acme" with master data "dock-c-content"
     Then "dock-a-record" output lists the sites of records "dock-b-record, dock-c-record" as additional sites of its address
+
+  #h3. Test Objective:
+  #
+  #* Verify that a site the golden record process no longer states for an address comes off that address.
+  #
+  #h3. Preconditions:
+  #
+  ## An additional address already belongs to two sites of a legal entity.
+  #
+  #h3. Description:
+  #
+  ## The sharing member updates the second record.
+  ## The golden record process refines it to the same additional address, but under a different site than before.
+  ## The address belongs to the first record's site and to the second record's new site alone - the site it no longer uses is gone.
+  @TEST_CXTPM-XXXX @BPDM
+  Scenario: Site No Longer Stated Comes Off The Address
+    Given the sharing member shares record "dock-a-record"
+    And the sharing member shares record "dock-b-record"
+    And the golden record process refines record "dock-a-record" to additional address "shared-dock" of site "site-a" of legal entity "acme" with master data "dock-a-content"
+    And the golden record process refines record "dock-b-record" to additional address "shared-dock" of site "site-b" of legal entity "acme" with master data "dock-b-content"
+    When the sharing member updates record "dock-b-record"
+    And the golden record process refines record "dock-b-record" to additional address "shared-dock" of site "site-c" of legal entity "acme" with master data "dock-b-moved-content"
+    Then the Pool address of "dock-a-record" belongs to the sites of records "dock-a-record, dock-b-record"
+    And "dock-a-record" output lists the site of record "dock-b-record" as an additional site of its address
 
   #h3. Test Objective:
   #

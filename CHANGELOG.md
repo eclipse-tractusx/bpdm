@@ -27,7 +27,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Pool: Added ultimate owner tracking fields to legal entities - `ownershipUltimate` flag and `ultimateOwnerBpnl` column - to support future ultimate owner resolution features [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
 - BPDM Gate: Added two new fields to business partner legal entity representation - `ownershipUltimate` to designate whether a legal entity is the ultimate owner in an ownership chain, and `ultimateOwnerBpnl` to hold the BPNL of the designated ultimate owner up in the ownership chain [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
-- BPDM Pool: Support multiple sites per address by merging incoming sites onto existing addresses instead of overwriting them; queries now return an address's main site plus all additional sites [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Pool: Support multiple sites per address; queries now return an address's main site plus all additional sites [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 - BPDM Gate: Business partner output now includes additional sites belonging to an address [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 - BPDM Pool, Gate and Orchestrator: A sharing member can now state further sites of its business partner's address itself, instead of relying on another record being refined to the same address. [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 - BPDM Pool, Gate and Orchestrator: `IsReplacedBy` is now also a valid relation between two legal entities (BPNL to BPNL), expressing that the source legal entity is succeeded by the target legal entity.
@@ -45,6 +45,11 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Changed
 
+- BPDM Pool, Gate and Orchestrator: The sites of an address are now upserted as a whole instead of accumulating.
+  A golden record task states the address's complete site membership through its own `site` together with `additionalSites`, and the Pool applies exactly that: a site the address currently belongs to but the task leaves out is unlinked from it.
+  Consolidating the flat records that share an address into that complete list is the golden record process's responsibility; a task without a `site` of its own states nothing about the membership and leaves it untouched.
+  A site the address is the main address of is bound to it by that relation and has to be stated - leaving it out is rejected.
+  The Pool's `PUT /v7/addresses` gained an optional `bpnSites` for the same purpose, with the same replacing semantics; omitting it leaves the membership as it is [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 - BPDM Pool: A golden record task that puts a new site on an already existing address now applies the site main address payload it carries to that address, instead of leaving the address content untouched.
   This is what lets such a site be named in its own scripts; in exchange the payload has to keep covering the scripts the address's other business partners are named in [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 - BPDM Pool: IsAlternativeHeadquarterFor relations now carry semantic meaning through their direction: the relation starts at the alternative entity and ends at the main entity.

@@ -108,7 +108,9 @@ enum class AddressCreateError : ErrorCode {
 @Schema(description = "AddressUpdateError")
 enum class AddressUpdateError : ErrorCode {
     AddressNotFound,
+    SiteNotFound,
     SiteNotInLegalEntity,
+    SiteMainAddressOmitted,
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
