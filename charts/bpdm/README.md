@@ -4,7 +4,6 @@
 
 Deploys the full BPDM application stack as a single release and configures it end to
 end, showcasing how a golden record process is realized for a single sharing member.
-A second Gate can be enabled to add a second sharing member sharing the same golden records.
 
 The chart bundles the four BPDM services — Gate, Pool, Orchestrator and the reference
 Cleaning Service Dummy — together with a PostgreSQL database and a Keycloak instance that
@@ -29,17 +28,6 @@ helm test bpdm
 See `values.yaml` for configuration, including `bpdmRealm.clients.*.secret` to pin client
 secrets and the `postgres`/`keycloak` toggles for running against external infrastructure.
 
-A second sharing member, with a Gate of its own, is one value away:
-
-```bash
-helm install bpdm charts/bpdm --set bpdm-gate-2.enabled=true
-```
-
-Its Gate is owned by the second sharing member of the bundled realm and runs against the
-same database under its own schema. The end-to-end test then also covers what only shows
-with two of them: each member reflecting the other's changes to a shared golden record,
-and the sharing member count of that golden record rising.
-
 **Homepage:** <https://github.com/eclipse-tractusx/bpdm>
 
 ## Maintainers
@@ -59,7 +47,6 @@ and the sharing member count of that golden record rising.
 |  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 5.1.0-SNAPSHOT |
 |  | bpdm-common | 2.0.0 |
 |  | bpdm-gate(bpdm-gate) | 8.1.0-SNAPSHOT |
-|  | bpdm-gate-2(bpdm-gate) | 8.1.0-SNAPSHOT |
 |  | bpdm-orchestrator(bpdm-orchestrator) | 5.1.0-SNAPSHOT |
 |  | bpdm-pool(bpdm-pool) | 9.1.0-SNAPSHOT |
 | oci://registry-1.docker.io/cloudpirates | keycloak | 0.21.10 |
@@ -72,12 +59,6 @@ and the sharing member count of that golden record rising.
 | bpdm-cleaning-service-dummy.enabled | bool | `true` |  |
 | bpdm-cleaning-service-dummy.externalApplicationConfig[0] | string | `"{{ include \"bpdm.cleaningDummyKeycloakConfig.name\" . }}"` |  |
 | bpdm-cleaning-service-dummy.externalApplicationConfig[1] | string | `"{{ include \"bpdm.clientUrlConfig.name\" . }}"` |  |
-| bpdm-gate-2.applicationConfig.bpdm.bpn.owner-bpn-l | string | `"BPNL000000000002"` |  |
-| bpdm-gate-2.applicationConfig.bpdm.datasource.schema | string | `"bpdmgate2"` |  |
-| bpdm-gate-2.enabled | bool | `false` |  |
-| bpdm-gate-2.externalApplicationConfig[0] | string | `"{{ include \"bpdm.postgresConnectionConfig.name\" . }}"` |  |
-| bpdm-gate-2.externalApplicationConfig[1] | string | `"{{ include \"bpdm.gateKeycloakConfig.name\" . }}"` |  |
-| bpdm-gate-2.externalApplicationConfig[2] | string | `"{{ include \"bpdm.clientUrlConfig.name\" . }}"` |  |
 | bpdm-gate.enabled | bool | `true` |  |
 | bpdm-gate.externalApplicationConfig[0] | string | `"{{ include \"bpdm.postgresConnectionConfig.name\" . }}"` |  |
 | bpdm-gate.externalApplicationConfig[1] | string | `"{{ include \"bpdm.gateKeycloakConfig.name\" . }}"` |  |
@@ -92,8 +73,6 @@ and the sharing member count of that golden record rising.
 | bpdmRealm.clients.admin.secret | string | `""` |  |
 | bpdmRealm.clients.cleaningDummy.secret | string | `""` |  |
 | bpdmRealm.clients.gate.secret | string | `""` |  |
-| bpdmRealm.clients.gate2InputManager.secret | string | `""` |  |
-| bpdmRealm.clients.gate2OutputConsumer.secret | string | `""` |  |
 | bpdmRealm.clients.gateInputConsumer.secret | string | `""` |  |
 | bpdmRealm.clients.gateInputManager.secret | string | `""` |  |
 | bpdmRealm.clients.gateOutputConsumer.secret | string | `""` |  |

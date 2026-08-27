@@ -10,9 +10,6 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- The bundled Keycloak realm now holds a second sharing member: group `SharingMember2` (BPNL000000000002) with the technical users `BPDM_GATE_2_INPUT_MANAGER` and `BPDM_GATE_2_OUTPUT_CONSUMER`, whose secrets are configurable under `bpdmRealm.clients.gate2InputManager` / `gate2OutputConsumer`. A Gate scopes its data by the BPNL in the token, so these credentials are what lets the end-to-end tests share the same golden record from two sharing members.
-- A second Gate can be deployed for that second sharing member with `bpdm-gate-2.enabled: true` (off by default). It runs against the bundled database under its own schema, is owned by the second member's BPNL, and is wired into the client-url config and the end-to-end test hook, which then also runs the scenarios that need two sharing members.
-
 ### Changed
 
 - The end-to-end test hook now reaches a Gate the way a sharing member does, with one client per role (`BPDM_GATE_INPUT_MANAGER` to share input data, `BPDM_GATE_OUTPUT_CONSUMER` to read the golden record output) instead of the `BPDM_ADMIN` client. Pool and Orchestrator keep that admin client, which writes Pool metadata and takes the refinement service's part.

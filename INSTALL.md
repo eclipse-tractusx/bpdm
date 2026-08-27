@@ -175,7 +175,7 @@ bpdmRealm:
       secret: $CLEANING_DUMMY_SECRET
 ```
 
-The available client keys are `admin`, `gate`, `pool`, `orchestrator`, `cleaningDummy`, `gateInputConsumer`, `gateInputManager`, `gateOutputConsumer`, `gate2InputManager`, `gate2OutputConsumer`, `participant`, `sharingMember`, `taskCreator`, `refinerClean`, `refinerCleanAndSync` and `refinerPoolSync`.
+The available client keys are `admin`, `gate`, `pool`, `orchestrator`, `cleaningDummy`, `gateInputConsumer`, `gateInputManager`, `gateOutputConsumer`, `participant`, `sharingMember`, `taskCreator`, `refinerClean`, `refinerCleanAndSync` and `refinerPoolSync`.
 The umbrella wires each application to its client automatically, so no per-service client configuration is needed when using the bundled Keycloak.
 
 #### Insecure Installation

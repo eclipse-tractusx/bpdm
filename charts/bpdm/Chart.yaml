@@ -24,7 +24,6 @@ type: application
 description: |
   Deploys the full BPDM application stack as a single release and configures it end to
   end, showcasing how a golden record process is realized for a single sharing member.
-  A second Gate can be enabled to add a second sharing member sharing the same golden records.
 version: 7.1.0-SNAPSHOT
 appVersion: "7.5.0-SNAPSHOT"
 home: https://github.com/eclipse-tractusx/bpdm
@@ -38,12 +37,6 @@ dependencies:
     version: 8.1.0-SNAPSHOT
     alias: bpdm-gate
     condition: bpdm-gate.enabled
-  # The same Gate chart a second time, for a second sharing member. Disabled by default; the values entry
-  # bpdm-gate-2 has to exist for that, since Helm enables a dependency whose condition path does not resolve.
-  - name: bpdm-gate
-    version: 8.1.0-SNAPSHOT
-    alias: bpdm-gate-2
-    condition: bpdm-gate-2.enabled
   - name: bpdm-pool
     version: 9.1.0-SNAPSHOT
     alias: bpdm-pool

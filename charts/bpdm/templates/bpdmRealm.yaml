@@ -8,8 +8,6 @@
 {{- $gateInputConsumerSecret  := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-input-consumer-client-secret"  (($clients.gateInputConsumer  | default dict).secret | default "")) }}
 {{- $gateInputManagerSecret   := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-input-manager-client-secret"   (($clients.gateInputManager   | default dict).secret | default "")) }}
 {{- $gateOutputConsumerSecret := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-output-consumer-client-secret" (($clients.gateOutputConsumer | default dict).secret | default "")) }}
-{{- $gate2InputManagerSecret   := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-2-input-manager-client-secret"   (($clients.gate2InputManager   | default dict).secret | default "")) }}
-{{- $gate2OutputConsumerSecret := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-2-output-consumer-client-secret" (($clients.gate2OutputConsumer | default dict).secret | default "")) }}
 {{- $orchestratorSecret    := include "bpdm.resolveOrGenerateSecret" (list . $secretName "orchestrator-client-secret"       (($clients.orchestrator      | default dict).secret | default "")) }}
 {{- $participantSecret     := include "bpdm.resolveOrGenerateSecret" (list . $secretName "participant-client-secret"        (($clients.participant       | default dict).secret | default "")) }}
 {{- $poolSecret            := include "bpdm.resolveOrGenerateSecret" (list . $secretName "pool-client-secret"               (($clients.pool              | default dict).secret | default "")) }}
@@ -35,8 +33,6 @@ stringData:
   gate-input-consumer-client-secret: {{ $gateInputConsumerSecret | quote }}
   gate-input-manager-client-secret: {{ $gateInputManagerSecret | quote }}
   gate-output-consumer-client-secret: {{ $gateOutputConsumerSecret | quote }}
-  gate-2-input-manager-client-secret: {{ $gate2InputManagerSecret | quote }}
-  gate-2-output-consumer-client-secret: {{ $gate2OutputConsumerSecret | quote }}
   orchestrator-client-secret: {{ $orchestratorSecret | quote }}
   participant-client-secret: {{ $participantSecret | quote }}
   pool-client-secret: {{ $poolSecret | quote }}
@@ -334,22 +330,6 @@ stringData:
             }
           ],
           "security-admin-console": [],
-          "BPDM_GATE_2_INPUT_MANAGER": [
-            {
-              "name": "uma_protection",
-              "composite": false,
-              "clientRole": true,
-              "attributes": {}
-            }
-          ],
-          "BPDM_GATE_2_OUTPUT_CONSUMER": [
-            {
-              "name": "uma_protection",
-              "composite": false,
-              "clientRole": true,
-              "attributes": {}
-            }
-          ],
           "BPDM_GATE_OUTPUT_CONSUMER": [
             {
               "name": "uma_protection",
@@ -977,18 +957,6 @@ stringData:
           },
           "realmRoles": [],
           "clientRoles": {}
-        },
-        {
-          "name": "SharingMember2",
-          "path": "/SharingMember2",
-          "subGroups": [],
-          "attributes": {
-            "bpn": [
-              "BPNL000000000002"
-            ]
-          },
-          "realmRoles": [],
-          "clientRoles": {}
         }
       ],
       "defaultRole": {
@@ -1200,56 +1168,6 @@ stringData:
           "notBefore": 0,
           "groups": [
             "/Operator"
-          ]
-        },
-        {
-          "username": "service-account-bpdm_gate_2_input_manager",
-          "emailVerified": false,
-          "enabled": true,
-          "totp": false,
-          "serviceAccountClientId": "BPDM_GATE_2_INPUT_MANAGER",
-          "credentials": [],
-          "disableableCredentialTypes": [],
-          "requiredActions": [],
-          "realmRoles": [
-            "default-roles-bpdm"
-          ],
-          "clientRoles": {
-            "BPDM_GATE": [
-              "input_manager"
-            ],
-            "BPDM_GATE_2_INPUT_MANAGER": [
-              "uma_protection"
-            ]
-          },
-          "notBefore": 0,
-          "groups": [
-            "/SharingMember2"
-          ]
-        },
-        {
-          "username": "service-account-bpdm_gate_2_output_consumer",
-          "emailVerified": false,
-          "enabled": true,
-          "totp": false,
-          "serviceAccountClientId": "BPDM_GATE_2_OUTPUT_CONSUMER",
-          "credentials": [],
-          "disableableCredentialTypes": [],
-          "requiredActions": [],
-          "realmRoles": [
-            "default-roles-bpdm"
-          ],
-          "clientRoles": {
-            "BPDM_GATE": [
-              "output_consumer"
-            ],
-            "BPDM_GATE_2_OUTPUT_CONSUMER": [
-              "uma_protection"
-            ]
-          },
-          "notBefore": 0,
-          "groups": [
-            "/SharingMember2"
           ]
         },
         {
@@ -2154,202 +2072,6 @@ stringData:
           "attributes": {
             "oidc.ciba.grant.enabled": "false",
             "client.secret.creation.time": "1774506775",
-            "backchannel.logout.session.required": "true",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.revoke.offline.tokens": "false"
-          },
-          "authenticationFlowBindingOverrides": {},
-          "fullScopeAllowed": true,
-          "nodeReRegistrationTimeout": -1,
-          "protocolMappers": [
-            {
-              "name": "Client ID",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usersessionmodel-note-mapper",
-              "consentRequired": false,
-              "config": {
-                "user.session.note": "client_id",
-                "id.token.claim": "true",
-                "introspection.token.claim": "true",
-                "access.token.claim": "true",
-                "claim.name": "client_id",
-                "jsonType.label": "String"
-              }
-            },
-            {
-              "name": "Client Host",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usersessionmodel-note-mapper",
-              "consentRequired": false,
-              "config": {
-                "user.session.note": "clientHost",
-                "id.token.claim": "true",
-                "introspection.token.claim": "true",
-                "access.token.claim": "true",
-                "claim.name": "clientHost",
-                "jsonType.label": "String"
-              }
-            },
-            {
-              "name": "Client IP Address",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usersessionmodel-note-mapper",
-              "consentRequired": false,
-              "config": {
-                "user.session.note": "clientAddress",
-                "id.token.claim": "true",
-                "introspection.token.claim": "true",
-                "access.token.claim": "true",
-                "claim.name": "clientAddress",
-                "jsonType.label": "String"
-              }
-            }
-          ],
-          "defaultClientScopes": [
-            "web-origins",
-            "bpn",
-            "acr",
-            "roles",
-            "profile",
-            "basic",
-            "email"
-          ],
-          "optionalClientScopes": [
-            "address",
-            "phone",
-            "offline_access",
-            "microprofile-jwt"
-          ]
-        },
-        {
-          "clientId": "BPDM_GATE_2_INPUT_MANAGER",
-          "name": "BPDM_GATE_2_INPUT_MANAGER",
-          "description": "",
-          "rootUrl": "",
-          "adminUrl": "",
-          "baseUrl": "",
-          "surrogateAuthRequired": false,
-          "enabled": true,
-          "alwaysDisplayInConsole": false,
-          "clientAuthenticatorType": "client-secret",
-          "secret": "{{ $gate2InputManagerSecret }}",
-          "redirectUris": [
-            "/*"
-          ],
-          "webOrigins": [
-            "*"
-          ],
-          "notBefore": 0,
-          "bearerOnly": false,
-          "consentRequired": false,
-          "standardFlowEnabled": false,
-          "implicitFlowEnabled": false,
-          "directAccessGrantsEnabled": false,
-          "serviceAccountsEnabled": true,
-          "authorizationServicesEnabled": true,
-          "publicClient": false,
-          "frontchannelLogout": true,
-          "protocol": "openid-connect",
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.revoke.offline.tokens": "false"
-          },
-          "authenticationFlowBindingOverrides": {},
-          "fullScopeAllowed": true,
-          "nodeReRegistrationTimeout": -1,
-          "protocolMappers": [
-            {
-              "name": "Client IP Address",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usersessionmodel-note-mapper",
-              "consentRequired": false,
-              "config": {
-                "user.session.note": "clientAddress",
-                "id.token.claim": "true",
-                "introspection.token.claim": "true",
-                "access.token.claim": "true",
-                "claim.name": "clientAddress",
-                "jsonType.label": "String"
-              }
-            },
-            {
-              "name": "Client Host",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usersessionmodel-note-mapper",
-              "consentRequired": false,
-              "config": {
-                "user.session.note": "clientHost",
-                "id.token.claim": "true",
-                "introspection.token.claim": "true",
-                "access.token.claim": "true",
-                "claim.name": "clientHost",
-                "jsonType.label": "String"
-              }
-            },
-            {
-              "name": "Client ID",
-              "protocol": "openid-connect",
-              "protocolMapper": "oidc-usersessionmodel-note-mapper",
-              "consentRequired": false,
-              "config": {
-                "user.session.note": "client_id",
-                "id.token.claim": "true",
-                "introspection.token.claim": "true",
-                "access.token.claim": "true",
-                "claim.name": "client_id",
-                "jsonType.label": "String"
-              }
-            }
-          ],
-          "defaultClientScopes": [
-            "web-origins",
-            "bpn",
-            "acr",
-            "roles",
-            "profile",
-            "basic",
-            "email"
-          ],
-          "optionalClientScopes": [
-            "address",
-            "phone",
-            "offline_access",
-            "microprofile-jwt"
-          ]
-        },
-        {
-          "clientId": "BPDM_GATE_2_OUTPUT_CONSUMER",
-          "name": "BPDM_GATE_2_OUTPUT_CONSUMER",
-          "description": "",
-          "rootUrl": "",
-          "adminUrl": "",
-          "baseUrl": "",
-          "surrogateAuthRequired": false,
-          "enabled": true,
-          "alwaysDisplayInConsole": false,
-          "clientAuthenticatorType": "client-secret",
-          "secret": "{{ $gate2OutputConsumerSecret }}",
-          "redirectUris": [
-            "/*"
-          ],
-          "webOrigins": [
-            "*"
-          ],
-          "notBefore": 0,
-          "bearerOnly": false,
-          "consentRequired": false,
-          "standardFlowEnabled": false,
-          "implicitFlowEnabled": false,
-          "directAccessGrantsEnabled": false,
-          "serviceAccountsEnabled": true,
-          "authorizationServicesEnabled": true,
-          "publicClient": false,
-          "frontchannelLogout": true,
-          "protocol": "openid-connect",
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
             "backchannel.logout.session.required": "true",
             "oauth2.device.authorization.grant.enabled": "false",
             "backchannel.logout.revoke.offline.tokens": "false"
@@ -4886,9 +4608,7 @@ stringData:
 # account holds the `admin` role on both, writes Pool metadata and takes the refinement service's part
 # in the golden record process. A Gate it addresses as a sharing member would, one client per role -
 # an input manager to share data and drive the process, an output consumer to read the golden record
-# output - which is how the Portal issues a sharing member's technical users. The second Gate is
-# addressed with that member's own two clients: it is owned by another company and rejects the tokens
-# of the first member, the admin client included.
+# output - which is how the Portal issues a sharing member's technical users.
 apiVersion: v1
 kind: Secret
 metadata:
@@ -4912,20 +4632,6 @@ stringData:
           registration:
             client-id: BPDM_GATE_OUTPUT_CONSUMER
             client-secret: {{ $gateOutputConsumerSecret | quote }}
-        {{- if (index .Values "bpdm-gate-2" | default dict).enabled }}
-        gate-2-input:
-          provider:
-            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
-          registration:
-            client-id: BPDM_GATE_2_INPUT_MANAGER
-            client-secret: {{ $gate2InputManagerSecret | quote }}
-        gate-2-output:
-          provider:
-            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
-          registration:
-            client-id: BPDM_GATE_2_OUTPUT_CONSUMER
-            client-secret: {{ $gate2OutputConsumerSecret | quote }}
-        {{- end }}
         pool:
           provider:
             issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}

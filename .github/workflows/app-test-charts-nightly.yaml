@@ -18,8 +18,8 @@
 ################################################################################
 
 # Runs the chart tests once a night with the entire system-tester suite instead of the smoke subset a pull
-# request gets. That scope is also the only one that deploys a second Gate, so the scenarios asserting what
-# two sharing members see of the same golden record run here and nowhere else in CI.
+# request gets. The release holds one Gate either way, so the scenarios that take further sharing members
+# skip themselves here as they do on a pull request; they are run by hand against a real deployment.
 #
 # It is a deployment check on a throwaway cluster, not the release validation: that one is the manual run
 # against the INT deployment, described in docs/maintainer/e2e-testing.md.

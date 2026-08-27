@@ -356,10 +356,12 @@ For GitHub Actions, [`mikepenz/xray-action`](https://github.com/mikepenz/xray-ac
 
 The chart ships the system tester as a Helm test hook, and CI runs it against a freshly deployed chart on a throwaway cluster in two scopes:
 
-| Run | Scope | Sharing members |
-|---|---|---|
-| Pull request, and push to `main` or `release/**` | the `@Smoke` subset | one |
-| Nightly (*Perform Nightly Chart Tests*, 02:20 UTC) | the entire suite | two — the only CI run that deploys a second Gate, and therefore the only one that executes the `@TwoSharingMembers` scenarios. CI deploys no third Gate, so `@ThreeSharingMembers` skips there and is covered by the release run alone |
+| Run | Scope |
+|---|---|
+| Pull request, and push to `main` or `release/**` | the `@Smoke` subset |
+| Nightly (*Perform Nightly Chart Tests*, 02:20 UTC) | the entire suite |
+
+A release deploys one Gate, so neither run holds a second or third sharing member: the `@TwoSharingMembers` and `@ThreeSharingMembers` scenarios skip themselves in CI and are covered by the release run alone.
 
 Either way this is a deployment check, not the release validation: an ephemeral deployment and no JSON report to upload.
 The release validation is the manual full run described above, against the INT deployment of the release candidate — and it covers the multi-member scenarios only when [those members are supplied](#scenarios-that-need-further-sharing-members).

@@ -83,11 +83,3 @@ jobs:
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: ct lint --target-branch $DEFAULT_BRANCH --config .chart-testing-config.yaml
-
-      # The second Gate is disabled by default, so no other job renders it: the chart tests deploy it only
-      # in their full scope. Rendering it here keeps a change from breaking that topology unnoticed, and
-      # costs seconds instead of a second application in a cluster.
-      - name: Render the second sharing member's Gate
-        run: |
-          helm dependency update charts/bpdm
-          helm template bpdm-test charts/bpdm --set bpdm-gate-2.enabled=true --set tests.enabled=true > /dev/null
