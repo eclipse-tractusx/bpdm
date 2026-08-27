@@ -19,12 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.mapper.v6
 
+import org.eclipse.tractusx.bpdm.orchestrator.mapper.BusinessPartnerRequestMapper
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.LegalEntityRequest
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.PostalAddressWithScriptVariantsRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntry
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as LegalEntityV7
 import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity as LegalEntityV6
 import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner as BusinessPartnerV6
 
@@ -36,7 +37,9 @@ import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner as Busines
  * reused by V6, so this is a pure, narrow translation with the missing V7-only fields defaulted.
  */
 @Component
-class GoldenRecordTaskCreateInboundMapperV6 {
+class GoldenRecordTaskCreateInboundMapperV6(
+    private val businessPartnerRequestMapper: BusinessPartnerRequestMapper
+) {
 
     fun toRequest(entry: TaskCreateRequestEntry): GoldenRecordTaskCreateRequest =
         GoldenRecordTaskCreateRequest(
@@ -47,31 +50,36 @@ class GoldenRecordTaskCreateInboundMapperV6 {
     private fun toBusinessPartnerRequest(businessPartner: BusinessPartnerV6): BusinessPartnerRequest =
         with(businessPartner) {
             BusinessPartnerRequest(
-                nameParts = nameParts,
+                nameParts = nameParts.map(businessPartnerRequestMapper::toNamePartRequest),
                 owningCompany = owningCompany,
-                uncategorized = uncategorized,
-                legalEntity = toLegalEntityV7(legalEntity),
-                site = site,
-                additionalAddress = additionalAddress?.let { PostalAddressWithScriptVariants(it, emptyList()) },
+                uncategorized = businessPartnerRequestMapper.toUncategorizedPropertiesRequest(uncategorized),
+                legalEntity = toLegalEntityRequest(legalEntity),
+                site = site?.let(businessPartnerRequestMapper::toSiteRequest),
+                additionalAddress = additionalAddress?.let {
+                    PostalAddressWithScriptVariantsRequest(
+                        postalProperties = businessPartnerRequestMapper.toPostalAddressRequest(it),
+                        scriptVariants = emptyList()
+                    )
+                },
                 additionalSites = emptyList()
             )
         }
 
-    private fun toLegalEntityV7(legalEntity: LegalEntityV6): LegalEntityV7 =
+    private fun toLegalEntityRequest(legalEntity: LegalEntityV6): LegalEntityRequest =
         with(legalEntity) {
-            LegalEntityV7(
-                bpnReference = bpnReference,
+            LegalEntityRequest(
+                bpnReference = businessPartnerRequestMapper.toBpnReferenceRequest(bpnReference),
                 legalName = legalName,
                 legalShortName = legalShortName,
                 legalForm = legalForm,
-                identifiers = identifiers,
-                states = states,
-                confidenceCriteria = confidenceCriteria,
+                identifiers = identifiers.map(businessPartnerRequestMapper::toIdentifierRequest),
+                states = states.map(businessPartnerRequestMapper::toBusinessStateRequest),
+                confidenceCriteria = businessPartnerRequestMapper.toConfidenceCriteriaRequest(confidenceCriteria),
                 isParticipantData = isCatenaXMemberData,
                 hasChanged = hasChanged,
                 ownershipUltimate = null,
                 ultimateOwnerBpnl = null,
-                legalAddress = legalAddress,
+                legalAddress = businessPartnerRequestMapper.toPostalAddressRequest(legalAddress),
                 scriptVariants = emptyList(),
                 goldenRecordRelations = emptyList(),
                 updatedAt = null
