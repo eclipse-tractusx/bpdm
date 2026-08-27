@@ -122,7 +122,7 @@ Feature: Output Reflects Golden Record Master Data Changes
   #* The second sharing member shares a record of its own.
   #* The golden record process refines it to the same legal entity with new master data.
   #* Both sharing members' outputs reflect the updated legal entity master data.
-  @TwoSharingMembers @BPDM
+  @TEST_CXTPM-1066 @BPDM @TwoSharingMembers
   Scenario: Legal Entity Master Data Change By Another Sharing Member Reflected In Output
     Given record "acme-record" of the first sharing member reflects legal entity "acme" with master data "acme-content"
     When the second sharing member shares record "acme-other-record"

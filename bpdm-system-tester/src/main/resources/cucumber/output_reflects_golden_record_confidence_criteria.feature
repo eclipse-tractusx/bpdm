@@ -198,7 +198,7 @@ Feature: Output Reflects Golden Record Confidence Criteria
   #* The sharing member shares an own company record.
   #* The golden record process refines it to a legal entity.
   #* The output reflects a sharing member count of one for the legal entity and the legal address.
-  @BPDM
+  @TEST_CXTPM-1063 @BPDM
   Scenario: Legal Entity Shared By One Sharing Member
     When the sharing member shares own company record "acme-record"
     And the golden record process refines record "acme-record" to a legal entity without external verification
@@ -218,7 +218,7 @@ Feature: Output Reflects Golden Record Confidence Criteria
   #* The second sharing member shares an own company record.
   #* The golden record process refines it to the same legal entity.
   #* Both sharing members' outputs reflect a sharing member count of two for the legal entity and the legal address.
-  @TwoSharingMembers @BPDM
+  @TEST_CXTPM-1064 @BPDM @TwoSharingMembers
   Scenario: Legal Entity Shared By Two Sharing Members
     Given record "acme-record" of the first sharing member reflects legal entity "acme" with master data "acme-content"
     And "acme-record" output reflects a sharing member count of 1 for its legal entity
@@ -238,7 +238,7 @@ Feature: Output Reflects Golden Record Confidence Criteria
   #* Three sharing members each share a third-party record of their own.
   #* The golden record process refines both to the same legal entity.
   #* Only from the third sharing member on does the sharing member count raise the confidence level, from zero to one.
-  @ThreeSharingMembers @BPDM
+  @TEST_CXTPM-1065 @BPDM @ThreeSharingMembers
   Scenario: Legal Entity Shared By Three Sharing Members
     When the first sharing member shares third-party record "acme-record"
     And the golden record process refines record "acme-record" to legal entity "acme" with master data "acme-content"
