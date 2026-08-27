@@ -37,7 +37,7 @@ data class AddressPartnerUpdateRequest(
 
     val scriptVariants: List<LogisticAddressScriptVariantDto> = emptyList(),
 
-    @Schema(
+    @get:Schema(
         description = "The BPNS of every site this address belongs to. Stating them replaces the address's current " +
                 "site membership, so a site left out is unlinked; a site whose main address this address is must be " +
                 "stated. Omitting the field leaves the membership untouched."
