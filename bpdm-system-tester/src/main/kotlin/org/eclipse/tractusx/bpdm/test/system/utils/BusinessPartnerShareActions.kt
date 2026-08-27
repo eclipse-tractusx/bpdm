@@ -20,44 +20,74 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withUltimateOwner
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
-import tools.jackson.databind.json.JsonMapper
+import java.time.Instant
 
 class BusinessPartnerShareActions(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val orchestratorClient: OrchestrationApiClient,
     private val testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
-    private val sharingStateWatcher: SharingStateWatcher,
     private val taskReservationWatcher: TaskReservationWatcher,
-    private val jsonMapper: JsonMapper
+    private val apiCallEvidence: ApiCallEvidence
 ) {
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
 
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
+
+    /**
+     * Shares the record's input data through [member]'s Gate, which every later step on that record then acts
+     * through as well. Scenarios that name no sharing member are read as sharing through the first one.
+     */
     fun upload(
         recordId: String,
         isOwnCompanyData: Boolean,
         contentSeed: String = recordId,
-        additionalSites: List<AdditionalSiteInputDto> = emptyList()
+        additionalSites: List<AdditionalSiteInputDto> = emptyList(),
+        member: SharingMember = SharingMember.FIRST
     ) {
+        val existingState = context.records[recordId]
+        check(existingState == null || existingState.member == member) {
+            "record '$recordId' was already shared by the ${existingState!!.member.name.lowercase()} sharing member"
+        }
+
         val inputData = testDataGenerator.buildInputData(contentSeed)
             .copy(isOwnCompanyData = isOwnCompanyData, additionalSites = additionalSites)
         val runId = context.runId(recordId)
         val request = listOf(inputData.copy(externalId = runId))
-        val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
-        attachApiCall("PUT", "/v7/input/business-partners", request, response.body)
-        context.records[recordId] = (context.records[recordId] ?: RecordState()).copy(
+        val response = sharingMemberGates.of(member).businessParters.upsertBusinessPartnersInput(request)
+        apiCallEvidence.attach("PUT", "/v7/input/business-partners", request, response.body)
+        context.records[recordId] = (existingState ?: RecordState(member)).copy(
             contentSeed = contentSeed,
             currentInput = inputData
         )
+    }
+
+    /**
+     * Re-shares the record's input with its legal entity marked as the ultimate owner, so the golden record
+     * process picks the flag up on a new task.
+     */
+    fun uploadAsUltimateOwner(recordId: String) {
+        val state = context.records[recordId] ?: error("record '$recordId' must be shared by an earlier step")
+        val currentInput = state.currentInput!!
+        // The Gate only takes an input whose sequence timestamp is after the stored one, so re-sharing the
+        // record's input as is would be silently ignored.
+        val inputData = currentInput.copy(
+            legalEntity = currentInput.legalEntity.copy(ownershipUltimate = true),
+            externalSequenceTimestamp = Instant.now()
+        )
+        val request = listOf(inputData.copy(externalId = context.runId(recordId)))
+        val response = gateOf(recordId).businessParters.upsertBusinessPartnersInput(request)
+        apiCallEvidence.attach("PUT", "/v7/input/business-partners", request, response.body)
+        context.records[recordId] = state.copy(currentInput = inputData)
     }
 
     /**
@@ -78,7 +108,7 @@ class BusinessPartnerShareActions(
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified))
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.legalEntity
     }
 
@@ -105,7 +135,34 @@ class BusinessPartnerShareActions(
         }
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
+        return entityResult.legalEntity
+    }
+
+    /**
+     * Refines a record into the legal entity it already reflects, now carrying the ultimate owner flag, and waits for
+     * the golden record process to complete. The flag is stated on the refinement instead of carried over from the
+     * record's re-shared input, because that input references the BPNs the sharing member declared, which the Pool
+     * cannot map onto the existing golden record. Returns the golden record so the caller can store it as the current
+     * expectation for that legal entity.
+     */
+    fun refineAsUltimateOwner(
+        recordId: String,
+        masterDataSeed: String,
+        legalEntityLabel: String
+    ): LegalEntityWithLegalAddressVerboseDto {
+        val state = context.records[recordId]!!
+        // The Pool marks the ultimate owner itself by the flag alone and leaves its ultimateOwnerBpnl empty; only the
+        // entities below it carry its BPNL (see UltimateOwnerRecalculationService).
+        val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified = false)).let {
+            it.copy(
+                legalEntity = it.legalEntity.withUltimateOwner(ownershipUltimate = true, ultimateOwnerBpnl = null),
+                taskData = it.taskData.copy(legalEntity = it.taskData.legalEntity.copy(ownershipUltimate = true))
+            )
+        }
+        resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
+        context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.legalEntity
     }
 
@@ -135,7 +192,7 @@ class BusinessPartnerShareActions(
                 entityResult.siteBasedLegalEntity.legalEntity.legalAddress
             )
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return entityResult.siteBasedLegalEntity
     }
 
@@ -162,7 +219,7 @@ class BusinessPartnerShareActions(
             legalEntity = siteResult.siteWithParent.legalEntity,
             poolSite = siteResult.siteWithParent.site
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return siteResult.siteWithParent
     }
 
@@ -196,7 +253,7 @@ class BusinessPartnerShareActions(
             legalEntity = siteResult.siteWithParent.legalEntity,
             poolSite = siteResult.siteWithParent.site
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return siteResult.siteWithParent
     }
 
@@ -226,7 +283,7 @@ class BusinessPartnerShareActions(
             legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
             poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return addressResult.additionalLegalEntityAddressWithParent
     }
 
@@ -268,7 +325,7 @@ class BusinessPartnerShareActions(
             legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
             poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return addressResult.additionalLegalEntityAddressWithParent
     }
 
@@ -308,23 +365,31 @@ class BusinessPartnerShareActions(
             poolSite = addressResult.additionalSiteAddressWithParent.siteWithParent.site,
             poolAddress = addressResult.additionalSiteAddressWithParent.address
         )
-        sharingStateWatcher.waitForCompletedState(recordId)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
         return addressResult.additionalSiteAddressWithParent
     }
 
-    private fun resolveTask(recordId: String, taskData: BusinessPartner) {
+    private fun resolveTask(recordId: String, taskData: BusinessPartner) =
+        resolveReservedTask(recordId) { reserved ->
+            // The generated result describes the golden record this record is refined to; the sites the sharing
+            // member stated for its address are not part of that and are carried over as a refinement service does.
+            taskData.copy(additionalSites = reserved.additionalSites)
+        }
+
+    private fun resolveReservedTask(recordId: String, result: (BusinessPartner) -> BusinessPartner) {
         val runId = context.runId(recordId)
-        sharingStateWatcher.waitForTaskId(recordId)
-        val sharingStatePage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
-        attachApiCall("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
+        val gate = gateOf(recordId)
+        gate.sharingStates.waitForTaskId(recordId)
+        val sharingStatePage = gate.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
+        apiCallEvidence.attach("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
         val taskId = sharingStatePage.content.single().taskId!!
         val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
-        // The generated result describes the golden record this record is refined to; the sites the sharing
-        // member stated for its address are not part of that and are carried over as a refinement service does.
-        val result = taskData.copy(additionalSites = reservedTask.businessPartner.additionalSites)
-        orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, result)))
+        val resultRequest = TaskStepResultRequest(
+            TaskStep.CleanAndSync,
+            listOf(TaskStepResultEntryDto(taskId, result(reservedTask.businessPartner)))
         )
+        orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
+        apiCallEvidence.attach("POST", "/v7/business-partners/golden-record-tasks/step-results", resultRequest)
     }
 
     private fun givenConfidence(state: RecordState, verified: Boolean): GivenConfidence =
@@ -394,17 +459,4 @@ class BusinessPartnerShareActions(
 
     private fun requestIdentifier(prefix: String, label: String): BpnReference =
         BpnReference("$prefix-request-${context.runId(label)}", null, BpnReferenceType.BpnRequestIdentifier)
-
-    private fun attachApiCall(method: String, path: String, request: Any? = null, response: Any? = null) {
-        val content = buildMap {
-            put("uri", "$method $path")
-            if (request != null) put("request", request)
-            if (response != null) put("response", response)
-        }
-        context.scenario.attach(
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
-            "application/json",
-            "$method $path"
-        )
-    }
 }

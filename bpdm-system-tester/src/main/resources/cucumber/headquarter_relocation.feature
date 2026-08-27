@@ -3,7 +3,7 @@
 # address and the former legal address becomes an additional address. This feature asserts that address
 # reclassification outcome; relation reflection in the output is covered in
 # output_reflects_golden_record_relations.feature.
-@CXTPM-1039
+@CXTPM-1043
 Feature: Headquarter Relocation
 
   #h3. Test Objective:
@@ -12,13 +12,13 @@ Feature: Headquarter Relocation
   #
   #h3. Preconditions:
   #
-  ## A legal entity exists with a legal address and a previously shared additional address.
+  #* A legal entity exists with a legal address and a previously shared additional address.
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the current legal address to the additional address, effective immediately.
-  ## The golden record process establishes the relation.
-  ## The additional address becomes the new legal address and the former legal address becomes an additional address.
+  #* The sharing member shares an IsReplacedBy relation from the current legal address to the additional address, effective immediately.
+  #* The golden record process establishes the relation.
+  #* The additional address becomes the new legal address and the former legal address becomes an additional address.
   @TEST_CXTPM-993 @BPDM
   Scenario: Legal entity's headquarters moves to a previously shared address
     Given record "old-hq" reflects legal entity "acme" with legal address "acme-old-hq"
