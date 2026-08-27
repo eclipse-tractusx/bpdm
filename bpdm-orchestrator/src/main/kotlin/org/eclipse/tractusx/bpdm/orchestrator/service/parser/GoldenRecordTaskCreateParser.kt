@@ -31,11 +31,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-/**
- * Validates and resolves golden record task create requests: rejects business partner data whose additional sites
- * have no site of their own, and resolves each `recordId` to its already-registered gate record. Read-only: entries
- * without a `recordId` are left unresolved (`null`) for the operation to create their gate record when executing.
- */
 @Service
 @Transactional(readOnly = true)
 class GoldenRecordTaskCreateParser(
@@ -51,20 +46,12 @@ class GoldenRecordTaskCreateParser(
         }
     }
 
-    /**
-     * Rejects business partner data that states further sites of its address without stating a site of its own,
-     * which those sites would be additional to.
-     */
     private fun validateBusinessPartner(businessPartner: BusinessPartner): ParseResult<BusinessPartner, GoldenRecordTaskCreateParseError> =
         if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null)
             ParseResult.ofSingleFailure(GoldenRecordTaskCreateParseError.AdditionalSitesWithoutSite)
         else
             ParseResult.Success(businessPartner)
 
-    /**
-     * Resolves each `recordId` to its registered gate record. A missing `recordId` resolves to `null` (a new gate
-     * record is created for it during execution); a malformed or unregistered `recordId` is reported as an error.
-     */
     private fun resolveGateRecords(recordIds: List<String?>): List<ParseResult<SharingMemberRecordDb?, GoldenRecordTaskCreateParseError>> {
         val parsedUuids = recordIds.map { recordId -> recordId?.let { toUuidOrNull(it) } }
 

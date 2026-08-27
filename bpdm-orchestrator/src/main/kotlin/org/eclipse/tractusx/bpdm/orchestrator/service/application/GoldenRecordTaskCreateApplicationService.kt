@@ -90,13 +90,6 @@ class GoldenRecordTaskCreateApplicationService(
             execute = { parsed -> operation.execute(mode, parsed, newGateRecordIsGoldenRecordCounted) }
         )
 
-    /**
-     * Reconstructs the exact exception the previous, pre-refactoring implementation threw for these problems, so
-     * existing error responses stay unchanged: an entry whose additional sites have no site of their own always
-     * wins (that check used to run, and could throw, before any record ID was even looked at); next, an invalid
-     * record ID format (used to be looked up eagerly, in request order, before existence was checked); finally the
-     * IDs of every requested record that does not exist.
-     */
     private fun toValidationException(errors: List<GoldenRecordTaskCreateParseError>): RuntimeException =
         when {
             errors.any { it is GoldenRecordTaskCreateParseError.AdditionalSitesWithoutSite } ->

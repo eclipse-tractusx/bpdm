@@ -19,24 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.model.error
 
-/**
- * Problems found while validating and resolving a [org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest].
- */
 sealed interface GoldenRecordTaskCreateParseError {
-
-    /**
-     * The business partner data states further sites of its address without stating a site of its own, which those
-     * sites would be additional to.
-     */
     data object AdditionalSitesWithoutSite : GoldenRecordTaskCreateParseError
-
-    /**
-     * The given `recordId` is not a valid sharing member record UUID.
-     */
     data class RecordIdInvalid(val recordId: String) : GoldenRecordTaskCreateParseError
-
-    /**
-     * The given `recordId` is a valid UUID but is not a registered gate record.
-     */
     data class RecordNotFound(val recordId: String) : GoldenRecordTaskCreateParseError
 }

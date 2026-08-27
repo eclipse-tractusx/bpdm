@@ -21,13 +21,6 @@ package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
-/**
- * The unified per-entry request for creating a golden record task, shared by the V6 and V7 API versions.
- * The business partner content itself already uses the V7 model as its common structure since V7's model
- * is a structural superset of V6's (V6's nested types like [org.eclipse.tractusx.orchestrator.api.model.Site]
- * or [org.eclipse.tractusx.orchestrator.api.model.PostalAddress] are in fact the very same classes reused by
- * V6, only the top-level `BusinessPartner`/`LegalEntity` shapes differ slightly between the two API versions).
- */
 data class GoldenRecordTaskCreateRequest(
     val recordId: String?,
     val businessPartner: BusinessPartner

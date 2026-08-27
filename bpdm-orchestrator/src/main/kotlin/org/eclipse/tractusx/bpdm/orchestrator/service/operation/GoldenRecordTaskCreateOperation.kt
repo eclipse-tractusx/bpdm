@@ -32,11 +32,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-/**
- * Creates the golden record tasks for a validated batch: creates a fresh gate record for every entry that did not
- * already resolve to one, aborts any outdated pending tasks on the gate records involved, and initializes a new task
- * for each entry via the [GoldenRecordTaskStateMachine].
- */
 @Service
 class GoldenRecordTaskCreateOperation(
     private val sharingMemberRecordRepository: SharingMemberRecordRepository,
@@ -46,10 +41,6 @@ class GoldenRecordTaskCreateOperation(
 
     private val logger = KotlinLogging.logger { }
 
-    /**
-     * @param newGateRecordIsGoldenRecordCounted the `isGoldenRecordCounted` value given to a newly created gate
-     * record (an entry that did not resolve to an already-registered one during parsing).
-     */
     @Transactional
     fun execute(
         mode: TaskMode,
