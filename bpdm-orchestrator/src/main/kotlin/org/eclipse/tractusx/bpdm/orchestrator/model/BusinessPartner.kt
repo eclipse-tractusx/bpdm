@@ -17,12 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.model.parsed
+package org.eclipse.tractusx.bpdm.orchestrator.model
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
-import org.eclipse.tractusx.bpdm.orchestrator.model.BusinessPartnerRequest
+import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntity
+import org.eclipse.tractusx.orchestrator.api.model.NamePart
+import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants
+import org.eclipse.tractusx.orchestrator.api.model.Site
+import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
 
-data class GoldenRecordTaskCreateParsed(
-    val existingGateRecord: SharingMemberRecordDb?,
-    val businessPartner: BusinessPartnerRequest
+data class BusinessPartnerRequest(
+    val nameParts: List<NamePart>,
+    val owningCompany: String?,
+    val uncategorized: UncategorizedProperties,
+    val legalEntity: LegalEntity,
+    val site: Site?,
+    val additionalAddress: PostalAddressWithScriptVariants?,
+    val additionalSites: List<AdditionalSite> = emptyList()
 )

@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.model.BusinessPartnerRequest
 
 data class GoldenRecordTaskCreateRequest(
     val recordId: String?,
-    val businessPartner: BusinessPartner
+    val businessPartner: BusinessPartnerRequest
 )
