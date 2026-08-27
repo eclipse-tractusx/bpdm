@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.mapper.v6
 
-import org.eclipse.tractusx.bpdm.orchestrator.model.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntry
@@ -29,23 +28,29 @@ import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as LegalEntityV7
 import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner as BusinessPartnerV6
 import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity as LegalEntityV6
 
+/**
+ * Translates the V6 create-task request entry into the unified [GoldenRecordTaskCreateRequest]. V6's `BusinessPartner`
+ * and `LegalEntity` are near-identical, slightly reduced variants of the V7 ones (no `additionalSites`, no ultimate
+ * owner or script variant/golden record relation information, and `isCatenaXMemberData` instead of
+ * `isParticipantData`); every other nested type (site, addresses, identifiers, ...) is already the very same V7 type
+ * reused by V6, so this is a pure, narrow translation with the missing V7-only fields defaulted.
+ */
 @Component
 class GoldenRecordTaskCreateInboundMapperV6 {
 
     fun toRequest(entry: TaskCreateRequestEntry): GoldenRecordTaskCreateRequest =
         GoldenRecordTaskCreateRequest(
             recordId = entry.recordId,
-            businessPartner = toBusinessPartnerRequest(entry.businessPartner)
+            businessPartner = toBusinessPartnerV7(entry.businessPartner)
         )
 
-    private fun toBusinessPartnerRequest(businessPartner: BusinessPartnerV6): BusinessPartnerRequest =
+    private fun toBusinessPartnerV7(businessPartner: BusinessPartnerV6): BusinessPartnerV7 =
         with(businessPartner) {
-            val v7LegalEntity = toLegalEntityV7(legalEntity)
-            BusinessPartnerRequest(
+            BusinessPartnerV7(
                 nameParts = nameParts,
                 owningCompany = owningCompany,
                 uncategorized = uncategorized,
-                legalEntity = v7LegalEntity,
+                legalEntity = toLegalEntityV7(legalEntity),
                 site = site,
                 additionalAddress = additionalAddress?.let { PostalAddressWithScriptVariants(it, emptyList()) },
                 additionalSites = emptyList()

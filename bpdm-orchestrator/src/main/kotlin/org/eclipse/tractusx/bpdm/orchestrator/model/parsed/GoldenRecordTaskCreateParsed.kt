@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.orchestrator.model.parsed
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
-import org.eclipse.tractusx.bpdm.orchestrator.model.BusinessPartnerRequest
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
 data class GoldenRecordTaskCreateParsed(
     val existingGateRecord: SharingMemberRecordDb?,
-    val businessPartner: BusinessPartnerRequest
+    val businessPartner: BusinessPartner
 )

@@ -19,29 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.mapper.v7
 
-import org.eclipse.tractusx.bpdm.orchestrator.model.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner as ApiBusinessPartner
 
+/**
+ * Translates the V7 create-task request entry into the unified [GoldenRecordTaskCreateRequest]. Since V7's own
+ * `BusinessPartner` already is the unified business partner model, this translation is a straight pass-through.
+ */
 @Component
 class GoldenRecordTaskCreateInboundMapperV7 {
 
     fun toRequest(entry: TaskCreateRequestEntry): GoldenRecordTaskCreateRequest =
         GoldenRecordTaskCreateRequest(
             recordId = entry.recordId,
-            businessPartner = toBusinessPartnerRequest(entry.businessPartner)
-        )
-
-    private fun toBusinessPartnerRequest(apiBp: ApiBusinessPartner): BusinessPartnerRequest =
-        BusinessPartnerRequest(
-            nameParts = apiBp.nameParts,
-            owningCompany = apiBp.owningCompany,
-            uncategorized = apiBp.uncategorized,
-            legalEntity = apiBp.legalEntity,
-            site = apiBp.site,
-            additionalAddress = apiBp.additionalAddress,
-            additionalSites = apiBp.additionalSites
+            businessPartner = entry.businessPartner
         )
 }

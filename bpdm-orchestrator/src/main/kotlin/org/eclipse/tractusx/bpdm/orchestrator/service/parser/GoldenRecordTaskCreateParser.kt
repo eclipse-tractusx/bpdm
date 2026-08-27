@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
-import org.eclipse.tractusx.bpdm.orchestrator.model.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.error.GoldenRecordTaskCreateParseError
 import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskCreateParsed
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -46,7 +46,7 @@ class GoldenRecordTaskCreateParser(
         }
     }
 
-    private fun validateBusinessPartner(businessPartner: BusinessPartnerRequest): ParseResult<BusinessPartnerRequest, GoldenRecordTaskCreateParseError> =
+    private fun validateBusinessPartner(businessPartner: BusinessPartner): ParseResult<BusinessPartner, GoldenRecordTaskCreateParseError> =
         if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null)
             ParseResult.ofSingleFailure(GoldenRecordTaskCreateParseError.AdditionalSitesWithoutSite)
         else
