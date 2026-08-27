@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.mapper.v6
 
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntry
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner as BusinessPartnerV7
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as LegalEntityV7
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner as BusinessPartnerV6
 import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity as LegalEntityV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner as BusinessPartnerV6
 
 /**
  * Translates the V6 create-task request entry into the unified [GoldenRecordTaskCreateRequest]. V6's `BusinessPartner`
@@ -41,12 +41,12 @@ class GoldenRecordTaskCreateInboundMapperV6 {
     fun toRequest(entry: TaskCreateRequestEntry): GoldenRecordTaskCreateRequest =
         GoldenRecordTaskCreateRequest(
             recordId = entry.recordId,
-            businessPartner = toBusinessPartnerV7(entry.businessPartner)
+            businessPartner = toBusinessPartnerRequest(entry.businessPartner)
         )
 
-    private fun toBusinessPartnerV7(businessPartner: BusinessPartnerV6): BusinessPartnerV7 =
+    private fun toBusinessPartnerRequest(businessPartner: BusinessPartnerV6): BusinessPartnerRequest =
         with(businessPartner) {
-            BusinessPartnerV7(
+            BusinessPartnerRequest(
                 nameParts = nameParts,
                 owningCompany = owningCompany,
                 uncategorized = uncategorized,

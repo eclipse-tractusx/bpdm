@@ -20,11 +20,25 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
 @Service
 class RequestMapper {
+
+    fun toBusinessPartner(businessPartner: BusinessPartnerRequest) =
+        toBusinessPartner(
+            BusinessPartner(
+                nameParts = businessPartner.nameParts,
+                owningCompany = businessPartner.owningCompany,
+                uncategorized = businessPartner.uncategorized,
+                legalEntity = businessPartner.legalEntity,
+                site = businessPartner.site,
+                additionalAddress = businessPartner.additionalAddress,
+                additionalSites = businessPartner.additionalSites
+            )
+        )
 
     fun toBusinessPartner(businessPartner: BusinessPartner) =
         with(businessPartner){
