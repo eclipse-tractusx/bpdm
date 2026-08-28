@@ -30,10 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTa
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.model.error.*
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest

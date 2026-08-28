@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError.TechnicalKeyAlreadyTaken
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError.UnresolvableAdministrativeArea

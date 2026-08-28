@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.combine
+import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.combine
-import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service

@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnRequestIdentifier
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.BpnSearchRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.BpnSearchResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.BpnSearchParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIdentifierSearchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnRequestIdentifierSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnIdentifierSearchParser
