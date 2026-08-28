@@ -71,6 +71,7 @@ bpdm-gate:
             client-id: <path:bpdm/data/int/bpdm-test-sharing-member/gate/orchestrator-client#client-id>
       security:
         auth-server-url: https://centralidp.int.catena-x.net/auth
+        client-id: Cl16-CX-BPDMGate
         realm: CX-Central
         permissions:
           uploadInputPartner: write_input_partner
