@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -50,6 +51,10 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
     // BPNA of an address remembered under the label a scenario refers to it by, so an assertion can name a
     // specific address (e.g. the relocation source/target) independent of how the record was refined.
     val addressBpnByLabel: MutableMap<String, String> = mutableMapOf()
+    // The site each record puts on the address it is refined to, keyed by that address's BPN request identifier and
+    // then by record. This is the ledger of the shared stream a refinement service has to keep to hand the Pool the
+    // complete set of sites of an address; the tester stands in for that service.
+    val sitesByAddressReference: MutableMap<String, MutableMap<String, AdditionalSite>> = mutableMapOf()
     val records: MutableMap<String, RecordState> = mutableMapOf()
     val relations: MutableMap<String, RelationState> = mutableMapOf()
 

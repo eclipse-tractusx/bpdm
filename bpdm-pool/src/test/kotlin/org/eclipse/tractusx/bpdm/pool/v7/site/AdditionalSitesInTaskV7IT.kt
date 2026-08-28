@@ -105,6 +105,57 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
+     * GIVEN an address that belongs to a further site because an earlier task stated it
+     * WHEN the record is processed again without stating that site
+     * THEN the site is unlinked and the address belongs to the site of the record alone
+     */
+    @Test
+    fun `unlink a site the record no longer states`() {
+        //GIVEN
+        val existing = testDataClient.processTask("First $testName", orchestratorRequestFactory.buildSiteBusinessPartner("First $testName").copyWithBpnRequests())
+        val existingSiteBpn = existing.recordSiteBpn()
+
+        val stating = orchestratorRequestFactory.buildSiteBusinessPartner("Second $testName")
+            .copyWithBpnRequests()
+            .underLegalEntity(existing.legalEntity.bpnReference.referenceValue!!)
+            .copy(additionalSites = listOf(AdditionalSite(BpnReference(existingSiteBpn, null, BpnReferenceType.Bpn), null)))
+        val linked = testDataClient.processTask("Second $testName", stating)
+        assertThat(sitesOfMainAddress(linked)).containsExactlyInAnyOrder(linked.recordSiteBpn(), existingSiteBpn)
+
+        //WHEN
+        val result = testDataClient.processTask("Second $testName", stating.copy(additionalSites = emptyList()))
+
+        //THEN
+        assertThat(result.additionalSites).isEmpty()
+        assertThat(sitesOfMainAddress(result)).containsExactly(result.recordSiteBpn())
+    }
+
+    /**
+     * GIVEN an address that is the main address of a site an earlier task created on it
+     * WHEN the record is processed again without stating that site
+     * THEN the task is resolved as an error, because the site is bound to the address by its own main-address relation
+     */
+    @Test
+    fun `reject dropping a site the record address is the main address of`() {
+        //GIVEN
+        val statedSite = AdditionalSite(
+            bpnReference = BpnReference("Additional Site Reference $testName", null, BpnReferenceType.BpnRequestIdentifier),
+            siteName = "Additional Site $testName"
+        )
+        val stating = orchestratorRequestFactory.buildSiteBusinessPartner(testName)
+            .copyWithBpnRequests()
+            .copy(additionalSites = listOf(statedSite))
+        val createdSiteBpn = testDataClient.processTask(testName, stating).additionalSites.single().bpn()
+
+        //WHEN
+        val errors = testDataClient.processTaskToErrors(testName, stating.copy(additionalSites = emptyList()))
+
+        //THEN
+        assertThat(errors).hasSize(1)
+        assertThat(errors.single().description).contains(createdSiteBpn, "must be stated")
+    }
+
+    /**
      * GIVEN a golden record task for a site that states a further site belonging to another legal entity
      * WHEN the task is processed
      * THEN the task is resolved as an error and the main address keeps belonging to its own site alone

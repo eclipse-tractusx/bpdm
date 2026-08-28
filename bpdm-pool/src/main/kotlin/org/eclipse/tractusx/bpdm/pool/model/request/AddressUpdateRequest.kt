@@ -21,6 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.request
 
 data class AddressUpdateRequest(
     val addressBpn: String,
-    val siteBpn: String?,
+    val siteBpns: List<String>?,
     val content: LogisticAddressRequest
 )

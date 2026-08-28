@@ -35,7 +35,7 @@ import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteAssignmentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -48,7 +48,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityP
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteAssignmentParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteMembershipParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
@@ -90,7 +90,7 @@ class TaskStepBuildService(
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteCreateOnAddressParser: SiteCreateOnAddressParser,
-    private val addressSiteAssignmentParser: AddressSiteAssignmentParser,
+    private val addressSiteMembershipParser: AddressSiteMembershipParser,
     private val addressUpdateService: AddressUpdateService,
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
@@ -134,12 +134,9 @@ class TaskStepBuildService(
         // The address the additional sites attach to only exists once its own golden record has been written, so this
         // runs after all three components.
         val recordAddressBpn = recordAddressBpn(businessPartnerDto.type!!, legalEntityResult, siteResult, addressResult)
-        processAdditionalSites(businessPartnerDto, recordAddressBpn, taskEntryBpnMapping)
-        // Additional sites are the sites of the address next to the site this data is about, so business partner data
-        // without a site of its own reports none - the same rule the data has to satisfy on its way in.
-        val additionalSiteResults = siteResult
-            ?.let { readAdditionalSites(recordAddressBpn, it.bpnReference.referenceValue) }
-            .orEmpty()
+        val recordSiteBpn = siteResult?.bpnReference?.referenceValue
+        processAdditionalSites(businessPartnerDto, recordSiteBpn, recordAddressBpn, taskEntryBpnMapping)
+        val additionalSiteResults = recordSiteBpn?.let { readAdditionalSites(recordAddressBpn, it) }.orEmpty()
 
         val (updatedLegalEntityResult, updatedSiteResult, updatedAddressResult) =
             updateConfidences(businessPartnerDto.type!!, taskEntry.recordId, legalEntityResult, siteResult, addressResult)
@@ -158,17 +155,26 @@ class TaskStepBuildService(
 
     private fun processAdditionalSites(
         businessPartner: BusinessPartner,
+        recordSiteBpn: String?,
         recordAddressBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ) {
+        // Additional sites are the sites of the address next to the site this data is about, so business partner data
+        // without a site of its own states nothing about the membership and leaves it as it stands - the same rule the
+        // data has to satisfy on its way in.
+        if (recordSiteBpn == null) return
+
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by the
         // reference it carries and, carrying none, by the name its site is to be created under - as far as identity goes
         // here: resolving a name to an existing site is the refinement service's job, not this one's.
         val statedOnce = businessPartner.additionalSites.distinctBy { it.bpnReference.referenceValue ?: it.siteName }
         val (known, unknown) = statedOnce.partition { taskEntryBpnMapping.getBpn(it.bpnReference) != null }
 
-        createAdditionalSites(unknown, businessPartner, recordAddressBpn, taskEntryBpnMapping)
-        linkAdditionalSites(known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }.distinct(), recordAddressBpn)
+        val createdSiteBpns = createAdditionalSites(unknown, businessPartner, recordAddressBpn, taskEntryBpnMapping)
+        val knownSiteBpns = known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }
+
+        val completeMembership = (listOf(recordSiteBpn) + knownSiteBpns + createdSiteBpns).distinct()
+        setAddressSites(recordAddressBpn, completeMembership)
     }
 
     private fun createAdditionalSites(
@@ -176,8 +182,8 @@ class TaskStepBuildService(
         businessPartner: BusinessPartner,
         recordAddressBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
-    ) {
-        if (additionalSites.isEmpty()) return
+    ): List<String> {
+        if (additionalSites.isEmpty()) return emptyList()
 
         val confidenceCriteria = additionalSiteConfidence(businessPartner)
         val requests = additionalSites.map { taskSiteRequestMapper.toCreateOnAddressRequest(recordAddressBpn, it, confidenceCriteria) }
@@ -192,18 +198,16 @@ class TaskStepBuildService(
         additionalSites.zip(createdSites).forEach { (additionalSite, createdSite) ->
             taskEntryBpnMapping.addMapping(additionalSite.bpnReference, createdSite.bpn)
         }
+
+        return createdSites.map { it.bpn }
     }
 
-    private fun linkAdditionalSites(siteBpns: List<String>, recordAddressBpn: String) {
-        if (siteBpns.isEmpty()) return
-
-        val requests = siteBpns.map { AddressSiteAssignmentRequest(addressBpn = recordAddressBpn, siteBpn = it) }
-
+    private fun setAddressSites(recordAddressBpn: String, siteBpns: List<String>) {
         parseAndExecuteAllOrNone(
-            requests,
-            addressSiteAssignmentParser::parse,
-            { errors -> BpdmMultiValidationException(errors.map { renderAddressSiteAssignmentError(it) }) },
-            addressUpdateService::assignToSites
+            listOf(AddressSiteMembershipRequest(addressBpn = recordAddressBpn, siteBpns = siteBpns)),
+            addressSiteMembershipParser::parse,
+            { errors -> BpdmMultiValidationException(errors.map { renderAddressSiteMembershipError(it) }) },
+            addressUpdateService::setSites
         )
     }
 
@@ -464,7 +468,7 @@ class TaskStepBuildService(
         val upsertedBpn = if (bpnA == null) {
             createLogisticAddress(additionalAddress, legalEntityBpn, siteBpn)
         } else {
-            updateLogisticAddress(bpnA, siteBpn, additionalAddress)
+            updateLogisticAddress(bpnA, additionalAddress)
         }
 
         taskEntryBpnMapping.addMapping(bpnAReference, upsertedBpn)
@@ -499,12 +503,12 @@ class TaskStepBuildService(
 
     private fun updateLogisticAddress(
         bpnA: String,
-        siteBpn: String?,
         additionalAddress: PostalAddressWithScriptVariants
     ): String {
+        // Site membership is stated once for the whole record, by processAdditionalSites, so this update leaves it alone.
         val request = AddressUpdateRequest(
             addressBpn = bpnA,
-            siteBpn = siteBpn,
+            siteBpns = null,
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
@@ -530,17 +534,19 @@ class TaskStepBuildService(
             is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderAddressSiteAssignmentError(error: AddressSiteAssignmentParseError): String =
+    private fun renderAddressSiteMembershipError(error: AddressSiteMembershipParseError): String =
         when (error) {
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
+            is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
         }
 
     private fun renderAddressUpdateError(error: AddressUpdateParseError): String =
         when (error) {
             is ScriptVariantCoverageParseError -> renderScriptVariantCoverageError(error)
             is UnresolvableAddress -> "Address ${error.bpn} not found"
+            is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
             is AddressContentParseError -> renderAddressContentError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"

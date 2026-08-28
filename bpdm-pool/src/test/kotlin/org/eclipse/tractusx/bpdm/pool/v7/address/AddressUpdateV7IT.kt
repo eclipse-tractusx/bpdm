@@ -19,7 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.address
 
+import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
@@ -360,5 +364,168 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN an additional address of a site
+     * WHEN operator updates it without stating the sites it belongs to
+     * THEN the address keeps belonging to that site
+     */
+    @Test
+    fun `update address without stating its sites keeps them`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
+        val addressResponse = testDataClient.createAdditionalAddress(siteResponse, testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressResponse)
+        poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        assertThat(sitesOf(addressRequest.bpna)).containsExactly(siteResponse.site.bpns)
+    }
+
+    /**
+     * GIVEN an additional address of a site and a further site of the same legal entity
+     * WHEN operator states both sites on the address
+     * THEN the address belongs to both
+     */
+    @Test
+    fun `set the sites an address belongs to`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
+        val furtherSiteResponse = testDataClient.createSite(legalEntityResponse, "Further $testName")
+        val addressResponse = testDataClient.createAdditionalAddress(siteResponse, testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressResponse)
+            .copy(bpnSites = listOf(siteResponse.site.bpns, furtherSiteResponse.site.bpns))
+        poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        assertThat(sitesOf(addressRequest.bpna)).containsExactlyInAnyOrder(siteResponse.site.bpns, furtherSiteResponse.site.bpns)
+    }
+
+    /**
+     * GIVEN an additional address of a site
+     * WHEN operator states an empty list of sites on it
+     * THEN the address belongs to no site any more
+     */
+    @Test
+    fun `clear the sites an address belongs to`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
+        val addressResponse = testDataClient.createAdditionalAddress(siteResponse, testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressResponse).copy(bpnSites = emptyList())
+        poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        assertThat(sitesOf(addressRequest.bpna)).isEmpty()
+    }
+
+    /**
+     * WHEN operator tries to state a site that does not exist on an address
+     * THEN operator sees site not found error
+     */
+    @Test
+    fun `try update address with unknown site`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val addressResponse = testDataClient.createAdditionalAddress(legalEntityResponse, testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressResponse).copy(bpnSites = listOf("UNKNOWN"))
+        val updateResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressUpdateError.SiteNotFound, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(updateResponse, expectedResponse)
+    }
+
+    /**
+     * WHEN operator tries to state a site of another legal entity on an address
+     * THEN operator sees site not in legal entity error
+     */
+    @Test
+    fun `try update address with site of another legal entity`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val addressResponse = testDataClient.createAdditionalAddress(legalEntityResponse, testName)
+
+        val otherLegalEntityResponse = testDataClient.createParticipantLegalEntity("Other $testName")
+        val otherSiteResponse = testDataClient.createSite(otherLegalEntityResponse, "Other $testName")
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressResponse)
+            .copy(bpnSites = listOf(otherSiteResponse.site.bpns))
+        val updateResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressUpdateError.SiteNotInLegalEntity, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(updateResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN a site main address
+     * WHEN operator tries to state a site list on it that leaves out the site it is the main address of
+     * THEN operator sees site main address omitted error
+     */
+    @Test
+    fun `try update site main address without stating its own site`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).copy(bpnSites = emptyList())
+        val updateResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressUpdateError.SiteMainAddressOmitted, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(updateResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN an additional address of a site whose content is already what the update states
+     * WHEN operator clears the sites it belongs to
+     * THEN losing the site counts as a change of the address and is recorded in the changelog
+     */
+    @Test
+    fun `record losing a site in the changelog`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
+        val addressResponse = testDataClient.createAdditionalAddress(siteResponse, testName)
+
+        // Applied first so the second update states exactly the content the address already has and differs in the
+        // site membership alone.
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressResponse)
+        poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //WHEN
+        poolClient.addresses.updateAddresses(listOf(addressRequest.copy(bpnSites = emptyList())))
+
+        //THEN
+        val updates = poolClient.changelogs
+            .getChangelogEntries(ChangelogSearchRequest(bpns = setOf(addressRequest.bpna)), PaginationRequest(0, 20))
+            .content.filter { it.changelogType == ChangelogType.UPDATE }
+
+        assertThat(updates).hasSize(2)
+    }
+
+    private fun sitesOf(addressBpn: String): List<String> {
+        val address = poolClient.addresses.getAddress(addressBpn).address
+        return listOfNotNull(address.bpnSite) + address.additionalSites
     }
 }
