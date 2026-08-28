@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCr
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service

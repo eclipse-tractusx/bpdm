@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressSiteAssignmentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteAssignmentParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteAssignmentRequest
-import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
 import org.springframework.stereotype.Service

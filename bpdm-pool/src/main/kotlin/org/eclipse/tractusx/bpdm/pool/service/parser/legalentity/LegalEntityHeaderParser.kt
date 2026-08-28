@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
