@@ -25,7 +25,6 @@ import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -33,7 +32,6 @@ import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
-import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDate
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
@@ -50,14 +48,13 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorR
  * because the relation propagates into already-shared outputs asynchronously.
  */
 class GoldenRecordRelationsInOutputStepDefs(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val orchestratorClient: OrchestrationApiClient,
     private val shareActions: BusinessPartnerShareActions,
-    private val sharingStateWatcher: SharingStateWatcher,
     private val taskReservationWatcher: TaskReservationWatcher,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertHelper: GoldenRecordRelationAssertHelper,
-    private val jsonMapper: JsonMapper
+    private val apiCallEvidence: ApiCallEvidence
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -71,6 +68,8 @@ class GoldenRecordRelationsInOutputStepDefs(
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
     private val scenarioName: String get() = context.scenarioName
 
     // -------------------------------------------------------------------------
@@ -193,7 +192,8 @@ class GoldenRecordRelationsInOutputStepDefs(
             "[$scenarioName] When: the sharing member shares relation '$relationId' of type '$relationType' " +
                 "from '$sourceRecordId' to '$targetRecordId' effective immediately"
         }
-        // IsReplacedBy must be currently valid, so the relation is shared effective immediately (today).
+        // IsReplacedBy must be currently valid, and the ultimate owner resolution only follows currently valid
+        // IsOwnedBy relations, so the relation is shared effective immediately (today).
         shareRelation(relationId, relationType, sourceRecordId, targetRecordId, currentlyValid = true)
     }
 
@@ -210,8 +210,8 @@ class GoldenRecordRelationsInOutputStepDefs(
             baseEntry
 
         val request = RelationPutRequest(listOf(entry))
-        val response = gateClient.relation.put(true, request)
-        attachGateCall("PUT", "/v7/input/relations", request = request, response = response)
+        val response = gateOf(sourceRecordId).relation.put(true, request)
+        apiCallEvidence.attach("PUT", "/v7/input/relations", request = request, response = response)
         context.relations[relationId] = RelationState(
             submittedEntry = entry,
             sourceRecordId = sourceRecordId,
@@ -225,11 +225,12 @@ class GoldenRecordRelationsInOutputStepDefs(
         val relationState = context.relations[relationId]!!
         val runId = context.runId(relationId)
 
-        sharingStateWatcher.waitForRelationTaskId(relationId)
-        val relationSharingStatePage = gateClient.relationSharingState.get(
+        val gate = gateOf(relationState.sourceRecordId)
+        gate.sharingStates.waitForRelationTaskId(relationId)
+        val relationSharingStatePage = gate.relationSharingState.get(
             externalIds = listOf(runId), sharingStateTypes = null, updatedAfter = null, paginationRequest = PaginationRequest()
         )
-        attachGateCall("GET", "/v7/relations/sharing-state", request = mapOf("externalIds" to listOf(runId)), response = relationSharingStatePage)
+        apiCallEvidence.attach("GET", "/v7/relations/sharing-state", request = mapOf("externalIds" to listOf(runId)), response = relationSharingStatePage)
         val taskId = relationSharingStatePage.content.single().taskId!!
         taskReservationWatcher.waitForReservedRelationTask(taskId)
 
@@ -249,7 +250,7 @@ class GoldenRecordRelationsInOutputStepDefs(
             ))
         )
 
-        sharingStateWatcher.waitForRelationCompletedState(relationId)
+        gate.sharingStates.waitForRelationCompletedState(relationId)
         context.relations[relationId] = relationState.copy(resolvedSourceBpn = sourceBpn, resolvedTargetBpn = targetBpn)
     }
 
@@ -299,8 +300,8 @@ class GoldenRecordRelationsInOutputStepDefs(
 
     private fun goldenRecordOutputOf(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachGateCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
         return outputPage.content.single()
     }
 
@@ -330,17 +331,4 @@ class GoldenRecordRelationsInOutputStepDefs(
 
     private fun siteBpnOf(output: BusinessPartnerOutputDto): String =
         output.site?.siteBpn ?: error("record output '${output.externalId}' must have a site to take part in a site relation")
-
-    private fun attachGateCall(method: String, path: String, request: Any? = null, response: Any? = null) {
-        val content = buildMap {
-            put("uri", "$method $path")
-            if (request != null) put("request", request)
-            if (response != null) put("response", response)
-        }
-        context.scenario.attach(
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
-            "application/json",
-            "$method $path"
-        )
-    }
 }

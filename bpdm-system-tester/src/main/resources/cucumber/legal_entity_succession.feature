@@ -3,7 +3,7 @@
 # legal entity's headquarters (headquarter_relocation.feature), a succession has no side effects on the
 # involved legal entities: nothing is inherited and no state changes. This feature gathers the scenarios for
 # legal entity successions.
-@CXTPM-1039
+@CXTPM-1043
 Feature: Legal Entity Succession
 
   #h3. Test Objective:
@@ -12,14 +12,14 @@ Feature: Legal Entity Succession
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect a legal entity (predecessor and successor).
+  #* Two records each reflect a legal entity (predecessor and successor).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the predecessor record to the successor record.
-  ## The golden record process establishes the relation.
-  ## The relation output reflects the established golden record relation.
-  @BPDM
+  #* The sharing member shares an IsReplacedBy relation from the predecessor record to the successor record.
+  #* The golden record process establishes the relation.
+  #* The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1046 @BPDM
   Scenario: IsReplacedBy Relation Between Legal Entities Reflected In Sharing Member Relation Output
     Given record "predecessor-record" reflects legal entity "predecessor"
     And record "successor-record" reflects legal entity "successor"

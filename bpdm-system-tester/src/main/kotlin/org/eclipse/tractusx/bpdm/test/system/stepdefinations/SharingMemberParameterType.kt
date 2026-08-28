@@ -17,12 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.test.system.stepdefinations
 
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import io.cucumber.java.ParameterType
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 
-data class AddressSiteAssignmentParsed(
-    val address: LogisticAddressDb,
-    val site: SiteDb
-)
+/**
+ * Lets a step name the sharing member that acts in it, so one step definition serves them all.
+ *
+ * A scenario naming no sharing member acts as the first one, which is why the unqualified steps have no
+ * sharing member to name.
+ */
+class SharingMemberParameterType : SpringTestRunConfiguration() {
+
+    @ParameterType("first|second|third")
+    fun sharingMember(name: String): SharingMember = SharingMember.valueOf(name.uppercase())
+}

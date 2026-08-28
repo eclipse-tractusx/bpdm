@@ -9,11 +9,6 @@
     "url" : "http://localhost:8085",
     "description" : "Generated server url"
   } ],
-  "security" : [ {
-    "open_id_scheme" : [ ]
-  }, {
-    "bearer_scheme" : [ ]
-  } ],
   "paths" : {
     "/v7/sharing-member-records" : {
       "get" : {
@@ -34,6 +29,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "0",
             "minimum" : 0
           }
         }, {
@@ -43,6 +39,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "10",
             "maximum" : 100,
             "minimum" : 0
           }
@@ -579,6 +576,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "0",
             "minimum" : 0
           }
         }, {
@@ -588,6 +586,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "10",
             "maximum" : 100,
             "minimum" : 0
           }
@@ -630,6 +629,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "0",
             "minimum" : 0
           }
         }, {
@@ -639,6 +639,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "10",
             "maximum" : 100,
             "minimum" : 0
           }
@@ -681,6 +682,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "0",
             "minimum" : 0
           }
         }, {
@@ -690,6 +692,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
+            "default" : "10",
             "maximum" : 100,
             "minimum" : 0
           }
@@ -714,6 +717,18 @@
   },
   "components" : {
     "schemas" : {
+      "AdditionalSite" : {
+        "type" : "object",
+        "description" : "A further site an address belongs to. It carries only what identifies the site, because it is never the subject of the business partner data it appears in: the address it belongs to is the one stated by the surrounding business partner data.",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReference"
+          },
+          "siteName" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
       "AddressGoldenRecordRelation" : {
         "type" : "object",
         "description" : "A golden record relation between addresses, pointing from a source BPNA to a target BPNA",
@@ -738,43 +753,34 @@
             "$ref" : "#/components/schemas/GeoCoordinate"
           },
           "country" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel1" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "postalCode" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "city" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "deliveryServiceType" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "enum" : [ "PO_BOX", "PRIVATE_BAG", "BOITE_POSTALE" ]
           },
           "deliveryServiceQualifier" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "deliveryServiceNumber" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           }
         }
       },
       "AlternativeAddressScriptVariant" : {
         "type" : "object",
         "properties" : {
-          "postalCode" : {
-            "type" : "string"
-          },
           "city" : {
-            "type" : "string"
-          },
-          "deliveryServiceQualifier" : {
-            "type" : "string"
-          },
-          "deliveryServiceNumber" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           }
         }
       },
@@ -783,13 +789,13 @@
         "description" : "A reference to a BPN for the corresponding business partner data. Either this reference contains an existing BPN or a BPN request identifier. The golden record process makes sure that the each unique BPN request identifier is associated to a unique BPN. For a new BPN request identifier the golden record process creates a new BPN (and golden record) and associates it with the BPN request identifier. Known BPN request identifiers are resolved to the BPN and the corresponding golden record is updated with the business partner data. This makes it possible for duplication check services to reference unique business partners by their own BPN request identifiers instead of needing to rely on BPNs for identification.",
         "properties" : {
           "referenceValue" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "desiredBpn" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "referenceType" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "enum" : [ "Bpn", "BpnRequestIdentifier" ]
           }
         }
@@ -805,7 +811,7 @@
             }
           },
           "owningCompany" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "uncategorized" : {
             "$ref" : "#/components/schemas/UncategorizedProperties"
@@ -814,13 +820,28 @@
             "$ref" : "#/components/schemas/LegalEntity"
           },
           "site" : {
-            "$ref" : "#/components/schemas/Site"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/Site"
+            }, {
+              "type" : "null"
+            } ]
           },
           "additionalAddress" : {
-            "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "additionalSites" : {
+            "type" : "array",
+            "description" : "The further sites the address of this business partner data belongs to, next to the site in 'site'. Together with 'site' this states the address's complete site membership: a site the address currently belongs to but this field leaves out is unlinked from it. Consolidating the records that share an address into that complete list is the golden record process's responsibility, not the Pool's. An entry that resolves to an existing site links that site to the address; an entry that does not resolve creates a new site with this address as its main address. An already existing site is never updated through this field. A site the address is the main address of cannot be unlinked and has to be stated.",
+            "items" : {
+              "$ref" : "#/components/schemas/AdditionalSite"
+            }
           },
           "type" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The recognized golden record type this business partner data contains.\n* `Legal Entity`: The business partner data only contains legal entity and legal address information.\n* `Site`: The business partner data contains site, site main address and its parent legal entity information.\n* `Additional Address`: The business partner data contains an additional address, (optional) parent site and parent legal entity information.\n* `Null`: No clear type determined, undecided. The golden record process will not create golden record from this business partner data.",
             "enum" : [ "LegalEntity", "Site", "Address" ]
           }
@@ -847,7 +868,7 @@
             }
           },
           "reasonCode" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           }
         }
       },
@@ -856,17 +877,17 @@
         "description" : "The business state information for the corresponding business partner",
         "properties" : {
           "validFrom" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time",
             "description" : "Date since when the status is/was valid."
           },
           "validTo" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time",
             "description" : "Date until the status was valid, if applicable."
           },
           "type" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The type of this specified status.",
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
@@ -877,25 +898,25 @@
         "description" : "Contains information to evaluate how good or verified the information in the attached business partner data is. This information will be directly written in the matched golden record's confidence criteria.",
         "properties" : {
           "sharedByOwner" : {
-            "type" : "boolean"
+            "type" : [ "boolean", "null" ]
           },
           "checkedByExternalDataSource" : {
-            "type" : "boolean"
+            "type" : [ "boolean", "null" ]
           },
           "numberOfSharingMembers" : {
-            "type" : "integer",
+            "type" : [ "integer", "null" ],
             "format" : "int32"
           },
           "lastConfidenceCheckAt" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time"
           },
           "nextConfidenceCheckAt" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time"
           },
           "confidenceLevel" : {
-            "type" : "integer",
+            "type" : [ "integer", "null" ],
             "format" : "int32"
           }
         }
@@ -964,15 +985,15 @@
         "description" : "The exact location of the physical postal address in latitude, longitude, and altitude.",
         "properties" : {
           "longitude" : {
-            "type" : "number",
+            "type" : [ "number", "null" ],
             "format" : "double"
           },
           "latitude" : {
-            "type" : "number",
+            "type" : [ "number", "null" ],
             "format" : "double"
           },
           "altitude" : {
-            "type" : "number",
+            "type" : [ "number", "null" ],
             "format" : "double"
           }
         }
@@ -982,15 +1003,15 @@
         "description" : "The additional identifiers of this business partner (excluding the BPN)",
         "properties" : {
           "value" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "Value of the identifier"
           },
           "type" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The type of identifier"
           },
           "issuingBody" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The organisation that issued this identifier"
           }
         }
@@ -1003,13 +1024,13 @@
             "$ref" : "#/components/schemas/BpnReference"
           },
           "legalName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "legalShortName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "legalForm" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "identifiers" : {
             "type" : "array",
@@ -1027,13 +1048,13 @@
             "$ref" : "#/components/schemas/ConfidenceCriteria"
           },
           "hasChanged" : {
-            "type" : "boolean"
+            "type" : [ "boolean", "null" ]
           },
           "ownershipUltimate" : {
-            "type" : "boolean"
+            "type" : [ "boolean", "null" ]
           },
           "ultimateOwnerBpnl" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "legalAddress" : {
             "$ref" : "#/components/schemas/PostalAddress"
@@ -1051,11 +1072,11 @@
             }
           },
           "updatedAt" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time"
           },
           "isParticipantData" : {
-            "type" : "boolean",
+            "type" : [ "boolean", "null" ],
             "description" : "Whether this legal entity is part of the Data Space network"
           }
         }
@@ -1083,10 +1104,10 @@
             "type" : "string"
           },
           "legalName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "legalShortName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "legalAddress" : {
             "$ref" : "#/components/schemas/PostalAddressScriptVariant"
@@ -1148,81 +1169,72 @@
             "$ref" : "#/components/schemas/GeoCoordinate"
           },
           "country" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel1" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel2" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel3" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "postalCode" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "city" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "district" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "street" : {
             "$ref" : "#/components/schemas/Street"
           },
           "companyPostalCode" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "industrialZone" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "building" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "floor" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "door" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "taxJurisdictionCode" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           }
         }
       },
       "PhysicalAddressScriptVariant" : {
         "type" : "object",
         "properties" : {
-          "postalCode" : {
-            "type" : "string"
-          },
           "city" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "district" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "street" : {
-            "$ref" : "#/components/schemas/Street"
-          },
-          "companyPostalCode" : {
-            "type" : "string"
+            "$ref" : "#/components/schemas/StreetScriptVariant"
           },
           "industrialZone" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "building" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "floor" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "door" : {
-            "type" : "string"
-          },
-          "taxJurisdictionCode" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           }
         }
       },
@@ -1234,7 +1246,7 @@
             "$ref" : "#/components/schemas/BpnReference"
           },
           "addressName" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The name of this address"
           },
           "identifiers" : {
@@ -1258,10 +1270,15 @@
             "$ref" : "#/components/schemas/PhysicalAddress"
           },
           "alternativeAddress" : {
-            "$ref" : "#/components/schemas/AlternativeAddress"
+            "type" : "null",
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddress"
+            }, {
+              "type" : "null"
+            } ]
           },
           "hasChanged" : {
-            "type" : "boolean",
+            "type" : [ "boolean", "null" ],
             "deprecated" : true,
             "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
           },
@@ -1273,7 +1290,7 @@
             }
           },
           "updatedAt" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time",
             "description" : "Timestamp when this address was last updated in the source system"
           }
@@ -1283,13 +1300,17 @@
         "type" : "object",
         "properties" : {
           "addressName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "physicalAddress" : {
             "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
           },
           "alternativeAddress" : {
-            "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
       },
@@ -1300,13 +1321,10 @@
             "type" : "string"
           },
           "addressName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "physicalAddress" : {
             "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
-          },
-          "alternativeAddress" : {
-            "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
           }
         }
       },
@@ -1318,7 +1336,7 @@
             "$ref" : "#/components/schemas/BpnReference"
           },
           "addressName" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The name of this address"
           },
           "identifiers" : {
@@ -1341,11 +1359,8 @@
           "physicalAddress" : {
             "$ref" : "#/components/schemas/PhysicalAddress"
           },
-          "alternativeAddress" : {
-            "$ref" : "#/components/schemas/AlternativeAddress"
-          },
           "hasChanged" : {
-            "type" : "boolean",
+            "type" : [ "boolean", "null" ],
             "deprecated" : true,
             "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
           },
@@ -1357,7 +1372,7 @@
             }
           },
           "updatedAt" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time",
             "description" : "Timestamp when this address was last updated in the source system"
           },
@@ -1366,6 +1381,13 @@
             "items" : {
               "$ref" : "#/components/schemas/PostalAddressScriptVariantWithScriptCode"
             }
+          },
+          "alternativeAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddress"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
       },
@@ -1377,7 +1399,7 @@
             "format" : "date"
           },
           "validTo" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date"
           }
         }
@@ -1397,7 +1419,7 @@
             "format" : "date-time"
           },
           "isGoldenRecordCounted" : {
-            "type" : "boolean"
+            "type" : [ "boolean", "null" ]
           }
         }
       },
@@ -1420,7 +1442,7 @@
             "$ref" : "#/components/schemas/BpnReference"
           },
           "siteName" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "states" : {
             "type" : "array",
@@ -1432,10 +1454,14 @@
             "$ref" : "#/components/schemas/ConfidenceCriteria"
           },
           "hasChanged" : {
-            "type" : "boolean"
+            "type" : [ "boolean", "null" ]
           },
           "siteMainAddress" : {
-            "$ref" : "#/components/schemas/PostalAddress"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PostalAddress"
+            }, {
+              "type" : "null"
+            } ]
           },
           "scriptVariants" : {
             "type" : "array",
@@ -1443,13 +1469,35 @@
               "$ref" : "#/components/schemas/SiteScriptVariant"
             }
           },
+          "goldenRecordRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteGoldenRecordRelation"
+            }
+          },
           "updatedAt" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time"
           },
           "siteMainIsLegalAddress" : {
             "type" : "boolean",
             "description" : "This site's main address is the legal address of the legal entity. The address information therefore is stored in the legal address."
+          }
+        }
+      },
+      "SiteGoldenRecordRelation" : {
+        "type" : "object",
+        "description" : "A golden record relation between sites, pointing from a source BPNS to a target BPNS",
+        "properties" : {
+          "relationType" : {
+            "type" : "string",
+            "enum" : [ "IsReplacedBy" ]
+          },
+          "sourceBpn" : {
+            "type" : "string"
+          },
+          "targetBpn" : {
+            "type" : "string"
           }
         }
       },
@@ -1472,31 +1520,54 @@
         "description" : "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway",
         "properties" : {
           "name" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "houseNumber" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "houseNumberSupplement" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "milestone" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "direction" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "namePrefix" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "additionalNamePrefix" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "nameSuffix" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "additionalNameSuffix" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "StreetScriptVariant" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ]
+          },
+          "direction" : {
+            "type" : [ "string", "null" ]
+          },
+          "namePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNamePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "nameSuffix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNameSuffix" : {
+            "type" : [ "string", "null" ]
           }
         }
       },
@@ -1563,7 +1634,7 @@
         "type" : "object",
         "properties" : {
           "recordId" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
           },
           "businessPartnerRelations" : {
@@ -1607,7 +1678,7 @@
         "type" : "object",
         "properties" : {
           "recordId" : {
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
           },
           "businessPartner" : {
@@ -2006,31 +2077,13 @@
             }
           },
           "address" : {
-            "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
-      }
-    },
-    "securitySchemes" : {
-      "open_id_scheme" : {
-        "type" : "oauth2",
-        "flows" : {
-          "clientCredentials" : {
-            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
-            "scopes" : { }
-          },
-          "authorizationCode" : {
-            "authorizationUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/auth",
-            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
-            "refreshUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
-            "scopes" : { }
-          }
-        }
-      },
-      "bearer_scheme" : {
-        "type" : "http",
-        "scheme" : "bearer",
-        "bearerFormat" : "JWT"
       }
     }
   }

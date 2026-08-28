@@ -30,12 +30,13 @@ import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates address-update requests: the target address, an optional parent site to assign it to, and the new address
- * content.
+ * Validates address-update requests: the target address, an optionally stated complete site membership, and the new
+ * address content.
  */
 @Service
 class AddressUpdateParser(
@@ -43,6 +44,7 @@ class AddressUpdateParser(
     private val addressBpnParser: AddressBpnParser,
     private val siteBpnParser: SiteBpnParser,
     private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator,
+    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator,
     private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val partnerReader: AddressPartnerScriptCodeReader
 ) {
@@ -55,18 +57,23 @@ class AddressUpdateParser(
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
-        val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
-        val consistentSiteResults: List<ParseResult<SiteDb?, AddressUpdateParseError>> =
-            crossValidateParseResults(targetResults, siteResults) { target, site ->
-                siteLegalEntityConsistencyValidator.check(target.legalEntity, site)
+        val siteResults = siteBpnParser.parseAll(requests.map { it.siteBpns })
+        val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateParseError>> =
+            crossValidateParseResults(targetResults, siteResults) { target, sites ->
+                when (sites) {
+                    // A request that states no membership asks for none of it to be judged.
+                    null -> emptyList()
+                    else -> sites.flatMap { siteLegalEntityConsistencyValidator.check(target.legalEntity, it) } +
+                            siteMainAddressConsistencyValidator.check(target, sites)
+                }
             }
         val coveredContentResults: List<ParseResult<LogisticAddressParsed, AddressUpdateParseError>> =
             crossValidateParseResults(targetResults, contentResults) { target, content ->
                 scriptVariantCoverageValidator.check(content.scriptCodes(), partnerReader.storedPartners(target))
             }
 
-        return zipParseResults(coveredContentResults, targetResults, consistentSiteResults) { content, target, site ->
-            AddressUpdateParsed(target, site, content)
+        return zipParseResults(coveredContentResults, targetResults, consistentSiteResults) { content, target, sites ->
+            AddressUpdateParsed(target, sites, content)
         }
     }
 }
