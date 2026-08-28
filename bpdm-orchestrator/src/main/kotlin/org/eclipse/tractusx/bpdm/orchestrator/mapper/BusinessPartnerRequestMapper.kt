@@ -77,6 +77,11 @@ import org.eclipse.tractusx.orchestrator.api.model.SiteScriptVariant as SiteScri
 import org.eclipse.tractusx.orchestrator.api.model.Street as StreetDto
 import org.eclipse.tractusx.orchestrator.api.model.StreetScriptVariant as StreetScriptVariantDto
 import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties as UncategorizedPropertiesDto
+import org.eclipse.tractusx.orchestrator.api.model.NamePartType
+import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 
 @Component
 class BusinessPartnerRequestMapper {
@@ -95,7 +100,13 @@ class BusinessPartnerRequestMapper {
     fun toNamePartRequest(namePart: NamePartDto) =
         NamePartRequest(
             name = namePart.name,
-            type = NamePartTypeRequest.valueOf(namePart.type.name)
+            type = when (namePart.type) {
+                NamePartType.LegalName -> NamePartTypeRequest.LegalName
+                NamePartType.ShortName -> NamePartTypeRequest.ShortName
+                NamePartType.LegalForm -> NamePartTypeRequest.LegalForm
+                NamePartType.SiteName -> NamePartTypeRequest.SiteName
+                NamePartType.AddressName -> NamePartTypeRequest.AddressName
+            }
         )
 
     fun toIdentifierRequest(identifier: IdentifierDto) =
@@ -116,7 +127,12 @@ class BusinessPartnerRequestMapper {
         BpnReferenceRequest(
             referenceValue = bpnReference.referenceValue,
             desiredBpn = bpnReference.desiredBpn,
-            referenceType = bpnReference.referenceType?.let { BpnReferenceTypeRequest.valueOf(it.name) }
+            referenceType = bpnReference.referenceType?.let { refType ->
+                when (refType) {
+                    BpnReferenceType.Bpn -> BpnReferenceTypeRequest.Bpn
+                    BpnReferenceType.BpnRequestIdentifier -> BpnReferenceTypeRequest.BpnRequestIdentifier
+                }
+            }
         )
 
     fun toPostalAddressRequest(postalAddress: PostalAddressDto) =
@@ -302,21 +318,30 @@ class BusinessPartnerRequestMapper {
 
     fun toLegalEntityGoldenRecordRelationRequest(relation: LegalEntityGoldenRecordRelationDto) =
         LegalEntityGoldenRecordRelationRequest(
-            relationType = LegalEntityGoldenRecordRelationTypeRequest.valueOf(relation.relationType.name),
+            relationType = when (relation.relationType) {
+                LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeRequest.IsAlternativeHeadquarterFor
+                LegalEntityGoldenRecordRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeRequest.IsManagedBy
+                LegalEntityGoldenRecordRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeRequest.IsOwnedBy
+                LegalEntityGoldenRecordRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationTypeRequest.IsReplacedBy
+            },
             sourceBpn = relation.sourceBpn,
             targetBpn = relation.targetBpn
         )
 
     fun toSiteGoldenRecordRelationRequest(relation: SiteGoldenRecordRelationDto) =
         SiteGoldenRecordRelationRequest(
-            relationType = SiteGoldenRecordRelationTypeRequest.valueOf(relation.relationType.name),
+            relationType = when (relation.relationType) {
+                SiteGoldenRecordRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeRequest.IsReplacedBy
+            },
             sourceBpn = relation.sourceBpn,
             targetBpn = relation.targetBpn
         )
 
     fun toAddressGoldenRecordRelationRequest(relation: AddressGoldenRecordRelationDto) =
         AddressGoldenRecordRelationRequest(
-            relationType = AddressGoldenRecordRelationTypeRequest.valueOf(relation.relationType.name),
+            relationType = when (relation.relationType) {
+                AddressGoldenRecordRelationType.IsReplacedBy -> AddressGoldenRecordRelationTypeRequest.IsReplacedBy
+            },
             sourceBpn = relation.sourceBpn,
             targetBpn = relation.targetBpn
         )

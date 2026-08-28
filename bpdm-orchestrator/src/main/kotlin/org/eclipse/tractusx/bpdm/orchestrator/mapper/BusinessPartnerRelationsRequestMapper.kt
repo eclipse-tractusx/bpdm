@@ -32,7 +32,12 @@ class BusinessPartnerRelationsRequestMapper {
     fun toBusinessPartnerRelationsRequest(businessPartnerRelations: BusinessPartnerRelations): BusinessPartnerRelationsRequest =
         with(businessPartnerRelations) {
             BusinessPartnerRelationsRequest(
-                relationType = RelationTypeRequest.valueOf(relationType.name),
+                relationType = when (relationType) {
+                    RelationType.IsAlternativeHeadquarterFor -> RelationTypeRequest.IsAlternativeHeadquarterFor
+                    RelationType.IsManagedBy -> RelationTypeRequest.IsManagedBy
+                    RelationType.IsOwnedBy -> RelationTypeRequest.IsOwnedBy
+                    RelationType.IsReplacedBy -> RelationTypeRequest.IsReplacedBy
+                },
                 businessPartnerSourceBpn = businessPartnerSourceBpn,
                 businessPartnerTargetBpn = businessPartnerTargetBpn,
                 validityPeriods = validityPeriods.map { validityPeriod ->
