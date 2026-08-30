@@ -19,10 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.model.error.GoldenRecordTaskResolveParseError
+import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskResolveParsed
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskResolveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskResolveOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskResolveParser
@@ -43,12 +44,16 @@ class GoldenRecordTaskResolveApplicationService(
             results = resultRequest.results
         )
 
-        parseAndExecuteAllOrNone(
-            listOf(resolveRequest),
-            { requests -> requests.flatMap { parser.parse(it) } },
-            ::toValidationException,
-            execute = { parsed -> operation.execute(parsed) }
-        )
+        val parseResults = parser.parse(resolveRequest)
+        val errors = parseResults.filterIsInstance<ParseResult.Failure<GoldenRecordTaskResolveParseError>>()
+            .flatMap { it.errors }
+            .filterNot { it is GoldenRecordTaskResolveParseError.TaskAborted }
+
+        if (errors.isNotEmpty()) throw toValidationException(errors)
+
+        val parsed = parseResults.filterIsInstance<ParseResult.Success<GoldenRecordTaskResolveParsed>>()
+            .map { it.parsed }
+        operation.execute(parsed)
     }
 
     private fun toValidationException(errors: List<GoldenRecordTaskResolveParseError>): RuntimeException =
@@ -58,14 +63,9 @@ class GoldenRecordTaskResolveApplicationService(
                     errors.filterIsInstance<GoldenRecordTaskResolveParseError.InvalidBusinessPartner>().first().message
                 )
 
-            errors.any { it is GoldenRecordTaskResolveParseError.TaskNotFound } ->
-                BpdmTaskNotFoundException(
-                    errors.filterIsInstance<GoldenRecordTaskResolveParseError.TaskNotFound>().first().taskId
-                )
-
             else ->
                 BpdmTaskNotFoundException(
-                    errors.filterIsInstance<GoldenRecordTaskResolveParseError.TaskAborted>().first().taskId
+                    errors.filterIsInstance<GoldenRecordTaskResolveParseError.TaskNotFound>().first().taskId
                 )
         }
 }
