@@ -10,39 +10,42 @@
 			"name": "Negotiate for Access",
 			"item": [
 				{
-					"name": "1. Select Offer",
+					"name": "1. Select Asset",
 					"item": [
 						{
 							"name": "Select Pool Participant Read Access",
 							"event": [
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								},
-								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"const KEY     = \"POOL_PARTICIPANT_READ\";",
+											"const PURPOSE = \"cx.bpdm.pool:1\";",
+											"",
+											"pm.test(\"Catalog returned an offer\", function () {",
 											"    pm.response.to.have.status(200);",
+											"    pm.expect(pm.response.json().dataset, \"dataset\").to.be.an(\"array\").that.is.not.empty;",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
-											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
-											"pm.collectionVariables.set(\"OFFER\", offerId);",
-											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
-											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.pool:1\")"
+											"",
+											"const v = pm.collectionVariables;",
+											"const dataset = pm.response.json().dataset[0];",
+											"",
+											"v.set(\"SELECTED_KEY\", KEY);",
+											"v.set(\"SELECTED_ASSET\", dataset[\"@id\"]);",
+											"v.set(\"SELECTED_PURPOSE\", PURPOSE);",
+											"v.set(\"OFFER\", dataset.hasPolicy[0][\"@id\"]);",
+											"",
+											"// restore whatever was already negotiated for this asset",
+											"const agreement = v.get(\"AGREEMENT_\" + KEY) || \"\";",
+											"v.set(\"AGREEMENT\", agreement);",
+											"v.set(\"TRANSFER_TOKEN\", v.get(\"TRANSFER_TOKEN_\" + KEY) || \"\");",
+											"",
+											"console.log(agreement",
+											"    ? \"[\" + KEY + \"] agreement \" + agreement + \" exists - skip step 2, go to Get Transfer Token\"",
+											"    : \"[\" + KEY + \"] not negotiated yet - run step 2\");"
 										],
 										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
+										"packages": {}
 									}
 								}
 							],
@@ -76,33 +79,36 @@
 							"name": "Select Gate Input Full Access",
 							"event": [
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								},
-								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"const KEY     = \"GATE_INPUT_FULL\";",
+											"const PURPOSE = \"cx.bpdm.gate.upload:1\";",
+											"",
+											"pm.test(\"Catalog returned an offer\", function () {",
 											"    pm.response.to.have.status(200);",
+											"    pm.expect(pm.response.json().dataset, \"dataset\").to.be.an(\"array\").that.is.not.empty;",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
-											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
-											"pm.collectionVariables.set(\"OFFER\", offerId);",
-											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
-											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.gate.upload:1\")"
+											"",
+											"const v = pm.collectionVariables;",
+											"const dataset = pm.response.json().dataset[0];",
+											"",
+											"v.set(\"SELECTED_KEY\", KEY);",
+											"v.set(\"SELECTED_ASSET\", dataset[\"@id\"]);",
+											"v.set(\"SELECTED_PURPOSE\", PURPOSE);",
+											"v.set(\"OFFER\", dataset.hasPolicy[0][\"@id\"]);",
+											"",
+											"// restore whatever was already negotiated for this asset",
+											"const agreement = v.get(\"AGREEMENT_\" + KEY) || \"\";",
+											"v.set(\"AGREEMENT\", agreement);",
+											"v.set(\"TRANSFER_TOKEN\", v.get(\"TRANSFER_TOKEN_\" + KEY) || \"\");",
+											"",
+											"console.log(agreement",
+											"    ? \"[\" + KEY + \"] agreement \" + agreement + \" exists - skip step 2, go to Get Transfer Token\"",
+											"    : \"[\" + KEY + \"] not negotiated yet - run step 2\");"
 										],
 										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
+										"packages": {}
 									}
 								}
 							],
@@ -136,33 +142,36 @@
 							"name": "Select Gate Input Read Access",
 							"event": [
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								},
-								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"const KEY     = \"GATE_INPUT_READ\";",
+											"const PURPOSE = \"cx.bpdm.gate.download:1\";",
+											"",
+											"pm.test(\"Catalog returned an offer\", function () {",
 											"    pm.response.to.have.status(200);",
+											"    pm.expect(pm.response.json().dataset, \"dataset\").to.be.an(\"array\").that.is.not.empty;",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
-											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
-											"pm.collectionVariables.set(\"OFFER\", offerId);",
-											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
-											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.gate.upload:1\")"
+											"",
+											"const v = pm.collectionVariables;",
+											"const dataset = pm.response.json().dataset[0];",
+											"",
+											"v.set(\"SELECTED_KEY\", KEY);",
+											"v.set(\"SELECTED_ASSET\", dataset[\"@id\"]);",
+											"v.set(\"SELECTED_PURPOSE\", PURPOSE);",
+											"v.set(\"OFFER\", dataset.hasPolicy[0][\"@id\"]);",
+											"",
+											"// restore whatever was already negotiated for this asset",
+											"const agreement = v.get(\"AGREEMENT_\" + KEY) || \"\";",
+											"v.set(\"AGREEMENT\", agreement);",
+											"v.set(\"TRANSFER_TOKEN\", v.get(\"TRANSFER_TOKEN_\" + KEY) || \"\");",
+											"",
+											"console.log(agreement",
+											"    ? \"[\" + KEY + \"] agreement \" + agreement + \" exists - skip step 2, go to Get Transfer Token\"",
+											"    : \"[\" + KEY + \"] not negotiated yet - run step 2\");"
 										],
 										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
+										"packages": {}
 									}
 								}
 							],
@@ -196,33 +205,36 @@
 							"name": "Select Gate Output Read Access",
 							"event": [
 								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								},
-								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"const KEY     = \"GATE_OUTPUT_READ\";",
+											"const PURPOSE = \"cx.bpdm.gate.download:1\";",
+											"",
+											"pm.test(\"Catalog returned an offer\", function () {",
 											"    pm.response.to.have.status(200);",
+											"    pm.expect(pm.response.json().dataset, \"dataset\").to.be.an(\"array\").that.is.not.empty;",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
-											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
-											"pm.collectionVariables.set(\"OFFER\", offerId);",
-											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
-											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.gate.download:1\")"
+											"",
+											"const v = pm.collectionVariables;",
+											"const dataset = pm.response.json().dataset[0];",
+											"",
+											"v.set(\"SELECTED_KEY\", KEY);",
+											"v.set(\"SELECTED_ASSET\", dataset[\"@id\"]);",
+											"v.set(\"SELECTED_PURPOSE\", PURPOSE);",
+											"v.set(\"OFFER\", dataset.hasPolicy[0][\"@id\"]);",
+											"",
+											"// restore whatever was already negotiated for this asset",
+											"const agreement = v.get(\"AGREEMENT_\" + KEY) || \"\";",
+											"v.set(\"AGREEMENT\", agreement);",
+											"v.set(\"TRANSFER_TOKEN\", v.get(\"TRANSFER_TOKEN_\" + KEY) || \"\");",
+											"",
+											"console.log(agreement",
+											"    ? \"[\" + KEY + \"] agreement \" + agreement + \" exists - skip step 2, go to Get Transfer Token\"",
+											"    : \"[\" + KEY + \"] not negotiated yet - run step 2\");"
 										],
 										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
+										"packages": {}
 									}
 								}
 							],
@@ -258,22 +270,35 @@
 					"name": "2. Negotiate",
 					"item": [
 						{
-							"name": "Initiate Negotiation",
+							"name": "Negotiate Selected Asset",
 							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const v = pm.collectionVariables;",
+											"if (!v.get(\"SELECTED_ASSET\")) {",
+											"    throw new Error(\"Run 1. Select Asset first.\");",
+											"}",
+											"if (v.get(\"AGREEMENT_\" + v.get(\"SELECTED_KEY\"))) {",
+											"    console.warn(\"[\" + v.get(\"SELECTED_KEY\") + \"] already negotiated - this creates a SECOND agreement.\");",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"pm.test(\"Negotiation started\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var negotiationId = responseJson[\"@id\"];",
-											"pm.collectionVariables.set(\"NEGOTIATION\", negotiationId);"
+											"pm.collectionVariables.set(\"NEGOTIATION\", pm.response.json()[\"@id\"]);"
 										],
 										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
+										"packages": {}
 									}
 								}
 							],
@@ -303,28 +328,34 @@
 							"response": []
 						},
 						{
-							"name": "Get Agreement",
+							"name": "Confirm Agreement",
 							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.sendRequest('https://postman-echo.com/delay/5');"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
+											"const v = pm.collectionVariables;",
+											"const body = pm.response.json();",
+											"",
+											"pm.test(\"Negotiation not terminated\", function () {",
+											"    pm.expect(body.state, body.errorDetail || \"\").to.not.equal(\"TERMINATED\");",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var agreementId = responseJson[\"contractAgreementId\"];",
-											"pm.collectionVariables.set(\"AGREEMENT\", agreementId);"
+											"",
+											"if (body.state !== \"FINALIZED\") {",
+											"    const tries = Number(v.get(\"NEGOTIATION_TRIES\") || 0) + 1;",
+											"    v.set(\"NEGOTIATION_TRIES\", tries);",
+											"    console.log(\"state=\" + body.state + \" - re-send this request (poll \" + tries + \")\");",
+											"    if (tries < 10) {",
+											"        postman.setNextRequest(\"Confirm Agreement\");   // Collection Runner only",
+											"    }",
+											"    return;",
+											"}",
+											"",
+											"v.unset(\"NEGOTIATION_TRIES\");",
+											"const KEY = v.get(\"SELECTED_KEY\");",
+											"v.set(\"AGREEMENT\", body.contractAgreementId);",
+											"v.set(\"AGREEMENT_\" + KEY, body.contractAgreementId);",
+											"console.log(\"[\" + KEY + \"] agreement \" + body.contractAgreementId + \" stored - step 2 never needed again\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -347,15 +378,23 @@
 								}
 							},
 							"response": []
-						},
+						}
+					]
+				},
+				{
+					"name": "3. Access",
+					"item": [
 						{
-							"name": "Get Transferprocess",
+							"name": "Start New Transfer",
 							"event": [
 								{
 									"listen": "prerequest",
 									"script": {
 										"exec": [
-											""
+											"const v = pm.collectionVariables;",
+											"if (!v.get(\"AGREEMENT\")) {",
+											"    throw new Error(\"No agreement selected - run 1. Select Asset (and 2. Negotiate if needed).\");",
+											"}"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -365,12 +404,12 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"pm.test(\"Transfer started\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var transferProcessId = responseJson[0][\"transferProcessId\"];",
-											"pm.collectionVariables.set(\"TRANSFERPROCESS\", transferProcessId);"
+											"const tp = pm.response.json()[\"@id\"];",
+											"pm.collectionVariables.set(\"TRANSFERPROCESS\", tp);",
+											"console.log(\"transfer \" + tp + \" requested - once it reaches STARTED, Get Transfer Token will find its EDR\");"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -382,7 +421,76 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"@context\": {\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n    },\n    \"@type\": \"QuerySpec\",\n    \"offset\": 0,\n    \"limit\": 1,\n    \"filterExpression\": [\n        {\n            \"operandLeft\": \"agreementId\",\n            \"operator\": \"=\",\n            \"operandRight\": \"{{AGREEMENT}}\"\n        }\n    ]\n}",
+									"raw": "{\n    \"@context\": {\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n    },\n    \"@type\": \"TransferRequest\",\n    \"contractId\": \"{{AGREEMENT}}\",\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\n    \"protocol\": \"dataspace-protocol-http:2025-1\",\n    \"transferType\": \"HttpData-PULL\",\n    \"dataDestination\": {\n        \"type\": \"HttpProxy\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{CONSUMER_EDC_MANAGEMENT_API}}/v3/transferprocesses",
+									"host": [
+										"{{CONSUMER_EDC_MANAGEMENT_API}}"
+									],
+									"path": [
+										"v3",
+										"transferprocesses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Find Transfer Process",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const v = pm.collectionVariables;",
+											"if (!v.get(\"AGREEMENT\")) {",
+											"    throw new Error(\"No agreement selected - run 1. Select Asset (and 2. Negotiate if needed).\");",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const entries = pm.response.json();",
+											"",
+											"pm.test(\"EDR found for the agreement\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(entries, \"EDR entries\").to.be.an(\"array\").that.is.not.empty;",
+											"});",
+											"",
+											"if (!Array.isArray(entries) || entries.length === 0) {",
+											"    console.log(\"No EDR for this agreement yet - the transfer may still be starting, \"",
+											"              + \"or run 3. Access / Start New Transfer.\");",
+											"    return;",
+											"}",
+											"",
+											"// newest first; a replaced transfer leaves older entries behind",
+											"entries.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });",
+											"pm.collectionVariables.set(\"TRANSFERPROCESS\", entries[0].transferProcessId);",
+											"console.log(\"transfer process \" + entries[0].transferProcessId",
+											"          + \" - Get Transfer Token can now be re-sent as often as needed\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"@context\": {\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n    },\n    \"@type\": \"QuerySpec\",\n    \"offset\": 0,\n    \"limit\": 50,\n    \"filterExpression\": [\n        {\n            \"operandLeft\": \"agreementId\",\n            \"operator\": \"=\",\n            \"operandRight\": \"{{AGREEMENT}}\"\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -404,18 +512,38 @@
 							"response": []
 						},
 						{
-							"name": "Get Authorization",
+							"name": "Get Transfer Token",
 							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const v = pm.collectionVariables;",
+											"if (!v.get(\"AGREEMENT\")) {",
+											"    throw new Error(\"No agreement selected - run 1. Select Asset (and 2. Negotiate if needed).\");",
+											"}",
+											"if (!v.get(\"TRANSFERPROCESS\")) {",
+											"    throw new Error(\"No transfer process - run 3. Access / Find Transfer Process.\");",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
+											"pm.test(\"Got an EDR\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
-											"var responseJson = pm.response.json();",
-											"var transferToken = responseJson[\"authorization\"];",
-											"pm.collectionVariables.set(\"TRANSFER_TOKEN\", transferToken);"
+											"",
+											"const v = pm.collectionVariables;",
+											"const edr = pm.response.json();",
+											"",
+											"v.set(\"TRANSFER_TOKEN\", edr.authorization);",
+											"v.set(\"TRANSFER_TOKEN_\" + v.get(\"SELECTED_KEY\"), edr.authorization);",
+											"v.set(\"baseUrl\", edr.endpoint);"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -1416,7 +1544,7 @@
 				"apikey": [
 					{
 						"key": "value",
-						"value": "{{TRANSFER_TOKEN}}",
+						"value": "{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}",
 						"type": "string"
 					},
 					{
@@ -3166,7 +3294,7 @@
 				"apikey": [
 					{
 						"key": "value",
-						"value": "{{TRANSFER_TOKEN}}",
+						"value": "{{TRANSFER_TOKEN_GATE_INPUT_FULL}}",
 						"type": "string"
 					},
 					{
@@ -4369,7 +4497,7 @@
 				"apikey": [
 					{
 						"key": "value",
-						"value": "{{TRANSFER_TOKEN}}",
+						"value": "{{TRANSFER_TOKEN_GATE_INPUT_READ}}",
 						"type": "string"
 					},
 					{
@@ -5572,7 +5700,7 @@
 				"apikey": [
 					{
 						"key": "value",
-						"value": "{{TRANSFER_TOKEN}}",
+						"value": "{{TRANSFER_TOKEN_GATE_OUTPUT_READ}}",
 						"type": "string"
 					},
 					{
@@ -5711,6 +5839,56 @@
 		{
 			"key": "CONSUMER_DID",
 			"value": ""
+		},
+		{
+			"key": "SELECTED_KEY",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "NEGOTIATION_TRIES",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "AGREEMENT_POOL_PARTICIPANT_READ",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "AGREEMENT_GATE_INPUT_FULL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "AGREEMENT_GATE_INPUT_READ",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "AGREEMENT_GATE_OUTPUT_READ",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TRANSFER_TOKEN_POOL_PARTICIPANT_READ",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TRANSFER_TOKEN_GATE_INPUT_FULL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TRANSFER_TOKEN_GATE_INPUT_READ",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TRANSFER_TOKEN_GATE_OUTPUT_READ",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
