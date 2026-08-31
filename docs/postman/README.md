@@ -12,7 +12,7 @@ This folder contains Postman collections documenting how to reach the BPDM APIs 
   * [Adding The BPDM APIs From The Open-API Documents](#adding-the-bpdm-apis-from-the-open-api-documents)
     * [Import The Document](#import-the-document)
     * [Point The Collection At The EDC Data Plane](#point-the-collection-at-the-edc-data-plane)
-    * [Which Endpoints An Asset Actually Grants](#which-endpoints-an-asset-actually-grants)
+    * [How The Access Groups Are Derived](#how-the-access-groups-are-derived)
   * [NOTICE](#notice)
 <!-- TOC -->
 
@@ -72,13 +72,24 @@ re-negotiating. The token lands in `TRANSFER_TOKEN_<ASSET>` and the data plane a
 
 ### Import The Document
 
-In Postman choose *Import* and select the document for the API behind your asset:
+Each BPDM service publishes an Open-API document per user group, holding only the endpoints that
+user group may call. Import the group matching your asset and the generated collection is already
+scoped to it — nothing to prune:
 
-| Asset                                     | Open-API document          |
-|-------------------------------------------|----------------------------|
-| `BPDMPool`                                | [pool.json](../api/pool.json)       |
-| `BPDMGate`                                | [gate.json](../api/gate.json)       |
-| (not exposed over EDC)                    | [orchestrator.json](../api/orchestrator.json) |
+| Asset                                   | Service | Access group document                     |
+|-----------------------------------------|---------|-------------------------------------------|
+| `ReadAccessPoolForDataSpaceParticipant` | Pool    | `/docs/api-docs/v7-participant`            |
+| `FullAccessGateInputForSharingMember`   | Gate    | `/docs/api-docs/v7-input-manager`          |
+| `ReadAccessGateInputForSharingMember`   | Gate    | `/docs/api-docs/v7-input-consumer`         |
+| `ReadAccessGateOutputForSharingMember`  | Gate    | `/docs/api-docs/v7-output-consumer`        |
+
+Fetch the document from a running application and hand the file to Postman's *Import*, or paste the
+URL directly. The same groups appear in the Swagger UI dropdown, which is the quickest way to check
+what an asset exposes without importing anything.
+
+The full documents for both services remain available as [pool.json](../api/pool.json) and
+[gate.json](../api/gate.json), along with [orchestrator.json](../api/orchestrator.json) for the
+Orchestrator, which is not exposed over EDC.
 
 Postman generates a collection with one folder per Open-API tag. Re-import to refresh it after an
 API change instead of editing requests by hand.
@@ -99,22 +110,27 @@ The imported requests then run against the proxy exactly as they would against t
 Mind that Postman fills required parameters with generated placeholder values on import, so query
 parameters and request bodies still need real values.
 
-### Which Endpoints An Asset Actually Grants
+### How The Access Groups Are Derived
 
-An imported document describes the whole API, while an asset only grants the subset its technical
-user is permitted to call. Everything else answers `403`. The permissions come from composite roles
-in Keycloak:
+Every endpoint declares the permission it requires in its `@PreAuthorize` annotation, and each access
+group is a set of permissions. An endpoint appears in a group exactly when the permission it requires
+belongs to that group, so the documents cannot drift from what the applications enforce.
 
-| Asset                                   | Consumer variable suffix | Composite role              | Grants                                                                                                   |
-|-----------------------------------------|--------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------|
-| `ReadAccessPoolForDataSpaceParticipant` | `POOL_PARTICIPANT_READ`  | `BPDM_POOL:participant`     | `read_partner_member`, `read_changelog_member`, `read_metadata`                                            |
-| `FullAccessGateInputForSharingMember`   | `GATE_INPUT_FULL`        | `BPDM_GATE:input_manager`   | `read_input_partner`, `write_input_partner`, `read_input_changelog`, `read_sharing_state`, `write_sharing_state`, `read_stats` |
-| `ReadAccessGateInputForSharingMember`   | `GATE_INPUT_READ`        | `BPDM_GATE:input_consumer`  | `read_input_partner`, `read_input_changelog`, `read_sharing_state`, `read_stats`                           |
-| `ReadAccessGateOutputForSharingMember`  | `GATE_OUTPUT_READ`       | `BPDM_GATE:output_consumer` | `read_output_partner`, `read_output_changelog`, `read_sharing_state`, `read_stats`                         |
+| Service | Group                 | Permissions                                                                                                                                    |
+|---------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| Pool    | `v7-participant`      | `read_partner_member`, `read_changelog_member`, `read_metadata`                                                                                  |
+| Pool    | `v7-sharing-member`   | `read_partner`, `read_changelog`, `read_metadata`                                                                                                |
+| Pool    | `v7-admin`            | all Pool permissions                                                                                                                             |
+| Gate    | `v7-input-consumer`   | `read_input_partner`, `read_input_changelog`, `read_input_relation`, `read_sharing_state`, `read_stats`                                           |
+| Gate    | `v7-output-consumer`  | `read_output_partner`, `read_output_changelog`, `read_sharing_state`, `read_stats`                                                               |
+| Gate    | `v7-input-manager`    | the input consumer permissions plus `write_input_partner`, `upload_input_partner`, `write_input_relation`, `write_sharing_state`                  |
+| Gate    | `v7-admin`            | all Gate permissions                                                                                                                             |
 
-Each endpoint declares the permission it requires in its `@PreAuthorize` annotation, so an endpoint
-is reachable through an asset exactly when that permission appears in the row above. The
-[API documentation](../api/README.md) describes the same grouping as user groups.
+The groups mirror the composite roles a technical user holds in Keycloak. If an asset's user is
+granted a different role than the table assumes, the group document will describe access the
+application then refuses, so keep the two in step. `AccessGroupOpenApiIT` in each service asserts
+that every v7 endpoint belongs to at least one group, which catches an endpoint whose permission was
+never added to any of them.
 
 ## NOTICE
 
