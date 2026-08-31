@@ -20,7 +20,7 @@
 project: project-bpdm
 source:
   repoURL: 'https://eclipse-tractusx.github.io/charts/dev'
-  targetRevision: 0.11.1
+  targetRevision: 0.12.2
   plugin:
     env:
       - name: AVP_SECRET

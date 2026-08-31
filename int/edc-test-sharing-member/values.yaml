@@ -23,6 +23,8 @@ install:
 
 participant:
   id: "BPNL000000000BXT"
+  # -- Participant Context Id - Newly introduced id for a connector instance (needed for multitenancy)
+  contextId: "d16cf5de-edf5-421c-86d6-1780f46a3c9a"
 
 iatp:
   # Decentralized Identifier
@@ -37,10 +39,14 @@ iatp:
       client:
         id: "sb-e91ba924-e3c3-4ff5-838b-58f2eca0d4a8!b517493|ica-production-dim-prod-eu10-004-prod-dis-cloud-approuter!b174292"
         secret_alias: "wallet-client-secret"
+  # - Configures the Verifiable Presentation cache
+  cache:
+    # -- Whether the Verifiable Presentation cache is enabled
+    enabled: true
+    # -- Validity of the Verifiable Presentation cache in seconds
+    validity: 86400
 
 controlplane:
-  env:
-    EDC_IAM_TRUSTED-ISSUER_ISSUER1_ID: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
   endpoints:
     # -- data management api, used by internal users, can be added to an ingress and must not be internet facing
     management:
@@ -71,8 +77,6 @@ controlplane:
         secretName: tls-secret-edc-test-sharing-member-controlplane
 
 dataplane:
-  env:
-    EDC_IAM_TRUSTED-ISSUER_ISSUER1_ID: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
   endpoints:
     proxy:
       authKey: <path:bpdm/data/int/edc-test-sharing-member/api#proxy-key>
