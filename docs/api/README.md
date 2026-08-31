@@ -193,15 +193,15 @@ As a result for this step the golden record process expects the following:
 The main user groups for BPDM are sharing members, golden record processing service providers and VAS providers.
 
 This document contains explanations for different use cases for these user groups.
-The explanations may refer to requests whose examples can be found in this [Postman collection](../postman/EDC%20BPDM%20Consumer.postman_collection.json).
-Please mind that the requests in this Postman collection are not meant to be executed for automated tests but rather serve as documentation.
+The explanations refer to BPDM API endpoints which are described in the Open-API documents of the [Pool API](pool.yaml), [Gate API](gate.yaml) and [Orchestrator API](orchestrator.yaml).
+If you reach those APIs over an EDC, the [Postman documentation](../postman/README.md) shows how to negotiate for a data offer and how to import an Open-API document so that its requests run against the EDC data plane.
 
 ### Access BPDM over EDC
 
 Some users can not directly access the BPDM API but may only do so over the EDC public API.
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
 has been configured to [provide assets for your company's BPN](../../INSTALL.md).
-In the provided consumer Postman collection you will see an example of how you can negotiate for a BPDM data offer.
+The [consumer Postman collection](../postman/README.md) documents how you can negotiate for a BPDM data offer.
 Offers are separated into purposes (defined in the BPDM framework agreement) on why you want to access the BPDM API.
 First, you need to select the offer based on your purpose.
 Afterward you can negotiate for a contract agreement in order to get access to the data.
