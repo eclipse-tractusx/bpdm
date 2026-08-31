@@ -22,8 +22,10 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskReserveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskCreateApplicationService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskReserveApplicationService
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskResolveApplicationService
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -37,6 +39,7 @@ class GoldenRecordTaskController(
     val apiConfigProperties: ApiConfigProperties,
     val goldenRecordTaskService: GoldenRecordTaskService,
     val goldenRecordTaskCreateApplicationService: GoldenRecordTaskCreateApplicationService,
+    val goldenRecordTaskReserveApplicationService: GoldenRecordTaskReserveApplicationService,
     val goldenRecordTaskResolveApplicationService: GoldenRecordTaskResolveApplicationService
 ) : GoldenRecordTaskApi {
 
@@ -53,7 +56,9 @@ class GoldenRecordTaskController(
         if (reservationRequest.amount > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
 
-        return goldenRecordTaskService.reserveTasksForStep(reservationRequest)
+        return goldenRecordTaskReserveApplicationService.reserveTasksForStep(
+            GoldenRecordTaskReserveRequest(reservationRequest.step, reservationRequest.amount)
+        )
     }
 
     @PreAuthorize("@stepSecurityService.assertHasResultAuthority(authentication, #resultRequest.step)")
