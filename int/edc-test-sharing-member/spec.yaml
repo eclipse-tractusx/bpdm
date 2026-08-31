@@ -28,7 +28,7 @@ source:
       - name: helm_args
         value: >-
           -f
-          https://raw.githubusercontent.com/eclipse-tractusx/bpdm/environments/int/edc-test-sharing-member-2/values.yaml
+          https://raw.githubusercontent.com/eclipse-tractusx/bpdm/environments/int/edc-test-sharing-member/values.yaml
   chart: tractusx-connector
 destination:
   server: 'https://kubernetes.default.svc'
