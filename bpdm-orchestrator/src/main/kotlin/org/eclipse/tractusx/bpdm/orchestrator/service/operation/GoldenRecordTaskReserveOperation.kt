@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
+import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskReserveParsed
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
@@ -34,6 +35,7 @@ import java.time.Instant
 @Service
 class GoldenRecordTaskReserveOperation(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
+    private val taskConfigProperties: TaskConfigProperties,
     private val responseMapper: ResponseMapper
 ) {
 
@@ -60,7 +62,7 @@ class GoldenRecordTaskReserveOperation(
     }
 
     private fun calculateTaskPendingTimeout(task: GoldenRecordTaskDb): Instant =
-        task.createdAt.instant.plus(java.time.Duration.ofHours(24)) // Default timeout, should be configurable
+        task.createdAt.instant.plus(taskConfigProperties.taskPendingTimeout)
 
     private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =
         map { it.uuid.toString() }.joinIdentifiersForLog()
