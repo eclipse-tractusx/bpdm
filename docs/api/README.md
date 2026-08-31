@@ -19,6 +19,8 @@
       * [Clean And Sync Step](#clean-and-sync-step)
   * [Use Cases](#use-cases)
     * [Access BPDM over EDC](#access-bpdm-over-edc)
+      * [Negotiating For A Data Offer](#negotiating-for-a-data-offer)
+      * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
     * [Sharing Members](#sharing-members)
       * [Sharing Business Partner Data](#sharing-business-partner-data)
       * [Sharing Other Company's Data](#sharing-other-companys-data)
@@ -194,18 +196,72 @@ The main user groups for BPDM are sharing members, golden record processing serv
 
 This document contains explanations for different use cases for these user groups.
 The explanations refer to BPDM API endpoints which are described in the Open-API documents of the [Pool API](pool.yaml), [Gate API](gate.yaml) and [Orchestrator API](orchestrator.yaml).
-If you reach those APIs over an EDC, the [Postman documentation](../postman/README.md) shows how to negotiate for a data offer and how to import an Open-API document so that its requests run against the EDC data plane.
+If you reach those APIs over an EDC, the [Access BPDM over EDC](#access-bpdm-over-edc) section shows how to negotiate for a data offer and how to import an Open-API document so that its requests run against the EDC data plane.
 
 ### Access BPDM over EDC
 
 Some users can not directly access the BPDM API but may only do so over the EDC public API.
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
 has been configured to [provide assets for your company's BPN](../../INSTALL.md).
-The [consumer Postman collection](../postman/README.md) documents how you can negotiate for a BPDM data offer.
 Offers are separated into purposes (defined in the BPDM framework agreement) on why you want to access the BPDM API.
 First, you need to select the offer based on your purpose.
 Afterward you can negotiate for a contract agreement in order to get access to the data.
 The final result of that negotiation will be a transfer token with which you can navigate the BPDM APIs over the BPDM EDC's public API (which acts as a proxy).
+
+The [EDC BPDM Consumer Postman collection](EDC%20BPDM%20Consumer.postman_collection.json) documents that negotiation.
+It is documentation, not an automated test.
+
+#### Negotiating For A Data Offer
+
+Set up a Postman environment with at least the following variables.
+Mind that Postman only exports the shared value of a variable, so credentials you keep local are not part of an exported environment.
+
+| Variable                      | Example                                          |
+|-------------------------------|--------------------------------------------------|
+| `CONSUMER_EDC_MANAGEMENT_API` | `https://your-edc.example.net/management`        |
+| `CONSUMER_EDC_API_KEY`        | the consumer EDC management key                  |
+| `PROVIDER_EDC_DATASPACE_API`  | `https://bpdm-edc.example.net/api/v1/dsp/2025-1` |
+| `PROVIDER_DID`                | the provider's decentralized identifier          |
+| `CONSUMER_BPNL`               | your BPNL                                        |
+
+The `Negotiate for Access` folder is ordered as the flow runs:
+
+1. **Select Asset**: pick the offer for your purpose.
+   Each request stores the asset, the offer and the purpose, and restores any agreement previously negotiated for that asset.
+   Run it whenever you switch assets.
+2. **Negotiate**: run once per asset, ever.
+   `Negotiate Selected Asset` starts the negotiation and `Confirm Agreement` polls until it is finalized, storing the agreement per asset.
+3. **Access**: run whenever a token expires.
+   `Find Transfer Process` locates the transfer belonging to the agreement and `Get Transfer Token` fetches the token.
+   `Start New Transfer` is only needed when the previous transfer is gone.
+
+Because agreements and tokens are stored per asset, you can hold access to several assets at once without negotiating again.
+The token lands in `TRANSFER_TOKEN_<ASSET>` and the address of the EDC data plane in `baseUrl`.
+
+#### Reaching The BPDM APIs With The Transfer Token
+
+The consumer collection deliberately contains no BPDM API requests.
+Instead, each BPDM service publishes an Open-API document per user group which holds only the endpoints that user group may call.
+Importing the group that matches your asset into Postman gives you a collection already scoped to that asset:
+
+| Asset                                   | Service | Access group document               |
+|-----------------------------------------|---------|-------------------------------------|
+| `ReadAccessPoolForDataSpaceParticipant` | Pool    | `/docs/api-docs/v7-participant`     |
+| `FullAccessGateInputForSharingMember`   | Gate    | `/docs/api-docs/v7-input-manager`   |
+| `ReadAccessGateInputForSharingMember`   | Gate    | `/docs/api-docs/v7-input-consumer`  |
+| `ReadAccessGateOutputForSharingMember`  | Gate    | `/docs/api-docs/v7-output-consumer` |
+
+The same groups appear in the Swagger-UI dropdown of a running application, which is the quickest way to see what an asset exposes without importing anything.
+An endpoint belongs to a group exactly when the permission it requires is one of the group's permissions, so these documents describe what the application actually enforces.
+
+An imported collection needs two adjustments, both on the collection rather than on individual requests:
+
+1. Set its `baseUrl` variable to `{{baseUrl}}`, which `Get Transfer Token` fills with the address of the EDC data plane.
+2. Set its authorization to an API key with the key `Authorization` and the value `{{TRANSFER_TOKEN_<ASSET>}}` of the asset you negotiated, for example `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}`.
+   Do not send a Keycloak token here; the data plane injects the backend credentials itself.
+
+The imported requests then run against the data plane exactly as they would run against the API directly.
+Mind that Postman fills required parameters with generated placeholder values on import, so query parameters and request bodies still need real values.
 
 ### Sharing Members
 

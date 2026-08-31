@@ -322,7 +322,7 @@ For deploying an EDC please consult the documentation on the [EDC repository](ht
 The general idea of configuring data offers for BPDM is to assets which grant access to a portion of the BPDM APIs.
 Which API resources are accessible over an asset is determined by the purposes defined in the BPDM framework agreement.
 For some purposes you may need to access business partner output data from the BPDM Gate for example but won't have access to the input data.
-Blueprints for such assets are documented in this [POSTMAN collection](docs/postman/EDC%20Provider%20Setup.postman_collection.json).
+Blueprints for such assets are documented in this [POSTMAN collection](docs/admin/EDC%20Provider%20Setup.postman_collection.json).
 Accompanying the asset definitions are Policy and Contract Definition blueprints.
 Except for a general Access Policy those blueprints are grouped by purpose.
 
