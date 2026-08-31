@@ -278,7 +278,7 @@ Communication with BPDM application must be via EDC. The standards for EDC Asset
 * [BPDM Gate API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0074-BusinessPartnerGateAPI/CX-0074-BusinessPartnerGateAPI.md#223-data-asset-structure)
 
 
-An example postman collection for Asset definition you can find [here](<../postman/EDC%20Provider%20Setup.postman_collection.json>)
+An example postman collection for Asset definition you can find [here](<../admin/EDC%20Provider%20Setup.postman_collection.json>)
 
 #### Verified Credentials
 
