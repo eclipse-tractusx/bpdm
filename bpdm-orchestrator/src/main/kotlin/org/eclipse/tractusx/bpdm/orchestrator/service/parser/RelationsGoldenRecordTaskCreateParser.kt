@@ -21,36 +21,32 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.orchestrator.model.error.GoldenRecordTaskCreateParseError
-import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskCreateParsed
-import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
-import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.model.error.RelationsGoldenRecordTaskCreateParseError
+import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.RelationsGoldenRecordTaskCreateParsed
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.SharingMemberRecordResolutionService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
-class GoldenRecordTaskCreateParser(
+class RelationsGoldenRecordTaskCreateParser(
     private val sharingMemberRecordResolutionService: SharingMemberRecordResolutionService
 ) {
 
-    fun parse(requests: List<GoldenRecordTaskCreateRequest>): List<ParseResult<GoldenRecordTaskCreateParsed, GoldenRecordTaskCreateParseError>> {
-        val businessPartnerResults = requests.map { validateBusinessPartner(it.businessPartner) }
+    fun parse(requests: List<RelationsGoldenRecordTaskCreateRequest>): List<ParseResult<RelationsGoldenRecordTaskCreateParsed, RelationsGoldenRecordTaskCreateParseError>> {
+        val businessPartnerRelationsResults = requests.map { ParseResult.Success(it.businessPartnerRelations) }
         val gateRecordResults = sharingMemberRecordResolutionService.resolveGateRecords(
             requests.map { it.recordId },
-            { GoldenRecordTaskCreateParseError.RecordIdInvalid(it) },
-            { GoldenRecordTaskCreateParseError.RecordNotFound(it) }
+            { RelationsGoldenRecordTaskCreateParseError.RecordIdInvalid(it) },
+            { RelationsGoldenRecordTaskCreateParseError.RecordNotFound(it) }
         )
 
-        return zipParseResults(businessPartnerResults, gateRecordResults) { businessPartner, gateRecord ->
-            GoldenRecordTaskCreateParsed(existingGateRecord = gateRecord, businessPartner = businessPartner)
+        return zipParseResults(businessPartnerRelationsResults, gateRecordResults) { businessPartnerRelations, gateRecord ->
+            RelationsGoldenRecordTaskCreateParsed(
+                existingGateRecord = gateRecord,
+                businessPartnerRelations = businessPartnerRelations
+            )
         }
     }
-
-    private fun validateBusinessPartner(businessPartner: BusinessPartnerRequest): ParseResult<BusinessPartnerRequest, GoldenRecordTaskCreateParseError> =
-        if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null)
-            ParseResult.ofSingleFailure(GoldenRecordTaskCreateParseError.AdditionalSitesWithoutSite)
-        else
-            ParseResult.Success(businessPartner)
 }
