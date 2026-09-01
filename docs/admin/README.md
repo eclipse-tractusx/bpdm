@@ -59,6 +59,25 @@ This means, you are not able to change the parent legal entity of a site.
 Likewise, you are not able to change the legal entity or site of an addresses, nor change the address type.
 ---
 
+## Exposing BPDM Over EDC
+
+Companies that may not reach the BPDM APIs directly are given access through EDC data offers.
+Setting up those offers is described in the [INSTALL](../../INSTALL.md#creating-offers) documentation.
+
+The [EDC Provider Setup Postman collection](EDC%20Provider%20Setup.postman_collection.json) holds blueprints for the calls that setup requires:
+the usage policies for the purposes defined in the BPDM framework agreement, an access policy restricting an offer to a consumer's BPNL,
+and the asset and contract definition of each offer.
+It is documentation, not an automated test.
+
+Run the `Usage Policies` folder once per EDC.
+The folders under `Sharing Member Offers` then create the access policy, assets and contract definitions of one consumer, and are repeated per company you grant access to.
+Each asset points at a technical user whose permissions determine which part of the BPDM API the offer exposes,
+so the technical user must hold the role matching the offer before the asset is created.
+
+Which endpoints an offer ends up exposing can be read from the access group Open-API documents of a running application,
+for example `/docs/api-docs/v7-participant` for the Pool or `/docs/api-docs/v7-input-manager` for the Gate.
+The consumer side of this flow is documented under [Access BPDM over EDC](../api/README.md#access-bpdm-over-edc).
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
