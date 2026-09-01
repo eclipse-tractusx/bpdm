@@ -221,7 +221,7 @@ Deploy from [`<env>/edc-bpdm/spec.yaml`](https://github.com/eclipse-tractusx/bpd
 ### Creating the assets
 
 With the EDC running, create the assets the sharing member consumes.
-[INSTALL.md — Creating offers](../../INSTALL.md#creating-offers) describes them, and the [EDC Provider Setup Postman collection](../postman) automates the calls.
+[INSTALL.md — Creating offers](../../INSTALL.md#creating-offers) describes them, and the [EDC Provider Setup Postman collection](../admin/EDC%20Provider%20Setup.postman_collection.json) automates the calls.
 The collection variables for an environment are checked in next to that environment's EDC configuration, for example [`int/edc-bpdm/`](https://github.com/eclipse-tractusx/bpdm/tree/environments/int/edc-bpdm).
 The `CLIENT_SECRET_PATH_…` variables hold vault paths, not secrets — the EDC resolves them itself.
 
@@ -233,7 +233,7 @@ The sharing member's own EDC is the same deployment without assets, which remove
 2. Create the same vault secrets minus the `asset-secrets` entries, under `<env>/edc-<member>/`.
 3. Deploy from that app's `spec.yaml`, adapting the BPNL and wallet client id in the values.
 
-To exercise the connection, use the [EDC BPDM Consumer Postman collection](../postman) pointed at the consumer's management API and the provider's dataspace API.
+To exercise the connection, use the [EDC BPDM Consumer Postman collection](../api/EDC%20BPDM%20Consumer.postman_collection.json) pointed at the consumer's management API and the provider's dataspace API.
 
 ## Feature Branch Deployments
 
