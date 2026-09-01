@@ -23,6 +23,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
+import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
+import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcClientProperties
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGate
@@ -36,30 +38,39 @@ import org.springframework.http.client.reactive.ClientHttpConnector
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
 @ConfigurationProperties(prefix = GateInputClientConfigProperties.PREFIX)
-data class GateInputClientConfigProperties(
+class GateInputClientConfigProperties(
     override val baseUrl: String = "http://localhost:8081",
     val searchChangelogPageSize: Int = 100,
-    override val securityEnabled: Boolean = false,
+    securityEnabled: Boolean = false,
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
-) : BpdmClientProperties {
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
+) : EdcCapableClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-input"
     }
+
+    // The data plane holds the credentials of a client that goes over the EDC, so it has none of its own to
+    // be registered with. Deriving this rather than configuring it twice keeps the two from being set at once.
+    override val securityEnabled = securityEnabled && !edc.enabled
 
     override fun getId() = PREFIX
 }
 
 @ConfigurationProperties(prefix = GateOutputClientConfigProperties.PREFIX)
-data class GateOutputClientConfigProperties(
+class GateOutputClientConfigProperties(
     override val baseUrl: String = "http://localhost:8081",
-    override val securityEnabled: Boolean = false,
+    securityEnabled: Boolean = false,
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
-) : BpdmClientProperties {
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
+) : EdcCapableClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-output"
     }
+
+    // See GateInputClientConfigProperties.
+    override val securityEnabled = securityEnabled && !edc.enabled
 
     override fun getId() = PREFIX
 }
@@ -71,19 +82,20 @@ data class GateOutputClientConfigProperties(
  * named by its base-url or not named at all - and an unconfigured client that still reported itself as secured
  * would be handed to the OAuth2 client registrations, which cannot be built without credentials.
  */
-interface FurtherGateClientProperties : BpdmClientProperties {
+interface FurtherGateClientProperties : EdcCapableClientProperties {
 
     /** Reports whether the run is given this sharing member at all. */
-    val isConfigured get() = baseUrl.isNotBlank()
+    val isConfigured get() = baseUrl.isNotBlank() || edc.enabled
 
-    override val securityEnabled get() = isConfigured
+    override val securityEnabled get() = isConfigured && !edc.enabled
 }
 
 @ConfigurationProperties(prefix = SecondGateInputClientConfigProperties.PREFIX)
 data class SecondGateInputClientConfigProperties(
     override val baseUrl: String = "",
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
 ) : FurtherGateClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-2-input"
@@ -96,7 +108,8 @@ data class SecondGateInputClientConfigProperties(
 data class SecondGateOutputClientConfigProperties(
     override val baseUrl: String = "",
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
 ) : FurtherGateClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-2-output"
@@ -109,7 +122,8 @@ data class SecondGateOutputClientConfigProperties(
 data class ThirdGateInputClientConfigProperties(
     override val baseUrl: String = "",
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
 ) : FurtherGateClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-3-input"
@@ -122,7 +136,8 @@ data class ThirdGateInputClientConfigProperties(
 data class ThirdGateOutputClientConfigProperties(
     override val baseUrl: String = "",
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
 ) : FurtherGateClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate-3-output"
@@ -140,42 +155,19 @@ class GateClientConfig{
 
     @Bean
     fun gateCredentialCompanyCheck(
-        inputProperties: GateInputClientConfigProperties,
-        outputProperties: GateOutputClientConfigProperties,
-        secondInputProperties: SecondGateInputClientConfigProperties,
-        secondOutputProperties: SecondGateOutputClientConfigProperties,
-        thirdInputProperties: ThirdGateInputClientConfigProperties,
-        thirdOutputProperties: ThirdGateOutputClientConfigProperties,
+        credentials: SharingMemberCredentialSet,
         clientRegistrations: ClientRegistrationRepository?
-    ): GateCredentialCompanyCheck {
-        val credentials = sharingMemberCredentials(
-            inputProperties, outputProperties,
-            secondInputProperties, secondOutputProperties,
-            thirdInputProperties, thirdOutputProperties
-        )
-        return GateCredentialCompanyCheck(credentials, clientRegistrations)
-    }
+    ): GateCredentialCompanyCheck = GateCredentialCompanyCheck(credentials, clientRegistrations)
 
     /** Returns the Gate of every sharing member this run holds credentials for. */
     @Bean
     fun sharingMemberGates(
         webClientProvider: BpdmWebClientProvider,
-        inputProperties: GateInputClientConfigProperties,
-        outputProperties: GateOutputClientConfigProperties,
-        secondInputProperties: SecondGateInputClientConfigProperties,
-        secondOutputProperties: SecondGateOutputClientConfigProperties,
-        thirdInputProperties: ThirdGateInputClientConfigProperties,
-        thirdOutputProperties: ThirdGateOutputClientConfigProperties,
+        credentials: SharingMemberCredentialSet,
         clientConnector: ClientHttpConnector,
         credentialCompanyCheck: GateCredentialCompanyCheck
     ): SharingMemberGates {
         credentialCompanyCheck.verify()
-
-        val credentials = sharingMemberCredentials(
-            inputProperties, outputProperties,
-            secondInputProperties, secondOutputProperties,
-            thirdInputProperties, thirdOutputProperties
-        )
 
         logger.info {
             "Sharing as " + credentials.joinToString(", ") {
@@ -188,23 +180,23 @@ class GateClientConfig{
 
     /**
      * The sharing members this run can act as: the first one always, a further one where its Gate is named.
-     * Both the credential check and the Gates are built from this one list, so they cannot disagree on who
-     * this run is.
+     * Every bean that has to know who this run is takes this one set, so they cannot disagree on it.
      */
-    private fun sharingMemberCredentials(
+    @Bean
+    fun sharingMemberCredentials(
         inputProperties: GateInputClientConfigProperties,
         outputProperties: GateOutputClientConfigProperties,
         secondInputProperties: SecondGateInputClientConfigProperties,
         secondOutputProperties: SecondGateOutputClientConfigProperties,
         thirdInputProperties: ThirdGateInputClientConfigProperties,
         thirdOutputProperties: ThirdGateOutputClientConfigProperties
-    ): List<SharingMemberCredentials> = buildList {
+    ) = SharingMemberCredentialSet(buildList {
         add(SharingMemberCredentials(SharingMember.FIRST, inputProperties, outputProperties))
         if (secondInputProperties.isConfigured)
             add(SharingMemberCredentials(SharingMember.SECOND, secondInputProperties, secondOutputProperties))
         if (thirdInputProperties.isConfigured)
             add(SharingMemberCredentials(SharingMember.THIRD, thirdInputProperties, thirdOutputProperties))
-    }
+    })
 
     private fun gateOf(
         credentials: SharingMemberCredentials,

@@ -1,0 +1,117 @@
+################################################################################
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+# Reaches the Gates and the Pool of the INT environment over EDC data offers instead of with credentials of
+# their own, the way a sharing member reaches them. Layered on the 'int' profile, which keeps the API and
+# issuer addresses in one place:
+#
+#   SPRING_PROFILES_ACTIVE=int,int-edc \
+#     BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
+#     BPDM_INT_EDC_PROVIDER_DID=... \
+#     java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+#
+# Each sharing member negotiates through a connector carrying its own identity, because the Gate offers are
+# scoped to the consumer's BPNL. The third member is the operator's own Gate, and the connector that provides
+# the offers consumes them for it: an EDC is provider and consumer at once, so its own DID and dataspace API
+# are named on both sides.
+#
+# The Orchestrator is deliberately left on the direct route. It is operator-internal and no data offer exposes
+# it, while the suite drives it as the golden record processing service in nearly every scenario.
+#
+# 'security-enabled' is not set here and must not be: a client with 'edc.enabled' derives it as false, since
+# the data plane holds the credentials it calls the API with. Turning a client back onto the direct route is
+# one property, from anywhere - for example BPDM_CLIENT_POOL_EDC_ENABLED=false.
+#
+# Before a run, the provider's 'Sharing Member Offers' have to exist for every BPNL below, the operator's own
+# included. See docs/admin/EDC Provider Setup.postman_collection.json.
+
+bpdm:
+  client:
+    # The Pool is offered to every dataspace participant, so its catalog filter carries no BPNL and any of the
+    # three connectors could negotiate it. It goes through the first member's.
+    pool:
+      edc:
+        enabled: true
+        consumer: &first-member-connector
+          management-api-url: ${BPDM_INT_EDC_MANAGEMENT_API:https://bpdm-sharing-member-edc.int.catena-x.net/management}
+          api-key: ${BPDM_INT_EDC_API_KEY}
+          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.int.catena-x.net/api/v1/dsp/2025-1}
+          provider-did: ${BPDM_INT_EDC_PROVIDER_DID}
+          consumer-bpnl: ${BPDM_INT_EDC_CONSUMER_BPNL}
+        asset:
+          type: https://w3id.org/catenax/taxonomy#BPDMPool
+          subject: https://w3id.org/catenax/taxonomy#ReadAccessPoolForDataSpaceParticipant
+          version: "7"
+          usage-purpose: cx.bpdm.pool:1
+          bpn-scoped: false
+    gate-input:
+      base-url: https://business-partners.int.catena-x.net/companies/test-sharing-member
+      edc:
+        enabled: true
+        consumer: *first-member-connector
+        asset: &gate-input-full
+          type: https://w3id.org/catenax/taxonomy#BPDMGate
+          subject: https://w3id.org/catenax/taxonomy#FullAccessGateInputForSharingMember
+          version: "7"
+          usage-purpose: cx.bpdm.gate.upload:1
+          bpn-scoped: true
+    gate-output:
+      edc:
+        enabled: true
+        consumer: *first-member-connector
+        asset: &gate-output-read
+          type: https://w3id.org/catenax/taxonomy#BPDMGate
+          subject: https://w3id.org/catenax/taxonomy#ReadAccessGateOutputForSharingMember
+          version: "7"
+          usage-purpose: cx.bpdm.gate.download:1
+          bpn-scoped: true
+    gate-2-input:
+      base-url: ${BPDM_INT_GATE_2_BASE_URL:https://business-partners.int.catena-x.net/companies/test-sharing-member-2}
+      edc:
+        enabled: true
+        consumer: &second-member-connector
+          management-api-url: ${BPDM_INT_EDC_2_MANAGEMENT_API:https://bpdm-sharing-member-2-edc.int.catena-x.net/management}
+          api-key: ${BPDM_INT_EDC_2_API_KEY}
+          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.int.catena-x.net/api/v1/dsp/2025-1}
+          provider-did: ${BPDM_INT_EDC_PROVIDER_DID}
+          consumer-bpnl: ${BPDM_INT_EDC_2_CONSUMER_BPNL}
+        asset: *gate-input-full
+    gate-2-output:
+      edc:
+        enabled: true
+        consumer: *second-member-connector
+        asset: *gate-output-read
+    # The operator's own Gate. Its connector is the one that provides the offers, consuming them from itself,
+    # so the provider's dataspace API and DID are its own.
+    gate-3-input:
+      base-url: ${BPDM_INT_GATE_3_BASE_URL:https://business-partners.int.catena-x.net/companies/test-company}
+      edc:
+        enabled: true
+        consumer: &operator-connector
+          management-api-url: ${BPDM_INT_EDC_3_MANAGEMENT_API:https://bpdm-edc.int.catena-x.net/management}
+          api-key: ${BPDM_INT_EDC_3_API_KEY}
+          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.int.catena-x.net/api/v1/dsp/2025-1}
+          provider-did: ${BPDM_INT_EDC_PROVIDER_DID}
+          consumer-bpnl: ${BPDM_INT_EDC_3_CONSUMER_BPNL}
+        asset: *gate-input-full
+    gate-3-output:
+      edc:
+        enabled: true
+        consumer: *operator-connector
+        asset: *gate-output-read

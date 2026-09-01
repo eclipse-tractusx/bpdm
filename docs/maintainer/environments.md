@@ -233,7 +233,19 @@ The sharing member's own EDC is the same deployment without assets, which remove
 2. Create the same vault secrets minus the `asset-secrets` entries, under `<env>/edc-<member>/`.
 3. Deploy from that app's `spec.yaml`, adapting the BPNL and wallet client id in the values.
 
+The operator's own Gate at `/companies/test-company` is a sharing member like any other, and the operator EDC consumes its own offers for it: an EDC is provider and consumer at once, so its own DID and dataspace API stand on both sides of that negotiation.
+It therefore needs an offer set of its own, created for the operator's BPNL, next to the ones for the test sharing members.
+
 To exercise the connection, use the [EDC BPDM Consumer Postman collection](../api/EDC%20BPDM%20Consumer.postman_collection.json) pointed at the consumer's management API and the provider's dataspace API.
+The [system tester](../../bpdm-system-tester) exercises the same negotiation from code and covers every offer in one run:
+
+```bash
+SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_PROVIDER_DID=... \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @EdcAccess
+```
+
+Those scenarios only read, so they can be repeated against an environment while its offers are being set up.
+`bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector of each sharing member and the variables its credentials come from.
 
 ## Feature Branch Deployments
 

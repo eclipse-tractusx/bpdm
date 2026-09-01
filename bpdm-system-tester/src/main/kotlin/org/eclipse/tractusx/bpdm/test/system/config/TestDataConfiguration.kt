@@ -52,9 +52,18 @@ import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 
+/**
+ * The test data and assertion helpers the step definitions share.
+ *
+ * Built lazily, because [testMetadataV7] reads the metadata the Pool holds: were it built with the context,
+ * reaching the Pool would be a condition of the run starting at all, and a scenario that says why the Pool
+ * cannot be reached could never run to say it.
+ */
+@Lazy
 @Configuration
 class TestDataConfiguration {
 

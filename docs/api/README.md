@@ -254,11 +254,14 @@ Importing the group that matches your asset into Postman gives you a collection 
 The same groups appear in the Swagger-UI dropdown of a running application, which is the quickest way to see what an asset exposes without importing anything.
 An endpoint belongs to a group exactly when the permission it requires is one of the group's permissions, so these documents describe what the application actually enforces.
 
-An imported collection needs two adjustments, both on the collection rather than on individual requests:
+An imported collection needs three adjustments, the first two on the collection rather than on individual requests:
 
 1. Set its `baseUrl` variable to `{{baseUrl}}`, which `Get Transfer Token` fills with the address of the EDC data plane.
 2. Set its authorization to an API key with the key `Authorization` and the value `{{TRANSFER_TOKEN_<ASSET>}}` of the asset you negotiated, for example `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}`.
    Do not send a Keycloak token here; the data plane injects the backend credentials itself.
+3. Remove the leading `/v7` from the path of each request.
+   An asset points at the API's `/v7` path already and the data plane appends the path it is called with, so a request left as imported would arrive as `/v7/v7/...`.
+   Which version an offer serves is fixed by the asset, not by the path you send.
 
 The imported requests then run against the data plane exactly as they would run against the API directly.
 Mind that Postman fills required parameters with generated placeholder values on import, so query parameters and request bodies still need real values.
