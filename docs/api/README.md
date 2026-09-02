@@ -21,6 +21,7 @@
     * [Access BPDM over EDC](#access-bpdm-over-edc)
       * [Negotiating For A Data Offer](#negotiating-for-a-data-offer)
       * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
+        * [Setting Up An Imported Collection](#setting-up-an-imported-collection)
     * [Sharing Members](#sharing-members)
       * [Sharing Business Partner Data](#sharing-business-partner-data)
       * [Sharing Other Company's Data](#sharing-other-companys-data)
@@ -254,14 +255,51 @@ Importing the group that matches your asset into Postman gives you a collection 
 The same groups appear in the Swagger-UI dropdown of a running application, which is the quickest way to see what an asset exposes without importing anything.
 An endpoint belongs to a group exactly when the permission it requires is one of the group's permissions, so these documents describe what the application actually enforces.
 
-An imported collection needs two adjustments, both on the collection rather than on individual requests:
+##### Setting Up An Imported Collection
 
-1. Set its `baseUrl` variable to `{{baseUrl}}`, which `Get Transfer Token` fills with the address of the EDC data plane.
-2. Set its authorization to an API key with the key `Authorization` and the value `{{TRANSFER_TOKEN_<ASSET>}}` of the asset you negotiated, for example `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}`.
-   Do not send a Keycloak token here; the data plane injects the backend credentials itself.
+None of this is guessable from the import dialog, and skipping any one step produces a failure that points somewhere else.
+Work through it once per access group.
+
+**1. Select the environment you negotiated with.**
+The imported collection is a collection of its own and cannot read the consumer collection's collection variables.
+`Get Transfer Token` therefore publishes the three values that have to cross that boundary — `baseUrl`, `TRANSFER_TOKEN` and `TRANSFER_TOKEN_<ASSET>` — as *environment* variables, and refuses to run with no environment selected.
+Both collections read them from that one environment.
+The tokens are written as current values, so they stay local and do not reach the checked-in environment file when you export it.
+
+**2. Import the access group document** from the table above, for example `https://<host>/pool/docs/api-docs/v7-participant`, with *Import → Link* (or save it to a file and import that).
+Postman creates a collection whose requests are exactly the endpoints that asset may call.
+
+**3. Set the collection's authorization**, on the collection itself — not on a request:
+
+| Field | Value |
+|-------|-------|
+| Type | **API Key** |
+| Key | `Authorization` |
+| Value | `{{TRANSFER_TOKEN_<ASSET>}}`, e.g. `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}` |
+| Add to | **Header** |
+
+Three things go wrong here in particular:
+
+- **Name the asset's own token variable, not the generic `TRANSFER_TOKEN`.** The generic one holds whichever asset was selected last, so a Pool request sent with a Gate token reaches the Gate backend and the data plane answers `Failed to read data from source: NOT_FOUND` — an error that names no URL and looks like a wrong path.
+- **Use API Key, not Bearer Token.** Bearer Token prepends `Bearer ` to a value that already carries whatever scheme the connector issued.
+- **Leave each request at *Inherit auth from parent*.** A collection imported from an OpenAPI document carries that document's security scheme per request, and request-level auth wins over collection-level, so the collection setting is silently ignored until you clear it.
+
+Do not send a Keycloak token here at all; the data plane injects the backend credentials itself.
+
+**4. Remove the leading `/v7` from the path of each request.**
+An asset points at the API's `/v7` path already and the data plane appends the path it is called with, so a request left as imported arrives as `/v7/v7/...`.
+Which version an offer serves is fixed by the asset, not by the path you send.
+
+`baseUrl` needs no editing: Postman resolves an environment variable ahead of a collection variable of the same name, so the environment's `baseUrl` overrides the one the import took from the document's server URL.
 
 The imported requests then run against the data plane exactly as they would run against the API directly.
 Mind that Postman fills required parameters with generated placeholder values on import, so query parameters and request bodies still need real values.
+
+| The data plane answers | Most likely |
+|------------------------|-------------|
+| `401` | The request carried no `Authorization` header at all. |
+| `Failed to read data from source: NOT_FOUND` | The token belongs to another asset, or the path still carries its leading `/v7`. The backend URL the data plane built is in its own log. |
+| `403` | The transfer token expired, or the offer's access policy does not name your BPNL, or the endpoint needs a permission the asset's technical user does not hold. A data plane answers every token it will not accept the same way, so try `Get Transfer Token` first - it requests with `auto_refresh=true` and republishes a fresh one without renegotiating - and read the body for the reason when a fresh token is refused too. |
 
 ### Sharing Members
 

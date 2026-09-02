@@ -27,11 +27,13 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
+import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcAccessNegotiators
 import org.opentest4j.TestAbortedException
 
 class ScenarioLifecycleHooks(
     private val testRunData: TestRunData,
-    private val sharingMemberGates: SharingMemberGates
+    private val sharingMemberGates: SharingMemberGates,
+    private val edcAccessNegotiators: EdcAccessNegotiators
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -60,6 +62,23 @@ class ScenarioLifecycleHooks(
     @Before("@ThreeSharingMembers")
     fun skipWithoutThirdSharingMember(scenario: Scenario) {
         skipUnlessConfigured(scenario, SharingMember.SECOND, SharingMember.THIRD)
+    }
+
+    /**
+     * Skips a scenario about reaching an API over the EDC when this run reaches none that way.
+     *
+     * Most deployments give the tester no connector at all, and such a scenario would then report on how the
+     * run is configured rather than on anything a dataspace did.
+     */
+    @Before("@EdcAccess")
+    fun skipWithoutEdcAccess(scenario: Scenario) {
+        if (edcAccessNegotiators.isAnyConfigured) return
+
+        val reason = "Skipping scenario '${scenario.name}': it reaches an API over the EDC, and no client of this" +
+                " run does. Set 'bpdm.client.<client>.edc.enabled' and name the connector to run it."
+        logger.warn { reason }
+        scenario.log(reason)
+        throw TestAbortedException(reason)
     }
 
     private fun skipUnlessConfigured(scenario: Scenario, vararg members: SharingMember) {

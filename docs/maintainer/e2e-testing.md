@@ -19,6 +19,8 @@ This guide covers the maintainer's three duties around that: keeping the test de
     * [Run](#run)
     * [Scenarios that need further sharing members](#scenarios-that-need-further-sharing-members)
     * [Trying the suite on the snapshot deployment first](#trying-the-suite-on-the-snapshot-deployment-first)
+    * [Testing through a sharing member's Gate](#testing-through-a-sharing-members-gate)
+    * [Testing over the EDC](#testing-over-the-edc)
     * [Testing another deployment](#testing-another-deployment)
     * [Test data is not cleaned up](#test-data-is-not-cleaned-up)
   * [3. Upload the Test Execution](#3-upload-the-test-execution)
@@ -263,13 +265,60 @@ BPDM_INT_GATE_OUTPUT_CLIENT_SECRET=<output consumer client secret> \
   --plugin json:target/cucumber-report.json
 ```
 
-Point the Gate at that member's context path as well — `BPDM_CLIENT_GATE_INPUT_BASE_URL=https://business-partners.int.catena-x.net/companies/<member>`, which the output client follows. Pool and Orchestrator keep the operator user: the tester writes Pool metadata and acts as the cleaning service against the Orchestrator, which no sharing member user may do.
+Point the Gate at that member's context path as well — `BPDM_CLIENT_GATE_INPUT_BASE_URL=https://business-partners.int.catena-x.net/companies/<member>`, which the output client follows. Pool and Orchestrator keep the operator user: the tester reads Pool metadata and golden records and acts as the cleaning service against the Orchestrator, which no sharing member user may do.
 
 Both Gate users have to belong to the same company. The Gate scopes what a read returns by the BPNL of the token that made it, so an output consumer from another company reads an empty output rather than a `403`. The tester fetches a token for each Gate credential before the first scenario and refuses to run when the two name different companies, naming both in the message — without that check the run would fail much later, in the wait for the golden record output, with nothing pointing at the credentials. It logs the company it verified, and where it cannot decide — one credential in both roles, or a token carrying no BPNL — it says so and continues.
 
 Leaving the two pairs unset falls back to `BPDM_INT_CLIENT_ID`/`BPDM_INT_CLIENT_SECRET` for both clients, which is how the Gate of the golden record core deployment is tested.
 
 Naming further members' Gates and users on top of these runs the scenarios that need more than one sharing member — see [scenarios that need further sharing members](#scenarios-that-need-further-sharing-members).
+
+### Testing over the EDC
+
+A sharing member reaches its Gate over an EDC, not with credentials of its own: its connector negotiates a data offer with the operator's connector, and the operator's data plane calls the API with the credentials it holds in its vault.
+The `int-edc` profile puts the suite's Gate clients on that route, so a release run can validate the way sharing members actually reach their Gate rather than only the direct one.
+
+It is layered on `int` and leaves only the three connectors' management API keys open:
+
+```bash
+SPRING_PROFILES_ACTIVE=int,int-edc \
+BPDM_INT_CLIENT_ID=<operator client id> \
+BPDM_INT_CLIENT_SECRET=<operator client secret> \
+BPDM_INT_EDC_API_KEY=<test sharing member connector key> \
+BPDM_INT_EDC_2_API_KEY=<test sharing member 2 connector key> \
+BPDM_INT_EDC_3_API_KEY=<operator connector key> \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
+  --plugin json:target/cucumber-report.json
+```
+
+The keys are the `api#management-key` vault secrets of the three connectors — see [setting up the EDC](environments.md#setting-up-the-edc).
+Everything else defaults to the INT deployment as it stands: the connector addresses, the provider's DID and each member's BPNL are checked in, taken from the environment files next to each connector's [ArgoCD app](https://github.com/eclipse-tractusx/bpdm/tree/environments).
+The Gate base URLs come with them, so an EDC run acts for all three sharing members without any `BPDM_INT_GATE_2_*` or `BPDM_INT_GATE_3_*` variables — the scenarios that need further members run rather than skip.
+
+`BPDM_INT_CLIENT_*` is still needed, because the Orchestrator and the Pool stay on the direct route.
+
+The Orchestrator is operator-internal: no data offer exposes it, and the suite drives it as the cleaning service in nearly every scenario.
+The Pool is a limitation worth knowing about. The dataspace standardises exactly one Pool offer, `ReadAccessPoolForDataSpaceParticipant`, and its technical user holds the Pool's `participant` role — `read_partner_member`, `read_changelog_member` and `read_metadata`, which reach `/v7/members/**` and the metadata endpoints only.
+Every Pool read the suite makes to verify a golden record (`/v7/legal-entities`, `/v7/sites/{bpns}`, `/v7/addresses/{bpna}`) requires `read_partner` instead.
+Putting a broader credential behind the standardised asset would make the deployment non-conformant and have the suite validate access no real sharing member has, so the Pool keeps the operator user and its `@EdcAccess` scenario reports as skipped.
+Note that `INSTALL.md` still describes this offer under its former name `ReadAccessPoolForCatenaXMember`; it was renamed to the participant subject for the 25.06 standards and is the same, member-scoped offer.
+
+Each member negotiates through a connector carrying its own identity, because the Gate offers are scoped to the consumer's BPNL.
+The third member is the operator's own Gate at `/companies/test-company`, whose offers the providing connector consumes for it.
+All of them have to exist before the run — the offer set of every BPNL involved, the operator's own included; [INSTALL.md — creating offers](../../INSTALL.md#creating-offers) and the [EDC Provider Setup Postman collection](../admin/EDC%20Provider%20Setup.postman_collection.json) cover that.
+
+The negotiation happens once per offer while the Spring context starts, before the first scenario, and a failure is recorded instead of thrown so that the run names every offer it could not reach rather than dying on the first.
+A client whose negotiation failed fails on its first call with that failure as the cause.
+
+To shake out an EDC setup without a full round trip, run the `@EdcAccess` scenarios: one read per offer, nothing written, one scenario reporting per offer, repeatable while offers are still being created.
+
+```bash
+SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @EdcAccess
+```
+
+Any client can be put back on the direct route from anywhere to compare the two, for example `BPDM_CLIENT_POOL_EDC_ENABLED=false`.
+`bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector and the offer of every client.
 
 ### Testing another deployment
 
