@@ -21,26 +21,24 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.model.error.RelationsGoldenRecordTaskCreateParseError
 import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.RelationsGoldenRecordTaskCreateParsed
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.service.SharingMemberRecordResolutionService
+import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 @Transactional(readOnly = true)
 class RelationsGoldenRecordTaskCreateParser(
-    private val sharingMemberRecordResolutionService: SharingMemberRecordResolutionService
+    private val sharingMemberRecordRepository: SharingMemberRecordRepository
 ) {
 
     fun parse(requests: List<RelationsGoldenRecordTaskCreateRequest>): List<ParseResult<RelationsGoldenRecordTaskCreateParsed, RelationsGoldenRecordTaskCreateParseError>> {
         val businessPartnerRelationsResults = requests.map { ParseResult.Success(it.businessPartnerRelations) }
-        val gateRecordResults = sharingMemberRecordResolutionService.resolveGateRecords(
-            requests.map { it.recordId },
-            { RelationsGoldenRecordTaskCreateParseError.RecordIdInvalid(it) },
-            { RelationsGoldenRecordTaskCreateParseError.RecordNotFound(it) }
-        )
+        val gateRecordResults = resolveGateRecords(requests.map { it.recordId })
 
         return zipParseResults(businessPartnerRelationsResults, gateRecordResults) { businessPartnerRelations, gateRecord ->
             RelationsGoldenRecordTaskCreateParsed(
@@ -49,4 +47,28 @@ class RelationsGoldenRecordTaskCreateParser(
             )
         }
     }
+
+    private fun resolveGateRecords(recordIds: List<String?>): List<ParseResult<SharingMemberRecordDb?, RelationsGoldenRecordTaskCreateParseError>> {
+        val parsedUuids = recordIds.map { recordId -> recordId?.let { toUuidOrNull(it) } }
+
+        val recordsByPrivateId = parsedUuids.filterNotNull().toSet()
+            .let { sharingMemberRecordRepository.findByPrivateIdIn(it) }
+            .associateBy { it.privateId }
+
+        return recordIds.zip(parsedUuids).map { (recordId, uuid) ->
+            when {
+                recordId == null -> ParseResult.Success(null)
+                uuid == null -> ParseResult.ofSingleFailure(RelationsGoldenRecordTaskCreateParseError.RecordIdInvalid(recordId))
+                else -> recordsByPrivateId[uuid]?.let { ParseResult.Success(it) }
+                    ?: ParseResult.ofSingleFailure(RelationsGoldenRecordTaskCreateParseError.RecordNotFound(recordId))
+            }
+        }
+    }
+
+    private fun toUuidOrNull(uuidString: String): UUID? =
+        try {
+            UUID.fromString(uuidString)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
 }
