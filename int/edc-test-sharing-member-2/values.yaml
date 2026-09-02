@@ -110,6 +110,8 @@ postgresql:
   jdbcUrl: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/edc"
   persistence:
     enabled: true
+    # -- Empty takes the cluster's default class; the chart would otherwise ask for 'standard'.
+    storageClass: ""
   auth:
     # -- Credentials of the superuser the chart creates the connector database with.
     password: <path:bpdm/data/int/edc-test-sharing-member-2/postgres#password>
