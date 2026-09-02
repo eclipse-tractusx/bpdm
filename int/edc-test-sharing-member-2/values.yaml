@@ -48,6 +48,11 @@ dcp:
     validity: 86400
 
 controlplane:
+  env:
+    # -- The portal serves status list credentials as JSON. Since EDC 0.16 the revocation service only
+    #    parses them as JSON when this accept header is exactly 'application/json'; on the default '*/*'
+    #    it validates the body as a signed JWT instead and rejects every credential.
+    EDC_IAM_CREDENTIAL_REVOCATION_MIMETYPE: "application/json"
   endpoints:
     # -- data management api, used by internal users, can be added to an ingress and must not be internet facing
     management:
