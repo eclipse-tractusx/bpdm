@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.test.system.config
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
@@ -40,7 +39,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 @ConfigurationProperties(prefix = GateInputClientConfigProperties.PREFIX)
 class GateInputClientConfigProperties(
     override val baseUrl: String = "http://localhost:8081",
-    val searchChangelogPageSize: Int = 100,
     securityEnabled: Boolean = false,
     override val registration: OAuth2ClientProperties.Registration,
     override val provider: OAuth2ClientProperties.Provider,
