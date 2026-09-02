@@ -22,17 +22,18 @@ install:
   vault: false
 
 participant:
-  id: "BPNL00000000726A"
+  # -- Participant Id, resp. the Decentralized IDentifier (DID) of the connector
+  id: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000000726A"
+  # -- BPNL Number
+  bpnl: "BPNL00000000726A"
   # -- Participant Context Id - Newly introduced id for a connector instance (needed for multitenancy)
   contextId: "e0f7de3d-9ecf-4c4f-b570-30a1445e4084"
 
-iatp:
-  # Decentralized Identifier
-  id: "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000000726A"
+dcp:
   trustedIssuers:
     - "did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK"
   sts:
-    dim:
+    div:
       url: "https://dis-integration-service-prod.eu10.dim.cloud.sap/api/v2.0.0/iatp/catena-x-portal"
     oauth:
       token_url: "https://b74ef27e-2777-4840-bb30-d82871ff1ba5-m6iluaqk.authentication.eu10.hana.ondemand.com/oauth/token"
@@ -107,12 +108,15 @@ dataplane:
 
 postgresql:
   jdbcUrl: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/edc"
-  primary:
-    persistence:
-      enabled: true
+  persistence:
+    enabled: true
   auth:
+    # -- Credentials of the superuser the chart creates the connector database with.
+    password: <path:bpdm/data/int/edc-test-sharing-member-2/postgres#password>
+  customUser:
+    # -- The database and user the connector itself works with.
     database: "edc"
-    username: "user"
+    name: "user"
     password: <path:bpdm/data/int/edc-test-sharing-member-2/postgres#password>
 
 vault:
