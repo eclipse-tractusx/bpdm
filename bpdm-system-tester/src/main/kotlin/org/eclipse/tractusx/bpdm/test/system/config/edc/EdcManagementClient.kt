@@ -23,13 +23,11 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
-/** The offer a catalog request selected, identified by the asset it targets and the policy it is offered under. */
 data class EdcOffer(
     val assetId: String,
     val offerId: String
 )
 
-/** How far a contract negotiation has come, and the agreement it produced once it is finalized. */
 data class EdcNegotiationState(
     val state: String,
     val agreementId: String?,
@@ -40,14 +38,12 @@ data class EdcNegotiationState(
     val isTerminated get() = state == "TERMINATED"
 }
 
-/** A transfer process the consumer holds an endpoint data reference for. */
 data class EdcTransferProcess(
     val id: String,
     val agreementId: String,
     val createdAt: Long
 )
 
-/** The address of the provider's data plane together with the token that authorizes a call to it. */
 data class EdcDataAddress(
     val endpoint: String,
     val authorization: String
@@ -56,10 +52,9 @@ data class EdcDataAddress(
 /**
  * The consumer connector's management API, as far as negotiating access to one data offer needs it.
  *
- * The requests are the ones the EDC BPDM Consumer Postman collection documents, in the same order. Bodies are
- * built as plain maps and responses are read field by field, so that reaching the dataspace costs the reactor
- * no EDC dependency. Responses are read leniently: the connector compacts a single-element JSON-LD array into
- * the bare object, so a field that holds one result does not arrive as a list.
+ * Bodies are built as plain maps and responses read field by field, so that reaching the dataspace costs no EDC
+ * dependency. Responses are read leniently: the connector compacts a single-element JSON-LD array into the bare
+ * object.
  */
 class EdcManagementClient(
     private val webClient: WebClient,
@@ -173,8 +168,7 @@ class EdcManagementClient(
     /**
      * Returns the transfer processes the consumer holds a data reference for on the asset, newest first.
      *
-     * An agreement outlives the run that made it, so this is what lets a re-run reuse one instead of
-     * negotiating a second agreement for the same offer.
+     * An agreement outlives the run that made it, so a re-run reuses one instead of negotiating a second.
      */
     fun findTransferProcessesOfAsset(assetId: String) = findTransferProcesses("assetId", assetId)
 

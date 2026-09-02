@@ -56,9 +56,7 @@ class EdcClientConfig {
     /**
      * Negotiates access for every client configured for the EDC, before any scenario runs.
      *
-     * Clients naming the same consumer and the same asset share one negotiator, and with it one agreement and
-     * one transfer token: the Gate input and output roles of one sharing member consume different offers, but
-     * nothing stops two clients from consuming the same one.
+     * Clients naming the same consumer and the same asset share one negotiator, and with it one agreement.
      */
     @Bean
     fun edcAccessNegotiators(clientProperties: List<EdcCapableClientProperties>): EdcAccessNegotiators {
@@ -94,10 +92,7 @@ class EdcClientConfig {
         negotiators: EdcAccessNegotiators
     ): BpdmWebClientProvider = EdcWebClientProvider(delegate, negotiators.all())
 
-    /**
-     * A connector of its own, so that keeping a token fresh never waits behind the API calls it is meant to
-     * authorize.
-     */
+    // A client of its own, so that keeping a token fresh never waits behind the API calls it authorizes.
     private fun managementClientOf(consumer: EdcConsumerProperties) =
         EdcManagementClient(
             WebClient.builder()

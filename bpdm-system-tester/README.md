@@ -58,8 +58,8 @@ SPRING_PROFILES_ACTIVE=int BPDM_INT_CLIENT_ID=<id> BPDM_INT_CLIENT_SECRET=<secre
 
 **A user per Gate role.** A Gate whose technical users the Portal manages grants each of them one role only, so
 no single credential covers the whole Gate API. Name the two Gate users then; Pool and Orchestrator keep
-`BPDM_INT_CLIENT_*`, because the tester writes Pool metadata and acts as the cleaning service against the
-Orchestrator, which no sharing member user may do:
+`BPDM_INT_CLIENT_*`, because the tester reads Pool metadata and golden records and acts as the cleaning
+service against the Orchestrator, which no sharing member user may do:
 
 ```bash
 SPRING_PROFILES_ACTIVE=int \
@@ -93,6 +93,58 @@ A third member follows the same shape, with `BPDM_INT_GATE_3_BASE_URL` and the f
 
 Locally no such variables are needed: the further Gates of a local installation are checked in as the default
 configuration. See [INSTALL.md](../INSTALL.md#further-gates-for-further-sharing-members) for how to run them.
+
+**Over the EDC.** A sharing member does not hold credentials for its Gate at all — it reaches it through a data
+offer its own connector negotiates with the operator's. The `int-edc` profile is layered on top of `int` and
+puts all three Gates on that route:
+
+```bash
+SPRING_PROFILES_ACTIVE=int,int-edc \
+BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
+BPDM_INT_EDC_API_KEY=<first member's management key> \
+BPDM_INT_EDC_2_API_KEY=<second member's management key> \
+BPDM_INT_EDC_3_API_KEY=<operator connector's management key> \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+```
+
+The three management API keys are the only values the profile leaves open. Everything else — the connector
+addresses, the provider's DID and each member's BPNL — defaults to the INT deployment as it stands, and the
+Gate base URLs come with it, so no `BPDM_INT_GATE_2_*` or `BPDM_INT_GATE_3_*` variables are needed: an EDC run
+acts for all three members by default. `BPDM_INT_CLIENT_*` is still required, because the Orchestrator and the
+Pool stay on the direct route.
+
+The Orchestrator is operator-internal, no offer exposes it, and the suite drives it as the cleaning service in
+nearly every scenario. The Pool is a deliberate limitation: the only Pool offer the dataspace standardises is
+`ReadAccessPoolForDataSpaceParticipant`, whose technical user holds the Pool's `participant` role — member
+scoped reads under `/v7/members/**` and metadata. Every Pool read the suite makes to verify a golden record
+needs `read_partner`, which that role does not grant, so the Pool is treated like the Orchestrator rather than
+given an offer no real sharing member would have. Its `@EdcAccess` scenario reports as skipped.
+
+Each member negotiates through a connector carrying its own identity, since the Gate offers are scoped to the
+consumer's BPNL. The third member is the operator's own Gate, whose offers are provided and consumed by the
+same connector.
+
+The negotiations happen once while the Spring context starts, one per data offer, and a failed one is recorded
+rather than thrown: the run reports every offer it could not reach instead of dying on the first. A client
+whose negotiation failed fails on its first call, naming that failure as the cause.
+
+To check an EDC setup without a full round trip, run the `@EdcAccess` scenarios. They read one page per offer
+and write nothing, so they can be repeated while offers are still being set up, and each reports on one offer:
+
+```bash
+SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @EdcAccess
+```
+
+Any single client can be put back on the direct route from anywhere, for example
+`BPDM_CLIENT_POOL_EDC_ENABLED=false`, which is what lets an EDC run be compared against a direct one. Do not
+set `security-enabled` for an EDC client: a client on the EDC route derives it as false, because the data plane
+holds the credentials it calls the API with.
+
+The offers have to exist on the provider before a run, for every BPNL involved including the operator's own.
+See [EDC Provider Setup.postman_collection.json](../docs/admin/EDC%20Provider%20Setup.postman_collection.json)
+and [setting up the EDC](../docs/maintainer/environments.md#setting-up-the-edc).
+`bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector and offer of every client.
 
 Note that the profile has to come from the environment — `--spring.profiles.active` is forwarded to the
 Cucumber CLI, not to Spring, and aborts the run. The full release procedure is in the

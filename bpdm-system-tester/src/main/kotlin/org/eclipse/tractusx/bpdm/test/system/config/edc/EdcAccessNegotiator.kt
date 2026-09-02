@@ -23,8 +23,8 @@ import com.nimbusds.jwt.JWTParser
 import mu.KotlinLogging
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 
-/** The access one data offer grants: the agreement it rests on and the transfer the tokens are drawn from. */
 data class EdcAccess(
     val agreementId: String,
     val transferProcessId: String,
@@ -34,11 +34,9 @@ data class EdcAccess(
 /**
  * Holds the access to one data offer for the whole run: negotiates it once and keeps its token fresh.
  *
- * Negotiating in the constructor is what makes "one agreement per asset" a property of the bean lifecycle:
- * the negotiators are singletons built while the Spring context starts, before Cucumber runs a scenario on any
- * of its threads. The outcome is captured rather than thrown so that a run reports every asset it could not
- * reach instead of dying on the first one; a client whose negotiation failed fails on its first call, with
- * that failure as the cause.
+ * Negotiating in the constructor makes one agreement per asset a property of the singleton lifecycle. A failed
+ * negotiation is captured rather than thrown, so a run reports every offer it could not reach instead of dying
+ * on the first; the client using it fails on its first call, with that failure as the cause.
  */
 class EdcAccessNegotiator(
     private val assetName: String,
@@ -52,8 +50,7 @@ class EdcAccessNegotiator(
         private val NEGOTIATION_TIMEOUT = Duration.ofMinutes(2)
         private val NEGOTIATION_POLL_INTERVAL = Duration.ofSeconds(2)
 
-        // A token is replaced before it expires, so that a call started just under the wire still carries a
-        // token the data plane accepts by the time it arrives.
+        // A call started just under the wire must still carry a token the data plane accepts when it arrives.
         private val REFRESH_MARGIN = Duration.ofSeconds(60)
     }
 
@@ -61,6 +58,8 @@ class EdcAccessNegotiator(
 
     @Volatile
     private var dataAddress: EdcDataAddress? = access.getOrNull()?.dataAddress
+
+    private val unreadableExpiryReported = AtomicBoolean(false)
 
     init {
         access.fold(
@@ -89,11 +88,7 @@ class EdcAccessNegotiator(
         return if (isFresh(held)) held.authorization else refreshed(held).authorization
     }
 
-    /**
-     * Returns a token fetched after [rejectedToken] was refused, or the token that replaced it in the meantime.
-     *
-     * Two calls can be refused at once, and the second must not undo the refresh the first one caused.
-     */
+    /** Returns a token fetched after [rejectedToken] was refused, or the token that replaced it in the meantime. */
     fun tokenAfterRejectionOf(rejectedToken: String): String {
         val held = heldAddress()
         return if (held.authorization != rejectedToken) held.authorization else refreshed(held).authorization
@@ -117,16 +112,13 @@ class EdcAccessNegotiator(
         val transferProcessId = accessOrThrow().transferProcessId
         return management.getDataAddress(transferProcessId).also {
             dataAddress = it
-            logger.debug { "Refreshed the transfer token of the '$assetName' data offer from transfer $transferProcessId" }
+            logger.debug {
+                "Refreshed the transfer token of the '$assetName' data offer from transfer $transferProcessId," +
+                        " expiring ${expiryOf(it)?.toString() ?: "at no time it states"}"
+            }
         }
     }
 
-    /**
-     * Takes over the transfer of an agreement made earlier, and negotiates one only where there is none.
-     *
-     * An agreement outlives the run that made it, which is what keeps a re-run of the suite cheap and keeps
-     * the provider from collecting one agreement per run of the same offer.
-     */
     private fun negotiate(): EdcAccess {
         val offer = management.requestCatalog(asset)
             ?: error(
@@ -177,15 +169,22 @@ class EdcAccessNegotiator(
         }
     }
 
-    /**
-     * Reports whether the token still has more life in it than the refresh margin.
-     *
-     * A token the connector does not issue as a JWT carries no expiry to read, and is then only replaced once
-     * the data plane refuses it.
-     */
+    // A token whose expiry cannot be read is reported stale rather than fresh: that costs a refresh per call,
+    // but never holds a token past an expiry no one here can see.
     private fun isFresh(address: EdcDataAddress): Boolean {
-        val expiresAt = runCatching { JWTParser.parse(address.authorization).jwtClaimsSet.expirationTime }
-            .getOrNull() ?: return true
-        return Instant.now().plus(REFRESH_MARGIN).isBefore(expiresAt.toInstant())
+        val expiresAt = expiryOf(address) ?: return false.also { reportUnreadableExpiryOnce() }
+        return Instant.now().plus(REFRESH_MARGIN).isBefore(expiresAt)
+    }
+
+    private fun expiryOf(address: EdcDataAddress): Instant? =
+        runCatching { JWTParser.parse(address.authorization).jwtClaimsSet.expirationTime }.getOrNull()?.toInstant()
+
+    private fun reportUnreadableExpiryOnce() {
+        if (unreadableExpiryReported.compareAndSet(false, true)) {
+            logger.warn {
+                "The transfer token of the '$assetName' data offer states no expiry this run can read, so every" +
+                        " call to it fetches a token of its own"
+            }
+        }
     }
 }

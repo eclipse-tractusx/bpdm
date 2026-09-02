@@ -34,10 +34,8 @@ data class EdcConsumerProperties(
 /**
  * The catalog filter that selects one data offer, and the policy the consumer accepts for it.
  *
- * The taxonomy IRIs and the version are matched against the asset's properties, so they have to name the
- * asset exactly as the provider created it. A Gate asset additionally carries the sharing member's BPNL,
- * which is what [bpnScoped] adds to the filter; the Pool asset is offered to every dataspace participant and
- * must not be filtered by it.
+ * The filter has to name the asset exactly as the provider created it. [bpnScoped] adds the consumer's BPNL to
+ * it, which a Gate asset carries and an asset offered to every participant does not.
  */
 data class EdcAssetProperties(
     val type: String = "",
@@ -51,10 +49,8 @@ data class EdcAssetProperties(
 /**
  * Whether a client reaches its API over an EDC, and through which offer.
  *
- * [enabled] is a scalar rather than the presence of the block on purpose: Spring cannot unset a nested object
- * from a source of higher precedence, so a profile that configured EDC access could never be turned off again
- * from the environment or the command line. As a boolean the route can be switched either way from any
- * source, which is what lets one build compare an EDC run against a direct one.
+ * [enabled] is a scalar rather than the presence of the block, because Spring cannot unset a nested object from
+ * a source of higher precedence: only as a boolean can the route be switched either way from the environment.
  */
 data class EdcClientProperties(
     val enabled: Boolean = false,
@@ -62,12 +58,7 @@ data class EdcClientProperties(
     val asset: EdcAssetProperties = EdcAssetProperties()
 ) {
 
-    /**
-     * Fails unless every value the negotiation needs is present, naming the properties that are not.
-     *
-     * The block is bound whether or not it is enabled, so a half-written EDC section is no longer caught by
-     * its absence. Reporting all of them at once spares the reader one startup failure per missing value.
-     */
+    /** Fails unless every value the negotiation needs is present, naming all the properties that are not. */
     fun validate(propertyPrefix: String) {
         if (!enabled) return
 

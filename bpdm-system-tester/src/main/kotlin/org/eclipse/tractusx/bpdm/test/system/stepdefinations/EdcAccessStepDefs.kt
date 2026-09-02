@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.system.stepdefinations
 
 import io.cucumber.java.en.Then
+import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -29,16 +30,16 @@ import org.eclipse.tractusx.bpdm.test.system.config.PoolClientConfigurationPrope
 import org.eclipse.tractusx.bpdm.test.system.config.SharingMemberCredentialSet
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcAccessNegotiators
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
+import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
+import org.opentest4j.TestAbortedException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 /**
  * Reads one page over each data offer this run consumes, to tell whether the EDC access works at all.
  *
- * Each step reports on one offer and reads only, so a run says which offers are reachable without changing
- * anything the rest of the suite would then see. What the API answers with is not asserted: an offer that
- * grants access to an empty Gate answers an empty page, and that is a pass.
+ * What the API answers with is not asserted: an empty page is a pass.
  */
 class EdcAccessStepDefs(
     private val poolClient: PoolApiClient,
@@ -49,7 +50,12 @@ class EdcAccessStepDefs(
 ) : SpringTestRunConfiguration() {
 
     companion object {
+        private val logger = KotlinLogging.logger { }
+
         private val ONE_PAGE = PaginationRequest(page = 0, size = 1)
+
+        // The query parameter has to travel, not match.
+        private const val NO_SUCH_EXTERNAL_ID = "edc-access-probe"
     }
 
     @Then("the Pool answers a read over the EDC")
@@ -66,6 +72,13 @@ class EdcAccessStepDefs(
         }
     }
 
+    @Then("the Gate input of the {sharingMember} sharing member answers a read with query parameters over the EDC")
+    fun gateInputAnswersQueryReadOverEdc(member: SharingMember) {
+        readOverOffer(credentialsOf(member).input.getId(), "GET", "/v7/business-partners/sharing-state") {
+            sharingMemberGates.of(member).sharingState.getSharingStates(ONE_PAGE, listOf(NO_SUCH_EXTERNAL_ID))
+        }
+    }
+
     @Then("the Gate output of the {sharingMember} sharing member answers a read over the EDC")
     fun gateOutputAnswersReadOverEdc(member: SharingMember) {
         readOverOffer(credentialsOf(member).output.getId(), "POST", "/v7/output/business-partners/search") {
@@ -77,17 +90,13 @@ class EdcAccessStepDefs(
         credentials.singleOrNull { it.member == member }
             ?: error("this run has no Gate credentials for the ${member.name.lowercase()} sharing member")
 
-    /**
-     * Reads one page over the offer the client consumes, failing with what went wrong where it cannot.
-     *
-     * A negotiation that never succeeded is reported as itself rather than as the read that could not be
-     * made, because the two fail for entirely different reasons.
-     */
+    // A client this run reaches directly is skipped rather than failed: a profile may put one API on the
+    // direct route and the rest over offers, and the scenario would then report on the run's configuration.
     private fun readOverOffer(registrationId: String, method: String, path: String, read: () -> PageDto<*>) {
         val negotiator = negotiators.of(registrationId)
-            ?: error(
+            ?: skip(
                 "'$registrationId' does not reach its API over an EDC in this run." +
-                        " Set '$registrationId.edc.enabled' to run this scenario against a data offer."
+                        " Set '$registrationId.edc.enabled' and name the connector to run it."
             )
 
         assertThat(negotiator.isAvailable)
@@ -101,21 +110,26 @@ class EdcAccessStepDefs(
         apiCallEvidence.attach(method, path, response = mapOf("totalElements" to page.totalElements))
     }
 
-    /**
-     * Names what a refused call most likely says about the offer.
-     *
-     * The two failures an EDC setup produces are told apart by their status alone, and both of them look like
-     * an ordinary API error unless the data plane in front of the API is named.
-     */
+    private fun skip(reason: String): Nothing {
+        val context = ScenarioContext.current()
+        val message = "Skipping scenario '${context?.scenarioName ?: "unnamed"}': $reason"
+        logger.warn { message }
+        context?.scenario?.log(message)
+        throw TestAbortedException(message)
+    }
+
     private fun diagnosisOf(failure: Throwable): String {
         val status = (failure as? WebClientResponseException)?.statusCode?.value()
         val hint = when (status) {
+            400 -> "the data plane refused to proxy the call - the asset may not carry the proxy setting the call" +
+                    " needs (proxyPath, proxyQueryParams, proxyMethod or proxyBody)"
             403 -> "the data plane refused the call - the access policy of the offer may not name this consumer's BPNL," +
                     " or the technical user behind the asset may lack the permission the endpoint requires"
             404 -> "the data plane found nothing at this path - the asset's 'dataAddress.baseUrl' and the path sent" +
                     " may not line up"
             else -> "the data plane answered ${status ?: "no status"}"
         }
-        return "$hint (${failure.message})"
+        val body = (failure as? WebClientResponseException)?.responseBodyAsString?.takeIf { it.isNotBlank() }
+        return "$hint (${failure.message}${body?.let { ": $it" } ?: ""})"
     }
 }

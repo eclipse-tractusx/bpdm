@@ -240,12 +240,14 @@ To exercise the connection, use the [EDC BPDM Consumer Postman collection](../ap
 The [system tester](../../bpdm-system-tester) exercises the same negotiation from code and covers every offer in one run:
 
 ```bash
-SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_PROVIDER_DID=... \
+SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @EdcAccess
 ```
 
 Those scenarios only read, so they can be repeated against an environment while its offers are being set up.
-`bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector of each sharing member and the variables its credentials come from.
+They cover the Gate offers; the Pool scenario reports as skipped, because the suite keeps the Pool on the direct route — see [testing over the EDC](e2e-testing.md#testing-over-the-edc) for why.
+The three `api#management-key` secrets of the connectors are the only values to supply: `bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector and offer of each sharing member, with the addresses, the provider's DID and each member's BPNL defaulted to the INT deployment.
+Running the whole suite over the EDC instead of only these scenarios is described under [testing over the EDC](e2e-testing.md#testing-over-the-edc).
 
 ## Feature Branch Deployments
 
