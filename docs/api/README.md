@@ -6,11 +6,6 @@
     * [Pool API](#pool-api)
       * [Authorization](#authorization)
     * [Gate API](#gate-api)
-      * [Business Partner](#business-partner)
-      * [Address Type](#address-type)
-      * [Stages](#stages)
-      * [Sharing State](#sharing-state)
-      * [Changelog](#changelog)
       * [Additional information](#additional-information)
       * [Authorization](#authorization-1)
     * [Orchestrator API](#orchestrator-api)
@@ -23,10 +18,6 @@
       * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
         * [Setting Up An Imported Collection](#setting-up-an-imported-collection)
     * [Sharing Members](#sharing-members)
-      * [Sharing Business Partner Data](#sharing-business-partner-data)
-      * [Sharing Other Company's Data](#sharing-other-companys-data)
-      * [Sharing Own Company Data](#sharing-own-company-data)
-      * [Headquarter Relocation With No Leftover](#headquarter-relocation-with-no-leftover)
     * [VAS Providers](#vas-providers)
     * [Golden Record Processing Service Providers](#golden-record-processing-service-providers)
       * [Outdated Tasks](#outdated-tasks)
@@ -69,57 +60,8 @@ With the [Gate API](gate.yaml) you can share business partner data with the gold
 This API is important for sharing members and value added services who offer extended functionality for sharing members.
 More general information can be obtained from the [BPDM Gate standard](https://catenax-ev.github.io/docs/standards/CX-0074-BusinessPartnerGateAPI).
 
-#### Business Partner
-
-A business partner is a logistic address augmented by additional meta information like names, identifiers and state of operation.
-The business partner data may contain legal entity and/or site information.
-For example, the business partner's name may include the name of the legal entity the logistic address belongs to.
-Sharing member business partners are assigned up to three BPNs during the golden record process.
-A BPNA refers to the actual logistic address contained in the business partner data.
-A BPNL refers to the legal entity that logistic address belongs to.
-An optional BPNS exists if the logistic address also belongs to a site of that legal entity.
-
-
-#### Address Type
-
-The data in the output stage does not directly say which business partner type has been determined.
-Instead, you will find the determined address type which is slightly more accurate than the business partner type.
-If you want to categorize your business partner data into legal entity, site and address you can refer to this explanation:
-
-| Address Type                | Golden Record Type |
-|-----------------------------|--------------------|
-| Legal Address               | Legal Entity       |
-| Site Main Address           | Site               |
-| Legal And Site Main Address | Site\*             |
-| Additional Address          | Logistic Address   |
-
-
-\* Note that the Legal and Site Main Address type is special in this regard since it indicates a site that has the legal address as its site main address.
-For each legal entity there can only be up to one of such sites.
-
-#### Stages
-
-Business partners have two types of data: input and output data.
-Input data is the version of the business partner how it is shared by the sharing member.
-Output data is the version of the business partner after it has gone through the golden record process.
-Sharing members can only update the input data and the golden record process can only update the output data.
-
-#### Sharing State
-
-Each business partner has a sharing state in regard to the golden record process.
-The sharing state indicates whether the business partner input data is currently in processing, has not yet started process or has already finished.
-
-> Initial Sharing State: The BPDM API can be configured to support an additional 'Initial' sharing state.
-> Such a sharing state indicates that the business partner input data has been changed but is not yet marked for sharing.
-> If that is the case the sharing state needs to be manually set to ready to be shared to the golden record process.
-> If no initial sharing state has been configured uploaded input data is automatically shared to the golden record process as soon as it is received.
-
-
-#### Changelog
-
-Contains events for each stage on when business partner data has been added or changed.
-The changelog only contains the information of when the business partner changed not what changed.
-
+The generic business partner format, the two data stages, the sharing state and the changelog are
+explained from a sharing member's perspective in the [Sharing Member Guide](sharing-member-guide.md).
 
 #### Additional information
 
@@ -128,8 +70,7 @@ This means, a sharing member or value added service may only see the business pa
 
 The full implementation of the Golden Record Process - which includes duplication checks, categorizing and cleaning of data - is not yet provided in this repository.
 Instead, BPDM offers a dummy golden record processing service that performs rudimentary checks and processing to offer a limited Golden Record Process without relying on an external provider.
-Since the dummy service is very limited when using the BPDM API behind such a dummy golden record process comes with restrictions.
-The next sections deal with how to use the BPDM API as a sharing member with a real golden record process and what to consider with the dummy service.
+Since the dummy service is very limited, using the BPDM API behind such a dummy golden record process comes with [restrictions](../architecture/11_Risks_And_Technical_Debts.md).
 
 
 > NOTE: 
@@ -303,63 +244,11 @@ Mind that Postman fills required parameters with generated placeholder values on
 
 ### Sharing Members
 
-As a sharing member you want to share business partner data to the golden record process in order to obtain BPNs and refined data.
-The process on how you use the BPDM APIs differs slightly on whether it is your own company data or that of other companies you do business with.
-
-> Please notice that this repository offers a limited dummy golden record process which comes with a [list of restrictions](../architecture/11_Risks_And_Technical_Debts.md).
-> If you are using such dummy golden record process for test purposes you may need to consider these restrictions when sharing business partner data.
-
-#### Sharing Business Partner Data
-
-The golden record process will determine the type and give you the information back together with the associated BPNs and refined data.
-
-To share such business partners you perform the following actions:
-
-1. Obtain access to the `ReadAccessPoolForCatenaXMember` asset
-2. Query the Pool metadata information to obtain the list of supported legal forms, identifier types and administrative level 1 regions
-3. Obtain access to the `FullAccessGateInputForSharingMember` asset
-4. Within the constraints of the supported metadata upload a generic business partner entry to the Gate input stage
-5. Optionally, if the Gate has been configured for [manual sharing](../../INSTALL.md) you should set the business partner entry to ready
-6. Obtain access to the `ReadAccessGateOutputForSharingMember` asset
-7. Monitor the output changelog for the business partner entry until you receive a CREATE event for that entry (UPDATE if you have shared it before)
-8. Query the business partner data in the output stage
-
-
-#### Sharing Other Company's Data
-
-Business partners that do not belong to you or your managed subsidiaries should be shared as generic business partners - that is a business partner for which it is unknown whether it is a Legal Entity, Site or Address.
-Additionally, the business partner **must not** be marked as `isOwnCompanyData`.
-
-Also, it is important to note that sharing sites is reserved for the owning company of that site.
-If you give site information to a business partner which does not belong to you, the entry might come back as invalid or the site information will be ignored.
-The exact behaviour is determined by the golden record process implementation.
-
-
-#### Sharing Own Company Data
-
-When  sharing business partner data that belongs to your own company or managed subsidiary you are required to specify a fixed address type of the business partner.
-That means, you can't share your own company data as of an unknown business partner type.
-
-Additionally, you are required to mark the business partner as `isOwnCompanyData`.
-This is the way to recognize that you want to share your own data.
-
-In contrast to sharing other company's data you are allowed to specify site information including whether an address is a site main address.
-
-#### Headquarter Relocation With No Leftover
-
-The sharing member wants to report to the network that the headquarters address of a legal entity changed (or will change in the future).
-The old headquarters address will not be active anymore (hence 'No Leftover').
-
-Steps for the sharing member to take in order to realize that use case:
-
-1. The sharing member MUST create a business partner record `A` for the existing headquarters address
-2. The sharing member MUST create a business partner record `B` for the new headquarters address
-3. The sharing member MUST create a IsReplacedBy relation from `A` to `B`
-4. The sharing member MUST update the old headquarters address `A` to have an inactive business state
-
-In order to make sure that the golden record process processed the shared records correctly it is recommended that the sharing member SHOULD wait for the output results between steps 1 - 3.
-To clearly indicate that an old headquarters address is set to inactive and not the current legal entity, the sharing member MUST wait for step 3 correct output results before executing the final step 4.
-
+As a sharing member you want to share business partner data with the golden record process in order
+to obtain BPNs and refined data.
+The [Sharing Member Guide](sharing-member-guide.md) covers that end to end: what the generic
+business partner format expects, how the process looks from the Gate, and what to send for the
+individual cases.
 
 ### VAS Providers
 
