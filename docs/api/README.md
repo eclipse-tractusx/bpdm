@@ -108,6 +108,10 @@ Permissions:
 
 This API offers endpoints for retrieving and resolving business partner data being processed inside the golden record process.
 
+What a golden record task is, what its business partner data can express and what to put into a step
+result are explained from a refinement service provider's perspective in the
+[Refinement Service Provider Guide](refinement-service-guide.md).
+
 #### Tasks
 
 Business partner data to be processed come in processing tasks with their own task ID.
@@ -280,6 +284,9 @@ There are similar interactions possible for analyzing the business partner outpu
 
 As a golden record processing service provider you participate in realising the golden record process.
 You provide a step towards transforming shared business partner data to a golden record.
+The [Refinement Service Provider Guide](refinement-service-guide.md) covers that end to end: the task
+lifecycle, the BPN reference concept, and what to send back for a legal entity, a site or an
+additional address.
 
 As such your main point of interaction will be with the Orchestrator API.
 The Pool API may also offer useful context information that benefits your service.
