@@ -9,14 +9,14 @@ The API documentation calls this role a
 [golden record processing service provider](README.md#golden-record-processing-service-providers).
 
 It does not cover how a sharing member gets data into the process
-([see the Sharing Member Guide](sharing-member-guide.md)), how to read finished golden records from
-the Pool ([see the Dataspace Participant Guide](dataspace-participant-guide.md)), or how to reach
-the API through an EDC ([see the API documentation](README.md#access-bpdm-over-edc)).
+([see the Sharing Member Guide](sharing-member-guide.md)) or how to read finished golden records from
+the Pool ([see the Dataspace Participant Guide](dataspace-participant-guide.md)).
 The endpoints named here are described in full in [orchestrator.yaml](orchestrator.yaml); this guide
 says which ones to call and what the data you send back has to say.
 
 <!-- TOC -->
 * [Refinement Service Provider Guide](#refinement-service-provider-guide)
+  * [Getting Access](#getting-access)
   * [The Golden Record Task](#the-golden-record-task)
     * [Modes And Steps](#modes-and-steps)
     * [Reserve, Process, Resolve](#reserve-process-resolve)
@@ -43,6 +43,46 @@ says which ones to call and what the data you send back has to say.
     * [Resolving Your Own Request Identifiers Later](#resolving-your-own-request-identifiers-later)
   * [NOTICE](#notice)
 <!-- TOC -->
+
+## Getting Access
+
+The Orchestrator is reached differently from the other two APIs, and the difference is worth knowing
+before you build against it.
+A sharing member reaches its Gate and a dataspace participant reaches the Pool through an EDC, over a
+data offer they negotiate.
+The Orchestrator is exposed through no such offer.
+You are integrated by the golden record process provider itself: it issues your service a technical
+user at its identity provider, and you call the API directly with those client credentials.
+
+What that technical user holds is one permission pair, per step:
+
+| Permission                       | Lets you                                    |
+|----------------------------------|---------------------------------------------|
+| `create_reservation_<step>`      | reserve tasks from that step's queue        |
+| `create_result_<step>`           | post step results into that step            |
+
+So a service refining `CleanAndSync` needs `create_reservation_CleanAndSync` and
+`create_result_CleanAndSync`, and nothing else.
+The reference identity provider configuration bundles each pair as a single composite role named
+`refiner_<step>`, which is what an operator normally grants.
+Those are the default names - an operator may configure others - and they are matched
+case-insensitively, so ask for the pair by step rather than by spelling.
+
+Two consequences follow.
+
+You are scoped to your step, not to a set of records.
+Reserving from a step takes the tasks that are queued in it, whichever Gate created them and
+whichever sharing member they came from - the Orchestrator publishes no per-caller view of the queue
+the way the Pool and the Gate publish per-user-group ones.
+Your service therefore sits inside the golden record process rather than in front of it, which is why
+the data reaches you pseudonymised: see [The Golden Record Task](#the-golden-record-task) for what the
+record id does and does not tell you.
+
+And the task client endpoints are not yours.
+Creating tasks (`create_task`) and reading task states and finished-task events (`read_task`) belong
+to the Gate, which is the task creator; a refinement service is granted neither.
+Everything a refinement service calls is the two endpoints in
+[Reserve, Process, Resolve](#reserve-process-resolve).
 
 ## The Golden Record Task
 

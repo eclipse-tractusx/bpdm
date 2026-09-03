@@ -5,14 +5,18 @@ through its own BPDM Gate, in order to obtain BPNs and refined data in return.
 It explains what the data format expects, what the process looks like from the outside, and what
 to put into a request for the cases that come up most.
 
-It does not cover how to reach the Gate through an EDC ([see the API documentation](README.md#access-bpdm-over-edc)),
-how to query golden records from the Pool ([pool.yaml](pool.yaml)), or how to operate a golden
-record processing service ([see the API documentation](README.md#golden-record-processing-service-providers)).
+It does not cover the EDC negotiation that gets you to the Gate in the first place
+([see Access BPDM over EDC](README.md#access-bpdm-over-edc)), how to query golden records from the
+Pool ([see the Dataspace Participant Guide](dataspace-participant-guide.md)), or how to operate a
+refinement service ([see the Refinement Service Provider Guide](refinement-service-guide.md)).
 The endpoints named here are described in full in [gate.yaml](gate.yaml); this guide says which
 ones to call, in which order, and with what content.
+The network-wide contract the Gate API implements is the
+[BPDM Gate standard](https://catenax-ev.github.io/docs/standards/CX-0074-BusinessPartnerGateAPI).
 
 <!-- TOC -->
 * [Sharing Member Guide](#sharing-member-guide)
+  * [Getting Access](#getting-access)
   * [The Generic Business Partner](#the-generic-business-partner)
     * [What The Golden Record Process Determines](#what-the-golden-record-process-determines)
     * [Address Type](#address-type)
@@ -55,6 +59,30 @@ ones to call, in which order, and with what content.
     * [What Does Not Pass Through The Process](#what-does-not-pass-through-the-process)
   * [NOTICE](#notice)
 <!-- TOC -->
+
+## Getting Access
+
+You do not reach your Gate directly.
+The golden record process provider exposes it through an EDC as a set of offers, one per purpose
+defined in the BPDM framework agreement, and which endpoints you may call follows from the offer you
+negotiated rather than from anything you send:
+
+| Asset                                  | Lets you                                                              |
+|----------------------------------------|-----------------------------------------------------------------------|
+| `FullAccessGateInputForSharingMember`  | write and read input, release records, read the input changelog and the sharing state |
+| `ReadAccessGateInputForSharingMember`  | read input, the input changelog and the sharing state                 |
+| `ReadAccessGateOutputForSharingMember` | read output, the output changelog and the sharing state               |
+
+The process described in this guide needs **two** of them.
+Sharing data and releasing it are input access, reading the result is output access, and no single
+offer covers both - the input offer deliberately does not let you read the golden record output.
+So negotiate `FullAccessGateInputForSharingMember` for steps 1 to 3 and
+`ReadAccessGateOutputForSharingMember` for step 4.
+The sharing state is in every one of them, which is why polling it works whichever offer you hold.
+
+[Access BPDM over EDC](README.md#access-bpdm-over-edc) has the negotiation itself, and each asset
+comes with an Open-API document holding exactly the endpoints it exposes - the quickest way to see
+what an offer you hold is good for.
 
 ## The Generic Business Partner
 

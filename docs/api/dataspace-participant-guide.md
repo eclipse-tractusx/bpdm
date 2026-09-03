@@ -7,11 +7,13 @@ It explains what a golden record is, what the Pool tells you about one, and what
 cases that come up.
 
 It does not cover sharing data with the golden record process to obtain BPNs of your own
-([see the Sharing Member Guide](sharing-member-guide.md)), how to reach the Pool through an EDC
-([see the API documentation](README.md#access-bpdm-over-edc)), or how to operate a golden record
-processing service ([see the API documentation](README.md#golden-record-processing-service-providers)).
+([see the Sharing Member Guide](sharing-member-guide.md)), the EDC negotiation that gets you to the
+Pool in the first place ([see Access BPDM over EDC](README.md#access-bpdm-over-edc)), or how to
+operate a refinement service ([see the Refinement Service Provider Guide](refinement-service-guide.md)).
 The endpoints named here are described in full in [pool.yaml](pool.yaml); this guide says which ones
 to call and how to read what comes back.
+The network-wide contract the Pool API implements is the
+[BPDM Pool API standard](https://catenax-ev.github.io/docs/standards/CX-0012-BusinessPartnerDataPoolAPI).
 
 <!-- TOC -->
 * [Dataspace Participant Guide](#dataspace-participant-guide)
@@ -19,6 +21,7 @@ to call and how to read what comes back.
     * [The Three Levels](#the-three-levels)
     * [Where An Address Belongs](#where-an-address-belongs)
     * [Metadata](#metadata)
+  * [Getting Access](#getting-access)
   * [What The Pool Shows You](#what-the-pool-shows-you)
   * [Use Cases](#use-cases)
     * [Resolving A BPN You Received](#resolving-a-bpn-you-received)
@@ -120,6 +123,22 @@ per country and field, whether the golden record process treats that field as `M
 or `FORBIDDEN`.
 It is what tells you why a golden record from one country carries a field that one from another never
 does.
+
+## Getting Access
+
+You do not reach the Pool directly.
+The golden record process provider exposes it through an EDC as offers, one per purpose defined in
+the BPDM framework agreement, and the offer you negotiated is what decides which endpoints you may
+call - a dataspace participant needs exactly one:
+
+| Asset                                   | Lets you                                                  |
+|-----------------------------------------|-----------------------------------------------------------|
+| `ReadAccessPoolForDataSpaceParticipant` | read participant golden records, their changelog and the metadata |
+
+That is the same surface [What The Pool Shows You](#what-the-pool-shows-you) describes, and the asset
+comes with an Open-API document holding exactly those endpoints - the quickest way to see what it is
+good for without reading further.
+[Access BPDM over EDC](README.md#access-bpdm-over-edc) has the negotiation itself.
 
 ## What The Pool Shows You
 
