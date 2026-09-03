@@ -18,6 +18,7 @@
       * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
         * [Setting Up An Imported Collection](#setting-up-an-imported-collection)
     * [Sharing Members](#sharing-members)
+    * [Dataspace Participants](#dataspace-participants)
     * [VAS Providers](#vas-providers)
     * [Golden Record Processing Service Providers](#golden-record-processing-service-providers)
       * [Outdated Tasks](#outdated-tasks)
@@ -37,6 +38,10 @@ With the [Pool API](pool.yaml) you can query golden record and available metadat
 Value added services who operate on golden record data mainly use this API.
 However, this API may also be interesting to sharing members who want to see which metadata information the golden record process provider supports.
 Have a look at the corresponding [BPDM Pool API standard](https://catenax-ev.github.io/docs/standards/CX-0012-BusinessPartnerDataPoolAPI) for more information.
+
+The golden record levels, the metadata lists and what a dataspace participant may read of them are
+explained from a dataspace participant's perspective in the
+[Dataspace Participant Guide](dataspace-participant-guide.md).
 
 #### Authorization
 
@@ -248,6 +253,14 @@ As a sharing member you want to share business partner data with the golden reco
 to obtain BPNs and refined data.
 The [Sharing Member Guide](sharing-member-guide.md) covers that end to end: what the generic
 business partner format expects, how the process looks from the Gate, and what to send for the
+individual cases.
+
+### Dataspace Participants
+
+As a dataspace participant you want to resolve the BPNs you receive from other participants and read
+the golden records behind them.
+The [Dataspace Participant Guide](dataspace-participant-guide.md) covers that: what a golden record
+is, how legal entities, sites and addresses relate, how metadata fits in, and what to call for the
 individual cases.
 
 ### VAS Providers
