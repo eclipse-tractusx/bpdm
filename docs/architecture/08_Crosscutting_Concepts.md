@@ -39,10 +39,10 @@ The golden record process contains sharing members which need to share their dat
 
 We defined the following relevant permission groups in BPDM:
 
-1. Gate Admin: Create, update and read sharing member business partner input data as well as read the output data of the golden record process
-2. Gate Input Manager: Create, update and read sharing member business partner input data
-3. Gate Input Consumer: Read sharing member business partner input data
-4. Gate Output Consumer: Read sharing member business partner output data
+1. Gate Admin: Create, update and read sharing member business partner and relation input data as well as read the output data of the golden record process
+2. Gate Input Manager: Create, update and read sharing member business partner and relation input data, including uploading it as a file
+3. Gate Input Consumer: Read sharing member business partner and relation input data
+4. Gate Output Consumer: Read sharing member business partner and relation output data
 5. Pool Admin: Read, create and update golden records as well as meta data in the Pool
 6. Pool Dataspace Participant: Read golden records that belong to dataspace participants from the Pool
 7. Pool Sharing Member: Read all golden records from the Pool
@@ -85,6 +85,9 @@ We defined the following relevant permission groups in BPDM:
             <li>read_sharing_state</li>
             <li>write_sharing_state</li>
             <li>read_stats</li>
+            <li>upload_input_partner</li>
+            <li>read_input_relation</li>
+            <li>write_input_relation</li>
         </ul>
       </td>
       <td>
@@ -123,6 +126,9 @@ Gate permissions:
             <li>read_input_partner</li>
             <li>write_input_partner</li>
             <li>read_input_changelog</li>
+            <li>read_input_relation</li>
+            <li>write_input_relation</li>
+            <li>upload_input_partner</li>
             <li>read_sharing_state</li>
             <li>write_sharing_state</li>
             <li>read_stats</li>
@@ -130,16 +136,15 @@ Gate permissions:
       </td>
       <td>
          <ul>
-            <li>read_input_changelog</li>
             <li>read_input_partner</li>
             <li>read_input_changelog</li>
+            <li>read_input_relation</li>
             <li>read_sharing_state</li>
             <li>read_stats</li>
         </ul>
       </td>
        <td>
          <ul>
-            <li>read_output_changelog</li>
             <li>read_output_partner</li>
             <li>read_output_changelog</li>
             <li>read_sharing_state</li>
@@ -204,14 +209,14 @@ Orchestrator Permissions:
       </td>
       <td>
         <ul>
-            <li>create_reservation_clean</li>
-            <li>create_result_clean</li>
+            <li>create_reservation_cleanAndSync</li>
+            <li>create_result_cleanAndSync</li>
         </ul>
       </td>
       <td>
         <ul>
-            <li>create_reservation_cleanAndSync</li>
-            <li>create_result_cleanAndSync</li>
+            <li>create_reservation_clean</li>
+            <li>create_result_clean</li>
         </ul>
       </td>
     <td>
@@ -226,10 +231,10 @@ Orchestrator Permissions:
 
 #### Mapping to Portal user roles for all companies (for all Catena-X members):
 
-| BPDM Permission Group | Portal Role                   |
-|-----------------------|-------------------------------|
-| Gate Admin            | Business Partner Data Manager |
-| Pool Cx Member        | CX User                       |
+| BPDM Permission Group      | Portal Role                   |
+|----------------------------|-------------------------------|
+| Gate Admin                 | Business Partner Data Manager |
+| Pool Dataspace Participant | CX User                       |
 
 #### Technical Users:
 
@@ -250,13 +255,13 @@ Still, for the sake of defining a demo configuration, here is a proposal:
 
 **BPDM Pool:**
 
-Valid Origin: `https://business-partners.{env}.demo.catena-x.net/pool/*`
+Valid Origin: `https://business-partners.{env}.catena-x.net/pool/*`
 
 Description: BPDM Pool
 
 **BPDM Gate:**
 
-Valid Origin: `https://business-partners{env}.demo.catena-x.net/companies/*`
+Valid Origin: `https://business-partners.{env}.catena-x.net/companies/*`
 
 Description: BPDM Gate
 
@@ -266,6 +271,12 @@ This example configuration includes the roles, clients and client scopes that BP
 The actual client IDs are subject to change depending on the name they receive in the Portal Keycloak configuration.
 [BPDM-realm.json](../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json)
 
+> [!NOTE]
+> The realm is the configuration the integration tests run against, so it covers the permissions
+> those tests need. It does not yet define the Gate's `upload_input_partner`, `read_input_relation`
+> and `write_input_relation`; the services define them regardless, and an operator granting them
+> has to add them to the realm.
+
 For more details see: https://github.com/eclipse-tractusx/sig-release/issues/565
 
 ### EDC Communication
@@ -274,8 +285,8 @@ For more details see: https://github.com/eclipse-tractusx/sig-release/issues/565
 
 Communication with BPDM application must be via EDC. The standards for EDC Assets are defined as follows:
 
-* [BPDM Pool API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0012-BusinessPartnerDataPoolAPI/CX-0012-BusinessPartnerDataPoolAPI.md#223-data-asset-structure)
-* [BPDM Gate API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0074-BusinessPartnerGateAPI/CX-0074-BusinessPartnerGateAPI.md#223-data-asset-structure)
+* [BPDM Pool API Asset Structure](https://catenax-ev.github.io/docs/standards/CX-0012-BusinessPartnerDataPoolAPI)
+* [BPDM Gate API Asset Structure](https://catenax-ev.github.io/docs/standards/CX-0074-BusinessPartnerGateAPI)
 
 
 An example postman collection for Asset definition you can find [here](<../admin/EDC%20Provider%20Setup.postman_collection.json>)
@@ -319,23 +330,27 @@ sequenceDiagram
 
 ## Business Partner Data Management Standards
 
-The BPDM APIs follow the [Catena-X standards](https://catena-x.net/de/standard-library).
+The BPDM APIs follow the [Catena-X standards](https://catenax-ev.github.io/docs/standards/overview), in particular [CX-0010 Business Partner Number](https://catenax-ev.github.io/docs/standards/CX-0010-BusinessPartnerNumber), [CX-0012 Business Partner Data Pool API](https://catenax-ev.github.io/docs/standards/CX-0012-BusinessPartnerDataPoolAPI) and [CX-0074 Business Partner Gate API](https://catenax-ev.github.io/docs/standards/CX-0074-BusinessPartnerGateAPI).
 
 ## Logging Behavior
 
 As Spring Boot applications BPDM employs Spring
-specific [logging behavior](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#features.logging)
+specific [logging behavior](https://docs.spring.io/spring-boot/reference/features/logging.html).
 
 We enhance the default log entries with user request information including the determined user ID and a generated request ID.
 Not all logs belong to an ongoing user request in which case these entries are empty.
 
-In addition to the Spring standard logs the BPDM applications keep a log of the following events:
+What belongs on which level is binding for the code and is defined in the
+[logging guide](../developer/logging-guide.md). In short:
 
-* INFO: User requesting resource with resource name and HTTP verb
-* INFO: Request HTTP response
-* INFO: Update/Create Golden Record Business Partners
-* INFO: Creating BPNs
-* ERROR: Uncaught exceptions occurring in the service logic
+* INFO is reserved for three things: a change that was persisted, the effective configuration at
+  startup, and a process lifecycle transition. A persisted-change entry is an outcome and names its
+  subject by identifier - a BPN, a task id, an external id - so that it can be traced.
+* Everything else is DEBUG, which is switched off in production. This includes the request and
+  response entries: each request is logged once when it completes, with user, method, URI, status
+  and duration. Requests to `/actuator` are not logged at all, as the Kubernetes probes would drown
+  out everything else.
+* ERROR is for uncaught exceptions occurring in the service logic.
 
 
 ## NOTICE
