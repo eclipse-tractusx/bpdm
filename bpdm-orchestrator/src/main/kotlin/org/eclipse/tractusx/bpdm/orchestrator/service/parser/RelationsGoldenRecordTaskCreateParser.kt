@@ -26,9 +26,9 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.error.RelationsGoldenRecordT
 import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.RelationsGoldenRecordTaskCreateParsed
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.util.toUuidOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 @Transactional(readOnly = true)
@@ -65,10 +65,4 @@ class RelationsGoldenRecordTaskCreateParser(
         }
     }
 
-    private fun toUuidOrNull(uuidString: String): UUID? =
-        try {
-            UUID.fromString(uuidString)
-        } catch (_: IllegalArgumentException) {
-            null
-        }
 }
