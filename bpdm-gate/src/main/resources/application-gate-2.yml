@@ -19,7 +19,7 @@
 
 # Runs a second Gate next to the default one, acting for a second sharing member:
 #
-#   mvn spring-boot:run -Dspring.profiles.active=gate-2
+#   mvn spring-boot:run -Dspring-boot.run.profiles=gate-2
 #
 # Two Gates are what it takes to observe a golden record shared by more than one sharing member -
 # both members reflecting each other's master data changes, and the sharing member count of the
