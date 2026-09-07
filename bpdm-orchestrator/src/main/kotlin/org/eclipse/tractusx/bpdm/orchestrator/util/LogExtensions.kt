@@ -21,6 +21,10 @@ package org.eclipse.tractusx.bpdm.orchestrator.util
 
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 
 fun Collection<GoldenRecordTaskDb>.toLogIdentifiers(): String =
+    map { it.uuid.toString() }.joinIdentifiersForLog()
+
+fun Collection<RelationsGoldenRecordTaskDb>.toRelationsLogIdentifiers(): String =
     map { it.uuid.toString() }.joinIdentifiersForLog()
