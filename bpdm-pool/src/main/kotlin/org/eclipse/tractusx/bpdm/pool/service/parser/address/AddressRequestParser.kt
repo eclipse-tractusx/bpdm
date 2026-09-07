@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadata
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
 import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressFieldParseError

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed

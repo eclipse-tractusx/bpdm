@@ -79,6 +79,7 @@ class AddressParseErrorMapperV6 {
             // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
             is ScriptVariantCoverageStillNeeded -> throw internalError(error)
             is UnresolvableSite,
+            is SiteMainAddressOmitted,
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 

@@ -6,9 +6,6 @@ info:
 servers:
   - url: http://localhost:8081
     description: Generated server url
-security:
-  - open_id_scheme: []
-  - bearer_scheme: []
 paths:
   /v7/input/relations:
     put:
@@ -184,6 +181,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -191,6 +189,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       responses:
@@ -315,6 +314,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -322,6 +322,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -354,6 +355,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -361,6 +363,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -395,6 +398,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -402,6 +406,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -437,6 +442,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -444,6 +450,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -478,6 +485,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -485,6 +493,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -518,6 +527,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -525,6 +535,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -557,6 +568,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -564,6 +576,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -598,6 +611,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -605,6 +619,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -639,6 +654,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -646,6 +662,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -726,6 +743,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -733,6 +751,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -847,6 +866,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -854,6 +874,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -888,6 +909,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -895,6 +917,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       requestBody:
@@ -955,6 +978,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -962,6 +986,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
       responses:
@@ -985,6 +1010,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -992,6 +1018,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
         - name: externalIds
@@ -1158,6 +1185,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "0"
             minimum: 0
         - name: size
           in: query
@@ -1165,6 +1193,7 @@ paths:
           required: false
           schema:
             type: string
+            default: "10"
             maximum: 100
             minimum: 0
         - name: externalIds
@@ -1224,6 +1253,21 @@ paths:
                 format: binary
 components:
   schemas:
+    AdditionalSiteInputDto:
+      type: object
+      description: "A further site the business partner's address belongs to, next\
+        \ to the site in 'site'"
+      properties:
+        siteBpn:
+          type:
+            - string
+            - "null"
+          description: "The BPNS of the site, if it is known"
+        name:
+          type:
+            - string
+            - "null"
+          description: The name of the site
     AdditionalSiteOutputDto:
       type: object
       description: "A further site a business partner's address belongs to, in addition\
@@ -1233,7 +1277,9 @@ components:
           type: string
           description: The BPNS of the site
         name:
-          type: string
+          type:
+            - string
+            - "null"
           description: The name of the site
       required:
         - siteBpn
@@ -1246,13 +1292,17 @@ components:
           description: "The BPNA of the address, on which the business partner provides\
             \ a view."
         name:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the address, on which the business partner provides\
             \ a view. This is not according to official registers but according to\
             \ the name the sharing members agree on, such as the name of a gate or\
             \ any other additional names that designate the address in common parlance."
         addressType:
-          type: string
+          type:
+            - string
+            - "null"
           description: "One of the address types: Legal Address, Site Main Address,\
             \ Legal and Site Main Address, Additional Address. "
           enum:
@@ -1265,10 +1315,12 @@ components:
           description: "The physical postal address of the address, on which the business\
             \ partner provides a view, such as an office, warehouse, gate, etc."
         alternativePostalAddress:
-          $ref: "#/components/schemas/AlternativePostalAddressDto"
           description: "The alternative postal address of the address, on which the\
             \ business partner provides a view, for example if the goods are to be\
             \ picked up somewhere else."
+          oneOf:
+            - $ref: "#/components/schemas/AlternativePostalAddressDto"
+            - type: "null"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
         states:
@@ -1284,7 +1336,9 @@ components:
           items:
             $ref: "#/components/schemas/AddressGoldenRecordRelationDto"
         updatedAt:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: Timestamp when the associated address golden record was last
             updated
@@ -1316,17 +1370,23 @@ components:
       type: object
       properties:
         addressBpn:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The BPNA of the address, on which the business partner provides\
             \ a view."
         name:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the address, on which the business partner provides\
             \ a view. This is not according to official registers but according to\
             \ the name the sharing members agree on, such as the name of a gate or\
             \ any other additional names that designate the address in common parlance."
         addressType:
-          type: string
+          type:
+            - string
+            - "null"
           description: "One of the address types: Legal Address, Site Main Address,\
             \ Legal and Site Main Address, Additional Address. "
           enum:
@@ -1339,10 +1399,12 @@ components:
           description: "The physical postal address of the address, on which the business\
             \ partner provides a view, such as an office, warehouse, gate, etc."
         alternativePostalAddress:
-          $ref: "#/components/schemas/AlternativePostalAddressDto"
           description: "The alternative postal address of the address, on which the\
             \ business partner provides a view, for example if the goods are to be\
             \ picked up somewhere else."
+          oneOf:
+            - $ref: "#/components/schemas/AlternativePostalAddressDto"
+            - type: "null"
         states:
           type: array
           items:
@@ -1351,31 +1413,35 @@ components:
       type: object
       properties:
         name:
-          type: string
+          type:
+            - string
+            - "null"
         physicalAddress:
           $ref: "#/components/schemas/PhysicalAddressScriptVariantDto"
         alternativeAddress:
-          $ref: "#/components/schemas/AlternativeAddressScriptVariantDto"
+          oneOf:
+            - $ref: "#/components/schemas/AlternativeAddressScriptVariantDto"
+            - type: "null"
     AlternativeAddressScriptVariantDto:
       type: object
       properties:
-        postalCode:
-          type: string
         city:
-          type: string
-        deliveryServiceQualifier:
-          type: string
-        deliveryServiceNumber:
-          type: string
+          type:
+            - string
+            - "null"
     AlternativePostalAddressDto:
       type: object
       description: An alternative postal address describes an alternative way of delivery
         for example if the goods are to be picked up somewhere else.
       properties:
         geographicCoordinates:
-          $ref: "#/components/schemas/GeoCoordinateDto"
+          oneOf:
+            - $ref: "#/components/schemas/GeoCoordinateDto"
+            - type: "null"
         country:
-          type: string
+          type:
+            - string
+            - "null"
           description: The 2-digit country code of the physical postal address according
             to ISO 3166-1.
           enum:
@@ -1652,20 +1718,28 @@ components:
             - ZR
             - ZW
         administrativeAreaLevel1:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The 2-digit country subdivision code according to ISO 3166-2,\
             \ such as a region within a country."
         postalCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The alphanumeric identifier (sometimes including spaces or\
             \ punctuation) of the physical postal address for the purpose of sorting\
             \ mail, synonyms:postcode, post code, PIN or ZIP code."
         city:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the city of the physical postal address, synonyms:\
             \ town, village, municipality."
         deliveryServiceType:
-          type: string
+          type:
+            - string
+            - "null"
           description: "One of the alternative postal address types: P.O. box, private\
             \ bag, boite postale."
           enum:
@@ -1673,14 +1747,18 @@ components:
             - PRIVATE_BAG
             - BOITE_POSTALE
         deliveryServiceQualifier:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The qualifier uniquely identifying the delivery service endpoint\
             \ of the alternative postal address in conjunction with the delivery service\
             \ number. In some countries for example, entering a P.O. box number, postal\
             \ code and city is not sufficient to uniquely identify a P.O. box, because\
             \ the same P.O. box number is assigned multiple times in some cities."
         deliveryServiceNumber:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The number indicating the delivery service endpoint of the\
             \ alternative postal address to which the delivery is to be delivered,\
             \ such as a P.O. box number or a private bag number."
@@ -1688,13 +1766,19 @@ components:
       type: object
       properties:
         type:
-          type: string
+          type:
+            - string
+            - "null"
           description: The type of the identifier.
         value:
-          type: string
+          type:
+            - string
+            - "null"
           description: The value of the identifier like “DE123465789.
         issuingBody:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the official register, where the identifier is\
             \ registered. For example, a Handelsregisternummer in Germany is only\
             \ valid with its corresponding Registergericht and Registerart."
@@ -1747,7 +1831,9 @@ components:
           $ref: "#/components/schemas/AddressRepresentationInputDto"
           description: "The address, on which the business partner provides a view. "
         externalSequenceTimestamp:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: The timestamp indicates the last time point of change from
             the user side
@@ -1755,6 +1841,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerScriptVariantDto"
+        additionalSites:
+          type: array
+          description: "The further sites this business partner's address belongs\
+            \ to, next to the site in 'site'. A site is identified by its BPNS or,\
+            \ where that is unknown, by its name, which the golden record process\
+            \ resolves to an existing site or creates a new site for. An address is\
+            \ never taken away from a site it already belongs to, so removing an entry\
+            \ here has no effect."
+          items:
+            $ref: "#/components/schemas/AdditionalSiteInputDto"
         createdAt:
           type: string
           format: date-time
@@ -1822,7 +1918,9 @@ components:
           $ref: "#/components/schemas/AddressRepresentationInputDto"
           description: "The address, on which the business partner provides a view. "
         externalSequenceTimestamp:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: The timestamp indicates the last time point of change from
             the user side
@@ -1830,6 +1928,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerScriptVariantDto"
+        additionalSites:
+          type: array
+          description: "The further sites this business partner's address belongs\
+            \ to, next to the site in 'site'. A site is identified by its BPNS or,\
+            \ where that is unknown, by its name, which the golden record process\
+            \ resolves to an existing site or creates a new site for. An address is\
+            \ never taken away from a site it already belongs to, so removing an entry\
+            \ here has no effect."
+          items:
+            $ref: "#/components/schemas/AdditionalSiteInputDto"
         isOwnCompanyData:
           type: boolean
           description: Indicates whether the sharing member claims (in the initial
@@ -1880,13 +1988,17 @@ components:
           description: "The legal entity, on which the business partner provides a\
             \ view."
         site:
-          $ref: "#/components/schemas/SiteRepresentationOutputDto"
           description: "The site, on which the business partner provides a view."
+          oneOf:
+            - $ref: "#/components/schemas/SiteRepresentationOutputDto"
+            - type: "null"
         address:
           $ref: "#/components/schemas/AddressComponentOutputDto"
           description: "The address, on which the business partner provides a view. "
         externalSequenceTimestamp:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: The timestamp indicates the last time point of change from
             the user side
@@ -1934,15 +2046,21 @@ components:
       type: object
       properties:
         validFrom:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: Date since when the status is/was valid.
         validTo:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: "Date until the status was valid, if applicable."
         type:
-          type: string
+          type:
+            - string
+            - "null"
           description: The type of this specified status.
           enum:
             - ACTIVE
@@ -1972,13 +2090,17 @@ components:
       type: object
       properties:
         timestampAfter:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: Only changelog entries created after this time. Ignored if
             empty.
           example: 2023-03-20T10:23:28.194Z
         externalIds:
-          type: array
+          type:
+            - array
+            - "null"
           description: Only for business partners with the given array of external
             IDs. Ignored if empty.
           items:
@@ -2016,7 +2138,9 @@ components:
           type: string
           description: Error message that explains the error
         entityKey:
-          type: string
+          type:
+            - string
+            - "null"
           description: Key (externalId) of the entity that failed
       title: ErrorInfo
     GateErrorResponse:
@@ -2113,7 +2237,9 @@ components:
           format: double
           description: Latitude coordinate
         altitude:
-          type: number
+          type:
+            - number
+            - "null"
           format: double
           description: "Altitude, if applicable"
     LegalEntityGoldenRecordRelationDto:
@@ -2134,27 +2260,39 @@ components:
       type: object
       properties:
         legalEntityBpn:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The BPNL of the legal entity, on which the business partner\
             \ provides a view."
         legalName:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the legal entity, on which the business partner\
             \ provides a view, according to official registers."
         shortName:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The abbreviated name of the legal entity, on which the business\
             \ partner provides a view."
         legalForm:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The legal form of the legal entity, on which the business\
             \ partner provides a view."
         ownershipUltimate:
-          type: boolean
+          type:
+            - boolean
+            - "null"
           description: Designates whether this legal entity is the ultimate owner
             in an ownership chain.
         ultimateOwnerBpnl:
-          type: string
+          type:
+            - string
+            - "null"
           description: The BPNL of the designated ultimate owner up in the ownership
             chain.
         states:
@@ -2170,25 +2308,35 @@ components:
           description: "The BPNL of the legal entity, on which the business partner\
             \ provides a view."
         legalName:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the legal entity, on which the business partner\
             \ provides a view, according to official registers."
         shortName:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The abbreviated name of the legal entity, on which the business\
             \ partner provides a view."
         legalForm:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The legal form of the legal entity, on which the business\
             \ partner provides a view."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
         ownershipUltimate:
-          type: boolean
+          type:
+            - boolean
+            - "null"
           description: Designates whether this legal entity is the ultimate owner
             in an ownership chain.
         ultimateOwnerBpnl:
-          type: string
+          type:
+            - string
+            - "null"
           description: The BPNL of the designated ultimate owner up in the ownership
             chain.
         states:
@@ -2200,7 +2348,9 @@ components:
           items:
             $ref: "#/components/schemas/LegalEntityGoldenRecordRelationDto"
         updatedAt:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: Timestamp when the associated legal entity golden record was
             last updated
@@ -2210,9 +2360,13 @@ components:
       type: object
       properties:
         legalName:
-          type: string
+          type:
+            - string
+            - "null"
         shortName:
-          type: string
+          type:
+            - string
+            - "null"
     PageChangeLogDtoChangelogGateDto:
       type: object
       description: Paginated collection of results
@@ -2426,35 +2580,45 @@ components:
     PhysicalAddressScriptVariantDto:
       type: object
       properties:
-        postalCode:
-          type: string
         city:
-          type: string
+          type:
+            - string
+            - "null"
         district:
-          type: string
+          type:
+            - string
+            - "null"
         street:
-          $ref: "#/components/schemas/StreetDto"
-        companyPostalCode:
-          type: string
+          $ref: "#/components/schemas/StreetScriptVariantDto"
         industrialZone:
-          type: string
+          type:
+            - string
+            - "null"
         building:
-          type: string
+          type:
+            - string
+            - "null"
         floor:
-          type: string
+          type:
+            - string
+            - "null"
         door:
-          type: string
-        taxJurisdictionCode:
-          type: string
+          type:
+            - string
+            - "null"
     PhysicalPostalAddressDto:
       type: object
       description: "A physical postal address describes the physical location of an\
         \ office, warehouse, gate, etc."
       properties:
         geographicCoordinates:
-          $ref: "#/components/schemas/GeoCoordinateDto"
+          oneOf:
+            - $ref: "#/components/schemas/GeoCoordinateDto"
+            - type: "null"
         country:
-          type: string
+          type:
+            - string
+            - "null"
           description: The 2-digit country code of the physical postal address according
             to ISO 3166-1.
           enum:
@@ -2731,54 +2895,80 @@ components:
             - ZR
             - ZW
         administrativeAreaLevel1:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The 2-digit country subdivision code according to ISO 3166-2,\
             \ such as a region within a country."
         administrativeAreaLevel2:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the locally regulated secondary country subdivision\
             \ of the physical postal address, such as county within a country."
         administrativeAreaLevel3:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the locally regulated tertiary country subdivision\
             \ of the physical address, such as townships within a country."
         postalCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The alphanumeric identifier (sometimes including spaces or\
             \ punctuation) of the physical postal address for the purpose of sorting\
             \ mail, synonyms:postcode, post code, PIN or ZIP code."
         city:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the city of the physical postal address, synonyms:\
             \ town, village, municipality."
         district:
-          type: string
+          type:
+            - string
+            - "null"
           description: The name of the district of the physical postal address which
             divides the city in several smaller areas.
         street:
-          $ref: "#/components/schemas/StreetDto"
+          oneOf:
+            - $ref: "#/components/schemas/StreetDto"
+            - type: "null"
         companyPostalCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The company postal code of the physical postal address, which\
             \ is sometimes required for large companies."
         industrialZone:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The industrial zone of the physical postal address, designating\
             \ an area for industrial development, synonym: industrial area."
         building:
-          type: string
+          type:
+            - string
+            - "null"
           description: The alphanumeric identifier of the building addressed by the
             physical postal address.
         floor:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The number of a floor in the building addressed by the physical\
             \ postal address, synonym: level."
         door:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The number of a door in the building on the respective floor\
             \ addressed by the physical postal address, synonyms: room, suite."
         taxJurisdictionCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: "Tax jurisdiction codes are used to identify the specific jurisdiction(s)\
             \ that a company belong to, particularly in bureaucratic processes such\
             \ as tax returns and IRS forms."
@@ -2818,7 +3008,9 @@ components:
           items:
             $ref: "#/components/schemas/RelationValidityPeriodDto"
         reasonCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: The technical key of the reason code describing why the relation
             was established. The list of reason codes is available from the golden
             record Pool.
@@ -2859,7 +3051,9 @@ components:
           items:
             $ref: "#/components/schemas/RelationValidityPeriodDto"
         reasonCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: The technical key of the reason code describing why the relation
             was established. The list of reason codes is available from the golden
             record Pool.
@@ -2873,33 +3067,45 @@ components:
         output relations
       properties:
         externalIds:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             type: string
         relationType:
-          type: string
+          type:
+            - string
+            - "null"
           enum:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
             - IsReplacedBy
         sourceBpns:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             type: string
         targetBpns:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             type: string
         updatedAtFrom:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
     RelationPostRequest:
       type: object
       description: A request to create a new relation between two business partners
       properties:
         externalId:
-          type: string
+          type:
+            - string
+            - "null"
         relationType:
           type: string
           enum:
@@ -2929,7 +3135,9 @@ components:
         businessPartnerTargetExternalId:
           type: string
         reasonCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: The technical key of the reason code describing why the relation
             was established. The list of reason codes is available from the golden
             record Pool.
@@ -2979,26 +3187,36 @@ components:
         relations
       properties:
         externalIds:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             type: string
         relationType:
-          type: string
+          type:
+            - string
+            - "null"
           enum:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
             - IsReplacedBy
         businessPartnerSourceExternalIds:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             type: string
         businessPartnerTargetExternalIds:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             type: string
         updatedAtFrom:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
     RelationSharingStateDto:
       type: object
@@ -3016,7 +3234,9 @@ components:
             - Error
             - Success
         sharingErrorCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: "One of the sharing error codes in case the current sharing\
             \ state type is \"error\". \n* `SharingProcessError`: A general error\
             \ occurred during the sharing process.\n* `SharingTimeout`: The processing\
@@ -3025,11 +3245,15 @@ components:
             - SharingProcessError
             - SharingTimeout
         sharingErrorMessage:
-          type: string
+          type:
+            - string
+            - "null"
           description: The error message in case the current sharing state type is
             "error".
         taskId:
-          type: string
+          type:
+            - string
+            - "null"
           description: When the sharing state last changed.
         updatedAt:
           type: string
@@ -3066,7 +3290,9 @@ components:
           type: string
           format: date
         validTo:
-          type: string
+          type:
+            - string
+            - "null"
           format: date
     SharingStateDto:
       type: object
@@ -3087,7 +3313,9 @@ components:
             - Initial
             - Ready
         sharingErrorCode:
-          type: string
+          type:
+            - string
+            - "null"
           description: "One of the sharing error codes in case the current sharing\
             \ state type is \"error\". \n* `NaturalPersonError`: The provided record\
             \ contains natural person information.\n* `BpnErrorNotFound`: The provided\
@@ -3110,29 +3338,50 @@ components:
             - BlacklistCountryPresent
             - UnknownSpecialCharacters
         sharingErrorMessage:
-          type: string
+          type:
+            - string
+            - "null"
           description: The error message in case the current sharing state type is
             "error".
         sharingProcessStarted:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: The date and time when the sharing process was started.
         taskId:
-          type: string
+          type:
+            - string
+            - "null"
           description: The orchestrator task identifier that was created
         updatedAt:
           type: string
           format: date-time
           description: The time when the sharing state has been last updated
+    SiteGoldenRecordRelationDto:
+      type: object
+      properties:
+        relationType:
+          type: string
+          enum:
+            - IsReplacedBy
+        sourceBpn:
+          type: string
+        targetBpn:
+          type: string
     SiteRepresentationInputDto:
       type: object
       properties:
         siteBpn:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The BPNS of the site, on which the business partner provides\
             \ a view."
         name:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the site, on which the business partner provides\
             \ a view. This is not according to official registers but according to\
             \ the name the owner chooses."
@@ -3149,7 +3398,9 @@ components:
           description: "The BPNS of the site, on which the business partner provides\
             \ a view."
         name:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The name of the site, on which the business partner provides\
             \ a view. This is not according to official registers but according to\
             \ the name the owner chooses."
@@ -3159,15 +3410,23 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
+        goldenRecordRelations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteGoldenRecordRelationDto"
         updatedAt:
-          type: string
+          type:
+            - string
+            - "null"
           format: date-time
           description: Timestamp when the associated site golden record was last updated
     SiteScriptVariantDto:
       type: object
       properties:
         name:
-          type: string
+          type:
+            - string
+            - "null"
     StatsAddressTypesResponse:
       type: object
       properties:
@@ -3234,52 +3493,81 @@ components:
         \ lane, boulevard, highway"
       properties:
         namePrefix:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The street related information, which is usually printed before\
             \ the official street name on an address label."
         additionalNamePrefix:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The additional street related information, which is usually\
             \ printed before the official street name on an address label."
         name:
-          type: string
+          type:
+            - string
+            - "null"
           description: The name of the street.
         nameSuffix:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The street related information, which is usually printed after\
             \ the official street name on an address label."
         additionalNameSuffix:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The additional street related information, which is usually\
             \ printed after the official street name on an address label."
         houseNumber:
-          type: string
+          type:
+            - string
+            - "null"
           description: The number representing the exact location of a building within
             the street.
         houseNumberSupplement:
-          type: string
+          type:
+            - string
+            - "null"
         milestone:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The number representing the exact location of an addressed\
             \ object within a street without house numbers, such as within long roads."
         direction:
-          type: string
+          type:
+            - string
+            - "null"
           description: "The cardinal direction describing where the exit to the location\
             \ of the addressed object on large highways / motorways is located, such\
             \ as Highway 101 South."
-  securitySchemes:
-    open_id_scheme:
-      type: oauth2
-      flows:
-        clientCredentials:
-          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
-          scopes: {}
-        authorizationCode:
-          authorizationUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/auth
-          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
-          refreshUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
-          scopes: {}
-    bearer_scheme:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    StreetScriptVariantDto:
+      type: object
+      properties:
+        name:
+          type:
+            - string
+            - "null"
+        direction:
+          type:
+            - string
+            - "null"
+        namePrefix:
+          type:
+            - string
+            - "null"
+        additionalNamePrefix:
+          type:
+            - string
+            - "null"
+        nameSuffix:
+          type:
+            - string
+            - "null"
+        additionalNameSuffix:
+          type:
+            - string
+            - "null"

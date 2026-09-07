@@ -131,14 +131,13 @@ class TaskRelationsBatchResolutionService(
     }
 
     fun deleteResolved(){
-        var tasksDeleted = 0
-        do{
-            val task = goldenRecordTaskRepository.findFirstByIsResolved(true)?.let { task ->
+        // Each query re-asks what is left to delete, so a query has to see the preceding delete: keep this lazy.
+        val tasksDeleted = generateSequence { goldenRecordTaskRepository.findFirstByIsResolved(true) }
+            .onEach { task ->
                 goldenRecordTaskRepository.delete(task)
                 entityManager.clear()
-                tasksDeleted++
             }
-        }while (task != null)
+            .count()
 
         if (tasksDeleted > 0)
             logger.info { "Deleted $tasksDeleted resolved relation tasks" }

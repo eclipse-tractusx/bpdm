@@ -87,12 +87,16 @@ class SiteCreateWithReferencedAddressAsMainService(
         return sites
     }
 
+    // Creating a site says nothing about the address's other memberships, so the new sites are stated on top of the
+    // ones the address already has rather than in place of them — the update vocabulary replaces what it is given.
     private fun mainAddressUpdate(ofOneAddress: List<Pair<SiteCreateWithReferencedAddressAsMainParsed, SiteDb>>): AddressContentUpdate {
-        val sites = ofOneAddress.map { (_, site) -> site }
+        val mainAddress = ofOneAddress.first().first.mainAddress
+        val newSites = ofOneAddress.map { (_, site) -> site }
+        val sites = FieldUpdate.Set(mainAddress.sites.toList() + newSites)
         val statedContent = ofOneAddress.mapNotNull { (entry, _) -> entry.mainAddressContent }.singleOrNull()
 
         return statedContent
-            ?.let { addressUpdateMapper.toFullUpdate(it, assignToSites = sites) }
-            ?: AddressContentUpdate.NoOp.copy(assignToSites = FieldUpdate.Set(sites))
+            ?.let { addressUpdateMapper.toFullUpdate(it, sites) }
+            ?: AddressContentUpdate.NoOp.copy(sites = sites)
     }
 }

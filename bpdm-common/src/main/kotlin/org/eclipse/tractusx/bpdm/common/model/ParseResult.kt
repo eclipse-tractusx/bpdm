@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.common.model
 
 /**
  * Per-entry outcome of parsing a single request into [T] or a list of errors [E].

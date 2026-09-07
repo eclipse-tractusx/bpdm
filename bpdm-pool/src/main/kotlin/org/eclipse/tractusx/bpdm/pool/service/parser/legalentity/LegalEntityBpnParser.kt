@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service

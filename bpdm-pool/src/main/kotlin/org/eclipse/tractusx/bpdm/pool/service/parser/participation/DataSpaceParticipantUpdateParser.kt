@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.participation
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.error.DataSpaceParticipantUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.DataSpaceParticipantUpdateParseError.DuplicateParticipantEntry
 import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantUpdateParsed

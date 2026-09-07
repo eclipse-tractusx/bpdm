@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
@@ -43,42 +42,10 @@ class GoldenRecordTaskService(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
     private val responseMapper: ResponseMapper,
-    private val taskRepository: GoldenRecordTaskRepository,
-    private val sharingMemberRecordService: SharingMemberRecordService
+    private val taskRepository: GoldenRecordTaskRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
-        logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
-
-        createRequest.requests.forEach { assertAdditionalSitesHaveSite(it.businessPartner) }
-
-        val gateRecords = sharingMemberRecordService.getOrCreateGateRecords(createRequest.requests)
-        abortOutdatedTasks(gateRecords.toSet())
-
-        val createdTasks = createRequest.requests.zip(gateRecords)
-            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
-
-        if (createdTasks.isNotEmpty())
-            logger.info { "Created ${createdTasks.size} golden record tasks in mode ${createRequest.mode}: ${createdTasks.toLogIdentifiers()}" }
-
-        return createdTasks
-            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateResponse(createdTasks = it) }
-    }
-
-    /**
-     * Rejects business partner data that states further sites of its address without stating a site of its own, which
-     * those sites would be additional to.
-     */
-    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
-        if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null)
-            throw BpdmInvalidBusinessPartnerException(
-                "additional sites of its address are stated but no site of its own is, which they would be additional to"
-            )
-    }
 
     fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
         logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
@@ -236,12 +203,13 @@ class GoldenRecordTaskService(
             throw BpdmTaskNotFoundException(uuidString)
         }
 
-    private fun abortOutdatedTasks(records: Set<SharingMemberRecordDb>){
-        val abortedTasks = taskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, GoldenRecordTaskDb.ResultState.Pending)
-            .map { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
-
-        if (abortedTasks.isNotEmpty())
-            logger.info { "Aborted ${abortedTasks.size} outdated golden record tasks: ${abortedTasks.toLogIdentifiers()}" }
+    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
+        val hasSite = businessPartner.site?.bpnReference?.referenceValue != null || businessPartner.site?.siteName != null
+        if (businessPartner.additionalSites.isNotEmpty() && !hasSite) {
+            throw BpdmInvalidBusinessPartnerException(
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
+        }
     }
 }
 

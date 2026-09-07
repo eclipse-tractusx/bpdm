@@ -12,6 +12,8 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- The end-to-end test hook now reaches a Gate the way a sharing member does, with one client per role (`BPDM_GATE_INPUT_MANAGER` to share input data, `BPDM_GATE_OUTPUT_CONSUMER` to read the golden record output) instead of the `BPDM_ADMIN` client. Pool and Orchestrator keep that admin client, which writes Pool metadata and takes the refinement service's part.
+
 ## [7.0.0] - 2026-06-10
 
 ### Added

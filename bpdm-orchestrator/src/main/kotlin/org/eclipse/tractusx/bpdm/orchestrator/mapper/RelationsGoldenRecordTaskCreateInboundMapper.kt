@@ -17,12 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.orchestrator.mapper
 
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskCreateRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequestEntry
+import org.springframework.stereotype.Component
 
-data class AddressSiteAssignmentParsed(
-    val address: LogisticAddressDb,
-    val site: SiteDb
-)
+@Component
+class RelationsGoldenRecordTaskCreateInboundMapper(
+    private val businessPartnerRelationsRequestMapper: BusinessPartnerRelationsRequestMapper
+) {
+
+    fun toRequest(entry: TaskCreateRelationsRequestEntry): RelationsGoldenRecordTaskCreateRequest =
+        RelationsGoldenRecordTaskCreateRequest(
+            recordId = entry.recordId,
+            businessPartnerRelations = businessPartnerRelationsRequestMapper.toBusinessPartnerRelationsRequest(entry.businessPartnerRelations)
+        )
+}

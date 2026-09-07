@@ -126,4 +126,37 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
     }
+
+    /**
+     * GIVEN sharing member records whose update order differs from their creation order
+     * WHEN user searches for records
+     * THEN user sees the records oldest update first
+     */
+    @Test
+    fun `search sharing member records ordered by oldest update first`(){
+        //GIVEN
+        val createdTask1 = testDataClient.createBusinessPartnerTask("$testName 1")
+        val createdTask2 = testDataClient.createBusinessPartnerTask("$testName 2")
+        val createdTask3 = testDataClient.createBusinessPartnerTask("$testName 3")
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask2.recordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask1.recordId, true))
+
+        //WHEN
+        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(beforeTestingTime), PaginationRequest())
+
+        //THEN
+        //Get sharing member record IDs for golden record process services
+        val sharingMemberRecordIdsByTaskId = testDataClient.reserveBusinessPartnerTasks(createdTask1.processingState.step)
+            .reservedTasks.associate { it.taskId to it.recordId }
+        val expectedResult = PageDto(
+            3, 1, 0, 3,
+            listOf(
+                SharingMemberRecord(sharingMemberRecordIdsByTaskId[createdTask3.taskId]!!, null, Instant.now(), Instant.now()),
+                SharingMemberRecord(sharingMemberRecordIdsByTaskId[createdTask2.taskId]!!, true, Instant.now(), Instant.now()),
+                SharingMemberRecord(sharingMemberRecordIdsByTaskId[createdTask1.taskId]!!, true, Instant.now(), Instant.now())
+            )
+        )
+
+        assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
+    }
 }

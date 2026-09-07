@@ -19,15 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser

@@ -4601,11 +4601,14 @@ stringData:
       security:
         auth-server-url: {{ $keycloakUrl | quote }}
 ---
-# Keycloak config for the system-tester `helm test` hook. Unlike the per-service configs above, the
-# tester acts as a privileged client against all three APIs: it uses the BPDM_ADMIN client (whose
-# service account holds the `admin` role on BPDM_GATE, BPDM_POOL and BPDM_ORCHESTRATOR in this realm)
-# for every outbound connection, so the end-to-end scenarios can both write and read across Gate,
-# Pool and Orchestrator. Base-urls come from the shared client-url-config Secret.
+# Keycloak config for the system-tester `helm test` hook. Base-urls come from the shared
+# client-url-config Secret.
+#
+# Against Pool and Orchestrator the tester acts as the operator: the BPDM_ADMIN client, whose service
+# account holds the `admin` role on both, writes Pool metadata and takes the refinement service's part
+# in the golden record process. A Gate it addresses as a sharing member would, one client per role -
+# an input manager to share data and drive the process, an output consumer to read the golden record
+# output - which is how the Portal issues a sharing member's technical users.
 apiVersion: v1
 kind: Secret
 metadata:
@@ -4617,12 +4620,18 @@ stringData:
   application.yml: |-
     bpdm:
       client:
-        gate:
+        gate-input:
           provider:
             issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
           registration:
-            client-id: BPDM_ADMIN
-            client-secret: {{ $adminSecret | quote }}
+            client-id: BPDM_GATE_INPUT_MANAGER
+            client-secret: {{ $gateInputManagerSecret | quote }}
+        gate-output:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_GATE_OUTPUT_CONSUMER
+            client-secret: {{ $gateOutputConsumerSecret | quote }}
         pool:
           provider:
             issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}

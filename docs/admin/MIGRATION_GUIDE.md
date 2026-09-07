@@ -4,12 +4,17 @@
 * [Migration Guide](#migration-guide)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
+      * [Required Operator Actions](#required-operator-actions)
+      * [What Happens After Upgrade](#what-happens-after-upgrade)
+      * [Disjoint Periods](#disjoint-periods)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
     * [Script variants removed from the deprecated Pool v6 API](#script-variants-removed-from-the-deprecated-pool-v6-api)
+      * [Impact](#impact)
     * [Script variants are validated like invariant data (Pool)](#script-variants-are-validated-like-invariant-data-pool)
+      * [Impact](#impact-1)
   * [7.3.x to 7.4.x](#73x-to-74x)
     * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
-      * [Impact](#impact)
+      * [Impact](#impact-2)
       * [Rationale](#rationale)
     * [New relation type for addresses](#new-relation-type-for-addresses)
     * [No required operator actions](#no-required-operator-actions)
@@ -287,7 +292,7 @@ logging:
 ### EDC Version 0.11
 
 BPDM 7.1 was tested on and now supports EDC version 0.11.
-The [Postman documentation](../postman) shows how to setup an offer and negotiation between two 0.11 EDCs.
+The [Exposing BPDM Over EDC](README.md#exposing-bpdm-over-edc) section and the consumer side under [Access BPDM over EDC](../api/README.md#access-bpdm-over-edc) show how to setup an offer and negotiation between two 0.11 EDCs.
 The new EDC version now supports two different DCP versions 0.8 and 1.0.
 Creating new offers with the new EDC is not backwards compatible for either DCP usage.
 However, if you have migrated versions with existing offers, they will still be usable.

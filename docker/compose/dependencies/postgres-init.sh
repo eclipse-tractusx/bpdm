@@ -23,3 +23,4 @@ psql -U postgres -c "CREATE USER keycloak" -c "CREATE DATABASE keycloak"  -c "GR
 psql -U postgres -d keycloak -c "GRANT ALL PRIVILEGES ON SCHEMA public TO keycloak"
 
 psql -U postgres -c "CREATE DATABASE bpdm_gate_2" -c "GRANT ALL PRIVILEGES ON DATABASE bpdm_gate_2 TO bpdm"
+psql -U postgres -c "CREATE DATABASE bpdm_gate_3" -c "GRANT ALL PRIVILEGES ON DATABASE bpdm_gate_3 TO bpdm"

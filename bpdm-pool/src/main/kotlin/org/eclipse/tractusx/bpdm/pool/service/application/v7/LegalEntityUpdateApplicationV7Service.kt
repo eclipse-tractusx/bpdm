@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
 import org.springframework.stereotype.Service

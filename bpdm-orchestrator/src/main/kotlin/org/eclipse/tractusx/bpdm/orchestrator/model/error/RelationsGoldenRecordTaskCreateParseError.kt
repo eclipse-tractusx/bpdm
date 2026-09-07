@@ -17,9 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.orchestrator.model.error
 
-data class AddressSiteAssignmentRequest(
-    val addressBpn: String,
-    val siteBpn: String
-)
+sealed class RelationsGoldenRecordTaskCreateParseError {
+    data class RecordIdInvalid(val recordId: String) : RelationsGoldenRecordTaskCreateParseError()
+    data class RecordNotFound(val recordId: String) : RelationsGoldenRecordTaskCreateParseError()
+}

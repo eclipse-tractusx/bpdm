@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
+import org.eclipse.tractusx.bpdm.orchestrator.mapper.BusinessPartnerRelationsRequestMapper
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchRelationsData
@@ -43,6 +44,7 @@ class RelationsGoldenRecordTaskService(
     private val relationsResponseMapper: RelationsResponseMapper,
     private val relationsTaskRepository: RelationsGoldenRecordTaskRepository,
     private val sharingMemberRecordRepository: SharingMemberRecordRepository,
+    private val businessPartnerRelationsRequestMapper: BusinessPartnerRelationsRequestMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -55,7 +57,7 @@ class RelationsGoldenRecordTaskService(
         abortOutdatedTasks(gateRecords.toSet())
 
         val createdTasks = createRequest.requests.zip(gateRecords)
-            .map { (request, record) -> relationsGoldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartnerRelations, record) }
+            .map { (request, record) -> relationsGoldenRecordTaskStateMachine.initTask(createRequest.mode, businessPartnerRelationsRequestMapper.toBusinessPartnerRelationsRequest(request.businessPartnerRelations), record) }
 
         if (createdTasks.isNotEmpty())
             logger.info { "Created ${createdTasks.size} relation golden record tasks in mode ${createRequest.mode}: ${createdTasks.toLogIdentifiers()}" }

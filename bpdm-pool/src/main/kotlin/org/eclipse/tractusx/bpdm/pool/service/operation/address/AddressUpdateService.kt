@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteAssignmentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
@@ -58,18 +58,12 @@ class AddressUpdateService(
         update(listOf(request)).single()
 
     /**
-     * Adds the stated site memberships to their addresses and reports for each address whether it actually changed.
-     * Several memberships of one address are applied as a single write, so that address yields one result rather than
-     * one per membership.
+     * Sets each address's site membership to the stated sites, unlinking the ones it leaves out, and reports for each
+     * address whether it actually changed.
      */
     @Transactional
-    fun assignToSites(assignments: List<AddressSiteAssignmentParsed>): List<UpsertResult<LogisticAddressDb>> =
-        update(assignments.groupBy { it.address.bpn }.map { (_, ofOneAddress) ->
-            AddressUpdate(
-                ofOneAddress.first().address,
-                AddressContentUpdate.NoOp.copy(assignToSites = FieldUpdate.Set(ofOneAddress.map { it.site }))
-            )
-        })
+    fun setSites(memberships: List<AddressSiteMembershipParsed>): List<UpsertResult<LogisticAddressDb>> =
+        update(memberships.map { AddressUpdate(it.address, AddressContentUpdate.NoOp.copy(sites = FieldUpdate.Set(it.sites))) })
 
     /**
      * Applies one change in memory without persisting, so a caller can see whether the address changed — and wire it into
@@ -122,8 +116,7 @@ class AddressUpdateService(
         update.scriptVariants.ifSet {
             if (scriptVariantKeys(addressEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
-        // Site membership is add-only, so assigning a site the address already belongs to changes nothing.
-        update.assignToSites.ifSet { sites -> if (sites.any { site -> target.sites.none { it.bpn == site.bpn } }) return true }
+        update.sites.ifSet { if (siteKeys(it) != siteKeys(target.sites)) return true }
 
         return false
     }
@@ -162,6 +155,9 @@ class AddressUpdateService(
     private fun scriptVariantKeys(variants: Collection<LogisticAddressScriptVariantDb>): Set<Any?> =
         variants.map { listOf(it.scriptCode.technicalKey, it.name, it.physicalAddress, it.alternativeAddress) }.toSet()
 
+    private fun siteKeys(sites: Collection<SiteDb>): Set<Any?> =
+        sites.map { it.bpn }.toSet()
+
     private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
@@ -172,7 +168,6 @@ class AddressUpdateService(
         update.identifiers.ifSet { target.identifiers.replace(addressEntityMapper.toIdentifiers(it).onEach { id -> id.address = target }) }
         update.states.ifSet { target.states.replace(addressEntityMapper.toStates(it).onEach { state -> state.address = target }) }
         update.scriptVariants.ifSet { target.scriptVariants.replace(addressEntityMapper.toScriptVariants(it)) }
-        // Site membership is add-only; assigning is idempotent and never removes.
-        update.assignToSites.ifSet { target.sites.addAll(it) }
+        update.sites.ifSet { target.sites.replace(it) }
     }
 }

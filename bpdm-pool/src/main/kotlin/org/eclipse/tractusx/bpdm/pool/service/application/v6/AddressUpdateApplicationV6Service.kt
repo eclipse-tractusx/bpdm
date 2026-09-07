@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.springframework.stereotype.Service

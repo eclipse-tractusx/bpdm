@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceLevel
 import org.eclipse.tractusx.bpdm.test.system.utils.OutputComponent
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 
 /**
  * Steps for the "Output Reflects Golden Record Confidence Criteria" feature.
@@ -66,11 +67,23 @@ class ConfidenceCriteriaStepDefs(
         shareActions.upload(recordId, isOwnCompanyData = true)
     }
 
+    @When("the {sharingMember} sharing member shares own company record {string}")
+    fun `when member shares own company record`(member: SharingMember, recordId: String) {
+        logger.info { "[$scenarioName] When: the ${member.name.lowercase()} sharing member shares own company record '$recordId'" }
+        shareActions.upload(recordId, isOwnCompanyData = true, member = member)
+    }
+
     @When("the sharing member shares third-party record {string}")
     fun `when shares third-party record`(recordId: String) {
         logger.info { "[$scenarioName] When: the sharing member shares third-party record '$recordId'" }
         // Not own company data, so the OwnerShared signal is off (sharedByOwner = false).
         shareActions.upload(recordId, isOwnCompanyData = false)
+    }
+
+    @When("the {sharingMember} sharing member shares third-party record {string}")
+    fun `when member shares third-party record`(member: SharingMember, recordId: String) {
+        logger.info { "[$scenarioName] When: the ${member.name.lowercase()} sharing member shares third-party record '$recordId'" }
+        shareActions.upload(recordId, isOwnCompanyData = false, member = member)
     }
 
     // -------------------------------------------------------------------------
@@ -151,14 +164,32 @@ class ConfidenceCriteriaStepDefs(
             "VerifiedOwnerShared confidence" -> ConfidenceLevel.VERIFIED_OWNER_SHARED
             else -> error("Unknown confidence level: '$confidenceExpr'")
         }
-        val component = when (componentExpr) {
-            "legal entity"       -> OutputComponent.LEGAL_ENTITY
-            "legal address"      -> OutputComponent.LEGAL_ADDRESS
-            "additional address" -> OutputComponent.ADDITIONAL_ADDRESS
-            "site"               -> OutputComponent.SITE
-            else -> error("Unknown output component: '$componentExpr'")
-        }
         logger.info { "[$scenarioName] Then: '$recordId' output reflects $confidenceExpr for its $componentExpr" }
-        confidenceAssertHelper.assertConfidence(recordId, component, level)
+        confidenceAssertHelper.assertConfidence(recordId, componentOf(componentExpr), level)
+    }
+
+    // The sharing member count is the one confidence criterion the refinement does not state, so its own step
+    // asserts it: the Pool counts the sharing members that share a golden record, independent of any signal a
+    // single record carries.
+    @Then("^\"([^\"]+)\" output reflects a sharing member count of (\\d+) for its (legal entity|legal address|additional address|site)$")
+    fun `then output reflects sharing member count`(recordId: String, expectedCount: Int, componentExpr: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output reflects a sharing member count of $expectedCount for its $componentExpr" }
+        confidenceAssertHelper.assertSharingMemberCount(recordId, componentOf(componentExpr), expectedCount)
+    }
+
+    // The confidence level is derived from the criteria, and the number of sharing members only counts towards
+    // it from a threshold on, so it takes a scenario with enough sharing members to move it at all.
+    @Then("^\"([^\"]+)\" output reflects a confidence level of (\\d+) for its (legal entity|legal address|additional address|site)$")
+    fun `then output reflects confidence level`(recordId: String, expectedLevel: Int, componentExpr: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output reflects a confidence level of $expectedLevel for its $componentExpr" }
+        confidenceAssertHelper.assertConfidenceLevel(recordId, componentOf(componentExpr), expectedLevel)
+    }
+
+    private fun componentOf(componentExpr: String) = when (componentExpr) {
+        "legal entity"       -> OutputComponent.LEGAL_ENTITY
+        "legal address"      -> OutputComponent.LEGAL_ADDRESS
+        "additional address" -> OutputComponent.ADDITIONAL_ADDRESS
+        "site"               -> OutputComponent.SITE
+        else -> error("Unknown output component: '$componentExpr'")
     }
 }

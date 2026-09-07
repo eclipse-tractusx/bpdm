@@ -24,15 +24,15 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import tools.jackson.databind.json.JsonMapper
 
 /**
  * Steps for the "Output Reflects Golden Record Script Variants" feature.
@@ -53,12 +53,12 @@ import tools.jackson.databind.json.JsonMapper
  * addresses get explicit, distinct script codes so the merged output provably contains both.
  */
 class ScriptVariantStepDefs(
-    private val gateClient: GateClient,
+    private val sharingMemberGates: SharingMemberGates,
     private val poolClient: PoolApiClient,
     private val shareActions: BusinessPartnerShareActions,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertRepository: GateAssertRepositoryV7,
-    private val jsonMapper: JsonMapper
+    private val apiCallEvidence: ApiCallEvidence
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -66,6 +66,8 @@ class ScriptVariantStepDefs(
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
     private val scenarioName: String get() = context.scenarioName
 
     // -------------------------------------------------------------------------
@@ -179,7 +181,7 @@ class ScriptVariantStepDefs(
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
-        attachCall("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromLegalEntity(inputResponseOf(recordId), poolLegalEntity))
     }
 
@@ -193,9 +195,9 @@ class ScriptVariantStepDefs(
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
-        attachCall("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(actual.site!!.siteBpn)
-        attachCall("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
+        apiCallEvidence.attach("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromLegalEntityOnSite(inputResponseOf(recordId), poolLegalEntity, poolSite))
     }
 
@@ -209,9 +211,9 @@ class ScriptVariantStepDefs(
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
-        attachCall("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(actual.site!!.siteBpn)
-        attachCall("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
+        apiCallEvidence.attach("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromSite(inputResponseOf(recordId), poolLegalEntity, poolSite))
     }
 
@@ -237,11 +239,11 @@ class ScriptVariantStepDefs(
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
-        attachCall("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(actual.site!!.siteBpn)
-        attachCall("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
+        apiCallEvidence.attach("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
         val poolAddress = poolClient.addresses.getAddress(actual.address.addressBpn)
-        attachCall("GET", "/v7/addresses/${actual.address.addressBpn}", response = poolAddress)
+        apiCallEvidence.attach("GET", "/v7/addresses/${actual.address.addressBpn}", response = poolAddress)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromAdditionalAddressOnSite(inputResponseOf(recordId), poolLegalEntity, poolSite, poolAddress))
     }
 
@@ -257,9 +259,9 @@ class ScriptVariantStepDefs(
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
-        attachCall("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
+        apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
         val poolAddress = poolClient.addresses.getAddress(actual.address.addressBpn)
-        attachCall("GET", "/v7/addresses/${actual.address.addressBpn}", response = poolAddress)
+        apiCallEvidence.attach("GET", "/v7/addresses/${actual.address.addressBpn}", response = poolAddress)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromAdditionalAddressOnLegalEntity(inputResponseOf(recordId), poolLegalEntity, poolAddress))
     }
 
@@ -280,8 +282,8 @@ class ScriptVariantStepDefs(
      */
     private fun assertGateOutputScriptVariants(recordId: String, expected: BusinessPartnerOutputDto): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
         assertRepository.assertBusinessPartnerOutput(
             outputPage,
             PageDto(1, 1, 0, 1, listOf(expected.copy(externalId = runId))),
@@ -300,19 +302,6 @@ class ScriptVariantStepDefs(
             listOf(poolAsOutput),
             listOf(expected),
             assertRepository.outputScriptVariantsComparisonConfig
-        )
-    }
-
-    private fun attachCall(method: String, path: String, request: Any? = null, response: Any? = null) {
-        val content = buildMap {
-            put("uri", "$method $path")
-            if (request != null) put("request", request)
-            if (response != null) put("response", response)
-        }
-        context.scenario.attach(
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
-            "application/json",
-            "$method $path"
         )
     }
 }

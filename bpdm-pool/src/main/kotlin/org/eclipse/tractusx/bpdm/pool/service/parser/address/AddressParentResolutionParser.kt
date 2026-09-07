@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity

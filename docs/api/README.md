@@ -19,6 +19,9 @@
       * [Clean And Sync Step](#clean-and-sync-step)
   * [Use Cases](#use-cases)
     * [Access BPDM over EDC](#access-bpdm-over-edc)
+      * [Negotiating For A Data Offer](#negotiating-for-a-data-offer)
+      * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
+        * [Setting Up An Imported Collection](#setting-up-an-imported-collection)
     * [Sharing Members](#sharing-members)
       * [Sharing Business Partner Data](#sharing-business-partner-data)
       * [Sharing Other Company's Data](#sharing-other-companys-data)
@@ -193,19 +196,110 @@ As a result for this step the golden record process expects the following:
 The main user groups for BPDM are sharing members, golden record processing service providers and VAS providers.
 
 This document contains explanations for different use cases for these user groups.
-The explanations may refer to requests whose examples can be found in this [Postman collection](../postman/EDC%20BPDM%20Consumer.postman_collection.json).
-Please mind that the requests in this Postman collection are not meant to be executed for automated tests but rather serve as documentation.
+The explanations refer to BPDM API endpoints which are described in the Open-API documents of the [Pool API](pool.yaml), [Gate API](gate.yaml) and [Orchestrator API](orchestrator.yaml).
+If you reach those APIs over an EDC, the [Access BPDM over EDC](#access-bpdm-over-edc) section shows how to negotiate for a data offer and how to import an Open-API document so that its requests run against the EDC data plane.
 
 ### Access BPDM over EDC
 
 Some users can not directly access the BPDM API but may only do so over the EDC public API.
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
 has been configured to [provide assets for your company's BPN](../../INSTALL.md).
-In the provided consumer Postman collection you will see an example of how you can negotiate for a BPDM data offer.
 Offers are separated into purposes (defined in the BPDM framework agreement) on why you want to access the BPDM API.
 First, you need to select the offer based on your purpose.
 Afterward you can negotiate for a contract agreement in order to get access to the data.
 The final result of that negotiation will be a transfer token with which you can navigate the BPDM APIs over the BPDM EDC's public API (which acts as a proxy).
+
+The [EDC BPDM Consumer Postman collection](EDC%20BPDM%20Consumer.postman_collection.json) documents that negotiation.
+It is documentation, not an automated test.
+
+#### Negotiating For A Data Offer
+
+Set up a Postman environment with at least the following variables.
+Mind that Postman only exports the shared value of a variable, so credentials you keep local are not part of an exported environment.
+
+| Variable                      | Example                                          |
+|-------------------------------|--------------------------------------------------|
+| `CONSUMER_EDC_MANAGEMENT_API` | `https://your-edc.example.net/management`        |
+| `CONSUMER_EDC_API_KEY`        | the consumer EDC management key                  |
+| `PROVIDER_EDC_DATASPACE_API`  | `https://bpdm-edc.example.net/api/v1/dsp/2025-1` |
+| `PROVIDER_DID`                | the provider's decentralized identifier          |
+| `CONSUMER_BPNL`               | your BPNL                                        |
+
+The `Negotiate for Access` folder is ordered as the flow runs:
+
+1. **Select Asset**: pick the offer for your purpose.
+   Each request stores the asset, the offer and the purpose, and restores any agreement previously negotiated for that asset.
+   Run it whenever you switch assets.
+2. **Negotiate**: run once per asset, ever.
+   `Negotiate Selected Asset` starts the negotiation and `Confirm Agreement` polls until it is finalized, storing the agreement per asset.
+3. **Access**: run whenever a token expires.
+   `Find Transfer Process` locates the transfer belonging to the agreement and `Get Transfer Token` fetches the token.
+   `Start New Transfer` is only needed when the previous transfer is gone.
+
+Because agreements and tokens are stored per asset, you can hold access to several assets at once without negotiating again.
+The token lands in `TRANSFER_TOKEN_<ASSET>` and the address of the EDC data plane in `baseUrl`.
+
+#### Reaching The BPDM APIs With The Transfer Token
+
+The consumer collection deliberately contains no BPDM API requests.
+Instead, each BPDM service publishes an Open-API document per user group which holds only the endpoints that user group may call.
+Importing the group that matches your asset into Postman gives you a collection already scoped to that asset:
+
+| Asset                                   | Service | Access group document               |
+|-----------------------------------------|---------|-------------------------------------|
+| `ReadAccessPoolForDataSpaceParticipant` | Pool    | `/docs/api-docs/v7-participant`     |
+| `FullAccessGateInputForSharingMember`   | Gate    | `/docs/api-docs/v7-input-manager`   |
+| `ReadAccessGateInputForSharingMember`   | Gate    | `/docs/api-docs/v7-input-consumer`  |
+| `ReadAccessGateOutputForSharingMember`  | Gate    | `/docs/api-docs/v7-output-consumer` |
+
+The same groups appear in the Swagger-UI dropdown of a running application, which is the quickest way to see what an asset exposes without importing anything.
+An endpoint belongs to a group exactly when the permission it requires is one of the group's permissions, so these documents describe what the application actually enforces.
+
+##### Setting Up An Imported Collection
+
+None of this is guessable from the import dialog, and skipping any one step produces a failure that points somewhere else.
+Work through it once per access group.
+
+**1. Select the environment you negotiated with.**
+The imported collection is a collection of its own and cannot read the consumer collection's collection variables.
+`Get Transfer Token` therefore publishes the three values that have to cross that boundary — `baseUrl`, `TRANSFER_TOKEN` and `TRANSFER_TOKEN_<ASSET>` — as *environment* variables, and refuses to run with no environment selected.
+Both collections read them from that one environment.
+The tokens are written as current values, so they stay local and do not reach the checked-in environment file when you export it.
+
+**2. Import the access group document** from the table above, for example `https://<host>/pool/docs/api-docs/v7-participant`, with *Import → Link* (or save it to a file and import that).
+Postman creates a collection whose requests are exactly the endpoints that asset may call.
+
+**3. Set the collection's authorization**, on the collection itself — not on a request:
+
+| Field | Value |
+|-------|-------|
+| Type | **API Key** |
+| Key | `Authorization` |
+| Value | `{{TRANSFER_TOKEN_<ASSET>}}`, e.g. `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}` |
+| Add to | **Header** |
+
+Three things go wrong here in particular:
+
+- **Name the asset's own token variable, not the generic `TRANSFER_TOKEN`.** The generic one holds whichever asset was selected last, so a Pool request sent with a Gate token reaches the Gate backend and the data plane answers `Failed to read data from source: NOT_FOUND` — an error that names no URL and looks like a wrong path.
+- **Use API Key, not Bearer Token.** Bearer Token prepends `Bearer ` to a value that already carries whatever scheme the connector issued.
+- **Leave each request at *Inherit auth from parent*.** A collection imported from an OpenAPI document carries that document's security scheme per request, and request-level auth wins over collection-level, so the collection setting is silently ignored until you clear it.
+
+Do not send a Keycloak token here at all; the data plane injects the backend credentials itself.
+
+**4. Remove the leading `/v7` from the path of each request.**
+An asset points at the API's `/v7` path already and the data plane appends the path it is called with, so a request left as imported arrives as `/v7/v7/...`.
+Which version an offer serves is fixed by the asset, not by the path you send.
+
+`baseUrl` needs no editing: Postman resolves an environment variable ahead of a collection variable of the same name, so the environment's `baseUrl` overrides the one the import took from the document's server URL.
+
+The imported requests then run against the data plane exactly as they would run against the API directly.
+Mind that Postman fills required parameters with generated placeholder values on import, so query parameters and request bodies still need real values.
+
+| The data plane answers | Most likely |
+|------------------------|-------------|
+| `401` | The request carried no `Authorization` header at all. |
+| `Failed to read data from source: NOT_FOUND` | The token belongs to another asset, or the path still carries its leading `/v7`. The backend URL the data plane built is in its own log. |
+| `403` | The transfer token expired, or the offer's access policy does not name your BPNL, or the endpoint needs a permission the asset's technical user does not hold. A data plane answers every token it will not accept the same way, so try `Get Transfer Token` first - it requests with `auto_refresh=true` and republishes a fresh one without renegotiating - and read the body for the reason when a fresh token is refused too. |
 
 ### Sharing Members
 
