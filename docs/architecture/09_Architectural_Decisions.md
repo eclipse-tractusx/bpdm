@@ -1,17 +1,20 @@
 # Architecture Decisions
 
 
-1. [Use a multi gate deployment approach to realize multi-tenancy](#use-a-multi-gate-deployment-approach-to-realize-multi-tenancy)
-2. [EDC is not a mandatory, but recommended component for accessing BPDM Pool API/Data](#edc-is-not-a-mandatory-but-recommended-component-for-accessing-bpdm-pool-apidata)
-3. [Using an API based service component approach for orchestration logic instead of a message bus approach](#using-an-api-based-service-component-approach-for-orchestration-logic-instead-of-a-message-bus-approach)
-4. [Limitations of OpenAPI text descriptions](#limitations-of-openapi-text-descriptions)
-5. [Recommended usage scenarios of an EDC enabled communication in Business Partner Data Management Solution](#recommended-usage-scenarios-of-an-edc-enabled-communication-in-business-partner-data-management-solution)
+1. [Use a multi gate deployment approach to realize multi-tenancy](#use-a-multi-gate-deployment-approach-to-realize-multi-tenancy) (superseded)
+2. [Realize multi-tenancy within one Gate deployment](#realize-multi-tenancy-within-one-gate-deployment)
+3. [EDC is not a mandatory, but recommended component for accessing BPDM Pool API/Data](#edc-is-not-a-mandatory-but-recommended-component-for-accessing-bpdm-pool-apidata)
+4. [Using an API based service component approach for orchestration logic instead of a message bus approach](#using-an-api-based-service-component-approach-for-orchestration-logic-instead-of-a-message-bus-approach)
+5. [Limitations of OpenAPI text descriptions](#limitations-of-openapi-text-descriptions)
+6. [Recommended usage scenarios of an EDC enabled communication in Business Partner Data Management Solution](#recommended-usage-scenarios-of-an-edc-enabled-communication-in-business-partner-data-management-solution)
 
 ## ~~Use a multi gate deployment approach to realize multi-tenancy~~
 
-> **Disclaimer:** This decision has been overturned as deploying one gate per tenant is not feasible with thousands of tenants
+> **Disclaimer:** This decision has been overturned as deploying one gate per tenant is not feasible with thousands of tenants.
+> It is superseded by [Realize multi-tenancy within one Gate deployment](#realize-multi-tenancy-within-one-gate-deployment).
+> The record is kept for the reasoning it documents; it does not describe the implementation.
 
-* status: accepted
+* status: superseded
 * date: 2023-06-01
 * deciders: devs, architects
 * consulted: ea, pca
@@ -76,6 +79,35 @@ Chosen option: "Use multiple Gates so that every member will have its own Gate w
 * Good, because better failure tolerance.
 * Good, because flexibility in upcoming requirements.
 * Bad, because we need a separate deployment and configuration for a new Gate when a new CX Member wants to use BPDM Service. As reference implementation this is fine, for production Usecases these deployments can be automated.
+
+## Realize multi-tenancy within one Gate deployment
+
+* status: accepted
+* date: 2024-03-19
+* deciders: devs, architects
+
+### Context and Problem Statement
+
+Multi-tenancy was originally realized by deploying one Gate per sharing member. With thousands of
+potential sharing members in the network, one deployment and one database per tenant is not
+operable, so the Gate has to be able to serve several sharing members at once - while still
+guaranteeing that a sharing member never sees another one's data.
+
+### Decision Outcome
+
+Chosen option: multi-tenancy inside the Gate. Every business partner record, relation, sharing state
+and changelog entry carries the BPNL of the tenant it belongs to, and the Gate derives that BPNL
+from the token of the caller rather than from a request parameter. Uniqueness of an external id is
+enforced per tenant.
+
+#### Consequences
+
+* Good, because a new sharing member needs no new deployment, database or EDC asset configuration.
+* Good, because one Gate can be operated and upgraded for all sharing members.
+* Bad, because data separation is now a property of the code rather than of the deployment, and
+  every query has to be written against the tenant of the caller. This is a permanent test concern.
+* Neutral, because an operator may still run a Gate per sharing member, for instance to separate
+  the databases or to place a Gate in a particular region. Nothing in the implementation prevents it.
 
 ## EDC is not a mandatory, but recommended component for accessing BPDM Pool API/Data
 

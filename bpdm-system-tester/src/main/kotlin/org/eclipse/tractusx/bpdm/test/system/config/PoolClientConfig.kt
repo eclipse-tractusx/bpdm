@@ -19,9 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.test.system.config
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
+import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
+import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcClientProperties
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -32,16 +33,20 @@ import org.springframework.http.client.reactive.ClientHttpConnector
 
 
 @ConfigurationProperties(prefix = PoolClientConfigurationProperties.PREFIX)
-data class PoolClientConfigurationProperties(
+class PoolClientConfigurationProperties(
     override val baseUrl: String = "http://localhost:8080",
-    val searchChangelogPageSize: Int = 100,
-    override val securityEnabled: Boolean = false,
+    securityEnabled: Boolean = false,
     override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
-) : BpdmClientProperties {
+    override val provider: OAuth2ClientProperties.Provider,
+    override val edc: EdcClientProperties = EdcClientProperties()
+) : EdcCapableClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.pool"
     }
+
+    // The data plane holds the credentials of a client that goes over the EDC, so it has none of its own to
+    // be registered with. Deriving this rather than configuring it twice keeps the two from being set at once.
+    override val securityEnabled = securityEnabled && !edc.enabled
 
     override fun getId() = PREFIX
 }

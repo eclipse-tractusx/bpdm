@@ -22,16 +22,22 @@ package org.eclipse.tractusx.bpdm.test.system.config
 import com.nimbusds.jwt.JWTParser
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
+import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.endpoint.RestClientClientCredentialsTokenResponseClient
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
+/** The Gate credentials of every sharing member this run acts for. */
+class SharingMemberCredentialSet(
+    credentials: List<SharingMemberCredentials>
+) : List<SharingMemberCredentials> by credentials
+
 /** The two Gate credentials this run acts as one sharing member with. */
 data class SharingMemberCredentials(
     val member: SharingMember,
-    val input: BpdmClientProperties,
-    val output: BpdmClientProperties
+    val input: EdcCapableClientProperties,
+    val output: EdcCapableClientProperties
 )
 
 /**
@@ -45,7 +51,7 @@ data class SharingMemberCredentials(
  * and reports the credentials it could not compare.
  */
 class GateCredentialCompanyCheck(
-    private val credentials: List<SharingMemberCredentials>,
+    private val credentials: SharingMemberCredentialSet,
     private val clientRegistrations: ClientRegistrationRepository?
 ) {
 
@@ -65,40 +71,67 @@ class GateCredentialCompanyCheck(
 
     private fun companyOf(credentials: SharingMemberCredentials): String? {
         val memberName = credentials.member.name.lowercase()
-        val inputClientId = credentials.input.registration.clientId
-        val outputClientId = credentials.output.registration.clientId
+        val input = describe(credentials.input)
+        val output = describe(credentials.output)
 
-        if (clientRegistrations == null || !credentials.input.securityEnabled || !credentials.output.securityEnabled) {
-            logger.info { "Not verifying the company of the $memberName sharing member: its Gate clients are not both secured." }
+        if (!canDecide(credentials.input) || !canDecide(credentials.output)) {
+            logger.info {
+                "Not verifying the company of the $memberName sharing member: its Gate clients neither go over an" +
+                        " EDC nor are both secured."
+            }
             return null
         }
 
-        if (inputClientId == outputClientId && credentials.input.provider.issuerUri == credentials.output.provider.issuerUri) {
-            logger.info { "Gate client '$inputClientId' serves both the input and the output role of the $memberName sharing member." }
-            return companyInTokenOf(credentials.input)
+        if (servedByOneCredential(credentials)) {
+            logger.info { "Gate $input serves both the input and the output role of the $memberName sharing member." }
+            return companyOf(credentials.input)
         }
 
-        val inputCompany = companyInTokenOf(credentials.input)
-        val outputCompany = companyInTokenOf(credentials.output)
+        val inputCompany = companyOf(credentials.input)
+        val outputCompany = companyOf(credentials.output)
         if (inputCompany == null || outputCompany == null) {
             logger.warn {
-                "Cannot verify that the Gate clients '$inputClientId' (input) and '$outputClientId' (output) of the" +
-                        " $memberName sharing member act for the same company: no '$COMPANY_CLAIM' claim in the token" +
-                        " of at least one of them."
+                "Cannot verify that the Gate credentials $input (input) and $output (output) of the $memberName" +
+                        " sharing member act for the same company: at least one of them names none."
             }
             return null
         }
 
         check(inputCompany == outputCompany) {
-            "The Gate clients of the $memberName sharing member act for different companies: '$inputClientId' (input)" +
-                    " for $inputCompany, '$outputClientId' (output) for $outputCompany. The Gate answers a read with the" +
+            "The Gate credentials of the $memberName sharing member act for different companies: $input (input)" +
+                    " for $inputCompany, $output (output) for $outputCompany. The Gate answers a read with the" +
                     " data of the company in the token, so the output would stay empty for everything this run shares." +
-                    " Configure both clients from one company."
+                    " Configure both credentials from one company."
         }
 
-        logger.info { "Gate clients '$inputClientId' (input) and '$outputClientId' (output) act as $inputCompany, the $memberName sharing member." }
+        logger.info { "Gate credentials $input (input) and $output (output) act as $inputCompany, the $memberName sharing member." }
         return inputCompany
     }
+
+    /**
+     * Returns the company a credential acts for, or null where it cannot be decided.
+     *
+     * A credential that reaches the Gate over the EDC holds no token to read: its company is the one it
+     * negotiates as, which is also the BPNL the offer's access policy matches on.
+     */
+    private fun companyOf(credential: EdcCapableClientProperties): String? = when {
+        credential.edc.enabled -> credential.edc.consumer.consumerBpnl
+        clientRegistrations == null || !credential.securityEnabled -> null
+        else -> companyInTokenOf(credential)
+    }
+
+    private fun canDecide(credential: EdcCapableClientProperties) =
+        credential.edc.enabled || (clientRegistrations != null && credential.securityEnabled)
+
+    private fun servedByOneCredential(credentials: SharingMemberCredentials) = when {
+        credentials.input.edc.enabled || credentials.output.edc.enabled -> credentials.input.edc == credentials.output.edc
+        else -> credentials.input.registration.clientId == credentials.output.registration.clientId &&
+                credentials.input.provider.issuerUri == credentials.output.provider.issuerUri
+    }
+
+    private fun describe(credential: EdcCapableClientProperties) =
+        if (credential.edc.enabled) "offer '${credential.edc.asset.subject}' of ${credential.edc.consumer.consumerBpnl}"
+        else "client '${credential.registration.clientId}'"
 
     private fun verifyMembersDiffer(companies: List<Pair<SharingMember, String>>) {
         val membersByCompany = companies.groupBy({ it.second }, { it.first })

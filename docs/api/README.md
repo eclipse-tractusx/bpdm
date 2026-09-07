@@ -4,32 +4,14 @@
 * [API Documentation](#api-documentation)
   * [BPDM APIs](#bpdm-apis)
     * [Pool API](#pool-api)
-      * [Authorization](#authorization)
     * [Gate API](#gate-api)
-      * [Business Partner](#business-partner)
-      * [Address Type](#address-type)
-      * [Stages](#stages)
-      * [Sharing State](#sharing-state)
-      * [Changelog](#changelog)
       * [Additional information](#additional-information)
-      * [Authorization](#authorization-1)
     * [Orchestrator API](#orchestrator-api)
-      * [Tasks](#tasks)
-      * [Processing Steps](#processing-steps)
-      * [Clean And Sync Step](#clean-and-sync-step)
-  * [Use Cases](#use-cases)
-    * [Access BPDM over EDC](#access-bpdm-over-edc)
-      * [Negotiating For A Data Offer](#negotiating-for-a-data-offer)
-      * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
-    * [Sharing Members](#sharing-members)
-      * [Sharing Business Partner Data](#sharing-business-partner-data)
-      * [Sharing Other Company's Data](#sharing-other-companys-data)
-      * [Sharing Own Company Data](#sharing-own-company-data)
-      * [Headquarter Relocation With No Leftover](#headquarter-relocation-with-no-leftover)
-    * [VAS Providers](#vas-providers)
-    * [Golden Record Processing Service Providers](#golden-record-processing-service-providers)
-      * [Outdated Tasks](#outdated-tasks)
-      * [Mapping of Gate Business Partner To Golden Record Tasks](#mapping-of-gate-business-partner-to-golden-record-tasks)
+    * [Authorization](#authorization)
+  * [Access BPDM over EDC](#access-bpdm-over-edc)
+    * [Negotiating For A Data Offer](#negotiating-for-a-data-offer)
+    * [Reaching The BPDM APIs With The Transfer Token](#reaching-the-bpdm-apis-with-the-transfer-token)
+      * [Setting Up An Imported Collection](#setting-up-an-imported-collection)
   * [NOTICE](#notice)
 <!-- TOC -->
 
@@ -42,163 +24,58 @@ This section details concepts for the BPDM APIs.
 ### Pool API
 
 With the [Pool API](pool.yaml) you can query golden record and available metadata information like legal forms and identifier types.
-Value added services who operate on golden record data mainly use this API.
-However, this API may also be interesting to sharing members who want to see which metadata information the golden record process provider supports.
+Dataspace participants use it to resolve the BPNs they receive, and it is also of interest to sharing members who want to see which metadata information the golden record process provider supports.
 Have a look at the corresponding [BPDM Pool API standard](https://catenax-ev.github.io/docs/standards/CX-0012-BusinessPartnerDataPoolAPI) for more information.
 
-#### Authorization
-
-The BPDM Pool API recognizes two user groups:
-
-1. Dataspace Participants who can read golden records that belong to dataspace participants and the metadata.
-2. Admins who have full read and write access to the golden record and metadata.
-
-Permissions:
-
-| Resource                             | Dataspace Participant | Admin |
-|--------------------------------------|-----------------------|-------|
-| Dataspace Participant Golden Records | R                     | R & W |
-| Dataspace Participant Changelog      | R                     | R     |
-| Metadata                             | R                     | R & W |
-| Golden Records                       | -                     | R & W |
+The golden record levels, the metadata lists and what a dataspace participant may read of them are
+explained from a dataspace participant's perspective in the
+[Dataspace Participant Guide](dataspace-participant-guide.md).
 
 ### Gate API
 
 With the [Gate API](gate.yaml) you can share business partner data with the golden record process and query the results.
-This API is important for sharing members and value added services who offer extended functionality for sharing members.
+This API is important for sharing members.
 More general information can be obtained from the [BPDM Gate standard](https://catenax-ev.github.io/docs/standards/CX-0074-BusinessPartnerGateAPI).
 
-#### Business Partner
-
-A business partner is a logistic address augmented by additional meta information like names, identifiers and state of operation.
-The business partner data may contain legal entity and/or site information.
-For example, the business partner's name may include the name of the legal entity the logistic address belongs to.
-Sharing member business partners are assigned up to three BPNs during the golden record process.
-A BPNA refers to the actual logistic address contained in the business partner data.
-A BPNL refers to the legal entity that logistic address belongs to.
-An optional BPNS exists if the logistic address also belongs to a site of that legal entity.
-
-
-#### Address Type
-
-The data in the output stage does not directly say which business partner type has been determined.
-Instead, you will find the determined address type which is slightly more accurate than the business partner type.
-If you want to categorize your business partner data into legal entity, site and address you can refer to this explanation:
-
-| Address Type                | Golden Record Type |
-|-----------------------------|--------------------|
-| Legal Address               | Legal Entity       |
-| Site Main Address           | Site               |
-| Legal And Site Main Address | Site\*             |
-| Additional Address          | Logistic Address   |
-
-
-\* Note that the Legal and Site Main Address type is special in this regard since it indicates a site that has the legal address as its site main address.
-For each legal entity there can only be up to one of such sites.
-
-#### Stages
-
-Business partners have two types of data: input and output data.
-Input data is the version of the business partner how it is shared by the sharing member.
-Output data is the version of the business partner after it has gone through the golden record process.
-Sharing members can only update the input data and the golden record process can only update the output data.
-
-#### Sharing State
-
-Each business partner has a sharing state in regard to the golden record process.
-The sharing state indicates whether the business partner input data is currently in processing, has not yet started process or has already finished.
-
-> Initial Sharing State: The BPDM API can be configured to support an additional 'Initial' sharing state.
-> Such a sharing state indicates that the business partner input data has been changed but is not yet marked for sharing.
-> If that is the case the sharing state needs to be manually set to ready to be shared to the golden record process.
-> If no initial sharing state has been configured uploaded input data is automatically shared to the golden record process as soon as it is received.
-
-
-#### Changelog
-
-Contains events for each stage on when business partner data has been added or changed.
-The changelog only contains the information of when the business partner changed not what changed.
-
+The generic business partner format, the two data stages, the sharing state and the changelog are
+explained from a sharing member's perspective in the [Sharing Member Guide](sharing-member-guide.md).
 
 #### Additional information
 
 The Gate API only works in context of one sharing member at a time.
-This means, a sharing member or value added service may only see the business partner data information of one sharing member at a time.
+This means you only ever see the business partner data of one sharing member through it.
 
 The full implementation of the Golden Record Process - which includes duplication checks, categorizing and cleaning of data - is not yet provided in this repository.
 Instead, BPDM offers a dummy golden record processing service that performs rudimentary checks and processing to offer a limited Golden Record Process without relying on an external provider.
-Since the dummy service is very limited when using the BPDM API behind such a dummy golden record process comes with restrictions.
-The next sections deal with how to use the BPDM API as a sharing member with a real golden record process and what to consider with the dummy service.
+Since the dummy service is very limited, using the BPDM API behind such a dummy golden record process comes with [restrictions](../architecture/11_Risks_And_Technical_Debts.md).
 
 
-> NOTE: 
-> The dummy cleaning service is at the moment only available for business partners.
-> A golden record process for business partner relations requires an actual refinement service to be integrated.
-
-
-#### Authorization
-
-The BPDM Gate API considers the following user groups:
-
-1. Input Consumer: can read business partner input data
-2. Output Consumer: can read business partner output data
-3. Input Manager: can read and write business partner input data and may also start the sharing process
-4. Admin: full access to all resources
-
-Permissions:
-
-| Resource                | Input Consumer | Output Consumer | Input Manager | Admin |
-|-------------------------|----------------|-----------------|---------------|-------|
-| Business Partner Input  | R              | -               | R & W         | R & W |
-| Business Partner Output | -              | R               | -             | R & W |
-| Sharing State           | R              | R               | R & W         | R & W |
-| Input Changelog         | R              | -               | R             | R     |
-| Output Changelog        | -              | R               | -             | R     |
-| Statistics              | R              | R               | R             | R     |
+> NOTE:
+> The dummy refines business partners only.
+> It reserves relation tasks as well but passes them through unchanged, so a golden record process for business partner relations requires an actual refinement service to be integrated.
 
 
 ### Orchestrator API
 
-This API offers endpoints for retrieving and resolving business partner data being processed inside the golden record process.
+With the [Orchestrator API](orchestrator.yaml) you retrieve and resolve business partner data being processed inside the golden record process.
 
-#### Tasks
+What a golden record task is, what its business partner data can express, what to put into a step
+result, and how a refinement service is granted access to this API are explained from a refinement
+service provider's perspective in the
+[Refinement Service Provider Guide](refinement-service-guide.md).
+Unlike the Pool and the Gate, the Orchestrator is not exposed over an EDC.
 
-Business partner data to be processed come in processing tasks with their own task ID.
-A processing service receives the business partner along with the task ID.
-The service than can process the data and post the result of the task back to the API with the matching task ID.
+### Authorization
 
+All three APIs are OAuth2 resource servers.
+Every request carries a bearer token, and which endpoints a token may call follows from the
+permissions behind it; the guides linked above say which endpoints each role calls.
+The Pool and the Gate additionally publish an Open-API document per role, holding exactly the
+endpoints that role may call - the quickest way to see what a set of credentials is good for.
+Where you reach an API through an EDC, the data plane supplies the credentials itself and you send
+the transfer token instead; see [Access BPDM over EDC](#access-bpdm-over-edc).
 
-#### Processing Steps
-
-Business partner in the golden record process goes through different processing steps.
-A golden record processing service can query and post results for the processing step it is responsible for.
-
-#### Clean And Sync Step
-
-Currently, there is only one step supported: CleanAndSync.
-In this step the whole business partner process - including duplication check, natural person screening and cleaning of data - should be conducted.
-
-The business partner that this step receives is the data the sharing member provided.
-Depending on what the sharing member provided the data could be completely uncategorized or pre-categorized.
-This data needs to be verified and corrected.
-If that is not possible the data can be returned to the golden record process with an error message.
-
-As a result for this step the golden record process expects the following:
-
-1. If the business partner data refers to existing golden records the BPNs should be provided in the BPN reference fields.
-2. The whole golden record hierarchy should be provided.
-   That means if the business partner data contains an additional address, the result should also contain the possible site parent and the legal entity parent information
-
-
-## Use Cases
-
-The main user groups for BPDM are sharing members, golden record processing service providers and VAS providers.
-
-This document contains explanations for different use cases for these user groups.
-The explanations refer to BPDM API endpoints which are described in the Open-API documents of the [Pool API](pool.yaml), [Gate API](gate.yaml) and [Orchestrator API](orchestrator.yaml).
-If you reach those APIs over an EDC, the [Access BPDM over EDC](#access-bpdm-over-edc) section shows how to negotiate for a data offer and how to import an Open-API document so that its requests run against the EDC data plane.
-
-### Access BPDM over EDC
+## Access BPDM over EDC
 
 Some users can not directly access the BPDM API but may only do so over the EDC public API.
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
@@ -211,7 +88,7 @@ The final result of that negotiation will be a transfer token with which you can
 The [EDC BPDM Consumer Postman collection](EDC%20BPDM%20Consumer.postman_collection.json) documents that negotiation.
 It is documentation, not an automated test.
 
-#### Negotiating For A Data Offer
+### Negotiating For A Data Offer
 
 Set up a Postman environment with at least the following variables.
 Mind that Postman only exports the shared value of a variable, so credentials you keep local are not part of an exported environment.
@@ -238,10 +115,10 @@ The `Negotiate for Access` folder is ordered as the flow runs:
 Because agreements and tokens are stored per asset, you can hold access to several assets at once without negotiating again.
 The token lands in `TRANSFER_TOKEN_<ASSET>` and the address of the EDC data plane in `baseUrl`.
 
-#### Reaching The BPDM APIs With The Transfer Token
+### Reaching The BPDM APIs With The Transfer Token
 
 The consumer collection deliberately contains no BPDM API requests.
-Instead, each BPDM service publishes an Open-API document per user group which holds only the endpoints that user group may call.
+Instead, the Pool and the Gate publish an Open-API document per user group which holds only the endpoints that user group may call.
 Importing the group that matches your asset into Postman gives you a collection already scoped to that asset:
 
 | Asset                                   | Service | Access group document               |
@@ -254,430 +131,51 @@ Importing the group that matches your asset into Postman gives you a collection 
 The same groups appear in the Swagger-UI dropdown of a running application, which is the quickest way to see what an asset exposes without importing anything.
 An endpoint belongs to a group exactly when the permission it requires is one of the group's permissions, so these documents describe what the application actually enforces.
 
-An imported collection needs two adjustments, both on the collection rather than on individual requests:
+#### Setting Up An Imported Collection
 
-1. Set its `baseUrl` variable to `{{baseUrl}}`, which `Get Transfer Token` fills with the address of the EDC data plane.
-2. Set its authorization to an API key with the key `Authorization` and the value `{{TRANSFER_TOKEN_<ASSET>}}` of the asset you negotiated, for example `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}`.
-   Do not send a Keycloak token here; the data plane injects the backend credentials itself.
+None of this is guessable from the import dialog, and skipping any one step produces a failure that points somewhere else.
+Work through it once per access group.
+
+**1. Select the environment you negotiated with.**
+The imported collection is a collection of its own and cannot read the consumer collection's collection variables.
+`Get Transfer Token` therefore publishes the three values that have to cross that boundary — `baseUrl`, `TRANSFER_TOKEN` and `TRANSFER_TOKEN_<ASSET>` — as *environment* variables, and refuses to run with no environment selected.
+Both collections read them from that one environment.
+The tokens are written as current values, so they stay local and do not reach the checked-in environment file when you export it.
+
+**2. Import the access group document** from the table above, for example `https://<host>/pool/docs/api-docs/v7-participant`, with *Import → Link* (or save it to a file and import that).
+Postman creates a collection whose requests are exactly the endpoints that asset may call.
+
+**3. Set the collection's authorization**, on the collection itself — not on a request:
+
+| Field | Value |
+|-------|-------|
+| Type | **API Key** |
+| Key | `Authorization` |
+| Value | `{{TRANSFER_TOKEN_<ASSET>}}`, e.g. `{{TRANSFER_TOKEN_POOL_PARTICIPANT_READ}}` |
+| Add to | **Header** |
+
+Three things go wrong here in particular:
+
+- **Name the asset's own token variable, not the generic `TRANSFER_TOKEN`.** The generic one holds whichever asset was selected last, so a Pool request sent with a Gate token reaches the Gate backend and the data plane answers `Failed to read data from source: NOT_FOUND` — an error that names no URL and looks like a wrong path.
+- **Use API Key, not Bearer Token.** Bearer Token prepends `Bearer ` to a value that already carries whatever scheme the connector issued.
+- **Leave each request at *Inherit auth from parent*.** A collection imported from an OpenAPI document carries that document's security scheme per request, and request-level auth wins over collection-level, so the collection setting is silently ignored until you clear it.
+
+Do not send a Keycloak token here at all; the data plane injects the backend credentials itself.
+
+**4. Remove the leading `/v7` from the path of each request.**
+An asset points at the API's `/v7` path already and the data plane appends the path it is called with, so a request left as imported arrives as `/v7/v7/...`.
+Which version an offer serves is fixed by the asset, not by the path you send.
+
+`baseUrl` needs no editing: Postman resolves an environment variable ahead of a collection variable of the same name, so the environment's `baseUrl` overrides the one the import took from the document's server URL.
 
 The imported requests then run against the data plane exactly as they would run against the API directly.
 Mind that Postman fills required parameters with generated placeholder values on import, so query parameters and request bodies still need real values.
 
-### Sharing Members
-
-As a sharing member you want to share business partner data to the golden record process in order to obtain BPNs and refined data.
-The process on how you use the BPDM APIs differs slightly on whether it is your own company data or that of other companies you do business with.
-
-> Please notice that this repository offers a limited dummy golden record process which comes with a [list of restrictions](../architecture/11_Risks_And_Technical_Debts.md).
-> If you are using such dummy golden record process for test purposes you may need to consider these restrictions when sharing business partner data.
-
-#### Sharing Business Partner Data
-
-The golden record process will determine the type and give you the information back together with the associated BPNs and refined data.
-
-To share such business partners you perform the following actions:
-
-1. Obtain access to the `ReadAccessPoolForCatenaXMember` asset
-2. Query the Pool metadata information to obtain the list of supported legal forms, identifier types and administrative level 1 regions
-3. Obtain access to the `FullAccessGateInputForSharingMember` asset
-4. Within the constraints of the supported metadata upload a generic business partner entry to the Gate input stage
-5. Optionally, if the Gate has been configured for [manual sharing](../../INSTALL.md) you should set the business partner entry to ready
-6. Obtain access to the `ReadAccessGateOutputForSharingMember` asset
-7. Monitor the output changelog for the business partner entry until you receive a CREATE event for that entry (UPDATE if you have shared it before)
-8. Query the business partner data in the output stage
-
-
-#### Sharing Other Company's Data
-
-Business partners that do not belong to you or your managed subsidiaries should be shared as generic business partners - that is a business partner for which it is unknown whether it is a Legal Entity, Site or Address.
-Additionally, the business partner **must not** be marked as `isOwnCompanyData`.
-
-Also, it is important to note that sharing sites is reserved for the owning company of that site.
-If you give site information to a business partner which does not belong to you, the entry might come back as invalid or the site information will be ignored.
-The exact behaviour is determined by the golden record process implementation.
-
-
-#### Sharing Own Company Data
-
-When  sharing business partner data that belongs to your own company or managed subsidiary you are required to specify a fixed address type of the business partner.
-That means, you can't share your own company data as of an unknown business partner type.
-
-Additionally, you are required to mark the business partner as `isOwnCompanyData`.
-This is the way to recognize that you want to share your own data.
-
-In contrast to sharing other company's data you are allowed to specify site information including whether an address is a site main address.
-
-#### Headquarter Relocation With No Leftover
-
-The sharing member wants to report to the network that the headquarters address of a legal entity changed (or will change in the future).
-The old headquarters address will not be active anymore (hence 'No Leftover').
-
-Steps for the sharing member to take in order to realize that use case:
-
-1. The sharing member MUST create a business partner record `A` for the existing headquarters address
-2. The sharing member MUST create a business partner record `B` for the new headquarters address
-3. The sharing member MUST create a IsReplacedBy relation from `A` to `B`
-4. The sharing member MUST update the old headquarters address `A` to have an inactive business state
-
-In order to make sure that the golden record process processed the shared records correctly it is recommended that the sharing member SHOULD wait for the output results between steps 1 - 3.
-To clearly indicate that an old headquarters address is set to inactive and not the current legal entity, the sharing member MUST wait for step 3 correct output results before executing the final step 4.
-
-
-### VAS Providers
-
-Providers of value added services analyze the sharing member business partner data and provide useful insights before and after the golden record process.
-Which APIs such services need to access depends highly on their use case.
-The following shows an example interaction for a value added service that analyzes sharing member input data.
-
-1. Obtain access to the `ReadAccessGateInputForSharingMember` asset
-2. Monitor the input changelog events notifying you about new business partners (business partner updates)
-3. Query the business partner input
-4. Perform your analysis
-
-There are similar interactions possible for analyzing the business partner output and even golden record pool data.
-
-### Golden Record Processing Service Providers
-
-As a golden record processing service provider you participate in realising the golden record process.
-You provide a step towards transforming shared business partner data to a golden record.
-
-As such your main point of interaction will be with the Orchestrator API.
-The Pool API may also offer useful context information that benefits your service.
-
-In general, as a golden record processing service provider you are expected to reserve and resolve golden record tasks.
-Your service is responsible for a refinement step for which you will provide these resolutions.
-The following list details the interaction:
-
-1. Reserve a number of tasks for your refinement step to receive the business partner data to process (POST reserve endpoint)
-2. Process and/or validate the business partner data according to your service logic
-3. By specifying the task ID post the resulting business partner data (POST resolution endpoint)
-4. Start from the beginning until no golden record tasks remain
-
-Please note that you have to post the full resulting business partner data even for data points that you have not changed.
-Failing to do so will be interpreted as specifying NULL values which may have unintended consequences for the business partner result.
-
-#### Outdated Tasks
-
-Between reserving a golden record task and providing a resolution a task may become outdated.
-This can have several reasons:
-
-1. The sharing member may have shared newer data for the business partner data in the task.
-In this case, the task is aborted and resolutions to that task are accepted but ignored.
-2. The golden record task may go into timeout as defined by the time was given to process to it.
-Trying to provide a resolution for a timeout task results in an error.
-
-#### Mapping of Gate Business Partner To Golden Record Tasks
-
-This section shows how business partner data shared in a Gate is represented in golden record tasks in the Orchestrator.
-
-```mermaid
----
-title: Share Unknown Business Partner Data Without Site
----
-classDiagram
-  direction LR
-  class Input["Gate Input"]{
-    Name Parts: A
-    Identifiers: B
-    States: C
-    Legal Entity Properties: D
-    Site Properties: NULL
-    Address Properties: F
-    Is Own Company Data: G
-  }
-
-  class BusinessPartner["Business Partner"]{
-      Name Parts: EMPTY
-      Owning Company: G
-      Site: NULL
-      Additional Address: NULL
-  }
-  
-  class Uncategorized{
-      Name Parts: A
-      Identifiers: B
-      States: C
-      Address: F
-  }
-  
-  class LegalEntity{
-      Legal Name: D
-      Legal Short Name: D
-      Legalform: D
-      Identifiers: EMPTY
-      States: D
-      Legal Address: EMPTY
-  }
-
-  Input ..> BusinessPartner
-  BusinessPartner --> Uncategorized
-  BusinessPartner --> LegalEntity: D
-```
-
-```mermaid
----
-title: Share Legal Address Without Site
----
-classDiagram
-  direction LR
-  class Input["Gate Input"]{
-    Name Parts: A
-    Identifiers: B
-    States: C
-    Legal Entity Properties: D
-    Site Properties: NULL
-    Address Properties: F
-    Is Own Company Data: G
-  }
-
-  class BusinessPartner["Business Partner"]{
-      Name Parts: EMPTY
-      Owning Company: G
-      Site: NULL
-      Additional Address: NULL
-  }
-  
-  class Uncategorized{
-      Name Parts: A
-      Identifiers: B
-      States: C
-      Address: NULL
-  }
-  
-  class LegalEntity{
-      Legal Name: D
-      Legal Short Name: D
-      Legalform: D
-      Identifiers: EMPTY
-      States: D
-      Legal Address: F
-  }
-
-  Input ..> BusinessPartner
-  BusinessPartner --> Uncategorized
-  BusinessPartner --> LegalEntity: D
-```
-
-```mermaid
----
-title: Share Site Main Address
----
-classDiagram
-  direction LR
-  class Input["Gate Input"]{
-    Name Parts: A
-    Identifiers: B
-    States: C
-    Legal Entity Properties: D
-    Site Properties: E
-    Address Properties: F
-    Is Own Company Data: G
-  }
-
-  class BusinessPartner["Business Partner"]{
-      Name Parts: EMPTY
-      Owning Company: G
-      Additional Address: NULL
-  }
-  
-  class Uncategorized{
-      Name Parts: A
-      Identifiers: B
-      States: C
-      Address: NULL
-  }
-  
-  class LegalEntity{
-      BPN Reference: D
-      Legal Name: D
-      Legal Short Name: D
-      Legalform: D
-      Identifiers: EMPTY
-      States: D
-      Legal Address: NULL
-  }
-  
-  class Site{
-      BPN Reference: E
-      Site Name: E
-      Identifiers: E
-      States: E
-      Site Main Address: F
-  }
-
-  Input ..> BusinessPartner
-  BusinessPartner --> Uncategorized
-  BusinessPartner --> LegalEntity: D
-  BusinessPartner --> Site: E
-```
-
-```mermaid
----
-title: Share Legal And Site Main Address
----
-classDiagram
-  direction LR
-  class Input["Gate Input"]{
-    Name Parts: A
-    Identifiers: B
-    States: C
-    Legal Entity Properties: D
-    Site Properties: E
-    Address Properties: F
-    Is Own Company Data: G
-  }
-
-  class BusinessPartner["Business Partner"]{
-      Name Parts: EMPTY
-      Owning Company: G
-      Additional Address: NULL
-  }
-  
-  class Uncategorized{
-      Name Parts: A
-      Identifiers: B
-      States: C
-      Address: NULL
-  }
-  
-  class LegalEntity{
-      BPN Reference: D
-      Legal Name: D
-      Legal Short Name: D
-      Legalform: D
-      Identifiers: EMPTY
-      States: D
-      Legal Address: F
-  }
-  
-  class Site{
-      BPN Reference: E
-      Site Name: E
-      Identifiers: EMPTY
-      States: E
-      Site Main Address: NULL
-  }
-
-  Input ..> BusinessPartner
-  BusinessPartner --> Uncategorized
-  BusinessPartner --> LegalEntity: D
-  BusinessPartner --> Site: E
-```
-
-```mermaid
----
-title: Share Additional Address Of Site
----
-classDiagram
-  direction LR
-  class Input["Gate Input"]{
-    Name Parts: A
-    Identifiers: B
-    States: C
-    Legal Entity Properties: D
-    Site Properties: E
-    Address Properties: F
-    Is Own Company Data: G
-  }
-
-  class BusinessPartner["Business Partner"]{
-      Name Parts: EMPTY
-      Owning Company: G
-  }
-  
-  class Uncategorized{
-      Name Parts: A
-      Identifiers: B
-      States: C
-      Address: NULL
-  }
-  
-  class LegalEntity{
-      BPN Reference: D
-      Legal Name: D
-      Legal Short Name: D
-      Legalform: D
-      Identifiers: EMPTY
-      States: D
-      Legal Address: EMPTY
-  }
-  
-  class Site{
-      BPN Reference: E
-      Site Name: E
-      Identifiers: EMPTY
-      States: E
-      Site Main Address: NULL
-  }
-  
-  class AdditionalAddress{
-      BPN Reference: F
-      Identifiers: EMPTY
-      States: F
-      Physical Address: F
-      Alternative Address: F
-  }
-
-  Input ..> BusinessPartner
-  BusinessPartner --> Uncategorized
-  BusinessPartner --> LegalEntity: D
-  BusinessPartner --> Site: E
-  BusinessPartner --> AdditionalAddress: F
-```
-
-```mermaid
----
-title: Share Additional Address Of Legal Entity
----
-classDiagram
-  direction LR
-  class Input["Gate Input"]{
-    Name Parts: A
-    Identifiers: B
-    States: C
-    Legal Entity Properties: D
-    Site Properties: NULL
-    Address Properties: F
-    Is Own Company Data: G
-  }
-
-  class BusinessPartner["Business Partner"]{
-      Name Parts: EMPTY
-      Owning Company: G
-      Site: NULL
-  }
-  
-  class Uncategorized{
-      Name Parts: A
-      Identifiers: B
-      States: C
-      Address: NULL
-  }
-  
-  class LegalEntity{
-      BPN Reference: D
-      Legal Name: D
-      Legal Short Name: D
-      Legalform: D
-      Identifiers: EMPTY
-      States: D
-      Legal Address: EMPTY
-  }
-  
-  class AdditionalAddress{
-      BPN Reference: F
-      Identifiers: EMPTY
-      States: F
-      Physical Address: F
-      Alternative Address: F
-  }
-
-  Input ..> BusinessPartner
-  BusinessPartner --> Uncategorized
-  BusinessPartner --> LegalEntity: D
-  BusinessPartner --> AdditionalAddress: F
-```
-
+| The data plane answers | Most likely |
+|------------------------|-------------|
+| `401` | The request carried no `Authorization` header at all. |
+| `Failed to read data from source: NOT_FOUND` | The token belongs to another asset, or the path still carries its leading `/v7`. The backend URL the data plane built is in its own log. |
+| `403` | The transfer token expired, or the offer's access policy does not name your BPNL, or the endpoint needs a permission the asset's technical user does not hold. A data plane answers every token it will not accept the same way, so try `Get Transfer Token` first - it requests with `auto_refresh=true` and republishes a fresh one without renegotiating - and read the body for the reason when a fresh token is refused too. |
 
 ## NOTICE
 

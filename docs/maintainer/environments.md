@@ -233,7 +233,21 @@ The sharing member's own EDC is the same deployment without assets, which remove
 2. Create the same vault secrets minus the `asset-secrets` entries, under `<env>/edc-<member>/`.
 3. Deploy from that app's `spec.yaml`, adapting the BPNL and wallet client id in the values.
 
+The operator's own Gate at `/companies/test-company` is a sharing member like any other, and the operator EDC consumes its own offers for it: an EDC is provider and consumer at once, so its own DID and dataspace API stand on both sides of that negotiation.
+It therefore needs an offer set of its own, created for the operator's BPNL, next to the ones for the test sharing members.
+
 To exercise the connection, use the [EDC BPDM Consumer Postman collection](../api/EDC%20BPDM%20Consumer.postman_collection.json) pointed at the consumer's management API and the provider's dataspace API.
+The [system tester](../../bpdm-system-tester) exercises the same negotiation from code and covers every offer in one run:
+
+```bash
+SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @EdcAccess
+```
+
+Those scenarios only read, so they can be repeated against an environment while its offers are being set up.
+They cover the Gate offers; the Pool scenario reports as skipped, because the suite keeps the Pool on the direct route — see [testing over the EDC](e2e-testing.md#testing-over-the-edc) for why.
+The three `api#management-key` secrets of the connectors are the only values to supply: `bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector and offer of each sharing member, with the addresses, the provider's DID and each member's BPNL defaulted to the INT deployment.
+Running the whole suite over the EDC instead of only these scenarios is described under [testing over the EDC](e2e-testing.md#testing-over-the-edc).
 
 ## Feature Branch Deployments
 
