@@ -16,6 +16,13 @@ The following chapters show how to install the applications in different scenari
 
 BPDM services require a PostgreSQL database and Keycloak server to run.
 Navigate to the root folder of the BPDM repository.
+The Keycloak container takes its admin password from a `KEYCLOAK_ADMIN_PASSWORD` variable, which the Compose file expects in an `.env` file next to it and which is not part of the repository:
+
+```console
+echo "KEYCLOAK_ADMIN_PASSWORD=admin" > docker/compose/dependencies/.env
+```
+
+Without that variable Keycloak still starts and imports the realm, only its admin console has no user to log in with.
 Then set up the necessary dependencies by using the provided Docker Compose file:
 
 ```console
@@ -76,8 +83,8 @@ Start them once the rest of the stack is up — like any Gate, they refuse to st
 
 ```console
 cd bpdm-gate
-mvn spring-boot:run -Dspring.profiles.active=gate-2
-mvn spring-boot:run -Dspring.profiles.active=gate-3
+mvn spring-boot:run -Dspring-boot.run.profiles=gate-2
+mvn spring-boot:run -Dspring-boot.run.profiles=gate-3
 ```
 
 They run on ports 8082 and 8083 against their own `bpdm_gate_2` and `bpdm_gate_3` databases (created by the Docker Compose file above) and are owned by `BPNL000000000002` and `BPNL000000000003`, so each serves only its own member.
@@ -109,7 +116,7 @@ You may want to perform a quick local installation in which security is not nece
 Make sure to disable authentication requirements by using the provided `no-auth` profile when running the applications:
 
 ```console
-mvn spring-boot:run -Dspring.profiles.active=no-auth
+mvn spring-boot:run -Dspring-boot.run.profiles=no-auth
 ```
 
 ## Helm Charts

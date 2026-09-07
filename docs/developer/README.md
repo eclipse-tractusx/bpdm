@@ -144,7 +144,7 @@ In order to do so, the following changes are required:
 3. Adapt the Keycloak realm configuration to include roles for the new steps. This should be done [locally](../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json) as well as [remotely](https://github.com/eclipse-tractusx/portal-iam).
     Alternatively, you can also override the generated standard permission names with ones that already exist in the IdP see next point)
 4. Optionally: Adapt the step permissions in the [application properties](../../bpdm-orchestrator/src/main/resources/application.yml) for documentation purposes or for overriding the generated standard permission names
-5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/auth) for testing the new step permission configuration
+5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/v7/OrchestratorAuthV7IT.kt) for testing the new step permission configuration
 
 ## GitHub Workflows
 
