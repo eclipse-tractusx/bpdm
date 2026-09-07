@@ -14,6 +14,7 @@ The following are the various components of the business context setup:
 
 **Small-Medium-Enterprises (SME) (Catena-X Member)**
 * A SME company that's participating in the Catena-X Ecosystem and consuming digital services or data assets.
+* An SME does not need a master data management system to share data: the Gate accepts a CSV file over its partner upload endpoints and offers a template for it.
 
 **Catena-X Portal/Marketplace (CX Portal)**
 * The Portal which provides an entry point for the Catena-X Members, to discover Apps that are offered in Catena-X.
@@ -30,6 +31,7 @@ The following are the various components of the business context setup:
 
 **Curation & Enrichment Services**
 * To offer the BPDM and Golden Record Services, Catena-X uses services from external third party service providers. These can either be operated by the operator itself or external companies that have a contract with the operator.
+* The API documentation calls this role a refinement service provider, or golden record processing service provider; see the [Refinement Service Provider Guide](../api/refinement-service-guide.md).
 
 ## Technical Context
 
@@ -38,6 +40,11 @@ The technical context setup including deployment is depicted in the following fi
 
 * The BPDM Application follows a microservice approach to separate the different components of the system.
 * Within Catena-X there will be only one central operation environment that operates the BPDM Application. This operation environment provides the services and data for other operation environment or applications which needs to consume business partner data or golden record data.
+
+> [!NOTE]
+> The diagram shows the CSV upload of an SME as a separate upload service. This is no longer a
+> component of its own: the Gate itself accepts a CSV file, so an SME reaches the same Gate API as
+> any other sharing member. See the [Building Block View](05_Building_Block_View.md).
 
 ## NOTICE
 

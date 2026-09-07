@@ -301,7 +301,6 @@ The Orchestrator is operator-internal: no data offer exposes it, and the suite d
 The Pool is a limitation worth knowing about. The dataspace standardises exactly one Pool offer, `ReadAccessPoolForDataSpaceParticipant`, and its technical user holds the Pool's `participant` role — `read_partner_member`, `read_changelog_member` and `read_metadata`, which reach `/v7/members/**` and the metadata endpoints only.
 Every Pool read the suite makes to verify a golden record (`/v7/legal-entities`, `/v7/sites/{bpns}`, `/v7/addresses/{bpna}`) requires `read_partner` instead.
 Putting a broader credential behind the standardised asset would make the deployment non-conformant and have the suite validate access no real sharing member has, so the Pool keeps the operator user and its `@EdcAccess` scenario reports as skipped.
-Note that `INSTALL.md` still describes this offer under its former name `ReadAccessPoolForCatenaXMember`; it was renamed to the participant subject for the 25.06 standards and is the same, member-scoped offer.
 
 Each member negotiates through a connector carrying its own identity, because the Gate offers are scoped to the consumer's BPNL.
 The third member is the operator's own Gate at `/companies/test-company`, whose offers the providing connector consumes for it.
