@@ -165,4 +165,52 @@ class RelationTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
         val resultRequest = TaskRelationsStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(resultRequest)
     }
+
+    /**
+     * GIVEN reserved relation task
+     * WHEN user resolves task with invalid relation data
+     * THEN user sees bad request
+     */
+    @Test
+    fun `reject invalid relation result`(){
+        //GIVEN
+        val createdTask = testDataClient.createRelationTask(testName)
+        val reservedTask = testDataClient.reserveRelationTask(createdTask)
+
+        //WHEN
+        val invalidRelation = createdTask.businessPartnerRelations.copy(
+            businessPartnerSourceBpn = "",
+            businessPartnerTargetBpn = ""
+        )
+        val resultEntry = TaskRelationsStepResultEntryDto(reservedTask.taskId, invalidRelation)
+        val resultRequest = TaskRelationsStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+
+        //THEN
+        Assertions.assertThatThrownBy { orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(resultRequest) }
+            .isInstanceOf(WebClientResponseException.BadRequest::class.java)
+    }
+
+    /**
+     * GIVEN reserved relation task with existing validation errors
+     * WHEN user resolves task with invalid relation data
+     * THEN user still sees bad request
+     */
+    @Test
+    fun `reject invalid relation result even with errors`(){
+        //GIVEN
+        val createdTask = testDataClient.createRelationTask(testName)
+        val reservedTask = testDataClient.reserveRelationTask(createdTask)
+
+        //WHEN
+        val invalidRelation = createdTask.businessPartnerRelations.copy(
+            businessPartnerSourceBpn = "",
+            businessPartnerTargetBpn = ""
+        )
+        val resultEntry = TaskRelationsStepResultEntryDto(reservedTask.taskId, invalidRelation, emptyList())
+        val resultRequest = TaskRelationsStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+
+        //THEN
+        Assertions.assertThatThrownBy { orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(resultRequest) }
+            .isInstanceOf(WebClientResponseException.BadRequest::class.java)
+    }
 }
