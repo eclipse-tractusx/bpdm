@@ -1,32 +1,9 @@
 # bpdm
 
-![Version: 7.1.0-rc3](https://img.shields.io/badge/Version-7.1.0--rc3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.5.0-rc3](https://img.shields.io/badge/AppVersion-7.5.0--rc3-informational?style=flat-square)
+![Version: 7.1.0](https://img.shields.io/badge/Version-7.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.5.0](https://img.shields.io/badge/AppVersion-7.5.0-informational?style=flat-square)
 
 Deploys the full BPDM application stack as a single release and configures it end to
 end, showcasing how a golden record process is realized for a single sharing member.
-
-The chart bundles the four BPDM services — Gate, Pool, Orchestrator and the reference
-Cleaning Service Dummy — together with a PostgreSQL database and a Keycloak instance that
-is pre-seeded with the `BPDM` realm. On install it generates and wires the connection and
-credential secrets the services need, so the stack comes up ready to run: a sharing member
-uploads business partner data through the Gate, the Orchestrator coordinates cleaning and
-golden record creation, and the result is shared back via the Gate and the Pool. Each
-dependency (the services, PostgreSQL and Keycloak) can be disabled individually to instead
-integrate with externally managed infrastructure.
-
-## Quick start
-
-```bash
-# Resolve dependencies and install the release
-helm dependency build charts/bpdm
-helm install bpdm charts/bpdm
-
-# Run the bundled end-to-end smoke test
-helm test bpdm
-```
-
-See `values.yaml` for configuration, including `bpdmRealm.clients.*.secret` to pin client
-secrets and the `postgres`/`keycloak` toggles for running against external infrastructure.
 
 **Homepage:** <https://github.com/eclipse-tractusx/bpdm>
 
@@ -44,11 +21,11 @@ secrets and the `postgres`/`keycloak` toggles for running against external infra
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 5.1.0-rc3 |
+|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 5.1.0 |
 |  | bpdm-common | 2.0.0 |
-|  | bpdm-gate(bpdm-gate) | 8.1.0-rc3 |
-|  | bpdm-orchestrator(bpdm-orchestrator) | 5.1.0-rc3 |
-|  | bpdm-pool(bpdm-pool) | 9.1.0-rc3 |
+|  | bpdm-gate(bpdm-gate) | 8.1.0 |
+|  | bpdm-orchestrator(bpdm-orchestrator) | 5.1.0 |
+|  | bpdm-pool(bpdm-pool) | 9.1.0 |
 | oci://registry-1.docker.io/cloudpirates | keycloak | 0.21.10 |
 | oci://registry-1.docker.io/cloudpirates | postgres(postgres) | 0.11.0 |
 
