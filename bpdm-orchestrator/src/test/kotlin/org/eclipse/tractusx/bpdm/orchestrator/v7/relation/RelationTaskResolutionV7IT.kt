@@ -178,7 +178,7 @@ class RelationTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
         val reservedTask = testDataClient.reserveRelationTask(createdTask)
 
         //WHEN
-        val invalidRelation = createdTask.businessPartnerRelations.copy(
+        val invalidRelation = createdTask.businessPartnerRelationsResult.copy(
             businessPartnerSourceBpn = "",
             businessPartnerTargetBpn = ""
         )
@@ -202,7 +202,7 @@ class RelationTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
         val reservedTask = testDataClient.reserveRelationTask(createdTask)
 
         //WHEN
-        val invalidRelation = createdTask.businessPartnerRelations.copy(
+        val invalidRelation = createdTask.businessPartnerRelationsResult.copy(
             businessPartnerSourceBpn = "",
             businessPartnerTargetBpn = ""
         )
