@@ -17,27 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.util
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
+fun Collection<GoldenRecordTaskDb>.toLogIdentifiers(): String =
+    map { it.uuid.toString() }.joinIdentifiersForLog()
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
-
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
-    }
-}
+fun Collection<RelationsGoldenRecordTaskDb>.toRelationsLogIdentifiers(): String =
+    map { it.uuid.toString() }.joinIdentifiersForLog()

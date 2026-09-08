@@ -17,27 +17,38 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
+import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 
 @Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
+class StepSecurityOperation(
+    private val permissionConfigProperties: PermissionConfigProperties
 ) {
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
+    private val defaultPermissions = PermissionConfigProperties()
+
     fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
+        val authorities = authentication.authorities.mapNotNull { it.authority?.uppercase() }
+
+        val expectedAuthority = permissionConfigProperties.reservation[step]
+            ?: defaultPermissions.reservation[step]
+
+        expectedAuthority?.uppercase().takeIf { it in authorities }
+            ?: throw AccessDeniedException("Insufficient permissions")
     }
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
     fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
+        val authorities = authentication.authorities.mapNotNull { it.authority?.uppercase() }
+
+        val expectedAuthority = permissionConfigProperties.result[step]
+            ?: defaultPermissions.result[step]
+
+        expectedAuthority?.uppercase().takeIf { it in authorities }
+            ?: throw AccessDeniedException("Insufficient permissions")
     }
 }

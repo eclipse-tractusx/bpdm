@@ -17,27 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.SharingMemberRecordOperation
+import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
+import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
+import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.springframework.stereotype.Service
 
 @Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
+class SharingMemberRecordApplicationService(
+    private val recordOperation: SharingMemberRecordOperation
 ) {
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
+    fun queryRecords(request: SharingMemberRecordQueryRequest, paginationRequest: PaginationRequest): PageDto<SharingMemberRecord> {
+        return recordOperation.queryRecords(request, paginationRequest)
     }
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
+    fun updateRecord(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
+        return recordOperation.updateRecord(request)
     }
 }

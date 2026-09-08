@@ -17,27 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskEventOperation
+import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
+class RelationsGoldenRecordTaskEventApplicationService(
+    private val eventOperation: RelationsGoldenRecordTaskEventOperation
 ) {
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
-
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
+    fun getRelationsFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+        return eventOperation.getRelationsFinishedTaskEvents(timestamp, paginationRequest)
     }
 }

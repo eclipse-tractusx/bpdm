@@ -22,15 +22,14 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskQueryOperation
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskTimeoutOperation
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,33 +41,19 @@ class GoldenRecordTaskService(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
     private val responseMapper: ResponseMapper,
-    private val taskRepository: GoldenRecordTaskRepository
+    private val taskRepository: GoldenRecordTaskRepository,
+    private val queryOperation: GoldenRecordTaskQueryOperation,
+    private val timeoutOperation: GoldenRecordTaskTimeoutOperation
 ) {
 
     private val logger = KotlinLogging.logger { }
 
-    fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
-        logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
-
-        val uuidsToSearch = stateRequest.taskIds.map { toUUID(it) }.toSet()
-        val tasksByUuid  = taskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
-
-        return TaskResultStateSearchResponse(uuidsToSearch
-            .map { tasksByUuid[it]?.processingState?.resultState }
-            .map { it?.let { responseMapper.toResultState(it) }
-            })
+    fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse {
+        return queryOperation.searchTaskResultStates(stateRequest)
     }
 
     fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
-        logger.debug { "Search for the state of golden record task: executing searchTaskStates() with parameters $stateRequest" }
-        val requestsByTaskId = stateRequest.entries.associateBy { it.taskId }
-
-        return stateRequest.entries.map { toUUID(it.taskId) }
-            .let { uuids -> taskRepository.findByUuidIn(uuids.toSet()) }
-            .also { tasks -> taskRepository.fetchBusinessPartnerData(tasks) }
-            .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
-            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskStateResponse(tasks = it) }
+        return queryOperation.searchTaskStates(stateRequest)
     }
 
     @Transactional
@@ -135,66 +120,16 @@ class GoldenRecordTaskService(
             ?.let { tasks -> logger.info { "Failed ${tasks.size} golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
     }
 
-    @Transactional
     fun processPendingTimeouts(pageSize: Int): PaginationInfo {
-        val timedOutTasks = mutableListOf<GoldenRecordTaskDb>()
-
-        return batchProcessTasks(pageSize,
-            fetchPage = { pageable -> taskRepository.findByProcessingStatePendingTimeoutBefore(DbTimestamp.now(), pageable) },
-            processTask = { task ->
-                goldenRecordTaskStateMachine.doResolveTaskToTimeout(task)
-                timedOutTasks.add(task)
-            }
-        ).also {
-            if (timedOutTasks.isNotEmpty())
-                logger.info { "Timed out ${timedOutTasks.size} golden record tasks: ${timedOutTasks.toLogIdentifiers()}" }
-        }
+        return timeoutOperation.processPendingTimeouts(pageSize)
     }
 
-    @Transactional
     fun processRetentionTimeouts(pageSize: Int): PaginationInfo {
-        val deletedTasks = mutableListOf<GoldenRecordTaskDb>()
-
-        return batchProcessTasks(pageSize,
-            fetchPage = { pageable -> taskRepository.findByProcessingStateRetentionTimeoutBefore(DbTimestamp.now(), pageable) },
-            processTask = { task ->
-                taskRepository.delete(task)
-                deletedTasks.add(task)
-            }
-        ).also {
-            if (deletedTasks.isNotEmpty())
-                logger.info { "Deleted ${deletedTasks.size} golden record tasks after their retention timeout: ${deletedTasks.toLogIdentifiers()}" }
-        }
-    }
-
-    private fun batchProcessTasks(
-        pageSize: Int,
-        fetchPage: (Pageable) -> Page<GoldenRecordTaskDb>,
-        processTask: (GoldenRecordTaskDb) -> Unit
-    ): PaginationInfo {
-        val pageable: Pageable = PageRequest.of(0, pageSize)
-        val page = fetchPage(pageable)
-        var hasProcessedTasks = false
-        var processedTaskCount = 0
-
-        page.forEach { task ->
-            try {
-                processTask(task)
-                hasProcessedTasks = true
-                processedTaskCount++ // Increment on successful processing
-            } catch (err: RuntimeException) {
-                logger.error(err) { "Error processing timeout for task ${task.uuid}" }
-            }
-        }
-
-        return PaginationInfo(hasProcessedTasks, page.hasNext(), processedTaskCount)
+        return timeoutOperation.processRetentionTimeouts(pageSize)
     }
 
     private fun calculateTaskPendingTimeout(task: GoldenRecordTaskDb) =
         task.createdAt.instant.plus(taskConfigProperties.taskPendingTimeout)
-
-    private fun calculateTaskRetentionTimeout(task: GoldenRecordTaskDb) =
-        task.createdAt.instant.plus(taskConfigProperties.taskRetentionTimeout)
 
     private fun toUUID(uuidString: String) =
         try {

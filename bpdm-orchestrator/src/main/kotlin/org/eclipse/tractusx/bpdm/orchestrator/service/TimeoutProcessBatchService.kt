@@ -20,17 +20,16 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import jakarta.annotation.PostConstruct
-import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.TimeoutProcessBatchOperation
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
 class TimeoutProcessBatchService(
-    private val goldenRecordTaskService: GoldenRecordTaskService,
-    private val taskConfigProperties: TaskConfigProperties,
-    private val entityManager: EntityManager
+    private val batchOperation: TimeoutProcessBatchOperation,
+    private val taskConfigProperties: TaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -47,30 +46,7 @@ class TimeoutProcessBatchService(
 
     @Scheduled(cron = "\${bpdm.task.timeoutCheckCron}")
     fun processForTimeouts() {
-        try {
-            // Track the total number of processed tasks
-            var totalProcessedTasks = 0
-            logger.debug { "Checking for timeouts" }
-            // Process pending timeouts
-            totalProcessedTasks += processTimeouts(goldenRecordTaskService::processPendingTimeouts)
-            // Process retention timeouts
-            totalProcessedTasks += processTimeouts(goldenRecordTaskService::processRetentionTimeouts)
-            logger.debug { "Finished processing timeouts. Total processed tasks: $totalProcessedTasks" }
-        } catch (err: RuntimeException) {
-            logger.error(err) { "Error checking for timeouts" }
-        }
-    }
-
-
-    private fun processTimeouts(processFunction: (Int) -> PaginationInfo): Int {
-        val pageSize = 1000  // Adjust the page size based on memory constraints
-        var processedTasks = 0
-        do {
-            val paginationInfo = processFunction(pageSize)
-            processedTasks += paginationInfo.countProcessedTasks()
-            entityManager.clear() // Clear the persistence context to free memory
-        } while (paginationInfo.hasNextPage)
-        return processedTasks
+        batchOperation.processForTimeouts()
     }
 
     companion object {
