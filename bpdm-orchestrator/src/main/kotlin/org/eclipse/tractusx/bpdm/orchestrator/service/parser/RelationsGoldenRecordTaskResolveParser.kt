@@ -54,7 +54,10 @@ class RelationsGoldenRecordTaskResolveParser(
                             ParseResult.ofSingleFailure(RelationsGoldenRecordTaskResolveParseError.TaskAborted(resultEntry.taskId))
                         else -> {
                             try {
-                                assertBusinessPartnerRelationsValid(resultEntry.businessPartnerRelations)
+                                // Only validate business partner relations if there are no errors
+                                if (resultEntry.errors.isEmpty()) {
+                                    assertBusinessPartnerRelationsValid(resultEntry.businessPartnerRelations)
+                                }
                                 ParseResult.Success(RelationsGoldenRecordTaskResolveParsed(resolveRequest.step, task, resultEntry))
                             } catch (e: BpdmInvalidBusinessPartnerException) {
                                 ParseResult.ofSingleFailure(
