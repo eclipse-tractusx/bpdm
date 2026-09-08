@@ -17,24 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.controller
+package org.eclipse.tractusx.bpdm.orchestrator.service.application
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.application.RelationsGoldenRecordTaskEventApplicationService
-import org.eclipse.tractusx.orchestrator.api.RelationsFinishedTaskEventApi
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskEventOperation
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.stereotype.Service
 import java.time.Instant
 
-@RestController
-class RelationsFinishedTaskEventController(
-    private val relationsTaskEventApplicationService: RelationsGoldenRecordTaskEventApplicationService
-) : RelationsFinishedTaskEventApi {
+@Service
+class GoldenRecordTaskEventApplicationService(
+    private val eventOperation: GoldenRecordTaskEventOperation
+) {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun getRelationsEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
-        return relationsTaskEventApplicationService.getRelationsFinishedTaskEvents(timestamp, paginationRequest)
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+        return eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
     }
 }
