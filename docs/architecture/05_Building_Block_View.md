@@ -27,28 +27,28 @@ flowchart TB
     participant -->|"resolves BPNs to<br>golden records"| pool
 ```
 
-**BPDM Gate**
-* Holds the business partner data of the sharing members in an input and an output stage, together with a sharing state and a changelog per stage.
-* Serves several sharing members at once; each record carries the BPNL of its tenant.
-* Accepts data as JSON over the business partner endpoints and as a CSV file over the partner upload endpoints.
-* Drives the process from the sharing member's side: it creates golden record tasks in the Orchestrator, picks up finished ones and writes the result into the output stage.
+* **BPDM Gate**
+  * Holds the business partner data of the sharing members in an input and an output stage, together with a sharing state and a changelog per stage.
+  * Serves several sharing members at once; each record carries the BPNL of its tenant.
+  * Accepts data as JSON over the business partner endpoints and as a CSV file over the partner upload endpoints.
+  * Drives the process from the sharing member's side: it creates golden record tasks in the Orchestrator, picks up finished ones and writes the result into the output stage.
 
-**BPDM Pool**
-* The single source of truth for golden records, and the issuing authority for BPNs.
-* Participates in the golden record process as the service that reserves the `PoolSync` step: it writes the refined data into the golden records and reports the resulting BPNs back into the task.
-* Serves golden record and metadata reads to dataspace participants and value added services, and a changelog the Gate polls for golden record changes.
+* **BPDM Pool**
+  * The single source of truth for golden records, and the issuing authority for BPNs.
+  * Participates in the golden record process as the service that reserves the `PoolSync` step: it writes the refined data into the golden records and reports the resulting BPNs back into the task.
+  * Serves golden record and metadata reads to dataspace participants and value added services, and a changelog the Gate polls for golden record changes.
 
-**BPDM Orchestrator**
-* Passive component. It stores golden record tasks and their step states and hands a task to whichever service reserved the step the task is queued in; it never calls a service itself.
-* Keeps the sharing member anonymous towards the refinement services: a task carries the business partner data, not the identity of the Gate that created it.
-* Holds two kinds of tasks - business partner tasks and relation tasks - plus the sharing member records, which state how many sharing members share a given golden record.
+* **BPDM Orchestrator**
+  * Passive component. It stores golden record tasks and their step states and hands a task to whichever service reserved the step the task is queued in; it never calls a service itself.
+  * Keeps the sharing member anonymous towards the refinement services: a task carries the business partner data, not the identity of the Gate that created it.
+  * Holds two kinds of tasks - business partner tasks and relation tasks - plus the sharing member records, which state how many sharing members share a given golden record.
 
-**Cleaning Service Dummy**
-* A reference refinement service, so that the stack can run a golden record process end to end without an external provider under contract.
-* Reserves the step it is configured for (`CleanAndSync` by default) and applies rudimentary processing; it does not clean or correct data. Its restrictions are listed in [Risks and Technical Debts](11_Risks_And_Technical_Debts.md).
+* **Cleaning Service Dummy**
+  * A reference refinement service, so that the stack can run a golden record process end to end without an external provider under contract.
+  * Reserves the step it is configured for (`CleanAndSync` by default) and applies rudimentary processing; it does not clean or correct data. Its restrictions are listed in [Risks and Technical Debts](11_Risks_And_Technical_Debts.md).
 
-**EDC Operator**
-* Communication between the operating environment and another legal entity goes through an EDC. Diagrams may show an EDC several times for readability; on a technical level one EDC instance serves all BPDM assets of the operator. Which communication needs an EDC is decided in [Architecture Decisions](09_Architectural_Decisions.md).
+* **EDC Operator**
+  * Communication between the operating environment and another legal entity goes through an EDC. Diagrams may show an EDC several times for readability; on a technical level one EDC instance serves all BPDM assets of the operator. Which communication needs an EDC is decided in [Architecture Decisions](09_Architectural_Decisions.md).
 
 ## Level 2: The Modules
 
@@ -84,11 +84,11 @@ response models of an integration are the ones the API documentation publishes.
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 - SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2024 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2024 SAP SE
-- SPDX-FileCopyrightText: 2023,2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2024 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2024 Robert Bosch GmbH
-- SPDX-FileCopyrightText: 2023,2024 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2024 Contributors to the Eclipse Foundation
+- SPDX-FileCopyrightText: 2023-2026 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023-2026 SAP SE
+- SPDX-FileCopyrightText: 2023-2026 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023-2026 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023-2026 Robert Bosch GmbH
+- SPDX-FileCopyrightText: 2023-2026 Schaeffler AG
+- SPDX-FileCopyrightText: 2023-2026 Contributors to the Eclipse Foundation
 - Source URL: https://github.com/eclipse-tractusx/bpdm

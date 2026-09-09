@@ -2,19 +2,19 @@
 
 ## Risks
 
-**Dependency on third party service provider**
-* Originally the golden record creation could not be changed to a different third party service provider without effort.
-* ✔️ Solved: the BPDM Orchestrator holds the golden record tasks and their data, and a refinement service integrates by reserving a step over a standardized API. The Cleaning Service Dummy is such a service and lets the stack run without any provider under contract.
+* **Dependency on third party service provider**
+  * Originally the golden record creation could not be changed to a different third party service provider without effort.
+  * ✔️ Solved: the BPDM Orchestrator holds the golden record tasks and their data, and a refinement service integrates by reserving a step over a standardized API. The Cleaning Service Dummy is such a service and lets the stack run without any provider under contract.
 
-**Data Storage and anonymize concept**
-* How to anonymize the relations between CX-Member and its belonging Business Partner?
-* 💡 Idea: using kind of "ticket numbering"
-* ✔️ Solved via the golden record tasks in the Orchestrator: a task carries business partner data, not the identity of the Gate that created it.
+* **Data Storage and anonymize concept**
+  * How to anonymize the relations between CX-Member and its belonging Business Partner?
+  * 💡 Idea: using kind of "ticket numbering"
+  * ✔️ Solved via the golden record tasks in the Orchestrator: a task carries business partner data, not the identity of the Gate that created it.
 
-**Accessability for SMEs**
-* An SME has no master data management system to share data from.
-* ✔️ Solved for the upload itself: the Gate accepts a CSV file over its partner upload endpoints and offers a template for it.
-* ⚠️ Reaching the Gate across legal entities still requires an EDC, so an SME needs one - either its own or one offered as a service.
+* **Accessability for SMEs**
+  * An SME has no master data management system to share data from.
+  * ✔️ Solved for the upload itself: the Gate accepts a CSV file over its partner upload endpoints and offers a template for it.
+  * ⚠️ Reaching the Gate across legal entities still requires an EDC, so an SME needs one - either its own or one offered as a service.
 
 ## Technical Debts
 
@@ -84,11 +84,11 @@ A refinement service meant for production has to keep that ledger.
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 - SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2024 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2024 SAP SE
-- SPDX-FileCopyrightText: 2023,2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2024 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2024 Robert Bosch GmbH
-- SPDX-FileCopyrightText: 2023,2024 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2024 Contributors to the Eclipse Foundation
+- SPDX-FileCopyrightText: 2023-2026 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023-2026 SAP SE
+- SPDX-FileCopyrightText: 2023-2026 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023-2026 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023-2026 Robert Bosch GmbH
+- SPDX-FileCopyrightText: 2023-2026 Schaeffler AG
+- SPDX-FileCopyrightText: 2023-2026 Contributors to the Eclipse Foundation
 - Source URL: https://github.com/eclipse-tractusx/bpdm
