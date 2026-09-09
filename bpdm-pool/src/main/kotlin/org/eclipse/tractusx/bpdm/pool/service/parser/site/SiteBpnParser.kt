@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 
 /**
- * Resolves site BPNs to the sites they name.
+ * Resolves site BPNs to the sites they name, reading a BPN case-insensitively.
  */
 @Service
 class SiteBpnParser(
@@ -78,18 +78,18 @@ class SiteBpnParser(
     }
 
     private fun resolve(bpns: Set<String>): Map<String, SiteDb> =
-        siteRepository.findDistinctByBpnIn(bpns).associateBy { it.bpn }
+        siteRepository.findDistinctByBpnIn(bpns.mapTo(mutableSetOf()) { it.uppercase() }).associateBy { it.bpn }
 
     private fun resolveAllResult(bpns: List<String>, sitesByBpn: Map<String, SiteDb>): ParseResult<List<SiteDb>, UnresolvableSite> {
-        val unresolvable = bpns.filterNot { sitesByBpn.containsKey(it) }.map { UnresolvableSite(it) }
+        val unresolvable = bpns.filterNot { sitesByBpn.containsKey(it.uppercase()) }.map { UnresolvableSite(it) }
         return when {
             unresolvable.isNotEmpty() -> ParseResult.Failure(unresolvable)
-            else -> ParseResult.Success(bpns.map { sitesByBpn.getValue(it) })
+            else -> ParseResult.Success(bpns.map { sitesByBpn.getValue(it.uppercase()) })
         }
     }
 
     private fun resolveResult(bpn: String, sitesByBpn: Map<String, SiteDb>): ParseResult<SiteDb, UnresolvableSite> =
-        when (val site = sitesByBpn[bpn]) {
+        when (val site = sitesByBpn[bpn.uppercase()]) {
             null -> ParseResult.ofSingleFailure(UnresolvableSite(bpn))
             else -> ParseResult.Success(site)
         }

@@ -55,7 +55,7 @@ flowchart LR
     OUT["Response DTO + ErrorInfo"]
 
     DTO -->|inbound mapper| REQ
-    REQ -->|"parser — validate · resolve · collect errors"| PARSED
+    REQ -->|"parser — normalize · validate · resolve"| PARSED
     PARSED -->|"operation — issue BPN · persist · changelog"| DB
     DB -->|outbound mapper| OUT
 
@@ -85,7 +85,15 @@ The four representations, by suffix:
 
 **Application** — the API boundary. One service per *(domain × operation × API version)*. It is the only layer that knows about API DTOs and API versions. It maps the incoming DTO to a `…Request`, drives the parse-then-execute flow, owns the transaction, and maps the outcome back to response DTOs and errors. It contains no validation and no business rules of its own.
 
-**Parser** — the decision layer. Its main purpose is to **validate data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors. A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. It is pure: it only reads (metadata lookups, resolving a BPN to an entity), never writes. It is API- and version-neutral — it never sees a DTO. Because it is neutral and composable, one parser serves every version and every context that embeds the same content (a standalone address, a site's main address, a legal entity's address).
+**Parser** — the decision layer. It is the only layer that handles **data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors.
+
+It has exactly three responsibilities:
+
+- **Normalization** — bringing an accepted value into the one canonical form the rest of the code works in: trimming, dropping blanks, upper-casing a BPN, defaulting an omitted identifier type. Normalization decides nothing and rejects nothing; it removes variation that no later layer should have to know about.
+- **Validation** — deciding whether the value is acceptable at all, and rejecting it with an error when it is not.
+- **Resolution** — turning an accepted reference into the thing it names: a BPN into its entity, a metadata key into its record. Resolution is how the parser decides a reference is valid, so the resolved entity is part of its verdict.
+
+The three run in that order — a value is normalized before it is judged, and judged before it is resolved — which is why a caller never normalizes on a parser's behalf. A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. It is pure: it only reads (metadata lookups, resolving a BPN to an entity), never writes. It is API- and version-neutral — it never sees a DTO. Because it is neutral and composable, one parser serves every version and every context that embeds the same content (a standalone address, a site's main address, a legal entity's address).
 
 **Operation** — the execution layer. It carries out the operation against the service's data — reading, writing, or both — and in principle spans the full range of CRUD; one operation may be composite, combining several CRUD steps, sometimes across more than one entity. For any part that writes, the operation service is *the single authority* for that entity's write — the one place it happens — so BPN issuance, persistence, and changelog live in exactly one location. It works in internal domain and managed models and returns them, never response DTOs.
 
@@ -130,6 +138,8 @@ This structure governs **operations** — create, read, search, update, and dele
 
 The write-specific obligations — single write authority, changelog, owning the transaction — apply to whichever parts of an operation change state. A pure read or search uses the same layering, with the parser validating any external input and the operation layer querying rather than writing.
 
+Sometimes there is nothing left for the operation layer to do. Because a parser resolves the references it validates, a fetch-by-identifier has already produced its own result by the time parsing is done: the entity the response is built from. Such an operation gets no operation service — the application service maps what the parser resolved. An operation service earns its place by carrying out work the parse did not: a query with criteria, a fetch of associations, a projection, or any write.
+
 Background jobs and internal process orchestration are not request-driven operations of this kind and are not forced into this exact shape, though the same principles (pure vs. impure, API-neutral core, mappers for translation) still guide them.
 
 ---
@@ -155,6 +165,10 @@ Background jobs and internal process orchestration are not request-driven operat
 
 ## 2.3 Parser layer
 
+- A parser MUST own all three of normalization, validation and resolution for the data it accepts. No other layer MAY normalize an inbound value: not the controller, not the application service, not a mapper, and not a caller preparing input for a parser.
+- Normalization MUST happen once, in the parser that owns the value — for a shared reference, that is the resolving parser every path funnels through, not each of its callers. A value that reaches a `…Parsed` MUST already be canonical.
+- A parser SHOULD normalize the inbound value rather than make its lookup tolerant. Matching a stored value loosely (a case-insensitive or otherwise widened query) hides the canonical form and gives up an exact indexed lookup; normalizing the input keeps both.
+- An error a parser reports SHOULD quote the value as the caller sent it, not its normalized form, so the client recognises its own input.
 - A parser MUST validate all data entering the application from outside its own database — both requests received on our API endpoints and responses received from calls the application makes to other services. Data read from our own database is trusted and MUST NOT require parser validation.
 - A parser MUST be free of side effects other than database reads; it MUST NOT write.
 - A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.7](#27-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
@@ -162,6 +176,7 @@ Background jobs and internal process orchestration are not request-driven operat
 - A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
 - A parser MUST honour the positional contract: the output list has the same size and order as the input, and the i-th result is the verdict for the i-th request.
 - A parser MUST be annotated `@Transactional(readOnly = true)` when a single parse issues more than one database query. *(Current gap: several parsers do multiple reads without this annotation.)*
+- A parser SHOULD resolve the references it validates to the entities they name, rather than passing the identifier on for a later layer to look up.
 - A parser SHOULD be decomposed into single-responsibility parsers (content validation, reference/BPN resolution, cross-cutting checks) composed with the `ParseResult` combinators, rather than written as one monolith.
 - A parser SHOULD fetch metadata once per batch, not once per entry.
 
@@ -170,6 +185,7 @@ Background jobs and internal process orchestration are not request-driven operat
 - An operation service MUST carry out one operation against the service's data — a single CRUD action (create, read, search, update, delete) or a composite built from several of them.
 - It MUST consume validated `…Parsed` input wherever the operation takes external input, and MUST return internal domain or managed models (`…Db` / `UpsertResult` / query results); it MUST NOT return or reference API DTOs or response models.
 - For any part of an operation that writes, the operation service MUST be the single authority for that entity's write: the only place that issues the entity's BPN, persists it, and emits its changelog at the entity's own aggregate boundary.
+- An operation service MUST NOT be created for an operation the parse already completes. Where a parser's resolution has produced the operation's whole result — a fetch by identifier is the typical case — the application service maps that result directly; a pass-through operation service adds a layer without adding authority.
 - An operation service SHOULD expose the simplest form its callers need. The stage/commit split MUST be introduced only when a composite must wire an unsaved, cyclically-referenced graph before flushing — not as a default shape.
 - An update MUST NOT be able to change an entity's identity or parentage. This MUST be enforced structurally (e.g. a mutator that exposes only the permitted writes), not by convention.
 
@@ -177,7 +193,7 @@ Background jobs and internal process orchestration are not request-driven operat
 
 - Every representation MUST carry its suffix: `…Dto` (API), `…Request` (unified input), `…Parsed` (validated), `…Db` (entity).
 - The `…Request` model MUST be a superset that captures the content of all inbound sources (v6, v7, Orchestrator), so one parsing path feeds one domain model.
-- A `…Parsed` value MUST be fully validated and non-null — safe to persist without further checks.
+- A `…Parsed` value MUST be fully validated, normalized and non-null — safe to persist without further checks, and carrying every value in its canonical form.
 - Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types. Where an internal model duplicates the shape of an API DTO, it SHOULD reuse the shared value types and enums rather than cloning them — only the DTO wrapper is duplicated, not the vocabulary it is built from.
 - Types SHOULD be named domain-noun first, with the role/stage as a suffix (`AddressCreateParsed`, not `ParsedAddressCreate`).
 
