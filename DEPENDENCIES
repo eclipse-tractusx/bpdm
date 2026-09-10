@@ -11,7 +11,7 @@ maven/mavencentral/com.fasterxml.jackson.jakarta.rs/jackson-jakarta-rs-json-prov
 maven/mavencentral/com.fasterxml.jackson.jakarta.rs/jackson-jakarta-rs-yaml-provider/2.21.5, Apache-2.0, approved, #29992
 maven/mavencentral/com.fasterxml.jackson.module/jackson-module-jakarta-xmlbind-annotations/2.21.5, Apache-2.0, approved, #25588
 maven/mavencentral/com.fasterxml/classmate/1.7.3, Apache-2.0, approved, #24482
-maven/mavencentral/com.github.dasniko/testcontainers-keycloak/4.2.1, Apache-2.0, approved, #29991
+maven/mavencentral/com.github.dasniko/testcontainers-keycloak/4.3.1, Apache-2.0, approved, #31028
 maven/mavencentral/com.github.docker-java/docker-java-api/3.7.1, Apache-2.0, approved, #26612
 maven/mavencentral/com.github.docker-java/docker-java-transport-zerodep/3.7.1, Apache-2.0 AND MPL-2.0, approved, #25269
 maven/mavencentral/com.github.docker-java/docker-java-transport/3.7.1, Apache-2.0, approved, #26615
@@ -20,7 +20,6 @@ maven/mavencentral/com.github.java-json-tools/jackson-coreutils/2.0, Apache-2.0 
 maven/mavencentral/com.github.java-json-tools/json-patch/1.13, Apache-2.0 OR LGPL-3.0-or-later, approved, CQ23929
 maven/mavencentral/com.github.java-json-tools/msg-simple/1.2, Apache-2.0 OR LGPL-3.0-or-later, approved, #15239
 maven/mavencentral/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache-2.0, approved, CQ21949
-maven/mavencentral/com.github.tomakehurst/wiremock-jre8-standalone/2.35.2, MIT AND Apache-2.0, approved, #6979
 maven/mavencentral/com.ibm.async/asyncutil/0.1.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.jayway.jsonpath/json-path/2.10.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.neovisionaries/nv-i18n/1.29, Apache-2.0, approved, clearlydefined
@@ -173,9 +172,9 @@ maven/mavencentral/org.jboss.resteasy/resteasy-core/6.2.15.Final, Apache-2.0, ap
 maven/mavencentral/org.jboss.resteasy/resteasy-jackson2-provider/6.2.15.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jboss.resteasy/resteasy-jaxb-provider/6.2.15.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jboss.resteasy/resteasy-multipart-provider/6.2.15.Final, Apache-2.0, approved, clearlydefined
-maven/mavencentral/org.jboss.shrinkwrap/shrinkwrap-api/2.0.0-beta-2, Apache-2.0, approved, clearlydefined
-maven/mavencentral/org.jboss.shrinkwrap/shrinkwrap-impl-base/2.0.0-beta-2, Apache-2.0, approved, clearlydefined
-maven/mavencentral/org.jboss.shrinkwrap/shrinkwrap-spi/2.0.0-beta-2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jboss.shrinkwrap/shrinkwrap-api/2.0.0-beta-3, Apache-2.0, approved, #31029
+maven/mavencentral/org.jboss.shrinkwrap/shrinkwrap-impl-base/2.0.0-beta-3, Apache-2.0, approved, #31026
+maven/mavencentral/org.jboss.shrinkwrap/shrinkwrap-spi/2.0.0-beta-3, Apache-2.0, approved, #31027
 maven/mavencentral/org.jboss/jandex/2.4.5.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jetbrains.kotlin/kotlin-reflect/2.4.10, Apache-2.0, approved, #30182
 maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib-common/1.8.0, Apache-2.0, approved, #8910
@@ -192,8 +191,8 @@ maven/mavencentral/org.junit.jupiter/junit-jupiter-params/6.0.3, EPL-2.0, approv
 maven/mavencentral/org.junit.jupiter/junit-jupiter/6.0.3, EPL-2.0, approved, #25620
 maven/mavencentral/org.junit.platform/junit-platform-commons/6.0.3, EPL-2.0, approved, #22893
 maven/mavencentral/org.junit.platform/junit-platform-engine/6.0.3, EPL-2.0, approved, #23933
-maven/mavencentral/org.keycloak/keycloak-admin-client/26.0.9, Apache-2.0, approved, #26481
-maven/mavencentral/org.keycloak/keycloak-client-common-synced/26.0.9, Apache-2.0, approved, #22754
+maven/mavencentral/org.keycloak/keycloak-admin-client/26.0.11, Apache-2.0, approved, #26481
+maven/mavencentral/org.keycloak/keycloak-client-common-synced/26.0.11, Apache-2.0, approved, #22754
 maven/mavencentral/org.mockito/mockito-junit-jupiter/5.23.0, MIT, approved, #26528
 maven/mavencentral/org.objenesis/objenesis/3.3, Apache-2.0, approved, #19727
 maven/mavencentral/org.opentest4j/opentest4j/1.3.0, Apache-2.0, approved, #9713
@@ -292,6 +291,7 @@ maven/mavencentral/org.testcontainers/testcontainers-postgresql/2.0.5, MIT, appr
 maven/mavencentral/org.testcontainers/testcontainers/2.0.5, MIT, approved, #25274
 maven/mavencentral/org.webjars/swagger-ui/5.32.11, Apache-2.0 AND (Apache-2.0 AND MIT) AND MIT, approved, #27611
 maven/mavencentral/org.webjars/webjars-locator-lite/1.1.4, MIT, approved, #24484
+maven/mavencentral/org.wiremock/wiremock-standalone/3.0.1, MIT AND Apache-2.0, approved, #31025
 maven/mavencentral/org.xmlunit/xmlunit-core/2.11.0, Apache-2.0, approved, #24661
 maven/mavencentral/org.yaml/snakeyaml/2.6, Apache-2.0, approved, #26233
 maven/mavencentral/tools.jackson.core/jackson-core/3.1.5, Apache-2.0 AND MIT, approved, #26415
