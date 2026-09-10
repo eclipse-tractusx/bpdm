@@ -58,6 +58,7 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCrea
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.*
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskCoverageValidator
+import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskSiteMainAddressValidator
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -95,6 +96,7 @@ class TaskStepBuildService(
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
     private val coverageValidator: GoldenRecordTaskCoverageValidator,
+    private val siteMainAddressValidator: GoldenRecordTaskSiteMainAddressValidator,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper
 ) {
 
@@ -105,6 +107,7 @@ class TaskStepBuildService(
 
         assertParentsConsistent(businessPartnerDto, taskEntryBpnMapping)
         assertScriptVariantCoverage(businessPartnerDto, taskEntryBpnMapping)
+        assertSiteMainAddressStated(businessPartnerDto, taskEntryBpnMapping)
 
         val legalEntityResult = processLegalEntity(businessPartnerDto, taskEntryBpnMapping)
         val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
@@ -226,7 +229,7 @@ class TaskStepBuildService(
         val bpnLReference = legalEntity.bpnReference
         val bpnL = taskEntryBpnMapping.getBpn(bpnLReference)
 
-        val existingLegalEntityInformation by lazy { fetchLegalEntityResult(bpnL!!, hasChanged = false) }
+        val existingLegalEntityInformation by lazy { fetchExistingLegalEntityResult(bpnL!!) }
 
         val isDataSpaceParticipant = legalEntity.isParticipantData ?: if(bpnL != null) existingLegalEntityInformation.isParticipantData else false
 
@@ -254,7 +257,7 @@ class TaskStepBuildService(
         taskEntryBpnMapping.addMapping(legalAddress.bpnReference, upsertedLegalEntity.legalAddress.bpn)
 
         // Read the upserted golden record back so the reply carries its full state (matches the address path).
-        return fetchLegalEntityResult(upsertedLegalEntity.bpn, hasChanged = true)
+        return readUpsertedLegalEntityResult(upsertedLegalEntity.bpn)
     }
 
     private fun createLegalEntity(legalEntity: LegalEntity): LegalEntityDb {
@@ -273,10 +276,17 @@ class TaskStepBuildService(
         }
     }
 
-    private fun fetchLegalEntityResult(bpnL: String, hasChanged: Boolean?): LegalEntity =
+    private fun fetchExistingLegalEntityResult(bpnL: String): LegalEntity =
+        readLegalEntityResult(bpnL, hasChanged = false)
+            ?: throw BpdmValidationException("Legal entity with specified BPNL $bpnL not found")
+
+    private fun readUpsertedLegalEntityResult(bpnL: String): LegalEntity =
+        readLegalEntityResult(bpnL, hasChanged = true)
+            ?: error("Legal entity $bpnL was written by this task but cannot be read back")
+
+    private fun readLegalEntityResult(bpnL: String, hasChanged: Boolean?): LegalEntity? =
         businessPartnerFetchService.fetchDtosByBpns(listOf(bpnL)).firstOrNull()
             ?.let { taskResultMapper.toTaskResult(it, hasChanged) }
-            ?: throw BpdmValidationException("Legal entity with specified BPNL $bpnL not found")
 
     private fun processSite(
         businessPartner: BusinessPartner,
@@ -290,7 +300,7 @@ class TaskStepBuildService(
 
         val siteResult = if(bpnS != null && site.hasChanged == false){
             //No need to upsert, just fetch the information
-            fetchSiteResult(bpnS, hasChanged = false)
+            fetchExistingSiteResult(bpnS)
         } else {
             val bpnA = taskEntryBpnMapping.getBpn(site.siteMainAddress?.bpnReference)
             if (bpnA == null) {
@@ -334,7 +344,7 @@ class TaskStepBuildService(
         // address). The referenced service re-parents that existing address onto the new site - adding the site to
         // the address's site set - and derives the legal-entity parent from the address itself. The task states that
         // address's content too, so it is applied: the site's own view of its main address is its golden record.
-        val siteMainAddress = site.siteMainAddress ?: throw BpdmValidationException(GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message)
+        val siteMainAddress = site.siteMainAddress ?: error("Site to create on address ${existingAddress.bpn} states no main address")
         val bpnSReference = site.bpnReference
         val mergedSite = site.withRelevantScriptVariants(businessPartner)
 
@@ -346,7 +356,7 @@ class TaskStepBuildService(
 
         taskEntryBpnMapping.addMapping(bpnSReference, createdSite.bpn)
         taskEntryBpnMapping.addMapping(siteMainAddress.bpnReference, createdSite.mainAddress.bpn)
-        return fetchSiteResult(createdSite.bpn, hasChanged = true)
+        return readUpsertedSiteResult(createdSite.bpn)
     }
 
     private fun upsertSite(
@@ -357,7 +367,7 @@ class TaskStepBuildService(
     ): Site {
         val isSiteMainAndLegalAddress = site.siteMainIsLegalAddress
         val siteMainAddress = if(isSiteMainAndLegalAddress) businessPartner.legalEntity.legalAddress
-            else (site.siteMainAddress ?: throw BpdmValidationException(GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message))
+            else (site.siteMainAddress ?: error("Site ${site.bpnReference.referenceValue} states no main address"))
 
         val bpnSReference = site.bpnReference
         val bpnS = taskEntryBpnMapping.getBpn(bpnSReference)
@@ -375,7 +385,7 @@ class TaskStepBuildService(
         if(!isSiteMainAndLegalAddress)
             taskEntryBpnMapping.addMapping(siteMainAddress.bpnReference, upsertedSite.mainAddress.bpn)
 
-        return fetchSiteResult(upsertedSite.bpn, hasChanged = true)
+        return readUpsertedSiteResult(upsertedSite.bpn)
     }
 
     private fun createSite(
@@ -411,10 +421,19 @@ class TaskStepBuildService(
         }
     }
 
-    private fun fetchSiteResult(bpnS: String, hasChanged: Boolean?): Site =
+    // A site the task states but does not write is rejected with the main-address wording the throwing translation
+    // produced for it; a proper unresolvable-site error waits for the site BPN to be resolved by a parser.
+    private fun fetchExistingSiteResult(bpnS: String): Site =
+        readSiteResult(bpnS, hasChanged = false)
+            ?: throw BpdmValidationException(GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message)
+
+    private fun readUpsertedSiteResult(bpnS: String): Site =
+        readSiteResult(bpnS, hasChanged = true)
+            ?: error("Site $bpnS was written by this task but cannot be read back")
+
+    private fun readSiteResult(bpnS: String, hasChanged: Boolean?): Site? =
         siteRepository.findByBpn(bpnS)?.let { siteResponseMapper.toSiteWithMainAddress(it) }
             ?.let { taskResultMapper.toTaskResult(it.site, it.mainAddress, hasChanged) }
-            ?: throw BpdmValidationException(GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message)
 
     private fun processAdditionalAddress(
         businessPartner: BusinessPartner,
@@ -471,7 +490,7 @@ class TaskStepBuildService(
         }
 
     private fun readUpsertedAddress(bpnA: String): LogisticAddressDb =
-        logisticAddressRepository.findByBpn(bpnA) ?: throw BpdmValidationException(GoldenRecordTaskErrorMessage.BPNA_IS_NULL.message)
+        logisticAddressRepository.findByBpn(bpnA) ?: error("Address $bpnA was written by this task but cannot be read back")
 
     private fun toAddressResult(address: LogisticAddressDb, hasChanged: Boolean?): PostalAddressWithScriptVariants {
         val result = addressResponseMapper.toAddress(address)
@@ -613,6 +632,11 @@ class TaskStepBuildService(
         return legalEntity.scriptVariants
             .filterNot { it.scriptCode in statedScriptCodes }
             .map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.legalAddress) }
+    }
+
+    private fun assertSiteMainAddressStated(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
+        val violations = siteMainAddressValidator.validate(businessPartner, taskEntryBpnMapping)
+        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { parseErrorMapper.toTaskDescription(it) })
     }
 
     private fun assertScriptVariantCoverage(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {

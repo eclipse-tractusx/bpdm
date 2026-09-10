@@ -31,6 +31,14 @@ import org.springframework.stereotype.Component
 class GoldenRecordTaskParseErrorMapper {
 
     /**
+     * Describes an error the task decides for itself, before any of its operations runs.
+     */
+    fun toTaskDescription(error: GoldenRecordTaskParseError): String =
+        when (error) {
+            SiteMainAddressMissing -> GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message
+        }
+
+    /**
      * Describes an error from creating the task's additional address.
      */
     fun toAddressCreateDescription(error: AddressCreateParseError): String =
