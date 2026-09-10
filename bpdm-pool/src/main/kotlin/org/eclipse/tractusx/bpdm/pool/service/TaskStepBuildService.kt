@@ -57,6 +57,7 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressC
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.*
+import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskCoverageValidator
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -93,7 +94,7 @@ class TaskStepBuildService(
     private val addressUpdateService: AddressUpdateService,
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
-    private val coverageValidator: TaskScriptVariantCoverageValidator,
+    private val coverageValidator: GoldenRecordTaskCoverageValidator,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper
 ) {
 

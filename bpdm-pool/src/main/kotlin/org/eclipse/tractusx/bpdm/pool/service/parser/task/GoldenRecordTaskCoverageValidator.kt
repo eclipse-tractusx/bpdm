@@ -17,11 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageParseError
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.service.TaskEntryBpnMapping
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.orchestrator.api.model.BpnReference
@@ -38,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional
  * therefore parse without the coverage check and coverage is judged here, once, for the task as a whole.
  */
 @Service
-class TaskScriptVariantCoverageValidator(
+class GoldenRecordTaskCoverageValidator(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val partnerReader: AddressPartnerScriptCodeReader,
     private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator
