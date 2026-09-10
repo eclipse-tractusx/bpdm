@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.application.SharingMemberRecordApplicationService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.SharingMemberRecordApplicationV7Service
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecordApi
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SharingMemberRecordController(
-    private val sharingMemberRecordApplicationService: SharingMemberRecordApplicationService
+    private val sharingMemberRecordApplicationService: SharingMemberRecordApplicationV7Service
 ): SharingMemberRecordApi{
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
