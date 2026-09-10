@@ -23,16 +23,15 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
-import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordIdNotValid
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.util.toRecordUuid
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.util.*
 
 @Service
 class SharingMemberRecordOperation(
@@ -53,7 +52,7 @@ class SharingMemberRecordOperation(
     }
 
     fun updateRecord(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
-        val uuid = toUUID(request.recordId)
+        val uuid = toRecordUuid(request.recordId)
         val sharingMemberRecord = sharingMemberRecordRepository.findByPrivateIdIn(setOf(uuid))
             .firstOrNull() ?: throw BpdmRecordNotFoundException(listOf(uuid))
 
@@ -66,13 +65,6 @@ class SharingMemberRecordOperation(
 
         return toPrivateDto(sharingMemberRecord)
     }
-
-    private fun toUUID(uuidString: String) =
-        try {
-            UUID.fromString(uuidString)
-        } catch (e: IllegalArgumentException) {
-            throw BpdmRecordIdNotValid(uuidString)
-        }
 
     private fun toPrivateDto(entity: SharingMemberRecordDb): SharingMemberRecord {
         return toDto(entity, entity.privateId.toString())

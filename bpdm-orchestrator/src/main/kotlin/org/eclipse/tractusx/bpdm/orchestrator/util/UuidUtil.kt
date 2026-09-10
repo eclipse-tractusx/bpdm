@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.util
 
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordIdNotValid
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import java.util.UUID
 
 fun toUuidOrNull(uuidString: String): UUID? =
@@ -26,4 +28,18 @@ fun toUuidOrNull(uuidString: String): UUID? =
         UUID.fromString(uuidString)
     } catch (_: IllegalArgumentException) {
         null
+    }
+
+fun toTaskUuid(uuidString: String): UUID =
+    try {
+        UUID.fromString(uuidString)
+    } catch (e: IllegalArgumentException) {
+        throw BpdmTaskNotFoundException(uuidString)
+    }
+
+fun toRecordUuid(uuidString: String): UUID =
+    try {
+        UUID.fromString(uuidString)
+    } catch (e: IllegalArgumentException) {
+        throw BpdmRecordIdNotValid(uuidString)
     }
