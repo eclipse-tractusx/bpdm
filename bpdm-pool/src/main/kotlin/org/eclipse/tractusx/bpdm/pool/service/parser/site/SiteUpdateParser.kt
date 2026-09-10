@@ -60,7 +60,7 @@ class SiteUpdateParser(
      */
     @Transactional(readOnly = true)
     fun parseWithoutCoverageCheck(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
-        val targetResults = siteBpnParser.parseRequired(requests.map { it.siteBpn })
+        val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
         val mainAddressResults = addressContentParser.parse(requests.map { it.content.mainAddress }, ownerBpns)

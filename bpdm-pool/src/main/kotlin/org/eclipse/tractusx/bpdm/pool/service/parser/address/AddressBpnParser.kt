@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 
 /**
- * Resolves address BPNs to the addresses they name.
+ * Resolves address BPNs to the addresses they name, reading a BPN case-insensitively.
  */
 @Service
 class AddressBpnParser(
@@ -37,15 +37,18 @@ class AddressBpnParser(
      * Resolves each BPN to its address, failing the entry when no address carries that BPN.
      */
     fun parse(addressBpns: List<String>): List<ParseResult<LogisticAddressDb, UnresolvableAddress>> {
-        val addressesByBpn = logisticAddressRepository
-            .findDistinctByBpnIn(addressBpns.toSet())
-            .associateBy { it.bpn }
+        val addressesByBpn = resolve(addressBpns)
 
         return addressBpns.map { bpn ->
-            when (val address = addressesByBpn[bpn]) {
+            when (val address = addressesByBpn[bpn.uppercase()]) {
                 null -> ParseResult.ofSingleFailure(UnresolvableAddress(bpn))
                 else -> ParseResult.Success(address)
             }
         }
     }
+
+    private fun resolve(addressBpns: List<String>): Map<String, LogisticAddressDb> =
+        logisticAddressRepository
+            .findDistinctByBpnIn(addressBpns.mapTo(mutableSetOf()) { it.uppercase() })
+            .associateBy { it.bpn }
 }

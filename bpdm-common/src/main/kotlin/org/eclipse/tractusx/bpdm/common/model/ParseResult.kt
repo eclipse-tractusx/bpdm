@@ -146,6 +146,27 @@ fun <A, B, E> chainParseResults(
     }
 }
 
+/**
+ * Runs a strict [parse] over the entries that are present, positionally: an absent entry becomes a `Success(null)`
+ * without reaching [parse], and the verdicts of the present ones are woven back into their positions. Lets every
+ * resolving parser stay strict — an entity it cannot find is always a failure — while a caller whose reference is
+ * optional still receives one verdict per entry.
+ */
+fun <T, R, E> parseWherePresent(
+    values: List<T?>,
+    parse: (List<T>) -> List<ParseResult<R, E>>
+): List<ParseResult<R?, E>> {
+    val presentResults = parse(values.filterNotNull())
+
+    val presentIterator = presentResults.iterator()
+    return values.map { value ->
+        when (value) {
+            null -> ParseResult.Success(null)
+            else -> presentIterator.next()
+        }
+    }
+}
+
 fun <REQUEST, PARSED, CREATED, ERROR> parseAndExecute(
     requests: List<REQUEST>,
     parse: (List<REQUEST>) -> List<ParseResult<PARSED, ERROR>>,
