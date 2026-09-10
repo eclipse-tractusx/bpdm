@@ -36,6 +36,8 @@ class GoldenRecordTaskParseErrorMapper {
     fun toTaskDescription(error: GoldenRecordTaskParseError): String =
         when (error) {
             SiteMainAddressMissing -> GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message
+            is SiteNotInTaskLegalEntity -> GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message
+            is AdditionalAddressNotInTaskLegalEntity -> GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message
         }
 
     /**

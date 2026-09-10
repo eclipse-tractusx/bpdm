@@ -58,6 +58,7 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCrea
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.*
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskCoverageValidator
+import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskParentConsistencyValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskSiteMainAddressValidator
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
@@ -97,6 +98,7 @@ class TaskStepBuildService(
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
     private val coverageValidator: GoldenRecordTaskCoverageValidator,
     private val siteMainAddressValidator: GoldenRecordTaskSiteMainAddressValidator,
+    private val parentConsistencyValidator: GoldenRecordTaskParentConsistencyValidator,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper
 ) {
 
@@ -584,27 +586,8 @@ class TaskStepBuildService(
     }
 
     private fun assertParentsConsistent(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
-        val addressBpn = businessPartner.additionalAddress?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
-        val siteBpn = businessPartner.site?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
-        val legalEntityBpn = taskEntryBpnMapping.getBpn(businessPartner.legalEntity.bpnReference)
-
-        if (siteBpn != null) {
-            val foundSite = siteRepository.findByBpn(siteBpn)
-            if (foundSite != null) {
-                if (foundSite.legalEntity.bpn != legalEntityBpn) {
-                    throw BpdmValidationException(GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
-                }
-            }
-        }
-
-        if (addressBpn != null) {
-            val foundAddress = logisticAddressRepository.findByBpn(addressBpn)
-            if (foundAddress != null) {
-                if (foundAddress.legalEntity!!.bpn != legalEntityBpn) {
-                    throw BpdmValidationException(GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
-                }
-            }
-        }
+        val violations = parentConsistencyValidator.validate(businessPartner, taskEntryBpnMapping)
+        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { parseErrorMapper.toTaskDescription(it) })
     }
 
     private fun PostalAddress.withUpdatedNumberOfSharingMembers(fromCandidates: Collection<LogisticAddressDb>): PostalAddress{
