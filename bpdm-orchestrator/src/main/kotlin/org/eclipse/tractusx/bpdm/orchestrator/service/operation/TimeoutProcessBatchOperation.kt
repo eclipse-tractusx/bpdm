@@ -19,19 +19,35 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
+import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.orchestrator.service.PaginationInfo
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
 class TimeoutProcessBatchOperation(
     private val goldenRecordTaskService: GoldenRecordTaskService,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
+    private val taskConfigProperties: TaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Reports whether task timeout processing runs on a schedule in this deployment.
+     */
+    @PostConstruct
+    fun logScheduleActivation() {
+        if (taskConfigProperties.timeoutCheckCron == CRON_DISABLED)
+            logger.info { "Task timeout processing schedule is disabled" }
+        else
+            logger.info { "Task timeout processing scheduled with cron '${taskConfigProperties.timeoutCheckCron}'" }
+    }
+
+    @Scheduled(cron = "\${bpdm.task.timeoutCheckCron}")
     fun processForTimeouts() {
         try {
             // Track the total number of processed tasks
@@ -56,5 +72,9 @@ class TimeoutProcessBatchOperation(
             entityManager.clear() // Clear the persistence context to free memory
         } while (paginationInfo.hasNextPage)
         return processedTasks
+    }
+
+    companion object {
+        private const val CRON_DISABLED = "-"
     }
 }
