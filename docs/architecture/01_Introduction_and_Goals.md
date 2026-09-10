@@ -14,7 +14,8 @@ The Golden Record business partner data in combination with the BPN acts as the 
 > A Business Partner Data cleaning as well as Golden Record Creation Process is **not** part of this reference implementation!
 
 **Additional Information Material**:
-* Visit BPDM on the official Catena-X Website: [bpdm_catenax_website](https://catena-x.net/en/offers-standards/bpdm)
+* Visit BPDM on the official Catena-X Website: [bpdm_catenax_website](https://catena-x.net/de/angebote-standards/bpdm)
+* The standards BPDM implements: [CX-0010 Business Partner Number](https://catenax-ev.github.io/docs/standards/CX-0010-BusinessPartnerNumber), [CX-0012 Business Partner Data Pool API](https://catenax-ev.github.io/docs/standards/CX-0012-BusinessPartnerDataPoolAPI), [CX-0074 Business Partner Gate API](https://catenax-ev.github.io/docs/standards/CX-0074-BusinessPartnerGateAPI)
 
 ## Goals Overview
 
@@ -26,14 +27,10 @@ The following goals have been established for this system:
 | 1        | Provide centralized Master Data Management for business partner data                                         |
 | 2        | Enable network-based data sharing for business partner data to increase overall data quality and reliability |
 | 2        | Enable also Small and medium-sized Businesses (SMEs) to use the services |
-| 3        | Provide a change history für business partner data |
+| 3        | Provide a change history for business partner data |
 
 
 ## Requirements Overview
-
-> [!IMPORTANT]
-> **Cross-Check with CACs**
-
 
 ![bpdm_usecase_diagram](assets/usecase_diagram.drawio.svg)
 
@@ -64,22 +61,30 @@ The following Usecases together with its requirements exist for this system:
 | 1        | Sensitivity of data     | the uploaded business partner data is highly sensitive, that's why it must be ensured that no unauthorized user/system can access data which does not belong to it. More over it must be guaranteed that no one can see the business partners related to the specific Catena-X Member.                                                                                                               |
 
 ## Stakeholders
-| Role/Name               | Expectations                                                                                                 | Example                                                                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Big Company (CX-Member) | Company wants to have cleaned and enriched business partner data objects with a BPN.                         |                                                                                                                                             |
-| SME Company (CX-Member) | Company wants to have cleaned and enriched business partner data objects with a BPN based on a CSV data.     |                                                                                                                                             |
-| CX Apps                 | Other apps and their use cases want to use the business partner data objects and the BPN for their processes | The CX Portal will use the BPN for on-boarding new companies into the network. Traceability Apps will use BPN to describe business partners |
+
+The API documentation describes the same roles from an integrator's perspective, each with its own
+guide: [sharing member](../api/sharing-member-guide.md),
+[dataspace participant](../api/dataspace-participant-guide.md) and
+[refinement service provider](../api/refinement-service-guide.md).
+
+| Role/Name                              | Expectations                                                                                                       | Example                                                                                                                                    |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| Sharing member (big company)           | Company wants to have cleaned and enriched business partner data objects with a BPN.                               | Shares its business partner data through the Gate API from its master data management system                                                |
+| Sharing member (SME)                   | Company wants to have cleaned and enriched business partner data objects with a BPN based on a CSV data.            | Shares its business partner data as a CSV file through the Gate's partner upload endpoints                                                 |
+| Dataspace participant                  | Resolve the BPNs it receives from other participants and look up the golden record behind them                     | A use case application that receives a BPN in a data offer and needs the legal entity behind it                                            |
+| Refinement service provider            | Integrate a duplication check, cleaning or validation step into the golden record process                          | A commercial data provider reserving golden record tasks from the Orchestrator API                                                         |
+| CX Apps                                | Other apps and their use cases want to use the business partner data objects and the BPN for their processes        | The CX Portal will use the BPN for on-boarding new companies into the network. Traceability Apps will use BPN to describe business partners |
 
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 - SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2024 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2024 SAP SE
-- SPDX-FileCopyrightText: 2023,2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2024 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2024 Robert Bosch GmbH
-- SPDX-FileCopyrightText: 2023,2024 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2024 Contributors to the Eclipse Foundation
+- SPDX-FileCopyrightText: 2023-2026 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023-2026 SAP SE
+- SPDX-FileCopyrightText: 2023-2026 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023-2026 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023-2026 Robert Bosch GmbH
+- SPDX-FileCopyrightText: 2023-2026 Schaeffler AG
+- SPDX-FileCopyrightText: 2023-2026 Contributors to the Eclipse Foundation
 - Source URL: https://github.com/eclipse-tractusx/bpdm

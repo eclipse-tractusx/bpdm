@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 
 /**
- * Resolves site BPNs to the sites they name.
+ * Resolves site BPNs to the sites they name, reading a BPN case-insensitively.
  */
 @Service
 class SiteBpnParser(
@@ -34,32 +34,34 @@ class SiteBpnParser(
 ) {
 
     /**
-     * Resolves each BPN to its site and a null BPN to a legitimately absent site, failing the entry when no site carries
-     * a given BPN. Owning the optionality here keeps callers free of null special-casing.
-     */
-    fun parse(siteBpns: List<String?>): List<ParseResult<SiteDb?, UnresolvableSite>> {
-        val sitesByBpn = resolve(siteBpns.filterNotNull().toSet())
-        return siteBpns.map { bpn ->
-            when (bpn) {
-                null -> ParseResult.Success(null)
-                else -> resolveResult(bpn, sitesByBpn)
-            }
-        }
-    }
-
-    /**
      * Resolves each BPN to its site, failing the entry when no site carries that BPN.
      */
-    fun parseRequired(siteBpns: List<String>): List<ParseResult<SiteDb, UnresolvableSite>> {
+    fun parse(siteBpns: List<String>): List<ParseResult<SiteDb, UnresolvableSite>> {
         val sitesByBpn = resolve(siteBpns.toSet())
         return siteBpns.map { bpn -> resolveResult(bpn, sitesByBpn) }
     }
 
+    /**
+     * Resolves each entry's BPNs to their sites, failing an entry with one error per BPN no site carries.
+     */
+    fun parseAll(siteBpnsPerEntry: List<List<String>>): List<ParseResult<List<SiteDb>, UnresolvableSite>> {
+        val sitesByBpn = resolve(siteBpnsPerEntry.flatten().toSet())
+        return siteBpnsPerEntry.map { resolveAllResult(it, sitesByBpn) }
+    }
+
     private fun resolve(bpns: Set<String>): Map<String, SiteDb> =
-        siteRepository.findDistinctByBpnIn(bpns).associateBy { it.bpn }
+        siteRepository.findDistinctByBpnIn(bpns.mapTo(mutableSetOf()) { it.uppercase() }).associateBy { it.bpn }
+
+    private fun resolveAllResult(bpns: List<String>, sitesByBpn: Map<String, SiteDb>): ParseResult<List<SiteDb>, UnresolvableSite> {
+        val unresolvable = bpns.filterNot { sitesByBpn.containsKey(it.uppercase()) }.map { UnresolvableSite(it) }
+        return when {
+            unresolvable.isNotEmpty() -> ParseResult.Failure(unresolvable)
+            else -> ParseResult.Success(bpns.map { sitesByBpn.getValue(it.uppercase()) })
+        }
+    }
 
     private fun resolveResult(bpn: String, sitesByBpn: Map<String, SiteDb>): ParseResult<SiteDb, UnresolvableSite> =
-        when (val site = sitesByBpn[bpn]) {
+        when (val site = sitesByBpn[bpn.uppercase()]) {
             null -> ParseResult.ofSingleFailure(UnresolvableSite(bpn))
             else -> ParseResult.Success(site)
         }

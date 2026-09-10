@@ -23,6 +23,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskCreateApplicationService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskResolveApplicationService
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.HttpStatus
@@ -33,7 +35,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class GoldenRecordTaskController(
     val apiConfigProperties: ApiConfigProperties,
-    val goldenRecordTaskService: GoldenRecordTaskService
+    val goldenRecordTaskService: GoldenRecordTaskService,
+    val goldenRecordTaskCreateApplicationService: GoldenRecordTaskCreateApplicationService,
+    val goldenRecordTaskResolveApplicationService: GoldenRecordTaskResolveApplicationService
 ) : GoldenRecordTaskApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
@@ -41,7 +45,7 @@ class GoldenRecordTaskController(
         if (createRequest.requests.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
-        return goldenRecordTaskService.createTasks(createRequest)
+        return goldenRecordTaskCreateApplicationService.createTasksV7(createRequest)
     }
 
     @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")
@@ -58,7 +62,7 @@ class GoldenRecordTaskController(
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
 
-        goldenRecordTaskService.resolveStepResults(resultRequest)
+        goldenRecordTaskResolveApplicationService.resolveStepResults(resultRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")

@@ -21,15 +21,17 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Applies a full parsed address-update payload — descriptive content plus an optional site assignment — to an
+ * Applies a full parsed address-update payload — descriptive content plus an optionally stated site membership — to an
  * already-resolved address, replacing every field the payload covers.
  */
 @Service
@@ -52,7 +54,7 @@ class AddressPayloadUpdateService(
     fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
         parsed.map { entry ->
             addressStagedUpdateService.stageUpdate(
-                AddressUpdate(entry.target, addressUpdateMapper.toFullUpdate(entry.address, listOfNotNull(entry.site)))
+                AddressUpdate(entry.target, addressUpdateMapper.toFullUpdate(entry.address, entry.sites.toFieldUpdate()))
             )
         }
 
@@ -62,4 +64,7 @@ class AddressPayloadUpdateService(
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressStagedUpdateService.commit(staged)
+
+    private fun List<SiteDb>?.toFieldUpdate(): FieldUpdate<List<SiteDb>> =
+        this?.let { FieldUpdate.Set(it) } ?: FieldUpdate.NoOp
 }

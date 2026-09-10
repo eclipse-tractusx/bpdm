@@ -42,11 +42,6 @@ class IdentifierTypeCreateService(
      */
     @Transactional
     fun create(identifierType: IdentifierTypeCreateParsed): IdentifierTypeDb {
-        logger.info {
-            "Create new Identifier-Type with key ${identifierType.technicalKey}, " +
-                    "businessPartnerType ${identifierType.businessPartnerType} and name ${identifierType.name}"
-        }
-
         val entity = IdentifierTypeDb(
             technicalKey = identifierType.technicalKey,
             businessPartnerType = identifierType.businessPartnerType,
@@ -60,5 +55,10 @@ class IdentifierTypeCreateService(
         entity.details.addAll(identifierType.details.map { IdentifierTypeDetailDb(entity, it.country, it.mandatory) })
 
         return identifierTypeRepository.save(entity)
+            .also {
+                logger.info {
+                    "Created identifier type '${it.technicalKey}' for ${it.businessPartnerType} with name ${it.name}"
+                }
+            }
     }
 }

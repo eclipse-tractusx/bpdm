@@ -34,7 +34,7 @@ class TriggerBatchProcessExecutionService(
 
     @Scheduled(cron = "#{${GoldenRecordEventTriggerConfigProperties.GET_CRON}}", zone = "UTC")
     fun executeUnprocessedTriggers(){
-        logger.info("Execute unprocessed triggers")
+        logger.debug("Execute unprocessed triggers")
         batchProcessExecutionService.executeUntilFinished(addressRelationTriggerExecutionService)
         batchProcessExecutionService.executeUntilFinished(legalEntityRelationTriggerExecutionService)
     }

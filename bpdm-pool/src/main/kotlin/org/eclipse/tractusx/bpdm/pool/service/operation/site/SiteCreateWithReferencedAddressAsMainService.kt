@@ -19,19 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -54,6 +57,8 @@ class SiteCreateWithReferencedAddressAsMainService(
     private val changelogCreateService: ChangelogCreateService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Creates the given sites on their referenced main addresses and returns the persisted entities.
      */
@@ -74,17 +79,24 @@ class SiteCreateWithReferencedAddressAsMainService(
         siteRepository.saveAll(sites)
         changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
 
+        if (sites.isNotEmpty())
+            logger.info { "Created ${countForLog(sites.size, "site", "sites")}: ${sites.map { it.bpn }.joinIdentifiersForLog()}" }
+
         addressUpdateService.commit(stagedAddressUpdates.values.toList())
 
         return sites
     }
 
+    // Creating a site says nothing about the address's other memberships, so the new sites are stated on top of the
+    // ones the address already has rather than in place of them — the update vocabulary replaces what it is given.
     private fun mainAddressUpdate(ofOneAddress: List<Pair<SiteCreateWithReferencedAddressAsMainParsed, SiteDb>>): AddressContentUpdate {
-        val sites = ofOneAddress.map { (_, site) -> site }
+        val mainAddress = ofOneAddress.first().first.mainAddress
+        val newSites = ofOneAddress.map { (_, site) -> site }
+        val sites = FieldUpdate.Set(mainAddress.sites.toList() + newSites)
         val statedContent = ofOneAddress.mapNotNull { (entry, _) -> entry.mainAddressContent }.singleOrNull()
 
         return statedContent
-            ?.let { addressUpdateMapper.toFullUpdate(it, assignToSites = sites) }
-            ?: AddressContentUpdate.NoOp.copy(assignToSites = FieldUpdate.Set(sites))
+            ?.let { addressUpdateMapper.toFullUpdate(it, sites) }
+            ?: AddressContentUpdate.NoOp.copy(sites = sites)
     }
 }

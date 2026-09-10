@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import jakarta.annotation.PostConstruct
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.service.*
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
@@ -38,54 +39,70 @@ class GoldenRecordTaskConfiguration(
     private val sharingMemberRecordCountedService: GoldenRecordCountedService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     @PostConstruct
     fun scheduleGoldenRecordTasks() {
         taskScheduler.scheduleIfEnabled(
+            "golden record task creation from sharing member data",
             { taskCreationService.createTasksForReadyBusinessPartners() },
             configProperties.creation.fromSharingMember.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "business partner output update from pool changes",
             { updateService.updateOutputOnGoldenRecordChange() },
             configProperties.creation.fromPool.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "golden record task resolution",
             { taskResolutionService.resolveTasks() },
             configProperties.check.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "golden record task health check",
             { taskResolutionService.healthCheck() },
             configProperties.healthCheck.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "golden record consistency check",
             { goldenRecordConsistencyService.check() },
             configProperties.consistencyCheck.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "golden record relation task creation",
             { relationTaskCreationService.sendTasks() },
             configProperties.relationCreation.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "golden record relation task resolution",
             { relationTaskResolutionService.checkResolveTasks() },
             configProperties.relationCreation.cron
         )
 
         taskScheduler.scheduleIfEnabled(
+            "golden record count synchronization",
             { sharingMemberRecordCountedService.synchronizeGoldenRecordCounted() },
             configProperties.recordSync.cron
         )
     }
 
-    private fun TaskScheduler.scheduleIfEnabled(task: Runnable, cronExpression: String) {
-        if (cronExpression != "-") {
-            schedule(task, CronTrigger(cronExpression))
+    private fun TaskScheduler.scheduleIfEnabled(name: String, task: Runnable, cronExpression: String) {
+        if (cronExpression == CRON_DISABLED) {
+            logger.info { "Schedule '$name' is disabled" }
+            return
         }
+
+        logger.info { "Schedule '$name' activated with cron '$cronExpression'" }
+        schedule(task, CronTrigger(cronExpression))
     }
 
-
+    companion object {
+        private const val CRON_DISABLED = "-"
+    }
 }

@@ -86,7 +86,14 @@ class AddressParseErrorMapper {
                             "is named in that script",
                     entityKey
                 )
-            is UnresolvableSite,
+            is UnresolvableSite ->
+                ErrorInfo(AddressUpdateError.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
+            is SiteMainAddressOmitted ->
+                ErrorInfo(
+                    AddressUpdateError.SiteMainAddressOmitted,
+                    "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
+                    entityKey
+                )
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 

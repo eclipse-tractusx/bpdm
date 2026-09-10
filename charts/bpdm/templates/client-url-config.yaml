@@ -25,6 +25,13 @@ SPDX-License-Identifier: Apache-2.0
 # Mounted by the BPDM applications (and the test pod) via their
 # externalApplicationConfig; the authentication credentials for each client are
 # kept in the per-service Keycloak config Secrets.
+#
+# The base-url of a further sharing member's Gate is also what tells the tester
+# it can share as that member, and the tester's own defaults name the three
+# Gates of a local installation. A release deploys one Gate, so the other two
+# are blanked here rather than left out: an omitted base-url would leave the
+# tester dialling localhost from inside the test pod instead of skipping the
+# scenarios that take more than one sharing member.
 apiVersion: v1
 kind: Secret
 metadata:
@@ -40,5 +47,9 @@ stringData:
           base-url: {{ include "bpdm.orchestratorUrl" . | quote }}
         pool:
           base-url: {{ include "bpdm.poolUrl" . | quote }}
-        gate:
+        gate-input:
           base-url: {{ include "bpdm.gateUrl" . | quote }}
+        gate-2-input:
+          base-url: ""
+        gate-3-input:
+          base-url: ""

@@ -59,7 +59,7 @@ class GoldenRecordUpdateBatchService(
     private val logger = KotlinLogging.logger { }
 
     fun updateOutputOnGoldenRecordChange(){
-        logger.info { "Update Business Partner Output based on Golden Record Updates from the Pool..." }
+        logger.debug { "Update Business Partner Output based on Golden Record Updates from the Pool..." }
 
         var totalLegalEntitiesUpdated = 0
         var totalSitesUpdated = 0
@@ -72,7 +72,10 @@ class GoldenRecordUpdateBatchService(
             totalAddressesUpdated += stats.updatedAddresses
         }while (stats.foundChangelogEntries != 0)
 
-        logger.debug { "In total updated '$totalLegalEntitiesUpdated' legal entities, '$totalSitesUpdated' sites and '$totalAddressesUpdated' addresses." }
+        if (totalLegalEntitiesUpdated > 0 || totalSitesUpdated > 0 || totalAddressesUpdated > 0)
+            logger.info { "Updated business partner output of $totalLegalEntitiesUpdated legal entities, $totalSitesUpdated sites and $totalAddressesUpdated addresses" }
+        else
+            logger.debug { "No golden record updates from the Pool to apply to business partner output" }
     }
 }
 
@@ -91,7 +94,7 @@ class GoldenRecordUpdateChunkService(
 
     @Transactional
     fun updateFromNextChunk(): UpdateStats{
-        logger.info { "Update next chunk of Business Partner Output based on Golden Record Updates from the Pool..." }
+        logger.debug { "Update next chunk of Business Partner Output based on Golden Record Updates from the Pool..." }
 
         val syncRecord = syncRecordService.getOrCreateRecord(SyncTypeDb.POOL_TO_GATE_OUTPUT)
 
@@ -106,21 +109,25 @@ class GoldenRecordUpdateChunkService(
 
         logger.debug { "Found ${changedBpnLs.size} BPNL, ${changedBpnSs.size} BPNS and ${changedBpnAs.size} BPNA entries." }
 
-        val updatedLegalEntities = updateLegalEntities(changedBpnLs).size
-        val updatedSites = updateSites(changedBpnSs).size
-        val updatedAddresses = updateAddresses(changedBpnAs).size
+        val updatedLegalEntities = updateLegalEntities(changedBpnLs)
+        val updatedSites = updateSites(changedBpnSs)
+        val updatedAddresses = updateAddresses(changedBpnAs)
+
+        businessPartnerService.reportWrites(updatedLegalEntities + updatedSites + updatedAddresses, StageType.Output)
 
         syncRecordService.updateRecord(syncRecord, poolChangelogEntries.content.lastOrNull()?.timestamp)
 
-        logger.debug { "Updated '$updatedLegalEntities' legal entities, '$updatedSites' sites and '$updatedAddresses' addresses." }
+        logger.debug { "Updated '${updatedLegalEntities.size}' legal entities, '${updatedSites.size}' sites and '${updatedAddresses.size}' addresses." }
 
-        return UpdateStats(poolChangelogEntries.content.size, updatedLegalEntities, updatedSites, updatedAddresses)
+        return UpdateStats(poolChangelogEntries.content.size, updatedLegalEntities.size, updatedSites.size, updatedAddresses.size)
     }
 
     fun updateAgainstPool(businessPartners: List<BusinessPartnerDb>){
-        updateLegalEntitiesByReference(businessPartners).size
-        updateSitesByReference(businessPartners.filter { it.bpnS != null }).size
-        updateAddressesByReference(businessPartners).size
+        val updatedLegalEntities = updateLegalEntitiesByReference(businessPartners)
+        val updatedSites = updateSitesByReference(businessPartners.filter { it.bpnS != null })
+        val updatedAddresses = updateAddressesByReference(businessPartners)
+
+        businessPartnerService.reportWrites(updatedLegalEntities + updatedSites + updatedAddresses, StageType.Output)
     }
 
     private fun updateLegalEntities(changedBpnLs: Collection<String>): List<BusinessPartnerService.UpsertResult> {

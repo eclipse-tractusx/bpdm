@@ -19,31 +19,51 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityGetParsed
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityGetParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityGetRequest
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
 /**
- * Turns a loose legal entity fetch request into the normalized form the fetch operation looks the legal entity up by.
+ * Resolves a legal entity fetch request to the legal entity it names.
  *
- * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: neither the
- * requested identifier value nor its type can be rejected — that they name no legal entity is the fetch's outcome, not
- * a parse error.
+ * The request names its legal entity either by BPN or by one of its other identifiers, which are looked up by different
+ * queries; the identifier type the request leaves out defaults to the BPN type.
  */
 @Service
 class LegalEntityGetParser(
-    private val bpnConfigProperties: BpnConfigProperties
+    private val bpnConfigProperties: BpnConfigProperties,
+    private val legalEntityBpnParser: LegalEntityBpnParser,
+    private val legalEntityRepository: LegalEntityRepository
 ) {
 
     /**
-     * Decides which identifier the legal entity is looked up by, defaulting to its BPN when the request names no
-     * identifier type, and normalizes the request so a BPN is read case-insensitively.
+     * Resolves the requested identifier to its legal entity, failing when no legal entity carries it.
      */
-    fun parse(request: LegalEntityGetRequest): LegalEntityGetParsed {
+    fun parse(request: LegalEntityGetRequest): ParseResult<LegalEntityDb, LegalEntityGetParseError> {
         val identifierType = request.identifierType ?: bpnConfigProperties.id
 
-        return if (identifierType == bpnConfigProperties.id) LegalEntityGetParsed.ByBpn(request.identifierValue.uppercase())
-        else LegalEntityGetParsed.ByIdentifier(identifierType, request.identifierValue)
+        return when (identifierType) {
+            bpnConfigProperties.id -> legalEntityBpnParser.parse(listOf(request.identifierValue)).single()
+            else -> resolveByIdentifier(identifierType, request.identifierValue)
+        }
+    }
+
+    private fun resolveByIdentifier(identifierTypeKey: String, identifierValue: String): ParseResult<LegalEntityDb, LegalEntityGetParseError> {
+        val legalEntity = legalEntityRepository.findByIdentifierTypeKeyAndValueIgnoreCase(
+            IdentifierBusinessPartnerType.LEGAL_ENTITY,
+            identifierTypeKey,
+            identifierValue
+        )
+
+        return when (legalEntity) {
+            null -> ParseResult.ofSingleFailure(UnresolvableLegalEntityIdentifier(identifierTypeKey, identifierValue))
+            else -> ParseResult.Success(legalEntity)
+        }
     }
 }

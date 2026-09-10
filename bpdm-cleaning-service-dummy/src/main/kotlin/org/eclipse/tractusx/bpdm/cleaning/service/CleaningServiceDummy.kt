@@ -56,7 +56,7 @@ class CleaningServiceDummy(
 
     private fun processPollingTasks(step: TaskStep) {
         try {
-            logger.info { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
+            logger.debug { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
 
             do{
                 val cleaningRequest = orchestrationApiClient.goldenRecordTasks
@@ -64,7 +64,7 @@ class CleaningServiceDummy(
 
                 val cleaningTasks = cleaningRequest.reservedTasks
 
-                logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
+                logger.debug { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
                 if (cleaningTasks.isNotEmpty()) {
                     val cleaningResults = cleaningTasks.map { reservedTask ->
@@ -72,7 +72,7 @@ class CleaningServiceDummy(
                     }
 
                     orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
-                    logger.info { "Cleaning tasks processing completed for this iteration." }
+                    logger.debug { "Cleaning tasks processing completed for this iteration." }
                 }
             }while (cleaningRequest.reservedTasks.isNotEmpty())
         } catch (e: Exception) {
@@ -164,6 +164,11 @@ class CleaningServiceDummy(
     }
 
 
+    // The Pool takes this list together with the record's own site as the address's complete site membership and
+    // unlinks whatever it leaves out. Consolidating the records that share an address into that complete list needs the
+    // whole stream over time, which this service does not see - it is handed one record per task and keeps no ledger.
+    // So it passes the sharing member's own statement through: an address several records name ends up with the sites
+    // of whichever record was refined last. A refinement service meant for production has to keep that ledger.
     private fun cleanAdditionalSites(businessPartner: BusinessPartner): List<AdditionalSite> {
         return businessPartner.additionalSites.map { additionalSite ->
             // An entry without a name offers nothing to derive a distinct reference from, and the record's name parts -
