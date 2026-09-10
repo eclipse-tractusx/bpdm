@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskErrorMessage
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
@@ -121,7 +121,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
-        assertTaskError(createResult[0], "TASK_1", CleaningError.LEGAL_NAME_IS_NULL)
+        assertTaskError(createResult[0], "TASK_1", GoldenRecordTaskErrorMessage.LEGAL_NAME_IS_NULL)
     }
 
     @Test
@@ -1001,7 +1001,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
         assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
     @Test
@@ -1021,7 +1021,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
         assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
 
@@ -1141,7 +1141,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
     }
 
-    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
+    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: GoldenRecordTaskErrorMessage) {
 
         assertThat(step.taskId).isEqualTo(taskId)
         assertThat(step.errors.size).isEqualTo(1)
