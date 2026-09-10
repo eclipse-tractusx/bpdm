@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service.application
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -27,8 +27,11 @@ import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryReque
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.springframework.stereotype.Service
 
+/**
+ * The REST-API boundary for the V7 "sharing member record" operations.
+ */
 @Service
-class SharingMemberRecordApplicationService(
+class SharingMemberRecordApplicationV7Service(
     private val recordOperation: SharingMemberRecordOperation
 ) {
 

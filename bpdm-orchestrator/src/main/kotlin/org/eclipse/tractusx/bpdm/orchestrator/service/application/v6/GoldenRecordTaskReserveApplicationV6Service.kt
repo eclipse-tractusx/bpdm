@@ -17,25 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service.application
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskReserveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskReserveOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskReserveParser
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+/**
+ * The REST-API boundary for the V6 "reserve golden record tasks" operation.
+ */
 @Service
-class GoldenRecordTaskReserveApplicationService(
+class GoldenRecordTaskReserveApplicationV6Service(
     private val parser: GoldenRecordTaskReserveParser,
     private val operation: GoldenRecordTaskReserveOperation
 ) {
 
     @Transactional
-    fun reserveTasksForStep(reservationRequest: GoldenRecordTaskReserveRequest): TaskStepReservationResponse {
-        val parseResult = parser.parse(reservationRequest)
+    fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
+        val unifiedRequest = GoldenRecordTaskReserveRequest(reservationRequest.step, reservationRequest.amount)
+        val parseResult = parser.parse(unifiedRequest)
         
         return when (parseResult) {
             is ParseResult.Success -> operation.execute(parseResult.parsed)

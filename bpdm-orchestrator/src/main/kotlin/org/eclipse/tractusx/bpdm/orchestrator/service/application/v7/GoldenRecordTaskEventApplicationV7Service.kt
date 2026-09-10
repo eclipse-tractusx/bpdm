@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service.application
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskEventOperation
@@ -25,8 +25,11 @@ import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.stereotype.Service
 import java.time.Instant
 
+/**
+ * The REST-API boundary for the V7 "get finished task events" operation.
+ */
 @Service
-class GoldenRecordTaskEventApplicationService(
+class GoldenRecordTaskEventApplicationV7Service(
     private val eventOperation: GoldenRecordTaskEventOperation
 ) {
 

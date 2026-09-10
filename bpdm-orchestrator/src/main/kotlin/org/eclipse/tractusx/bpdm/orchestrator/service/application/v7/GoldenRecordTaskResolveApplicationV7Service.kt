@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service.application
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
@@ -31,8 +31,11 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+/**
+ * The REST-API boundary for the V7 "resolve golden record task results" operation.
+ */
 @Service
-class GoldenRecordTaskResolveApplicationService(
+class GoldenRecordTaskResolveApplicationV7Service(
     private val parser: GoldenRecordTaskResolveParser,
     private val operation: GoldenRecordTaskResolveOperation
 ) {
