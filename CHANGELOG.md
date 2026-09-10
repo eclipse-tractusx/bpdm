@@ -6,7 +6,17 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [7.5.0] - unreleased
+## [7.6.0] - unreleased
+
+### Breaking
+
+### Added
+
+### Changed
+
+- BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
+
+## [7.5.0] - 2026-09-08
 
 ### Breaking
 

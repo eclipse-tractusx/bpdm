@@ -20,9 +20,9 @@ Source:
 
 - Bpdm-Gate
 - Bpdm-Pool
-- Bpdm-Bridge-dummy
 - Bpdm-Orchestrator
 - Bpdm-Cleaning-service-dummy
+- Bpdm-System-tester
 
 ### How to use
 
@@ -51,7 +51,7 @@ The Dockerfiles specified in this directory, all contain different types of argu
 
 - **ARG USERNAME=bpdm**: Change the username for the non-root user.
 - **ARG USERID=10001**: Change the user ID for the non-root user.
-- **ARG GID=3000**: Change the group ID for the non-root user.
+- **ARG GID=10001**: Change the group ID for the non-root user.
 
 ## Notice for Docker image
 
@@ -59,4 +59,4 @@ The Dockerfiles specified in this directory, all contain different types of argu
 * [BPDM Gate](./gate/DOCKER_NOTICE.md)
 * [BPDM Orchestrator](./orchestrator/DOCKER_NOTICE.md)
 * [BPDM Cleaning Service Dummy](./cleaning-service-dummy/DOCKER_NOTICE.md)
-* [BPDM Bridge Dummy](./bridge-dummy/DOCKER_NOTICE.md)
+* [BPDM System Tester](./system-tester/DOCKER_NOTICE.md)
