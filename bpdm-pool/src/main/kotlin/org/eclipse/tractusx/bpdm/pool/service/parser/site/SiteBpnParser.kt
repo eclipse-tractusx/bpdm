@@ -34,23 +34,9 @@ class SiteBpnParser(
 ) {
 
     /**
-     * Resolves each BPN to its site and a null BPN to a legitimately absent site, failing the entry when no site carries
-     * a given BPN. Owning the optionality here keeps callers free of null special-casing.
-     */
-    fun parse(siteBpns: List<String?>): List<ParseResult<SiteDb?, UnresolvableSite>> {
-        val sitesByBpn = resolve(siteBpns.filterNotNull().toSet())
-        return siteBpns.map { bpn ->
-            when (bpn) {
-                null -> ParseResult.Success(null)
-                else -> resolveResult(bpn, sitesByBpn)
-            }
-        }
-    }
-
-    /**
      * Resolves each BPN to its site, failing the entry when no site carries that BPN.
      */
-    fun parseRequired(siteBpns: List<String>): List<ParseResult<SiteDb, UnresolvableSite>> {
+    fun parse(siteBpns: List<String>): List<ParseResult<SiteDb, UnresolvableSite>> {
         val sitesByBpn = resolve(siteBpns.toSet())
         return siteBpns.map { bpn -> resolveResult(bpn, sitesByBpn) }
     }
@@ -58,23 +44,9 @@ class SiteBpnParser(
     /**
      * Resolves each entry's BPNs to their sites, failing an entry with one error per BPN no site carries.
      */
-    fun parseAllRequired(siteBpnsPerEntry: List<List<String>>): List<ParseResult<List<SiteDb>, UnresolvableSite>> {
+    fun parseAll(siteBpnsPerEntry: List<List<String>>): List<ParseResult<List<SiteDb>, UnresolvableSite>> {
         val sitesByBpn = resolve(siteBpnsPerEntry.flatten().toSet())
         return siteBpnsPerEntry.map { resolveAllResult(it, sitesByBpn) }
-    }
-
-    /**
-     * Resolves each entry's BPNs to their sites and a null entry to a legitimately absent list, failing an entry with
-     * one error per BPN no site carries. Owning the optionality here keeps callers free of null special-casing.
-     */
-    fun parseAll(siteBpnsPerEntry: List<List<String>?>): List<ParseResult<List<SiteDb>?, UnresolvableSite>> {
-        val sitesByBpn = resolve(siteBpnsPerEntry.filterNotNull().flatten().toSet())
-        return siteBpnsPerEntry.map { siteBpns ->
-            when (siteBpns) {
-                null -> ParseResult.Success(null)
-                else -> resolveAllResult(siteBpns, sitesByBpn)
-            }
-        }
     }
 
     private fun resolve(bpns: Set<String>): Map<String, SiteDb> =

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
@@ -57,7 +58,7 @@ class AddressUpdateParser(
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
-        val siteResults = siteBpnParser.parseAll(requests.map { it.siteBpns })
+        val siteResults = parseWherePresent(requests.map { it.siteBpns }, siteBpnParser::parseAll)
         val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateParseError>> =
             crossValidateParseResults(targetResults, siteResults) { target, sites ->
                 when (sites) {

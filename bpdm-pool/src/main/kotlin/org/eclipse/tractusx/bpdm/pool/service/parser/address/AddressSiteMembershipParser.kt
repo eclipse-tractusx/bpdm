@@ -53,7 +53,7 @@ class AddressSiteMembershipParser(
     @Transactional(readOnly = true)
     fun parse(requests: List<AddressSiteMembershipRequest>): List<ParseResult<AddressSiteMembershipParsed, AddressSiteMembershipParseError>> {
         val addressResults = addressBpnParser.parse(requests.map { it.addressBpn })
-        val siteResults = siteBpnParser.parseAllRequired(requests.map { it.siteBpns })
+        val siteResults = siteBpnParser.parseAll(requests.map { it.siteBpns })
         val consistentSiteResults: List<ParseResult<List<SiteDb>, AddressSiteMembershipParseError>> =
             crossValidateParseResults(addressResults, siteResults) { address, sites ->
                 sites.flatMap { siteLegalEntityConsistencyValidator.check(address.legalEntity, it) } +

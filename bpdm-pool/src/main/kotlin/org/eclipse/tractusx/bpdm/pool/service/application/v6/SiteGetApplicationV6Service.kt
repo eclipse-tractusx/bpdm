@@ -41,7 +41,7 @@ class SiteGetApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun getSite(bpns: String): SiteWithMainAddressVerboseDtoV6 =
-        when (val result = siteBpnParser.parseRequired(listOf(bpns)).single()) {
+        when (val result = siteBpnParser.parse(listOf(bpns)).single()) {
             is ParseResult.Success -> siteResponseMapperV6.toSiteWithMainAddress(result.parsed)
             is ParseResult.Failure -> throw BpdmNotFoundException("Site", bpns)
         }

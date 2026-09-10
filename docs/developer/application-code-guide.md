@@ -85,7 +85,7 @@ The four representations, by suffix:
 
 **Application** — the API boundary. One service per *(domain × operation × API version)*. It is the only layer that knows about API DTOs and API versions. It maps the incoming DTO to a `…Request`, drives the parse-then-execute flow, owns the transaction, and maps the outcome back to response DTOs and errors. It contains no validation and no business rules of its own.
 
-**Parser** — the decision layer. It is the only layer that handles **data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors.
+**Parser** — the decision layer. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors. It is the only layer that handles **data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed.
 
 It has exactly three responsibilities:
 
@@ -93,7 +93,9 @@ It has exactly three responsibilities:
 - **Validation** — deciding whether the value is acceptable at all, and rejecting it with an error when it is not.
 - **Resolution** — turning an accepted reference into the thing it names: a BPN into its entity, a metadata key into its record. Resolution is how the parser decides a reference is valid, so the resolved entity is part of its verdict.
 
-The three run in that order — a value is normalized before it is judged, and judged before it is resolved — which is why a caller never normalizes on a parser's behalf. A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. It is pure: it only reads (metadata lookups, resolving a BPN to an entity), never writes. It is API- and version-neutral — it never sees a DTO. Because it is neutral and composable, one parser serves every version and every context that embeds the same content (a standalone address, a site's main address, a legal entity's address).
+The three run in that order — a value is normalized before it is judged, and judged before it is resolved — which is why a caller never normalizes on a parser's behalf.
+
+A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. The parser itself is pure (it only reads) and API-neutral (it never sees a DTO), which is what lets one parser serve every version and every context that embeds the same content: a standalone address, a site's main address, a legal entity's address.
 
 **Operation** — the execution layer. It carries out the operation against the service's data — reading, writing, or both — and in principle spans the full range of CRUD; one operation may be composite, combining several CRUD steps, sometimes across more than one entity. For any part that writes, the operation service is *the single authority* for that entity's write — the one place it happens — so BPN issuance, persistence, and changelog live in exactly one location. It works in internal domain and managed models and returns them, never response DTOs.
 
@@ -104,7 +106,7 @@ The three run in that order — a value is normalized before it is judged, and j
 ## 1.4 Supporting components
 
 - **`ParseResult<T, E>`** — the backbone type: per entry, either `Success(parsed)` or `Failure(errors)`. It is covariant in the error type, so a parser with a narrow error type composes into an operation with a wider one.
-- **Combinators** — `zipParseResults` (combine several parsers for the same entry, accumulating errors), `chainParseResults` (feed one parse stage into the next), and `parseAndExecute` (the application-to-operation contract: parse the batch, execute only the successes, weave results back into the original positions).
+- **Combinators** — `zipParseResults` (combine several parsers for the same entry, accumulating errors), `chainParseResults` (feed one parse stage into the next), `parseWherePresent` (run a strict parse over the entries a request actually names), and `parseAndExecute` (the application-to-operation contract: parse the batch, execute only the successes, weave results back into the original positions).
 - **Mappers** — `@Component`, translation only, each covering a single direction: *inbound* (DTO → `…Request`), *entity* (`…Parsed` → `…Db`), *outbound* (errors and results → response DTOs / `ErrorInfo` / the error an endpoint raises).
 - **`Pending…Write`** — a staged entity plus its `UpsertType` (`Created` / `Updated` / `NoChange`); the currency between staging and committing when a write must be split (see [2.4](#24-operation-layer)).
 
@@ -165,20 +167,30 @@ Background jobs and internal process orchestration are not request-driven operat
 
 ## 2.3 Parser layer
 
-- A parser MUST own all three of normalization, validation and resolution for the data it accepts. No other layer MAY normalize an inbound value: not the controller, not the application service, not a mapper, and not a caller preparing input for a parser.
-- Normalization MUST happen once, in the parser that owns the value — for a shared reference, that is the resolving parser every path funnels through, not each of its callers. A value that reaches a `…Parsed` MUST already be canonical.
-- A parser SHOULD normalize the inbound value rather than make its lookup tolerant. Matching a stored value loosely (a case-insensitive or otherwise widened query) hides the canonical form and gives up an exact indexed lookup; normalizing the input keeps both.
-- An error a parser reports SHOULD quote the value as the caller sent it, not its normalized form, so the client recognises its own input.
-- A parser MUST validate all data entering the application from outside its own database — both requests received on our API endpoints and responses received from calls the application makes to other services. Data read from our own database is trusted and MUST NOT require parser validation.
+A parser has exactly three responsibilities — **normalization**, **validation** and **resolution** — and it MUST own all three, in that order, for the data it accepts.
+
+**Scope and purity**
+
+- A parser MUST parse all data entering the application from outside its own database: both requests received on our API endpoints and responses received from calls the application makes to other services. Data read from our own database is trusted and MUST NOT require parsing.
 - A parser MUST be free of side effects other than database reads; it MUST NOT write.
-- A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.7](#27-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
-- A parser that can reject nothing MAY return its `…Parsed` value directly instead of a `ParseResult`. Normalizing search criteria is the typical case: an unknown or malformed filter value simply matches nothing, so there is no verdict to report. As soon as one input can be rejected, the parser MUST return a `ParseResult`.
-- A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
-- A parser MUST honour the positional contract: the output list has the same size and order as the input, and the i-th result is the verdict for the i-th request.
 - A parser MUST be annotated `@Transactional(readOnly = true)` when a single parse issues more than one database query. *(Current gap: several parsers do multiple reads without this annotation.)*
+
+**Normalization**
+
+- No other layer MAY normalize an inbound value: not the controller, not the application service, not a mapper, and not a caller preparing input for a parser. Normalization MUST happen once, in the parser that owns the value — for a shared reference, that is the resolving parser every path funnels through, not each of its callers. A value that reaches a `…Parsed` MUST already be canonical.
+- A parser SHOULD normalize the inbound value rather than widen its lookup. Matching a stored value loosely (a case-insensitive or otherwise tolerant query) hides the canonical form and gives up an exact indexed lookup; normalizing the input keeps both.
+
+**Validation**
+
+- A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
+- A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.7](#27-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
+- An error a parser reports SHOULD quote the value as the caller sent it, not its normalized form, so the client recognises its own input.
+- A parser that can reject nothing MAY return its `…Parsed` value directly instead of a `ParseResult`. Normalizing search criteria is the typical case: an unknown or malformed filter value simply matches nothing, so there is no verdict to report. As soon as one input can be rejected, the parser MUST return a `ParseResult`.
+
+**Resolution**
+
 - A parser SHOULD resolve the references it validates to the entities they name, rather than passing the identifier on for a later layer to look up.
-- A parser SHOULD be decomposed into single-responsibility parsers (content validation, reference/BPN resolution, cross-cutting checks) composed with the `ParseResult` combinators, rather than written as one monolith.
-- A parser SHOULD fetch metadata once per batch, not once per entry.
+- A resolving parser MUST NOT offer optional resolution: A parser always reports a missing referenced object as a parse error. Where a reference is optional, the *caller* handles that.
 
 ## 2.4 Operation layer
 
@@ -220,7 +232,8 @@ Background jobs and internal process orchestration are not request-driven operat
 
 ## 2.9 Batch & correlation contract
 
-- Every layer MUST preserve order: the i-th response corresponds to the i-th request.
+- Every layer MUST preserve order: the i-th response corresponds to the i-th request. A parser's verdict list and an operation's result list therefore have the same size as their input.
+- Every layer MUST query and write in batch, not once per entry: a lookup a batch shares — metadata, referenced entities, existing rows — is issued once for the whole batch. This applies to parsers and operation services alike.
 - New APIs MUST NOT introduce a client-supplied correlation index; request/response order is the correlation. Existing index fields are legacy and are not to be extended to new operations.
 
 ---

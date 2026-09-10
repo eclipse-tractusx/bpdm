@@ -47,16 +47,6 @@ class AddressBpnParser(
         }
     }
 
-    /**
-     * Resolves each BPN to its address and a BPN no address carries to null, for a caller to which an absent address is
-     * a legitimate outcome rather than a rejection.
-     */
-    fun parseOptional(addressBpns: List<String>): List<LogisticAddressDb?> {
-        val addressesByBpn = resolve(addressBpns)
-
-        return addressBpns.map { bpn -> addressesByBpn[bpn.uppercase()] }
-    }
-
     private fun resolve(addressBpns: List<String>): Map<String, LogisticAddressDb> =
         logisticAddressRepository
             .findDistinctByBpnIn(addressBpns.mapTo(mutableSetOf()) { it.uppercase() })

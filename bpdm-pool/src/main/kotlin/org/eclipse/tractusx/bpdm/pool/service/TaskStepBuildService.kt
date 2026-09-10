@@ -328,7 +328,7 @@ class TaskStepBuildService(
         legalEntityBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): Site {
-        val address = addressBpnParser.parseOptional(listOf(bpnA)).single()
+        val address = resolveAddressIfPresent(bpnA)
         val bpnS = taskEntryBpnMapping.getBpn(site.bpnReference)
         // A NEW site (no BPN yet) whose main-address reference already resolves to a persisted address adopts
         // that address as its main address - so several sites can share one main address - instead of creating a
@@ -473,6 +473,14 @@ class TaskStepBuildService(
         // Read the upserted golden record back so the reply carries its full state, including golden record relations.
         return toAddressResult(readUpsertedAddress(upsertedBpn), hasChanged = true)
     }
+
+    // The resolvers are strict, so an unknown BPN comes back as a failure; here that is not a rejection but the signal
+    // that this main-address reference names no address yet, which the caller answers by creating one.
+    private fun resolveAddressIfPresent(bpnA: String): LogisticAddressDb? =
+        when (val result = addressBpnParser.parse(listOf(bpnA)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> null
+        }
 
     private fun resolveRequestedAddress(bpnA: String): LogisticAddressDb =
         when (val result = addressBpnParser.parse(listOf(bpnA)).single()) {
