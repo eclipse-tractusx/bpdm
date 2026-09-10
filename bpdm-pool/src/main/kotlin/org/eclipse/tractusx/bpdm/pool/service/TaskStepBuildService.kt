@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTa
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskLegalEntityRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskResultMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
@@ -64,7 +65,7 @@ import org.springframework.stereotype.Service
 class TaskStepBuildService(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
-    private val taskResolutionMapper: TaskResolutionMapper,
+    private val taskResultMapper: GoldenRecordTaskResultMapper,
     private val addressResponseMapper: AddressResponseMapper,
     private val siteResponseMapper: SiteResponseMapper,
     private val logisticAddressRepository: LogisticAddressRepository,
@@ -273,7 +274,7 @@ class TaskStepBuildService(
 
     private fun fetchLegalEntityResult(bpnL: String, hasChanged: Boolean?): LegalEntity =
         businessPartnerFetchService.fetchDtosByBpns(listOf(bpnL)).firstOrNull()
-            ?.let { taskResolutionMapper.toTaskResult(it, hasChanged) }
+            ?.let { taskResultMapper.toTaskResult(it, hasChanged) }
             ?: throw BpdmValidationException("Legal entity with specified BPNL $bpnL not found")
 
     private fun processSite(
@@ -411,7 +412,7 @@ class TaskStepBuildService(
 
     private fun fetchSiteResult(bpnS: String, hasChanged: Boolean?): Site =
         siteRepository.findByBpn(bpnS)?.let { siteResponseMapper.toSiteWithMainAddress(it) }
-            ?.let { taskResolutionMapper.toTaskResult(it.site, it.mainAddress, hasChanged) }
+            ?.let { taskResultMapper.toTaskResult(it.site, it.mainAddress, hasChanged) }
             ?: throw BpdmValidationException(GoldenRecordTaskErrorMessage.MAINE_ADDRESS_IS_NULL.message)
 
     private fun processAdditionalAddress(
@@ -473,7 +474,7 @@ class TaskStepBuildService(
 
     private fun toAddressResult(address: LogisticAddressDb, hasChanged: Boolean?): PostalAddressWithScriptVariants {
         val result = addressResponseMapper.toAddress(address)
-        return taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
+        return taskResultMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
     }
 
     private fun createLogisticAddress(
