@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.application
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.SharingMemberRecordOperation
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.SharingMemberRecordQueryRequest as InternalQueryRequest
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
@@ -33,7 +34,8 @@ class SharingMemberRecordApplicationService(
 ) {
 
     fun queryRecords(request: SharingMemberRecordQueryRequest, paginationRequest: PaginationRequest): PageDto<SharingMemberRecord> {
-        return recordOperation.queryRecords(request, paginationRequest)
+        val internalRequest = InternalQueryRequest(timestampAfter = request.timestampAfter)
+        return recordOperation.queryRecords(internalRequest, paginationRequest)
     }
 
     fun updateRecord(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
