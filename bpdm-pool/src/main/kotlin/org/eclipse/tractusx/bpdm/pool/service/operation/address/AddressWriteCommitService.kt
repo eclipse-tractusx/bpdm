@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
@@ -41,6 +44,8 @@ class AddressWriteCommitService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Persists the staged addresses that changed, emits their CREATE or UPDATE changelog, and returns one result per
      * staged write.
@@ -57,6 +62,17 @@ class AddressWriteCommitService(
             }
         })
 
+        report("Created", staged.filter { it.upsertType == UpsertType.Created })
+        report("Updated", staged.filter { it.upsertType == UpsertType.Updated })
+
         return staged.map { UpsertResult(it.address, it.upsertType) }
+    }
+
+    private fun report(change: String, written: List<PendingAddressWrite>) {
+        if (written.isEmpty()) return
+
+        logger.info {
+            "$change ${countForLog(written.size, "address", "addresses")}: ${written.map { it.address.bpn }.joinIdentifiersForLog()}"
+        }
     }
 }

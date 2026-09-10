@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
@@ -28,9 +31,9 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIssueService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -50,6 +53,8 @@ class LegalEntityCreateService(
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Creates the given legal entities together with their legal addresses and returns the persisted entities.
      */
@@ -64,6 +69,12 @@ class LegalEntityCreateService(
 
         legalEntityRepository.saveAll(legalEntities)
         changelogCreateService.record(legalEntities.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
+
+        if (legalEntities.isNotEmpty())
+            logger.info {
+                "Created ${countForLog(legalEntities.size, "legal entity", "legal entities")}: " +
+                        legalEntities.map { it.bpn }.joinIdentifiersForLog()
+            }
 
         addressCreateService.commit(stagedAddresses)
 

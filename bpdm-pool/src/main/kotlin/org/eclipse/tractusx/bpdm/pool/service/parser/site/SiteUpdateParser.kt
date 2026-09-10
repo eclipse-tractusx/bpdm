@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.combine
+import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
@@ -60,7 +60,7 @@ class SiteUpdateParser(
      */
     @Transactional(readOnly = true)
     fun parseWithoutCoverageCheck(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
-        val targetResults = siteBpnParser.parseRequired(requests.map { it.siteBpn })
+        val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
         val mainAddressResults = addressContentParser.parse(requests.map { it.content.mainAddress }, ownerBpns)

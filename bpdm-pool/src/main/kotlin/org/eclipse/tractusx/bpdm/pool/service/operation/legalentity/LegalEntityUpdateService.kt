@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
@@ -29,8 +32,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.update.*
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,6 +51,8 @@ class LegalEntityUpdateService(
     private val repository: LegalEntityRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
+
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Applies the given changes and reports for each legal entity whether the aggregate — its header or its legal
@@ -67,6 +72,12 @@ class LegalEntityUpdateService(
 
         repository.saveAll(updatedLegalEntities.map { it.value })
         changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+
+        if (updatedLegalEntities.isNotEmpty())
+            logger.info {
+                "Updated ${countForLog(updatedLegalEntities.size, "legal entity", "legal entities")}: " +
+                        updatedLegalEntities.map { it.value.bpn }.joinIdentifiersForLog()
+            }
 
         return legalEntityChangeResults
     }

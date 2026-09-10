@@ -28,6 +28,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.reactive.ClientHttpConnector
 
 @ConfigurationProperties(prefix = OrchestratorClientConfigurationProperties.PREFIX)
 data class OrchestratorClientConfigurationProperties(
@@ -48,7 +49,11 @@ data class OrchestratorClientConfigurationProperties(
 class OrchestratorClientConfiguration{
 
     @Bean
-    fun orchestratorClient(webClientProvider: BpdmWebClientProvider, properties: OrchestratorClientConfigurationProperties): OrchestrationApiClient{
-        return OrchestrationApiClientImpl { webClientProvider.builder(properties).build() }
+    fun orchestratorClient(
+        webClientProvider: BpdmWebClientProvider,
+        properties: OrchestratorClientConfigurationProperties,
+        clientConnector: ClientHttpConnector
+    ): OrchestrationApiClient {
+        return OrchestrationApiClientImpl { webClientProvider.builder(properties).clientConnector(clientConnector).build() }
     }
 }

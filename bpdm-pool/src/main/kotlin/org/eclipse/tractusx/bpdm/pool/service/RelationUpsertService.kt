@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
@@ -37,6 +38,8 @@ class RelationUpsertService(
     private val relationRepository: RelationRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
+    private val logger = KotlinLogging.logger { }
+
     @Transactional
     fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
         val source = upsertRequest.source
@@ -60,6 +63,13 @@ class RelationUpsertService(
             }
         } else {
             UpsertResult(createNewRelation(upsertRequest), UpsertType.Created)
+        }
+
+        val relation = "${upsertRequest.legalEntityRelationType} relation from legal entity '${source.bpn}' to '${target.bpn}'"
+        when (upsertResult.upsertType) {
+            UpsertType.Created -> logger.info { "Created $relation" }
+            UpsertType.Updated -> logger.info { "Updated validity periods of $relation" }
+            UpsertType.NoChange -> logger.debug { "Left $relation unchanged" }
         }
 
         return upsertResult

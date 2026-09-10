@@ -9,13 +9,20 @@ The following chapters show how to install the applications in different scenari
 
 * JAVA 21
 * Maven (3.9 supported)
-* Docker Engine (tested on 26.1.2)
-* Docker Compose (tested on 2.27.0)
+* Docker Engine (tested on 29.5.3)
+* Docker Compose (tested on 5.1.4)
 
 ### Default Installation
 
 BPDM services require a PostgreSQL database and Keycloak server to run.
 Navigate to the root folder of the BPDM repository.
+The Keycloak container takes its admin password from a `KEYCLOAK_ADMIN_PASSWORD` variable, which the Compose file expects in an `.env` file next to it and which is not part of the repository:
+
+```console
+echo "KEYCLOAK_ADMIN_PASSWORD=admin" > docker/compose/dependencies/.env
+```
+
+Without that variable Keycloak still starts and imports the realm, only its admin console has no user to log in with.
 Then set up the necessary dependencies by using the provided Docker Compose file:
 
 ```console
@@ -67,6 +74,28 @@ bpdm:
 If it is set with a BPNL only users belonging to that company can access the Gate.
 If it is not set or set to null a user from any company can use the Gate, albeit the user can only see its own company shared business partner data.
 
+#### Further Gates for Further Sharing Members
+
+Some behaviour of the golden record process only shows when more than one sharing member shares the same golden record: each member reflecting the other's master data changes, and the sharing member count of the golden record rising.
+A third member shows one more thing — the confidence level itself, which the sharing member count only raises from three members on.
+Observing that locally takes further Gates, which the `gate-2` and `gate-3` profiles provide.
+Start them once the rest of the stack is up — like any Gate, they refuse to start while Pool or Orchestrator are unreachable:
+
+```console
+cd bpdm-gate
+mvn spring-boot:run -Dspring-boot.run.profiles=gate-2
+mvn spring-boot:run -Dspring-boot.run.profiles=gate-3
+```
+
+They run on ports 8082 and 8083 against their own `bpdm_gate_2` and `bpdm_gate_3` databases (created by the Docker Compose file above) and are owned by `BPNL000000000002` and `BPNL000000000003`, so each serves only its own member.
+Their technical users in the `BPDM` realm are `BPDM_GATE_2_INPUT_MANAGER` / `BPDM_GATE_2_OUTPUT_CONSUMER` and `BPDM_GATE_3_INPUT_MANAGER` / `BPDM_GATE_3_OUTPUT_CONSUMER`; the first Gate's `BPDM_GATE`, `BPDM_GATE_INPUT_MANAGER` and `BPDM_GATE_OUTPUT_CONSUMER` belong to `BPNL000000000001` and are not authorized on either.
+All Gates share the one Orchestrator and Pool: which member a Gate acts for travels in the golden record task, not in the credentials the Gate calls them with.
+
+The system tester names all three of them in its default configuration, so a local run of the end-to-end suite expects them to be up; see its [README](bpdm-system-tester/README.md) for how to act for fewer sharing members instead.
+
+A single Gate cannot stand in for several.
+It does keep the members' data apart by the BPNL in the token, but it decides which of its records count towards a golden record's sharing member count across all of them, so a further member sharing through the same Gate would not be counted.
+
 #### Manual Sharing
 
 On default, the BPDM Gate automatically starts the golden record process for uploaded business partner data.
@@ -77,7 +106,8 @@ In this case business partner data can be uploaded and changed, before the user 
 bpdm:
   tasks:
     creation:
-      starts-as-ready: false
+      fromSharingMember:
+        starts-as-ready: false
 ```
 
 ### Insecure Installation
@@ -86,24 +116,24 @@ You may want to perform a quick local installation in which security is not nece
 Make sure to disable authentication requirements by using the provided `no-auth` profile when running the applications:
 
 ```console
-mvn spring-boot:run -Dspring.profiles.active=no-auth
+mvn spring-boot:run -Dspring-boot.run.profiles=no-auth
 ```
 
 ## Helm Charts
 
-Installation of BPDM applications with the Helm Charts has the most software requirements but is the qickest way to set up a running system.
+Installation of BPDM applications with the Helm Charts has the most software requirements but is the quickest way to set up a running system.
 
 ### Requirements
 
-* kubectl (1.30 supported)
-* Docker Engine (tested on 26.1.2)
-* Minikube (tested on 1.33.0)
-* Helm (tested on 3.14.4)
+* kubectl (1.36 supported)
+* Docker Engine (tested on 29.5.3)
+* Minikube (tested on 1.38.1)
+* Helm (tested on 4.2.0)
 
 
 ### Default Installation
 
-Navigate to the projects root folder.
+Navigate to the project's root folder.
 Then install a new release of BPDM on your default namespace via helm:
 
 ```console
@@ -113,7 +143,7 @@ This will install the BPDM applications with its own Postgres and Keycloak in de
 
 ### Override Defaults
 
-The easiest way to overrride default configuration of the BPDM Helm Chart is to provide a custom values file while deploying.
+The easiest way to override default configuration of the BPDM Helm Chart is to provide a custom values file while deploying.
 
 ```bash
 helm install bpdm --values path/to/values/file.yml ./charts/bpdm
@@ -179,7 +209,7 @@ bpdm-orchestrator:
     - no-auth
 ```
 
-You can also more fine-granulary remove authentication on APIs and BPDM client connections.
+You can also more fine-granularly remove authentication on APIs and BPDM client connections.
 You can refer to the no-auth profile configurations (for example that of the [Gate](bpdm-gate/src/main/resources/application-no-auth.yml)) as a documentation.
 
 #### Use External Dependencies
@@ -190,7 +220,7 @@ However, for production it is recommended to host dedicated Postgres and Keycloa
 >Additional Requirements
 >
 > * Postgres (18.0 supported)
-> * Keycloak (26.6.3 supported)
+> * Keycloak (26.7.0 supported)
 
 Disable the bundled dependencies and supply the connection settings through each service's `applicationConfig` (non-secret values) and `applicationSecrets` (credentials).
 Gate, Pool and Orchestrator connect to the database; the Cleaning Service Dummy only needs the authentication settings.
@@ -256,9 +286,6 @@ bpdm-orchestrator:
 bpdm-cleaning-service-dummy:
   applicationConfig:
     bpdm:
-      security:
-        auth-server-url: "https://remote-keycloak/auth"
-        realm: BPDM
       client:
         orchestrator:
           provider:
@@ -275,7 +302,7 @@ You can combine this configuration with the examples for overriding passwords an
 
 ### Fine-granular Configuration
 
-You can configure all BPDM applications over Helm values more fine-granulary via the `applicationConfig` and `applicationSecrets`.
+You can configure all BPDM applications over Helm values more fine-granularly via the `applicationConfig` and `applicationSecrets`.
 Values under these groups are directly injected as application properties in the deployed containers.
 
 As a reference of what can be changed have a look at the respective application properties files of each application:
@@ -297,10 +324,10 @@ For deploying an EDC please consult the documentation on the [EDC repository](ht
 
 ### Installation
 
-The general idea of configuring data offers for BPDM is to assets which grant access to a portion of the BPDM APIs.
+The general idea of configuring data offers for BPDM is to create assets which grant access to a portion of the BPDM APIs.
 Which API resources are accessible over an asset is determined by the purposes defined in the BPDM framework agreement.
 For some purposes you may need to access business partner output data from the BPDM Gate for example but won't have access to the input data.
-Blueprints for such assets are documented in this [POSTMAN collection](docs/postman/EDC%20Provider%20Setup.postman_collection.json).
+Blueprints for such assets are documented in this [POSTMAN collection](docs/admin/EDC%20Provider%20Setup.postman_collection.json).
 Accompanying the asset definitions are Policy and Contract Definition blueprints.
 Except for a general Access Policy those blueprints are grouped by purpose.
 
@@ -310,17 +337,17 @@ are exposed.
 ### Creating Offers
 
 Following are specific instructions on how to create offers to expose the BPDM APIs over EDC.
-Note that the instructions reference definitions taken from the previously references Postman collection.
+Note that the instructions reference definitions taken from the previously referenced Postman collection.
 
-#### ReadAccessPoolForCatenaXMember
+#### ReadAccessPoolForDataSpaceParticipant
 
 This offer allows a company to access the Pool for reading golden record data of all Catena-X members.
 
 1. Create a policy of type `HasBusinessPartnerNumber` for the company's BPNL (if it not yet exists)
 2. Create a policy of type `AcceptPurpose` with usage purpose for the pool (if not yet exists)
 3. Create a technical user with role `BPDM Pool Consumer` and the company's BPN identity
-4. Create a `ReadAccessPoolForCatenaXMember` asset with the created technical user for client credentials
-5. Create a contract definition `ReadAccessPoolForCatenaXMember` referencing the created asset
+4. Create a `ReadAccessPoolForDataSpaceParticipant` asset with the created technical user for client credentials
+5. Create a contract definition `ReadAccessPoolForDataSpaceParticipant` referencing the created asset
 
 
 #### FullAccessGateInputForSharingMember
@@ -358,7 +385,7 @@ This offer does **not** grant access to the uploaded business partner input data
 
 ## Portal Configuration
 
-This section explains how BPDM needs to operated on the [Tractus-X Portal](https://github.com/eclipse-tractusx/portal).
+This section explains how BPDM needs to be operated on the [Tractus-X Portal](https://github.com/eclipse-tractusx/portal).
 
 At the moment we assume that the Catena-X operator is also the golden record process provider.
 This means the operator has the Admin role on the Portal.

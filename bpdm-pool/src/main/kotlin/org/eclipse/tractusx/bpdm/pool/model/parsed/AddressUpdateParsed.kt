@@ -24,6 +24,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 data class AddressUpdateParsed(
     val target: LogisticAddressDb,
-    val site: SiteDb?,
+    val sites: List<SiteDb>?,
     val address: LogisticAddressParsed
 )

@@ -20,6 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -30,12 +33,9 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTa
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.*
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteAssignmentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -48,16 +48,13 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityP
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteAssignmentParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteMembershipParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnAddressParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithReferencedAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -65,7 +62,6 @@ import org.springframework.stereotype.Service
 @Service
 class TaskStepBuildService(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val addressService: AddressService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val taskResolutionMapper: TaskResolutionMapper,
     private val addressResponseMapper: AddressResponseMapper,
@@ -73,6 +69,7 @@ class TaskStepBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
+    private val addressBpnParser: AddressBpnParser,
     private val typedParentAddressCreateParser: TypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
     private val addressUpdateParser: AddressUpdateParser,
@@ -90,7 +87,7 @@ class TaskStepBuildService(
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteCreateOnAddressParser: SiteCreateOnAddressParser,
-    private val addressSiteAssignmentParser: AddressSiteAssignmentParser,
+    private val addressSiteMembershipParser: AddressSiteMembershipParser,
     private val addressUpdateService: AddressUpdateService,
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
@@ -134,12 +131,9 @@ class TaskStepBuildService(
         // The address the additional sites attach to only exists once its own golden record has been written, so this
         // runs after all three components.
         val recordAddressBpn = recordAddressBpn(businessPartnerDto.type!!, legalEntityResult, siteResult, addressResult)
-        processAdditionalSites(businessPartnerDto, recordAddressBpn, taskEntryBpnMapping)
-        // Additional sites are the sites of the address next to the site this data is about, so business partner data
-        // without a site of its own reports none - the same rule the data has to satisfy on its way in.
-        val additionalSiteResults = siteResult
-            ?.let { readAdditionalSites(recordAddressBpn, it.bpnReference.referenceValue) }
-            .orEmpty()
+        val recordSiteBpn = siteResult?.bpnReference?.referenceValue
+        processAdditionalSites(businessPartnerDto, recordSiteBpn, recordAddressBpn, taskEntryBpnMapping)
+        val additionalSiteResults = recordSiteBpn?.let { readAdditionalSites(recordAddressBpn, it) }.orEmpty()
 
         val (updatedLegalEntityResult, updatedSiteResult, updatedAddressResult) =
             updateConfidences(businessPartnerDto.type!!, taskEntry.recordId, legalEntityResult, siteResult, addressResult)
@@ -158,17 +152,26 @@ class TaskStepBuildService(
 
     private fun processAdditionalSites(
         businessPartner: BusinessPartner,
+        recordSiteBpn: String?,
         recordAddressBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ) {
+        // Additional sites are the sites of the address next to the site this data is about, so business partner data
+        // without a site of its own states nothing about the membership and leaves it as it stands - the same rule the
+        // data has to satisfy on its way in.
+        if (recordSiteBpn == null) return
+
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by the
         // reference it carries and, carrying none, by the name its site is to be created under - as far as identity goes
         // here: resolving a name to an existing site is the refinement service's job, not this one's.
         val statedOnce = businessPartner.additionalSites.distinctBy { it.bpnReference.referenceValue ?: it.siteName }
         val (known, unknown) = statedOnce.partition { taskEntryBpnMapping.getBpn(it.bpnReference) != null }
 
-        createAdditionalSites(unknown, businessPartner, recordAddressBpn, taskEntryBpnMapping)
-        linkAdditionalSites(known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }.distinct(), recordAddressBpn)
+        val createdSiteBpns = createAdditionalSites(unknown, businessPartner, recordAddressBpn, taskEntryBpnMapping)
+        val knownSiteBpns = known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }
+
+        val completeMembership = (listOf(recordSiteBpn) + knownSiteBpns + createdSiteBpns).distinct()
+        setAddressSites(recordAddressBpn, completeMembership)
     }
 
     private fun createAdditionalSites(
@@ -176,8 +179,8 @@ class TaskStepBuildService(
         businessPartner: BusinessPartner,
         recordAddressBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
-    ) {
-        if (additionalSites.isEmpty()) return
+    ): List<String> {
+        if (additionalSites.isEmpty()) return emptyList()
 
         val confidenceCriteria = additionalSiteConfidence(businessPartner)
         val requests = additionalSites.map { taskSiteRequestMapper.toCreateOnAddressRequest(recordAddressBpn, it, confidenceCriteria) }
@@ -185,25 +188,23 @@ class TaskStepBuildService(
         val createdSites = parseAndExecuteAllOrNone(
             requests,
             siteCreateOnAddressParser::parse,
-            { errors -> BpdmMultiValidationException(errors.map { renderError(it) }) },
+            { errors -> BpdmMultiValidationException(errors.map { renderSiteCreateError(it) }) },
             siteCreateWithReferencedAddressAsMainService::create
         )
 
         additionalSites.zip(createdSites).forEach { (additionalSite, createdSite) ->
             taskEntryBpnMapping.addMapping(additionalSite.bpnReference, createdSite.bpn)
         }
+
+        return createdSites.map { it.bpn }
     }
 
-    private fun linkAdditionalSites(siteBpns: List<String>, recordAddressBpn: String) {
-        if (siteBpns.isEmpty()) return
-
-        val requests = siteBpns.map { AddressSiteAssignmentRequest(addressBpn = recordAddressBpn, siteBpn = it) }
-
+    private fun setAddressSites(recordAddressBpn: String, siteBpns: List<String>) {
         parseAndExecuteAllOrNone(
-            requests,
-            addressSiteAssignmentParser::parse,
-            { errors -> BpdmMultiValidationException(errors.map { renderError(it) }) },
-            addressUpdateService::assignToSites
+            listOf(AddressSiteMembershipRequest(addressBpn = recordAddressBpn, siteBpns = siteBpns)),
+            addressSiteMembershipParser::parse,
+            { errors -> BpdmMultiValidationException(errors.map { renderAddressSiteMembershipError(it) }) },
+            addressUpdateService::setSites
         )
     }
 
@@ -217,7 +218,7 @@ class TaskStepBuildService(
             ?: businessPartner.legalEntity.legalAddress.confidenceCriteria
 
     private fun readAdditionalSites(recordAddressBpn: String, recordSiteBpn: String?): List<AdditionalSite> =
-        addressService.findAddressByBpn(recordAddressBpn)
+        logisticAddressRepository.findByBpn(recordAddressBpn)
             ?.sites
             .orEmpty()
             .filterNot { it.bpn == recordSiteBpn }
@@ -278,7 +279,7 @@ class TaskStepBuildService(
         val request = taskLegalEntityRequestMapper.toCreateRequest(legalEntity)
         return when (val result = parseAndExecute(listOf(request), legalEntityCreateParser::parse, legalEntityCreateService::create).single()) {
             is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityCreateError(it) })
         }
     }
 
@@ -286,7 +287,7 @@ class TaskStepBuildService(
         val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
         return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parseWithoutCoverageCheck, legalEntityPayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityUpdateError(it) })
         }
     }
 
@@ -327,7 +328,7 @@ class TaskStepBuildService(
         legalEntityBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): Site {
-        val address = addressService.findAddressByBpn(bpnA)
+        val address = resolveAddressIfPresent(bpnA)
         val bpnS = taskEntryBpnMapping.getBpn(site.bpnReference)
         // A NEW site (no BPN yet) whose main-address reference already resolves to a persisted address adopts
         // that address as its main address - so several sites can share one main address - instead of creating a
@@ -358,7 +359,7 @@ class TaskStepBuildService(
         val request = taskSiteRequestMapper.toCreateWithReferencedAddressAsMainRequest(existingAddress.bpn, mergedSite, siteMainAddress)
         val createdSite = when (val result = parseAndExecute(listOf(request), siteCreateWithReferencedAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).single()) {
             is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteCreateError(it) })
         }
 
         taskEntryBpnMapping.addMapping(bpnSReference, createdSite.bpn)
@@ -411,7 +412,7 @@ class TaskStepBuildService(
 
         return when (result) {
             is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteCreateError(it) })
         }
     }
 
@@ -424,7 +425,7 @@ class TaskStepBuildService(
         val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress, additionalMainAddressScriptVariants)
         return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parseWithoutCoverageCheck, sitePayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteUpdateError(it) })
         }
     }
 
@@ -446,7 +447,7 @@ class TaskStepBuildService(
 
         return if (bpnA != null && additionalAddress.hasChanged == false) {
             // No need to upsert, just fetch the data
-            fetchAddressResult(bpnA, hasChanged = false)
+            toAddressResult(resolveRequestedAddress(bpnA), hasChanged = false)
         } else {
             upsertAdditionalAddress(additionalAddress, legalEntityBpn, siteBpn, taskEntryBpnMapping)
         }
@@ -464,18 +465,34 @@ class TaskStepBuildService(
         val upsertedBpn = if (bpnA == null) {
             createLogisticAddress(additionalAddress, legalEntityBpn, siteBpn)
         } else {
-            updateLogisticAddress(bpnA, siteBpn, additionalAddress)
+            updateLogisticAddress(bpnA, additionalAddress)
         }
 
         taskEntryBpnMapping.addMapping(bpnAReference, upsertedBpn)
 
         // Read the upserted golden record back so the reply carries its full state, including golden record relations.
-        return fetchAddressResult(upsertedBpn, hasChanged = true)
+        return toAddressResult(readUpsertedAddress(upsertedBpn), hasChanged = true)
     }
 
-    private fun fetchAddressResult(bpnA: String, hasChanged: Boolean?): PostalAddressWithScriptVariants {
-        val result = addressService.findAddressByBpn(bpnA)?.let { addressResponseMapper.toAddress(it) }
-            ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+    // The resolvers are strict, so an unknown BPN comes back as a failure; here that is not a rejection but the signal
+    // that this main-address reference names no address yet, which the caller answers by creating one.
+    private fun resolveAddressIfPresent(bpnA: String): LogisticAddressDb? =
+        when (val result = addressBpnParser.parse(listOf(bpnA)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> null
+        }
+
+    private fun resolveRequestedAddress(bpnA: String): LogisticAddressDb =
+        when (val result = addressBpnParser.parse(listOf(bpnA)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Address ${it.bpn} not found" })
+        }
+
+    private fun readUpsertedAddress(bpnA: String): LogisticAddressDb =
+        logisticAddressRepository.findByBpn(bpnA) ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+
+    private fun toAddressResult(address: LogisticAddressDb, hasChanged: Boolean?): PostalAddressWithScriptVariants {
+        val result = addressResponseMapper.toAddress(address)
         return taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
     }
 
@@ -493,65 +510,70 @@ class TaskStepBuildService(
         val result = parseAndExecute(listOf(request), typedParentAddressCreateParser::parse, addressCreateService::create).single()
         return when (result) {
             is ParseResult.Success -> result.parsed.bpn
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderError(it)}" })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderAddressCreateError(it)}" })
         }
     }
 
     private fun updateLogisticAddress(
         bpnA: String,
-        siteBpn: String?,
         additionalAddress: PostalAddressWithScriptVariants
     ): String {
+        // Site membership is stated once for the whole record, by processAdditionalSites, so this update leaves it alone.
         val request = AddressUpdateRequest(
             addressBpn = bpnA,
-            siteBpn = siteBpn,
+            siteBpns = null,
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
         val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressPayloadUpdateService::update).single()
         return when (result) {
             is ParseResult.Success -> result.parsed.value.bpn
-            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderAddressUpdateError(it)}" })
         }
     }
 
     // Address parse errors are rendered to messages here (caller-local) so the task path keeps its existing error wording;
     // the field errors reuse the CleaningError texts the old throwing translation produced.
-    private fun renderError(error: AddressCreateParseError): String =
+    // Each renderer is named after the error type it takes rather than overloading one name: the content and coverage errors
+    // subtype several operation error interfaces each, so overloads would resolve on static type alone and a branch delegating
+    // to the wrong one would still compile, silently emitting another operation's wording.
+    private fun renderAddressCreateError(error: AddressCreateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
             // Unreachable on the task path: parents arrive already typed, so the untyped-stage InvalidParentBpn never occurs here.
             is InvalidParentBpn -> "Parent ${error.bpn} is not a valid BPNL/BPNS"
-            is AddressContentParseError -> renderError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: AddressSiteAssignmentParseError): String =
+    private fun renderAddressSiteMembershipError(error: AddressSiteMembershipParseError): String =
         when (error) {
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
+            is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
         }
 
-    private fun renderError(error: AddressUpdateParseError): String =
+    private fun renderAddressUpdateError(error: AddressUpdateParseError): String =
         when (error) {
-            is ScriptVariantCoverageParseError -> renderError(error)
+            is ScriptVariantCoverageParseError -> renderScriptVariantCoverageError(error)
             is UnresolvableAddress -> "Address ${error.bpn} not found"
-            is AddressContentParseError -> renderError(error)
+            is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
+            is AddressContentParseError -> renderAddressContentError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
         }
 
-    private fun renderError(error: AddressContentParseError): String =
+    private fun renderAddressContentError(error: AddressContentParseError): String =
         when (error) {
-            is AddressFieldParseError -> renderFieldError(error)
-            is AddressMetadataParseError -> renderMetadataError(error)
-            is AddressConstraintParseError -> renderConstraintError(error)
-            is AddressScriptVariantParseError -> renderScriptVariantError(error)
+            is AddressFieldParseError -> renderAddressFieldError(error)
+            is AddressMetadataParseError -> renderAddressMetadataError(error)
+            is AddressConstraintParseError -> renderAddressConstraintError(error)
+            is AddressScriptVariantParseError -> renderAddressScriptVariantError(error)
         }
 
-    private fun renderFieldError(error: AddressFieldParseError): String =
+    private fun renderAddressFieldError(error: AddressFieldParseError): String =
         when (error) {
             AddressFieldParseError.PhysicalCountryMissing -> CleaningError.PHYSICAL_ADDRESS_COUNTRY_MISSING.message
             AddressFieldParseError.PhysicalCityMissing -> CleaningError.PHYSICAL_ADDRESS_CITY_MISSING.message
@@ -566,7 +588,7 @@ class TaskStepBuildService(
             is AddressFieldParseError.StateTypeMissing -> "Business Partner state type is null"
         }
 
-    private fun renderMetadataError(error: AddressMetadataParseError): String =
+    private fun renderAddressMetadataError(error: AddressMetadataParseError): String =
         when (error) {
             is AddressMetadataParseError.IdentifierTypeNotFound -> "Address identifier type '${error.type}' is not known"
             is AddressMetadataParseError.PhysicalRegionNotFound -> "Region '${error.regionCode}' in physical address is not known"
@@ -574,27 +596,27 @@ class TaskStepBuildService(
             is AddressMetadataParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
         }
 
-    private fun renderConstraintError(error: AddressConstraintParseError): String =
+    private fun renderAddressConstraintError(error: AddressConstraintParseError): String =
         when (error) {
             is AddressConstraintParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
             is AddressConstraintParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
         }
 
-    private fun renderScriptVariantError(error: AddressScriptVariantParseError): String =
+    private fun renderAddressScriptVariantError(error: AddressScriptVariantParseError): String =
         when (error) {
             is AddressScriptVariantParseError.PhysicalCityMissing -> "Script variant ${error.index} has no city in its physical address"
             is AddressScriptVariantParseError.AlternativeCityMissing -> "Script variant ${error.index} has no city in its alternative address"
             is AddressScriptVariantParseError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
         }
 
-    private fun renderError(error: LegalEntityCreateParseError): String =
+    private fun renderLegalEntityCreateError(error: LegalEntityCreateParseError): String =
         when (error) {
             is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
-            is LegalEntityContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is LegalEntityContentParseError -> renderLegalEntityContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: LegalEntityUpdateParseError): String =
+    private fun renderLegalEntityUpdateError(error: LegalEntityUpdateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is MultipleUltimateOwnersInHierarchy ->
@@ -603,11 +625,11 @@ class TaskStepBuildService(
             is AlternativeHeadquarterCannotOwnUltimately ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
             is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
-            is LegalEntityContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is LegalEntityContentParseError -> renderLegalEntityContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: LegalEntityContentParseError): String =
+    private fun renderLegalEntityContentError(error: LegalEntityContentParseError): String =
         when (error) {
             LegalEntityContentParseError.NameMissing -> CleaningError.LEGAL_NAME_IS_NULL.message
             LegalEntityContentParseError.ConfidenceCriteriaMissing -> CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message
@@ -623,25 +645,25 @@ class TaskStepBuildService(
                 "Duplicate legal entity script variant for script code '${error.scriptCode}'"
         }
 
-    private fun renderError(error: SiteCreateParseError): String =
+    private fun renderSiteCreateError(error: SiteCreateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
             is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
-            is SiteContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is SiteContentParseError -> renderSiteContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: SiteUpdateParseError): String =
+    private fun renderSiteUpdateError(error: SiteUpdateParseError): String =
         when (error) {
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
-            is SiteContentParseError -> renderError(error)
-            is AddressContentParseError -> renderError(error)
+            is SiteContentParseError -> renderSiteContentError(error)
+            is AddressContentParseError -> renderAddressContentError(error)
         }
 
-    private fun renderError(error: ScriptVariantCoverageParseError): String =
+    private fun renderScriptVariantCoverageError(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"
             is ScriptVariantCoverageStillNeeded ->
@@ -651,16 +673,16 @@ class TaskStepBuildService(
     private fun renderLegalAddressCoverageError(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the legal address"
-            is ScriptVariantCoverageStillNeeded -> renderError(error)
+            is ScriptVariantCoverageStillNeeded -> renderScriptVariantCoverageError(error)
         }
 
     private fun renderMainAddressCoverageError(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
-            is ScriptVariantCoverageStillNeeded -> renderError(error)
+            is ScriptVariantCoverageStillNeeded -> renderScriptVariantCoverageError(error)
         }
 
-    private fun renderError(error: SiteContentParseError): String =
+    private fun renderSiteContentError(error: SiteContentParseError): String =
         when (error) {
             SiteContentParseError.NameMissing -> CleaningError.SITE_NAME_MISSING.message
             SiteContentParseError.ConfidenceCriteriaMissing -> CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message
@@ -772,7 +794,7 @@ class TaskStepBuildService(
 
     private fun assertScriptVariantCoverage(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
         val violations = coverageValidator.validate(businessPartner, taskEntryBpnMapping)
-        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { renderError(it) })
+        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { renderScriptVariantCoverageError(it) })
     }
 
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {

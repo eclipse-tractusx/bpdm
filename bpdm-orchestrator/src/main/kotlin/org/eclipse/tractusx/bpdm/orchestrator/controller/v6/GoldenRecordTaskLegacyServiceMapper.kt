@@ -20,23 +20,19 @@
 package org.eclipse.tractusx.bpdm.orchestrator.controller.v6
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
-import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
-import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntry
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponse
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponse
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponse
@@ -52,41 +48,10 @@ class GoldenRecordTaskLegacyServiceMapper(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
     private val taskRepository: GoldenRecordTaskRepository,
-    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
-        logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
-
-        val gateRecords = getOrCreateGateRecords(createRequest.requests)
-        abortOutdatedTasks(gateRecords.toSet())
-
-        return createRequest.requests.zip(gateRecords)
-            .map { (request, record) -> initTask(createRequest.mode, request.businessPartner, record) }
-            .map { task -> responseToClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateResponse(createdTasks = it) }
-    }
-
-    private fun getOrCreateGateRecords(requests: List<TaskCreateRequestEntry>): List<SharingMemberRecordDb> {
-        val privateIds = requests.map { request -> request.recordId?.let { toUUID(it) } }
-        val notNullPrivateIds = privateIds.filterNotNull()
-
-        val foundRecords = sharingMemberRecordRepository.findByPrivateIdIn(notNullPrivateIds.toSet())
-        val foundRecordsByPrivateId = foundRecords.associateBy { it.privateId }
-        val requestedNotFoundRecords = notNullPrivateIds.minus(foundRecordsByPrivateId.keys)
-
-        if (requestedNotFoundRecords.isNotEmpty())
-            throw BpdmRecordNotFoundException(requestedNotFoundRecords)
-
-        return privateIds.map { privateId ->
-            val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: SharingMemberRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID(), isGoldenRecordCounted = true)
-            sharingMemberRecordRepository.save(gateRecord)
-        }
-    }
 
     private fun toUUID(uuidString: String) =
         try {
@@ -94,39 +59,6 @@ class GoldenRecordTaskLegacyServiceMapper(
         } catch (e: IllegalArgumentException) {
             throw BpdmTaskNotFoundException(uuidString)
         }
-
-
-    private fun abortOutdatedTasks(records: Set<SharingMemberRecordDb>){
-        return taskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, GoldenRecordTaskDb.ResultState.Pending)
-            .forEach { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
-    }
-
-    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner, record: SharingMemberRecordDb): GoldenRecordTaskDb {
-        logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner data: $initBusinessPartner" }
-
-        val initialStep = getInitialStep(mode)
-        val initProcessingState = GoldenRecordTaskDb.ProcessingState(
-            mode = mode,
-            resultState = GoldenRecordTaskDb.ResultState.Pending,
-            step = initialStep,
-            errors = mutableListOf(),
-            stepState = GoldenRecordTaskDb.StepState.Queued,
-            pendingTimeout =  Instant.now().plus(taskConfigProperties.taskPendingTimeout).toTimestamp(),
-            retentionTimeout = null
-        )
-
-        val initialTask = DbTimestamp.now().let { nowTime ->
-            GoldenRecordTaskDb(
-                gateRecord = record,
-                processingState = initProcessingState,
-                businessPartner = requestedToBusinessPartner(initBusinessPartner),
-                createdAt = nowTime,
-                updatedAt = nowTime
-            )
-        }
-
-        return taskRepository.save(initialTask)
-    }
 
     fun requestedToBusinessPartner(businessPartner: BusinessPartner) =
         with(businessPartner){
@@ -333,10 +265,6 @@ class GoldenRecordTaskLegacyServiceMapper(
                 referenceType = referenceType
             )
         }
-
-    private fun getInitialStep(mode: TaskMode): TaskStep {
-        return stateMachineConfigProperties.modeSteps[mode]!!.first()
-    }
 
     private fun calculateTaskRetentionTimeout(task: GoldenRecordTaskDb) =
         task.createdAt.instant.plus(taskConfigProperties.taskRetentionTimeout)
@@ -557,6 +485,8 @@ class GoldenRecordTaskLegacyServiceMapper(
         val reservedTasks = foundTasks.map { goldenRecordTaskStateMachine.doReserve(it) }
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
+        logger.debug { "Reserved ${reservedTasks.size} golden record tasks for step ${reservationRequest.step}: ${reservedTasks.toLogIdentifiers()}" }
+
         return reservedTasks
             .map { task ->
                 TaskStepReservationEntryDto(
@@ -578,10 +508,10 @@ class GoldenRecordTaskLegacyServiceMapper(
         val foundTasks = taskRepository.findByUuidIn(uuids.toSet()).also { taskRepository.fetchBusinessPartnerData(it) }
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
 
-        resultRequest.results
+        val resolvedTasks = resultRequest.results
             .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
             .filterNot { (task, _) -> task.processingState.resultState == GoldenRecordTaskDb.ResultState.Aborted }
-            .forEach { (task, resultEntry) ->
+            .mapNotNull { (task, resultEntry) ->
                 val step = resultRequest.step
                 val errors = resultEntry.errors
                 val resultBusinessPartner = resultEntry.businessPartner
@@ -591,13 +521,33 @@ class GoldenRecordTaskLegacyServiceMapper(
                     else ->  resolveTaskStepToSuccess(task, step, resultBusinessPartner)
                 }
             }
+
+        logResolvedTasks(resolvedTasks, resultRequest.step)
     }
 
+    private fun logResolvedTasks(resolvedTasks: List<GoldenRecordTaskDb>, step: TaskStep) {
+        val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }
+
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Pending]
+            ?.groupBy { it.processingState.step }
+            ?.forEach { (nextStep, tasks) ->
+                logger.info { "Advanced ${tasks.size} golden record tasks from step $step to step $nextStep: ${tasks.toLogIdentifiers()}" }
+            }
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Success]
+            ?.let { tasks -> logger.info { "Completed ${tasks.size} golden record tasks after step $step: ${tasks.toLogIdentifiers()}" } }
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Error]
+            ?.let { tasks -> logger.info { "Failed ${tasks.size} golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
+    }
+
+    /**
+     * Resolves the given step of the task as successful, moving the task to its next step or to overall success, and
+     * answers with null where the step was already resolved and the result is therefore ignored.
+     */
     fun resolveTaskStepToSuccess(
         task: GoldenRecordTaskDb,
         step: TaskStep,
         resultBusinessPartner: BusinessPartner
-    ): GoldenRecordTaskDb {
+    ): GoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
 
@@ -605,7 +555,7 @@ class GoldenRecordTaskLegacyServiceMapper(
             if(hasAlreadyResolvedStep(state, step))
             {
                 logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
-                return task
+                return null
             }else{
                 throw BpdmIllegalStateException(task.uuid, state)
             }
@@ -675,3 +625,6 @@ class GoldenRecordTaskLegacyServiceMapper(
             .let { TaskStateResponse(tasks = it) }
     }
 }
+
+private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =
+    map { it.uuid.toString() }.joinIdentifiersForLog()

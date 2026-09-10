@@ -7,7 +7,7 @@
 # the headquarters (headquarter_relocation.feature). Every other address succession leaves both addresses as they are:
 # nothing is reclassified, nothing is inherited and no state changes. This feature gathers the scenarios for those
 # successions.
-@CXTPM-1039
+@CXTPM-1043
 Feature: Address Succession
 
   #h3. Test Objective:
@@ -16,14 +16,14 @@ Feature: Address Succession
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect an additional address of the same legal entity (predecessor and successor).
+  #* Two records each reflect an additional address of the same legal entity (predecessor and successor).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the predecessor address record to the successor address record, effective immediately.
-  ## The golden record process establishes the relation between the two BPNA.
-  ## The relation output reflects the established golden record relation.
-  @BPDM
+  #* The sharing member shares an IsReplacedBy relation from the predecessor address record to the successor address record, effective immediately.
+  #* The golden record process establishes the relation between the two BPNA.
+  #* The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1044 @BPDM
   Scenario: IsReplacedBy Relation Between Addresses Reflected In Sharing Member Relation Output
     Given record "predecessor-address-record" reflects additional address "predecessor-address" of legal entity "acme"
     And record "successor-address-record" reflects additional address "successor-address" of the existing legal entity "acme"
@@ -37,15 +37,15 @@ Feature: Address Succession
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect an additional address of the same legal entity (predecessor and successor).
+  #* Two records each reflect an additional address of the same legal entity (predecessor and successor).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the predecessor address record to the successor address record, effective immediately.
-  ## The golden record process establishes the relation between the two BPNA.
-  ## Both records' outputs reflect the relation on their address.
-  ## Both records still reflect their address as additional address, as an address succession outside the headquarters relocation reclassifies nothing.
-  @BPDM
+  #* The sharing member shares an IsReplacedBy relation from the predecessor address record to the successor address record, effective immediately.
+  #* The golden record process establishes the relation between the two BPNA.
+  #* Both records' outputs reflect the relation on their address.
+  #* Both records still reflect their address as additional address, as an address succession outside the headquarters relocation reclassifies nothing.
+  @TEST_CXTPM-1045 @BPDM
   Scenario: IsReplacedBy Relation Between Addresses Reflected In Address Outputs
     Given record "predecessor-address-record" reflects additional address "predecessor-address" of legal entity "acme"
     And record "successor-address-record" reflects additional address "successor-address" of the existing legal entity "acme"

@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
@@ -34,8 +37,8 @@ import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -52,6 +55,8 @@ class SiteUpdateService(
     private val siteRepository: SiteRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
+
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Applies the given changes and reports for each site whether the aggregate — its header or its main address —
@@ -71,6 +76,11 @@ class SiteUpdateService(
 
         siteRepository.saveAll(updatedSites.map { it.value })
         changelogCreateService.record(updatedSites.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
+
+        if (updatedSites.isNotEmpty())
+            logger.info {
+                "Updated ${countForLog(updatedSites.size, "site", "sites")}: ${updatedSites.map { it.value.bpn }.joinIdentifiersForLog()}"
+            }
 
         return siteChangeResults
     }

@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepo
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -40,8 +40,14 @@ class SharingMemberRecordService(
     private val sharingMemberRecordRepository: SharingMemberRecordRepository
 ) {
 
+    /**
+     * Returns the sharing member records updated after the requested timestamp, oldest update first.
+     *
+     * The ascending order is what makes the result usable as a timestamp cursor: a consumer resuming after the last
+     * entry of a page only avoids skipping records when no unread record precedes it.
+     */
     fun queryRecords(request: SharingMemberRecordQueryRequest, paginationRequest: PaginationRequest): PageDto<SharingMemberRecord>{
-        val pageable = PageRequest.of(paginationRequest.page, paginationRequest.size)
+        val pageable = PageRequest.of(paginationRequest.page, paginationRequest.size, Sort.Direction.ASC, "updatedAt")
         val recordPage = sharingMemberRecordRepository.findByUpdatedAtAfter(request.timestampAfter, pageable)
 
         return recordPage.toPageDto { toPublicDto(it) }
@@ -60,23 +66,6 @@ class SharingMemberRecordService(
         }
 
         return toPrivateDto(sharingMemberRecord)
-    }
-
-     fun getOrCreateGateRecords(requests: List<TaskCreateRequestEntry>): List<SharingMemberRecordDb> {
-         val privateIds = requests.map { request -> request.recordId?.let { toUUID(it) } }
-        val notNullPrivateIds = privateIds.filterNotNull()
-
-        val foundRecords = sharingMemberRecordRepository.findByPrivateIdIn(notNullPrivateIds.toSet())
-        val foundRecordsByPrivateId = foundRecords.associateBy { it.privateId }
-        val requestedNotFoundRecords = notNullPrivateIds.minus(foundRecordsByPrivateId.keys)
-
-        if (requestedNotFoundRecords.isNotEmpty())
-            throw BpdmRecordNotFoundException(requestedNotFoundRecords)
-
-        return privateIds.map { privateId ->
-            val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: SharingMemberRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID(), isGoldenRecordCounted = null)
-            sharingMemberRecordRepository.save(gateRecord)
-        }
     }
 
     private fun toUUID(uuidString: String) =

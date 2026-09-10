@@ -7,6 +7,7 @@ Documentation here concerns developers who want to contribute to this repository
   * [Application Code Guide](#application-code-guide)
   * [Code Documentation Guide](#code-documentation-guide)
   * [Testing Guide](#testing-guide)
+  * [Logging Guide](#logging-guide)
   * [Apps and Charts](#apps-and-charts)
   * [License Check](#license-check)
   * [Branching Strategy](#branching-strategy)
@@ -29,6 +30,10 @@ Our [code documentation guide](documentation-guide.md) sets out what earns a com
 
 All contributions should be covered by API tests.
 Our in-depth [testing guide](testing-guide.md) how our testing setup works and what to look out for when writing your own test code.
+
+## Logging Guide
+
+Our [logging guide](logging-guide.md) defines what we log at which level. INFO is reserved for persisted changes, startup configuration and process lifecycle; everything else is DEBUG. Read it before adding or changing a log statement.
 
 ## Apps and Charts
 
@@ -139,7 +144,7 @@ In order to do so, the following changes are required:
 3. Adapt the Keycloak realm configuration to include roles for the new steps. This should be done [locally](../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json) as well as [remotely](https://github.com/eclipse-tractusx/portal-iam).
     Alternatively, you can also override the generated standard permission names with ones that already exist in the IdP see next point)
 4. Optionally: Adapt the step permissions in the [application properties](../../bpdm-orchestrator/src/main/resources/application.yml) for documentation purposes or for overriding the generated standard permission names
-5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/auth) for testing the new step permission configuration
+5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/v7/OrchestratorAuthV7IT.kt) for testing the new step permission configuration
 
 ## GitHub Workflows
 

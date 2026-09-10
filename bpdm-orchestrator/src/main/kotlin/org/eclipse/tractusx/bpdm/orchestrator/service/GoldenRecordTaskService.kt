@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
@@ -42,37 +42,10 @@ class GoldenRecordTaskService(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
     private val responseMapper: ResponseMapper,
-    private val taskRepository: GoldenRecordTaskRepository,
-    private val sharingMemberRecordService: SharingMemberRecordService
+    private val taskRepository: GoldenRecordTaskRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
-        logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
-
-        createRequest.requests.forEach { assertAdditionalSitesHaveSite(it.businessPartner) }
-
-        val gateRecords = sharingMemberRecordService.getOrCreateGateRecords(createRequest.requests)
-        abortOutdatedTasks(gateRecords.toSet())
-
-        return createRequest.requests.zip(gateRecords)
-            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
-            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateResponse(createdTasks = it) }
-    }
-
-    /**
-     * Rejects business partner data that states further sites of its address without stating a site of its own, which
-     * those sites would be additional to.
-     */
-    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
-        if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null)
-            throw BpdmInvalidBusinessPartnerException(
-                "additional sites of its address are stated but no site of its own is, which they would be additional to"
-            )
-    }
 
     fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
         logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
@@ -109,6 +82,8 @@ class GoldenRecordTaskService(
         val reservedTasks = foundTasks.map { goldenRecordTaskStateMachine.doReserve(it) }
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
+        logger.debug { "Reserved ${reservedTasks.size} golden record tasks for step ${reservationRequest.step}: ${reservedTasks.toLogIdentifiers()}" }
+
         return reservedTasks
             .map { task ->
                 TaskStepReservationEntryDto(
@@ -129,10 +104,10 @@ class GoldenRecordTaskService(
         val foundTasks = taskRepository.findByUuidIn(uuids.toSet()).also { taskRepository.fetchBusinessPartnerData(it) }
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
 
-        resultRequest.results
+        val resolvedTasks = resultRequest.results
             .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
             .filterNot { (task, _) -> task.processingState.resultState == GoldenRecordTaskDb.ResultState.Aborted }
-            .forEach { (task, resultEntry) ->
+            .mapNotNull { (task, resultEntry) ->
                 val step = resultRequest.step
                 val errors = resultEntry.errors
                 val resultBusinessPartner = resultEntry.businessPartner
@@ -142,28 +117,54 @@ class GoldenRecordTaskService(
                     else ->  goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartner)
                 }
             }
+
+        logResolvedTasks(resolvedTasks, resultRequest.step)
+    }
+
+    private fun logResolvedTasks(resolvedTasks: List<GoldenRecordTaskDb>, step: TaskStep) {
+        val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }
+
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Pending]
+            ?.groupBy { it.processingState.step }
+            ?.forEach { (nextStep, tasks) ->
+                logger.info { "Advanced ${tasks.size} golden record tasks from step $step to step $nextStep: ${tasks.toLogIdentifiers()}" }
+            }
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Success]
+            ?.let { tasks -> logger.info { "Completed ${tasks.size} golden record tasks after step $step: ${tasks.toLogIdentifiers()}" } }
+        tasksByResultState[GoldenRecordTaskDb.ResultState.Error]
+            ?.let { tasks -> logger.info { "Failed ${tasks.size} golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
     }
 
     @Transactional
     fun processPendingTimeouts(pageSize: Int): PaginationInfo {
+        val timedOutTasks = mutableListOf<GoldenRecordTaskDb>()
+
         return batchProcessTasks(pageSize,
             fetchPage = { pageable -> taskRepository.findByProcessingStatePendingTimeoutBefore(DbTimestamp.now(), pageable) },
             processTask = { task ->
-                logger.info { "Setting timeout for task ${task.uuid} after reaching pending timeout" }
                 goldenRecordTaskStateMachine.doResolveTaskToTimeout(task)
+                timedOutTasks.add(task)
             }
-        )
+        ).also {
+            if (timedOutTasks.isNotEmpty())
+                logger.info { "Timed out ${timedOutTasks.size} golden record tasks: ${timedOutTasks.toLogIdentifiers()}" }
+        }
     }
 
     @Transactional
     fun processRetentionTimeouts(pageSize: Int): PaginationInfo {
+        val deletedTasks = mutableListOf<GoldenRecordTaskDb>()
+
         return batchProcessTasks(pageSize,
             fetchPage = { pageable -> taskRepository.findByProcessingStateRetentionTimeoutBefore(DbTimestamp.now(), pageable) },
             processTask = { task ->
-                logger.info { "Removing task ${task.uuid} after reaching retention timeout" }
                 taskRepository.delete(task)
+                deletedTasks.add(task)
             }
-        )
+        ).also {
+            if (deletedTasks.isNotEmpty())
+                logger.info { "Deleted ${deletedTasks.size} golden record tasks after their retention timeout: ${deletedTasks.toLogIdentifiers()}" }
+        }
     }
 
     private fun batchProcessTasks(
@@ -202,11 +203,18 @@ class GoldenRecordTaskService(
             throw BpdmTaskNotFoundException(uuidString)
         }
 
-    private fun abortOutdatedTasks(records: Set<SharingMemberRecordDb>){
-        return taskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, GoldenRecordTaskDb.ResultState.Pending)
-            .forEach { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
+    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
+        val hasSite = businessPartner.site?.bpnReference?.referenceValue != null || businessPartner.site?.siteName != null
+        if (businessPartner.additionalSites.isNotEmpty() && !hasSite) {
+            throw BpdmInvalidBusinessPartnerException(
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
+        }
     }
 }
+
+private fun Collection<GoldenRecordTaskDb>.toLogIdentifiers() =
+    map { it.uuid.toString() }.joinIdentifiersForLog()
 
 data class PaginationInfo(
     val hasProcessedTasks: Boolean,

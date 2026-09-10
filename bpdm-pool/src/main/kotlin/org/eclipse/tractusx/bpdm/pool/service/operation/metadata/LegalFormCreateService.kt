@@ -41,8 +41,6 @@ class LegalFormCreateService(
      */
     @Transactional
     fun create(legalForm: LegalFormCreateParsed): LegalFormDb {
-        logger.info { "Create new Legal-Form with key ${legalForm.technicalKey} and name ${legalForm.name}" }
-
         val entity = LegalFormDb(
             technicalKey = legalForm.technicalKey,
             name = legalForm.name,
@@ -56,5 +54,6 @@ class LegalFormCreateService(
         )
 
         return legalFormRepository.save(entity)
+            .also { logger.info { "Created legal form '${it.technicalKey}' with name ${it.name}" } }
     }
 }

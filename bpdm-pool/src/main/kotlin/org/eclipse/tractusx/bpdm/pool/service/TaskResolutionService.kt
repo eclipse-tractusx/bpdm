@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
@@ -45,9 +46,20 @@ class TaskBatchResolutionService(
     ){
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Reports whether golden record task processing runs on a schedule in this deployment.
+     */
+    @PostConstruct
+    fun logScheduleActivation() {
+        if (goldenRecordTaskConfigProperties.cron == CRON_DISABLED)
+            logger.info { "Golden record task processing schedule is disabled" }
+        else
+            logger.info { "Golden record task processing scheduled with cron '${goldenRecordTaskConfigProperties.cron}'" }
+    }
+
     @Scheduled(cron = "#{${GoldenRecordTaskConfigProperties.GET_CRON}}", zone = "UTC")
     fun processTasks(){
-        logger.info { "Start golden record task processing schedule..." }
+        logger.debug { "Start golden record task processing schedule..." }
         reserveAndResolve()
         resolveUnresolved()
         deleteResolved()
@@ -76,7 +88,10 @@ class TaskBatchResolutionService(
             entityManager.clear()
         }while (taskStepReservation.reservedTasks.isNotEmpty())
 
-        logger.info { "Total of $totalTasksProcessed processed" }
+        if (totalTasksProcessed > 0)
+            logger.info { "Processed $totalTasksProcessed golden record tasks" }
+        else
+            logger.debug { "No golden record tasks to process" }
     }
 
     fun resolveUnresolved(){
@@ -111,21 +126,29 @@ class TaskBatchResolutionService(
             }
         }while (task != null)
 
-        logger.info { "Resolving tasks: Checked $processedTasks tasks and resolved $resolvedTasks tasks as errors" }
-
+        if (resolvedTasks > 0)
+            logger.info { "Resolved $resolvedTasks of $processedTasks checked tasks as errors" }
+        else
+            logger.debug { "Checked $processedTasks tasks, none needed resolving as errors" }
     }
 
     fun deleteResolved(){
-        var tasksDeleted = 0
-        do{
-            val task = goldenRecordTaskRepository.findFirstByIsResolved(true)?.let { task ->
+        // Each query re-asks what is left to delete, so a query has to see the preceding delete: keep this lazy.
+        val tasksDeleted = generateSequence { goldenRecordTaskRepository.findFirstByIsResolved(true) }
+            .onEach { task ->
                 goldenRecordTaskRepository.delete(task)
                 entityManager.clear()
-                tasksDeleted++
             }
-        }while (task != null)
+            .count()
 
-        logger.info { "Deleted $tasksDeleted resolved tasks" }
+        if (tasksDeleted > 0)
+            logger.info { "Deleted $tasksDeleted resolved tasks" }
+        else
+            logger.debug { "No resolved tasks to delete" }
+    }
+
+    companion object {
+        private const val CRON_DISABLED = "-"
     }
 }
 
@@ -138,7 +161,7 @@ class TaskResolutionService(
     private val logger = KotlinLogging.logger { }
 
     fun resolveTasks(taskStepReservation: TaskStepReservationResponse) {
-            logger.info { "${taskStepReservation.reservedTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
+            logger.debug { "${taskStepReservation.reservedTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
             if (taskStepReservation.reservedTasks.isNotEmpty()) {
                 val taskResults = upsertGoldenRecordIntoPool(taskStepReservation.reservedTasks)
@@ -151,7 +174,7 @@ class TaskResolutionService(
                 }
                 orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = goldenRecordTaskConfigProperties.step, results = resultsWithSafeErrors))
             }
-            logger.info { "Cleaning tasks processing completed for this iteration." }
+            logger.debug { "Cleaning tasks processing completed for this iteration." }
     }
 
     fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {

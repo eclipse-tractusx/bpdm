@@ -70,7 +70,8 @@ class LogisticAddressDb(
     /**
      * The sites this address belongs to. A single unified relationship: there is no stored "primary" site — the API's
      * `bpnSite` is derived as the oldest member by `createdAt` and the remainder is exposed as [additionalSites].
-     * A site's main address is also a member of its own set, which is how it is classified (see [addressType]).
+     * A site's main address is also a member of its own set, which is how it is classified (see [addressType]), and for
+     * that reason such a site cannot be taken out of the set.
      */
     @ManyToMany
     @JoinTable(

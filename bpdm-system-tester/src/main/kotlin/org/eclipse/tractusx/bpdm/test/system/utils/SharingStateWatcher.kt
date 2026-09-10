@@ -32,7 +32,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class SharingStateWatcher(
-    private val gateClient: GateClient
+    private val gateClient: GateClient,
+    member: SharingMember
 ) {
 
     companion object {
@@ -54,8 +55,10 @@ class SharingStateWatcher(
     private val awaitingRelationCompletedState = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateType>>()
     private val awaitingRelationTaskId         = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateType>>()
 
+    private val memberName = member.name.lowercase()
+
     private val scheduler = Executors.newSingleThreadScheduledExecutor { runnable ->
-        Thread(runnable, "sharing-state-watcher").also { it.isDaemon = true }
+        Thread(runnable, "sharing-state-watcher-$memberName").also { it.isDaemon = true }
     }
 
     init {
@@ -73,7 +76,10 @@ class SharingStateWatcher(
             result
         } catch (e: TimeoutException) {
             awaitingCompletedState.remove(externalId)
-            throw TimeoutException("Sharing state for '$recordId' did not reach a completed state within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            throw TimeoutException(
+                "Sharing state for '$recordId' at the $memberName sharing member's Gate did not reach a completed state" +
+                        " within ${WAIT_TIMEOUT.toMinutes()} minutes"
+            )
         }
     }
 
@@ -88,7 +94,10 @@ class SharingStateWatcher(
             result
         } catch (e: TimeoutException) {
             awaitingTaskId.remove(externalId)
-            throw TimeoutException("Sharing state for '$recordId' did not receive a task ID within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            throw TimeoutException(
+                "Sharing state for '$recordId' at the $memberName sharing member's Gate did not receive a task ID" +
+                        " within ${WAIT_TIMEOUT.toMinutes()} minutes"
+            )
         }
     }
 
@@ -103,7 +112,10 @@ class SharingStateWatcher(
             result
         } catch (e: TimeoutException) {
             awaitingRelationCompletedState.remove(externalId)
-            throw TimeoutException("Relation sharing state for '$recordId' did not reach a completed state within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            throw TimeoutException(
+                "Relation sharing state for '$recordId' at the $memberName sharing member's Gate did not reach a" +
+                        " completed state within ${WAIT_TIMEOUT.toMinutes()} minutes"
+            )
         }
     }
 
@@ -118,7 +130,10 @@ class SharingStateWatcher(
             result
         } catch (e: TimeoutException) {
             awaitingRelationTaskId.remove(externalId)
-            throw TimeoutException("Relation sharing state for '$recordId' did not receive a task ID within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            throw TimeoutException(
+                "Relation sharing state for '$recordId' at the $memberName sharing member's Gate did not receive a" +
+                        " task ID within ${WAIT_TIMEOUT.toMinutes()} minutes"
+            )
         }
     }
 

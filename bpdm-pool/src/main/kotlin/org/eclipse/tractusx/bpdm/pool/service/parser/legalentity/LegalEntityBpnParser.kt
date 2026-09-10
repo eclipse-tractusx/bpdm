@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
 /**
- * Resolves legal-entity BPNs to the legal entities they name.
+ * Resolves legal-entity BPNs to the legal entities they name, reading a BPN case-insensitively.
  */
 @Service
 class LegalEntityBpnParser(
@@ -38,11 +38,11 @@ class LegalEntityBpnParser(
      */
     fun parse(legalEntityBpns: List<String>): List<ParseResult<LegalEntityDb, UnresolvableLegalEntity>> {
         val legalEntitiesByBpn = legalEntityRepository
-            .findDistinctByBpnIn(legalEntityBpns.toSet())
+            .findDistinctByBpnIn(legalEntityBpns.mapTo(mutableSetOf()) { it.uppercase() })
             .associateBy { it.bpn }
 
         return legalEntityBpns.map { bpn ->
-            when (val legalEntity = legalEntitiesByBpn[bpn]) {
+            when (val legalEntity = legalEntitiesByBpn[bpn.uppercase()]) {
                 null -> ParseResult.ofSingleFailure(UnresolvableLegalEntity(bpn))
                 else -> ParseResult.Success(legalEntity)
             }

@@ -19,16 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
-import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRelationRepository
@@ -45,13 +42,18 @@ class SiteRelationUpsertService(
     private val changelogCreateService: ChangelogCreateService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Persists the succession and rejects it if the two sites belong to different legal entities, if the predecessor
      * already has a different successor in an overlapping validity period, or if it would close a replacement cycle
      * over overlapping periods.
      */
     @Transactional
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<SiteRelationDb> {
+    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<SiteRelationDb> =
+        upsert(upsertRequest).also { logOutcome(it.upsertType, upsertRequest) }
+
+    private fun upsert(upsertRequest: UpsertRequest): UpsertResult<SiteRelationDb> {
         validateNoSelfReference(upsertRequest)
         validateSameLegalEntity(upsertRequest)
         validateSingleSuccessor(upsertRequest)
@@ -69,6 +71,15 @@ class SiteRelationUpsertService(
         siteRelationRepository.save(existingRelation)
 
         return UpsertResult(existingRelation, UpsertType.Updated)
+    }
+
+    private fun logOutcome(upsertType: UpsertType, upsertRequest: UpsertRequest) {
+        val succession = "site succession from '${upsertRequest.source.bpn}' to '${upsertRequest.target.bpn}'"
+        when (upsertType) {
+            UpsertType.Created -> logger.info { "Created $succession" }
+            UpsertType.Updated -> logger.info { "Updated validity periods of $succession" }
+            UpsertType.NoChange -> logger.debug { "Left $succession unchanged" }
+        }
     }
 
     private fun validateNoSelfReference(upsertRequest: UpsertRequest) {

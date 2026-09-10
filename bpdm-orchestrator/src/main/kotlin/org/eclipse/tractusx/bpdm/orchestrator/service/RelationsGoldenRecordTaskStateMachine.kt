@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigPropertie
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRelationsRequest
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
@@ -43,7 +44,7 @@ class RelationsGoldenRecordTaskStateMachine(
 
     private val logger = KotlinLogging.logger { }
 
-    fun initTask(mode: TaskMode, initBusinessPartnerRelations: BusinessPartnerRelations, record: SharingMemberRecordDb): RelationsGoldenRecordTaskDb {
+    fun initTask(mode: TaskMode, initBusinessPartnerRelations: BusinessPartnerRelationsRequest, record: SharingMemberRecordDb): RelationsGoldenRecordTaskDb {
         logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner relations data: $initBusinessPartnerRelations" }
 
         val initialStep = getInitialStep(mode)
@@ -95,7 +96,11 @@ class RelationsGoldenRecordTaskStateMachine(
         return relationsTaskRepository.save(task)
     }
 
-    fun doResolveTaskToError(task: RelationsGoldenRecordTaskDb, step: TaskStep, errors: List<TaskRelationsErrorDto>): RelationsGoldenRecordTaskDb {
+    /**
+     * Resolves the given step of the task as failed and answers with null where the step was already resolved and the
+     * errors are therefore ignored.
+     */
+    fun doResolveTaskToError(task: RelationsGoldenRecordTaskDb, step: TaskStep, errors: List<TaskRelationsErrorDto>): RelationsGoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
@@ -103,7 +108,7 @@ class RelationsGoldenRecordTaskStateMachine(
             if(hasAlreadyResolvedStep(state, step))
             {
                 logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
-                return task
+                return null
             }else{
                 throw RelationsIllegalStateException(task.uuid, state)
             }
@@ -115,11 +120,15 @@ class RelationsGoldenRecordTaskStateMachine(
         return relationsTaskRepository.save(task)
     }
 
+    /**
+     * Resolves the given step of the task as successful, moving the task to its next step or to overall success, and
+     * answers with null where the step was already resolved and the result is therefore ignored.
+     */
     fun resolveTaskStepToSuccess(
         task: RelationsGoldenRecordTaskDb,
         step: TaskStep,
         resultBusinessPartnerRelaitons: BusinessPartnerRelations
-    ): RelationsGoldenRecordTaskDb {
+    ): RelationsGoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartnerRelaitons" }
         val state = task.processingState
 
@@ -127,7 +136,7 @@ class RelationsGoldenRecordTaskStateMachine(
             if(hasAlreadyResolvedStep(state, step))
             {
                 logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
-                return task
+                return null
             }else{
                 throw RelationsIllegalStateException(task.uuid, state)
             }

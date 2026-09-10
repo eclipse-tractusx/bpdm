@@ -19,16 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SharingMemberRecordDb
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SharingMemberRecordRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 
 @Service
@@ -39,16 +42,23 @@ class SharingMemberConfidenceService(
     private val changelogCreateService: ChangelogCreateService,
 ) {
 
-    fun updateGoldenRecordCounted(recordId: String, isGoldenRecordCounted: Boolean?): SharingMemberRecordDb?{
-        val foundSharingMemberRecord = sharingMemberRecordRepository.findByRecordId(recordId)
-        if(foundSharingMemberRecord != null){
-            if(foundSharingMemberRecord.isGoldenRecordCounted != isGoldenRecordCounted){
-                foundSharingMemberRecord.isGoldenRecordCounted = isGoldenRecordCounted
-                sharingMemberRecordRepository.save(foundSharingMemberRecord)
-                updateNumberOfSharingMembers(foundSharingMemberRecord.address)
-            }
+    private val logger = KotlinLogging.logger { }
+
+    /**
+     * Applies whether the sharing member record counts towards its address's confidence and reports whether that
+     * changed the record; an unknown record id yields null.
+     */
+    fun updateGoldenRecordCounted(recordId: String, isGoldenRecordCounted: Boolean?): UpsertResult<SharingMemberRecordDb>?{
+        val foundSharingMemberRecord = sharingMemberRecordRepository.findByRecordId(recordId) ?: return null
+
+        val hasChanges = foundSharingMemberRecord.isGoldenRecordCounted != isGoldenRecordCounted
+        if(hasChanges){
+            foundSharingMemberRecord.isGoldenRecordCounted = isGoldenRecordCounted
+            sharingMemberRecordRepository.save(foundSharingMemberRecord)
+            updateNumberOfSharingMembers(foundSharingMemberRecord.address)
         }
-        return foundSharingMemberRecord
+
+        return UpsertResult(foundSharingMemberRecord, if(hasChanges) UpsertType.Updated else UpsertType.NoChange)
     }
 
     fun updateAddress(recordId: String, addressBpn: String): Result{
@@ -87,6 +97,7 @@ class SharingMemberConfidenceService(
             address.confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
             logisticAddressRepository.save(address)
             changelogCreateService.record(ChangelogRecord(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            logger.debug { "Updated number of sharing members of address '${address.bpn}' to $newNumberOfSharingMembers" }
         }
 
         val legalEntity = address.legalEntity!!
@@ -96,6 +107,7 @@ class SharingMemberConfidenceService(
                 legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
                 legalEntityRepository.save(legalEntity)
                 changelogCreateService.record(ChangelogRecord(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+                logger.debug { "Updated number of sharing members of legal entity '${legalEntity.bpn}' to $newNumberOfSharingMembers" }
             }
         }
 
