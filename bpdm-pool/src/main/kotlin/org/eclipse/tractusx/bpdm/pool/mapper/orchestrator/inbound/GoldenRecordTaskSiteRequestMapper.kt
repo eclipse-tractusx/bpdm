@@ -24,7 +24,9 @@ import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant as SiteScriptVariantRequest
+import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite as TaskAdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState
+import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria as TaskConfidenceCriteria
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddress as TaskPostalAddress
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
@@ -64,6 +66,21 @@ class GoldenRecordTaskSiteRequestMapper(
             mainAddressBpn = mainAddressBpn,
             header = toHeaderRequest(site),
             mainAddress = toMainAddressRequest(site, mainAddress)
+        )
+
+    fun toCreateOnAddressRequest(
+        mainAddressBpn: String,
+        additionalSite: TaskAdditionalSite,
+        confidenceCriteria: TaskConfidenceCriteria
+    ): SiteCreateOnAddressRequest =
+        SiteCreateOnAddressRequest(
+            mainAddressBpn = mainAddressBpn,
+            header = SiteHeaderRequest(
+                name = additionalSite.siteName,
+                states = emptyList(),
+                confidenceCriteria = addressRequestMapper.toConfidenceRequest(confidenceCriteria),
+                scriptVariants = emptyList()
+            )
         )
 
     private fun toContentRequest(

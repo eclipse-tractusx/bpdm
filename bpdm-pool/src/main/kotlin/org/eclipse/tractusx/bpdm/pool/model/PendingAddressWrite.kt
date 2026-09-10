@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 
 /**
  * A logistic address with a staged, not-yet-persisted write (create or update) and the resulting change state. Produced
- * by [org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService]'s `stageCreate` /
- * [org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService]'s `stageUpdate` and consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.AddressWriteCommitService]'s `commit`, which is the single
+ * by [org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService]'s `stageCreate` /
+ * [org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService]'s `stageUpdate` and consumed by
+ * [org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressWriteCommitService]'s `commit`, which is the single
  * place an address is saved and changelogged. It is handed to callers so they can wire the (still-unsaved) address into
  * a cyclic parent — legal entity or site — before it is persisted.
  */

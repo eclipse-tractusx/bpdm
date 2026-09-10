@@ -296,12 +296,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = RelationSharingStateDto(
-            externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Pending,
-            taskId = createdTask.taskId,
-            updatedAt = Instant.MIN
-        )
+        val expected = expectedPendingState(relation.externalId, createdTask.taskId)
         assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
     }
 
@@ -471,22 +466,23 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
      * GIVEN an IsReplacedBy relation where the source has a site output and the target has an additional address output,
      *   and the golden record task creation has been triggered
      * WHEN input consumer searches for the relation sharing state
-     * THEN the sharing state shows Error because IsReplacedBy requires the non-additional side to be a legal entity, not a site
+     * THEN the sharing state shows Pending because a pair claimed by neither the legal entity nor the site level
+     *   is shared as a succession between the two addresses
      */
     @Test
-    fun `IsReplacedBy between site source and additional address target leads to sharing error`() {
+    fun `IsReplacedBy between site source and additional address target is shared as address relation`() {
         //GIVEN
         val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId, testName)
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = expectedErrorState(relation.externalId)
+        val expected = expectedPendingState(relation.externalId, createdTask.taskId)
         assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
     }
 
@@ -494,22 +490,23 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
      * GIVEN an IsReplacedBy relation where the source has a legal entity output and the target has a site output,
      *   and the golden record task creation has been triggered
      * WHEN input consumer searches for the relation sharing state
-     * THEN the sharing state shows Error because IsReplacedBy requires the non-legal-entity side to be an additional address, not a site
+     * THEN the sharing state shows Pending because only two legal entities succeed each other as legal entities,
+     *   so this pair is shared as a succession between the two addresses
      */
     @Test
-    fun `IsReplacedBy between legal entity source and site target leads to sharing error`() {
+    fun `IsReplacedBy between legal entity source and site target is shared as address relation`() {
         //GIVEN
         val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
             { testDataClient.businessPartner.refineToLegalEntity(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId, testName)
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = expectedErrorState(relation.externalId)
+        val expected = expectedPendingState(relation.externalId, createdTask.taskId)
         assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
     }
 
@@ -517,24 +514,31 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
      * GIVEN an IsReplacedBy relation where both source and target have additional address outputs,
      *   and the golden record task creation has been triggered
      * WHEN input consumer searches for the relation sharing state
-     * THEN the sharing state shows Error because IsReplacedBy requires one side to be a legal entity
+     * THEN the sharing state shows Pending because an additional address can be replaced by another address
      */
     @Test
-    fun `IsReplacedBy between two additional addresses leads to sharing error`() {
+    fun `IsReplacedBy between two additional addresses is shared as address relation`() {
         //GIVEN
         val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId, testName)
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = expectedErrorState(relation.externalId)
+        val expected = expectedPendingState(relation.externalId, createdTask.taskId)
         assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
     }
+
+    private fun expectedPendingState(externalId: String, taskId: String?) = RelationSharingStateDto(
+        externalId = externalId,
+        sharingStateType = RelationSharingStateType.Pending,
+        taskId = taskId,
+        updatedAt = Instant.MIN
+    )
 
     private fun expectedErrorState(externalId: String) = RelationSharingStateDto(
         externalId = externalId,

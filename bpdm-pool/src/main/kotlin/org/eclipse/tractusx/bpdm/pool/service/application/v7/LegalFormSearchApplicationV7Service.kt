@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormResponseMapper
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalFormSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.LegalFormSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

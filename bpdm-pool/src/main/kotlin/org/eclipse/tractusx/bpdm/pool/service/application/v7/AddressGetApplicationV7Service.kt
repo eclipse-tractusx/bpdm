@@ -20,11 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressGetRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressGetService
-import org.eclipse.tractusx.bpdm.pool.service.parser.AddressGetParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,8 +32,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class AddressGetApplicationV7Service(
-    private val addressGetParser: AddressGetParser,
-    private val addressGetService: AddressGetService,
+    private val addressBpnParser: AddressBpnParser,
     private val addressResponseMapper: AddressResponseMapper
 ) {
 
@@ -42,10 +40,9 @@ class AddressGetApplicationV7Service(
      * Returns the address with the given BPN and fails with a not-found error when no address carries it.
      */
     @Transactional(readOnly = true)
-    fun getAddress(bpna: String): LogisticAddressVerboseDto {
-        val criteria = addressGetParser.parse(AddressGetRequest(bpna))
-        val address = addressGetService.get(criteria) ?: throw BpdmNotFoundException("Address", criteria.addressBpn)
-
-        return addressResponseMapper.toAddress(address)
-    }
+    fun getAddress(bpna: String): LogisticAddressVerboseDto =
+        when (val result = addressBpnParser.parse(listOf(bpna)).single()) {
+            is ParseResult.Success -> addressResponseMapper.toAddress(result.parsed)
+            is ParseResult.Failure -> throw BpdmNotFoundException("Address", bpna)
+        }
 }

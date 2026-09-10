@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 
@@ -62,6 +63,13 @@ class BusinessPartnerTestDataClientV7(
         val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
         return createdTask
+    }
+
+    fun sharedBusinessPartnerOf(externalId: String, seed: String = externalId): BusinessPartner {
+        // Other tests share this mock server, so only what is recorded from here on is this record's sharing.
+        orchestratorMockDataFactory.resetRecordedRequests()
+        setStateToPending(externalId, seed)
+        return orchestratorMockDataFactory.getCreatedTaskBusinessPartners().single()
     }
 
     fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {

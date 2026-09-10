@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
-import org.eclipse.tractusx.bpdm.pool.service.operation.ScriptCodeSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.ScriptCodeSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

@@ -30,12 +30,12 @@ class OpenApiExampleCustomizer(
 
 
     override fun customise(openApi: OpenAPI) {
-        logger.info { "Examples size: ${examples.size}" }
+        logger.debug { "Examples size: ${examples.size}" }
         examples.forEach { schemaExample ->
             val schema = openApi.components?.schemas?.get(schemaExample.schemaName)
             if (schema != null) {
                 schema.example = schemaExample.example
-                logger.info { "Example attached to schema: ${schemaExample.schemaName}" }
+                logger.debug { "Example attached to schema: ${schemaExample.schemaName}" }
             } else {
                 logger.warn { "Schema not found: ${schemaExample.schemaName}" }
             }

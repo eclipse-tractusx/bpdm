@@ -65,9 +65,13 @@ class ResponseMapper {
                 uncategorized = toUncategorizedProperties(businessPartner),
                 legalEntity = toLegalEntity(businessPartner),
                 site = toSite(businessPartner),
-                additionalAddress = toAdditionalAddress(businessPartner)
+                additionalAddress = toAdditionalAddress(businessPartner),
+                additionalSites = toAdditionalSites(businessPartner)
             )
         }
+
+    fun toAdditionalSites(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.additionalSites.map { AdditionalSite(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
 
 
     fun toUncategorizedProperties(businessPartner: GoldenRecordTaskDb.BusinessPartner) =

@@ -52,14 +52,17 @@ class RelationTaskCreationService(
     private val logger = KotlinLogging.logger { }
 
     fun sendTasks(): Int{
-        logger.info { "Started scheduled task to create golden record tasks from business partner relations" }
+        logger.debug { "Started scheduled task to create golden record tasks from business partner relations" }
 
         stageRelations()
-        val totalSentCount = sendStagedRelations()
+        val sentTasks = sendStagedRelations()
 
-        logger.debug { "Total created $totalSentCount new golden record tasks from business partner relations" }
+        if (sentTasks.isNotEmpty())
+            logger.info { "Created ${sentTasks.size} new golden record tasks from business partner relations: ${sentTasks.toLogIdentifiers()}" }
+        else
+            logger.debug { "No business partner relations to create golden record tasks from" }
 
-        return totalSentCount
+        return sentTasks.size
     }
 
     private fun stageRelations(){
@@ -71,16 +74,16 @@ class RelationTaskCreationService(
         }while (stagedCount > 0)
     }
 
-    private fun sendStagedRelations(): Int{
-        var totalSentCount = 0
-        var sentCount = 0
+    private fun sendStagedRelations(): List<CreatedGoldenRecordTask>{
+        val totalSentTasks = mutableListOf<CreatedGoldenRecordTask>()
+        var sentTasks: List<CreatedGoldenRecordTask>
         do{
-            sentCount = transactionTemplate.execute { sendTaskBatch(taskConfigProperties.relationCreation.batchSize) } ?: 0
-            totalSentCount += sentCount
+            sentTasks = transactionTemplate.execute { sendTaskBatch(taskConfigProperties.relationCreation.batchSize) } ?: emptyList()
+            totalSentTasks.addAll(sentTasks)
             entityManager.clear()
-        }while (sentCount > 0)
+        }while (sentTasks.isNotEmpty())
 
-        return totalSentCount
+        return totalSentTasks
     }
 
     fun stageRelationsForSending(batchSize: Int): Int{
@@ -89,10 +92,10 @@ class RelationTaskCreationService(
         return toStagePage.content.size
     }
 
-    fun sendTaskBatch(batchSize: Int): Int{
+    fun sendTaskBatch(batchSize: Int): List<CreatedGoldenRecordTask>{
         val toSendPage = relationRepository.findBySharingStateAndStaged(RelationSharingStateType.Ready, true, PageRequest.ofSize(batchSize))
         val toSendRelations = toSendPage.content
-        if (toSendRelations.isEmpty()) return 0
+        if (toSendRelations.isEmpty()) return emptyList()
 
         val toSendStages = relationStageRepository.findByRelationInAndStage(toSendRelations.toSet(), StageType.Input)
         val stagesByRelation = toSendStages.associateBy { it.relation.id }
@@ -169,15 +172,15 @@ class RelationTaskCreationService(
 
         val createdTasks = taskCreateRequests.letNonNull { sendTasks(it) }
 
-        toSendRelations.zip(createdTasks){ relation, createdTask ->
+        return toSendRelations.zip(createdTasks){ relation, createdTask ->
             if (createdTask != null){
                 relationSharingStateService.setPending(relation, createdTask.taskId, createdTask.recordId)
+                CreatedGoldenRecordTask(relation.externalId, createdTask.taskId)
             }else{
                 unstage(relation)
+                null
             }
-        }
-
-        return createdTasks.filterNotNull().size
+        }.filterNotNull()
     }
 
     private fun determineTaskKind(
@@ -186,7 +189,7 @@ class RelationTaskCreationService(
         relationType: RelationType
     ): RelationTaskKind? {
 
-        fun isLegalEntityLike(t: AddressType?) = when (t) {
+        fun isLegalEntityLike(t: AddressType) = when (t) {
             AddressType.LegalAndSiteMainAddress,
             AddressType.LegalAddress -> true
 
@@ -196,20 +199,24 @@ class RelationTaskCreationService(
         // A site relation requires SiteMainAddress on both sides rather than everything a site can be reached through:
         // LegalAndSiteMainAddress is a legal entity too, and IsReplacedBy between two of those already means the legal
         // entities succeed each other. A site sharing its legal entity's address can therefore not be replaced.
-        fun isSiteMainOnly(t: AddressType?) = t == AddressType.SiteMainAddress
+        fun isSiteMainOnly(t: AddressType) = t == AddressType.SiteMainAddress
 
-        fun isAdditional(t: AddressType?) = t == AddressType.AdditionalAddress
+        if (sourceAddressType == null || targetAddressType == null) return null
 
-        return when {
-            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(
-                RelationType.IsAlternativeHeadquarterFor,
-                RelationType.IsOwnedBy,
-                RelationType.IsManagedBy,
-                RelationType.IsReplacedBy
-            ) -> RelationTaskKind.LegalEntity
-            isSiteMainOnly(sourceAddressType) && isSiteMainOnly(targetAddressType) && relationType == RelationType.IsReplacedBy -> RelationTaskKind.Site
-            ((isAdditional(sourceAddressType) && isLegalEntityLike(targetAddressType)) || (isLegalEntityLike(sourceAddressType) && isAdditional(targetAddressType))) && relationType == RelationType.IsReplacedBy -> RelationTaskKind.Address
-            else -> null
+        val bothLegalEntityLike = isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType)
+
+        return when (relationType) {
+            RelationType.IsAlternativeHeadquarterFor,
+            RelationType.IsOwnedBy,
+            RelationType.IsManagedBy -> if (bothLegalEntityLike) RelationTaskKind.LegalEntity else null
+
+            // An address succession is what remains once neither higher level claims the pair: every refined record has
+            // a BPNA, so any other IsReplacedBy pair is a succession between the two addresses themselves.
+            RelationType.IsReplacedBy -> when {
+                bothLegalEntityLike -> RelationTaskKind.LegalEntity
+                isSiteMainOnly(sourceAddressType) && isSiteMainOnly(targetAddressType) -> RelationTaskKind.Site
+                else -> RelationTaskKind.Address
+            }
         }
     }
 

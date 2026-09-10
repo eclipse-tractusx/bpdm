@@ -8,7 +8,8 @@
 #   - site relations (IsReplacedBy between sites) surface on the output's site,
 #   - address relations (IsReplacedBy between addresses) surface on the output's address.
 # IsReplacedBy also exists between two legal entities, where it surfaces on the legal entity; that variant is
-# covered in legal_entity_succession.feature and the site variant in site_succession.feature.
+# covered in legal_entity_succession.feature, the site variant in site_succession.feature and the address
+# variant in address_succession.feature.
 # All levels are shown regardless of what the record itself was refined to. In particular, a record refined
 # as an additional address still shows the relations of its parent legal entity, even though the record is
 # technically the additional address and the legal entity is only its parent.
@@ -18,11 +19,10 @@
 #   - IsOwnedBy and IsAlternativeHeadquarterFor are relations between two legal entities.
 #   - IsManagedBy is between two legal entities; the managing entity must be a dataspace participant (own
 #     company data) and the validity must not start in the past.
-#   - IsReplacedBy at address level is between a legal address and an additional address of the SAME legal entity and must be
-#     currently valid. The Pool expects the legal address as the relation source and the additional address
-#     as the target, and reclassifies (swaps) the two addresses; this feature only asserts that the relation
-#     is reflected and accepts the swap.
-@CXTPM-1039
+#   - IsReplacedBy at address level is between two addresses of the SAME legal entity. Where the relation
+#     source is the legal address and it is currently valid, the Pool reclassifies (swaps) the two addresses;
+#     this feature only asserts that the relation is reflected and accepts the swap.
+@CXTPM-1043
 Feature: Output Reflects Golden Record Relations
 
   #h3. Test Objective:
@@ -31,13 +31,13 @@ Feature: Output Reflects Golden Record Relations
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect a legal entity (owner and owned).
+  #* Two records each reflect a legal entity (owner and owned).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsOwnedBy relation from the owned record to the owner record.
-  ## The golden record process establishes the relation.
-  ## Both records' outputs reflect the relation on their legal entity.
+  #* The sharing member shares an IsOwnedBy relation from the owned record to the owner record.
+  #* The golden record process establishes the relation.
+  #* Both records' outputs reflect the relation on their legal entity.
   @TEST_CXTPM-1008 @BPDM
   Scenario: IsOwnedBy Relation Reflected In Legal Entity Outputs
     Given record "owner-record" reflects legal entity "owner"
@@ -53,13 +53,13 @@ Feature: Output Reflects Golden Record Relations
   #
   #h3. Preconditions:
   #
-  ## Two records each reflect a legal entity (main and alternative headquarter).
+  #* Two records each reflect a legal entity (main and alternative headquarter).
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsAlternativeHeadquarterFor relation from the alternative to the main headquarter record.
-  ## The golden record process establishes the relation.
-  ## Both records' outputs reflect the relation on their legal entity.
+  #* The sharing member shares an IsAlternativeHeadquarterFor relation from the alternative to the main headquarter record.
+  #* The golden record process establishes the relation.
+  #* Both records' outputs reflect the relation on their legal entity.
   @TEST_CXTPM-1010 @BPDM
   Scenario: IsAlternativeHeadquarterFor Relation Reflected In Legal Entity Outputs
     Given record "main-hq-record" reflects legal entity "main-hq"
@@ -75,13 +75,13 @@ Feature: Output Reflects Golden Record Relations
   #
   #h3. Preconditions:
   #
-  ## Two own company records each reflect a legal entity (manager and managed); the managing entity is a dataspace participant.
+  #* Two own company records each reflect a legal entity (manager and managed); the managing entity is a dataspace participant.
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsManagedBy relation from the managed to the manager record, with validity starting now and not in the past.
-  ## The golden record process establishes the relation.
-  ## Both records' outputs reflect the relation on their legal entity.
+  #* The sharing member shares an IsManagedBy relation from the managed to the manager record, with validity starting now and not in the past.
+  #* The golden record process establishes the relation.
+  #* Both records' outputs reflect the relation on their legal entity.
   @TEST_CXTPM-1009 @BPDM
   Scenario: IsManagedBy Relation Reflected In Legal Entity Outputs
     Given own company record "manager-record" reflects legal entity "manager"
@@ -97,13 +97,13 @@ Feature: Output Reflects Golden Record Relations
   #
   #h3. Preconditions:
   #
-  ## A record reflects a legal entity and another record reflects an additional address of that same legal entity.
+  #* A record reflects a legal entity and another record reflects an additional address of that same legal entity.
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsReplacedBy relation from the legal address to the additional address, effective immediately.
-  ## The golden record process establishes the relation (the Pool swaps the two addresses).
-  ## Both records' outputs reflect the relation on their address.
+  #* The sharing member shares an IsReplacedBy relation from the legal address to the additional address, effective immediately.
+  #* The golden record process establishes the relation (the Pool swaps the two addresses).
+  #* Both records' outputs reflect the relation on their address.
   @TEST_CXTPM-1007 @BPDM
   Scenario: IsReplacedBy Relation Reflected In Address Outputs
     Given record "legal-address-record" reflects legal entity "acme"
@@ -119,13 +119,13 @@ Feature: Output Reflects Golden Record Relations
   #
   #h3. Preconditions:
   #
-  ## Records reflect a legal entity, an additional address of that legal entity, and a second owning legal entity.
+  #* Records reflect a legal entity, an additional address of that legal entity, and a second owning legal entity.
   #
   #h3. Description:
   #
-  ## The sharing member shares an IsOwnedBy relation onto the legal entity and an IsReplacedBy relation onto its additional address.
-  ## The golden record process establishes both relations.
-  ## The additional address record's output reflects the parent legal entity relation and the address relation.
+  #* The sharing member shares an IsOwnedBy relation onto the legal entity and an IsReplacedBy relation onto its additional address.
+  #* The golden record process establishes both relations.
+  #* The additional address record's output reflects the parent legal entity relation and the address relation.
   @TEST_CXTPM-1011 @BPDM
   Scenario: Additional Address Record Reflects Its Parent Legal Entity Relation
     Given record "legal-entity-record" reflects legal entity "acme"

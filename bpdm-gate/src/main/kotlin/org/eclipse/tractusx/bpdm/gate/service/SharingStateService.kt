@@ -58,7 +58,7 @@ class SharingStateService(
         ownerBpnl: String?
     ): PageDto<SharingStateDto> {
 
-        logger.info { "findSharingStates()" }
+        logger.debug { "findSharingStates()" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
         val spec = Specification.allOf(

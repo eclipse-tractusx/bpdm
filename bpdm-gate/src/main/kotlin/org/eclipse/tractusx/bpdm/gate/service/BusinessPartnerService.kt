@@ -23,6 +23,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.util.countForLog
+import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -34,7 +36,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
@@ -49,7 +50,7 @@ class BusinessPartnerService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val businessPartnerMappings: BusinessPartnerMappings,
     private val sharingStateService: SharingStateService,
-    private val changelogRepository: ChangelogRepository,
+    private val changelogCreateService: ChangelogCreateService,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val compareUtil: BusinessPartnerComparisonUtil,
     private val outputUpsertMappings: OutputUpsertMappings
@@ -72,12 +73,14 @@ class BusinessPartnerService(
     fun upsertBusinessPartnersInput(requests: List<BusinessPartnerInputRequest>, tenantBpnl: String?): List<BusinessPartnerInputDto> {
         logger.debug { "Executing upsertBusinessPartnersInput() with parameters $requests" }
 
+        requests.forEach { assertAdditionalSitesHaveSite(it) }
+
         val sharingStates = sharingStateService.getOrCreateStates(requests.map { it.externalId }, tenantBpnl)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
         val existingInputs = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
         val existingInputsByExternalId = existingInputs.associateBy { it.sharingState.externalId }
 
-        val updatedEntities = requests.mapNotNull { request ->
+        val upsertResults = requests.mapNotNull { request ->
             val sharingState = sharingStatesByExternalId[request.externalId]!!
             val updatedData = businessPartnerMappings.toBusinessPartnerInput(request, sharingState)
             val existingInput = existingInputsByExternalId[request.externalId]
@@ -86,10 +89,11 @@ class BusinessPartnerService(
             upsertFromEntity(existingInput, updatedData)
                 .takeIf {  it.shouldUpdate && (it.hadChanges || sharingState.sharingStateType == SharingStateType.Error) }
                 ?.also { sharingStateService.setInitial(sharingState) }
-                ?.businessPartner
         }
 
-        return updatedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)
+        reportWrites(upsertResults, StageType.Input)
+
+        return upsertResults.map { businessPartnerMappings.toBusinessPartnerInputDto(it.businessPartner) }
     }
 
     @Transactional
@@ -106,6 +110,8 @@ class BusinessPartnerService(
             upsertFromEntity(existingOutput, updatedData)
         }
 
+        reportWrites(updatedEntities, StageType.Output)
+
         return updatedEntities
     }
 
@@ -121,6 +127,19 @@ class BusinessPartnerService(
     }
 
 
+    /**
+     * Rejects a business partner that states further sites of its address without stating a site of its own, which those
+     * sites would be additional to.
+     */
+    private fun assertAdditionalSitesHaveSite(request: BusinessPartnerInputRequest) {
+        val statesSite = request.site.siteBpn != null || request.site.name != null
+        if (request.additionalSites.isNotEmpty() && !statesSite)
+            throw BpdmInvalidPartnerException(
+                request.externalId,
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
+    }
+
     private fun upsertFromEntity(existingPartner: BusinessPartnerDb?, upsertData: BusinessPartnerDb): UpsertResult {
         val sharingState = upsertData.sharingState
         val stage = upsertData.stage
@@ -135,13 +154,44 @@ class BusinessPartnerService(
         }
 
         if (hasChanges && shouldUpdate) {
-                changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner))
+                changelogCreateService.record(
+                    ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner)
+                )
 
                 copyUtil.copyValues(upsertData, partnerToUpsert)
                 businessPartnerRepository.save(partnerToUpsert)
         }
 
         return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)
+    }
+
+    /**
+     * Reports the business partners the given results actually wrote, as one line per change type.
+     */
+    fun reportWrites(results: List<UpsertResult>, stage: StageType) {
+        val stageName = when (stage) {
+            StageType.Input -> "business partner input"
+            StageType.Output -> "business partner output"
+        }
+
+        results.filter { it.hadChanges && it.shouldUpdate }
+            .groupBy { it.type }
+            .forEach { (changeType, written) ->
+                val verb = when (changeType) {
+                    ChangelogType.CREATE -> "Created"
+                    ChangelogType.UPDATE -> "Updated"
+                }
+
+                logger.info {
+                    "$verb ${countForLog(written.size, stageName, "${stageName}s")}: " +
+                            written.map { it.businessPartner.toLogIdentifier() }.joinIdentifiersForLog()
+                }
+            }
+    }
+
+    private fun BusinessPartnerDb.toLogIdentifier(): String {
+        val bpns = listOfNotNull(bpnL, bpnS, bpnA)
+        return if (bpns.isEmpty()) sharingState.externalId else "${sharingState.externalId} (${bpns.joinToString("/")})"
     }
 
     private fun getBusinessPartners(

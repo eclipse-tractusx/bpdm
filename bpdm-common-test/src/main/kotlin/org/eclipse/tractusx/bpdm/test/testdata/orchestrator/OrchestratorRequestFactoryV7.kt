@@ -84,6 +84,10 @@ class OrchestratorRequestFactoryV7(
         )
     }
 
+    fun buildSiteWithAdditionalSitesBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartner {
+        return buildSiteBusinessPartner(seed, random).copy(additionalSites = commonFactory.buildAdditionalSites(seed))
+    }
+
     fun buildLegalAddressSiteBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartner {
         return BusinessPartner(
             nameParts = commonFactory.buildNameParts(seed),

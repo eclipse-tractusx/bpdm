@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -69,6 +70,22 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
             recordId = recordId
         )))
         assertRepo.assertBusinessPartnerTaskCreateResponseEqual(createResult, expectedResult, isForNewRecord = false)
+    }
+
+    /**
+     * WHEN user creates a task for business partner data stating additional sites of its address but no site of its own
+     * THEN user sees 400 BAD REQUEST error
+     */
+    @Test
+    fun `try create task for business partner with additional sites but no site`(){
+        //WHEN
+        val businessPartner = requestFactory.buildSiteWithAdditionalSitesBusinessPartner(testName).copy(site = null)
+        val newTask = requestFactory.buildBusinessPartnerTaskCreateEntry(testName).copy(businessPartner = businessPartner)
+        val requestBody = TaskCreateRequest(TaskMode.UpdateFromSharingMember, listOf(newTask))
+        val createRequest: () -> Unit = { orchestratorClient.goldenRecordTasks.createTasks(requestBody) }
+
+        //THEN
+        Assertions.assertThatThrownBy(createRequest).isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
     /**

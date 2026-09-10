@@ -27,12 +27,13 @@ import org.springframework.stereotype.Component
 
 /**
  * Builds an [AddressContentUpdate] that fully replaces a logistic address's content from parsed content — every field is
- * [FieldUpdate.Set]. An optional [assignToSite] adds site membership; when absent, membership is left untouched.
+ * [FieldUpdate.Set]. Site membership is not content, so the caller states it: [FieldUpdate.NoOp] leaves it as it stands,
+ * [FieldUpdate.Set] replaces it with the stated sites.
  */
 @Component
 class AddressUpdateMapper {
 
-    fun toFullUpdate(content: LogisticAddressParsed, assignToSite: SiteDb? = null) = AddressContentUpdate(
+    fun toFullUpdate(content: LogisticAddressParsed, sites: FieldUpdate<List<SiteDb>>) = AddressContentUpdate(
         name = FieldUpdate.Set(content.name),
         physicalPostalAddress = FieldUpdate.Set(content.physicalPostalAddress),
         alternativePostalAddress = FieldUpdate.Set(content.alternativePostalAddress),
@@ -40,6 +41,6 @@ class AddressUpdateMapper {
         identifiers = FieldUpdate.Set(content.identifiers),
         states = FieldUpdate.Set(content.states),
         scriptVariants = FieldUpdate.Set(content.scriptVariants),
-        assignToSite = assignToSite?.let { FieldUpdate.Set(it) } ?: FieldUpdate.NoOp
+        sites = sites
     )
 }

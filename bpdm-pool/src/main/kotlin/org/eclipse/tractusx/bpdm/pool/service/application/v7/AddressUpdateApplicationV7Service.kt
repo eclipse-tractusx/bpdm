@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
@@ -28,11 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressPayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,19 +47,15 @@ class AddressUpdateApplicationV7Service(
     private val addressResponseMapper: AddressResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Applies each request to the address it addresses by BPN and returns, per request, either the updated address or
      * the errors that stopped it.
      */
     @Transactional
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
-        logger.info { "Update ${requests.size} business partner addresses" }
-
         val requestList = requests.toList()
         val updateRequests = requestList.map {
-            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
+            AddressUpdateRequest(addressBpn = it.bpna, siteBpns = it.bpnSites, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
         }
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()

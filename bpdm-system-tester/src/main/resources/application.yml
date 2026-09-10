@@ -31,9 +31,10 @@ bpdm:
         client-id: BPDM_POOL
         # Please provide a secret here
         client-secret: "**********"
-    gate:
+    # Shares business partner input data and drives the sharing process.
+    gate-input:
       securityEnabled: true
-      # The base-url of the Pool-API
+      # The base-url of the Gate-API
       base-url: http://localhost:8081
       provider:
         issuer-uri: http://localhost:8180/realms/BPDM
@@ -42,6 +43,64 @@ bpdm:
         # Use a default client id for the client credentials request
         client-id: BPDM_GATE
         # Please provide secret here
+        client-secret: "**********"
+    # Reads the golden record output. Defaults to the gate-input client in every setting; where both are secured
+    # with credentials of their own, the two tokens have to carry the same BPNL.
+    gate-output:
+      securityEnabled: ${bpdm.client.gate-input.securityEnabled}
+      base-url: ${bpdm.client.gate-input.base-url}
+      provider:
+        issuer-uri: ${bpdm.client.gate-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: ${bpdm.client.gate-input.registration.client-id}
+        client-secret: ${bpdm.client.gate-input.registration.client-secret}
+    # The Gate of a second sharing member, for the scenarios in which two sharing members share the same
+    # golden record. A local installation runs it under the Gate's own `gate-2` profile (see INSTALL.md), so
+    # the default run acts for it and those scenarios are part of the default suite.
+    #
+    # Clearing the base-url is what takes a sharing member out of a run: its scenarios are then skipped
+    # instead of failing, which is how a deployment that has no second Gate configures itself. Unlike the
+    # clients above, these two are secured exactly when they are configured at all.
+    #
+    # That Gate is owned by BPNL000000000002 and rejects every other company - the BPDM_GATE client of the
+    # first member included - so the credentials below are the second member's own.
+    gate-2-input:
+      base-url: http://localhost:8082
+      provider:
+        issuer-uri: ${bpdm.client.gate-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: BPDM_GATE_2_INPUT_MANAGER
+        client-secret: "**********"
+    # Reads the second sharing member's golden record output. Defaults to its gate-2-input client, which the
+    # two tokens have to agree with on the BPNL - a different one than the first sharing member's.
+    gate-2-output:
+      base-url: ${bpdm.client.gate-2-input.base-url}
+      provider:
+        issuer-uri: ${bpdm.client.gate-2-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: BPDM_GATE_2_OUTPUT_CONSUMER
+        client-secret: "**********"
+    # A third sharing member, needed only where the confidence level itself has to move: the number of
+    # sharing members counts towards it from three of them on. Configured exactly like the second member,
+    # under the Gate's `gate-3` profile and owned by BPNL000000000003.
+    gate-3-input:
+      base-url: http://localhost:8083
+      provider:
+        issuer-uri: ${bpdm.client.gate-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: BPDM_GATE_3_INPUT_MANAGER
+        client-secret: "**********"
+    gate-3-output:
+      base-url: ${bpdm.client.gate-3-input.base-url}
+      provider:
+        issuer-uri: ${bpdm.client.gate-3-input.provider.issuer-uri}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: BPDM_GATE_3_OUTPUT_CONSUMER
         client-secret: "**********"
     orchestrator:
       securityEnabled: true

@@ -53,6 +53,7 @@ class BusinessPartnerMappings {
             address = toAddressComponentInputDto(entity),
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
+            additionalSites = entity.additionalSites.map { AdditionalSiteInputDto(siteBpn = it.bpn, name = it.name) },
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -87,11 +88,22 @@ class BusinessPartnerMappings {
             address = toAddressComponentOutputDto(entity),
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
-            additionalSites = entity.additionalSites.map { AdditionalSiteOutputDto(siteBpn = it.bpn, name = it.name) },
+            additionalSites = entity.additionalSites.map { toAdditionalSiteOutputDto(it, entity) },
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
     }
+
+    private fun toAdditionalSiteOutputDto(additionalSite: AdditionalSiteDb, entity: BusinessPartnerDb) =
+        AdditionalSiteOutputDto(
+            siteBpn = additionalSite.bpn ?: throw BpdmNullMappingException(
+                AdditionalSiteDb::class,
+                BusinessPartnerOutputDto::class,
+                AdditionalSiteDb::bpn,
+                entity.sharingState.externalId
+            ),
+            name = additionalSite.name
+        )
 
     fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest, sharingState: SharingStateDb): BusinessPartnerDb {
         val businessPartner = BusinessPartnerDb(
@@ -124,6 +136,8 @@ class BusinessPartnerMappings {
         )
         val scriptVariants = dto.scriptVariants.map { variant ->  toScriptVariantDb(businessPartner, variant) }
         scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
+
+        dto.additionalSites.mapTo(businessPartner.additionalSites) { AdditionalSiteDb(bpn = it.siteBpn, name = it.name) }
 
         return businessPartner
     }

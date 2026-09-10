@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
@@ -28,10 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCr
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -47,16 +46,12 @@ class LegalEntityCreateApplicationV6Service(
     private val legalEntityResponseMapperV6: LegalEntityResponseMapperV6
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Creates the requested legal entities with their legal addresses and returns, per request, either the created legal
      * entity or the errors that stopped it.
      */
     @Transactional
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequestV6>): LegalEntityPartnerCreateResponseWrapperV6 {
-        logger.info { "Create ${requests.size} new legal entities" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map { legalEntityDtoRequestMapperV6.toCreateRequest(it) }
 

@@ -35,8 +35,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
-    @Autowired
-    private lateinit var orchestratorRequestFactory: OrchestratorRequestFactoryV7
 
     private val searchRequestLimit = 100
 

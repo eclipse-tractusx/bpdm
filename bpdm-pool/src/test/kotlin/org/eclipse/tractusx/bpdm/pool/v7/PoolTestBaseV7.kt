@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.PoolTestBase
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.v7.util.AssertRepositoryV7
 import org.eclipse.tractusx.bpdm.pool.v7.util.TestDataClientV7
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,6 +40,8 @@ abstract class PoolTestBaseV7: PoolTestBase() {
     lateinit var assertRepository: AssertRepositoryV7
     @Autowired
     lateinit var poolClient: PoolApiClient
+    @Autowired
+    lateinit var orchestratorRequestFactory: OrchestratorRequestFactoryV7
 
     /** A known script code that is none of [scriptCodes] - for a test that needs a script a business partner is not named in. */
     fun scriptCodeOtherThan(scriptCodes: Set<String>): String =

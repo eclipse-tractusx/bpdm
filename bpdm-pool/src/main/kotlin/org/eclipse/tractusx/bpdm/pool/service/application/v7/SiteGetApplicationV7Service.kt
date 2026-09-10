@@ -20,11 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteGetRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteGetService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteGetParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,8 +32,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteGetApplicationV7Service(
-    private val siteGetParser: SiteGetParser,
-    private val siteGetService: SiteGetService,
+    private val siteBpnParser: SiteBpnParser,
     private val siteResponseMapper: SiteResponseMapper
 ) {
 
@@ -42,10 +40,9 @@ class SiteGetApplicationV7Service(
      * Returns the site with the given BPN and fails with a not-found error when no site carries it.
      */
     @Transactional(readOnly = true)
-    fun getSite(bpns: String): SiteWithMainAddressVerboseDto {
-        val criteria = siteGetParser.parse(SiteGetRequest(bpns))
-        val site = siteGetService.get(criteria) ?: throw BpdmNotFoundException("Site", criteria.siteBpn)
-
-        return siteResponseMapper.toSiteWithMainAddress(site)
-    }
+    fun getSite(bpns: String): SiteWithMainAddressVerboseDto =
+        when (val result = siteBpnParser.parse(listOf(bpns)).single()) {
+            is ParseResult.Success -> siteResponseMapper.toSiteWithMainAddress(result.parsed)
+            is ParseResult.Failure -> throw BpdmNotFoundException("Site", bpns)
+        }
 }

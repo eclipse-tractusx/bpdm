@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
@@ -28,10 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.service.operation.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -47,16 +46,12 @@ class SiteUpdateApplicationV7Service(
     private val siteResponseMapper: SiteResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Applies each request to the site it addresses by BPN and returns, per request, either the updated site or the
      * errors that stopped it.
      */
     @Transactional
     fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
-        logger.info { "Update ${requests.size} sites" }
-
         val requestList = requests.toList()
         val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it) }
 

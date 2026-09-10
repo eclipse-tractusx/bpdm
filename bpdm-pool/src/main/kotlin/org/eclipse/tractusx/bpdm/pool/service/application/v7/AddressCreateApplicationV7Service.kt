@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
@@ -28,11 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,16 +47,12 @@ class AddressCreateApplicationV7Service(
     private val addressResponseMapper: AddressResponseMapper
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     /**
      * Creates the requested addresses under their parent business partners and returns, per request, either the created
      * address or the errors that stopped it.
      */
     @Transactional
     fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new addresses" }
-
         val requestList = requests.toList()
         val createRequests = requestList.map {
             AddressCreateUntypedParentRequest(it.bpnParent, addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))

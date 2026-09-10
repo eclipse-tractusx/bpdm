@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.service.operation.ReasonCodeSearchService
+import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.ReasonCodeSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

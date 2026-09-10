@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityGetRequest
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityGetService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityGetParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityGetApplicationV7Service(
     private val legalEntityGetParser: LegalEntityGetParser,
-    private val legalEntityGetService: LegalEntityGetService,
     private val legalEntityResponseMapper: LegalEntityResponseMapper
 ) {
 
@@ -43,10 +42,9 @@ class LegalEntityGetApplicationV7Service(
      * type, and fails with a not-found error when no legal entity carries it.
      */
     @Transactional(readOnly = true)
-    fun getLegalEntity(identifierValue: String, identifierType: String?): LegalEntityWithLegalAddressVerboseDto {
-        val criteria = legalEntityGetParser.parse(LegalEntityGetRequest(identifierValue, identifierType))
-        val legalEntity = legalEntityGetService.get(criteria) ?: throw BpdmNotFoundException("Legal Entity", identifierValue)
-
-        return legalEntityResponseMapper.toLegalEntityWithLegalAddress(legalEntity)
-    }
+    fun getLegalEntity(identifierValue: String, identifierType: String?): LegalEntityWithLegalAddressVerboseDto =
+        when (val result = legalEntityGetParser.parse(LegalEntityGetRequest(identifierValue, identifierType))) {
+            is ParseResult.Success -> legalEntityResponseMapper.toLegalEntityWithLegalAddress(result.parsed)
+            is ParseResult.Failure -> throw BpdmNotFoundException("Legal Entity", identifierValue)
+        }
 }

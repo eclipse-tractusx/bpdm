@@ -21,7 +21,7 @@
 # Only script variants are compared here; master data, identifiers, states, BPNs and confidence
 # criteria are covered by their own features. The "script variant" argument of the refine steps is the
 # seed that determines the generated variant content (a different seed produces different variants).
-@CXTPM-1039
+@CXTPM-1043
 Feature: Output Reflects Golden Record Script Variants
 
   # -- Each business partner type reflects its golden record's script variants --
@@ -32,9 +32,9 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Description:
   #
-  ## The sharing member shares a record.
-  ## The golden record process refines it to a legal entity with a script variant.
-  ## The record's output reflects the legal entity's script variants.
+  #* The sharing member shares a record.
+  #* The golden record process refines it to a legal entity with a script variant.
+  #* The record's output reflects the legal entity's script variants.
   @TEST_CXTPM-1022 @BPDM
   Scenario: Legal Entity Script Variants In Output
     When the sharing member shares record "acme-record"
@@ -47,9 +47,9 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Description:
   #
-  ## The sharing member shares a record.
-  ## The golden record process refines it to a site-based legal entity with a site and a script variant.
-  ## The record's output reflects the site-based legal entity's script variants.
+  #* The sharing member shares a record.
+  #* The golden record process refines it to a site-based legal entity with a site and a script variant.
+  #* The record's output reflects the site-based legal entity's script variants.
   @TEST_CXTPM-1023 @BPDM
   Scenario: Site-Based Legal Entity Script Variants In Output
     When the sharing member shares record "acme-sbl-record"
@@ -62,9 +62,9 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Description:
   #
-  ## The sharing member shares a record.
-  ## The golden record process refines it to a site of a legal entity with a script variant.
-  ## The record's output reflects the site's script variants.
+  #* The sharing member shares a record.
+  #* The golden record process refines it to a site of a legal entity with a script variant.
+  #* The record's output reflects the site's script variants.
   @TEST_CXTPM-1020 @BPDM
   Scenario: Site Script Variants In Output
     When the sharing member shares record "acme-site-record"
@@ -77,9 +77,9 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Description:
   #
-  ## The sharing member shares a record.
-  ## The golden record process refines it to an additional address of a legal entity with a script variant.
-  ## The record's output reflects the additional address's script variants.
+  #* The sharing member shares a record.
+  #* The golden record process refines it to an additional address of a legal entity with a script variant.
+  #* The record's output reflects the additional address's script variants.
   @TEST_CXTPM-1028 @BPDM
   Scenario: Additional Address Of Legal Entity Script Variants In Output
     When the sharing member shares record "acme-address-record"
@@ -92,9 +92,9 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Description:
   #
-  ## The sharing member shares a record.
-  ## The golden record process refines it to an additional address of a site with a script variant.
-  ## The record's output reflects the additional address's script variants.
+  #* The sharing member shares a record.
+  #* The golden record process refines it to an additional address of a site with a script variant.
+  #* The record's output reflects the additional address's script variants.
   @TEST_CXTPM-1024 @BPDM
   Scenario: Additional Address Of Site Script Variants In Output
     When the sharing member shares record "acme-site-address-record"
@@ -109,13 +109,13 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Preconditions:
   #
-  ## A record already reflects a legal entity with its script variant.
+  #* A record already reflects a legal entity with its script variant.
   #
   #h3. Description:
   #
-  ## The sharing member updates the record.
-  ## The golden record process refines it to the same legal entity with an updated script variant.
-  ## The record's output reflects the updated legal entity script variants.
+  #* The sharing member updates the record.
+  #* The golden record process refines it to the same legal entity with an updated script variant.
+  #* The record's output reflects the updated legal entity script variants.
   @TEST_CXTPM-1027 @BPDM
   Scenario: Updated Legal Entity Script Variants In Output
     Given record "acme-record" reflects legal entity "acme" with script variant "acme-content"
@@ -129,13 +129,13 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Preconditions:
   #
-  ## A record already reflects a site-based legal entity with a site and its script variant.
+  #* A record already reflects a site-based legal entity with a site and its script variant.
   #
   #h3. Description:
   #
-  ## The sharing member updates the record.
-  ## The golden record process refines it to the same site-based legal entity with an updated script variant.
-  ## The record's output reflects the updated site-based legal entity script variants.
+  #* The sharing member updates the record.
+  #* The golden record process refines it to the same site-based legal entity with an updated script variant.
+  #* The record's output reflects the updated site-based legal entity script variants.
   @TEST_CXTPM-1026 @BPDM
   Scenario: Updated Site-Based Legal Entity Script Variants In Output
     Given record "acme-sbl-record" reflects site-based legal entity "acme-sbl" with site "acme-sbl-site" with script variant "acme-sbl-content"
@@ -149,13 +149,13 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Preconditions:
   #
-  ## A record already reflects a site of a legal entity with its script variant.
+  #* A record already reflects a site of a legal entity with its script variant.
   #
   #h3. Description:
   #
-  ## The sharing member updates the record.
-  ## The golden record process refines it to the same site with an updated script variant.
-  ## The record's output reflects the updated site script variants.
+  #* The sharing member updates the record.
+  #* The golden record process refines it to the same site with an updated script variant.
+  #* The record's output reflects the updated site script variants.
   @TEST_CXTPM-1029 @BPDM
   Scenario: Updated Site Script Variants In Output
     Given record "acme-site-record" reflects site "acme-site" of legal entity "acme-site-le" with script variant "acme-site-content"
@@ -169,13 +169,13 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Preconditions:
   #
-  ## A record already reflects an additional address of a legal entity with its script variant.
+  #* A record already reflects an additional address of a legal entity with its script variant.
   #
   #h3. Description:
   #
-  ## The sharing member updates the record.
-  ## The golden record process refines it to the same additional address with an updated script variant.
-  ## The record's output reflects the updated additional address script variants.
+  #* The sharing member updates the record.
+  #* The golden record process refines it to the same additional address with an updated script variant.
+  #* The record's output reflects the updated additional address script variants.
   @TEST_CXTPM-1021 @BPDM
   Scenario: Updated Additional Address Of Legal Entity Script Variants In Output
     Given record "acme-address-record" reflects additional address "acme-branch" of legal entity "acme-addr-le" with script variant "acme-address-content"
@@ -189,13 +189,13 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Preconditions:
   #
-  ## A record already reflects an additional address of a site with its script variant.
+  #* A record already reflects an additional address of a site with its script variant.
   #
   #h3. Description:
   #
-  ## The sharing member updates the record.
-  ## The golden record process refines it to the same additional address with an updated script variant.
-  ## The record's output reflects the updated additional address script variants.
+  #* The sharing member updates the record.
+  #* The golden record process refines it to the same additional address with an updated script variant.
+  #* The record's output reflects the updated additional address script variants.
   @TEST_CXTPM-1030 @BPDM
   Scenario: Updated Additional Address Of Site Script Variants In Output
     Given record "acme-site-address-record" reflects additional address "acme-dock" of site "acme-sa-site" of legal entity "acme-sa-le" with script variant "acme-site-address-content"
@@ -211,13 +211,13 @@ Feature: Output Reflects Golden Record Script Variants
   #
   #h3. Preconditions:
   #
-  ## A legal entity is shared with one script code, filling its legal entity properties.
+  #* A legal entity is shared with one script code, filling its legal entity properties.
   #
   #h3. Description:
   #
-  ## The sharing member shares a record for one of the legal entity's additional addresses with a different script code.
-  ## The golden record process refines it to that additional address of the existing legal entity.
-  ## The address record's output merges both variants: each script code fills only its own entity's properties and leaves the others empty.
+  #* The sharing member shares a record for one of the legal entity's additional addresses with a different script code.
+  #* The golden record process refines it to that additional address of the existing legal entity.
+  #* The address record's output merges both variants: each script code fills only its own entity's properties and leaves the others empty.
   @TEST_CXTPM-1025 @BPDM
   Scenario: Output Merges The Script Variants Of A Legal Entity And Its Additional Address
     Given record "acme-le-record" reflects legal entity "acme" with script code "CHINESE_SIMPLIFIED"

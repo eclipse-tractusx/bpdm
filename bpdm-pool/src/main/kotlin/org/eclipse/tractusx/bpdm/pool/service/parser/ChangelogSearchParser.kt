@@ -20,11 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ChangelogSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnFilterParser
 import org.springframework.stereotype.Service
 
 /**

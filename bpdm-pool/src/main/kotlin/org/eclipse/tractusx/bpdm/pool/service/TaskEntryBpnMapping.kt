@@ -40,7 +40,8 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
                 taskEntries.map { it.businessPartner.legalEntity.legalAddress.bpnReference } +
                 taskEntries.mapNotNull { it.businessPartner.site?.bpnReference } +
                 taskEntries.mapNotNull { it.businessPartner.site?.siteMainAddress?.bpnReference } +
-                taskEntries.mapNotNull { it.businessPartner.additionalAddress?.bpnReference }
+                taskEntries.mapNotNull { it.businessPartner.additionalAddress?.bpnReference } +
+                taskEntries.flatMap { entry -> entry.businessPartner.additionalSites.map { it.bpnReference } }
 
         val filledReferences = references.filter { it.referenceValue != null && it.referenceType != null }
 

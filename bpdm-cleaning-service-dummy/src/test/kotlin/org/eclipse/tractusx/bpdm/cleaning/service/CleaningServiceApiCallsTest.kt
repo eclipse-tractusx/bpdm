@@ -352,6 +352,66 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
+    fun `Additional Sites With BPNs`() {
+        //Mock Orchestrator responses
+        val additionalSites = listOf(
+            AdditionalSite(BpnReference("BPNS0000000001XY", null, BpnReferenceType.Bpn), "Additional Site 1 test"),
+            AdditionalSite(BpnReference("BPNS0000000002XY", null, BpnReferenceType.Bpn), "Additional Site 2 test")
+        )
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(
+                additionalSites = additionalSites,
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!.postalProperties)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
+                .copyWithHasChanged(false, false, true)
+                .copyAsCxMemberData()
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse)
+    }
+
+    @Test
+    fun `Additional Sites Without BPNs`() {
+        //Mock Orchestrator responses
+        val additionalSites = listOf(
+            AdditionalSite(BpnReference.empty, "Additional Site 1 test"),
+            AdditionalSite(BpnReference.empty, "Additional Site 2 test")
+        )
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithBpnReferences(BpnReference.empty)
+            .copy(additionalSites = additionalSites)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val cleanedBusinessPartner = getResolveResult(resolveMapping).results.single().businessPartner
+
+        //Every additional site is requested as its own site, distinct from the site the record itself is about
+        val additionalSiteReferences = cleanedBusinessPartner.additionalSites.map { it.bpnReference }
+        assertThat(additionalSiteReferences).allMatch { it.referenceType == BpnReferenceType.BpnRequestIdentifier }
+        assertThat(additionalSiteReferences.map { it.referenceValue }.distinct()).hasSameSizeAs(additionalSites)
+        assertThat(additionalSiteReferences).doesNotContain(cleanedBusinessPartner.site!!.bpnReference)
+    }
+
+    @Test
     fun `Legal Entity without BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
