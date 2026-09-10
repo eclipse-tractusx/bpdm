@@ -22,11 +22,9 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import tools.jackson.databind.json.JsonMapper
 
 /**
  * Asserts that a record's Gate output reflects an established golden record relation.
@@ -42,11 +40,13 @@ import tools.jackson.databind.json.JsonMapper
  * which also makes it robust against the address-type swap an IsReplacedBy relation triggers.
  */
 class GoldenRecordRelationAssertHelper(
-    private val gateClient: GateClient,
-    private val jsonMapper: JsonMapper
+    private val sharingMemberGates: SharingMemberGates,
+    private val apiCallEvidence: ApiCallEvidence
 ) {
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    private fun gateOf(recordId: String) = sharingMemberGates.of(context.memberOf(recordId))
 
     /**
      * Asserts the [recordId] output's legal entity reflects [relation] in its golden record relations. When
@@ -114,8 +114,8 @@ class GoldenRecordRelationAssertHelper(
         val expectedBpns = resolvedBpnPair(relation)
 
         val searchRequest = RelationOutputSearchRequest(externalIds = listOf(runId))
-        val outputPage = gateClient.relationOutput.postSearch(searchRequest, PaginationRequest())
-        attachApiCall("POST", "/v7/output/relations/search", searchRequest, outputPage)
+        val outputPage = gateOf(relation.sourceRecordId).relationOutput.postSearch(searchRequest, PaginationRequest())
+        apiCallEvidence.attach("POST", "/v7/output/relations/search", searchRequest, outputPage)
 
         val output = outputPage.content.singleOrNull()
             ?: error("relation '$relationId' must have exactly one output, but found ${outputPage.content.size}")
@@ -154,21 +154,8 @@ class GoldenRecordRelationAssertHelper(
 
     private fun fetchOutput(recordId: String): BusinessPartnerOutputDto {
         val runId = context.runId(recordId)
-        val outputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
-        attachApiCall("POST", "/v7/output/business-partners/search", listOf(runId), outputPage)
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", listOf(runId), outputPage)
         return outputPage.content.single()
-    }
-
-    private fun attachApiCall(method: String, path: String, request: Any? = null, response: Any? = null) {
-        val content = buildMap {
-            put("uri", "$method $path")
-            if (request != null) put("request", request)
-            if (response != null) put("response", response)
-        }
-        context.scenario.attach(
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
-            "application/json",
-            "$method $path"
-        )
     }
 }

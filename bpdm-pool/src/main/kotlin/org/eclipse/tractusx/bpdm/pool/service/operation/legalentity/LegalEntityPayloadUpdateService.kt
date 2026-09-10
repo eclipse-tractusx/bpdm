@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityHeaderUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
@@ -65,7 +66,7 @@ class LegalEntityPayloadUpdateService(
             LegalEntityUpdate(
                 it.target,
                 legalEntityHeaderUpdateMapper.toFullUpdate(it.content.header, currentness),
-                addressUpdateMapper.toFullUpdate(it.content.legalAddress)
+                addressUpdateMapper.toFullUpdate(it.content.legalAddress, FieldUpdate.NoOp)
             )
         }
 

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.site
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteHeaderUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
@@ -48,7 +49,7 @@ class SitePayloadUpdateService(
             SiteUpdate(
                 it.target,
                 siteHeaderUpdateMapper.toFullUpdate(it.content.header),
-                addressUpdateMapper.toFullUpdate(it.content.mainAddress)
+                addressUpdateMapper.toFullUpdate(it.content.mainAddress, FieldUpdate.NoOp)
             )
         }
 

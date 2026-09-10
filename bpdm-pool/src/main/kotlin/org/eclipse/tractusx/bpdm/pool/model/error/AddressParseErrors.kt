@@ -23,14 +23,22 @@ sealed interface AddressCreateParseError
 
 sealed interface AddressUpdateParseError
 
-sealed interface AddressSiteAssignmentParseError
+sealed interface AddressSiteMembershipParseError
 
 /**
  * A parent site was referenced that does not belong to the address's own legal entity. A site may only be assigned to an
  * address under the same legal entity. Unlike a resolution failure, both BPNs exist — they just don't belong together.
  */
 data class SiteNotInAddressLegalEntity(val siteBpn: String, val legalEntityBpn: String) :
-    AddressCreateParseError, AddressUpdateParseError, AddressSiteAssignmentParseError
+    AddressCreateParseError, AddressUpdateParseError, AddressSiteMembershipParseError
+
+/**
+ * A stated site membership left out a site the address is the main address of. Such a site is bound to the address by
+ * its own main-address relation, not by the statement, so unlinking it would leave it pointing at an address that does
+ * not list it.
+ */
+data class SiteMainAddressOmitted(val siteBpn: String) :
+    AddressUpdateParseError, AddressSiteMembershipParseError
 
 /**
  * Address-content parse errors. Subtypes every operation embedding an address (standalone, site main address, legal

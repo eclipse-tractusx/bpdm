@@ -70,7 +70,10 @@ class SharingMemberRecordSyncService(
         val syncRecord = syncRecordService.getOrCreateRecord(SyncType.SHARING_MEMBER_RECORDS)
 
         val queryRequest = SharingMemberRecordQueryRequest(syncRecord.fromTime)
-        val updatedSharingMemberRecords = orchestrationApiClient.sharingMemberRecords.queryRecords(queryRequest, PaginationRequest())
+        val updatedSharingMemberRecords = orchestrationApiClient.sharingMemberRecords.queryRecords(
+            queryRequest,
+            PaginationRequest(size = syncConfigProperties.batchSize)
+        )
 
         val changedRecords = updatedSharingMemberRecords.content
             .mapNotNull { sharingMemberConfidenceService.updateGoldenRecordCounted(it.recordId, it.isGoldenRecordCounted) }
@@ -83,6 +86,8 @@ class SharingMemberRecordSyncService(
                         changedRecords.map { "${it.recordId} (${it.address.bpn})" }.joinIdentifiersForLog()
             }
 
+        // Resuming after the last entry of the page is only lossless because the Orchestrator returns the records
+        // oldest update first: every record this batch has not seen was updated after the one the cursor stops at.
         syncRecord.fromTime =  updatedSharingMemberRecords.content.lastOrNull()?.updatedAt ?: syncRecord.fromTime
         syncRecordRepository.save(syncRecord)
 

@@ -19,15 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.system.config
 
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
+import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
-import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
@@ -49,12 +48,20 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 
+/**
+ * The test data and assertion helpers the step definitions share.
+ *
+ * Built lazily, because [testMetadataV7] reads the metadata the Pool holds: were it built with the context,
+ * reaching the Pool would be a condition of the run starting at all, and a scenario that says why the Pool
+ * cannot be reached could never run to say it.
+ */
+@Lazy
 @Configuration
 class TestDataConfiguration {
 
@@ -79,11 +86,6 @@ class TestDataConfiguration {
     @Bean
     fun testRunData(): TestRunData {
         return TestRunData(Instant.now())
-    }
-
-    @Bean
-    fun sharingStateWatcher(gateClient: GateClient): SharingStateWatcher {
-        return SharingStateWatcher(gateClient)
     }
 
     @Bean
@@ -197,37 +199,40 @@ class TestDataConfiguration {
     }
 
     @Bean
+    fun apiCallEvidence(jsonMapper: JsonMapper): ApiCallEvidence {
+        return ApiCallEvidence(jsonMapper)
+    }
+
+    @Bean
     fun confidenceAssertHelper(
-        gateClient: GateClient,
-        jsonMapper: JsonMapper
+        sharingMemberGates: SharingMemberGates,
+        apiCallEvidence: ApiCallEvidence
     ): ConfidenceAssertHelper {
-        return ConfidenceAssertHelper(gateClient, jsonMapper)
+        return ConfidenceAssertHelper(sharingMemberGates, apiCallEvidence)
     }
 
     @Bean
     fun goldenRecordRelationAssertHelper(
-        gateClient: GateClient,
-        jsonMapper: JsonMapper
+        sharingMemberGates: SharingMemberGates,
+        apiCallEvidence: ApiCallEvidence
     ): GoldenRecordRelationAssertHelper {
-        return GoldenRecordRelationAssertHelper(gateClient, jsonMapper)
+        return GoldenRecordRelationAssertHelper(sharingMemberGates, apiCallEvidence)
     }
 
     @Bean
     fun businessPartnerShareActions(
-        gateClient: GateClient,
+        sharingMemberGates: SharingMemberGates,
         orchestratorClient: OrchestrationApiClient,
         testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
-        sharingStateWatcher: SharingStateWatcher,
         taskReservationWatcher: TaskReservationWatcher,
-        jsonMapper: JsonMapper
+        apiCallEvidence: ApiCallEvidence
     ): BusinessPartnerShareActions{
         return BusinessPartnerShareActions(
-            gateClient,
+            sharingMemberGates,
             orchestratorClient,
             testDataGenerator,
-            sharingStateWatcher,
             taskReservationWatcher,
-            jsonMapper
+            apiCallEvidence
         )
     }
 }

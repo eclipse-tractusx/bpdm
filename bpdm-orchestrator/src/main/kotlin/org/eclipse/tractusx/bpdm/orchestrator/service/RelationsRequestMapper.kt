@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRelationsRequest
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationTypeRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
@@ -29,6 +31,27 @@ import org.springframework.stereotype.Service
 
 @Service
 class RelationsRequestMapper {
+
+    fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelationsRequest) =
+        with(businessPartnerRelations){
+            RelationsGoldenRecordTaskDb.BusinessPartnerRelations(
+                relationType = when (relationType) {
+                    RelationTypeRequest.IsAlternativeHeadquarterFor -> RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
+                    RelationTypeRequest.IsManagedBy -> RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
+                    RelationTypeRequest.IsOwnedBy -> RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
+                    RelationTypeRequest.IsReplacedBy -> RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy
+                },
+                businessPartnerSourceBpn = businessPartnerSourceBpn,
+                businessPartnerTargetBpn = businessPartnerTargetBpn,
+                validityPeriods = businessPartnerRelations.validityPeriods.map {
+                    RelationValidityPeriod(
+                        validFrom = it.validFrom,
+                        validTo = it.validTo
+                    )
+                }.toMutableList(),
+                reasonCode = reasonCode
+            )
+        }
 
     fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelations) =
         with(businessPartnerRelations){

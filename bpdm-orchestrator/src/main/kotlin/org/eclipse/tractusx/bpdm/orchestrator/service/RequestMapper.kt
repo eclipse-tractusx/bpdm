@@ -20,11 +20,44 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
 @Service
 class RequestMapper {
+
+    fun toBusinessPartner(businessPartner: BusinessPartnerRequest) =
+        with(businessPartner) {
+            GoldenRecordTaskDb.BusinessPartner(
+                nameParts = toNameParts(businessPartner),
+                identifiers = toIdentifiers(businessPartner),
+                businessStates = toStates(businessPartner),
+                confidences = toConfidences(businessPartner),
+                addresses = toPostalAddresses(businessPartner),
+                bpnReferences = toBpnReferences(businessPartner),
+                legalName = legalEntity.legalName,
+                legalShortName = legalEntity.legalShortName,
+                siteExists = site != null,
+                siteName = site?.siteName,
+                legalForm = legalEntity.legalForm,
+                isCatenaXMemberData = legalEntity.isParticipantData,
+                owningCompany = owningCompany,
+                legalEntityHasChanged = legalEntity.hasChanged,
+                ownershipUltimate = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
+                siteHasChanged = site?.hasChanged,
+                legalEntityUpdatedAt = legalEntity.updatedAt?.toTimestamp(),
+                siteUpdatedAt = site?.updatedAt?.toTimestamp(),
+                legalEntityHeaderScriptVariants = toLegalEntityScriptVariants(businessPartner),
+                siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
+                addressScriptVariants = toAddressScriptVariants(businessPartner),
+                legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
+                siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner),
+                additionalSites = toAdditionalSites(businessPartner)
+            )
+        }
 
     fun toBusinessPartner(businessPartner: BusinessPartner) =
         with(businessPartner){
@@ -62,6 +95,289 @@ class RequestMapper {
         businessPartner.additionalSites
             .map { AdditionalSiteDb(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
             .toMutableList()
+
+    fun toAdditionalSites(businessPartner: BusinessPartnerRequest) =
+        businessPartner.additionalSites
+            .map { AdditionalSiteDb(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
+            .toMutableList()
+
+    fun toNameParts(businessPartner: BusinessPartnerRequest) =
+        mutableListOf(
+            businessPartner.uncategorized.nameParts.map { NamePartDb(it, null) },
+            businessPartner.nameParts.map { NamePartDb(it.name, toNamePartType(it.type)) }
+        ).flatten().toMutableList()
+
+    fun toIdentifier(identifier: IdentifierRequest, scope: IdentifierDb.Scope) =
+        with(identifier) {
+            IdentifierDb(value, type, issuingBody, scope)
+        }
+
+    fun toIdentifiers(businessPartner: BusinessPartnerRequest) =
+        IdentifierDb.Scope.entries.mapNotNull { scope ->
+            when (scope) {
+                IdentifierDb.Scope.LegalEntity -> businessPartner.legalEntity.identifiers
+                IdentifierDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress.identifiers
+                IdentifierDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress?.identifiers
+                IdentifierDb.Scope.AdditionalAddress -> businessPartner.additionalAddress?.postalProperties?.identifiers
+                IdentifierDb.Scope.Uncategorized -> businessPartner.uncategorized.identifiers
+                IdentifierDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.postalProperties?.identifiers
+            }?.map { toIdentifier(it, scope) }
+        }.flatten().toMutableList()
+
+    fun toState(state: BusinessStateRequest, scope: BusinessStateDb.Scope) =
+        with(state) {
+            BusinessStateDb(validFrom?.toTimestamp(), validTo?.toTimestamp(), type, scope)
+        }
+
+    fun toStates(businessPartner: BusinessPartnerRequest) =
+        BusinessStateDb.Scope.entries.mapNotNull { scope ->
+            when (scope) {
+                BusinessStateDb.Scope.LegalEntity -> businessPartner.legalEntity.states
+                BusinessStateDb.Scope.Site -> businessPartner.site?.states
+                BusinessStateDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress.states
+                BusinessStateDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress?.states
+                BusinessStateDb.Scope.AdditionalAddress -> businessPartner.additionalAddress?.postalProperties?.states
+                BusinessStateDb.Scope.Uncategorized -> businessPartner.uncategorized.states
+                BusinessStateDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.postalProperties?.states
+            }?.map { toState(it, scope) }
+        }.flatten().toMutableList()
+
+    fun toConfidence(confidenceCriteria: ConfidenceCriteriaRequest) =
+        with(confidenceCriteria) {
+            ConfidenceCriteriaDb(
+                sharedByOwner,
+                checkedByExternalDataSource,
+                numberOfSharingMembers,
+                lastConfidenceCheckAt?.toTimestamp(),
+                nextConfidenceCheckAt?.toTimestamp(),
+                confidenceLevel
+            )
+        }
+
+    fun toConfidences(businessPartner: BusinessPartnerRequest) =
+        ConfidenceCriteriaDb.Scope.entries.mapNotNull { scope ->
+            when (scope) {
+                ConfidenceCriteriaDb.Scope.LegalEntity -> businessPartner.legalEntity.confidenceCriteria
+                ConfidenceCriteriaDb.Scope.Site -> businessPartner.site?.confidenceCriteria
+                ConfidenceCriteriaDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress.confidenceCriteria
+                ConfidenceCriteriaDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress?.confidenceCriteria
+                ConfidenceCriteriaDb.Scope.AdditionalAddress -> businessPartner.additionalAddress?.postalProperties?.confidenceCriteria
+                ConfidenceCriteriaDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.postalProperties?.confidenceCriteria
+            }?.let { scope to toConfidence(it) }
+        }.toMap().toMutableMap()
+
+    fun toPostalAddress(postalAddress: PostalAddressRequest, scope: PostalAddressDb.Scope) =
+        with(postalAddress) {
+            PostalAddressDb(
+                addressName = addressName,
+                physicalAddress = toPhysicalAddress(physicalAddress),
+                alternativeAddress = toAlternativeAddress(alternativeAddress),
+                hasChanged = hasChanged,
+                updatedAt = updatedAt?.toTimestamp()
+            )
+        }
+
+    fun toPostalAddresses(businessPartner: BusinessPartnerRequest) =
+        PostalAddressDb.Scope.entries.mapNotNull { scope ->
+            when (scope) {
+                PostalAddressDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress
+                PostalAddressDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress
+                PostalAddressDb.Scope.AdditionalAddress -> businessPartner.additionalAddress?.postalProperties
+                PostalAddressDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.postalProperties
+            }?.let { scope to toPostalAddress(it, scope) }
+        }.toMap().toMutableMap()
+
+    fun toBpnReference(bpnReference: BpnReferenceRequest) =
+        with(bpnReference) {
+            BpnReferenceDb(
+                referenceValue = referenceValue,
+                desiredBpn = desiredBpn,
+                referenceType = referenceType?.let(::toBpnReferenceType)
+            )
+        }
+
+    fun toBpnReferences(businessPartner: BusinessPartnerRequest) =
+        BpnReferenceDb.Scope.entries.mapNotNull { scope ->
+            when (scope) {
+                BpnReferenceDb.Scope.LegalEntity -> businessPartner.legalEntity.bpnReference
+                BpnReferenceDb.Scope.Site -> businessPartner.site?.bpnReference
+                BpnReferenceDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress.bpnReference
+                BpnReferenceDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress?.bpnReference
+                BpnReferenceDb.Scope.AdditionalAddress -> businessPartner.additionalAddress?.postalProperties?.bpnReference
+                BpnReferenceDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.postalProperties?.bpnReference
+            }?.let { scope to toBpnReference(it) }
+        }.toMap().toMutableMap()
+
+    fun toPhysicalAddress(physicalAddress: PhysicalAddressRequest) =
+        with(physicalAddress) {
+            PostalAddressDb.PhysicalAddressDb(
+                geographicCoordinates = toGeoCoordinate(geographicCoordinates),
+                country = country,
+                administrativeAreaLevel1 = administrativeAreaLevel1,
+                administrativeAreaLevel2 = administrativeAreaLevel2,
+                administrativeAreaLevel3 = administrativeAreaLevel3,
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = toStreet(street),
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode
+            )
+        }
+
+    fun toAlternativeAddress(alternativeAddress: AlternativeAddressRequest?) =
+        alternativeAddress?.let {
+            with(alternativeAddress) {
+                PostalAddressDb.AlternativeAddress(
+                    exists = true,
+                    geographicCoordinates = toGeoCoordinate(geographicCoordinates),
+                    country = country,
+                    administrativeAreaLevel1 = administrativeAreaLevel1,
+                    postalCode = postalCode,
+                    city = city,
+                    deliveryServiceType = deliveryServiceType,
+                    deliveryServiceQualifier = deliveryServiceQualifier,
+                    deliveryServiceNumber = deliveryServiceNumber
+                )
+            }
+        } ?: PostalAddressDb.AlternativeAddress(
+            exists = false,
+            geographicCoordinates = PostalAddressDb.GeoCoordinate(
+                longitude = null,
+                latitude = null,
+                altitude = null
+            ),
+            country = null,
+            administrativeAreaLevel1 = null,
+            postalCode = null,
+            city = null,
+            deliveryServiceType = null,
+            deliveryServiceQualifier = null,
+            deliveryServiceNumber = null
+        )
+
+    fun toGeoCoordinate(geoCoordinate: GeoCoordinateRequest) =
+        with(geoCoordinate) {
+            PostalAddressDb.GeoCoordinate(longitude, latitude, altitude)
+        }
+
+    fun toStreet(street: StreetRequest) =
+        with(street) {
+            PostalAddressDb.Street(
+                name,
+                houseNumber,
+                houseNumberSupplement,
+                milestone,
+                direction,
+                namePrefix,
+                additionalNamePrefix,
+                nameSuffix,
+                additionalNameSuffix
+            )
+        }
+
+    fun toLegalEntityScriptVariants(businessPartner: BusinessPartnerRequest): MutableList<LegalEntityHeaderScriptVariantDb> {
+        return businessPartner.legalEntity.scriptVariants
+            .map { LegalEntityHeaderScriptVariantDb(it.scriptCode, it.legalName, it.legalShortName) }
+            .toMutableList()
+    }
+
+    fun toSiteScriptVariants(businessPartner: BusinessPartnerRequest): MutableList<SiteHeaderScriptVariantDb> {
+        return businessPartner.site?.scriptVariants
+            ?.map { SiteHeaderScriptVariantDb(it.scriptCode, it.siteName) }
+            ?.toMutableList()
+            ?: mutableListOf()
+    }
+
+    fun toAddressScriptVariants(businessPartner: BusinessPartnerRequest): MutableList<PostalAddressScriptVariantDb> {
+        return listOfNotNull(
+            businessPartner.legalEntity.scriptVariants.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.LegalAddress, it.scriptCode, it.legalAddress) },
+            businessPartner.site?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.SiteMainAddress, it.scriptCode, it.mainAddress) },
+            businessPartner.additionalAddress?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.AdditionalAddress, it.scriptCode, it.postalProperties) },
+            businessPartner.uncategorized.address?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.UncategorizedAddress, it.scriptCode, it.postalProperties) }
+        ).flatten().toMutableList()
+    }
+
+    fun toPostalAddressScriptVariant(
+        scope: PostalAddressDb.Scope,
+        scriptCode: String,
+        postalAddressScriptVariant: PostalAddressScriptVariantRequest
+    ): PostalAddressScriptVariantDb {
+        return with(postalAddressScriptVariant) {
+            PostalAddressScriptVariantDb(
+                scope = scope,
+                scriptCode = scriptCode,
+                addressName = addressName,
+                physicalAddress = toPhysicalAddressScriptVariant(physicalAddress),
+                alternativeAddress = alternativeAddress?.let { toAlternativeAddressScriptVariant(it) }
+            )
+        }
+    }
+
+    fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantRequest): PhysicalAddressScriptVariantDb {
+        return with(physicalAddressScriptVariant) {
+            PhysicalAddressScriptVariantDb(
+                city = city,
+                district = district,
+                street = toScriptVariantStreet(street),
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door
+            )
+        }
+    }
+
+    fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantRequest): AlternativeAddressScriptVariantDb {
+        return with(alternativeAddressScriptVariant) {
+            AlternativeAddressScriptVariantDb(
+                city = city
+            )
+        }
+    }
+
+    fun toScriptVariantStreet(street: StreetScriptVariantRequest): StreetScriptVariantDb {
+        return with(street) {
+            StreetScriptVariantDb(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
+            )
+        }
+    }
+
+    fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartnerRequest): MutableList<LegalEntityGoldenRecordRelationDb> =
+        businessPartner.legalEntity.goldenRecordRelations
+            .map { LegalEntityGoldenRecordRelationDb(toLegalEntityGoldenRecordRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            .toMutableList()
+
+    fun toSiteGoldenRecordRelations(businessPartner: BusinessPartnerRequest): MutableList<SiteGoldenRecordRelationDb> =
+        businessPartner.site?.goldenRecordRelations
+            .orEmpty()
+            .map { SiteGoldenRecordRelationDb(toSiteGoldenRecordRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            .toMutableList()
+
+    fun toAddressGoldenRecordRelations(businessPartner: BusinessPartnerRequest): MutableList<AddressGoldenRecordRelationDb> =
+        listOfNotNull(
+            businessPartner.legalEntity.legalAddress.goldenRecordRelations.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.LegalAddress) },
+            businessPartner.site?.siteMainAddress?.goldenRecordRelations?.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.SiteMainAddress) },
+            businessPartner.additionalAddress?.postalProperties?.goldenRecordRelations?.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.AdditionalAddress) }
+        ).flatten().toMutableList()
+
+    fun toAddressGoldenRecordRelation(relation: AddressGoldenRecordRelationRequest, scope: AddressGoldenRecordRelationDb.Scope) =
+        AddressGoldenRecordRelationDb(
+            relationType = toAddressGoldenRecordRelationType(relation.relationType),
+            sourceBpn = relation.sourceBpn,
+            targetBpn = relation.targetBpn,
+            scope = scope
+        )
 
     fun toTaskError(error: TaskErrorDto) =
         with(error) {
@@ -340,5 +656,20 @@ class RequestMapper {
             targetBpn = relation.targetBpn,
             scope = scope
         )
+
+    fun toNamePartType(type: NamePartTypeRequest) =
+        NamePartType.valueOf(type.name)
+
+    fun toBpnReferenceType(type: BpnReferenceTypeRequest) =
+        BpnReferenceType.valueOf(type.name)
+
+    fun toLegalEntityGoldenRecordRelationType(type: LegalEntityGoldenRecordRelationTypeRequest) =
+        LegalEntityGoldenRecordRelationType.valueOf(type.name)
+
+    fun toSiteGoldenRecordRelationType(type: SiteGoldenRecordRelationTypeRequest) =
+        SiteGoldenRecordRelationType.valueOf(type.name)
+
+    fun toAddressGoldenRecordRelationType(type: AddressGoldenRecordRelationTypeRequest) =
+        AddressGoldenRecordRelationType.valueOf(type.name)
 
 }
