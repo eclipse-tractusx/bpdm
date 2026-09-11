@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskEventOperation
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.stereotype.Service
@@ -35,20 +34,6 @@ class GoldenRecordTaskEventApplicationV7Service(
 ) {
 
     fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
-        val eventPage = eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
-        
-        return FinishedTaskEventsResponse(
-            totalElements = eventPage.totalElements,
-            totalPages = eventPage.totalPages,
-            page = eventPage.page,
-            contentSize = eventPage.contentSize,
-            content = eventPage.content.map { event ->
-                FinishedTaskEventsResponse.Event(
-                    timestamp = event.timestamp,
-                    resultState = event.resultState,
-                    taskId = event.taskId
-                )
-            }
-        )
+        return eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
     }
 }
