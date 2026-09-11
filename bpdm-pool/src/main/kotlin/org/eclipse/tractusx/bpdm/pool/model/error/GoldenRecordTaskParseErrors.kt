@@ -24,7 +24,6 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  */
 sealed interface GoldenRecordTaskParseError
 
-data object SiteMainAddressMissing : GoldenRecordTaskParseError
 
 data class SiteNotInTaskLegalEntity(val siteBpn: String, val legalEntityBpn: String?) : GoldenRecordTaskParseError
 
