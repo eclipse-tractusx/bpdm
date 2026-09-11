@@ -17,26 +17,29 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
+
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.UpsertIntent
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.TaskEntryBpnMapping
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Decides the script variant coverage a single golden record task upsert cannot decide on its own: whether the task
+ * Decides the script variant coverage a single golden record upsert cannot decide on its own: whether the upsert
  * leaves a business partner it does not write named in a script its address no longer covers.
  *
- * A task writes its legal entity, its site and their addresses in several operations, and one address can be written
- * twice when a site's main address is the legal address, so every upsert sees a half-written state. The upserts
- * therefore parse without the coverage check and coverage is judged here, once, for the task as a whole.
+ * An upsert writes its legal entity, its site and their addresses in several operations, and one address can be
+ * written twice when a site's main address is the legal address, so every operation sees a half-written state. Those
+ * operations therefore parse without the coverage check and coverage is judged here, once, for the request as a whole.
  */
 @Service
 class GoldenRecordTaskCoverageValidator(
@@ -46,44 +49,45 @@ class GoldenRecordTaskCoverageValidator(
 ) {
 
     /**
-     * Reports every coverage [businessPartner] would take away from a business partner outside this task.
+     * Reports every coverage [request] would take away from a business partner outside it.
      */
     @Transactional(readOnly = true)
     fun validate(
-        businessPartner: BusinessPartner,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        request: GoldenRecordUpsertRequest,
+        bpnReferences: BpnReferenceAllocation
     ): List<ScriptVariantCoverageParseError> {
-        val rewrittenBpns = rewrittenPartnerBpns(businessPartner, taskEntryBpnMapping)
+        val rewrittenBpns = rewrittenPartnerBpns(request, bpnReferences)
 
-        return writtenAddresses(businessPartner, taskEntryBpnMapping).flatMap { (address, coveredScriptCodes) ->
+        return writtenAddresses(request, bpnReferences).flatMap { (address, coveredScriptCodes) ->
             scriptVariantCoverageValidator.check(coveredScriptCodes, partnerReader.storedPartners(address, rewrittenBpns))
         }
     }
 
     /**
-     * The already persisted addresses this task writes, each with the script codes it will cover afterwards. An address
-     * the task does not write keeps the coverage it has, and a reference that resolves to no BPN yet becomes a new
-     * address no partner can be named on — neither can strand anyone, so neither appears here.
+     * The already persisted addresses this request rewrites, each with the script codes its new payload will cover.
+     * An address the request creates is not among them: it takes no coverage away from anyone.
      */
     private fun writtenAddresses(
-        businessPartner: BusinessPartner,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        request: GoldenRecordUpsertRequest,
+        bpnReferences: BpnReferenceAllocation
     ): List<Pair<LogisticAddressDb, List<String>>> {
-        val site = businessPartner.site?.takeIf { it.hasChanged != false }
-        val legalEntityWritten = businessPartner.legalEntity.hasChanged != false
-        val legalEntityScriptCodes = businessPartner.legalEntity.scriptVariants.map { it.scriptCode }
-        val siteScriptCodes = site?.scriptVariants?.map { it.scriptCode }.orEmpty()
+        val site = request.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
+        val legalEntityWritten = request.legalEntity.intent == UpsertIntent.AlwaysWrite
+        val legalEntityScriptCodes = request.legalEntity.header.scriptVariants.map { it.scriptCode }
+        val siteScriptCodes = site?.header?.scriptVariants?.map { it.scriptCode }.orEmpty()
 
         // A site whose main address is the legal address is covered by that one address, so both partners' script codes
-        // end up on it - the task writes their union there (see TaskStepBuildService.legalAddressCoverageNotStatedBy).
-        val siteSharesLegalAddress = site != null && site.siteMainIsLegalAddress
-        val legalAddress = businessPartner.legalEntity.legalAddress.bpnReference
+        // end up on it - the request writes their union there (see TaskStepBuildService.legalAddressCoverageNotStatedBy).
+        val siteSharesLegalAddress = site is SiteUpsertRequest.WithLegalAddressAsMain
+        val legalAddress = request.legalEntity.legalAddress.reference
             .takeIf { legalEntityWritten || siteSharesLegalAddress }
-            ?.let { resolveAddress(it, taskEntryBpnMapping) }
+            ?.let { resolveAddress(it, bpnReferences) }
         val legalAddressScriptCodes =
             if (siteSharesLegalAddress) legalEntityScriptCodes.plus(siteScriptCodes).distinct() else legalEntityScriptCodes
 
-        val siteMainAddress = site?.siteMainAddress?.let { resolveAddress(it.bpnReference, taskEntryBpnMapping) }
+        val siteMainAddress = (site as? SiteUpsertRequest.WithOwnMainAddress)
+            ?.mainAddress?.reference
+            ?.let { resolveAddress(it, bpnReferences) }
 
         return listOfNotNull(
             legalAddress?.let { it to legalAddressScriptCodes },
@@ -92,20 +96,20 @@ class GoldenRecordTaskCoverageValidator(
     }
 
     /**
-     * The BPNs of the business partners this task writes itself; a partner reported as unchanged is not among them, so
-     * the coverage it has today has to survive the task.
+     * The BPNs of the business partners this request writes itself; a partner reported as unchanged is not among them,
+     * so the coverage it has today has to survive the request.
      */
-    private fun rewrittenPartnerBpns(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping): Set<String> {
-        val legalEntityBpn = businessPartner.legalEntity
-            .takeIf { it.hasChanged != false }
-            ?.let { taskEntryBpnMapping.getBpn(it.bpnReference) }
-        val siteBpn = businessPartner.site
-            ?.takeIf { it.hasChanged != false }
-            ?.let { taskEntryBpnMapping.getBpn(it.bpnReference) }
+    private fun rewrittenPartnerBpns(request: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation): Set<String> {
+        val legalEntityBpn = request.legalEntity
+            .takeIf { it.intent == UpsertIntent.AlwaysWrite }
+            ?.let { bpnReferences.resolve(it.reference) }
+        val siteBpn = request.site
+            ?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
+            ?.let { bpnReferences.resolve(it.reference) }
 
         return setOfNotNull(legalEntityBpn, siteBpn)
     }
 
-    private fun resolveAddress(bpnReference: BpnReference, taskEntryBpnMapping: TaskEntryBpnMapping): LogisticAddressDb? =
-        taskEntryBpnMapping.getBpn(bpnReference)?.let { logisticAddressRepository.findByBpn(it) }
+    private fun resolveAddress(reference: BpnReferenceRequest, bpnReferences: BpnReferenceAllocation): LogisticAddressDb? =
+        bpnReferences.resolve(reference)?.let { logisticAddressRepository.findByBpn(it) }
 }

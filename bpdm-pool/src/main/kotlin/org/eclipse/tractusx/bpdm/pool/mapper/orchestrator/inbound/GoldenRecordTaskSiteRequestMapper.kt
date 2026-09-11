@@ -93,7 +93,8 @@ class GoldenRecordTaskSiteRequestMapper(
             mainAddress = toMainAddressRequest(site, mainAddress, additionalMainAddressScriptVariants)
         )
 
-    private fun toMainAddressRequest(
+    /** The site's main address content, carrying the main-address half of the site's script variants. */
+    fun toMainAddressRequest(
         site: TaskSite,
         mainAddress: TaskPostalAddress,
         additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
@@ -103,7 +104,8 @@ class GoldenRecordTaskSiteRequestMapper(
             site.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.mainAddress) } + additionalMainAddressScriptVariants
         )
 
-    private fun toHeaderRequest(site: TaskSite): SiteHeaderRequest =
+    /** The site's own properties as the task states them, without its main address. */
+    fun toHeaderRequest(site: TaskSite): SiteHeaderRequest =
         SiteHeaderRequest(
             name = site.siteName,
             states = site.states.map { toState(it) },

@@ -45,7 +45,7 @@ class LegalEntityEntityMapper(
             legalForm = header.legalForm,
             currentness = currentness,
             confidenceCriteria = toConfidence(header.confidenceCriteria, numberOfSharingMembers),
-            isDataSpaceParticipant = header.isDataSpaceParticipant,
+            isDataSpaceParticipant = header.isDataSpaceParticipant ?: false,
             ownershipUltimate = header.ownershipUltimate ?: false,
             scriptVariants = toScriptVariants(header.scriptVariants).toMutableList()
         )

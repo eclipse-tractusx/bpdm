@@ -31,18 +31,23 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskLegalEntityRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskUpsertRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskResultMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
+import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.task.BpnRequestIdentifierMappingCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
@@ -59,7 +64,6 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpda
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.*
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskParentConsistencyValidator
-import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskSiteMainAddressValidator
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -67,7 +71,7 @@ import org.springframework.stereotype.Service
 @Service
 class TaskStepBuildService(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
+    private val bpnRequestIdentifierMappingCreateService: BpnRequestIdentifierMappingCreateService,
     private val taskResultMapper: GoldenRecordTaskResultMapper,
     private val addressResponseMapper: AddressResponseMapper,
     private val siteResponseMapper: SiteResponseMapper,
@@ -96,36 +100,38 @@ class TaskStepBuildService(
     private val addressUpdateService: AddressUpdateService,
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
+    private val upsertRequestMapper: GoldenRecordTaskUpsertRequestMapper,
     private val coverageValidator: GoldenRecordTaskCoverageValidator,
-    private val siteMainAddressValidator: GoldenRecordTaskSiteMainAddressValidator,
     private val parentConsistencyValidator: GoldenRecordTaskParentConsistencyValidator,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper
 ) {
 
     @Transactional
-    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto): TaskStepResultEntryDto {
-        val taskEntryBpnMapping = TaskEntryBpnMapping(listOf(taskEntry), bpnRequestIdentifierRepository)
+    fun upsertBusinessPartner(
+        taskEntry: TaskStepReservationEntryDto,
+        upsertRequest: GoldenRecordUpsertRequest,
+        bpnReferences: BpnReferenceAllocation
+    ): TaskStepResultEntryDto {
         val businessPartnerDto = taskEntry.businessPartner
 
-        assertParentsConsistent(businessPartnerDto, taskEntryBpnMapping)
-        assertScriptVariantCoverage(businessPartnerDto, taskEntryBpnMapping)
-        assertSiteMainAddressStated(businessPartnerDto, taskEntryBpnMapping)
+        assertParentsConsistent(upsertRequest, bpnReferences)
+        assertScriptVariantCoverage(upsertRequest, bpnReferences)
 
-        val legalEntityResult = processLegalEntity(businessPartnerDto, taskEntryBpnMapping)
-        val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
-        val addressResult = processAdditionalAddress(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, siteResult?.bpnReference?.referenceValue, taskEntryBpnMapping)
+        val legalEntityResult = processLegalEntity(businessPartnerDto, bpnReferences)
+        val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, bpnReferences)
+        val addressResult = processAdditionalAddress(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, siteResult?.bpnReference?.referenceValue, bpnReferences)
 
         // The address the additional sites attach to only exists once its own golden record has been written, so this
         // runs after all three components.
         val recordAddressBpn = recordAddressBpn(businessPartnerDto.type!!, legalEntityResult, siteResult, addressResult)
         val recordSiteBpn = siteResult?.bpnReference?.referenceValue
-        processAdditionalSites(businessPartnerDto, recordSiteBpn, recordAddressBpn, taskEntryBpnMapping)
+        processAdditionalSites(businessPartnerDto, recordSiteBpn, recordAddressBpn, bpnReferences)
         val additionalSiteResults = recordSiteBpn?.let { readAdditionalSites(recordAddressBpn, it) }.orEmpty()
 
         val (updatedLegalEntityResult, updatedSiteResult, updatedAddressResult) =
             updateConfidences(businessPartnerDto.type!!, taskEntry.recordId, legalEntityResult, siteResult, addressResult)
 
-        taskEntryBpnMapping.writeCreatedMappingsToDb(bpnRequestIdentifierRepository)
+        bpnRequestIdentifierMappingCreateService.create(bpnReferences.drainAllocated())
 
         return buildTaskReply(
             taskEntry.taskId,
@@ -141,7 +147,7 @@ class TaskStepBuildService(
         businessPartner: BusinessPartner,
         recordSiteBpn: String?,
         recordAddressBpn: String,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ) {
         // Additional sites are the sites of the address next to the site this data is about, so business partner data
         // without a site of its own states nothing about the membership and leaves it as it stands - the same rule the
@@ -152,10 +158,10 @@ class TaskStepBuildService(
         // reference it carries and, carrying none, by the name its site is to be created under - as far as identity goes
         // here: resolving a name to an existing site is the refinement service's job, not this one's.
         val statedOnce = businessPartner.additionalSites.distinctBy { it.bpnReference.referenceValue ?: it.siteName }
-        val (known, unknown) = statedOnce.partition { taskEntryBpnMapping.getBpn(it.bpnReference) != null }
+        val (known, unknown) = statedOnce.partition { bpnReferences.resolve(it.bpnReference.toRequest()) != null }
 
-        val createdSiteBpns = createAdditionalSites(unknown, businessPartner, recordAddressBpn, taskEntryBpnMapping)
-        val knownSiteBpns = known.map { taskEntryBpnMapping.getBpn(it.bpnReference)!! }
+        val createdSiteBpns = createAdditionalSites(unknown, businessPartner, recordAddressBpn, bpnReferences)
+        val knownSiteBpns = known.map { bpnReferences.resolve(it.bpnReference.toRequest())!! }
 
         val completeMembership = (listOf(recordSiteBpn) + knownSiteBpns + createdSiteBpns).distinct()
         setAddressSites(recordAddressBpn, completeMembership)
@@ -165,7 +171,7 @@ class TaskStepBuildService(
         additionalSites: List<AdditionalSite>,
         businessPartner: BusinessPartner,
         recordAddressBpn: String,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): List<String> {
         if (additionalSites.isEmpty()) return emptyList()
 
@@ -180,7 +186,7 @@ class TaskStepBuildService(
         )
 
         additionalSites.zip(createdSites).forEach { (additionalSite, createdSite) ->
-            taskEntryBpnMapping.addMapping(additionalSite.bpnReference, createdSite.bpn)
+            bpnReferences.allocate(additionalSite.bpnReference.toRequest(), createdSite.bpn)
         }
 
         return createdSites.map { it.bpn }
@@ -225,11 +231,11 @@ class TaskStepBuildService(
         }
 
     private fun processLegalEntity(
-        businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping
+        businessPartner: BusinessPartner, bpnReferences: BpnReferenceAllocation
     ): LegalEntity{
         val legalEntity = businessPartner.legalEntity
         val bpnLReference = legalEntity.bpnReference
-        val bpnL = taskEntryBpnMapping.getBpn(bpnLReference)
+        val bpnL = bpnReferences.resolve(bpnLReference.toRequest())
 
         val existingLegalEntityInformation by lazy { fetchExistingLegalEntityResult(bpnL!!) }
 
@@ -239,7 +245,7 @@ class TaskStepBuildService(
             //No need to upsert, just fetch the information
             existingLegalEntityInformation
         }else{
-            upsertLegalEntity(legalEntity.copy(isParticipantData = isDataSpaceParticipant), taskEntryBpnMapping)
+            upsertLegalEntity(legalEntity.copy(isParticipantData = isDataSpaceParticipant), bpnReferences)
         }
 
         return legalEntityResult
@@ -247,16 +253,16 @@ class TaskStepBuildService(
 
 
     private fun upsertLegalEntity(
-        legalEntity: LegalEntity, taskEntryBpnMapping: TaskEntryBpnMapping
+        legalEntity: LegalEntity, bpnReferences: BpnReferenceAllocation
     ): LegalEntity {
         val legalAddress = legalEntity.legalAddress
         val bpnLReference = legalEntity.bpnReference
-        val bpnL = taskEntryBpnMapping.getBpn(bpnLReference)
+        val bpnL = bpnReferences.resolve(bpnLReference.toRequest())
 
         val upsertedLegalEntity = if (bpnL == null) createLegalEntity(legalEntity) else updateLegalEntity(bpnL, legalEntity)
 
-        taskEntryBpnMapping.addMapping(bpnLReference, upsertedLegalEntity.bpn)
-        taskEntryBpnMapping.addMapping(legalAddress.bpnReference, upsertedLegalEntity.legalAddress.bpn)
+        bpnReferences.allocate(bpnLReference.toRequest(), upsertedLegalEntity.bpn)
+        bpnReferences.allocate(legalAddress.bpnReference.toRequest(), upsertedLegalEntity.legalAddress.bpn)
 
         // Read the upserted golden record back so the reply carries its full state (matches the address path).
         return readUpsertedLegalEntityResult(upsertedLegalEntity.bpn)
@@ -293,22 +299,22 @@ class TaskStepBuildService(
     private fun processSite(
         businessPartner: BusinessPartner,
         legalEntityBpn: String,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): Site? {
         val site = businessPartner.site ?: return null
 
         val bpnSReference = site.bpnReference
-        val bpnS = taskEntryBpnMapping.getBpn(bpnSReference)
+        val bpnS = bpnReferences.resolve(bpnSReference.toRequest())
 
         val siteResult = if(bpnS != null && site.hasChanged == false){
             //No need to upsert, just fetch the information
             fetchExistingSiteResult(bpnS)
         } else {
-            val bpnA = taskEntryBpnMapping.getBpn(site.siteMainAddress?.bpnReference)
+            val bpnA = bpnReferences.resolve(site.siteMainAddress?.bpnReference?.toRequest())
             if (bpnA == null) {
-                upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+                upsertSite(site, businessPartner, legalEntityBpn, bpnReferences)
             } else {
-                updateAddressLinkage(bpnA, site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+                updateAddressLinkage(bpnA, site, businessPartner, legalEntityBpn, bpnReferences)
             }
         }
 
@@ -320,18 +326,18 @@ class TaskStepBuildService(
         site: Site,
         businessPartner: BusinessPartner,
         legalEntityBpn: String,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): Site {
         val address = resolveAddressIfPresent(bpnA)
-        val bpnS = taskEntryBpnMapping.getBpn(site.bpnReference)
+        val bpnS = bpnReferences.resolve(site.bpnReference.toRequest())
         // A NEW site (no BPN yet) whose main-address reference already resolves to a persisted address adopts
         // that address as its main address - so several sites can share one main address - instead of creating a
         // duplicate. An existing site being updated, and the legal-address-as-main path, stay on upsertSite (the
         // latter already re-parents the legal address via the referenced-address service).
         return if (address != null && bpnS == null && !site.siteMainIsLegalAddress) {
-            createSiteOnExistingAddress(site, businessPartner, address, taskEntryBpnMapping)
+            createSiteOnExistingAddress(site, businessPartner, address, bpnReferences)
         } else {
-            upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+            upsertSite(site, businessPartner, legalEntityBpn, bpnReferences)
         }
     }
 
@@ -339,7 +345,7 @@ class TaskStepBuildService(
         site: Site,
         businessPartner: BusinessPartner,
         existingAddress: LogisticAddressDb,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): Site {
         // Reached only via the address-linkage path for a new site, where the site carries its own main address
         // reference resolving to an already-persisted address (an additional address, or another site's main
@@ -356,8 +362,8 @@ class TaskStepBuildService(
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { parseErrorMapper.toSiteCreateDescription(it) })
         }
 
-        taskEntryBpnMapping.addMapping(bpnSReference, createdSite.bpn)
-        taskEntryBpnMapping.addMapping(siteMainAddress.bpnReference, createdSite.mainAddress.bpn)
+        bpnReferences.allocate(bpnSReference.toRequest(), createdSite.bpn)
+        bpnReferences.allocate(siteMainAddress.bpnReference.toRequest(), createdSite.mainAddress.bpn)
         return readUpsertedSiteResult(createdSite.bpn)
     }
 
@@ -365,14 +371,14 @@ class TaskStepBuildService(
         site: Site,
         businessPartner: BusinessPartner,
         legalEntityBpn: String,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): Site {
         val isSiteMainAndLegalAddress = site.siteMainIsLegalAddress
         val siteMainAddress = if(isSiteMainAndLegalAddress) businessPartner.legalEntity.legalAddress
             else (site.siteMainAddress ?: error("Site ${site.bpnReference.referenceValue} states no main address"))
 
         val bpnSReference = site.bpnReference
-        val bpnS = taskEntryBpnMapping.getBpn(bpnSReference)
+        val bpnS = bpnReferences.resolve(bpnSReference.toRequest())
 
         val mergedSite = site.withRelevantScriptVariants(businessPartner)
 
@@ -383,9 +389,9 @@ class TaskStepBuildService(
             updateSite(bpnS, mergedSite, siteMainAddress, businessPartner.legalAddressCoverageNotStatedBy(mergedSite))
         }
 
-        taskEntryBpnMapping.addMapping(bpnSReference, upsertedSite.bpn)
+        bpnReferences.allocate(bpnSReference.toRequest(), upsertedSite.bpn)
         if(!isSiteMainAndLegalAddress)
-            taskEntryBpnMapping.addMapping(siteMainAddress.bpnReference, upsertedSite.mainAddress.bpn)
+            bpnReferences.allocate(siteMainAddress.bpnReference.toRequest(), upsertedSite.mainAddress.bpn)
 
         return readUpsertedSiteResult(upsertedSite.bpn)
     }
@@ -441,18 +447,18 @@ class TaskStepBuildService(
         businessPartner: BusinessPartner,
         legalEntityBpn: String,
         siteBpn: String?,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): PostalAddressWithScriptVariants? {
         val additionalAddress = businessPartner.additionalAddress ?: return null
 
         val bpnAReference = additionalAddress.bpnReference
-        val bpnA = taskEntryBpnMapping.getBpn(bpnAReference)
+        val bpnA = bpnReferences.resolve(bpnAReference.toRequest())
 
         return if (bpnA != null && additionalAddress.hasChanged == false) {
             // No need to upsert, just fetch the data
             toAddressResult(resolveRequestedAddress(bpnA), hasChanged = false)
         } else {
-            upsertAdditionalAddress(additionalAddress, legalEntityBpn, siteBpn, taskEntryBpnMapping)
+            upsertAdditionalAddress(additionalAddress, legalEntityBpn, siteBpn, bpnReferences)
         }
     }
 
@@ -460,10 +466,10 @@ class TaskStepBuildService(
         additionalAddress: PostalAddressWithScriptVariants,
         legalEntityBpn: String,
         siteBpn: String?,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        bpnReferences: BpnReferenceAllocation
     ): PostalAddressWithScriptVariants {
         val bpnAReference = additionalAddress.bpnReference
-        val bpnA = taskEntryBpnMapping.getBpn(bpnAReference)
+        val bpnA = bpnReferences.resolve(bpnAReference.toRequest())
 
         val upsertedBpn = if (bpnA == null) {
             createLogisticAddress(additionalAddress, legalEntityBpn, siteBpn)
@@ -471,7 +477,7 @@ class TaskStepBuildService(
             updateLogisticAddress(bpnA, additionalAddress)
         }
 
-        taskEntryBpnMapping.addMapping(bpnAReference, upsertedBpn)
+        bpnReferences.allocate(bpnAReference.toRequest(), upsertedBpn)
 
         // Read the upserted golden record back so the reply carries its full state, including golden record relations.
         return toAddressResult(readUpsertedAddress(upsertedBpn), hasChanged = true)
@@ -585,8 +591,12 @@ class TaskStepBuildService(
 
     }
 
-    private fun assertParentsConsistent(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
-        val violations = parentConsistencyValidator.validate(businessPartner, taskEntryBpnMapping)
+    // Transitional: this service still holds the task DTO while the references it looks up are Pool-side ones. It
+    // goes away with the service itself, once the golden record upsert is parsed as a whole.
+    private fun BpnReference.toRequest(): BpnReferenceRequest = upsertRequestMapper.toReference(this)
+
+    private fun assertParentsConsistent(upsertRequest: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation) {
+        val violations = parentConsistencyValidator.validate(upsertRequest, bpnReferences)
         if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { parseErrorMapper.toTaskDescription(it) })
     }
 
@@ -617,13 +627,8 @@ class TaskStepBuildService(
             .map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.legalAddress) }
     }
 
-    private fun assertSiteMainAddressStated(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
-        val violations = siteMainAddressValidator.validate(businessPartner, taskEntryBpnMapping)
-        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { parseErrorMapper.toTaskDescription(it) })
-    }
-
-    private fun assertScriptVariantCoverage(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
-        val violations = coverageValidator.validate(businessPartner, taskEntryBpnMapping)
+    private fun assertScriptVariantCoverage(upsertRequest: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation) {
+        val violations = coverageValidator.validate(upsertRequest, bpnReferences)
         if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { parseErrorMapper.toScriptVariantCoverageDescription(it) })
     }
 

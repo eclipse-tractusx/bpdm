@@ -48,13 +48,18 @@ class GoldenRecordTaskLegalEntityRequestMapper(
     private fun toContentRequest(legalEntity: TaskLegalEntity): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
-            legalAddress = addressRequestMapper.toContentRequest(
-                legalEntity.legalAddress,
-                legalEntity.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.legalAddress) }
-            )
+            legalAddress = toLegalAddressRequest(legalEntity)
         )
 
-    private fun toHeaderRequest(legalEntity: TaskLegalEntity): LegalEntityHeaderRequest =
+    /** The legal address content, carrying the legal-address half of the legal entity's script variants. */
+    fun toLegalAddressRequest(legalEntity: TaskLegalEntity): LogisticAddressRequest =
+        addressRequestMapper.toContentRequest(
+            legalEntity.legalAddress,
+            legalEntity.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.legalAddress) }
+        )
+
+    /** The legal entity's own properties as the task states them, without its legal address. */
+    fun toHeaderRequest(legalEntity: TaskLegalEntity): LegalEntityHeaderRequest =
         LegalEntityHeaderRequest(
             legalName = legalEntity.legalName,
             legalShortName = legalEntity.legalShortName,
@@ -62,7 +67,7 @@ class GoldenRecordTaskLegalEntityRequestMapper(
             identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
             states = legalEntity.states.map { toState(it) },
             confidenceCriteria = addressRequestMapper.toConfidenceRequest(legalEntity.confidenceCriteria),
-            isDataSpaceParticipant = legalEntity.isParticipantData ?: false,
+            isDataSpaceParticipant = legalEntity.isParticipantData,
             ownershipUltimate = legalEntity.ownershipUltimate,
             scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRequest(it.scriptCode, it.legalName, it.legalShortName) }
         )

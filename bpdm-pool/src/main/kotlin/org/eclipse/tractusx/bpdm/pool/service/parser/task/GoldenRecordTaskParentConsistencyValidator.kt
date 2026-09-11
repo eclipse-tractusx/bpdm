@@ -17,24 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
+
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotInTaskLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInTaskLegalEntity
-import org.eclipse.tractusx.bpdm.pool.service.TaskEntryBpnMapping
+import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The rule that the site and the additional address a task states must already belong to the legal entity it states
- * them under.
+ * The rule that the site and additional address an upsert states belong to the legal entity it states. A reference that
+ * names no persisted business partner yet is not judged here: the operation that writes it decides it.
  */
 @Service
 class GoldenRecordTaskParentConsistencyValidator(
@@ -43,14 +44,13 @@ class GoldenRecordTaskParentConsistencyValidator(
 ) {
 
     /**
-     * Reports every parent of [businessPartner] that names a legal entity other than the task's own. A reference that
-     * names no persisted business partner yet is not judged here: the operation that writes it decides it.
+     * Reports every violation of the rule in [request].
      */
     @Transactional(readOnly = true)
-    fun validate(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping): List<GoldenRecordTaskParseError> {
-        val legalEntityBpn = taskEntryBpnMapping.getBpn(businessPartner.legalEntity.bpnReference)
-        val siteBpn = businessPartner.site?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
-        val addressBpn = businessPartner.additionalAddress?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
+    fun validate(request: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation): List<GoldenRecordTaskParseError> {
+        val legalEntityBpn = bpnReferences.resolve(request.legalEntity.reference)
+        val siteBpn = request.site?.let { bpnReferences.resolve(it.reference) }
+        val addressBpn = request.additionalAddress?.let { bpnReferences.resolve(it.reference) }
 
         val site = siteBpn?.let { resolveSiteIfPresent(it) }
         val address = addressBpn?.let { resolveAddressIfPresent(it) }
