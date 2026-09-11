@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller.v6
 import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.application.GoldenRecordTaskCreateApplicationService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.v6.GoldenRecordTaskCreateApplicationV6Service
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApi
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController
 class GoldenRecordTaskController(
     val goldenRecordTaskLegacyServiceMapper: GoldenRecordTaskLegacyServiceMapper,
     val apiConfigProperties: ApiConfigProperties,
-    val goldenRecordTaskCreateApplicationService: GoldenRecordTaskCreateApplicationService
+    val goldenRecordTaskCreateApplicationService: GoldenRecordTaskCreateApplicationV6Service
 ) : GoldenRecordTaskApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
@@ -44,7 +44,7 @@ class GoldenRecordTaskController(
         if (createRequest.requests.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
-        return goldenRecordTaskCreateApplicationService.createTasksV6(createRequest)
+        return goldenRecordTaskCreateApplicationService.createTasks(createRequest)
     }
 
     @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")

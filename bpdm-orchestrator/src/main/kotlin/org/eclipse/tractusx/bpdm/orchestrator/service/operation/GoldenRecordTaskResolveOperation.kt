@@ -20,13 +20,12 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskResolveParsed
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
+import org.eclipse.tractusx.bpdm.orchestrator.util.toLogIdentifiers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.Collection
 
 @Service
 class GoldenRecordTaskResolveOperation(
@@ -61,14 +60,11 @@ class GoldenRecordTaskResolveOperation(
         tasksByResultState[GoldenRecordTaskDb.ResultState.Pending]
             ?.groupBy { it.processingState.step }
             ?.forEach { (nextStep, tasks) ->
-                logger.info { "Advanced ${tasks.size} golden record tasks from step $step to step $nextStep: ${toLogIdentifiers(tasks as Collection<GoldenRecordTaskDb>)}" }
+                logger.info { "Advanced ${tasks.size} golden record tasks from step $step to step $nextStep: ${tasks.toLogIdentifiers()}" }
             }
         tasksByResultState[GoldenRecordTaskDb.ResultState.Success]
-            ?.let { tasks -> logger.info { "Completed ${tasks.size} golden record tasks after step $step: ${toLogIdentifiers(tasks as Collection<GoldenRecordTaskDb>)}" } }
+            ?.let { tasks -> logger.info { "Completed ${tasks.size} golden record tasks after step $step: ${tasks.toLogIdentifiers()}" } }
         tasksByResultState[GoldenRecordTaskDb.ResultState.Error]
-            ?.let { tasks -> logger.info { "Failed ${tasks.size} golden record tasks in step $step: ${toLogIdentifiers(tasks as Collection<GoldenRecordTaskDb>)}" } }
+            ?.let { tasks -> logger.info { "Failed ${tasks.size} golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
     }
-
-    private fun toLogIdentifiers(tasks: Collection<GoldenRecordTaskDb>): String =
-        tasks.map { it.uuid.toString() }.joinIdentifiersForLog()
 }

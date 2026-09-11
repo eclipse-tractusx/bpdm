@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service.application
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
@@ -37,8 +37,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
+/**
+ * The REST-API boundary for the V7 "create relations golden record tasks" operation.
+ */
 @Service
-class RelationsGoldenRecordTaskCreateApplicationService(
+class RelationsGoldenRecordTaskCreateApplicationV7Service(
     private val inboundMapper: RelationsGoldenRecordTaskCreateInboundMapper,
     private val parser: RelationsGoldenRecordTaskCreateParser,
     private val operation: RelationsGoldenRecordTaskCreateOperation,
