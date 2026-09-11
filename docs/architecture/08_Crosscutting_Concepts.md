@@ -293,11 +293,11 @@ An example postman collection for Asset definition you can find [here](<../admin
 
 #### Verified Credentials
 
-**Gate**
+##### Gate
 
 To enable communication for uploading and downloading from the gate through EDC, it's essential to have a Verifiable Credential stored in the wallet for BPDM Framework Agreement. This credential will be verified during EDC communication. Additionally, the BPN-Verifiable Credential needs to be validated to ensure that only the sharing member has access to its own gate.
 
-**Pool**
+##### Pool
 
 To enable communication for downloading from the pool through EDC, it's essential to have a Verifiable Credential stored in the wallet for BPDM Framework Agreement. This credential will be verified during EDC communication. Additionally, the Membership Credential needs to be validated to ensure that only onboarded catena-x members have access to the pool.
 
@@ -358,11 +358,11 @@ What belongs on which level is binding for the code and is defined in the
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 - SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2024 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2024 SAP SE
-- SPDX-FileCopyrightText: 2023,2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2024 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2024 Robert Bosch GmbH
-- SPDX-FileCopyrightText: 2023,2024 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2024 Contributors to the Eclipse Foundation
+- SPDX-FileCopyrightText: 2023-2026 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023-2026 SAP SE
+- SPDX-FileCopyrightText: 2023-2026 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023-2026 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023-2026 Robert Bosch GmbH
+- SPDX-FileCopyrightText: 2023-2026 Schaeffler AG
+- SPDX-FileCopyrightText: 2023-2026 Contributors to the Eclipse Foundation
 - Source URL: https://github.com/eclipse-tractusx/bpdm

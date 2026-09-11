@@ -30,6 +30,7 @@ data class UnresolvableLegalEntity(val bpn: String) :
     AddressCreateParseError,
     SiteCreateParseError,
     LegalEntityUpdateParseError,
+    LegalEntityGetParseError,
     DataSpaceParticipantUpdateParseError
 data class UnresolvableSite(val bpn: String) :
     AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError, AddressSiteMembershipParseError

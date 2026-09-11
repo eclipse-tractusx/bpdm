@@ -20,6 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -30,9 +33,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTa
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
@@ -48,16 +48,13 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityP
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSiteMembershipParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnAddressParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithReferencedAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -65,7 +62,6 @@ import org.springframework.stereotype.Service
 @Service
 class TaskStepBuildService(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val addressService: AddressService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val taskResolutionMapper: TaskResolutionMapper,
     private val addressResponseMapper: AddressResponseMapper,
@@ -73,6 +69,7 @@ class TaskStepBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
+    private val addressBpnParser: AddressBpnParser,
     private val typedParentAddressCreateParser: TypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
     private val addressUpdateParser: AddressUpdateParser,
@@ -221,7 +218,7 @@ class TaskStepBuildService(
             ?: businessPartner.legalEntity.legalAddress.confidenceCriteria
 
     private fun readAdditionalSites(recordAddressBpn: String, recordSiteBpn: String?): List<AdditionalSite> =
-        addressService.findAddressByBpn(recordAddressBpn)
+        logisticAddressRepository.findByBpn(recordAddressBpn)
             ?.sites
             .orEmpty()
             .filterNot { it.bpn == recordSiteBpn }
@@ -331,7 +328,7 @@ class TaskStepBuildService(
         legalEntityBpn: String,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): Site {
-        val address = addressService.findAddressByBpn(bpnA)
+        val address = resolveAddressIfPresent(bpnA)
         val bpnS = taskEntryBpnMapping.getBpn(site.bpnReference)
         // A NEW site (no BPN yet) whose main-address reference already resolves to a persisted address adopts
         // that address as its main address - so several sites can share one main address - instead of creating a
@@ -450,7 +447,7 @@ class TaskStepBuildService(
 
         return if (bpnA != null && additionalAddress.hasChanged == false) {
             // No need to upsert, just fetch the data
-            fetchAddressResult(bpnA, hasChanged = false)
+            toAddressResult(resolveRequestedAddress(bpnA), hasChanged = false)
         } else {
             upsertAdditionalAddress(additionalAddress, legalEntityBpn, siteBpn, taskEntryBpnMapping)
         }
@@ -474,12 +471,28 @@ class TaskStepBuildService(
         taskEntryBpnMapping.addMapping(bpnAReference, upsertedBpn)
 
         // Read the upserted golden record back so the reply carries its full state, including golden record relations.
-        return fetchAddressResult(upsertedBpn, hasChanged = true)
+        return toAddressResult(readUpsertedAddress(upsertedBpn), hasChanged = true)
     }
 
-    private fun fetchAddressResult(bpnA: String, hasChanged: Boolean?): PostalAddressWithScriptVariants {
-        val result = addressService.findAddressByBpn(bpnA)?.let { addressResponseMapper.toAddress(it) }
-            ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+    // The resolvers are strict, so an unknown BPN comes back as a failure; here that is not a rejection but the signal
+    // that this main-address reference names no address yet, which the caller answers by creating one.
+    private fun resolveAddressIfPresent(bpnA: String): LogisticAddressDb? =
+        when (val result = addressBpnParser.parse(listOf(bpnA)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> null
+        }
+
+    private fun resolveRequestedAddress(bpnA: String): LogisticAddressDb =
+        when (val result = addressBpnParser.parse(listOf(bpnA)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Address ${it.bpn} not found" })
+        }
+
+    private fun readUpsertedAddress(bpnA: String): LogisticAddressDb =
+        logisticAddressRepository.findByBpn(bpnA) ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+
+    private fun toAddressResult(address: LogisticAddressDb, hasChanged: Boolean?): PostalAddressWithScriptVariants {
+        val result = addressResponseMapper.toAddress(address)
         return taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
     }
 

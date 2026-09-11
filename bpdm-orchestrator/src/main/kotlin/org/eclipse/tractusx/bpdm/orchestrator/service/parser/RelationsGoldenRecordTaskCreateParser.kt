@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepo
 import org.eclipse.tractusx.bpdm.orchestrator.util.toUuidOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 @Transactional(readOnly = true)

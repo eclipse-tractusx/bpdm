@@ -54,9 +54,14 @@ The following endpoints are available:
 **NOTE**
 
 Through the PUT endpoints you are able to change the business partner data.
-However, no structural changes are possible.
+Structural changes are not possible, with one exception.
 This means, you are not able to change the parent legal entity of a site.
-Likewise, you are not able to change the legal entity or site of an addresses, nor change the address type.
+Likewise, you are not able to change the legal entity of an address, nor change the address type.
+
+The exception is an address's site membership: `PUT addresses` takes an optional `bpnSites` holding the BPNS of every site the address belongs to.
+Stating them replaces the address's current membership, so a site left out is unlinked, and a site whose main address this address is has to be stated.
+Omitting the field leaves the membership untouched.
+
 ---
 
 ## Exposing BPDM Over EDC

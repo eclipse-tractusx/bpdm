@@ -2,6 +2,7 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [7.5.x to 7.6.x](#75x-to-76x)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
@@ -26,6 +27,10 @@
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
 
+
+## 7.5.x to 7.6.x
+
+_No migration steps yet._
 
 ## 7.4.x to 7.5.x
 

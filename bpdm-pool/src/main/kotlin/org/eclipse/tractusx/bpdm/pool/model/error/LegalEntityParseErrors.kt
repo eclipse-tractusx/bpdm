@@ -23,6 +23,10 @@ sealed interface LegalEntityCreateParseError
 
 sealed interface LegalEntityUpdateParseError
 
+sealed interface LegalEntityGetParseError
+
+data class UnresolvableLegalEntityIdentifier(val identifierTypeKey: String, val identifierValue: String) : LegalEntityGetParseError
+
 /**
  * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
  * being created has no ownership relations yet, so its tree is itself.

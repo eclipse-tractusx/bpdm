@@ -19,7 +19,7 @@
 
 # Runs a third Gate next to the default one and the second, acting for a third sharing member:
 #
-#   mvn spring-boot:run -Dspring.profiles.active=gate-3
+#   mvn spring-boot:run -Dspring-boot.run.profiles=gate-3
 #
 # A third sharing member is what it takes to observe the confidence level of a golden record rise: the
 # number of sharing members only counts towards that level from three of them on (see
