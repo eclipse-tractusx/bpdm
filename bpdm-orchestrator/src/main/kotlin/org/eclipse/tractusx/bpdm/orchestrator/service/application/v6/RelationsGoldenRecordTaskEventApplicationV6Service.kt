@@ -34,6 +34,20 @@ class RelationsGoldenRecordTaskEventApplicationV6Service(
 ) {
 
     fun getRelationsFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
-        return eventOperation.getRelationsFinishedTaskEvents(timestamp, paginationRequest)
+        val eventPage = eventOperation.getRelationsFinishedTaskEvents(timestamp, paginationRequest)
+        
+        return FinishedTaskEventsResponse(
+            totalElements = eventPage.totalElements,
+            totalPages = eventPage.totalPages,
+            page = eventPage.page,
+            contentSize = eventPage.contentSize,
+            content = eventPage.content.map { event ->
+                FinishedTaskEventsResponse.Event(
+                    timestamp = event.timestamp,
+                    resultState = event.resultState,
+                    taskId = event.taskId
+                )
+            }
+        )
     }
 }

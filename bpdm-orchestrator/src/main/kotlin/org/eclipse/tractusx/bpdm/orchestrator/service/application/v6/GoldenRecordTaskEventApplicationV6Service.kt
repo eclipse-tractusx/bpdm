@@ -34,6 +34,20 @@ class GoldenRecordTaskEventApplicationV6Service(
 ) {
 
     fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
-        return eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
+        val eventPage = eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
+        
+        return FinishedTaskEventsResponse(
+            totalElements = eventPage.totalElements,
+            totalPages = eventPage.totalPages,
+            page = eventPage.page,
+            contentSize = eventPage.contentSize,
+            content = eventPage.content.map { event ->
+                FinishedTaskEventsResponse.Event(
+                    timestamp = event.timestamp,
+                    resultState = event.resultState,
+                    taskId = event.taskId
+                )
+            }
+        )
     }
 }

@@ -19,10 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 
-
-data class RelationsGoldenRecordTaskResolveRequest(
-    val step: TaskStep,
-    val results: List<TaskRelationsStepResultEntry>
+/**
+ * Unified internal DTO for a single task relations step result entry.
+ * Decouples operation layer from API-specific models (v6, v7, etc.).
+ */
+data class TaskRelationsStepResultEntry(
+    val taskId: String,
+    val businessPartnerRelations: BusinessPartnerRelations,
+    val errors: List<String> = emptyList()
 )

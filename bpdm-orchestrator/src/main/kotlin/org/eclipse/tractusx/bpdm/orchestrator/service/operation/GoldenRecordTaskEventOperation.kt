@@ -22,9 +22,10 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.toTimestamp
+import org.eclipse.tractusx.bpdm.orchestrator.model.FinishedTaskEvent
+import org.eclipse.tractusx.bpdm.orchestrator.model.FinishedTaskEventPage
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -37,16 +38,22 @@ class GoldenRecordTaskEventOperation(
 ) {
     private val finishedTaskStates = setOf(GoldenRecordTaskDb.ResultState.Success, GoldenRecordTaskDb.ResultState.Error)
 
-    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventPage {
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size, Sort.Direction.ASC, "updatedAt")
         val finishedTasksPage = taskRepository.findByProcessingStateResultStateInAndUpdatedAtAfter(finishedTaskStates, timestamp.toTimestamp(), pageRequest)
 
-        return FinishedTaskEventsResponse(
+        return FinishedTaskEventPage(
             totalElements = finishedTasksPage.totalElements,
             totalPages = finishedTasksPage.totalPages,
             page = finishedTasksPage.number,
             contentSize = finishedTasksPage.content.size,
-            content = finishedTasksPage.content.map { FinishedTaskEventsResponse.Event(it.updatedAt.instant, responseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
+            content = finishedTasksPage.content.map { 
+                FinishedTaskEvent(
+                    timestamp = it.updatedAt.instant,
+                    resultState = responseMapper.toResultState(it.processingState.resultState),
+                    taskId = it.uuid.toString()
+                )
+            }
         )
     }
 }
