@@ -17,12 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.orchestrator.api.v6.model.response
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
+import java.time.Instant
 
-@Schema(description = "Response object for giving a list of created tasks")
-data class TaskCreateResponse(
+@Schema(description = "V6 API - Response object for giving a list of reserved tasks")
+data class TaskStepReservationResponseV6(
 
-    val createdTasks: List<TaskClientStateDto>
+    @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
+    val reservedTasks: List<TaskStepReservationEntryDto>,
+
+    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted", deprecated = true)
+    val timeout: Instant
 )

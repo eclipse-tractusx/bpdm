@@ -17,12 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.orchestrator.api.v7.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 
-@Schema(description = "Response object for giving a list of task states")
-data class TaskStateResponse(
+@Schema(description = "V7 API - Request object for reserving tasks for a step")
+data class TaskStepReservationRequestV7(
 
-    val tasks: List<TaskClientStateDto>
+    @get:Schema(description = "The step queue from which to reserve tasks", required = true)
+    val step: TaskStep,
+
+    @get:Schema(description = "The amount of tasks to reserve", required = true)
+    val amount: Int
 )
