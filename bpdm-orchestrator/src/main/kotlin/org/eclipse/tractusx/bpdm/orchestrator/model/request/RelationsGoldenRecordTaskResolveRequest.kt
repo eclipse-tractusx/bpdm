@@ -17,27 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
-
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
-
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
-    }
-}
+data class RelationsGoldenRecordTaskResolveRequest(
+    val step: TaskStep,
+    val results: List<org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto>
+)

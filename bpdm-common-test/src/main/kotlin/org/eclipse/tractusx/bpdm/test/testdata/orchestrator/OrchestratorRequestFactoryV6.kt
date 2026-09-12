@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.orchestrator.api.model.Site
 import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntry
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntity
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 import java.util.*
 import kotlin.random.Random
 
@@ -47,7 +47,7 @@ class OrchestratorRequestFactoryV6(
             uncategorized = commonFactory.buildUncategorizedProperties(seed, random).withoutScriptVariants(),
             legalEntity = buildLegalEntityProperties(seed, random),
             site = commonFactory.buildSite(seed, random).withoutScriptVariants(),
-            additionalAddress = commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random)
+            additionalAddress = commonFactory.buildPostalAddressWithScripVariants(seed, AddressType.AdditionalAddress, random)
         )
     }
 
@@ -91,7 +91,7 @@ class OrchestratorRequestFactoryV6(
             uncategorized = UncategorizedProperties.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = null,
-            additionalAddress = commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random)
+            additionalAddress = commonFactory.buildPostalAddressWithScripVariants(seed, AddressType.AdditionalAddress, random)
         )
     }
 
@@ -102,7 +102,7 @@ class OrchestratorRequestFactoryV6(
             uncategorized = UncategorizedProperties.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = commonFactory.buildSite(seed, random).withoutScriptVariants(),
-            additionalAddress = commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random)
+            additionalAddress = commonFactory.buildPostalAddressWithScripVariants(seed, AddressType.AdditionalAddress, random)
         )
     }
 
@@ -116,9 +116,10 @@ class OrchestratorRequestFactoryV6(
             identifiers = commonFactory.buildLegalIdentifiers(seed, random),
             states = commonFactory.buildStates(random),
             confidenceCriteria = commonFactory.buildConfidenceCriteria(random),
-            isCatenaXMemberData = random.nextBoolean(),
+            isParticipantData = random.nextBoolean(),
             hasChanged = random.nextBoolean(),
-            legalAddress = commonFactory.buildPostalAddress(seed, AddressType.LegalAddress, random)
+            legalAddress = commonFactory.buildPostalAddress(seed, AddressType.LegalAddress, random),
+            scriptVariants = emptyList()
         )
     }
 

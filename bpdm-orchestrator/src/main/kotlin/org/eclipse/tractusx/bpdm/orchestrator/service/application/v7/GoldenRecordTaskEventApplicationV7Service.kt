@@ -17,27 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskEventOperation
+import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.stereotype.Service
+import java.time.Instant
 
+/**
+ * The REST-API boundary for the V7 "get finished task events" operation.
+ */
 @Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
+class GoldenRecordTaskEventApplicationV7Service(
+    private val eventOperation: GoldenRecordTaskEventOperation
 ) {
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
-
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+        return eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
     }
 }

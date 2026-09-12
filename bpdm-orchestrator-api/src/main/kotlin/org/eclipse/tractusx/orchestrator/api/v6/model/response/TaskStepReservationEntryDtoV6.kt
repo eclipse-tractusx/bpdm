@@ -17,27 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.orchestrator.api.v6.model.response
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
+@Schema(description = "V6 API - Task reservation entry")
+data class TaskStepReservationEntryDtoV6(
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
+    @get:Schema(description = "The identifier of the reserved task")
+    val taskId: String,
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
+    @get:Schema(description = "The identifier of the gate record for which this task has been created")
+    val recordId: String,
+
+    @get:Schema(description = "The business partner data to process")
+    val businessPartner: BusinessPartnerV6
+) : RequestWithKey {
+    override fun getRequestKey(): String {
+        return taskId
     }
 }

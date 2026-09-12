@@ -17,20 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskService
+import org.eclipse.tractusx.bpdm.orchestrator.service.PaginationInfo
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-class TimeoutProcessBatchService(
+class TimeoutProcessBatchOperation(
     private val goldenRecordTaskService: GoldenRecordTaskService,
-    private val taskConfigProperties: TaskConfigProperties,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
+    private val taskConfigProperties: TaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -60,7 +62,6 @@ class TimeoutProcessBatchService(
             logger.error(err) { "Error checking for timeouts" }
         }
     }
-
 
     private fun processTimeouts(processFunction: (Int) -> PaginationInfo): Int {
         val pageSize = 1000  // Adjust the page size based on memory constraints

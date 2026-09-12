@@ -17,22 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.orchestrator.api.v6.model.request
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 
+@Schema(description = "V6 API - Request object to specify for which business partner data tasks should be created and in which mode")
+data class TaskCreateRequestV6(
 
-@Schema(description = "A step result for a golden record task")
-data class TaskStepResultEntryDto(
+    @get:Schema(required = true, description = "The mode affecting which processing steps the business partner goes through")
+    val mode: TaskMode,
 
-    @get:Schema(description = "The identifier of the task for which this is a result", required = true)
-    val taskId: String,
-
-    @get:Schema(description = "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task.")
-    val businessPartner: BusinessPartner,
-
-    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
-    val errors: List<TaskErrorDto> = emptyList()
+    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
+    val requests: List<TaskCreateRequestEntry>
 )

@@ -17,22 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.orchestrator.api.v7.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.orchestrator.api.model.TaskProcessingStateDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 
-@Schema(description = "The golden record task's processing state together with optional business partner data in case processing is done")
-data class TaskClientStateDto(
+@Schema(description = "V7 API - Request object for posting step results of previously reserved tasks")
+data class TaskStepResultRequestV7(
 
-    @get:Schema(required = true)
-    val taskId: String,
+    @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
+    val step: TaskStep,
 
-    @get:Schema(required = true, description = "The identifier of the gate record for which this task has been created")
-    val recordId: String,
-
-    val businessPartnerResult: BusinessPartner,
-
-    @get:Schema(required = true)
-    val processingState: TaskProcessingStateDto
+    val results: List<TaskStepResultEntryDto>
 )

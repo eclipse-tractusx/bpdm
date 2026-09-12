@@ -17,27 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.orchestrator.api.v6.model.request
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
+@Schema(description = "V6 API - Request object for posting step results of previously reserved tasks")
+data class TaskStepResultRequestV6(
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
+    @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
+    val step: TaskStep,
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
-    }
-}
+    val results: List<TaskStepResultEntryDto>
+)

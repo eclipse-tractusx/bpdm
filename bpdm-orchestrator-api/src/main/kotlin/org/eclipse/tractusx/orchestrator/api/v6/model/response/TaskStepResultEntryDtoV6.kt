@@ -17,27 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.orchestrator.api.v6.model.response
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
+@Schema(description = "V6 API - A step result for a golden record task")
+data class TaskStepResultEntryDtoV6(
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
-    }
-}
+    @get:Schema(description = "The identifier of the task for which this is a result", required = true)
+    val taskId: String,
+
+    @get:Schema(description = "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task.")
+    val businessPartner: BusinessPartnerV6,
+
+    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
+    val errors: List<TaskErrorDto> = emptyList()
+)

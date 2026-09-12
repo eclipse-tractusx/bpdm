@@ -17,27 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.orchestrator.api.v6.model.response
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.orchestrator.api.model.TaskProcessingStateDto
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
+@Schema(description = "V6 API - The golden record task's processing state together with optional business partner data in case processing is done")
+data class TaskClientStateDtoV6(
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
+    @get:Schema(required = true)
+    val taskId: String,
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
-    }
-}
+    @get:Schema(required = true, description = "The identifier of the gate record for which this task has been created")
+    val recordId: String,
+
+    val businessPartnerResult: BusinessPartnerV6,
+
+    @get:Schema(required = true)
+    val processingState: TaskProcessingStateDto
+)

@@ -17,27 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service
+package org.eclipse.tractusx.orchestrator.api.v7.model.response
 
-import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Service
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
+import java.time.Instant
 
-@Service
-class StepSecurityService(
-    private val securityOperation: StepSecurityOperation
-) {
+@Schema(description = "V7 API - Response object for giving a list of reserved tasks")
+data class TaskStepReservationResponseV7(
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasReservationAuthority(authentication, step)
-    }
+    @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
+    val reservedTasks: List<TaskStepReservationEntryDto>,
 
-    //Is being used by Pre-Authorize annotations
-    @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
-        securityOperation.assertHasResultAuthority(authentication, step)
-    }
-}
+    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted")
+    val pendingTimeout: Instant
+)

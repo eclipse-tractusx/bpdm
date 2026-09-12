@@ -33,12 +33,12 @@ class RelationsResponseMapper {
             TaskClientRelationsStateDto(
                 taskId = task.uuid.toString(),
                 recordId = task.gateRecord.privateId.toString(),
-                businessPartnerRelationsResult = toBusinessPartneRelationsResult(businessPartnerRelations),
+                businessPartnerRelationsResult = toBusinessPartnerRelationsResult(businessPartnerRelations),
                 processingState = toProcessingState(task, timeout)
             )
         }
 
-    fun toBusinessPartneRelationsResult(businessPartnerRelations: RelationsGoldenRecordTaskDb.BusinessPartnerRelations) =
+    fun toBusinessPartnerRelationsResult(businessPartnerRelations: RelationsGoldenRecordTaskDb.BusinessPartnerRelations) =
         with(businessPartnerRelations) {
             BusinessPartnerRelations(
                 relationType = toRelationType(relationType),

@@ -17,34 +17,29 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.controller
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.SharingMemberRecordApplicationV7Service
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.SharingMemberRecordOperation
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecordApi
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.stereotype.Service
 
-@RestController
-class SharingMemberRecordController(
-    private val sharingMemberRecordApplicationService: SharingMemberRecordApplicationV7Service
-): SharingMemberRecordApi{
+/**
+ * The REST-API boundary for the V6 "sharing member record" operations.
+ */
+@Service
+class SharingMemberRecordApplicationV6Service(
+    private val recordOperation: SharingMemberRecordOperation
+) {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
-    override fun update(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
-       return sharingMemberRecordApplicationService.updateRecord(request)
+    fun queryRecords(request: SharingMemberRecordQueryRequest, paginationRequest: PaginationRequest): PageDto<SharingMemberRecord> {
+        return recordOperation.queryRecords(request, paginationRequest)
     }
 
-    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, \"PoolSync\")")
-    override fun queryRecords(
-        request: SharingMemberRecordQueryRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<SharingMemberRecord> {
-        return sharingMemberRecordApplicationService.queryRecords(request, paginationRequest)
+    fun updateRecord(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
+        return recordOperation.updateRecord(request)
     }
 }
