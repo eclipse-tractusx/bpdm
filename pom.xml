@@ -77,7 +77,7 @@
         <!-- Override Spring Boot's managed Tomcat version to fix a vulnerability -->
         <tomcat.version>11.0.25</tomcat.version>
         <!-- Sonar related properties -->
-        <sonar.version>5.7.0.6970</sonar.version>
+        <sonar.version>5.8.0.7211</sonar.version>
         <sonar.coverage.jacoco.xmlReportPaths>
             ${maven.multiModuleProjectDirectory}/bpdm-coverage-aggregate/target/site/
             jacoco-aggregate/jacoco.xml
