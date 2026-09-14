@@ -20,29 +20,26 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 
 /**
- * Validates site-create requests: the parent legal entity, the header content, the new main address, and that the main
- * address covers every script code the header names.
+ * Validates site-create requests: the parent legal entity, the header content and the new main address.
  */
 @Service
 class SiteCreateParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val addressContentParser: AddressContentParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator
+    private val addressContentParser: AddressContentParser
 ) {
 
     /**
@@ -50,17 +47,35 @@ class SiteCreateParser(
      * that entry.
      */
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
+        val contentResults = parseContent(requests.map { it.content })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-        val mainAddresses = requests.map { it.content.mainAddress }
-        val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
-        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
-            crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
-                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
-            }
 
-        return zipParseResults(coveredHeaderResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
-            SiteCreateParsed(legalEntity, SiteContentParsed(header, mainAddress))
+        return zipParseResults(contentResults, legalEntityResults) { content, legalEntity ->
+            SiteCreateParsed(legalEntity, content)
         }
     }
+
+    /**
+     * Validates each site's content as a creation, whichever legal entity it turns out to be created under.
+     */
+    fun parseContent(requests: List<SiteContentRequest>): List<ParseResult<SiteContentParsed, SiteCreateParseError>> {
+        val headerResults = siteHeaderParser.parse(requests.map { it.header })
+        val mainAddresses = requests.map { it.mainAddress }
+        val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
+
+        return zipParseResults(headerResults, mainAddressResults) { header, mainAddress ->
+            SiteContentParsed(header, mainAddress)
+        }
+    }
+
+    /**
+     * Reports what this creation writes, as script variant coverage sees it.
+     */
+    fun coverageWrites(parsed: SiteCreateParsed): List<AddressCoverageWrite> =
+        listOf(
+            AddressCoverageWrite.Created(
+                partners = listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())),
+                scriptCodes = parsed.content.mainAddress.scriptCodes()
+            )
+        )
 }

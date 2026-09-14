@@ -24,7 +24,6 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  */
 enum class GoldenRecordTaskErrorMessage(val message: String) {
     LEGAL_NAME_IS_NULL("Legal name is null"),
-    MAINE_ADDRESS_IS_NULL("Main address is null"),
     PHYSICAL_ADDRESS_COUNTRY_MISSING("Physical Address has no country"),
     PHYSICAL_ADDRESS_CITY_MISSING("Physical Address has no city"),
     ALTERNATIVE_ADDRESS_COUNTRY_MISSING("Alternative Address has no country"),

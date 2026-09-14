@@ -17,8 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.exception
 
-class BpdmMultiValidationException(
-    val validationErrors: List<String>
-) : RuntimeException("Following validation errors found: ${validationErrors.joinToString("\n")}")
+package org.eclipse.tractusx.bpdm.pool.model.parsed
+
+/**
+ * A reference and the record it names, where that record already exists.
+ */
+data class ResolvedReference<T>(
+    val reference: BpnReferenceParsed,
+    val target: T?
+)

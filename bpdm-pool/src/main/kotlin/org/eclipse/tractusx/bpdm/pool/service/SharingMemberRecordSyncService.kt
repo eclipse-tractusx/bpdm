@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
 import org.springframework.scheduling.annotation.Scheduled

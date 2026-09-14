@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
-import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotInTaskLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInTaskLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotInRequestLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInRequestLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
  * names no persisted business partner yet is not judged here: the operation that writes it decides it.
  */
 @Service
-class GoldenRecordTaskParentConsistencyValidator(
+class GoldenRecordParentConsistencyValidator(
     private val siteBpnParser: SiteBpnParser,
     private val addressBpnParser: AddressBpnParser
 ) {
@@ -47,7 +47,7 @@ class GoldenRecordTaskParentConsistencyValidator(
      * Reports every violation of the rule in [request].
      */
     @Transactional(readOnly = true)
-    fun validate(request: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation): List<GoldenRecordTaskParseError> {
+    fun validate(request: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation): List<GoldenRecordUpsertParseError> {
         val legalEntityBpn = bpnReferences.resolve(request.legalEntity.reference)
         val siteBpn = request.site?.let { bpnReferences.resolve(it.reference) }
         val addressBpn = request.additionalAddress?.let { bpnReferences.resolve(it.reference) }
@@ -56,8 +56,8 @@ class GoldenRecordTaskParentConsistencyValidator(
         val address = addressBpn?.let { resolveAddressIfPresent(it) }
 
         return listOfNotNull(
-            site?.takeIf { it.legalEntity.bpn != legalEntityBpn }?.let { SiteNotInTaskLegalEntity(it.bpn, legalEntityBpn) },
-            address?.takeIf { it.legalEntity!!.bpn != legalEntityBpn }?.let { AdditionalAddressNotInTaskLegalEntity(it.bpn, legalEntityBpn) }
+            site?.takeIf { it.legalEntity.bpn != legalEntityBpn }?.let { SiteNotInRequestLegalEntity(it.bpn, legalEntityBpn) },
+            address?.takeIf { it.legalEntity!!.bpn != legalEntityBpn }?.let { AdditionalAddressNotInRequestLegalEntity(it.bpn, legalEntityBpn) }
         )
     }
 

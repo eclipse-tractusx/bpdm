@@ -24,13 +24,8 @@ import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskUpsertRequestMapper
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
-import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.repository.GoldenRecordTaskRepository
-import org.eclipse.tractusx.bpdm.pool.service.parser.task.BpnReferenceParser
+import org.eclipse.tractusx.bpdm.pool.service.application.task.GoldenRecordTaskApplicationService
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.scheduling.annotation.Scheduled
@@ -159,10 +154,8 @@ class TaskBatchResolutionService(
 @Service
 class TaskResolutionService(
     private val orchestrationClient: OrchestrationApiClient,
-    private val taskStepBuildService: TaskStepBuildService,
     private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
-    private val bpnReferenceParser: BpnReferenceParser,
-    private val upsertRequestMapper: GoldenRecordTaskUpsertRequestMapper
+    private val goldenRecordTaskApplicationService: GoldenRecordTaskApplicationService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -183,62 +176,6 @@ class TaskResolutionService(
             logger.debug { "Cleaning tasks processing completed for this iteration." }
     }
 
-    fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
-        val upsertRequests = taskEntries.map { upsertRequestMapper.toRequest(it) }
-        val bpnReferences = BpnReferenceAllocation(bpnReferenceParser.parse(upsertRequests))
-
-        val taskResults = taskEntries.zip(upsertRequests) { taskEntry, upsertRequest ->
-            businessPartnerTaskResult(taskEntry, upsertRequest, bpnReferences)
-        }
-
-        return taskResults
-    }
-
-    private fun businessPartnerTaskResult(
-        taskStep: TaskStepReservationEntryDto,
-        upsertRequest: GoldenRecordUpsertRequest,
-        bpnReferences: BpnReferenceAllocation
-    ): TaskStepResultEntryDto {
-
-        return try {
-            taskStepBuildService.upsertBusinessPartner(taskStep, upsertRequest, bpnReferences)
-        } catch (ex: BpdmValidationException) {
-            bpnReferences.discardAllocated()
-            TaskStepResultEntryDto(
-                taskId = taskStep.taskId,
-                errors = listOf(
-                    TaskErrorDto(
-                        type = TaskErrorType.Unspecified,
-                        description = ex.message ?: ""
-                    )
-                ),
-                businessPartner = taskStep.businessPartner
-            )
-        } catch (ex: BpdmMultiValidationException){
-            bpnReferences.discardAllocated()
-            TaskStepResultEntryDto(
-                taskId = taskStep.taskId,
-                errors = ex.validationErrors.map {
-                    TaskErrorDto(
-                        type = TaskErrorType.Unspecified,
-                        description = it
-                    )
-                },
-                businessPartner = taskStep.businessPartner
-            )
-        } catch (ex: Throwable) {
-            bpnReferences.discardAllocated()
-            logger.error(ex) { "An unexpected error occurred during golden record task processing" }
-            TaskStepResultEntryDto(
-                taskId = taskStep.taskId,
-                errors = listOf(
-                    TaskErrorDto(
-                        type = TaskErrorType.Unspecified,
-                        description = "An unexpected error occurred during Pool update"
-                    )
-                ),
-                businessPartner = taskStep.businessPartner
-            )
-        }
-    }
+    fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> =
+        goldenRecordTaskApplicationService.upsert(taskEntries)
 }

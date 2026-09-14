@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedBpnReferences
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceKind
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
@@ -44,16 +45,12 @@ class BpnReferenceAllocation(resolved: ResolvedBpnReferences) {
         }
 
     /** Records that this reference's request identifier now names [bpn], unless it already names one. */
-    fun allocate(reference: BpnReferenceRequest, bpn: String) {
-        val requestIdentifier = reference.value
-        if (
-            reference.type == BpnReferenceKind.RequestIdentifier
-            && !requestIdentifier.isNullOrEmpty()
-            && !bpnByRequestIdentifier.containsKey(requestIdentifier)
-        ) {
-            allocatedBpnByRequestIdentifier[requestIdentifier] = bpn
-            bpnByRequestIdentifier[requestIdentifier] = bpn
-        }
+    fun allocate(reference: BpnReferenceParsed, bpn: String) {
+        if (reference !is BpnReferenceParsed.Pending) return
+        if (bpnByRequestIdentifier.containsKey(reference.requestIdentifier)) return
+
+        allocatedBpnByRequestIdentifier[reference.requestIdentifier] = bpn
+        bpnByRequestIdentifier[reference.requestIdentifier] = bpn
     }
 
     /** The allocations made since the last drain, which the caller is now responsible for persisting. */
@@ -61,11 +58,5 @@ class BpnReferenceAllocation(resolved: ResolvedBpnReferences) {
         val allocated = allocatedBpnByRequestIdentifier.toMap()
         allocatedBpnByRequestIdentifier.clear()
         return allocated
-    }
-
-    /** Forgets the allocations made since the last drain, for an entry whose writes were rolled back. */
-    fun discardAllocated() {
-        allocatedBpnByRequestIdentifier.keys.forEach { bpnByRequestIdentifier.remove(it) }
-        allocatedBpnByRequestIdentifier.clear()
     }
 }

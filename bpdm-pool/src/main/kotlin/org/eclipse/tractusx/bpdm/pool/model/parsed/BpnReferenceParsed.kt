@@ -17,14 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+
+package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 /**
- * A rejection decided for a golden record task as a whole, rather than by one of the operations it drives.
+ * What a stated BPN reference turned out to be.
  */
-sealed interface GoldenRecordTaskParseError
+sealed interface BpnReferenceParsed {
 
+    data class Existing(val bpn: String) : BpnReferenceParsed
 
-data class SiteNotInTaskLegalEntity(val siteBpn: String, val legalEntityBpn: String?) : GoldenRecordTaskParseError
+    data class Pending(val requestIdentifier: String) : BpnReferenceParsed
 
-data class AdditionalAddressNotInTaskLegalEntity(val addressBpn: String, val legalEntityBpn: String?) : GoldenRecordTaskParseError
+    data object Unstated : BpnReferenceParsed
+}

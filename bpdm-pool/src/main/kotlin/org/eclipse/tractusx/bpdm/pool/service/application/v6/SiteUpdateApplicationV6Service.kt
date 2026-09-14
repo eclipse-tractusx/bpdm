@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
@@ -27,9 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteUpdateApplicationV6Service(
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val siteUpdateParser: SiteUpdateParser,
     private val sitePayloadUpdateService: SitePayloadUpdateService,
     private val siteDtoRequestMapperV6: SiteDtoRequestMapperV6,
@@ -57,7 +59,11 @@ class SiteUpdateApplicationV6Service(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfoV6<SiteUpdateErrorV6>>()
-        requestList.zip(parseAndExecute(updateRequests, siteUpdateParser::parse, sitePayloadUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            updateRequests,
+            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteUpdateParser.parse(parseRequests), siteUpdateParser::coverageWrites) { it } },
+            sitePayloadUpdateService::update
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapperV6.toUpsertResponse(result.parsed.value, request.bpns))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapperV6.toUpdateErrorInfo(it, request.bpns) })

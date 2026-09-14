@@ -30,105 +30,44 @@ import org.springframework.stereotype.Component
 @Component
 class GoldenRecordTaskParseErrorMapper {
 
-    /**
-     * Describes an error the task decides for itself, before any of its operations runs.
-     */
-    fun toTaskDescription(error: GoldenRecordTaskParseError): String =
+    fun toUpsertDescription(error: GoldenRecordUpsertParseError): String =
         when (error) {
-            is SiteNotInTaskLegalEntity -> GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message
-            is AdditionalAddressNotInTaskLegalEntity -> GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message
-        }
-
-    /**
-     * Describes an error from creating the task's additional address.
-     */
-    fun toAddressCreateDescription(error: AddressCreateParseError): String =
-        when (error) {
-            is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
-            is UnresolvableSite -> "Site ${error.bpn} not found"
-            is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
-            // Unreachable on the task path: parents arrive already typed, so the untyped-stage InvalidParentBpn never occurs here.
-            is InvalidParentBpn -> "Parent ${error.bpn} is not a valid BPNL/BPNS"
-            is AddressContentParseError -> toAddressContentDescription(error)
-        }
-
-    /**
-     * Describes an error from updating the task's additional address.
-     */
-    fun toAddressUpdateDescription(error: AddressUpdateParseError): String =
-        when (error) {
-            is ScriptVariantCoverageParseError -> toScriptVariantCoverageDescription(error)
-            is UnresolvableAddress -> "Address ${error.bpn} not found"
-            is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
-            is AddressContentParseError -> toAddressContentDescription(error)
-            is UnresolvableSite -> "Site parent ${error.bpn} not found"
-            is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
-        }
-
-    /**
-     * Describes an error from stating which sites the task's record address belongs to.
-     */
-    fun toAddressSiteMembershipDescription(error: AddressSiteMembershipParseError): String =
-        when (error) {
-            is UnresolvableAddress -> "Address ${error.bpn} not found"
-            is UnresolvableSite -> "Site ${error.bpn} not found"
-            is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
-            is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
-        }
-
-    /**
-     * Describes an error from creating the task's legal entity, naming the legal address where coverage is at stake.
-     */
-    fun toLegalEntityCreateDescription(error: LegalEntityCreateParseError): String =
-        when (error) {
-            is ScriptVariantCoverageParseError -> toLegalAddressCoverageDescription(error)
-            is LegalEntityContentParseError -> toLegalEntityContentDescription(error)
-            is AddressContentParseError -> toAddressContentDescription(error)
-        }
-
-    /**
-     * Describes an error from updating the task's legal entity, naming the legal address where coverage is at stake.
-     */
-    fun toLegalEntityUpdateDescription(error: LegalEntityUpdateParseError): String =
-        when (error) {
-            is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
-            is MultipleUltimateOwnersInHierarchy ->
+            is LegalEntityContentInvalid -> toLegalEntityContentDescription(error.error)
+            is LegalAddressContentInvalid -> toAddressContentDescription(error.error)
+            is SiteContentInvalid -> toSiteContentDescription(error.error)
+            is SiteMainAddressContentInvalid -> toAddressContentDescription(error.error)
+            is AdditionalAddressContentInvalid -> toAddressContentDescription(error.error)
+            is MembershipSiteContentInvalid -> toSiteContentDescription(error.error)
+            is LegalAddressCoverageLost -> toLegalAddressCoverageDescription(error.error)
+            is SiteMainAddressCoverageLost -> toMainAddressCoverageDescription(error.error)
+            is LegalEntityNotFound -> "Legal entity ${error.bpn} not found"
+            is SiteNotFound -> "Site ${error.bpn} not found"
+            is SiteMainAddressNotFound -> "Address ${error.bpn} not found"
+            is AdditionalAddressNotFound -> "Address ${error.bpn} not found"
+            is MembershipSiteNotFound -> "Site ${error.bpn} not found"
+            is SiteNotInRequestLegalEntity -> GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message
+            is AdditionalAddressNotInRequestLegalEntity ->
+                GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message
+            is MultipleUltimateOwners ->
                 "An ownership hierarchy can have at most one ultimate owner, but these legal entities are also flagged " +
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
-            is AlternativeHeadquarterCannotOwnUltimately ->
+            is AlternativeHeadquarterCannotOwn ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
-            is ScriptVariantCoverageParseError -> toLegalAddressCoverageDescription(error)
-            is LegalEntityContentParseError -> toLegalEntityContentDescription(error)
-            is AddressContentParseError -> toAddressContentDescription(error)
+            is ScriptVariantCoverageLost -> toScriptVariantCoverageDescription(error.error)
+            is MembershipOmitsSiteMainAddress -> "Site ${error.siteBpn} has this address as its main address and must be stated"
+            SiteMainAddressRestatesLegalAddress ->
+                "A site whose main address is the legal address must state no main address of its own"
+            AdditionalAddressRestatesLegalAddress ->
+                "An additional address must be a different address than the legal address"
+            AdditionalAddressRestatesSiteMainAddress ->
+                "An additional address must be a different address than the site main address"
+            is SiteScriptCodeNotStatedByLegalEntity ->
+                "A site whose main address is the legal address can only be named in scripts the legal entity is named in: " +
+                        "state script code '${error.scriptCode}' on the legal entity as well, or drop it from the site"
+            is MembershipSiteNotInLegalEntity ->
+                "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn ?: "of this record"}"
         }
 
-    /**
-     * Describes an error from creating one of the task's sites, naming the site main address where coverage is at stake.
-     */
-    fun toSiteCreateDescription(error: SiteCreateParseError): String =
-        when (error) {
-            is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
-            is UnresolvableAddress -> "Address ${error.bpn} not found"
-            is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
-            is ScriptVariantCoverageParseError -> toMainAddressCoverageDescription(error)
-            is SiteContentParseError -> toSiteContentDescription(error)
-            is AddressContentParseError -> toAddressContentDescription(error)
-        }
-
-    /**
-     * Describes an error from updating the task's site, naming the site main address where coverage is at stake.
-     */
-    fun toSiteUpdateDescription(error: SiteUpdateParseError): String =
-        when (error) {
-            is UnresolvableSite -> "Site ${error.bpn} not found"
-            is ScriptVariantCoverageParseError -> toMainAddressCoverageDescription(error)
-            is SiteContentParseError -> toSiteContentDescription(error)
-            is AddressContentParseError -> toAddressContentDescription(error)
-        }
-
-    /**
-     * Describes a coverage error the task decides for the record as a whole, without naming one of its addresses.
-     */
     fun toScriptVariantCoverageDescription(error: ScriptVariantCoverageParseError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"

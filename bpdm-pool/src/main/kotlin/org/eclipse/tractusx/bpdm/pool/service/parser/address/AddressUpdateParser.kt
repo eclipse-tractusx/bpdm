@@ -19,16 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
@@ -45,9 +44,7 @@ class AddressUpdateParser(
     private val addressBpnParser: AddressBpnParser,
     private val siteBpnParser: SiteBpnParser,
     private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator,
-    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
-    private val partnerReader: AddressPartnerScriptCodeReader
+    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator
 ) {
 
     /**
@@ -68,13 +65,15 @@ class AddressUpdateParser(
                             siteMainAddressConsistencyValidator.check(target, sites)
                 }
             }
-        val coveredContentResults: List<ParseResult<LogisticAddressParsed, AddressUpdateParseError>> =
-            crossValidateParseResults(targetResults, contentResults) { target, content ->
-                scriptVariantCoverageValidator.check(content.scriptCodes(), partnerReader.storedPartners(target))
-            }
 
-        return zipParseResults(coveredContentResults, targetResults, consistentSiteResults) { content, target, sites ->
+        return zipParseResults(contentResults, targetResults, consistentSiteResults) { content, target, sites ->
             AddressUpdateParsed(target, sites, content)
         }
     }
+
+    /**
+     * Reports what this update writes, as script variant coverage sees it.
+     */
+    fun coverageWrites(parsed: AddressUpdateParsed): List<AddressCoverageWrite> =
+        listOf(AddressCoverageWrite.Rewritten(address = parsed.target, partners = emptyList(), scriptCodes = parsed.address.scriptCodes()))
 }

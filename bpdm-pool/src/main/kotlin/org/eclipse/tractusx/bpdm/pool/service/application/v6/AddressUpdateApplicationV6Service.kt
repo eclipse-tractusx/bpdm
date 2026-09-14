@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
@@ -27,9 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class AddressUpdateApplicationV6Service(
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val addressUpdateParser: AddressUpdateParser,
     private val addressPayloadUpdateService: AddressPayloadUpdateService,
     private val addressDtoRequestMapperV6: AddressDtoRequestMapperV6,
@@ -57,7 +59,11 @@ class AddressUpdateApplicationV6Service(
 
         val responses = mutableListOf<LogisticAddressVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfoV6<AddressUpdateErrorV6>>()
-        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            updateRequests,
+            { parseRequests -> scriptVariantCoverageValidator.applyTo(addressUpdateParser.parse(parseRequests), addressUpdateParser::coverageWrites) { it } },
+            addressPayloadUpdateService::update
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(addressResponseMapperV6.toAddress(result.parsed.value))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapperV6.toUpdateErrorInfo(it, request.bpna) })

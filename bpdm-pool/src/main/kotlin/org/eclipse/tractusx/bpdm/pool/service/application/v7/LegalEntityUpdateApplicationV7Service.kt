@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
@@ -27,9 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalEntityUpdateApplicationV7Service(
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
     private val legalEntityPayloadUpdateService: LegalEntityPayloadUpdateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
@@ -57,7 +59,11 @@ class LegalEntityUpdateApplicationV7Service(
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            updateRequests,
+            { parseRequests -> scriptVariantCoverageValidator.applyTo(legalEntityUpdateParser.parse(parseRequests), legalEntityUpdateParser::coverageWrites) { it } },
+            legalEntityPayloadUpdateService::update
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed.value, request.bpnl))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })

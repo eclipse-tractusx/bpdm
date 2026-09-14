@@ -22,22 +22,20 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AlternativeHeadquarterValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates legal-entity update requests: the target legal entity, the new header content with its identifier
- * uniqueness, the new legal address, and that the new legal address still covers every script code the header and the
- * address's other partners name.
+ * uniqueness, and the new legal address.
  */
 @Service
 class LegalEntityUpdateParser(
@@ -46,9 +44,7 @@ class LegalEntityUpdateParser(
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
     private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
     private val alternativeHeadquarterValidator: AlternativeHeadquarterValidator,
-    private val addressContentParser: AddressContentParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
-    private val partnerReader: AddressPartnerScriptCodeReader
+    private val addressContentParser: AddressContentParser
 ) {
 
     /**
@@ -56,15 +52,7 @@ class LegalEntityUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> =
-        parseWithoutCoverageCheck(requests).map { result -> result.combine(scriptCodeCoverageErrors(result)) { it } }
-
-    /**
-     * Validates each request without judging script variant coverage — for a caller that rewrites several partners of
-     * the legal address in one operation set and therefore decides coverage at its own scope.
-     */
-    @Transactional(readOnly = true)
-    fun parseWithoutCoverageCheck(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
+    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         val headers = requests.map { it.content.header }
@@ -91,13 +79,15 @@ class LegalEntityUpdateParser(
             .zip(alternativeViolations) { result, violations -> result.combine(violations) { it } }
     }
 
-    private fun scriptCodeCoverageErrors(result: ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>): List<LegalEntityUpdateParseError> {
-        val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
-        val otherPartners = partnerReader.storedPartners(parsed.target.legalAddress, rewrittenBpns = setOf(parsed.target.bpn))
-
-        return scriptVariantCoverageValidator.check(
-            parsed.content.legalAddress.scriptCodes(),
-            listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())).plus(otherPartners)
+    /**
+     * Reports what this update writes, as script variant coverage sees it.
+     */
+    fun coverageWrites(parsed: LegalEntityUpdateParsed): List<AddressCoverageWrite> =
+        listOf(
+            AddressCoverageWrite.Rewritten(
+                address = parsed.target.legalAddress,
+                partners = listOf(PartnerScriptCodes(parsed.target.bpn, parsed.content.header.scriptCodes())),
+                scriptCodes = parsed.content.legalAddress.scriptCodes()
+            )
         )
-    }
 }

@@ -19,25 +19,83 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.combine
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageStillNeeded
 import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * The rule that a business partner may only be named in a script its address is also written in, decided on the state
- * the write leaves behind.
+ * the whole write leaves behind.
+ *
+ * The rule is judged for a set of writes rather than for one of them, because several entries can write one address:
+ * a partner another entry is about to rewrite must be judged on the script codes that entry states, not on the ones
+ * it carries today.
  */
 @Service
-class ScriptVariantCoverageValidator {
+class ScriptVariantCoverageValidator(
+    private val partnerReader: AddressPartnerScriptCodeReader
+) {
 
     /**
-     * Reports one violation per script code a partner in [partners] is named in that [addressScriptCodes] does not cover.
+     * Reports, per entry, every script code a business partner is named in that the address it is built on will not cover.
      */
-    fun check(addressScriptCodes: Collection<String>, partners: List<PartnerScriptCodes>): List<ScriptVariantCoverageParseError> {
-        val covered = addressScriptCodes.toSet()
+    @Transactional(readOnly = true)
+    fun validate(entries: List<List<AddressCoverageWrite>>): List<List<ScriptVariantCoverageParseError>> {
+        val writesByAddress = entries.flatten().groupBy { writtenAddress(it)?.bpn }
+        return entries.map { writes -> writes.flatMap { errorsFor(it, writesByAddress) }.distinct() }
+    }
 
+    /**
+     * Reports each entry with the coverage its write takes away folded into it, leaving an entry that already failed
+     * with the errors it has.
+     */
+    fun <T, E> applyTo(
+        results: List<ParseResult<T, E>>,
+        writesOf: (T) -> List<AddressCoverageWrite>,
+        toError: (ScriptVariantCoverageParseError) -> E
+    ): List<ParseResult<T, E>> {
+        val writes = results.map { result -> (result as? ParseResult.Success)?.parsed?.let(writesOf).orEmpty() }
+        return results.zip(validate(writes)) { result, errors -> result.combine(errors.map(toError)) { it } }
+    }
+
+    private fun errorsFor(
+        write: AddressCoverageWrite,
+        writesByAddress: Map<String?, List<AddressCoverageWrite>>
+    ): List<ScriptVariantCoverageParseError> {
+        val address = writtenAddress(write)
+            ?: return check((write as AddressCoverageWrite.Created).scriptCodes, write.partners)
+
+        val writesOfAddress = writesByAddress[address.bpn].orEmpty()
+        // A write that leaves the address content alone can only strand the partner it adds: the ones already on the
+        // address keep the coverage they have, however it stands today.
+        val contentWrite = writesOfAddress.filterIsInstance<AddressCoverageWrite.Rewritten>().firstOrNull()
+            ?: return check(address.scriptCodes(), write.partners)
+
+        // Every write of this address states its partners anew, so they are judged on what they are about to become
+        // and are left out of what is read from the database.
+        val stated = writesOfAddress.flatMap { it.partners }
+        val storedPartners = partnerReader.storedPartners(address, stated.mapNotNull { it.bpn }.toSet())
+
+        return check(contentWrite.scriptCodes, stated + storedPartners)
+    }
+
+    private fun writtenAddress(write: AddressCoverageWrite): LogisticAddressDb? =
+        when (write) {
+            is AddressCoverageWrite.Created -> null
+            is AddressCoverageWrite.Rewritten -> write.address
+            is AddressCoverageWrite.PartnerOnly -> write.address
+        }
+
+    private fun check(addressScriptCodes: Collection<String>, partners: List<PartnerScriptCodes>): List<ScriptVariantCoverageParseError> {
+        val covered = addressScriptCodes.toSet()
         return partners.flatMap { partner ->
             partner.scriptCodes.filterNot { it in covered }.distinct().map { scriptCode ->
                 if (partner.bpn == null) ScriptVariantNotCoveredByAddress(scriptCode)

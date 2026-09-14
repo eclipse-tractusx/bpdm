@@ -22,10 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.site
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteHeaderUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -55,4 +57,14 @@ class SitePayloadUpdateService(
 
         return siteUpdateService.update(updateRequests)
     }
+
+    /**
+     * Applies the given site properties in full and reports for each site whether it actually changed, leaving each
+     * site's main address as it stands.
+     */
+    @Transactional
+    fun updateHeaders(parsed: List<SiteHeaderUpdateParsed>): List<UpsertResult<SiteDb>> =
+        siteUpdateService.update(
+            parsed.map { SiteUpdate(it.target, siteHeaderUpdateMapper.toFullUpdate(it.header), AddressContentUpdate.NoOp) }
+        )
 }

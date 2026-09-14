@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
@@ -27,9 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreat
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalEntityCreateApplicationV7Service(
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
@@ -57,7 +59,11 @@ class LegalEntityCreateApplicationV7Service(
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
-        requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            createRequests,
+            { parseRequests -> scriptVariantCoverageValidator.applyTo(legalEntityCreateParser.parse(parseRequests), legalEntityCreateParser::coverageWrites) { it } },
+            legalEntityCreateService::create
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })

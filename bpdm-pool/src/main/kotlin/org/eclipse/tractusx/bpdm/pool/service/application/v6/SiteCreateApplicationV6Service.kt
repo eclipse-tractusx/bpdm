@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
@@ -28,11 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVer
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
 import org.springframework.stereotype.Service
@@ -43,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateApplicationV6Service(
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
@@ -64,7 +66,11 @@ class SiteCreateApplicationV6Service(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
-        requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            createRequests,
+            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteCreateParser.parse(parseRequests), siteCreateParser::coverageWrites) { it } },
+            siteCreateService::create
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapperV6.toUpsertResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapperV6.toCreateErrorInfo(it, request.index) })
@@ -120,7 +126,11 @@ class SiteCreateApplicationV6Service(
         }
 
         val createRequests = validRequests.map { siteDtoRequestMapperV6.toCreateWithLegalAddressAsMainRequest(it) }
-        parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create)
+        parseAndExecute(
+            createRequests,
+            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteCreateWithLegalAddressAsMainParser.parse(parseRequests), siteCreateWithLegalAddressAsMainParser::coverageWrites) { it } },
+            siteCreateWithReferencedAddressAsMainService::create
+        )
             .forEachIndexed { index, result ->
                 val entityKey = index.toString()
                 when (result) {
