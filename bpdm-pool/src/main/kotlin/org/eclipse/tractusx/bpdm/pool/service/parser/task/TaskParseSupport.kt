@@ -40,3 +40,11 @@ internal fun <T, E> List<ParseResult<T, E>>.singleOrRecord(
 /** The plan, or every reason it could not be made. */
 internal fun <T> T?.orFailure(errors: List<GoldenRecordUpsertParseError>): ParseResult<T, GoldenRecordUpsertParseError> =
     if (this == null || errors.isNotEmpty()) ParseResult.Failure(errors) else ParseResult.Success(this)
+
+/** The parsed value, or null where this entry was rejected. */
+internal fun <T> ParseResult<T, *>.parsedOrNull(): T? =
+    if (this is ParseResult.Success) parsed else null
+
+/** Every error the rejected entries among these results carry. */
+internal fun List<ParseResult<*, GoldenRecordUpsertParseError>>.failureErrors(): List<GoldenRecordUpsertParseError> =
+    flatMap { if (it is ParseResult.Failure) it.errors else emptyList() }

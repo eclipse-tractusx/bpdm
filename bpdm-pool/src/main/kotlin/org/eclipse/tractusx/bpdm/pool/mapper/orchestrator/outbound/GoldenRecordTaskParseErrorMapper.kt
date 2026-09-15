@@ -54,7 +54,6 @@ class GoldenRecordTaskParseErrorMapper {
             is AlternativeHeadquarterCannotOwn ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
             is ScriptVariantCoverageLost -> toScriptVariantCoverageDescription(error.error)
-            is MembershipOmitsSiteMainAddress -> "Site ${error.siteBpn} has this address as its main address and must be stated"
             SiteMainAddressRestatesLegalAddress ->
                 "A site whose main address is the legal address must state no main address of its own"
             AdditionalAddressRestatesLegalAddress ->

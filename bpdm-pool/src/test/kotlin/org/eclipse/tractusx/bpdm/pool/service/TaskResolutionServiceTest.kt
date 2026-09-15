@@ -1451,7 +1451,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `try create second site sharing an existing site main address without stating the first site`() {
+    fun `create second site sharing an existing site main address keeps the unstated first site`() {
         val leRef = "le-unstated"
         val leAddressRef = "le-addr-unstated"
         val sharedMainAddressRef = "shared-unstated-addr"
@@ -1464,8 +1464,8 @@ class TaskResolutionServiceTest @Autowired constructor(
         val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
-        // Site B takes over the same address without saying that site A still uses it, which would take the address away
-        // from the site it is the main address of.
+        // Site B takes over the same address without saying that site A still uses it. Site A is bound to the address
+        // by its own main-address relation, so it is kept rather than the request being refused.
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences("site-b-unstated".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
@@ -1473,10 +1473,11 @@ class TaskResolutionServiceTest @Autowired constructor(
             .copy(additionalAddress = null)
 
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
+        val siteBBpns = resultB[0].businessPartner.site?.bpnReference?.referenceValue!!
 
-        assertThat(resultB.single().errors.map { it.description })
-            .anyMatch { it.contains(siteABpns) && it.contains("must be stated") }
-        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
+        assertThat(resultB.single().errors).isEmpty()
+        assertThat(poolClient.sites.getSite(siteABpns).mainAddress.bpna).isEqualTo(sharedAddressBpn)
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).containsExactly(siteBBpns)
     }
 
     private fun scriptCodeOtherThan(scriptCode: String): String =

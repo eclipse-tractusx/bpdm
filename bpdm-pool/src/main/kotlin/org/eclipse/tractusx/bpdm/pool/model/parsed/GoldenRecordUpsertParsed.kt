@@ -145,6 +145,11 @@ sealed interface AddressUpsertPlan {
     ) : AddressUpsertPlan
 }
 
+data class RecordSitePlan(
+    val site: SiteUpsertPlan,
+    val coLocatedSites: SiteMembershipPlan
+)
+
 data class SiteMembershipPlan(
     val existingSites: List<SiteDb>,
     val newSites: List<MembershipSiteCreatePlan>

@@ -133,10 +133,10 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     /**
      * GIVEN an address that is the main address of a site an earlier task created on it
      * WHEN the record is processed again without stating that site
-     * THEN the task is resolved as an error, because the site is bound to the address by its own main-address relation
+     * THEN the site stays on the address, because it is bound to it by its own main-address relation
      */
     @Test
-    fun `reject dropping a site the record address is the main address of`() {
+    fun `keep a site the record address is the main address of`() {
         //GIVEN
         val statedSite = AdditionalSite(
             bpnReference = BpnReference("Additional Site Reference $testName", null, BpnReferenceType.BpnRequestIdentifier),
@@ -148,11 +148,11 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         val createdSiteBpn = testDataClient.processTask(testName, stating).additionalSites.single().bpn()
 
         //WHEN
-        val errors = testDataClient.processTaskToErrors(testName, stating.copy(additionalSites = emptyList()))
+        val result = testDataClient.processTask(testName, stating.copy(additionalSites = emptyList()))
 
         //THEN
-        assertThat(errors).hasSize(1)
-        assertThat(errors.single().description).contains(createdSiteBpn, "must be stated")
+        assertThat(result.additionalSites.single().bpn()).isEqualTo(createdSiteBpn)
+        assertThat(sitesOfMainAddress(result)).containsExactlyInAnyOrder(result.recordSiteBpn(), createdSiteBpn)
     }
 
     /**

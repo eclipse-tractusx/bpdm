@@ -64,8 +64,6 @@ data class AlternativeHeadquarterCannotOwn(val bpnl: String) : GoldenRecordUpser
 
 data class ScriptVariantCoverageLost(val error: ScriptVariantCoverageParseError) : GoldenRecordUpsertParseError
 
-data class MembershipOmitsSiteMainAddress(val siteBpn: String) : GoldenRecordUpsertParseError
-
 data class MembershipSiteNotInLegalEntity(val siteBpn: String, val legalEntityBpn: String?) : GoldenRecordUpsertParseError
 
 data object SiteMainAddressRestatesLegalAddress : GoldenRecordUpsertParseError
