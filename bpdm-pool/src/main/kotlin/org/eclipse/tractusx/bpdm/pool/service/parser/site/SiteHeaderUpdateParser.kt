@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderUpdateParsed
@@ -47,7 +48,7 @@ class SiteHeaderUpdateParser(
      * found in that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteHeaderUpdateRequest>): List<ParseResult<SiteHeaderUpdateParsed, SiteUpdateParseError>> {
+    fun parse(requests: List<SiteHeaderUpdateRequest>): List<ParseResult<SiteHeaderUpdateParsed, SiteUpdateEntryParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val headerResults = parseContent(requests.map { it.header })
 
@@ -59,6 +60,6 @@ class SiteHeaderUpdateParser(
     /**
      * Validates each site's own properties as a change, whichever site they turn out to belong to.
      */
-    fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteUpdateParseError>> =
+    fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteUpdateEntryParseError>> =
         siteHeaderParser.parse(requests)
 }

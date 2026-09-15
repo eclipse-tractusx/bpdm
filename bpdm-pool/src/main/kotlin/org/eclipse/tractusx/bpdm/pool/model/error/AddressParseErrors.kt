@@ -23,6 +23,12 @@ sealed interface AddressCreateParseError
 
 sealed interface AddressUpdateParseError
 
+/**
+ * The problems one address update can be faulted for on its own. Script variant coverage is judged over every address
+ * a caller writes rather than over one update, so it is not among them and subtypes [AddressUpdateParseError] directly.
+ */
+sealed interface AddressUpdateEntryParseError : AddressUpdateParseError
+
 sealed interface AddressSiteMembershipParseError
 
 /**
@@ -30,7 +36,7 @@ sealed interface AddressSiteMembershipParseError
  * address under the same legal entity. Unlike a resolution failure, both BPNs exist — they just don't belong together.
  */
 data class SiteNotInAddressLegalEntity(val siteBpn: String, val legalEntityBpn: String) :
-    AddressCreateParseError, AddressUpdateParseError, AddressSiteMembershipParseError
+    AddressCreateParseError, AddressUpdateEntryParseError, AddressSiteMembershipParseError
 
 /**
  * A stated site membership left out a site the address is the main address of. Such a site is bound to the address by
@@ -38,7 +44,7 @@ data class SiteNotInAddressLegalEntity(val siteBpn: String, val legalEntityBpn: 
  * not list it.
  */
 data class SiteMainAddressOmitted(val siteBpn: String) :
-    AddressUpdateParseError, AddressSiteMembershipParseError
+    AddressUpdateEntryParseError, AddressSiteMembershipParseError
 
 /**
  * Address-content parse errors. Subtypes every operation embedding an address (standalone, site main address, legal
@@ -46,11 +52,11 @@ data class SiteMainAddressOmitted(val siteBpn: String) :
  */
 sealed interface AddressContentParseError :
     AddressCreateParseError,
-    AddressUpdateParseError,
-    SiteCreateParseError,
-    SiteUpdateParseError,
-    LegalEntityCreateParseError,
-    LegalEntityUpdateParseError
+    AddressUpdateEntryParseError,
+    SiteCreateEntryParseError,
+    SiteUpdateEntryParseError,
+    LegalEntityCreateEntryParseError,
+    LegalEntityUpdateEntryParseError
 
 sealed interface AddressFieldParseError : AddressContentParseError {
     data object PhysicalCountryMissing : AddressFieldParseError

@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoReques
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalEntityUpdateApplicationV7Service(
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
     private val legalEntityPayloadUpdateService: LegalEntityPayloadUpdateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
@@ -61,7 +59,7 @@ class LegalEntityUpdateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
         requestList.zip(parseAndExecute(
             updateRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(legalEntityUpdateParser.parse(parseRequests), legalEntityUpdateParser::coverageWrites) { it } },
+            legalEntityUpdateParser::parse,
             legalEntityPayloadUpdateService::update
         )).forEach { (request, result) ->
             when (result) {

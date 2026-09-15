@@ -25,9 +25,11 @@ import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
@@ -44,7 +46,8 @@ class AddressUpdateParser(
     private val addressBpnParser: AddressBpnParser,
     private val siteBpnParser: SiteBpnParser,
     private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator,
-    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator
+    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator,
+    private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
@@ -52,11 +55,21 @@ class AddressUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
+    fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> =
+        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+
+    /**
+     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
+     * addresses and judges coverage over all of them together.
+     */
+    @Transactional(readOnly = true)
+    fun parseWithoutScriptVariantCoverage(
+        requests: List<AddressUpdateRequest>
+    ): List<ParseResult<AddressUpdateParsed, AddressUpdateEntryParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
         val siteResults = parseWherePresent(requests.map { it.siteBpns }, siteBpnParser::parseAll)
-        val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateParseError>> =
+        val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateEntryParseError>> =
             crossValidateParseResults(targetResults, siteResults) { target, sites ->
                 when (sites) {
                     // A request that states no membership asks for none of it to be judged.
@@ -71,9 +84,7 @@ class AddressUpdateParser(
         }
     }
 
-    /**
-     * Reports what this update writes, as script variant coverage sees it.
-     */
-    fun coverageWrites(parsed: AddressUpdateParsed): List<AddressCoverageWrite> =
+    // What this update writes, as script variant coverage sees it.
+    private fun coverageWrites(parsed: AddressUpdateParsed): List<AddressCoverageWrite> =
         listOf(AddressCoverageWrite.Rewritten(address = parsed.target, partners = emptyList(), scriptCodes = parsed.address.scriptCodes()))
 }

@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteUpdateApplicationV6Service(
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val siteUpdateParser: SiteUpdateParser,
     private val sitePayloadUpdateService: SitePayloadUpdateService,
     private val siteDtoRequestMapperV6: SiteDtoRequestMapperV6,
@@ -61,7 +59,7 @@ class SiteUpdateApplicationV6Service(
         val errors = mutableListOf<ErrorInfoV6<SiteUpdateErrorV6>>()
         requestList.zip(parseAndExecute(
             updateRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteUpdateParser.parse(parseRequests), siteUpdateParser::coverageWrites) { it } },
+            siteUpdateParser::parse,
             sitePayloadUpdateService::update
         )).forEach { (request, result) ->
             when (result) {

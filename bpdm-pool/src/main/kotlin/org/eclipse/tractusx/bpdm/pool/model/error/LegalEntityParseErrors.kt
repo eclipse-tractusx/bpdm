@@ -21,7 +21,19 @@ package org.eclipse.tractusx.bpdm.pool.model.error
 
 sealed interface LegalEntityCreateParseError
 
+/**
+ * The problems one legal entity creation can be faulted for on its own. Script variant coverage is judged over every
+ * address a caller writes, so it is not among them and subtypes [LegalEntityCreateParseError] directly.
+ */
+sealed interface LegalEntityCreateEntryParseError : LegalEntityCreateParseError
+
 sealed interface LegalEntityUpdateParseError
+
+/**
+ * The problems one legal entity update can be faulted for on its own. Script variant coverage is judged over every
+ * address a caller writes, so it is not among them and subtypes [LegalEntityUpdateParseError] directly.
+ */
+sealed interface LegalEntityUpdateEntryParseError : LegalEntityUpdateParseError
 
 sealed interface LegalEntityGetParseError
 
@@ -31,20 +43,20 @@ data class UnresolvableLegalEntityIdentifier(val identifierTypeKey: String, val 
  * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
  * being created has no ownership relations yet, so its tree is itself.
  */
-data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateParseError
+data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateEntryParseError
 
 /**
  * An alternative headquarter cannot carry the ultimate-owner flag. Update-only: setting the flag on an alternative is rejected,
  * but clearing it stays allowed.
  */
-data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateParseError
+data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateEntryParseError
 
 /**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
  * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
  * [AddressContentParseError] directly.
  */
-sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, LegalEntityUpdateParseError {
+sealed interface LegalEntityContentParseError : LegalEntityCreateEntryParseError, LegalEntityUpdateEntryParseError {
     data object NameMissing : LegalEntityContentParseError
     data object ConfidenceCriteriaMissing : LegalEntityContentParseError
     data class LegalFormNotFound(val legalForm: String) : LegalEntityContentParseError

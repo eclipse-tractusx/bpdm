@@ -76,13 +76,13 @@ class LegalEntityUpsertParser(
 
         if (target == null) {
             val created = legalEntityCreateParser
-                .parse(listOf(LegalEntityCreateRequest(toContentRequest(request))))
+                .parseWithoutScriptVariantCoverage(listOf(LegalEntityCreateRequest(toContentRequest(request))))
                 .singleOrRecord(errors, ::toCreateError) ?: return null
             return LegalEntityUpsertPlan.Create(reference, legalAddressReference, created.content)
         }
 
         val updated = legalEntityUpdateParser
-            .parse(listOf(LegalEntityUpdateRequest(target.bpn, toContentRequest(request))))
+            .parseWithoutScriptVariantCoverage(listOf(LegalEntityUpdateRequest(target.bpn, toContentRequest(request))))
             .singleOrRecord(errors, ::toUpdateError) ?: return null
 
         return LegalEntityUpsertPlan.Update(reference, legalAddressReference, target, updated.content)
@@ -91,18 +91,16 @@ class LegalEntityUpsertParser(
     private fun toContentRequest(request: LegalEntityUpsertRequest) =
         LegalEntityContentRequest(header = request.header, legalAddress = request.legalAddress.content)
 
-    private fun toCreateError(error: LegalEntityCreateParseError): GoldenRecordUpsertParseError =
+    private fun toCreateError(error: LegalEntityCreateEntryParseError): GoldenRecordUpsertParseError =
         when (error) {
             is LegalEntityContentParseError -> LegalEntityContentInvalid(error)
             is AddressContentParseError -> LegalAddressContentInvalid(error)
-            is ScriptVariantCoverageParseError -> LegalAddressCoverageLost(error)
         }
 
-    private fun toUpdateError(error: LegalEntityUpdateParseError): GoldenRecordUpsertParseError =
+    private fun toUpdateError(error: LegalEntityUpdateEntryParseError): GoldenRecordUpsertParseError =
         when (error) {
             is LegalEntityContentParseError -> LegalEntityContentInvalid(error)
             is AddressContentParseError -> LegalAddressContentInvalid(error)
-            is ScriptVariantCoverageParseError -> LegalAddressCoverageLost(error)
             is MultipleUltimateOwnersInHierarchy -> MultipleUltimateOwners(error.conflictingBpnls)
             is AlternativeHeadquarterCannotOwnUltimately -> AlternativeHeadquarterCannotOwn(error.bpnl)
             // The target was resolved before this parser was called.

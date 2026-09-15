@@ -21,19 +21,12 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskUpsertRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskResultMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordUpsertService
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.BpnReferenceParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordUpsertParser
@@ -54,10 +47,7 @@ class GoldenRecordTaskApplicationService(
     private val upsertParser: GoldenRecordUpsertParser,
     private val upsertService: GoldenRecordUpsertService,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper,
-    private val taskResultMapper: GoldenRecordTaskResultMapper,
-    private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val siteResponseMapper: SiteResponseMapper,
-    private val addressResponseMapper: AddressResponseMapper
+    private val taskResultMapper: GoldenRecordTaskResultMapper
 ) {
 
     /**
@@ -71,7 +61,7 @@ class GoldenRecordTaskApplicationService(
         return taskEntries.zip(requests) { taskEntry, request ->
             when (val result = upsertParser.parse(request, bpnReferences)) {
                 is ParseResult.Failure -> toErrorReply(taskEntry, result.errors)
-                is ParseResult.Success -> toSuccessReply(taskEntry, result.parsed, upsertService.upsert(result.parsed, bpnReferences))
+                is ParseResult.Success -> toSuccessReply(taskEntry, upsertService.upsert(result.parsed, bpnReferences))
             }
         }
     }
@@ -83,101 +73,10 @@ class GoldenRecordTaskApplicationService(
             errors = errors.map { TaskErrorDto(TaskErrorType.Unspecified, parseErrorMapper.toUpsertDescription(it)) }
         )
 
-    private fun toSuccessReply(
-        taskEntry: TaskStepReservationEntryDto,
-        plan: GoldenRecordUpsertParsed,
-        written: GoldenRecordUpsertResult
-    ): TaskStepResultEntryDto {
-        val confidenceUpdates = written.confidenceUpdates
-
-        val legalEntityResult = readLegalEntity(written, plan.legalEntity !is LegalEntityUpsertPlan.Unchanged)
-            .withUpdatedNumberOfSharingMembers(confidenceUpdates.updatedLegalEntities, confidenceUpdates.updatedAddresses)
-        val siteResult = written.site
-            ?.let { readSite(written, sitePlan(plan) !is SiteUpsertPlan.Unchanged) }
-            ?.let { it.copy(siteMainAddress = it.siteMainAddress?.withUpdatedNumberOfSharingMembers(confidenceUpdates.updatedAddresses)) }
-        val addressResult = written.additionalAddress
-            ?.let { readAddress(it) }
-            ?.copyAsPostalAddress { it.withUpdatedNumberOfSharingMembers(confidenceUpdates.updatedAddresses) }
-
-        return TaskStepResultEntryDto(
+    private fun toSuccessReply(taskEntry: TaskStepReservationEntryDto, written: GoldenRecordUpsertResult): TaskStepResultEntryDto =
+        TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
-            businessPartner = toBusinessPartnerResult(
-                taskEntry.businessPartner,
-                legalEntityResult,
-                siteResult,
-                addressResult,
-                readMembershipSites(written)
-            ),
+            businessPartner = taskResultMapper.toTaskResult(taskEntry.businessPartner, written),
             errors = emptyList()
-        )
-    }
-
-    private fun toBusinessPartnerResult(
-        stated: BusinessPartner,
-        legalEntityResult: LegalEntity,
-        siteResult: Site?,
-        addressResult: PostalAddressWithScriptVariants?,
-        membershipSites: List<AdditionalSite>
-    ): BusinessPartner {
-        // A site whose main address is the legal address has one address written twice over, and the site result holds
-        // its later state, so that is the one both partners are reported with.
-        val isLegalAndSiteMainAddress = siteResult?.siteMainAddress?.bpnReference == legalEntityResult.legalAddress.bpnReference
-
-        return stated.copy(
-            legalEntity = if (isLegalAndSiteMainAddress) legalEntityResult.copy(legalAddress = siteResult.siteMainAddress!!) else legalEntityResult,
-            site = if (isLegalAndSiteMainAddress) siteResult.copy(siteMainAddress = null) else siteResult,
-            additionalAddress = addressResult,
-            additionalSites = membershipSites
-        )
-    }
-
-    private fun sitePlan(plan: GoldenRecordUpsertParsed): SiteUpsertPlan? =
-        when (plan) {
-            is GoldenRecordUpsertParsed.SiteRecord -> plan.site
-            is GoldenRecordUpsertParsed.SiteAddressRecord -> plan.site
-            is GoldenRecordUpsertParsed.LegalEntityRecord, is GoldenRecordUpsertParsed.LegalEntityAddressRecord -> null
-        }
-
-    private fun readLegalEntity(written: GoldenRecordUpsertResult, hasChanged: Boolean): LegalEntity =
-        businessPartnerFetchService.fetchDtosByBpns(listOf(written.legalEntity.bpn)).firstOrNull()
-            ?.let { taskResultMapper.toTaskResult(it, hasChanged) }
-            ?: error("Legal entity ${written.legalEntity.bpn} was written by this task but cannot be read back")
-
-    private fun readSite(written: GoldenRecordUpsertResult, hasChanged: Boolean): Site =
-        siteResponseMapper.toSiteWithMainAddress(written.site!!)
-            .let { taskResultMapper.toTaskResult(it.site, it.mainAddress, hasChanged) }
-
-    private fun readAddress(address: LogisticAddressDb): PostalAddressWithScriptVariants =
-        addressResponseMapper.toAddress(address)
-            .let { taskResultMapper.toTaskResult(it.address, it.scriptVariants, hasChanged = true) }
-
-    private fun readMembershipSites(written: GoldenRecordUpsertResult): List<AdditionalSite> {
-        val recordSite = written.site ?: return emptyList()
-        return written.recordAddress.sites
-            .filterNot { it.bpn == recordSite.bpn }
-            .sortedBy { it.createdAt }
-            .map { AdditionalSite(BpnReference(it.bpn, null, BpnReferenceType.Bpn), it.name) }
-    }
-
-    private fun PostalAddress.withUpdatedNumberOfSharingMembers(candidates: Collection<LogisticAddressDb>): PostalAddress =
-        copy(
-            confidenceCriteria = confidenceCriteria.copy(
-                numberOfSharingMembers = candidates.find { it.bpn == bpnReference.referenceValue }
-                    ?.confidenceCriteria?.numberOfSharingMembers
-                    ?: confidenceCriteria.numberOfSharingMembers
-            )
-        )
-
-    private fun LegalEntity.withUpdatedNumberOfSharingMembers(
-        legalEntityCandidates: Collection<org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb>,
-        legalAddressCandidates: Collection<LogisticAddressDb>
-    ): LegalEntity =
-        copy(
-            confidenceCriteria = confidenceCriteria.copy(
-                numberOfSharingMembers = legalEntityCandidates.find { it.bpn == bpnReference.referenceValue }
-                    ?.confidenceCriteria?.numberOfSharingMembers
-                    ?: confidenceCriteria.numberOfSharingMembers
-            ),
-            legalAddress = legalAddress.withUpdatedNumberOfSharingMembers(legalAddressCandidates)
         )
 }

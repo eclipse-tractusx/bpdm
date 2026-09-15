@@ -33,7 +33,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
 import org.springframework.stereotype.Service
@@ -44,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateApplicationV6Service(
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
@@ -68,7 +66,7 @@ class SiteCreateApplicationV6Service(
         val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
         requestList.zip(parseAndExecute(
             createRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteCreateParser.parse(parseRequests), siteCreateParser::coverageWrites) { it } },
+            siteCreateParser::parse,
             siteCreateService::create
         )).forEach { (request, result) ->
             when (result) {
@@ -128,7 +126,7 @@ class SiteCreateApplicationV6Service(
         val createRequests = validRequests.map { siteDtoRequestMapperV6.toCreateWithLegalAddressAsMainRequest(it) }
         parseAndExecute(
             createRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteCreateWithLegalAddressAsMainParser.parse(parseRequests), siteCreateWithLegalAddressAsMainParser::coverageWrites) { it } },
+            siteCreateWithLegalAddressAsMainParser::parse,
             siteCreateWithReferencedAddressAsMainService::create
         )
             .forEachIndexed { index, result ->

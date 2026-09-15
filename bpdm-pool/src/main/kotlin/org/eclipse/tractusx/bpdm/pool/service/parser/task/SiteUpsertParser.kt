@@ -151,7 +151,7 @@ class SiteUpsertParser(
 
             is SiteUpsertRequest.WithOwnMainAddress ->
                 siteUpdateParser
-                    .parse(
+                    .parseWithoutScriptVariantCoverage(
                         listOf(SiteUpdateRequest(target.bpn, SiteContentRequest(request.header, request.mainAddress.content)))
                     )
                     .singleOrRecord(errors, ::toUpdateError)
@@ -166,22 +166,20 @@ class SiteUpsertParser(
         }
     }
 
-    private fun toCreateError(error: SiteCreateParseError): GoldenRecordUpsertParseError =
+    private fun toCreateError(error: SiteCreateEntryParseError): GoldenRecordUpsertParseError =
         when (error) {
             is SiteContentParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)
-            is ScriptVariantCoverageParseError -> SiteMainAddressCoverageLost(error)
             is UnresolvableLegalEntity -> LegalEntityNotFound(error.bpn)
             is UnresolvableAddress -> SiteMainAddressNotFound(error.bpn)
             // No parser produces this: it is declared on SiteCreateParseError but never raised.
             is LegalAddressAlreadyMainAddress -> error("Unexpected legal-address-already-main error for site ${error.bpnSite}")
         }
 
-    private fun toUpdateError(error: SiteUpdateParseError): GoldenRecordUpsertParseError =
+    private fun toUpdateError(error: SiteUpdateEntryParseError): GoldenRecordUpsertParseError =
         when (error) {
             is SiteContentParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)
-            is ScriptVariantCoverageParseError -> SiteMainAddressCoverageLost(error)
             // The target was resolved before this parser was called.
             is UnresolvableSite -> error("Unexpected unresolvable site ${error.bpn}")
         }

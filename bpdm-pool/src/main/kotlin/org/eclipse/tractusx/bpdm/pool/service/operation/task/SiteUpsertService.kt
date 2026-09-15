@@ -20,6 +20,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.task
 
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
@@ -48,29 +50,32 @@ class SiteUpsertService(
 ) {
 
     /**
-     * Writes what [plan] states under [legalEntity] and reports the site it leaves behind.
+     * Writes what [plan] states under [legalEntity] and reports the site it leaves behind, and whether that write changed it.
      */
     @Transactional
-    fun upsert(plan: SiteUpsertPlan, legalEntity: LegalEntityDb, bpnReferences: BpnReferenceAllocation): SiteDb {
-        val site = when (plan) {
-            is SiteUpsertPlan.Unchanged -> plan.target
+    fun upsert(plan: SiteUpsertPlan, legalEntity: LegalEntityDb, bpnReferences: BpnReferenceAllocation): UpsertResult<SiteDb> {
+        val result = when (plan) {
+            is SiteUpsertPlan.Unchanged -> UpsertResult(plan.target, UpsertType.NoChange)
             is SiteUpsertPlan.CreateWithOwnMainAddress ->
-                siteCreateService.create(listOf(SiteCreateParsed(legalEntity, plan.content))).single()
+                UpsertResult(siteCreateService.create(listOf(SiteCreateParsed(legalEntity, plan.content))).single(), UpsertType.Created)
             is SiteUpsertPlan.CreateOnLegalAddress ->
-                siteCreateWithReferencedAddressAsMainService.create(
-                    listOf(SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, plan.header, mainAddressContent = null))
-                ).single()
+                UpsertResult(
+                    siteCreateWithReferencedAddressAsMainService.create(
+                        listOf(SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, plan.header, mainAddressContent = null))
+                    ).single(),
+                    UpsertType.Created
+                )
             is SiteUpsertPlan.CreateOnExistingAddress ->
-                siteCreateWithReferencedAddressAsMainService.create(listOf(plan.parsed)).single()
+                UpsertResult(siteCreateWithReferencedAddressAsMainService.create(listOf(plan.parsed)).single(), UpsertType.Created)
             is SiteUpsertPlan.UpdateWithOwnMainAddress ->
-                sitePayloadUpdateService.update(listOf(SiteUpdateParsed(plan.target, plan.content))).single().value
+                sitePayloadUpdateService.update(listOf(SiteUpdateParsed(plan.target, plan.content))).single()
             is SiteUpsertPlan.UpdateOnLegalAddress ->
-                sitePayloadUpdateService.updateHeaders(listOf(plan.parsed)).single().value
+                sitePayloadUpdateService.updateHeaders(listOf(plan.parsed)).single()
         }
 
-        bpnReferences.allocate(plan.reference, site.bpn)
-        mainAddressReference(plan)?.let { bpnReferences.allocate(it, site.mainAddress.bpn) }
-        return site
+        bpnReferences.allocate(plan.reference, result.value.bpn)
+        mainAddressReference(plan)?.let { bpnReferences.allocate(it, result.value.mainAddress.bpn) }
+        return result
     }
 
     // A site whose main address is the legal address states no address of its own, so there is nothing to register:

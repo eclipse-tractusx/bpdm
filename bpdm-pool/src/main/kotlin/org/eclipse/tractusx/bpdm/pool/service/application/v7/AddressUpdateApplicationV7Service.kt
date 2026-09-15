@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMa
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class AddressUpdateApplicationV7Service(
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val addressUpdateParser: AddressUpdateParser,
     private val addressPayloadUpdateService: AddressPayloadUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
@@ -64,7 +62,7 @@ class AddressUpdateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
         requestList.zip(parseAndExecute(
             updateRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(addressUpdateParser.parse(parseRequests), addressUpdateParser::coverageWrites) { it } },
+            addressUpdateParser::parse,
             addressPayloadUpdateService::update
         )).forEach { (request, result) ->
             when (result) {

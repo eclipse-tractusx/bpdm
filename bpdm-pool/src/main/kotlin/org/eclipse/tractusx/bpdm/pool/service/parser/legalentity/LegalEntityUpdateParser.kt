@@ -24,10 +24,12 @@ import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AlternativeHeadquarterValidator
 import org.springframework.stereotype.Service
@@ -44,7 +46,8 @@ class LegalEntityUpdateParser(
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
     private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
     private val alternativeHeadquarterValidator: AlternativeHeadquarterValidator,
-    private val addressContentParser: AddressContentParser
+    private val addressContentParser: AddressContentParser,
+    private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
@@ -52,7 +55,17 @@ class LegalEntityUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
+    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> =
+        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+
+    /**
+     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
+     * addresses and judges coverage over all of them together.
+     */
+    @Transactional(readOnly = true)
+    fun parseWithoutScriptVariantCoverage(
+        requests: List<LegalEntityUpdateRequest>
+    ): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateEntryParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         val headers = requests.map { it.content.header }
@@ -79,10 +92,8 @@ class LegalEntityUpdateParser(
             .zip(alternativeViolations) { result, violations -> result.combine(violations) { it } }
     }
 
-    /**
-     * Reports what this update writes, as script variant coverage sees it.
-     */
-    fun coverageWrites(parsed: LegalEntityUpdateParsed): List<AddressCoverageWrite> =
+    // What this write leaves behind, as script variant coverage sees it.
+    private fun coverageWrites(parsed: LegalEntityUpdateParsed): List<AddressCoverageWrite> =
         listOf(
             AddressCoverageWrite.Rewritten(
                 address = parsed.target.legalAddress,

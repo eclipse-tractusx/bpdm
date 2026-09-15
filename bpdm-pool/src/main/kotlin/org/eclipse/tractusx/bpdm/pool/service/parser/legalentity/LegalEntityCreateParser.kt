@@ -24,10 +24,12 @@ import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service
 
@@ -38,13 +40,23 @@ import org.springframework.stereotype.Service
 class LegalEntityCreateParser(
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
-    private val addressContentParser: AddressContentParser
+    private val addressContentParser: AddressContentParser,
+    private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
      * Validates each request and reports either the validated legal entity or every problem found in that entry.
      */
-    fun parse(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> {
+    fun parse(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> =
+        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+
+    /**
+     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
+     * addresses and judges coverage over all of them together.
+     */
+    fun parseWithoutScriptVariantCoverage(
+        requests: List<LegalEntityCreateRequest>
+    ): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateEntryParseError>> {
         val headers = requests.map { it.content.header }
         val headerResults = legalEntityHeaderParser.parse(headers)
         val duplicateErrors = duplicateValidator.validate(headers, headers.map { null })
@@ -58,10 +70,8 @@ class LegalEntityCreateParser(
         }
     }
 
-    /**
-     * Reports what this creation writes, as script variant coverage sees it.
-     */
-    fun coverageWrites(parsed: LegalEntityCreateParsed): List<AddressCoverageWrite> =
+    // What this write leaves behind, as script variant coverage sees it.
+    private fun coverageWrites(parsed: LegalEntityCreateParsed): List<AddressCoverageWrite> =
         listOf(
             AddressCoverageWrite.Created(
                 partners = listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())),

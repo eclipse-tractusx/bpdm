@@ -20,6 +20,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.task
 
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -42,7 +44,8 @@ class AdditionalAddressUpsertService(
 ) {
 
     /**
-     * Writes what [plan] states under [legalEntity] and [site] and reports the address it leaves behind.
+     * Writes what [plan] states under [legalEntity] and [site], reporting the address it leaves behind and whether that write
+     * changed it.
      */
     @Transactional
     fun upsert(
@@ -50,17 +53,17 @@ class AdditionalAddressUpsertService(
         legalEntity: LegalEntityDb,
         site: SiteDb?,
         bpnReferences: BpnReferenceAllocation
-    ): LogisticAddressDb {
-        val address = when (plan) {
+    ): UpsertResult<LogisticAddressDb> {
+        val result = when (plan) {
             is AddressUpsertPlan.Create ->
-                addressCreateService.create(listOf(AddressCreateParsed(legalEntity, site, plan.content))).single()
+                UpsertResult(addressCreateService.create(listOf(AddressCreateParsed(legalEntity, site, plan.content))).single(), UpsertType.Created)
             is AddressUpsertPlan.Update ->
                 // Site membership is stated once for the whole record, by the membership plan, so this update leaves it alone.
                 addressPayloadUpdateService.update(listOf(AddressUpdateParsed(plan.target, sites = null, address = plan.content)))
-                    .single().value
+                    .single()
         }
 
-        bpnReferences.allocate(plan.reference, address.bpn)
-        return address
+        bpnReferences.allocate(plan.reference, result.value.bpn)
+        return result
     }
 }

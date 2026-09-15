@@ -77,7 +77,7 @@ class AdditionalAddressUpsertParser(
         }
 
         val updated = addressUpdateParser
-            .parse(listOf(AddressUpdateRequest(target.bpn, siteBpns = null, content = request.content)))
+            .parseWithoutScriptVariantCoverage(listOf(AddressUpdateRequest(target.bpn, siteBpns = null, content = request.content)))
             .singleOrRecord(errors, ::toUpdateError) ?: return null
 
         return AddressUpsertPlan.Update(resolved.reference, target, updated.address)
@@ -93,10 +93,9 @@ class AdditionalAddressUpsertParser(
             is InvalidParentBpn -> error("Unexpected untyped parent ${error.bpn}")
         }
 
-    private fun toUpdateError(error: AddressUpdateParseError): GoldenRecordUpsertParseError =
+    private fun toUpdateError(error: AddressUpdateEntryParseError): GoldenRecordUpsertParseError =
         when (error) {
             is AddressContentParseError -> AdditionalAddressContentInvalid(error)
-            is ScriptVariantCoverageParseError -> ScriptVariantCoverageLost(error)
             // The target was resolved first, and membership is stated once for the record, not by this update.
             is UnresolvableAddress -> error("Unexpected unresolvable address ${error.bpn}")
             is UnresolvableSite -> error("Unexpected unresolvable site ${error.bpn}")

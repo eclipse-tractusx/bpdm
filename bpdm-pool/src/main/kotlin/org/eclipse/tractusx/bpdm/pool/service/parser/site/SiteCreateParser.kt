@@ -23,11 +23,13 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
@@ -39,14 +41,24 @@ import org.springframework.stereotype.Service
 class SiteCreateParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val addressContentParser: AddressContentParser
+    private val addressContentParser: AddressContentParser,
+    private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
      * Validates each request and reports either the validated site with its resolved parent or every problem found in
      * that entry.
      */
-    fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
+    fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> =
+        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+
+    /**
+     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
+     * addresses and judges coverage over all of them together.
+     */
+    fun parseWithoutScriptVariantCoverage(
+        requests: List<SiteCreateRequest>
+    ): List<ParseResult<SiteCreateParsed, SiteCreateEntryParseError>> {
         val contentResults = parseContent(requests.map { it.content })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
@@ -58,7 +70,7 @@ class SiteCreateParser(
     /**
      * Validates each site's content as a creation, whichever legal entity it turns out to be created under.
      */
-    fun parseContent(requests: List<SiteContentRequest>): List<ParseResult<SiteContentParsed, SiteCreateParseError>> {
+    fun parseContent(requests: List<SiteContentRequest>): List<ParseResult<SiteContentParsed, SiteCreateEntryParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val mainAddresses = requests.map { it.mainAddress }
         val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
@@ -68,10 +80,8 @@ class SiteCreateParser(
         }
     }
 
-    /**
-     * Reports what this creation writes, as script variant coverage sees it.
-     */
-    fun coverageWrites(parsed: SiteCreateParsed): List<AddressCoverageWrite> =
+    // What this write leaves behind, as script variant coverage sees it.
+    private fun coverageWrites(parsed: SiteCreateParsed): List<AddressCoverageWrite> =
         listOf(
             AddressCoverageWrite.Created(
                 partners = listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())),

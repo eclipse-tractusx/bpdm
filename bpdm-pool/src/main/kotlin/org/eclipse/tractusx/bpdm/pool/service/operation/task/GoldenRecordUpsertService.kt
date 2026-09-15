@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityAssociationFetchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,54 +44,59 @@ class GoldenRecordUpsertService(
     private val additionalAddressUpsertService: AdditionalAddressUpsertService,
     private val coLocatedSiteUpsertService: CoLocatedSiteUpsertService,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
+    private val legalEntityAssociationFetchService: LegalEntityAssociationFetchService,
     private val bpnRequestIdentifierMappingCreateService: BpnRequestIdentifierMappingCreateService
 ) {
 
     /**
-     * Writes what [parsed] plans and reports the records it leaves behind.
+     * Writes what [parsed] plans and reports the records it leaves behind, loaded with what a report of them is built
+     * from.
      */
     @Transactional
     fun upsert(parsed: GoldenRecordUpsertParsed, bpnReferences: BpnReferenceAllocation): GoldenRecordUpsertResult {
         val legalEntity = legalEntityUpsertService.upsert(parsed.legalEntity, bpnReferences)
 
-        return when (parsed) {
+        val result = when (parsed) {
             is GoldenRecordUpsertParsed.LegalEntityRecord ->
                 GoldenRecordUpsertResult.LegalEntityRecord(
                     legalEntity,
-                    completeWrites(parsed, legalEntity.legalAddress, bpnReferences)
+                    completeWrites(parsed, legalEntity.value.legalAddress, bpnReferences)
                 )
 
             is GoldenRecordUpsertParsed.LegalEntityAddressRecord -> {
-                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity, site = null, bpnReferences)
+                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site = null, bpnReferences)
                 GoldenRecordUpsertResult.LegalEntityAddressRecord(
                     legalEntity,
                     address,
-                    completeWrites(parsed, address, bpnReferences)
+                    completeWrites(parsed, address.value, bpnReferences)
                 )
             }
 
             is GoldenRecordUpsertParsed.SiteRecord -> {
-                val site = siteUpsertService.upsert(parsed.site, legalEntity, bpnReferences)
-                coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site, site.mainAddress, bpnReferences)
+                val site = siteUpsertService.upsert(parsed.site, legalEntity.value, bpnReferences)
+                coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, site.value.mainAddress, bpnReferences)
                 GoldenRecordUpsertResult.SiteRecord(
                     legalEntity,
                     site,
-                    completeWrites(parsed, site.mainAddress, bpnReferences)
+                    completeWrites(parsed, site.value.mainAddress, bpnReferences)
                 )
             }
 
             is GoldenRecordUpsertParsed.SiteAddressRecord -> {
-                val site = siteUpsertService.upsert(parsed.site, legalEntity, bpnReferences)
-                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity, site, bpnReferences)
-                coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site, address, bpnReferences)
+                val site = siteUpsertService.upsert(parsed.site, legalEntity.value, bpnReferences)
+                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site.value, bpnReferences)
+                coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, address.value, bpnReferences)
                 GoldenRecordUpsertResult.SiteAddressRecord(
                     legalEntity,
                     site,
                     address,
-                    completeWrites(parsed, address, bpnReferences)
+                    completeWrites(parsed, address.value, bpnReferences)
                 )
             }
         }
+
+        legalEntityAssociationFetchService.fetch(setOf(legalEntity.value))
+        return result
     }
 
     private fun completeWrites(

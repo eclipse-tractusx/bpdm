@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoReques
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalEntityCreateApplicationV7Service(
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
@@ -61,7 +59,7 @@ class LegalEntityCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
         requestList.zip(parseAndExecute(
             createRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(legalEntityCreateParser.parse(parseRequests), legalEntityCreateParser::coverageWrites) { it } },
+            legalEntityCreateParser::parse,
             legalEntityCreateService::create
         )).forEach { (request, result) ->
             when (result) {

@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMappe
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
 import org.springframework.stereotype.Service
@@ -43,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateApplicationV7Service(
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
@@ -66,7 +64,7 @@ class SiteCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         requestList.zip(parseAndExecute(
             createRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteCreateParser.parse(parseRequests), siteCreateParser::coverageWrites) { it } },
+            siteCreateParser::parse,
             siteCreateService::create
         )).forEach { (request, result) ->
             when (result) {
@@ -91,7 +89,7 @@ class SiteCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         parseAndExecute(
             createRequests,
-            { parseRequests -> scriptVariantCoverageValidator.applyTo(siteCreateWithLegalAddressAsMainParser.parse(parseRequests), siteCreateWithLegalAddressAsMainParser::coverageWrites) { it } },
+            siteCreateWithLegalAddressAsMainParser::parse,
             siteCreateWithReferencedAddressAsMainService::create
         ).forEachIndexed { index, result ->
             val entityKey = index.toString()

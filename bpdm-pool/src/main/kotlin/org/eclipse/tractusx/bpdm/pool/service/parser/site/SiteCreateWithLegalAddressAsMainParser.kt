@@ -23,11 +23,13 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 
@@ -40,7 +42,8 @@ import org.springframework.stereotype.Service
 @Service
 class SiteCreateWithLegalAddressAsMainParser(
     private val siteHeaderParser: SiteHeaderParser,
-    private val legalEntityBpnParser: LegalEntityBpnParser
+    private val legalEntityBpnParser: LegalEntityBpnParser,
+    private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
@@ -49,7 +52,16 @@ class SiteCreateWithLegalAddressAsMainParser(
      */
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
-    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
+    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> =
+        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+
+    /**
+     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
+     * addresses and judges coverage over all of them together.
+     */
+    fun parseWithoutScriptVariantCoverage(
+        requests: List<SiteCreateWithLegalAddressAsMainRequest>
+    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateEntryParseError>> {
         val headerResults = parseContent(requests.map { it.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
@@ -61,13 +73,11 @@ class SiteCreateWithLegalAddressAsMainParser(
     /**
      * Validates each site's own properties as a creation, whichever legal address it turns out to be created on.
      */
-    fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+    fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteCreateEntryParseError>> =
         siteHeaderParser.parse(requests)
 
-    /**
-     * Reports what this creation writes, as script variant coverage sees it.
-     */
-    fun coverageWrites(parsed: SiteCreateWithReferencedAddressAsMainParsed): List<AddressCoverageWrite> =
+    // What this write leaves behind, as script variant coverage sees it.
+    private fun coverageWrites(parsed: SiteCreateWithReferencedAddressAsMainParsed): List<AddressCoverageWrite> =
         listOf(
             AddressCoverageWrite.PartnerOnly(
                 address = parsed.mainAddress,

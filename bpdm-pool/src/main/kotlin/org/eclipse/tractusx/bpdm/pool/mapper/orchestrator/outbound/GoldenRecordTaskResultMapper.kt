@@ -21,27 +21,69 @@ package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound
 
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
+import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Component
 import java.time.ZoneOffset
 
 /**
  * Maps the business partners a golden record task has written to the golden record the task reports back.
+ *
+ * Each partner is rendered through the mapper the Pool's own API reports it with, so a task and a read of the same
+ * record state the same content.
  */
 @Component
-class GoldenRecordTaskResultMapper {
+class GoldenRecordTaskResultMapper(
+    private val legalEntityResponseMapper: LegalEntityResponseMapper,
+    private val siteResponseMapper: SiteResponseMapper,
+    private val addressResponseMapper: AddressResponseMapper
+) {
 
     /**
-     * Reports a legal entity with its legal address as the task's legal entity result.
+     * Reports the records an upsert left behind as the task's business partner result, stated on top of the partner
+     * the task carried.
      */
-    fun toTaskResult(legalEntity: LegalEntityWithLegalAddressVerboseDto, hasChanged: Boolean?): LegalEntity{
+    fun toTaskResult(stated: BusinessPartner, written: GoldenRecordUpsertResult): BusinessPartner {
+        val legalEntityResult = toTaskResult(written.legalEntity)
+        val siteResult = written.site?.let { toTaskResult(it) }
+
+        // A site whose main address is the legal address is one record standing in both roles: it is reported on the
+        // legal entity, carrying the site's verdict on whether it changed, and the site states no main address of its own.
+        val sharedAddress = siteResult?.siteMainAddress?.takeIf { written.isSiteMainAddressTheLegalAddress }
+
+        return stated.copy(
+            legalEntity = sharedAddress?.let { legalEntityResult.copy(legalAddress = it) } ?: legalEntityResult,
+            site = sharedAddress?.let { siteResult.copy(siteMainAddress = null) } ?: siteResult,
+            additionalAddress = written.additionalAddress?.let { toTaskResult(it) },
+            additionalSites = written.membershipSites.map { AdditionalSite(BpnReference(it.bpn, null, BpnReferenceType.Bpn), it.name) }
+        )
+    }
+
+    private fun toTaskResult(written: UpsertResult<LegalEntityDb>): LegalEntity =
+        toTaskResult(legalEntityResponseMapper.toLegalEntityWithLegalAddress(written.value), written.hasChanged)
+
+    private fun toTaskResult(written: UpsertResult<SiteDb>): Site =
+        siteResponseMapper.toSiteWithMainAddress(written.value)
+            .let { toTaskResult(it.site, it.mainAddress, written.hasChanged) }
+
+    private fun toTaskResult(written: UpsertResult<LogisticAddressDb>): PostalAddressWithScriptVariants =
+        addressResponseMapper.toAddress(written.value)
+            .let { toTaskResult(it.address, it.scriptVariants, written.hasChanged) }
+
+    private fun toTaskResult(legalEntity: LegalEntityWithLegalAddressVerboseDto, hasChanged: Boolean?): LegalEntity{
         return toTaskResult(legalEntity.header, legalEntity.legalAddress, hasChanged, legalEntity.scriptVariants)
     }
 
-    /**
-     * Reports a site with its main address as the task's site result.
-     */
-    fun toTaskResult(site: SiteVerboseDto, siteMainAddress: LogisticAddressInvariantVerboseDto, hasChanged: Boolean?): Site{
+    // The site states its main address even where that address is the legal address: which of the two partners
+    // reports it is settled once, above, for the whole business partner.
+    private fun toTaskResult(site: SiteVerboseDto, siteMainAddress: LogisticAddressInvariantVerboseDto, hasChanged: Boolean?): Site{
         return with(site){
             Site(
                 bpnReference = BpnReference(bpns, null, BpnReferenceType.Bpn),
@@ -49,9 +91,6 @@ class GoldenRecordTaskResultMapper {
                 states = states.map { BusinessState(it.validFrom?.toInstant(ZoneOffset.UTC), it.validTo?.toInstant(ZoneOffset.UTC), it.type) },
                 confidenceCriteria = toTaskResult(confidenceCriteria),
                 hasChanged = hasChanged,
-                //Normally this should be null if the site main address is also the legal address
-                //However, due to synchronization issues we will pass the address here
-                // and perform that last step to set this to null later on after we use this site main address to override the legal entities legal address
                 siteMainAddress = toTaskResult(siteMainAddress, hasChanged),
                 scriptVariants = scriptVariants.map { toTaskResult(it) },
                 goldenRecordRelations = relations
@@ -62,10 +101,7 @@ class GoldenRecordTaskResultMapper {
         }
     }
 
-    /**
-     * Reports an address with its script variants as the task's additional address result.
-     */
-    fun toTaskResult(
+    private fun toTaskResult(
         postalAddress: LogisticAddressInvariantVerboseDto,
         scriptVariants: List<LogisticAddressScriptVariantDto>,
         hasChanged: Boolean?

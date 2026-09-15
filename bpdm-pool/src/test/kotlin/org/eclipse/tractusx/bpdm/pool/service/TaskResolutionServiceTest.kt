@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -74,7 +75,8 @@ class TaskResolutionServiceTest @Autowired constructor(
     val ownedByRelationUpsertService: OwnedByRelationUpsertService,
     val relationRepository: RelationRepository,
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
-    val transactionTemplate: TransactionTemplate
+    val transactionTemplate: TransactionTemplate,
+    val sharingMemberConfidenceService: SharingMemberConfidenceService
 ) {
 
     private lateinit var orchTestDataFactory: BusinessPartnerTestDataFactory
@@ -1025,18 +1027,26 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
 
-    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
+    fun upsertGoldenRecordIntoPool(
+        taskId: String,
+        businessPartner: BusinessPartner,
+        recordId: String = UUID.randomUUID().toString()
+    ): List<TaskStepResultEntryDto> {
 
-        val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
+        val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner, recordId = recordId)
         return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
     }
 
-    fun singleTaskStep(taskId: String, businessPartner: BusinessPartner): List<TaskStepReservationEntryDto> {
+    fun singleTaskStep(
+        taskId: String,
+        businessPartner: BusinessPartner,
+        recordId: String = UUID.randomUUID().toString()
+    ): List<TaskStepReservationEntryDto> {
 
         return listOf(
             TaskStepReservationEntryDto(
                 taskId = taskId,
-                recordId = UUID.randomUUID().toString(),
+                recordId = recordId,
                 businessPartner = businessPartner
             )
         )
@@ -1159,6 +1169,64 @@ class TaskResolutionServiceTest @Autowired constructor(
             nextConfidenceCheckAt = Instant.now().plus(1, ChronoUnit.DAYS),
             confidenceLevel = 10
         )
+
+    @Test
+    fun `report the sharing member count of the address the record moves to`() {
+        //GIVEN a counted sharing member record on a legal entity's legal address
+        val recordId = UUID.randomUUID().toString()
+        val legalEntityRef = "le-moved-record".toBpnRequest()
+        val legalAddressRef = "le-address-moved-record".toBpnRequest()
+        val legalEntityOnly = orchTestDataFactory.createFullBusinessPartner("moved-record")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .copy(site = null, additionalAddress = null)
+        upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = legalEntityOnly, recordId = recordId)
+        countSharingMemberRecord(recordId)
+
+        //WHEN the same record states an additional address it is now about
+        val movedToAdditionalAddress = orchTestDataFactory.createFullBusinessPartner("moved-record")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .withAdditionalAddressReference("additional-address-moved-record".toBpnRequest())
+            .copy(site = null)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = movedToAdditionalAddress, recordId = recordId)
+
+        //THEN the counts the task reports follow the record to the additional address
+        assertThat(result[0].errors).isEmpty()
+        val reported = result[0].businessPartner
+        assertThat(reported.additionalAddress!!.postalProperties.confidenceCriteria.numberOfSharingMembers).isEqualTo(1)
+        assertThat(reported.legalEntity.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+        assertThat(reported.legalEntity.legalAddress.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+    }
+
+    @Test
+    fun `report the sharing member count of the site main address the record moves to`() {
+        //GIVEN a counted sharing member record on a legal entity's legal address
+        val recordId = UUID.randomUUID().toString()
+        val legalEntityRef = "le-moved-to-site".toBpnRequest()
+        val legalAddressRef = "le-address-moved-to-site".toBpnRequest()
+        val legalEntityOnly = orchTestDataFactory.createFullBusinessPartner("moved-to-site")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .copy(site = null, additionalAddress = null)
+        upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = legalEntityOnly, recordId = recordId)
+        countSharingMemberRecord(recordId)
+
+        //WHEN the same record states a site with a main address of its own
+        val movedToSiteMainAddress = orchTestDataFactory.createFullBusinessPartner("moved-to-site")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .withSiteReferences("site-moved-to-site".toBpnRequest(), "site-address-moved-to-site".toBpnRequest())
+            .copy(additionalAddress = null)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = movedToSiteMainAddress, recordId = recordId)
+
+        //THEN the counts the task reports follow the record to the site main address
+        assertThat(result[0].errors).isEmpty()
+        val reported = result[0].businessPartner
+        assertThat(reported.site!!.siteMainAddress!!.confidenceCriteria.numberOfSharingMembers).isEqualTo(1)
+        assertThat(reported.legalEntity.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+        assertThat(reported.legalEntity.legalAddress.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+    }
+
+    private fun countSharingMemberRecord(recordId: String) {
+        transactionTemplate.execute { sharingMemberConfidenceService.updateGoldenRecordCounted(recordId, true) }
+    }
 
     @Test
     fun `update additional address to site main address`(){
