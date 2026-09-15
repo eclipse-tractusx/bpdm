@@ -28,4 +28,6 @@ interface BpnRequestIdentifierRepository : PagingAndSortingRepository<BpnRequest
 
     fun findDistinctByRequestIdentifierIn(requestIdentifiers: Collection<String>): Set<BpnRequestIdentifierMappingDb>
 
+    fun findByRequestIdentifier(requestIdentifier: String): BpnRequestIdentifierMappingDb?
+
 }

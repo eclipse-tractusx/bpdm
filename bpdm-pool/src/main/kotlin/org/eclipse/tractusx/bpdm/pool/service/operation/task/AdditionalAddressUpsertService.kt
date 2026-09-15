@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
@@ -51,10 +50,9 @@ class AdditionalAddressUpsertService(
     fun upsert(
         plan: AddressUpsertPlan,
         legalEntity: LegalEntityDb,
-        site: SiteDb?,
-        bpnReferences: BpnReferenceAllocation
-    ): UpsertResult<LogisticAddressDb> {
-        val result = when (plan) {
+        site: SiteDb?
+    ): UpsertResult<LogisticAddressDb> =
+        when (plan) {
             is AddressUpsertPlan.Create ->
                 UpsertResult(addressCreateService.create(listOf(AddressCreateParsed(legalEntity, site, plan.content))).single(), UpsertType.Created)
             is AddressUpsertPlan.Update ->
@@ -62,8 +60,4 @@ class AdditionalAddressUpsertService(
                 addressPayloadUpdateService.update(listOf(AddressUpdateParsed(plan.target, sites = null, address = plan.content)))
                     .single()
         }
-
-        bpnReferences.allocate(plan.reference, result.value.bpn)
-        return result
-    }
 }

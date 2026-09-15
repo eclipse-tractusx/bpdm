@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
@@ -43,12 +42,10 @@ class LegalEntityReferenceParser(
      * Reports the reference together with the legal entity it names, or a rejection where it names none that exists.
      */
     fun parse(
-        reference: BpnReferenceRequest,
-        bpnReferences: BpnReferenceAllocation
+        reference: BpnReferenceRequest
     ): ParseResult<ResolvedReference<LegalEntityDb>, GoldenRecordUpsertParseError> =
         referenceResolutionParser.parse(
             reference,
-            bpnReferences,
             { bpn -> (legalEntityBpnParser.parse(listOf(bpn)).single() as? ParseResult.Success)?.parsed },
             ::LegalEntityNotFound
         )

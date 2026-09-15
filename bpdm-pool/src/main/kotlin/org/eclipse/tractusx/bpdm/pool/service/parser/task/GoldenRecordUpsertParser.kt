@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.*
@@ -83,24 +82,21 @@ class GoldenRecordUpsertParser(
      * Reports the plan [request] amounts to, or every problem that stops it.
      */
     @Transactional(readOnly = true)
-    fun parse(
-        request: GoldenRecordUpsertRequest,
-        bpnReferences: BpnReferenceAllocation
-    ): ParseResult<GoldenRecordUpsertParsed, GoldenRecordUpsertParseError> {
+    fun parse(request: GoldenRecordUpsertRequest): ParseResult<GoldenRecordUpsertParsed, GoldenRecordUpsertParseError> {
         val errors = mutableListOf<GoldenRecordUpsertParseError>()
 
-        val legalEntity = legalEntityUpsertParser.parse(request.legalEntity, bpnReferences).recordIn(errors)
-        val site = request.site?.let { siteUpsertParser.parse(it, request.legalEntity, bpnReferences).recordIn(errors) }
-        val additionalAddress = request.additionalAddress?.let { additionalAddressUpsertParser.parse(it, bpnReferences).recordIn(errors) }
-        val membership = request.site?.let { parseMembership(request, bpnReferences, errors) }
+        val legalEntity = legalEntityUpsertParser.parse(request.legalEntity).recordIn(errors)
+        val site = request.site?.let { siteUpsertParser.parse(it, request.legalEntity).recordIn(errors) }
+        val additionalAddress = request.additionalAddress?.let { additionalAddressUpsertParser.parse(it).recordIn(errors) }
+        val membership = request.site?.let { parseMembership(request, errors) }
 
         errors += sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.site)
         errors += statedAddressDistinctnessValidator.validate(
-            referenceResolutionParser.parse(request.legalEntity.legalAddress.reference, bpnReferences),
-            (request.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference, bpnReferences) },
-            request.additionalAddress?.let { referenceResolutionParser.parse(it.reference, bpnReferences) }
+            referenceResolutionParser.parse(request.legalEntity.legalAddress.reference),
+            (request.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference) },
+            request.additionalAddress?.let { referenceResolutionParser.parse(it.reference) }
         )
-        errors += parentConsistencyValidator.validate(request, bpnReferences)
+        errors += parentConsistencyValidator.validate(request)
         errors += membershipOmissions(legalEntity, site, additionalAddress, membership)
         errors += foreignMembershipSites(legalEntity, membership)
 
@@ -108,7 +104,7 @@ class GoldenRecordUpsertParser(
         // not among them as far as the check can tell, so it would report the request taking away coverage it never
         // had. The other cross-partner checks resolve what they need themselves and stay meaningful.
         if (errors.none { it is LegalEntityNotFound || it is SiteNotFound || it is SiteMainAddressNotFound || it is AdditionalAddressNotFound })
-            errors += coverageValidator.validate(listOf(coverageWriteReader.writesOf(request, bpnReferences)))
+            errors += coverageValidator.validate(listOf(coverageWriteReader.writesOf(request)))
                 .single()
                 .map { ScriptVariantCoverageLost(it) }
 
@@ -143,7 +139,6 @@ class GoldenRecordUpsertParser(
 
     private fun parseMembership(
         request: GoldenRecordUpsertRequest,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): SiteMembershipPlan {
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by
@@ -155,7 +150,7 @@ class GoldenRecordUpsertParser(
         val newSites = mutableListOf<MembershipSiteCreatePlan>()
 
         statedOnce.forEachIndexed { index, stated ->
-            when (val result = siteReferenceParser.parse(stated.reference, bpnReferences)) {
+            when (val result = siteReferenceParser.parse(stated.reference)) {
                 is ParseResult.Failure -> errors += result.errors.map { toMembershipError(index, it) }
                 is ParseResult.Success -> {
                     val resolved = result.parsed

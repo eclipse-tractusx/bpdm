@@ -21,7 +21,6 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
@@ -49,20 +48,18 @@ class AdditionalAddressUpsertParser(
      */
     @Transactional(readOnly = true)
     fun parse(
-        request: AddressUpsertRequest,
-        bpnReferences: BpnReferenceAllocation
+        request: AddressUpsertRequest
     ): ParseResult<AddressUpsertPlan, GoldenRecordUpsertParseError> {
         val errors = mutableListOf<GoldenRecordUpsertParseError>()
-        return parsePlan(request, bpnReferences, errors).orFailure(errors)
+        return parsePlan(request, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: AddressUpsertRequest,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): AddressUpsertPlan? {
         val resolved = when (
-            val result = addressReferenceParser.parse(request.reference, bpnReferences, ::AdditionalAddressNotFound)
+            val result = addressReferenceParser.parse(request.reference, ::AdditionalAddressNotFound)
         ) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed

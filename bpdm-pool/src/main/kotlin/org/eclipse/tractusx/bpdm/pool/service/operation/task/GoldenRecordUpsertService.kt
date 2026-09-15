@@ -17,13 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-
 package org.eclipse.tractusx.bpdm.pool.service.operation.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteMembershipPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityAssociationFetchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.springframework.stereotype.Service
@@ -33,9 +35,9 @@ import org.springframework.transaction.annotation.Transactional
  * Carries out a planned golden record upsert against the Pool.
  *
  * It writes no partner itself: each plan variant names the services that own those writes, and this one only decides
- * the order and hands each step the parents the previous step produced. A request identifier that named no record yet
- * is registered here, as the record it now names comes into existence, so a later request in the same batch reaches
- * that record rather than creating a second one.
+ * the order and hands each step the parents the previous step produced. A request identifier the plan left pending is
+ * registered here, as the record it names comes into existence, so that a later task naming it reaches that record
+ * rather than creating a second one.
  */
 @Service
 class GoldenRecordUpsertService(
@@ -53,63 +55,94 @@ class GoldenRecordUpsertService(
      * from.
      */
     @Transactional
-    fun upsert(parsed: GoldenRecordUpsertParsed, bpnReferences: BpnReferenceAllocation): GoldenRecordUpsertResult {
-        val legalEntity = legalEntityUpsertService.upsert(parsed.legalEntity, bpnReferences)
+    fun upsert(parsed: GoldenRecordUpsertParsed): GoldenRecordUpsertResult {
+        val issued = mutableMapOf<String, String>()
 
-        val result = when (parsed) {
+        val legalEntity = legalEntityUpsertService.upsert(parsed.legalEntity)
+        issued.issue(parsed.legalEntity.reference, legalEntity.value.bpn)
+        issued.issue(parsed.legalEntity.legalAddressReference, legalEntity.value.legalAddress.bpn)
+
+        val records = when (parsed) {
             is GoldenRecordUpsertParsed.LegalEntityRecord ->
                 GoldenRecordUpsertResult.LegalEntityRecord(
                     legalEntity,
-                    completeWrites(parsed, legalEntity.value.legalAddress, bpnReferences)
+                    confidenceUpdates(parsed, legalEntity.value.legalAddress)
                 )
 
             is GoldenRecordUpsertParsed.LegalEntityAddressRecord -> {
-                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site = null, bpnReferences)
+                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site = null)
+                issued.issue(parsed.address.reference, address.value.bpn)
                 GoldenRecordUpsertResult.LegalEntityAddressRecord(
                     legalEntity,
                     address,
-                    completeWrites(parsed, address.value, bpnReferences)
+                    confidenceUpdates(parsed, address.value)
                 )
             }
 
             is GoldenRecordUpsertParsed.SiteRecord -> {
-                val site = siteUpsertService.upsert(parsed.site, legalEntity.value, bpnReferences)
-                coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, site.value.mainAddress, bpnReferences)
+                val site = siteUpsertService.upsert(parsed.site, legalEntity.value)
+                issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
+                val coLocatedSites = coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, site.value.mainAddress)
+                issued.issueCoLocatedSites(parsed.coLocatedSites, coLocatedSites)
                 GoldenRecordUpsertResult.SiteRecord(
                     legalEntity,
                     site,
-                    completeWrites(parsed, site.value.mainAddress, bpnReferences)
+                    confidenceUpdates(parsed, site.value.mainAddress)
                 )
             }
 
             is GoldenRecordUpsertParsed.SiteAddressRecord -> {
-                val site = siteUpsertService.upsert(parsed.site, legalEntity.value, bpnReferences)
-                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site.value, bpnReferences)
-                coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, address.value, bpnReferences)
+                val site = siteUpsertService.upsert(parsed.site, legalEntity.value)
+                issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
+                val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site.value)
+                issued.issue(parsed.address.reference, address.value.bpn)
+                val coLocatedSites = coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, address.value)
+                issued.issueCoLocatedSites(parsed.coLocatedSites, coLocatedSites)
                 GoldenRecordUpsertResult.SiteAddressRecord(
                     legalEntity,
                     site,
                     address,
-                    completeWrites(parsed, address.value, bpnReferences)
+                    confidenceUpdates(parsed, address.value)
                 )
             }
         }
 
+        bpnRequestIdentifierMappingCreateService.create(issued)
         legalEntityAssociationFetchService.fetch(setOf(legalEntity.value))
-        return result
+
+        return records
     }
 
-    private fun completeWrites(
+    private fun confidenceUpdates(
         parsed: GoldenRecordUpsertParsed,
-        recordAddress: LogisticAddressDb,
-        bpnReferences: BpnReferenceAllocation
-    ): SharingMemberConfidenceService.Result {
+        recordAddress: LogisticAddressDb
+    ): SharingMemberConfidenceService.Result =
         // The record now shares the address it is about, which is what the count of sharing members per golden
         // record is taken from, so it is recounted once every write of this request has landed.
-        val confidenceUpdates = sharingMemberConfidenceService.updateAddress(parsed.sharingMemberRecordId, recordAddress.bpn)
+        sharingMemberConfidenceService.updateAddress(parsed.sharingMemberRecordId, recordAddress.bpn)
 
-        bpnRequestIdentifierMappingCreateService.create(bpnReferences.drainAllocated())
-
-        return confidenceUpdates
+    private fun MutableMap<String, String>.issue(reference: BpnReferenceParsed, bpn: String) {
+        // A request identifier is answered by the first record it reaches, so a second write under the same
+        // identifier leaves the answer it already has standing.
+        if (reference is BpnReferenceParsed.Pending) putIfAbsent(reference.requestIdentifier, bpn)
     }
+
+    private fun MutableMap<String, String>.issueSite(plan: SiteUpsertPlan, siteBpn: String, mainAddressBpn: String) {
+        issue(plan.reference, siteBpn)
+        // A site whose main address is the legal address states no address of its own: that address is already
+        // answering to the legal entity's legal address reference.
+        mainAddressReference(plan)?.let { issue(it, mainAddressBpn) }
+    }
+
+    private fun MutableMap<String, String>.issueCoLocatedSites(plan: SiteMembershipPlan, createdSites: List<SiteDb>) {
+        plan.newSites.zip(createdSites).forEach { (planned, created) -> issue(planned.reference, created.bpn) }
+    }
+
+    private fun mainAddressReference(plan: SiteUpsertPlan): BpnReferenceParsed? =
+        when (plan) {
+            is SiteUpsertPlan.CreateWithOwnMainAddress -> plan.mainAddressReference
+            is SiteUpsertPlan.CreateOnExistingAddress -> plan.mainAddressReference
+            is SiteUpsertPlan.UpdateWithOwnMainAddress -> plan.mainAddressReference
+            is SiteUpsertPlan.CreateOnLegalAddress, is SiteUpsertPlan.UpdateOnLegalAddress, is SiteUpsertPlan.Unchanged -> null
+        }
 }

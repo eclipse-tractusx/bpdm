@@ -23,7 +23,6 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.task
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
@@ -34,9 +33,6 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * Carries out the legal entity a planned golden record upsert states.
- *
- * The record the plan settles on answers to both references the plan carries, whether this write created it or found
- * it unchanged, so the legal address reference is registered here rather than by whoever writes an address.
  */
 @Service
 class LegalEntityUpsertService(
@@ -48,17 +44,12 @@ class LegalEntityUpsertService(
      * Writes what [plan] states and reports the legal entity it leaves behind, and whether that write changed it.
      */
     @Transactional
-    fun upsert(plan: LegalEntityUpsertPlan, bpnReferences: BpnReferenceAllocation): UpsertResult<LegalEntityDb> {
-        val result = when (plan) {
+    fun upsert(plan: LegalEntityUpsertPlan): UpsertResult<LegalEntityDb> =
+        when (plan) {
             is LegalEntityUpsertPlan.Unchanged -> UpsertResult(plan.target, UpsertType.NoChange)
             is LegalEntityUpsertPlan.Create ->
                 UpsertResult(legalEntityCreateService.create(listOf(LegalEntityCreateParsed(plan.content))).single(), UpsertType.Created)
             is LegalEntityUpsertPlan.Update ->
                 legalEntityPayloadUpdateService.update(listOf(LegalEntityUpdateParsed(plan.target, plan.content))).single()
         }
-
-        bpnReferences.allocate(plan.reference, result.value.bpn)
-        bpnReferences.allocate(plan.legalAddressReference, result.value.legalAddress.bpn)
-        return result
-    }
 }

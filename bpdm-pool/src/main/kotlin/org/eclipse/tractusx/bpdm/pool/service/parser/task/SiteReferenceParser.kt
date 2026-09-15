@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
@@ -43,12 +42,10 @@ class SiteReferenceParser(
      * Reports the reference together with the site it names, or a rejection where it names none that exists.
      */
     fun parse(
-        reference: BpnReferenceRequest,
-        bpnReferences: BpnReferenceAllocation
+        reference: BpnReferenceRequest
     ): ParseResult<ResolvedReference<SiteDb>, GoldenRecordUpsertParseError> =
         referenceResolutionParser.parse(
             reference,
-            bpnReferences,
             { bpn -> (siteBpnParser.parse(listOf(bpn)).single() as? ParseResult.Success)?.parsed },
             ::SiteNotFound
         )

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
+import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class GoldenRecordCoverageWriteReader(
+    private val referenceResolutionParser: BpnReferenceResolutionParser,
     private val logisticAddressRepository: LogisticAddressRepository
 ) {
 
@@ -47,7 +48,7 @@ class GoldenRecordCoverageWriteReader(
      * Reports every address [request] writes, with the script codes it will carry and the partners stated on it.
      */
     @Transactional(readOnly = true)
-    fun writesOf(request: GoldenRecordUpsertRequest, bpnReferences: BpnReferenceAllocation): List<AddressCoverageWrite> {
+    fun writesOf(request: GoldenRecordUpsertRequest): List<AddressCoverageWrite> {
         val site = request.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
         val legalEntityWritten = request.legalEntity.intent == UpsertIntent.AlwaysWrite
 
@@ -55,18 +56,18 @@ class GoldenRecordCoverageWriteReader(
         // address ends up carrying the legal entity's script codes whichever of the two the request writes.
         val legalAddress = request.legalEntity.legalAddress.reference
             .takeIf { legalEntityWritten || site is SiteUpsertRequest.WithLegalAddressAsMain }
-            ?.let { resolveAddress(it, bpnReferences) }
+            ?.let { resolveAddress(it) }
         val siteMainAddress = (site as? SiteUpsertRequest.WithOwnMainAddress)
             ?.mainAddress?.reference
-            ?.let { resolveAddress(it, bpnReferences) }
+            ?.let { resolveAddress(it) }
         // An additional address is written whenever it is stated, so it needs no intent of its own.
-        val additionalAddress = request.additionalAddress?.let { resolveAddress(it.reference, bpnReferences) }
+        val additionalAddress = request.additionalAddress?.let { resolveAddress(it.reference) }
 
         val legalEntityPartner = request.legalEntity
             .takeIf { legalEntityWritten }
-            ?.let { PartnerScriptCodes(bpnReferences.resolve(it.reference), it.header.scriptVariants.map { variant -> variant.scriptCode }) }
+            ?.let { PartnerScriptCodes(resolveBpn(it.reference), it.header.scriptVariants.map { variant -> variant.scriptCode }) }
         val sitePartner = site
-            ?.let { PartnerScriptCodes(bpnReferences.resolve(it.reference), it.header.scriptVariants.map { variant -> variant.scriptCode }) }
+            ?.let { PartnerScriptCodes(resolveBpn(it.reference), it.header.scriptVariants.map { variant -> variant.scriptCode }) }
 
         return listOfNotNull(
             legalAddress?.let {
@@ -93,6 +94,9 @@ class GoldenRecordCoverageWriteReader(
         )
     }
 
-    private fun resolveAddress(reference: BpnReferenceRequest, bpnReferences: BpnReferenceAllocation): LogisticAddressDb? =
-        bpnReferences.resolve(reference)?.let { logisticAddressRepository.findByBpn(it) }
+    private fun resolveAddress(reference: BpnReferenceRequest): LogisticAddressDb? =
+        resolveBpn(reference)?.let { logisticAddressRepository.findByBpn(it) }
+
+    private fun resolveBpn(reference: BpnReferenceRequest): String? =
+        (referenceResolutionParser.parse(reference) as? BpnReferenceParsed.Existing)?.bpn
 }

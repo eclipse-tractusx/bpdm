@@ -21,7 +21,6 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
@@ -51,20 +50,18 @@ class LegalEntityUpsertParser(
      */
     @Transactional(readOnly = true)
     fun parse(
-        request: LegalEntityUpsertRequest,
-        bpnReferences: BpnReferenceAllocation
+        request: LegalEntityUpsertRequest
     ): ParseResult<LegalEntityUpsertPlan, GoldenRecordUpsertParseError> {
         val errors = mutableListOf<GoldenRecordUpsertParseError>()
-        return parsePlan(request, bpnReferences, errors).orFailure(errors)
+        return parsePlan(request, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: LegalEntityUpsertRequest,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): LegalEntityUpsertPlan? {
-        val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference, bpnReferences)
-        val resolved = when (val result = legalEntityReferenceParser.parse(request.reference, bpnReferences)) {
+        val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference)
+        val resolved = when (val result = legalEntityReferenceParser.parse(request.reference)) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }

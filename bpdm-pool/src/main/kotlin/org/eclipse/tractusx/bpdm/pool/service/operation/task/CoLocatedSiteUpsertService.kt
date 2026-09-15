@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteMembershipPlan
@@ -44,22 +43,18 @@ class CoLocatedSiteUpsertService(
 ) {
 
     /**
-     * Creates the sites [plan] states anew on [recordAddress] and makes that address the main address of exactly
-     * those sites and [recordSite].
+     * Creates the sites [plan] states anew on [recordAddress], makes that address the main address of exactly those
+     * sites and [recordSite], and reports the created sites in the order [plan] states them.
      */
     @Transactional
-    fun upsert(
-        plan: SiteMembershipPlan,
-        recordSite: SiteDb,
-        recordAddress: LogisticAddressDb,
-        bpnReferences: BpnReferenceAllocation
-    ) {
+    fun upsert(plan: SiteMembershipPlan, recordSite: SiteDb, recordAddress: LogisticAddressDb): List<SiteDb> {
         val createdSites = siteCreateWithReferencedAddressAsMainService.create(
             plan.newSites.map { SiteCreateWithReferencedAddressAsMainParsed(recordAddress, it.header, mainAddressContent = null) }
         )
-        plan.newSites.zip(createdSites).forEach { (planned, created) -> bpnReferences.allocate(planned.reference, created.bpn) }
 
         val membership = (listOf(recordSite) + plan.existingSites + createdSites).distinctBy { it.bpn }
         addressUpdateService.setSites(listOf(AddressSiteMembershipParsed(recordAddress, membership)))
+
+        return createdSites
     }
 }

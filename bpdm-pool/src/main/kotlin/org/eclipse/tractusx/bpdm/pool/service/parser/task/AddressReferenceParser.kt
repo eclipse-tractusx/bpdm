@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
@@ -46,12 +45,10 @@ class AddressReferenceParser(
      */
     fun parse(
         reference: BpnReferenceRequest,
-        bpnReferences: BpnReferenceAllocation,
         notFound: (String) -> GoldenRecordUpsertParseError
     ): ParseResult<ResolvedReference<LogisticAddressDb>, GoldenRecordUpsertParseError> =
         referenceResolutionParser.parse(
             reference,
-            bpnReferences,
             { bpn -> (addressBpnParser.parse(listOf(bpn)).single() as? ParseResult.Success)?.parsed },
             notFound
         )

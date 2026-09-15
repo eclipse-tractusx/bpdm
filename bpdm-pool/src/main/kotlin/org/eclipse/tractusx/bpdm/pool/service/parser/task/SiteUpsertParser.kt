@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
@@ -60,20 +59,18 @@ class SiteUpsertParser(
     @Transactional(readOnly = true)
     fun parse(
         request: SiteUpsertRequest,
-        legalEntityRequest: LegalEntityUpsertRequest,
-        bpnReferences: BpnReferenceAllocation
+        legalEntityRequest: LegalEntityUpsertRequest
     ): ParseResult<SiteUpsertPlan, GoldenRecordUpsertParseError> {
         val errors = mutableListOf<GoldenRecordUpsertParseError>()
-        return parsePlan(request, legalEntityRequest, bpnReferences, errors).orFailure(errors)
+        return parsePlan(request, legalEntityRequest, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: SiteUpsertRequest,
         legalEntityRequest: LegalEntityUpsertRequest,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): SiteUpsertPlan? {
-        val resolved = when (val result = siteReferenceParser.parse(request.reference, bpnReferences)) {
+        val resolved = when (val result = siteReferenceParser.parse(request.reference)) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }
@@ -83,14 +80,13 @@ class SiteUpsertParser(
         if (target != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
             return SiteUpsertPlan.Unchanged(reference, target)
 
-        return if (target == null) parseCreate(request, reference, bpnReferences, errors)
-        else parseUpdate(request, reference, target, legalEntityRequest, bpnReferences, errors)
+        return if (target == null) parseCreate(request, reference, errors)
+        else parseUpdate(request, reference, target, legalEntityRequest, errors)
     }
 
     private fun parseCreate(
         request: SiteUpsertRequest,
         reference: BpnReferenceParsed,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): SiteUpsertPlan? =
         when (request) {
@@ -99,17 +95,16 @@ class SiteUpsertParser(
                     .singleOrRecord(errors, ::toCreateError)
                     ?.let { SiteUpsertPlan.CreateOnLegalAddress(reference, it) }
             is SiteUpsertRequest.WithOwnMainAddress ->
-                parseCreateWithOwnMainAddress(request, reference, bpnReferences, errors)
+                parseCreateWithOwnMainAddress(request, reference, errors)
         }
 
     private fun parseCreateWithOwnMainAddress(
         request: SiteUpsertRequest.WithOwnMainAddress,
         reference: BpnReferenceParsed,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): SiteUpsertPlan? {
         val resolvedMainAddress = when (
-            val result = addressReferenceParser.parse(request.mainAddress.reference, bpnReferences, ::SiteMainAddressNotFound)
+            val result = addressReferenceParser.parse(request.mainAddress.reference, ::SiteMainAddressNotFound)
         ) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
@@ -137,7 +132,6 @@ class SiteUpsertParser(
         reference: BpnReferenceParsed,
         target: SiteDb,
         legalEntityRequest: LegalEntityUpsertRequest,
-        bpnReferences: BpnReferenceAllocation,
         errors: MutableList<GoldenRecordUpsertParseError>
     ): SiteUpsertPlan? {
         return when (request) {
@@ -158,7 +152,7 @@ class SiteUpsertParser(
                     ?.let {
                         SiteUpsertPlan.UpdateWithOwnMainAddress(
                             reference,
-                            referenceResolutionParser.parse(request.mainAddress.reference, bpnReferences),
+                            referenceResolutionParser.parse(request.mainAddress.reference),
                             target,
                             it.content
                         )

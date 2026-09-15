@@ -24,11 +24,9 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskUpsertRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskResultMapper
-import org.eclipse.tractusx.bpdm.pool.model.BpnReferenceAllocation
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordUpsertService
-import org.eclipse.tractusx.bpdm.pool.service.parser.task.BpnReferenceParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordUpsertParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
@@ -38,12 +36,13 @@ import org.springframework.transaction.annotation.Transactional
  * Answers a batch of reserved golden record tasks with the state of the records they asked for.
  *
  * Entries are handled one after another rather than as one batch: two entries may name the same BPN request
- * identifier and must then reach the same record, which is only settled once the earlier entry has been written.
+ * identifier and must then reach the same record, and which record that is - and whether the later entry creates it
+ * or updates it - is only settled once the earlier entry has been written. Each entry is therefore parsed against the
+ * state its predecessors left behind.
  */
 @Service
 class GoldenRecordTaskApplicationService(
     private val upsertRequestMapper: GoldenRecordTaskUpsertRequestMapper,
-    private val bpnReferenceParser: BpnReferenceParser,
     private val upsertParser: GoldenRecordUpsertParser,
     private val upsertService: GoldenRecordUpsertService,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper,
@@ -55,13 +54,10 @@ class GoldenRecordTaskApplicationService(
      */
     @Transactional
     fun upsert(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
-        val requests = taskEntries.map { upsertRequestMapper.toRequest(it) }
-        val bpnReferences = BpnReferenceAllocation(bpnReferenceParser.parse(requests))
-
-        return taskEntries.zip(requests) { taskEntry, request ->
-            when (val result = upsertParser.parse(request, bpnReferences)) {
+        return taskEntries.map { taskEntry ->
+            when (val result = upsertParser.parse(upsertRequestMapper.toRequest(taskEntry))) {
                 is ParseResult.Failure -> toErrorReply(taskEntry, result.errors)
-                is ParseResult.Success -> toSuccessReply(taskEntry, upsertService.upsert(result.parsed, bpnReferences))
+                is ParseResult.Success -> toSuccessReply(taskEntry, upsertService.upsert(result.parsed))
             }
         }
     }
