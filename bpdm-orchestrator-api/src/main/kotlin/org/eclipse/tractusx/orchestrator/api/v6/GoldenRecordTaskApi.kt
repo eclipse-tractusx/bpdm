@@ -27,7 +27,11 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.*
+import org.eclipse.tractusx.orchestrator.api.v6.model.request.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.request.TaskStepResultRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.response.TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.response.TaskStateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.response.TaskStepReservationResponseV6
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -58,7 +62,7 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagClient)
     @PostMapping(value = [ApiCommons.BASE_PATH_V6])
-    fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
+    fun createTasks(@RequestBody createRequest: TaskCreateRequestV6): TaskCreateResponseV6
 
     @Operation(
         summary = "Search for the state of golden record tasks by task identifiers",
@@ -75,7 +79,7 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagClient)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/state/search"])
-    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
+    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponseV6
 
     @Operation(
         summary = "Reserve the next golden record tasks waiting in the given step queue",
@@ -95,7 +99,7 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagWorker)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-reservations"])
-    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
+    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponseV6
 
     @Operation(
         summary = "Post step results for reserved golden record tasks in the given step queue",
@@ -120,5 +124,5 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagWorker)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-results"])
-    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
+    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequestV6)
 }

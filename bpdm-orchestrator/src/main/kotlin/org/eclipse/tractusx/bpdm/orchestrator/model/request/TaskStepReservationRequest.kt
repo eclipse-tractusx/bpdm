@@ -17,18 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 
-@Schema(description = "Request object to specify for which business partner data tasks should be created and in which mode")
-data class TaskCreateRequest(
-
-    @get:Schema(required = true, description = "The mode affecting which processing steps the business partner goes through")
-    val mode: TaskMode,
-
-    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
-    val requests: List<TaskCreateRequestEntry>
+data class TaskStepReservationRequest(
+    val step: TaskStep,
+    val amount: Int
 )

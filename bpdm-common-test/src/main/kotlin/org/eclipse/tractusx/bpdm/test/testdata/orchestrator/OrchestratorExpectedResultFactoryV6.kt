@@ -20,9 +20,6 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDto
 import java.time.Duration
 import java.time.Instant
 

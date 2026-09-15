@@ -17,22 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.orchestrator.api.v7.model.request
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 
+@Schema(description = "V7 API - Request object for posting step results of previously reserved tasks")
+data class TaskStepResultRequestV7(
 
-@Schema(description = "A step result for a golden record task")
-data class TaskStepResultEntryDto(
+    @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
+    val step: TaskStep,
 
-    @get:Schema(description = "The identifier of the task for which this is a result", required = true)
-    val taskId: String,
-
-    @get:Schema(description = "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task.")
-    val businessPartner: BusinessPartner,
-
-    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
-    val errors: List<TaskErrorDto> = emptyList()
+    val results: List<TaskStepResultEntryDto>
 )

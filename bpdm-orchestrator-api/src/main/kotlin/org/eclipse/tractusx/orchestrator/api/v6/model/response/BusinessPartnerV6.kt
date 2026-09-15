@@ -17,18 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.orchestrator.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.orchestrator.api.model.*
 
-@Schema(description = "Generic business partner data for golden record processing. " +
+@Schema(description = "V6 API - Generic business partner data for golden record processing. " +
         "Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. " +
         "The golden record process categorizes and completes the data in order to create and update the resulting golden records. " +
         "The golden records are found in the legalEntity, site and additionalAddress fields. " +
         "The business partner data needs to contain the full golden record parent relationship. " +
         "This means, if an additional address is specified in the business partner data, also its legal entity and also its site parent (if a site exists) needs to be specified. ")
-data class BusinessPartner(
+data class BusinessPartnerV6(
     @Schema(description = "Fully categorized and cleaned name parts based on the uncategorized name parts provided")
     val nameParts: List<NamePart>,
     @Schema(description = "The BPNL of the legal entity to which this business partner data belongs to")
@@ -39,7 +39,7 @@ data class BusinessPartner(
     val additionalAddress: PostalAddress?,
 ){
     companion object{
-        val empty = BusinessPartner(
+        val empty = BusinessPartnerV6(
             nameParts = emptyList(),
             owningCompany = null,
             uncategorized = UncategorizedProperties.empty,
