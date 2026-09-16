@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteHeaderUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
@@ -43,10 +43,10 @@ class SitePayloadUpdateService(
 ) {
 
     /**
-     * Applies the given payloads in full and reports for each site whether it actually changed.
+     * Applies the given payloads in full, main address included, and reports for each site whether it actually changed.
      */
     @Transactional
-    fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>> {
+    fun updateWithOwnMainAddress(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>> {
         val updateRequests = parsed.map {
             SiteUpdate(
                 it.target,
@@ -59,11 +59,11 @@ class SitePayloadUpdateService(
     }
 
     /**
-     * Applies the given site properties in full and reports for each site whether it actually changed, leaving each
-     * site's main address as it stands.
+     * Applies the given site properties in full and reports for each site whether it actually changed, leaving the
+     * legal address each site sits on as it stands.
      */
     @Transactional
-    fun updateHeaders(parsed: List<SiteHeaderUpdateParsed>): List<UpsertResult<SiteDb>> =
+    fun updateOnLegalAddress(parsed: List<SiteUpdateOnLegalAddressParsed>): List<UpsertResult<SiteDb>> =
         siteUpdateService.update(
             parsed.map { SiteUpdate(it.target, siteHeaderUpdateMapper.toFullUpdate(it.header), AddressContentUpdate.NoOp) }
         )

@@ -32,8 +32,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMappe
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithOwnMainAddressParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnLegalAddressParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,9 +42,9 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateApplicationV7Service(
-    private val siteCreateParser: SiteCreateParser,
+    private val siteCreateWithOwnMainAddressParser: SiteCreateWithOwnMainAddressParser,
     private val siteCreateService: SiteCreateService,
-    private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
+    private val siteCreateOnLegalAddressParser: SiteCreateOnLegalAddressParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
@@ -64,7 +64,7 @@ class SiteCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         requestList.zip(parseAndExecute(
             createRequests,
-            siteCreateParser::parse,
+            siteCreateWithOwnMainAddressParser::parse,
             siteCreateService::create
         )).forEach { (request, result) ->
             when (result) {
@@ -89,7 +89,7 @@ class SiteCreateApplicationV7Service(
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         parseAndExecute(
             createRequests,
-            siteCreateWithLegalAddressAsMainParser::parse,
+            siteCreateOnLegalAddressParser::parse,
             siteCreateWithReferencedAddressAsMainService::create
         ).forEachIndexed { index, result ->
             val entityKey = index.toString()

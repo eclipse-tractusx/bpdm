@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional
  * still parsed through the batch-shaped content parsers, one entry's worth at a time.
  */
 @Service
-class GoldenRecordUpsertParser(
+class GoldenRecordTaskUpsertParser(
     private val legalEntityUpsertParser: LegalEntityUpsertParser,
     private val siteUpsertParser: SiteUpsertParser,
     private val additionalAddressUpsertParser: AdditionalAddressUpsertParser,

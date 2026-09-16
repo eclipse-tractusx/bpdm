@@ -68,6 +68,8 @@ data class MembershipSiteNotInLegalEntity(val siteBpn: String, val legalEntityBp
 
 data object SiteMainAddressRestatesLegalAddress : GoldenRecordUpsertParseError
 
+data class SiteDoesNotSitOnLegalAddress(val siteBpn: String, val mainAddressBpn: String) : GoldenRecordUpsertParseError
+
 data object AdditionalAddressRestatesLegalAddress : GoldenRecordUpsertParseError
 
 data object AdditionalAddressRestatesSiteMainAddress : GoldenRecordUpsertParseError

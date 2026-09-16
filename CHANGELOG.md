@@ -10,6 +10,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Breaking
 
+- BPDM Pool: A golden record task that states a site without a main address is now rejected when that site already owns a main address of its own, instead of silently updating only the site's properties
+
 ### Added
 
 ### Changed

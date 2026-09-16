@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordT
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordUpsertService
-import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordUpsertParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskUpsertParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GoldenRecordTaskApplicationService(
     private val upsertRequestMapper: GoldenRecordTaskUpsertRequestMapper,
-    private val upsertParser: GoldenRecordUpsertParser,
+    private val upsertParser: GoldenRecordTaskUpsertParser,
     private val upsertService: GoldenRecordUpsertService,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper,
     private val taskResultMapper: GoldenRecordTaskResultMapper

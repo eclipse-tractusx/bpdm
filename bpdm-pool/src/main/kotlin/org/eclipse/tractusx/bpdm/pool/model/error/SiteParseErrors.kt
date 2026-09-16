@@ -37,6 +37,8 @@ sealed interface SiteUpdateEntryParseError : SiteUpdateParseError
 
 data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateEntryParseError
 
+data class SiteMainAddressNotLegalAddress(val bpnSite: String, val bpnMainAddress: String) : SiteUpdateEntryParseError
+
 sealed interface SiteContentParseError : SiteCreateEntryParseError, SiteUpdateEntryParseError {
     data object NameMissing : SiteContentParseError
     data object ConfidenceCriteriaMissing : SiteContentParseError

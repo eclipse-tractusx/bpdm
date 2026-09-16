@@ -40,7 +40,7 @@ import org.springframework.stereotype.Service
  * address, so it needs no operation of its own.
  */
 @Service
-class SiteCreateWithLegalAddressAsMainParser(
+class SiteCreateOnLegalAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
     private val coverageValidator: ScriptVariantCoverageValidator

@@ -22,23 +22,24 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressNotLegalAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateEntryParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateOnLegalAddressRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates a change to a site's own properties, leaving its main address alone.
+ * Validates a change to a site that sits on its legal entity's legal address, covering the site's own properties only.
  *
- * A site whose main address is the legal address does not own that address, so it states only itself: the address's
- * content is the legal entity's to write.
+ * Such a site does not own the address it sits on, so it states only itself: the address's content is the legal
+ * entity's to write. A site that owns a main address of its own is therefore not a target of this operation.
  */
 @Service
-class SiteHeaderUpdateParser(
+class SiteUpdateOnLegalAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val siteBpnParser: SiteBpnParser
 ) {
@@ -48,12 +49,12 @@ class SiteHeaderUpdateParser(
      * found in that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteHeaderUpdateRequest>): List<ParseResult<SiteHeaderUpdateParsed, SiteUpdateEntryParseError>> {
-        val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
+    fun parse(requests: List<SiteUpdateOnLegalAddressRequest>): List<ParseResult<SiteUpdateOnLegalAddressParsed, SiteUpdateEntryParseError>> {
+        val targetResults = siteBpnParser.parse(requests.map { it.siteBpn }).map(::requireSittingOnLegalAddress)
         val headerResults = parseContent(requests.map { it.header })
 
         return zipParseResults(headerResults, targetResults) { header, target ->
-            SiteHeaderUpdateParsed(target, header)
+            SiteUpdateOnLegalAddressParsed(target, header)
         }
     }
 
@@ -62,4 +63,17 @@ class SiteHeaderUpdateParser(
      */
     fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteUpdateEntryParseError>> =
         siteHeaderParser.parse(requests)
+
+    private fun requireSittingOnLegalAddress(
+        result: ParseResult<SiteDb, SiteUpdateEntryParseError>
+    ): ParseResult<SiteDb, SiteUpdateEntryParseError> =
+        when (result) {
+            is ParseResult.Failure -> result
+            is ParseResult.Success -> {
+                val site = result.parsed
+                // Compared by BPN: a lazily loaded address is a proxy, which no identity comparison recognises.
+                if (site.mainAddress.bpn == site.legalEntity.legalAddress.bpn) result
+                else ParseResult.ofSingleFailure(SiteMainAddressNotLegalAddress(site.bpn, site.mainAddress.bpn))
+            }
+        }
 }

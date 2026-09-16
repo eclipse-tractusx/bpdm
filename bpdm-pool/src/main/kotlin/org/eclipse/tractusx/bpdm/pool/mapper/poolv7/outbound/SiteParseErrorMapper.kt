@@ -76,6 +76,10 @@ class SiteParseErrorMapper(
                     entityKey
                 )
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+            // Only the golden record task updates a site on its legal address; a site update over the API always
+            // states the main address, so it can never be faulted for the site not owning one.
+            is SiteMainAddressNotLegalAddress ->
+                throw BpdmValidationException("Unexpected site parse error (no public error code): $error")
             is SiteContentParseError -> contentErrorInfo(
                 error,
                 entityKey,

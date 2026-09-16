@@ -21,8 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
@@ -36,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional
  * content as the new content of that address.
  */
 @Service
-class SiteCreateWithReferencedAddressAsMainParser(
+class SiteCreateOnExistingAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val addressBpnParser: AddressBpnParser,
     private val addressContentParser: AddressContentParser
@@ -59,16 +57,4 @@ class SiteCreateWithReferencedAddressAsMainParser(
             SiteCreateWithReferencedAddressAsMainParsed(target, header, mainAddress)
         }
     }
-
-    /**
-     * Reports what this creation writes, as script variant coverage sees it.
-     */
-    fun coverageWrites(parsed: SiteCreateWithReferencedAddressAsMainParsed): List<AddressCoverageWrite> =
-        listOf(
-            AddressCoverageWrite.Rewritten(
-                address = parsed.mainAddress,
-                partners = listOf(PartnerScriptCodes(bpn = null, parsed.siteHeader.scriptCodes())),
-                scriptCodes = parsed.mainAddressContent!!.scriptCodes()
-            )
-        )
 }

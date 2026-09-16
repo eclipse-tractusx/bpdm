@@ -35,10 +35,11 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnP
 import org.springframework.stereotype.Service
 
 /**
- * Validates site-create requests: the parent legal entity, the header content and the new main address.
+ * Validates site-create requests that bring a main address of their own: the parent legal entity, the header content
+ * and that new address.
  */
 @Service
-class SiteCreateParser(
+class SiteCreateWithOwnMainAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
     private val addressContentParser: AddressContentParser,

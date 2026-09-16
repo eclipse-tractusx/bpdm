@@ -18,9 +18,11 @@
  ******************************************************************************/
 
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-data class SiteHeaderUpdateRequest(
-    val siteBpn: String,
-    val header: SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+
+data class SiteUpdateOnLegalAddressParsed(
+    val target: SiteDb,
+    val header: SiteHeaderParsed
 )

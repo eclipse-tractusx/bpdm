@@ -34,10 +34,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates site-update requests: the target site, the new header content and the new main address.
+ * Validates site-update requests for a site that owns its main address: the target site, the new header content and
+ * the new content of that address.
  */
 @Service
-class SiteUpdateParser(
+class SiteUpdateWithOwnMainAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val siteBpnParser: SiteBpnParser,
     private val addressContentParser: AddressContentParser,

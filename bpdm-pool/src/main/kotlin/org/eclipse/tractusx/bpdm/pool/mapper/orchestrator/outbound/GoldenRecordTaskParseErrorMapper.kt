@@ -56,6 +56,9 @@ class GoldenRecordTaskParseErrorMapper {
             is ScriptVariantCoverageLost -> toScriptVariantCoverageDescription(error.error)
             SiteMainAddressRestatesLegalAddress ->
                 "A site whose main address is the legal address must state no main address of its own"
+            is SiteDoesNotSitOnLegalAddress ->
+                "Site ${error.siteBpn} has its own main address ${error.mainAddressBpn}, so it cannot be updated without one: " +
+                        "state that main address, or address the site that sits on the legal address"
             AdditionalAddressRestatesLegalAddress ->
                 "An additional address must be a different address than the legal address"
             AdditionalAddressRestatesSiteMainAddress ->

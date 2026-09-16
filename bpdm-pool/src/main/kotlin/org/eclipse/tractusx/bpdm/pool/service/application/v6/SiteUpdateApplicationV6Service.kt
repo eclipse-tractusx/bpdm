@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateWithOwnMainAddressParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteUpdateApplicationV6Service(
-    private val siteUpdateParser: SiteUpdateParser,
+    private val siteUpdateWithOwnMainAddressParser: SiteUpdateWithOwnMainAddressParser,
     private val sitePayloadUpdateService: SitePayloadUpdateService,
     private val siteDtoRequestMapperV6: SiteDtoRequestMapperV6,
     private val siteParseErrorMapperV6: SiteParseErrorMapperV6,
@@ -59,8 +59,8 @@ class SiteUpdateApplicationV6Service(
         val errors = mutableListOf<ErrorInfoV6<SiteUpdateErrorV6>>()
         requestList.zip(parseAndExecute(
             updateRequests,
-            siteUpdateParser::parse,
-            sitePayloadUpdateService::update
+            siteUpdateWithOwnMainAddressParser::parse,
+            sitePayloadUpdateService::updateWithOwnMainAddress
         )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapperV6.toUpsertResponse(result.parsed.value, request.bpns))

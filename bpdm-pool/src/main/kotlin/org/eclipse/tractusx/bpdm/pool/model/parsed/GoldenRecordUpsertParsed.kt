@@ -126,7 +126,7 @@ sealed interface SiteUpsertPlan {
 
     data class UpdateOnLegalAddress(
         override val reference: BpnReferenceParsed,
-        val parsed: SiteHeaderUpdateParsed
+        val parsed: SiteUpdateOnLegalAddressParsed
     ) : SiteUpsertPlan
 }
 
