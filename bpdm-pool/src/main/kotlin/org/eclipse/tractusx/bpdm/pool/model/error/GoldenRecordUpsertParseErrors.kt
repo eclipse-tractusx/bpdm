@@ -42,7 +42,7 @@ sealed interface SiteUpsertParseError : GoldenRecordUpsertParseError
 sealed interface AdditionalAddressUpsertParseError : GoldenRecordUpsertParseError
 
 /** What planning the sites stated as sharing the record address can be faulted for. */
-sealed interface SiteMembershipParseError : GoldenRecordUpsertParseError
+sealed interface AdditionalSitesParseError : GoldenRecordUpsertParseError
 
 /** What the partners of one golden record upsert can contradict each other over. */
 sealed interface CrossPartnerParseError : GoldenRecordUpsertParseError
@@ -73,9 +73,9 @@ data class AdditionalAddressContentInvalid(val error: AddressContentParseError) 
 
 data class AdditionalAddressNotFound(val bpn: String) : AdditionalAddressUpsertParseError
 
-data class MembershipSiteContentInvalid(val index: Int, val error: SiteContentParseError) : SiteMembershipParseError
+data class AdditionalSiteContentInvalid(val index: Int, val error: SiteContentParseError) : AdditionalSitesParseError
 
-data class MembershipSiteNotFound(val index: Int, val bpn: String) : SiteMembershipParseError
+data class AdditionalSiteNotFound(val index: Int, val bpn: String) : AdditionalSitesParseError
 
 // Resolving a legal entity is part of planning all three partners: the site and the additional address each state
 // which legal entity they belong under, and the legal entity states itself.
@@ -91,7 +91,7 @@ data class SiteNotInRequestLegalEntity(val siteBpn: String, val legalEntityBpn: 
 
 data class AdditionalAddressNotInRequestLegalEntity(val addressBpn: String, val legalEntityBpn: String?) : ParentConsistencyParseError
 
-data class MembershipSiteNotInLegalEntity(val siteBpn: String, val legalEntityBpn: String?) : ParentConsistencyParseError
+data class AdditionalSiteNotInLegalEntity(val siteBpn: String, val legalEntityBpn: String?) : ParentConsistencyParseError
 
 data object SiteMainAddressRestatesLegalAddress : StatedAddressDistinctnessParseError
 
@@ -100,6 +100,8 @@ data object AdditionalAddressRestatesLegalAddress : StatedAddressDistinctnessPar
 data object AdditionalAddressRestatesSiteMainAddress : StatedAddressDistinctnessParseError
 
 data object AdditionalSitesWithoutSite : CrossPartnerParseError
+
+data class AdditionalSiteOmitted(val siteBpn: String) : CrossPartnerParseError
 
 data class SiteScriptCodeNotStatedByLegalEntity(val scriptCode: String) : CrossPartnerParseError
 

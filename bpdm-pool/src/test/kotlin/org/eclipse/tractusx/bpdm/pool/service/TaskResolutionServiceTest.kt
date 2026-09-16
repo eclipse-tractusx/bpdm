@@ -1451,7 +1451,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `create second site sharing an existing site main address keeps the unstated first site`() {
+    fun `create second site sharing an existing site main address rejects leaving the first site unstated`() {
         val leRef = "le-unstated"
         val leAddressRef = "le-addr-unstated"
         val sharedMainAddressRef = "shared-unstated-addr"
@@ -1465,7 +1465,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
         // Site B takes over the same address without saying that site A still uses it. Site A is bound to the address
-        // by its own main-address relation, so it is kept rather than the request being refused.
+        // by its own main-address relation, so stating the membership without it contradicts what is stored.
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences("site-b-unstated".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
@@ -1473,11 +1473,10 @@ class TaskResolutionServiceTest @Autowired constructor(
             .copy(additionalAddress = null)
 
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
-        val siteBBpns = resultB[0].businessPartner.site?.bpnReference?.referenceValue!!
 
-        assertThat(resultB.single().errors).isEmpty()
-        assertThat(poolClient.sites.getSite(siteABpns).mainAddress.bpna).isEqualTo(sharedAddressBpn)
-        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).containsExactly(siteBBpns)
+        assertThat(resultB.single().errors).hasSize(1)
+        assertThat(resultB.single().errors.single().description).contains(siteABpns)
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
     }
 
     private fun scriptCodeOtherThan(scriptCode: String): String =

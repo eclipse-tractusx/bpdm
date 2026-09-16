@@ -61,10 +61,10 @@ class SiteUpsertService(
                     UpsertType.Created
                 )
             is SiteUpsertPlan.CreateOnExistingAddress ->
-                UpsertResult(siteCreateWithReferencedAddressAsMainService.create(listOf(plan.parsed)).single(), UpsertType.Created)
+                UpsertResult(siteCreateWithReferencedAddressAsMainService.create(listOf(plan.creation)).single(), UpsertType.Created)
             is SiteUpsertPlan.UpdateWithOwnMainAddress ->
                 sitePayloadUpdateService.updateWithOwnMainAddress(listOf(SiteUpdateParsed(plan.target, plan.content))).single()
             is SiteUpsertPlan.UpdateOnLegalAddress ->
-                sitePayloadUpdateService.updateOnLegalAddress(listOf(plan.parsed)).single()
+                sitePayloadUpdateService.updateOnLegalAddress(listOf(plan.update)).single()
         }
 }

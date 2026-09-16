@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotInRequestLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.ParentConsistencyParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.MembershipSiteNotInLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteNotInLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInRequestLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
@@ -56,11 +56,11 @@ class GoldenRecordParentConsistencyValidator(
     @Transactional(readOnly = true)
     fun validate(request: GoldenRecordUpsertRequest): List<ParentConsistencyParseError> {
         val legalEntityBpn = resolveBpn(request.legalEntity.reference)
-        val siteBpn = request.site?.let { resolveBpn(it.reference) }
+        val siteBpn = request.recordSite.site?.let { resolveBpn(it.reference) }
         // A membership stated without a site is rejected on its own, so judging its entries here would fault the same
         // statement twice.
-        val membershipBpns = request.site
-            ?.let { request.addressSiteMembership.mapNotNull { stated -> resolveBpn(stated.reference) }.distinct() }
+        val membershipBpns = request.recordSite.site
+            ?.let { request.recordSite.additionalSites.mapNotNull { stated -> resolveBpn(stated.reference) }.distinct() }
             ?: emptyList()
         val addressBpn = request.additionalAddress?.let { resolveBpn(it.reference) }
 
@@ -75,7 +75,7 @@ class GoldenRecordParentConsistencyValidator(
         ) + membershipBpns.mapNotNull { bpn ->
             sitesByBpn[bpn]
                 ?.takeIf { it.legalEntity.bpn != legalEntityBpn }
-                ?.let { MembershipSiteNotInLegalEntity(it.bpn, legalEntityBpn) }
+                ?.let { AdditionalSiteNotInLegalEntity(it.bpn, legalEntityBpn) }
         }
     }
 

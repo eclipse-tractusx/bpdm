@@ -37,14 +37,14 @@ class GoldenRecordTaskParseErrorMapper {
             is SiteContentInvalid -> toSiteContentDescription(error.error)
             is SiteMainAddressContentInvalid -> toAddressContentDescription(error.error)
             is AdditionalAddressContentInvalid -> toAddressContentDescription(error.error)
-            is MembershipSiteContentInvalid -> toSiteContentDescription(error.error)
+            is AdditionalSiteContentInvalid -> toSiteContentDescription(error.error)
             is LegalAddressCoverageLost -> toLegalAddressCoverageDescription(error.error)
             is SiteMainAddressCoverageLost -> toMainAddressCoverageDescription(error.error)
             is LegalEntityNotFound -> "Legal entity ${error.bpn} not found"
             is SiteNotFound -> "Site ${error.bpn} not found"
             is SiteMainAddressNotFound -> "Address ${error.bpn} not found"
             is AdditionalAddressNotFound -> "Address ${error.bpn} not found"
-            is MembershipSiteNotFound -> "Site ${error.bpn} not found"
+            is AdditionalSiteNotFound -> "Site ${error.bpn} not found"
             is SiteNotInRequestLegalEntity -> GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message
             is AdditionalAddressNotInRequestLegalEntity ->
                 GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message
@@ -66,9 +66,12 @@ class GoldenRecordTaskParseErrorMapper {
             is SiteScriptCodeNotStatedByLegalEntity ->
                 "A site whose main address is the legal address can only be named in scripts the legal entity is named in: " +
                         "state script code '${error.scriptCode}' on the legal entity as well, or drop it from the site"
+            is AdditionalSiteOmitted ->
+                "Site ${error.siteBpn} has the record's address as its main address, so it must be stated among the " +
+                        "additional sites of this record"
             AdditionalSitesWithoutSite ->
                 "Additional sites can only be stated for a business partner that states a site of its own"
-            is MembershipSiteNotInLegalEntity ->
+            is AdditionalSiteNotInLegalEntity ->
                 "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn ?: "of this record"}"
         }
 

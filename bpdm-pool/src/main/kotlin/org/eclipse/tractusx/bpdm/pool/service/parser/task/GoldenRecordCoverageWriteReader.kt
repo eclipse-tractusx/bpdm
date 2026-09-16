@@ -49,7 +49,7 @@ class GoldenRecordCoverageWriteReader(
      */
     @Transactional(readOnly = true)
     fun writesOf(request: GoldenRecordUpsertRequest): List<AddressCoverageWrite> {
-        val site = request.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
+        val site = request.recordSite.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
         val legalEntityWritten = request.legalEntity.intent == UpsertIntent.AlwaysWrite
 
         // A site sharing the legal address writes that one address too, with the legal entity's payload, so the

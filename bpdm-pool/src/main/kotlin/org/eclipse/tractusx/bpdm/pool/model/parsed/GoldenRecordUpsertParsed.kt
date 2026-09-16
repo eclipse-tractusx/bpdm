@@ -43,12 +43,12 @@ sealed interface GoldenRecordUpsertParsed {
         override val legalEntity: LegalEntityUpsertPlan
     ) : GoldenRecordUpsertParsed
 
-    /** A task about a site: the record address is the site's main address, shared with [coLocatedSites]. */
+    /** A task about a site: the record address is the site's main address, shared with [additionalSites]. */
     data class SiteRecord(
         override val sharingMemberRecordId: String,
         override val legalEntity: LegalEntityUpsertPlan,
         val site: SiteUpsertPlan,
-        val coLocatedSites: SiteMembershipPlan
+        val additionalSites: AdditionalSitesPlan
     ) : GoldenRecordUpsertParsed
 
     /** A task about an address of a legal entity: the record address is that address, and no site sits on it. */
@@ -58,13 +58,13 @@ sealed interface GoldenRecordUpsertParsed {
         val address: AddressUpsertPlan
     ) : GoldenRecordUpsertParsed
 
-    /** A task about an address of a site: the record address is that address, shared with [coLocatedSites]. */
+    /** A task about an address of a site: the record address is that address, shared with [additionalSites]. */
     data class SiteAddressRecord(
         override val sharingMemberRecordId: String,
         override val legalEntity: LegalEntityUpsertPlan,
         val site: SiteUpsertPlan,
         val address: AddressUpsertPlan,
-        val coLocatedSites: SiteMembershipPlan
+        val additionalSites: AdditionalSitesPlan
     ) : GoldenRecordUpsertParsed
 }
 
@@ -114,7 +114,7 @@ sealed interface SiteUpsertPlan {
     data class CreateOnExistingAddress(
         override val reference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
-        val parsed: SiteCreateWithReferencedAddressAsMainParsed
+        val creation: SiteCreateWithReferencedAddressAsMainParsed
     ) : SiteUpsertPlan
 
     data class UpdateWithOwnMainAddress(
@@ -126,7 +126,7 @@ sealed interface SiteUpsertPlan {
 
     data class UpdateOnLegalAddress(
         override val reference: BpnReferenceParsed,
-        val parsed: SiteUpdateOnLegalAddressParsed
+        val update: SiteUpdateOnLegalAddressParsed
     ) : SiteUpsertPlan
 }
 
@@ -145,17 +145,23 @@ sealed interface AddressUpsertPlan {
     ) : AddressUpsertPlan
 }
 
+/**
+ * The site a golden record upsert writes, together with the further sites its record address ends up shared with.
+ *
+ * [additionalSites] starts as what the request stated and is completed with the sites already bound to that address
+ * by their own main-address relation, so it is broader than the list the request carried.
+ */
 data class RecordSitePlan(
     val site: SiteUpsertPlan,
-    val coLocatedSites: SiteMembershipPlan
+    val additionalSites: AdditionalSitesPlan
 )
 
-data class SiteMembershipPlan(
+data class AdditionalSitesPlan(
     val existingSites: List<SiteDb>,
-    val newSites: List<MembershipSiteCreatePlan>
+    val newSites: List<AdditionalSiteCreatePlan>
 )
 
-data class MembershipSiteCreatePlan(
+data class AdditionalSiteCreatePlan(
     val reference: BpnReferenceParsed,
     val header: SiteHeaderParsed
 )

@@ -23,9 +23,19 @@ package org.eclipse.tractusx.bpdm.pool.model.request
 data class GoldenRecordUpsertRequest(
     val sharingMemberRecordId: String,
     val legalEntity: LegalEntityUpsertRequest,
+    val recordSite: RecordSiteRequest,
+    val additionalAddress: AddressUpsertRequest?
+)
+
+/**
+ * The site a golden record upsert is about, together with the further sites it states on the record's address.
+ *
+ * Both halves are stated together because the further sites share the record address *with* this site: a request
+ * naming further sites without one of its own is a contradiction, which is only rejectable while both are in view.
+ */
+data class RecordSiteRequest(
     val site: SiteUpsertRequest?,
-    val additionalAddress: AddressUpsertRequest?,
-    val addressSiteMembership: List<SiteReferenceRequest>
+    val additionalSites: List<SiteReferenceRequest>
 )
 
 enum class UpsertIntent {

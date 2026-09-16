@@ -20,7 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSitePlan
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.RecordSiteRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.springframework.stereotype.Service
@@ -28,6 +32,9 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * Reports where the partners one golden record upsert states contradict each other.
+ *
+ * Most of these rules read the partners as stated, but completeness of the additional sites is decidable only against
+ * the address they will sit on, which is why the planned partners are taken as well.
  */
 @Service
 class GoldenRecordCrossPartnerValidator(
@@ -35,34 +42,39 @@ class GoldenRecordCrossPartnerValidator(
     private val sharedLegalAddressScriptCodeValidator: SharedLegalAddressScriptCodeValidator,
     private val statedAddressDistinctnessValidator: StatedAddressDistinctnessValidator,
     private val parentConsistencyValidator: GoldenRecordParentConsistencyValidator,
+    private val additionalSitesCompletenessValidator: AdditionalSitesCompletenessValidator,
     private val coverageWriteReader: GoldenRecordCoverageWriteReader,
     private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
-     * Reports every contradiction between the partners [request] states, where [errorsSoFar] holds what parsing those
-     * partners has already rejected.
+     * Reports every contradiction between the partners [request] states and the partners planned from it, where
+     * [errorsSoFar] holds what planning those partners has already rejected.
      */
     @Transactional(readOnly = true)
     fun validate(
         request: GoldenRecordUpsertRequest,
+        legalEntity: LegalEntityUpsertPlan?,
+        recordSite: RecordSitePlan?,
+        additionalAddress: AddressUpsertPlan?,
         errorsSoFar: List<GoldenRecordUpsertParseError>
     ): List<CrossPartnerParseError> =
-        sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.site)
+        sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.recordSite.site)
             .plus(statedAddressDistinctness(request))
-            .plus(membershipWithoutSite(request))
+            .plus(additionalSitesWithoutSite(request.recordSite))
             .plus(parentConsistencyValidator.validate(request))
+            .plus(additionalSitesCompletenessValidator.validate(legalEntity, recordSite, additionalAddress))
             .plus(coverageLosses(request, errorsSoFar))
 
-    // The sites stated as sharing the record address share it with the record's own site, so there has to be one.
-    private fun membershipWithoutSite(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
-        if (request.site == null && request.addressSiteMembership.isNotEmpty()) listOf(AdditionalSitesWithoutSite)
+    // The additional sites share the record address with the record's own site, so there has to be one.
+    private fun additionalSitesWithoutSite(recordSite: RecordSiteRequest): List<CrossPartnerParseError> =
+        if (recordSite.site == null && recordSite.additionalSites.isNotEmpty()) listOf(AdditionalSitesWithoutSite)
         else emptyList()
 
     private fun statedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
         statedAddressDistinctnessValidator.validate(
             referenceResolutionParser.parse(request.legalEntity.legalAddress.reference),
-            (request.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference) },
+            (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference) },
             request.additionalAddress?.let { referenceResolutionParser.parse(it.reference) }
         )
 

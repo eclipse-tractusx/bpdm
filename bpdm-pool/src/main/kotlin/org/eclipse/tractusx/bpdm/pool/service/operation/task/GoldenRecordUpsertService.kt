@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteMembershipPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesPlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityAssociationFetchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
@@ -44,7 +44,7 @@ class GoldenRecordUpsertService(
     private val legalEntityUpsertService: LegalEntityUpsertService,
     private val siteUpsertService: SiteUpsertService,
     private val additionalAddressUpsertService: AdditionalAddressUpsertService,
-    private val coLocatedSiteUpsertService: CoLocatedSiteUpsertService,
+    private val additionalSiteUpsertService: AdditionalSiteUpsertService,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
     private val legalEntityAssociationFetchService: LegalEntityAssociationFetchService,
     private val bpnRequestIdentifierMappingCreateService: BpnRequestIdentifierMappingCreateService
@@ -82,8 +82,8 @@ class GoldenRecordUpsertService(
             is GoldenRecordUpsertParsed.SiteRecord -> {
                 val site = siteUpsertService.upsert(parsed.site, legalEntity.value)
                 issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
-                val coLocatedSites = coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, site.value.mainAddress)
-                issued.issueCoLocatedSites(parsed.coLocatedSites, coLocatedSites)
+                val additionalSites = additionalSiteUpsertService.upsert(parsed.additionalSites, site.value, site.value.mainAddress)
+                issued.issueAdditionalSites(parsed.additionalSites, additionalSites)
                 GoldenRecordUpsertResult.SiteRecord(
                     legalEntity,
                     site,
@@ -96,8 +96,8 @@ class GoldenRecordUpsertService(
                 issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
                 val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site.value)
                 issued.issue(parsed.address.reference, address.value.bpn)
-                val coLocatedSites = coLocatedSiteUpsertService.upsert(parsed.coLocatedSites, site.value, address.value)
-                issued.issueCoLocatedSites(parsed.coLocatedSites, coLocatedSites)
+                val additionalSites = additionalSiteUpsertService.upsert(parsed.additionalSites, site.value, address.value)
+                issued.issueAdditionalSites(parsed.additionalSites, additionalSites)
                 GoldenRecordUpsertResult.SiteAddressRecord(
                     legalEntity,
                     site,
@@ -134,7 +134,7 @@ class GoldenRecordUpsertService(
         mainAddressReference(plan)?.let { issue(it, mainAddressBpn) }
     }
 
-    private fun MutableMap<String, String>.issueCoLocatedSites(plan: SiteMembershipPlan, createdSites: List<SiteDb>) {
+    private fun MutableMap<String, String>.issueAdditionalSites(plan: AdditionalSitesPlan, createdSites: List<SiteDb>) {
         plan.newSites.zip(createdSites).forEach { (planned, created) -> issue(planned.reference, created.bpn) }
     }
 

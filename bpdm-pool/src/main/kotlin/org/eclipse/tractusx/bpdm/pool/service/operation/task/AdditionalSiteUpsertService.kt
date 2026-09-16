@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteMembershipPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesPlan
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.springframework.stereotype.Service
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional
  * states rather than something the plan can leave out.
  */
 @Service
-class CoLocatedSiteUpsertService(
+class AdditionalSiteUpsertService(
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val addressUpdateService: AddressUpdateService
 ) {
@@ -47,7 +47,7 @@ class CoLocatedSiteUpsertService(
      * sites and [recordSite], and reports the created sites in the order [plan] states them.
      */
     @Transactional
-    fun upsert(plan: SiteMembershipPlan, recordSite: SiteDb, recordAddress: LogisticAddressDb): List<SiteDb> {
+    fun upsert(plan: AdditionalSitesPlan, recordSite: SiteDb, recordAddress: LogisticAddressDb): List<SiteDb> {
         val createdSites = siteCreateWithReferencedAddressAsMainService.create(
             plan.newSites.map { SiteCreateWithReferencedAddressAsMainParsed(recordAddress, it.header, mainAddressContent = null) }
         )

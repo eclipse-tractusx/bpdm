@@ -21,14 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteMembershipParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.MembershipSiteContentInvalid
-import org.eclipse.tractusx.bpdm.pool.model.error.MembershipSiteNotFound
-import org.eclipse.tractusx.bpdm.pool.model.parsed.MembershipSiteCreatePlan
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSitesParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteContentInvalid
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSiteCreatePlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteMembershipPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesPlan
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteReferenceRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteHeaderParser
@@ -39,23 +38,23 @@ import org.springframework.transaction.annotation.Transactional
  * Decides which sites a golden record upsert states as sharing its record address: the ones that already exist, and
  * the ones it asks to be created there.
  *
- * A site the membership asks to be created has had no confidence assessed of its own, so the caller passes the
- * assessment it borrows — the one the record's own site carries.
+ * A site stated this way has had no confidence assessed of its own, so the caller passes the assessment one it
+ * asks to be created borrows - the one the record's own site carries.
  */
 @Service
-class SiteMembershipParser(
+class AdditionalSitesParser(
     private val siteReferenceParser: SiteReferenceParser,
     private val siteHeaderParser: SiteHeaderParser
 ) {
 
     /**
-     * Reports the membership [stated] amounts to, or every reason an entry of it cannot be accepted.
+     * Reports the additional sites [stated] amount to, or every reason an entry of them cannot be accepted.
      */
     @Transactional(readOnly = true)
     fun parse(
         stated: List<SiteReferenceRequest>,
         borrowedConfidence: ConfidenceCriteriaRequest
-    ): ParseResult<SiteMembershipPlan, SiteMembershipParseError> {
+    ): ParseResult<AdditionalSitesPlan, AdditionalSitesParseError> {
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by
         // the reference it carries and, carrying none, by the name its site is to be created under.
         val statedOnce = stated.distinctBy { it.reference.value ?: it.name }
@@ -67,25 +66,25 @@ class SiteMembershipParser(
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
         return ParseResult.Success(
-            SiteMembershipPlan(
+            AdditionalSitesPlan(
                 existingSites = resolutions.mapNotNull { it.parsedOrNull()?.target },
                 newSites = creations.mapNotNull { it.parsedOrNull() }
             )
         )
     }
 
-    private fun resolve(stated: SiteReferenceRequest, index: Int): ParseResult<ResolvedReference<SiteDb>, SiteMembershipParseError> =
+    private fun resolve(stated: SiteReferenceRequest, index: Int): ParseResult<ResolvedReference<SiteDb>, AdditionalSitesParseError> =
         when (val result = siteReferenceParser.parse(stated.reference)) {
             is ParseResult.Success -> ParseResult.Success(result.parsed)
             // The membership list is positional to the caller, so a rejection says which entry it is about.
-            is ParseResult.Failure -> ParseResult.Failure(result.errors.map { MembershipSiteNotFound(index, it.bpn) })
+            is ParseResult.Failure -> ParseResult.Failure(result.errors.map { AdditionalSiteNotFound(index, it.bpn) })
         }
 
     private fun parseCreations(
         statedOnce: List<SiteReferenceRequest>,
-        resolutions: List<ParseResult<ResolvedReference<SiteDb>, SiteMembershipParseError>>,
+        resolutions: List<ParseResult<ResolvedReference<SiteDb>, AdditionalSitesParseError>>,
         confidence: ConfidenceCriteriaRequest
-    ): List<ParseResult<MembershipSiteCreatePlan?, SiteMembershipParseError>> {
+    ): List<ParseResult<AdditionalSiteCreatePlan?, AdditionalSitesParseError>> {
         // An entry naming no site yet asks for one to be created on the record's address.
         val stated = resolutions.withIndex().mapNotNull { (index, resolution) ->
             resolution.parsedOrNull()?.takeIf { it.target == null }?.let { index to it.reference }
@@ -98,11 +97,12 @@ class SiteMembershipParser(
         val creationByIndex = stated.zip(headers).associate { (entry, header) ->
             val (index, reference) = entry
             index to when (header) {
-                is ParseResult.Success -> ParseResult.Success(MembershipSiteCreatePlan(reference, header.parsed))
-                is ParseResult.Failure -> ParseResult.Failure(header.errors.map { MembershipSiteContentInvalid(index, it) })
+                is ParseResult.Success -> ParseResult.Success(AdditionalSiteCreatePlan(reference, header.parsed))
+                is ParseResult.Failure -> ParseResult.Failure(header.errors.map { AdditionalSiteContentInvalid(index, it) })
             }
         }
 
         return resolutions.indices.map { creationByIndex[it] ?: ParseResult.Success(null) }
     }
+
 }

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteOmitted
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSitePlan
@@ -31,38 +32,34 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Works out which sites will sit on the address a golden record upsert is about, once every partner of the request has
- * been planned.
+ * The rule that a golden record upsert states every site its record address is the main address of.
  *
- * Writing the membership replaces the address's current sites rather than adding to them, so a site bound to the
- * address by its own main-address relation is kept whether or not the request states it.
+ * Writing the membership replaces the address's current sites rather than adding to them, and a site bound to the
+ * address by its own main-address relation cannot be unlinked by a statement about membership. Completing the list is
+ * the refinement service's job, so the Pool reports what it left out rather than filling it in.
  */
 @Service
-class RecordAddressSiteResolver(
+class AdditionalSitesCompletenessValidator(
     private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator
 ) {
 
     /**
-     * Reports the record's site with its stated membership extended by every site already bound to the record address.
+     * Reports every site the record address is the main address of that [recordSite] leaves out.
      */
     @Transactional(readOnly = true)
-    fun withBoundSites(
+    fun validate(
         legalEntity: LegalEntityUpsertPlan?,
         recordSite: RecordSitePlan?,
         additionalAddress: AddressUpsertPlan?
-    ): RecordSitePlan? {
-        if (recordSite == null) return null
-        val recordAddress = recordAddressTarget(legalEntity, recordSite.site, additionalAddress) ?: return recordSite
+    ): List<AdditionalSiteOmitted> {
+        if (recordSite == null) return emptyList()
+        // An address this request creates is not yet the main address of anything, so there is nothing to leave out.
+        val recordAddress = recordAddressTarget(legalEntity, recordSite.site, additionalAddress) ?: return emptyList()
 
         // The record's own site holds the record address whether or not the request repeats it.
-        val statedSites = recordSite.coLocatedSites.existingSites.plus(listOfNotNull(siteTarget(recordSite.site)))
-        val boundSites = siteMainAddressConsistencyValidator.omittedSites(recordAddress, statedSites)
+        val statedSites = recordSite.additionalSites.existingSites.plus(listOfNotNull(siteTarget(recordSite.site)))
 
-        return recordSite.copy(
-            coLocatedSites = recordSite.coLocatedSites.copy(
-                existingSites = recordSite.coLocatedSites.existingSites + boundSites
-            )
-        )
+        return siteMainAddressConsistencyValidator.omittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
     }
 
     private fun legalEntityTarget(plan: LegalEntityUpsertPlan?): LegalEntityDb? =
@@ -76,7 +73,7 @@ class RecordAddressSiteResolver(
         when (site) {
             is SiteUpsertPlan.Unchanged -> site.target
             is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.target
-            is SiteUpsertPlan.UpdateOnLegalAddress -> site.parsed.target
+            is SiteUpsertPlan.UpdateOnLegalAddress -> site.update.target
             is SiteUpsertPlan.CreateWithOwnMainAddress,
             is SiteUpsertPlan.CreateOnLegalAddress,
             is SiteUpsertPlan.CreateOnExistingAddress -> null
@@ -94,9 +91,9 @@ class RecordAddressSiteResolver(
     private fun siteMainAddressTarget(site: SiteUpsertPlan?): LogisticAddressDb? =
         when (site) {
             is SiteUpsertPlan.Unchanged -> site.target.mainAddress
-            is SiteUpsertPlan.CreateOnExistingAddress -> site.parsed.mainAddress
+            is SiteUpsertPlan.CreateOnExistingAddress -> site.creation.mainAddress
             is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.target.mainAddress
-            is SiteUpsertPlan.UpdateOnLegalAddress -> site.parsed.target.mainAddress
+            is SiteUpsertPlan.UpdateOnLegalAddress -> site.update.target.mainAddress
             is SiteUpsertPlan.CreateWithOwnMainAddress, is SiteUpsertPlan.CreateOnLegalAddress, null -> null
         }
 }

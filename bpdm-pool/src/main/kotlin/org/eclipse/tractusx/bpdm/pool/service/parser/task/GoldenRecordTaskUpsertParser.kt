@@ -43,9 +43,8 @@ class GoldenRecordTaskUpsertParser(
     private val legalEntityUpsertParser: LegalEntityUpsertParser,
     private val siteUpsertParser: SiteUpsertParser,
     private val additionalAddressUpsertParser: AdditionalAddressUpsertParser,
-    private val siteMembershipParser: SiteMembershipParser,
-    private val crossPartnerValidator: GoldenRecordCrossPartnerValidator,
-    private val recordAddressSiteResolver: RecordAddressSiteResolver
+    private val additionalSitesParser: AdditionalSitesParser,
+    private val crossPartnerValidator: GoldenRecordCrossPartnerValidator
 ) {
 
     /**
@@ -56,10 +55,10 @@ class GoldenRecordTaskUpsertParser(
         val legalEntity: ParseResult<LegalEntityUpsertPlan, GoldenRecordUpsertParseError> =
             legalEntityUpsertParser.parse(request.legalEntity)
         val recordSite: ParseResult<RecordSitePlan?, GoldenRecordUpsertParseError> =
-            request.site?.let { stated ->
+            request.recordSite.site?.let { stated ->
                 zipParseResults(
                     siteUpsertParser.parse(stated, request.legalEntity),
-                    siteMembershipParser.parse(request.addressSiteMembership, stated.header.confidenceCriteria),
+                    additionalSitesParser.parse(request.recordSite.additionalSites, stated.header.confidenceCriteria),
                     ::RecordSitePlan
                 )
             } ?: ParseResult.Success(null)
@@ -67,10 +66,12 @@ class GoldenRecordTaskUpsertParser(
             request.additionalAddress?.let { additionalAddressUpsertParser.parse(it) } ?: ParseResult.Success(null)
 
         val parsed = listOf(legalEntity, recordSite, additionalAddress)
-        val contradictions = crossPartnerValidator.validate(request, parsed.failureErrors())
+        val contradictions = crossPartnerValidator.validate(
+            request, legalEntity.parsedOrNull(), recordSite.parsedOrNull(), additionalAddress.parsedOrNull(), parsed.failureErrors()
+        )
 
         return zipParseResults(legalEntity, recordSite, additionalAddress) { entity, site, address ->
-            plan(request.sharingMemberRecordId, entity, recordAddressSiteResolver.withBoundSites(entity, site, address), address)
+            plan(request.sharingMemberRecordId, entity, site, address)
         }.combine(contradictions) { it }
     }
 
@@ -83,10 +84,10 @@ class GoldenRecordTaskUpsertParser(
         when {
             recordSite != null && additionalAddress != null ->
                 GoldenRecordUpsertParsed.SiteAddressRecord(
-                    sharingMemberRecordId, legalEntity, recordSite.site, additionalAddress, recordSite.coLocatedSites
+                    sharingMemberRecordId, legalEntity, recordSite.site, additionalAddress, recordSite.additionalSites
                 )
             recordSite != null ->
-                GoldenRecordUpsertParsed.SiteRecord(sharingMemberRecordId, legalEntity, recordSite.site, recordSite.coLocatedSites)
+                GoldenRecordUpsertParsed.SiteRecord(sharingMemberRecordId, legalEntity, recordSite.site, recordSite.additionalSites)
             additionalAddress != null ->
                 GoldenRecordUpsertParsed.LegalEntityAddressRecord(sharingMemberRecordId, legalEntity, additionalAddress)
             else ->
