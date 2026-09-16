@@ -51,14 +51,14 @@ class LegalEntityUpsertParser(
     @Transactional(readOnly = true)
     fun parse(
         request: LegalEntityUpsertRequest
-    ): ParseResult<LegalEntityUpsertPlan, GoldenRecordUpsertParseError> {
-        val errors = mutableListOf<GoldenRecordUpsertParseError>()
+    ): ParseResult<LegalEntityUpsertPlan, LegalEntityUpsertParseError> {
+        val errors = mutableListOf<LegalEntityUpsertParseError>()
         return parsePlan(request, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: LegalEntityUpsertRequest,
-        errors: MutableList<GoldenRecordUpsertParseError>
+        errors: MutableList<LegalEntityUpsertParseError>
     ): LegalEntityUpsertPlan? {
         val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference)
         val resolved = when (val result = legalEntityReferenceParser.parse(request.reference)) {
@@ -88,13 +88,13 @@ class LegalEntityUpsertParser(
     private fun toContentRequest(request: LegalEntityUpsertRequest) =
         LegalEntityContentRequest(header = request.header, legalAddress = request.legalAddress.content)
 
-    private fun toCreateError(error: LegalEntityCreateEntryParseError): GoldenRecordUpsertParseError =
+    private fun toCreateError(error: LegalEntityCreateEntryParseError): LegalEntityUpsertParseError =
         when (error) {
             is LegalEntityContentParseError -> LegalEntityContentInvalid(error)
             is AddressContentParseError -> LegalAddressContentInvalid(error)
         }
 
-    private fun toUpdateError(error: LegalEntityUpdateEntryParseError): GoldenRecordUpsertParseError =
+    private fun toUpdateError(error: LegalEntityUpdateEntryParseError): LegalEntityUpsertParseError =
         when (error) {
             is LegalEntityContentParseError -> LegalEntityContentInvalid(error)
             is AddressContentParseError -> LegalAddressContentInvalid(error)

@@ -49,14 +49,14 @@ class AdditionalAddressUpsertParser(
     @Transactional(readOnly = true)
     fun parse(
         request: AddressUpsertRequest
-    ): ParseResult<AddressUpsertPlan, GoldenRecordUpsertParseError> {
-        val errors = mutableListOf<GoldenRecordUpsertParseError>()
+    ): ParseResult<AddressUpsertPlan, AdditionalAddressUpsertParseError> {
+        val errors = mutableListOf<AdditionalAddressUpsertParseError>()
         return parsePlan(request, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: AddressUpsertRequest,
-        errors: MutableList<GoldenRecordUpsertParseError>
+        errors: MutableList<AdditionalAddressUpsertParseError>
     ): AddressUpsertPlan? {
         val resolved = when (
             val result = addressReferenceParser.parse(request.reference, ::AdditionalAddressNotFound)
@@ -80,7 +80,7 @@ class AdditionalAddressUpsertParser(
         return AddressUpsertPlan.Update(resolved.reference, target, updated.address)
     }
 
-    private fun toCreateError(error: AddressCreateParseError): GoldenRecordUpsertParseError =
+    private fun toCreateError(error: AddressCreateParseError): AdditionalAddressUpsertParseError =
         when (error) {
             is AddressContentParseError -> AdditionalAddressContentInvalid(error)
             is UnresolvableLegalEntity -> LegalEntityNotFound(error.bpn)
@@ -90,7 +90,7 @@ class AdditionalAddressUpsertParser(
             is InvalidParentBpn -> error("Unexpected untyped parent ${error.bpn}")
         }
 
-    private fun toUpdateError(error: AddressUpdateEntryParseError): GoldenRecordUpsertParseError =
+    private fun toUpdateError(error: AddressUpdateEntryParseError): AdditionalAddressUpsertParseError =
         when (error) {
             is AddressContentParseError -> AdditionalAddressContentInvalid(error)
             // The target was resolved first, and membership is stated once for the record, not by this update.

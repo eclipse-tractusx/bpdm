@@ -28,9 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
  *
  * The parsers a partner delegates to are batch-shaped, and an upsert parser hands them one entry at a time.
  */
-internal fun <T, E> List<ParseResult<T, E>>.singleOrRecord(
-    errors: MutableList<GoldenRecordUpsertParseError>,
-    toError: (E) -> GoldenRecordUpsertParseError
+internal fun <T, E, RECORDED> List<ParseResult<T, E>>.singleOrRecord(
+    errors: MutableList<RECORDED>,
+    toError: (E) -> RECORDED
 ): T? =
     when (val result = single()) {
         is ParseResult.Success -> result.parsed
@@ -38,7 +38,7 @@ internal fun <T, E> List<ParseResult<T, E>>.singleOrRecord(
     }
 
 /** The plan, or every reason it could not be made. */
-internal fun <T> T?.orFailure(errors: List<GoldenRecordUpsertParseError>): ParseResult<T, GoldenRecordUpsertParseError> =
+internal fun <T, E> T?.orFailure(errors: List<E>): ParseResult<T, E> =
     if (this == null || errors.isNotEmpty()) ParseResult.Failure(errors) else ParseResult.Success(this)
 
 /** The parsed value, or null where this entry was rejected. */
@@ -46,5 +46,5 @@ internal fun <T> ParseResult<T, *>.parsedOrNull(): T? =
     if (this is ParseResult.Success) parsed else null
 
 /** Every error the rejected entries among these results carry. */
-internal fun List<ParseResult<*, GoldenRecordUpsertParseError>>.failureErrors(): List<GoldenRecordUpsertParseError> =
+internal fun <E> List<ParseResult<*, E>>.failureErrors(): List<E> =
     flatMap { if (it is ParseResult.Failure) it.errors else emptyList() }

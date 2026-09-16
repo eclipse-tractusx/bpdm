@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotInRequestLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.ParentConsistencyParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.MembershipSiteNotInLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInRequestLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
@@ -54,7 +54,7 @@ class GoldenRecordParentConsistencyValidator(
      * Reports every violation of the rule in [request].
      */
     @Transactional(readOnly = true)
-    fun validate(request: GoldenRecordUpsertRequest): List<GoldenRecordUpsertParseError> {
+    fun validate(request: GoldenRecordUpsertRequest): List<ParentConsistencyParseError> {
         val legalEntityBpn = resolveBpn(request.legalEntity.reference)
         val siteBpn = request.site?.let { resolveBpn(it.reference) }
         // A membership stated without a site is rejected on its own, so judging its entries here would fault the same

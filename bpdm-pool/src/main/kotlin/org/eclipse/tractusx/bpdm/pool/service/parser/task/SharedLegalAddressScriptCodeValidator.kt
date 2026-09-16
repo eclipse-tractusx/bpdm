@@ -20,7 +20,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteScriptCodeNotStatedByLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpsertRequest
@@ -39,7 +38,7 @@ class SharedLegalAddressScriptCodeValidator {
     /**
      * Reports every script code the site claims that its shared legal address will not carry.
      */
-    fun validate(legalEntity: LegalEntityUpsertRequest, site: SiteUpsertRequest?): List<GoldenRecordUpsertParseError> {
+    fun validate(legalEntity: LegalEntityUpsertRequest, site: SiteUpsertRequest?): List<SiteScriptCodeNotStatedByLegalEntity> {
         if (site !is SiteUpsertRequest.WithLegalAddressAsMain) return emptyList()
 
         val statedByLegalEntity = legalEntity.header.scriptVariants.map { it.scriptCode }.toSet()

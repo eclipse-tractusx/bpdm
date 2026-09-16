@@ -221,6 +221,7 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 ## 2.7 Errors
 
 - Parse errors MUST be modelled as sealed hierarchies.
+- A parser's declared error type MUST name exactly the errors that parser can report — no more and no less. Every member of the declared type must be reachable from that parser, and every rejection it can reach must be a member. Widening to a shared top-level hierarchy "because it all ends up there anyway" is forbidden: the signature is what tells a reader and a test the parser's whole range of rejections, and a member that cannot occur forces callers to write branches for states that never arise. Where a parser reports a single error, that error's own type is the error type; no interface is needed for one member.
 - A shared content error SHOULD subtype each embedding operation's error interface, so it surfaces as that operation's error directly, without wrapping.
 - Error-to-code mapping MUST be exhaustive over the sealed type, so that adding a new error fails to compile until it is mapped.
 - An operation that answers with a single result rather than per-entry outcomes — a get, a search — MUST still model its parse errors as a sealed hierarchy and map them exhaustively. The mapping yields the error the endpoint raises instead of an `ErrorInfo` entry, and the application layer raises it; the parser still only returns the failure.

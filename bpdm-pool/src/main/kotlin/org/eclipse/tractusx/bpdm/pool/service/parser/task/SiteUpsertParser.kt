@@ -60,15 +60,15 @@ class SiteUpsertParser(
     fun parse(
         request: SiteUpsertRequest,
         legalEntityRequest: LegalEntityUpsertRequest
-    ): ParseResult<SiteUpsertPlan, GoldenRecordUpsertParseError> {
-        val errors = mutableListOf<GoldenRecordUpsertParseError>()
+    ): ParseResult<SiteUpsertPlan, SiteUpsertParseError> {
+        val errors = mutableListOf<SiteUpsertParseError>()
         return parsePlan(request, legalEntityRequest, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: SiteUpsertRequest,
         legalEntityRequest: LegalEntityUpsertRequest,
-        errors: MutableList<GoldenRecordUpsertParseError>
+        errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
         val resolved = when (val result = siteReferenceParser.parse(request.reference)) {
             is ParseResult.Failure -> { errors += result.errors; return null }
@@ -87,7 +87,7 @@ class SiteUpsertParser(
     private fun parseCreate(
         request: SiteUpsertRequest,
         reference: BpnReferenceParsed,
-        errors: MutableList<GoldenRecordUpsertParseError>
+        errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? =
         when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain ->
@@ -101,7 +101,7 @@ class SiteUpsertParser(
     private fun parseCreateWithOwnMainAddress(
         request: SiteUpsertRequest.WithOwnMainAddress,
         reference: BpnReferenceParsed,
-        errors: MutableList<GoldenRecordUpsertParseError>
+        errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
         val resolvedMainAddress = when (
             val result = addressReferenceParser.parse(request.mainAddress.reference, ::SiteMainAddressNotFound)
@@ -131,7 +131,7 @@ class SiteUpsertParser(
         request: SiteUpsertRequest,
         reference: BpnReferenceParsed,
         target: SiteDb,
-        errors: MutableList<GoldenRecordUpsertParseError>
+        errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
         return when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain ->
@@ -157,7 +157,7 @@ class SiteUpsertParser(
         }
     }
 
-    private fun toCreateError(error: SiteCreateEntryParseError): GoldenRecordUpsertParseError =
+    private fun toCreateError(error: SiteCreateEntryParseError): SiteUpsertParseError =
         when (error) {
             is SiteContentParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)
@@ -167,7 +167,7 @@ class SiteUpsertParser(
             is LegalAddressAlreadyMainAddress -> error("Unexpected legal-address-already-main error for site ${error.bpnSite}")
         }
 
-    private fun toUpdateError(error: SiteUpdateEntryParseError): GoldenRecordUpsertParseError =
+    private fun toUpdateError(error: SiteUpdateEntryParseError): SiteUpsertParseError =
         when (error) {
             is SiteContentParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)

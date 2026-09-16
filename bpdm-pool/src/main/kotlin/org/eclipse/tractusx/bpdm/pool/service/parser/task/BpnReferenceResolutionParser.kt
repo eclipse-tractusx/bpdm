@@ -21,7 +21,6 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceKind
@@ -47,11 +46,11 @@ class BpnReferenceResolutionParser(
      * Reports the reference together with the record it names, or the caller's error where it names none that exists.
      */
     @Transactional(readOnly = true)
-    fun <T> parse(
+    fun <T, E> parse(
         reference: BpnReferenceRequest,
         find: (String) -> T?,
-        notFound: (String) -> GoldenRecordUpsertParseError
-    ): ParseResult<ResolvedReference<T>, GoldenRecordUpsertParseError> {
+        notFound: (String) -> E
+    ): ParseResult<ResolvedReference<T>, E> {
         val parsed = parse(reference)
         val bpn = (parsed as? BpnReferenceParsed.Existing)?.bpn
             ?: return ParseResult.Success(ResolvedReference(parsed, null))

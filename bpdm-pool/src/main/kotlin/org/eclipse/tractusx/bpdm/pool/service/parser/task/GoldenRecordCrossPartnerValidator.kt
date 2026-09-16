@@ -47,7 +47,7 @@ class GoldenRecordCrossPartnerValidator(
     fun validate(
         request: GoldenRecordUpsertRequest,
         errorsSoFar: List<GoldenRecordUpsertParseError>
-    ): List<GoldenRecordUpsertParseError> =
+    ): List<CrossPartnerParseError> =
         sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.site)
             .plus(statedAddressDistinctness(request))
             .plus(membershipWithoutSite(request))
@@ -55,11 +55,11 @@ class GoldenRecordCrossPartnerValidator(
             .plus(coverageLosses(request, errorsSoFar))
 
     // The sites stated as sharing the record address share it with the record's own site, so there has to be one.
-    private fun membershipWithoutSite(request: GoldenRecordUpsertRequest): List<GoldenRecordUpsertParseError> =
+    private fun membershipWithoutSite(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
         if (request.site == null && request.addressSiteMembership.isNotEmpty()) listOf(AdditionalSitesWithoutSite)
         else emptyList()
 
-    private fun statedAddressDistinctness(request: GoldenRecordUpsertRequest): List<GoldenRecordUpsertParseError> =
+    private fun statedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
         statedAddressDistinctnessValidator.validate(
             referenceResolutionParser.parse(request.legalEntity.legalAddress.reference),
             (request.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference) },
@@ -69,7 +69,7 @@ class GoldenRecordCrossPartnerValidator(
     private fun coverageLosses(
         request: GoldenRecordUpsertRequest,
         errorsSoFar: List<GoldenRecordUpsertParseError>
-    ): List<GoldenRecordUpsertParseError> {
+    ): List<CrossPartnerParseError> {
         // Coverage reads the partners a written address is shared with. A partner this request failed to resolve is
         // not among them as far as the check can tell, so it would report the request taking away coverage it never
         // had. The other cross-partner checks resolve what they need themselves and stay meaningful.

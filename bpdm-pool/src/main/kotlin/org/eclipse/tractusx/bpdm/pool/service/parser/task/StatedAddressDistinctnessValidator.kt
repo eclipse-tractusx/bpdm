@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressRestatesLegalAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressRestatesSiteMainAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.StatedAddressDistinctnessParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressRestatesLegalAddress
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.springframework.stereotype.Service
@@ -43,7 +43,7 @@ class StatedAddressDistinctnessValidator {
         legalAddress: BpnReferenceParsed,
         siteMainAddress: BpnReferenceParsed?,
         additionalAddress: BpnReferenceParsed?
-    ): List<GoldenRecordUpsertParseError> =
+    ): List<StatedAddressDistinctnessParseError> =
         listOfNotNull(
             SiteMainAddressRestatesLegalAddress.takeIf { namesSameRecord(legalAddress, siteMainAddress) },
             AdditionalAddressRestatesLegalAddress.takeIf { namesSameRecord(legalAddress, additionalAddress) },

@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
@@ -43,7 +42,7 @@ class LegalEntityReferenceParser(
      */
     fun parse(
         reference: BpnReferenceRequest
-    ): ParseResult<ResolvedReference<LegalEntityDb>, GoldenRecordUpsertParseError> =
+    ): ParseResult<ResolvedReference<LegalEntityDb>, LegalEntityNotFound> =
         referenceResolutionParser.parse(
             reference,
             { bpn -> (legalEntityBpnParser.parse(listOf(bpn)).single() as? ParseResult.Success)?.parsed },
