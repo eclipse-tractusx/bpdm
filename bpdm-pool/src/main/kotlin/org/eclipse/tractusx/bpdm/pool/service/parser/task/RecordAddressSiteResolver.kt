@@ -21,28 +21,25 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.error.MembershipSiteNotInLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSitePlan
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Completes and checks the sites that will sit on the address a golden record upsert is about.
+ * Works out which sites will sit on the address a golden record upsert is about, once every partner of the request has
+ * been planned.
  *
  * Writing the membership replaces the address's current sites rather than adding to them, so a site bound to the
- * address by its own main-address relation is kept whether or not the request states it. A site of another legal
- * entity is refused instead, as the address belongs to the request's own legal entity.
+ * address by its own main-address relation is kept whether or not the request states it.
  */
 @Service
-class RecordAddressSitesParser(
-    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator,
-    private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator
+class RecordAddressSiteResolver(
+    private val siteMainAddressConsistencyValidator: SiteMainAddressConsistencyValidator
 ) {
 
     /**
@@ -66,21 +63,6 @@ class RecordAddressSitesParser(
                 existingSites = recordSite.coLocatedSites.existingSites + boundSites
             )
         )
-    }
-
-    /**
-     * Reports each site the request states as sitting on its record address that belongs to another legal entity.
-     */
-    @Transactional(readOnly = true)
-    fun validate(legalEntity: LegalEntityUpsertPlan?, recordSite: RecordSitePlan?): List<MembershipSiteNotInLegalEntity> {
-        val statedSites = recordSite?.coLocatedSites?.existingSites ?: return emptyList()
-        val legalEntityTarget = legalEntityTarget(legalEntity)
-            // A legal entity this request creates has no sites yet, so every site already persisted is another's.
-            ?: return statedSites.map { MembershipSiteNotInLegalEntity(it.bpn, null) }
-
-        return statedSites
-            .flatMap { siteLegalEntityConsistencyValidator.check(legalEntityTarget, it) }
-            .map { MembershipSiteNotInLegalEntity(it.siteBpn, it.legalEntityBpn) }
     }
 
     private fun legalEntityTarget(plan: LegalEntityUpsertPlan?): LegalEntityDb? =

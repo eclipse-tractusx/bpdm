@@ -70,6 +70,8 @@ data object SiteMainAddressRestatesLegalAddress : GoldenRecordUpsertParseError
 
 data class SiteDoesNotSitOnLegalAddress(val siteBpn: String, val mainAddressBpn: String) : GoldenRecordUpsertParseError
 
+data object AdditionalSitesWithoutSite : GoldenRecordUpsertParseError
+
 data object AdditionalAddressRestatesLegalAddress : GoldenRecordUpsertParseError
 
 data object AdditionalAddressRestatesSiteMainAddress : GoldenRecordUpsertParseError

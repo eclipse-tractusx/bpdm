@@ -66,6 +66,8 @@ class GoldenRecordTaskParseErrorMapper {
             is SiteScriptCodeNotStatedByLegalEntity ->
                 "A site whose main address is the legal address can only be named in scripts the legal entity is named in: " +
                         "state script code '${error.scriptCode}' on the legal entity as well, or drop it from the site"
+            AdditionalSitesWithoutSite ->
+                "Additional sites can only be stated for a business partner that states a site of its own"
             is MembershipSiteNotInLegalEntity ->
                 "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn ?: "of this record"}"
         }

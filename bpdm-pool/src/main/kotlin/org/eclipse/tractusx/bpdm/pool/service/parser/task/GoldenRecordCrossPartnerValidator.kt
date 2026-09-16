@@ -50,8 +50,14 @@ class GoldenRecordCrossPartnerValidator(
     ): List<GoldenRecordUpsertParseError> =
         sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.site)
             .plus(statedAddressDistinctness(request))
+            .plus(membershipWithoutSite(request))
             .plus(parentConsistencyValidator.validate(request))
             .plus(coverageLosses(request, errorsSoFar))
+
+    // The sites stated as sharing the record address share it with the record's own site, so there has to be one.
+    private fun membershipWithoutSite(request: GoldenRecordUpsertRequest): List<GoldenRecordUpsertParseError> =
+        if (request.site == null && request.addressSiteMembership.isNotEmpty()) listOf(AdditionalSitesWithoutSite)
+        else emptyList()
 
     private fun statedAddressDistinctness(request: GoldenRecordUpsertRequest): List<GoldenRecordUpsertParseError> =
         statedAddressDistinctnessValidator.validate(

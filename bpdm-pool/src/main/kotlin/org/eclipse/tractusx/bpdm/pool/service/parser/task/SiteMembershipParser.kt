@@ -40,8 +40,8 @@ import org.springframework.transaction.annotation.Transactional
  * Decides which sites a golden record upsert states as sharing its record address: the ones that already exist, and
  * the ones it asks to be created there.
  *
- * A site the membership asks to be created has had no confidence assessed of its own, so it borrows the assessment
- * the request carries for the business partner it is about.
+ * A site the membership asks to be created has had no confidence assessed of its own, so the caller passes the
+ * assessment it borrows — the one the record's own site carries.
  */
 @Service
 class SiteMembershipParser(
@@ -50,16 +50,19 @@ class SiteMembershipParser(
 ) {
 
     /**
-     * Reports the membership [request] states, or every reason an entry of it cannot be accepted.
+     * Reports the membership [stated] amounts to, or every reason an entry of it cannot be accepted.
      */
     @Transactional(readOnly = true)
-    fun parse(request: GoldenRecordUpsertRequest): ParseResult<SiteMembershipPlan, GoldenRecordUpsertParseError> {
+    fun parse(
+        stated: List<SiteReferenceRequest>,
+        borrowedConfidence: ConfidenceCriteriaRequest
+    ): ParseResult<SiteMembershipPlan, GoldenRecordUpsertParseError> {
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by
         // the reference it carries and, carrying none, by the name its site is to be created under.
-        val statedOnce = request.addressSiteMembership.distinctBy { it.reference.value ?: it.name }
+        val statedOnce = stated.distinctBy { it.reference.value ?: it.name }
 
-        val resolutions = statedOnce.mapIndexed { index, stated -> resolve(stated, index) }
-        val creations = parseCreations(statedOnce, resolutions, borrowedConfidence(request))
+        val resolutions = statedOnce.mapIndexed { index, entry -> resolve(entry, index) }
+        val creations = parseCreations(statedOnce, resolutions, borrowedConfidence)
 
         val errors = resolutions.failureErrors() + creations.failureErrors()
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
@@ -104,9 +107,4 @@ class SiteMembershipParser(
 
         return resolutions.indices.map { creationByIndex[it] ?: ParseResult.Success(null) }
     }
-
-    private fun borrowedConfidence(request: GoldenRecordUpsertRequest): ConfidenceCriteriaRequest =
-        request.site?.header?.confidenceCriteria
-            ?: request.additionalAddress?.content?.confidenceCriteria
-            ?: request.legalEntity.legalAddress.content.confidenceCriteria
 }

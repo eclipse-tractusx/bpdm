@@ -45,7 +45,7 @@ class GoldenRecordTaskUpsertParser(
     private val additionalAddressUpsertParser: AdditionalAddressUpsertParser,
     private val siteMembershipParser: SiteMembershipParser,
     private val crossPartnerValidator: GoldenRecordCrossPartnerValidator,
-    private val recordAddressSitesParser: RecordAddressSitesParser
+    private val recordAddressSiteResolver: RecordAddressSiteResolver
 ) {
 
     /**
@@ -57,17 +57,20 @@ class GoldenRecordTaskUpsertParser(
             legalEntityUpsertParser.parse(request.legalEntity)
         val recordSite: ParseResult<RecordSitePlan?, GoldenRecordUpsertParseError> =
             request.site?.let { stated ->
-                zipParseResults(siteUpsertParser.parse(stated, request.legalEntity), siteMembershipParser.parse(request), ::RecordSitePlan)
+                zipParseResults(
+                    siteUpsertParser.parse(stated, request.legalEntity),
+                    siteMembershipParser.parse(request.addressSiteMembership, stated.header.confidenceCriteria),
+                    ::RecordSitePlan
+                )
             } ?: ParseResult.Success(null)
         val additionalAddress: ParseResult<AddressUpsertPlan?, GoldenRecordUpsertParseError> =
             request.additionalAddress?.let { additionalAddressUpsertParser.parse(it) } ?: ParseResult.Success(null)
 
         val parsed = listOf(legalEntity, recordSite, additionalAddress)
-        val contradictions = crossPartnerValidator.validate(request, parsed.failureErrors()) +
-                recordAddressSitesParser.validate(legalEntity.parsedOrNull(), recordSite.parsedOrNull())
+        val contradictions = crossPartnerValidator.validate(request, parsed.failureErrors())
 
         return zipParseResults(legalEntity, recordSite, additionalAddress) { entity, site, address ->
-            plan(request.sharingMemberRecordId, entity, recordAddressSitesParser.withBoundSites(entity, site, address), address)
+            plan(request.sharingMemberRecordId, entity, recordAddressSiteResolver.withBoundSites(entity, site, address), address)
         }.combine(contradictions) { it }
     }
 
