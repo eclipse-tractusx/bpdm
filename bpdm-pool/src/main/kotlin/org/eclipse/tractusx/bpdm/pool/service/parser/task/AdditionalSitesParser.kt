@@ -59,7 +59,7 @@ class AdditionalSitesParser(
         // the reference it carries and, carrying none, by the name its site is to be created under.
         val distinctSiteReferences = siteReferences.distinctBy { it.reference.value ?: it.name }
 
-        val resolutions = distinctSiteReferences.mapIndexed { index, entry -> resolve(entry, index) }
+        val resolutions = distinctSiteReferences.mapIndexed { index, siteReference -> resolve(siteReference, index) }
         val creations = parseCreations(distinctSiteReferences, resolutions, borrowedConfidence)
 
         val errors = resolutions.failureErrors() + creations.failureErrors()
@@ -94,8 +94,8 @@ class AdditionalSitesParser(
             newSiteReferences.map { (index, _) -> SiteHeaderRequest(distinctSiteReferences[index].name, emptyList(), borrowedConfidence, emptyList()) }
         )
 
-        val creationByIndex = newSiteReferences.zip(headers).associate { (entry, header) ->
-            val (index, siteReference) = entry
+        val creationByIndex = newSiteReferences.zip(headers).associate { (indexedSiteReference, header) ->
+            val (index, siteReference) = indexedSiteReference
             index to when (header) {
                 is ParseResult.Success -> ParseResult.Success(AdditionalSiteCreatePlan(siteReference, header.parsed))
                 is ParseResult.Failure -> ParseResult.Failure(header.errors.map { AdditionalSiteContentInvalid(index, it) })

@@ -60,25 +60,25 @@ class GoldenRecordCrossPartnerValidator(
         errorsSoFar: List<GoldenRecordUpsertParseError>
     ): List<CrossPartnerParseError> =
         sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.recordSite.site)
-            .plus(statedAddressDistinctness(request))
-            .plus(additionalSitesWithoutSite(request.recordSite))
+            .plus(validateStatedAddressDistinctness(request))
+            .plus(validateAdditionalSitesHaveRecordSite(request.recordSite))
             .plus(parentConsistencyValidator.validate(request))
             .plus(additionalSitesCompletenessValidator.validate(legalEntity, recordSite, additionalAddress))
-            .plus(coverageLosses(request, errorsSoFar))
+            .plus(validateCoverageNotLost(request, errorsSoFar))
 
     // The additional sites share the record address with the record's own site, so there has to be one.
-    private fun additionalSitesWithoutSite(recordSite: RecordSiteRequest): List<CrossPartnerParseError> =
+    private fun validateAdditionalSitesHaveRecordSite(recordSite: RecordSiteRequest): List<CrossPartnerParseError> =
         if (recordSite.site == null && recordSite.additionalSites.isNotEmpty()) listOf(AdditionalSitesWithoutSite)
         else emptyList()
 
-    private fun statedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
+    private fun validateStatedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
         statedAddressDistinctnessValidator.validate(
             referenceResolutionParser.parse(request.legalEntity.legalAddress.reference),
             (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference) },
             request.additionalAddress?.let { referenceResolutionParser.parse(it.reference) }
         )
 
-    private fun coverageLosses(
+    private fun validateCoverageNotLost(
         request: GoldenRecordUpsertRequest,
         errorsSoFar: List<GoldenRecordUpsertParseError>
     ): List<CrossPartnerParseError> {
@@ -90,7 +90,7 @@ class GoldenRecordCrossPartnerValidator(
         }
         if (unresolved) return emptyList()
 
-        return coverageValidator.validate(listOf(coverageWriteReader.writesOf(request)))
+        return coverageValidator.validate(listOf(coverageWriteReader.collectWrites(request)))
             .single()
             .map { ScriptVariantCoverageLost(it) }
     }

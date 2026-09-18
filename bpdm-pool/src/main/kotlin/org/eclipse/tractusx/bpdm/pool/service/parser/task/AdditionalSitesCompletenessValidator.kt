@@ -59,7 +59,7 @@ class AdditionalSitesCompletenessValidator(
         // The record's own site holds the record address whether or not the request repeats it.
         val statedSites = recordSite.additionalSites.existingSites.plus(listOfNotNull(existingSite(recordSite.site)))
 
-        return siteMainAddressConsistencyValidator.omittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
+        return siteMainAddressConsistencyValidator.findOmittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
     }
 
     private fun existingLegalEntity(legalEntity: LegalEntityUpsertPlan?): LegalEntityDb? =

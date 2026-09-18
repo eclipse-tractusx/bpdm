@@ -48,7 +48,7 @@ class GoldenRecordCoverageWriteReader(
      * Reports every address [request] writes, with the script codes it will carry and the partners stated on it.
      */
     @Transactional(readOnly = true)
-    fun writesOf(request: GoldenRecordUpsertRequest): List<AddressCoverageWrite> {
+    fun collectWrites(request: GoldenRecordUpsertRequest): List<AddressCoverageWrite> {
         val writtenSite = request.recordSite.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
         val legalEntityWritten = request.legalEntity.intent == UpsertIntent.AlwaysWrite
 

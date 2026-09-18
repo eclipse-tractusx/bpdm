@@ -59,10 +59,10 @@ class ScriptVariantCoverageValidator(
      */
     fun <T, E> applyTo(
         results: List<ParseResult<T, E>>,
-        writesOf: (T) -> List<AddressCoverageWrite>,
+        collectWrites: (T) -> List<AddressCoverageWrite>,
         toError: (ScriptVariantCoverageParseError) -> E
     ): List<ParseResult<T, E>> {
-        val writes = results.map { result -> (result as? ParseResult.Success)?.parsed?.let(writesOf).orEmpty() }
+        val writes = results.map { result -> (result as? ParseResult.Success)?.parsed?.let(collectWrites).orEmpty() }
         return results.zip(validate(writes)) { result, errors -> result.combine(errors.map(toError)) { it } }
     }
 
@@ -73,18 +73,18 @@ class ScriptVariantCoverageValidator(
         val address = writtenAddress(write)
             ?: return check((write as AddressCoverageWrite.Created).scriptCodes, write.partners)
 
-        val writesOfAddress = writesByAddress[address.bpn].orEmpty()
+        val addressWrites = writesByAddress[address.bpn].orEmpty()
         // A write that leaves the address content alone can only strand the partner it adds: the ones already on the
         // address keep the coverage they have, however it stands today.
-        val contentWrite = writesOfAddress.filterIsInstance<AddressCoverageWrite.Rewritten>().firstOrNull()
+        val contentWrite = addressWrites.filterIsInstance<AddressCoverageWrite.Rewritten>().firstOrNull()
             ?: return check(address.scriptCodes(), write.partners)
 
         // Every write of this address states its partners anew, so they are judged on what they are about to become
         // and are left out of what is read from the database.
-        val stated = writesOfAddress.flatMap { it.partners }
-        val storedPartners = partnerReader.storedPartners(address, stated.mapNotNull { it.bpn }.toSet())
+        val statedPartners = addressWrites.flatMap { it.partners }
+        val storedPartners = partnerReader.storedPartners(address, statedPartners.mapNotNull { it.bpn }.toSet())
 
-        return check(contentWrite.scriptCodes, stated + storedPartners)
+        return check(contentWrite.scriptCodes, statedPartners + storedPartners)
     }
 
     private fun writtenAddress(write: AddressCoverageWrite): LogisticAddressDb? =

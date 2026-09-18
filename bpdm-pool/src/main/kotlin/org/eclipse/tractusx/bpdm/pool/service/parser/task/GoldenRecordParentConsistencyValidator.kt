@@ -85,8 +85,8 @@ class GoldenRecordParentConsistencyValidator(
         (referenceResolutionParser.parse(reference) as? BpnReferenceParsed.Existing)?.bpn
 
     private fun resolveSitesPresent(siteBpns: List<String>): Map<String, SiteDb> {
-        val distinct = siteBpns.distinct()
-        return distinct.zip(siteBpnParser.parse(distinct))
+        val distinctSiteBpns = siteBpns.distinct()
+        return distinctSiteBpns.zip(siteBpnParser.parse(distinctSiteBpns))
             .mapNotNull { (bpn, result) -> (result as? ParseResult.Success)?.let { bpn to it.parsed } }
             .toMap()
     }
