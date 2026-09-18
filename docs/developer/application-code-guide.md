@@ -24,10 +24,11 @@ It applies to every BPDM service: Pool, Gate, Orchestrator, and any service adde
   - [2.3 Parser layer](#23-parser-layer)
   - [2.4 Operation layer](#24-operation-layer)
   - [2.5 Models & naming](#25-models--naming)
-  - [2.6 Mappers](#26-mappers)
-  - [2.7 Errors](#27-errors)
-  - [2.8 Transactions](#28-transactions)
-  - [2.9 Batch & correlation contract](#29-batch--correlation-contract)
+  - [2.6 Naming of properties, variables & methods](#26-naming-of-properties-variables--methods)
+  - [2.7 Mappers](#27-mappers)
+  - [2.8 Errors](#28-errors)
+  - [2.9 Transactions](#29-transactions)
+  - [2.10 Batch & correlation contract](#210-batch--correlation-contract)
 - [NOTICE](#notice)
 
 ---
@@ -171,7 +172,7 @@ Background jobs and internal process orchestration are not request-driven operat
 - It MUST contain only orchestration and translation — no validation, no business rules, no persistence.
 - It MUST be the only layer that maps to or from API DTOs.
 - It MUST own the outer transaction boundary.
-- It MUST drive the flow through `parseAndExecute` (parse the whole batch, execute only successes) and preserve input order in the response, unless the operation is one of the entry-at-a-time exceptions of [2.9](#29-batch--correlation-contract).
+- It MUST drive the flow through `parseAndExecute` (parse the whole batch, execute only successes) and preserve input order in the response, unless the operation is one of the entry-at-a-time exceptions of [2.10](#210-batch--correlation-contract).
 
 ## 2.3 Parser layer
 
@@ -191,7 +192,7 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 **Validation**
 
 - A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
-- A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.7](#27-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
+- A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.8](#28-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
 - An error a parser reports SHOULD quote the value as the caller sent it, not its normalized form, so the client recognises its own input.
 - A parser that can reject nothing MAY return its `…Parsed` value directly instead of a `ParseResult`. Normalizing search criteria is the typical case: an unknown or malformed filter value simply matches nothing, so there is no verdict to report. As soon as one input can be rejected, the parser MUST return a `ParseResult`.
 
@@ -217,7 +218,34 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types. Where an internal model duplicates the shape of an API DTO, it SHOULD reuse the shared value types and enums rather than cloning them — only the DTO wrapper is duplicated, not the vocabulary it is built from.
 - Types SHOULD be named domain-noun first, with the role/stage as a suffix (`AddressCreateParsed`, not `ParsedAddressCreate`).
 
-## 2.6 Mappers
+## 2.6 Naming of properties, variables & methods
+
+Properties and variables:
+
+- A name MUST identify its subject, not its kind: `legalEntityReference`, not `reference`. This covers references, BPNs, ids and entities alike.
+- Qualification is required only where more than one candidate is in scope. Where a scope holds one value of a kind — including one whose subject the enclosing class name already fixes — the unqualified name MUST be kept.
+- Where two or more values of one kind are in scope, each of them MUST carry a qualifier. Leaving one of them bare is forbidden.
+- A qualifier MUST state the value's role in the request or the rule, never its type.
+- A value narrowed or filtered out of another MUST name the narrowing.
+- A name MUST use the vocabulary of the types and errors it belongs to, not wording invented in comments.
+- One word MUST NOT denote two different things within one scope.
+- A collection MUST be plural and MUST name its elements.
+- A name MUST describe the whole value. A pair or an indexed element MUST be named for the composite, not for the part destructured out of it on the next line.
+- A name established for a subject MUST be kept downstream, including in lambda parameters; it MUST NOT be abbreviated. Only the representation suffix (`…Request` / `…Parsed` / `…Plan` / `…Db`) distinguishes its forms.
+- A layer-generic stand-in (`parsed`, `content`, `result`, `resolved`, `created`, `updated`) MAY stand alone only where the scope performs that operation exactly once. Count the operations the scope performs, not the types it declares.
+- A word naming a role or a provenance (`target`, `stated`, `existing`) MUST be used only where the contrasting case is present in the same scope.
+- A value MUST be named for what it is, never for what a later step will do to it.
+- A preposition MUST NOT serve as a name.
+
+Methods:
+
+- A method name MUST be a verb phrase. A noun-named method is forbidden; where a noun is the only honest name, the member MUST be a property rather than a method.
+- A method MUST be named for the work it does or the rule it enforces — never for the failure it detects, and never for the type it returns.
+- A method name MUST use the established prefix for its kind: `parse…` for a parse step, `to…` for a pure conversion named after the type produced, `validate…` for a rule check, `find…` / `collect…` for a lookup.
+- A method name MUST NOT take its verb from a domain type family.
+- A helper's parameters MUST be named from the helper's own scope, not from a call site, and sibling helpers MUST agree with each other. Where only one call site justifies a qualifier, the qualifier belongs at that call site.
+
+## 2.7 Mappers
 
 - A mapper MUST be a `@Component` — not a `@Service`, because it is a humble translation object and holds none of a service's authority — do translation only (no business logic, no side effects), and live in the `mapper` package.
 - A decision, a rule-based default, or a branch on business state is business logic: it MUST NOT appear in a mapper, and MUST live in the parser (if it decides) or the operation (if it acts). No size or convenience argument justifies an exception.
@@ -226,7 +254,7 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - A mapper MUST cover exactly one direction: inbound (DTO → `…Request`), entity (`…Parsed` → `…Db`), or outbound (errors/results → response DTO / `ErrorInfo`). It MUST NOT merge two directions, and one direction MUST NOT be fragmented across several mappers for the same content.
 - Once extracted, mapping — including response shaping — MUST live in the `mapper` package as a proper `@Component` mapper. It MUST NOT be left as loose extension functions in a service package. *(Current gap: outbound response mapping still lives as extension functions outside the mapper package.)*
 
-## 2.7 Errors
+## 2.8 Errors
 
 - Parse errors MUST be modelled as sealed hierarchies.
 - A parser's declared error type MUST name exactly the errors that parser can report — no more and no less. Every member of the declared type must be reachable from that parser, and every rejection it can reach must be a member. Widening to a shared top-level hierarchy "because it all ends up there anyway" is forbidden: the signature is what tells a reader and a test the parser's whole range of rejections, and a member that cannot occur forces callers to write branches for states that never arise. Where a parser reports a single error, that error's own type is the error type; no interface is needed for one member.
@@ -235,11 +263,11 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - An operation that answers with a single result rather than per-entry outcomes — a get, a search — MUST still model its parse errors as a sealed hierarchy and map them exhaustively. The mapping yields the error the endpoint raises instead of an `ErrorInfo` entry, and the application layer raises it; the parser still only returns the failure.
 - A genuinely unreachable or internal error SHOULD map to a thrown 500, not to a client-facing error code.
 
-## 2.8 Transactions
+## 2.9 Transactions
 
 - A class MUST declare `@Transactional` only when it needs it: the application layer owns the outer boundary; operation methods are transactional so they are safe as standalone entry points and participate in the outer transaction otherwise; parsers use `@Transactional(readOnly = true)` when they read repeatedly (see [2.3](#23-parser-layer)).
 
-## 2.9 Batch & correlation contract
+## 2.10 Batch & correlation contract
 
 - Every layer MUST preserve order: the i-th response corresponds to the i-th request. A parser's verdict list and an operation's result list therefore have the same size as their input.
 - Every layer MUST query and write in batch, not once per entry: a lookup a batch shares — metadata, referenced entities, existing rows — is issued once for the whole batch. This applies to parsers and operation services alike.
