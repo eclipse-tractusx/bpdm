@@ -55,8 +55,8 @@ class BpnReferenceResolutionParser(
         val bpn = (parsed as? BpnReferenceParsed.Existing)?.bpn
             ?: return ParseResult.Success(ResolvedReference(parsed, null))
 
-        val target = find(bpn) ?: return ParseResult.ofSingleFailure(notFound(bpn))
-        return ParseResult.Success(ResolvedReference(parsed, target))
+        val existingRecord = find(bpn) ?: return ParseResult.ofSingleFailure(notFound(bpn))
+        return ParseResult.Success(ResolvedReference(parsed, existingRecord))
     }
 
     /**

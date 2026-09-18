@@ -48,50 +48,50 @@ class AdditionalSitesParser(
 ) {
 
     /**
-     * Reports the additional sites [stated] amount to, or every reason an entry of them cannot be accepted.
+     * Reports the additional sites [siteReferences] amount to, or every reason an entry of them cannot be accepted.
      */
     @Transactional(readOnly = true)
     fun parse(
-        stated: List<SiteReferenceRequest>,
+        siteReferences: List<SiteReferenceRequest>,
         borrowedConfidence: ConfidenceCriteriaRequest
     ): ParseResult<AdditionalSitesPlan, AdditionalSitesParseError> {
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by
         // the reference it carries and, carrying none, by the name its site is to be created under.
-        val statedOnce = stated.distinctBy { it.reference.value ?: it.name }
+        val distinctSiteReferences = siteReferences.distinctBy { it.reference.value ?: it.name }
 
-        val resolutions = statedOnce.mapIndexed { index, entry -> resolve(entry, index) }
-        val creations = parseCreations(statedOnce, resolutions, borrowedConfidence)
+        val resolutions = distinctSiteReferences.mapIndexed { index, entry -> resolve(entry, index) }
+        val creations = parseCreations(distinctSiteReferences, resolutions, borrowedConfidence)
 
         val errors = resolutions.failureErrors() + creations.failureErrors()
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
         return ParseResult.Success(
             AdditionalSitesPlan(
-                existingSites = resolutions.mapNotNull { it.parsedOrNull()?.target },
+                existingSites = resolutions.mapNotNull { it.parsedOrNull()?.existingRecord },
                 newSites = creations.mapNotNull { it.parsedOrNull() }
             )
         )
     }
 
-    private fun resolve(stated: SiteReferenceRequest, index: Int): ParseResult<ResolvedReference<SiteDb>, AdditionalSitesParseError> =
-        when (val result = siteReferenceParser.parse(stated.reference)) {
+    private fun resolve(siteReference: SiteReferenceRequest, index: Int): ParseResult<ResolvedReference<SiteDb>, AdditionalSitesParseError> =
+        when (val result = siteReferenceParser.parse(siteReference.reference)) {
             is ParseResult.Success -> ParseResult.Success(result.parsed)
             // The membership list is positional to the caller, so a rejection says which entry it is about.
             is ParseResult.Failure -> ParseResult.Failure(result.errors.map { AdditionalSiteNotFound(index, it.bpn) })
         }
 
     private fun parseCreations(
-        statedOnce: List<SiteReferenceRequest>,
+        distinctSiteReferences: List<SiteReferenceRequest>,
         resolutions: List<ParseResult<ResolvedReference<SiteDb>, AdditionalSitesParseError>>,
-        confidence: ConfidenceCriteriaRequest
+        borrowedConfidence: ConfidenceCriteriaRequest
     ): List<ParseResult<AdditionalSiteCreatePlan?, AdditionalSitesParseError>> {
         // An entry naming no site yet asks for one to be created on the record's address.
         val newSiteReferences = resolutions.withIndex().mapNotNull { (index, resolution) ->
-            resolution.parsedOrNull()?.takeIf { it.target == null }?.let { index to it.reference }
+            resolution.parsedOrNull()?.takeIf { it.existingRecord == null }?.let { index to it.reference }
         }
 
         val headers = siteHeaderParser.parse(
-            newSiteReferences.map { (index, _) -> SiteHeaderRequest(statedOnce[index].name, emptyList(), confidence, emptyList()) }
+            newSiteReferences.map { (index, _) -> SiteHeaderRequest(distinctSiteReferences[index].name, emptyList(), borrowedConfidence, emptyList()) }
         )
 
         val creationByIndex = newSiteReferences.zip(headers).associate { (entry, header) ->

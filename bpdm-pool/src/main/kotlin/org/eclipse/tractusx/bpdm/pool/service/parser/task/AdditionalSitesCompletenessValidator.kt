@@ -54,45 +54,45 @@ class AdditionalSitesCompletenessValidator(
     ): List<AdditionalSiteOmitted> {
         if (recordSite == null) return emptyList()
         // An address this request creates is not yet the main address of anything, so there is nothing to leave out.
-        val recordAddress = recordAddressTarget(legalEntity, recordSite.site, additionalAddress) ?: return emptyList()
+        val recordAddress = existingRecordAddress(legalEntity, recordSite.site, additionalAddress) ?: return emptyList()
 
         // The record's own site holds the record address whether or not the request repeats it.
-        val statedSites = recordSite.additionalSites.existingSites.plus(listOfNotNull(siteTarget(recordSite.site)))
+        val statedSites = recordSite.additionalSites.existingSites.plus(listOfNotNull(existingSite(recordSite.site)))
 
         return siteMainAddressConsistencyValidator.omittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
     }
 
-    private fun legalEntityTarget(legalEntity: LegalEntityUpsertPlan?): LegalEntityDb? =
+    private fun existingLegalEntity(legalEntity: LegalEntityUpsertPlan?): LegalEntityDb? =
         when (legalEntity) {
-            is LegalEntityUpsertPlan.Unchanged -> legalEntity.target
-            is LegalEntityUpsertPlan.Update -> legalEntity.target
+            is LegalEntityUpsertPlan.Unchanged -> legalEntity.existingLegalEntity
+            is LegalEntityUpsertPlan.Update -> legalEntity.existingLegalEntity
             is LegalEntityUpsertPlan.Create, null -> null
         }
 
-    private fun siteTarget(site: SiteUpsertPlan): SiteDb? =
+    private fun existingSite(site: SiteUpsertPlan): SiteDb? =
         when (site) {
-            is SiteUpsertPlan.Unchanged -> site.target
-            is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.target
+            is SiteUpsertPlan.Unchanged -> site.existingSite
+            is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.existingSite
             is SiteUpsertPlan.UpdateOnLegalAddress -> site.update.target
             is SiteUpsertPlan.CreateWithOwnMainAddress,
             is SiteUpsertPlan.CreateOnLegalAddress,
             is SiteUpsertPlan.CreateOnExistingAddress -> null
         }
 
-    private fun recordAddressTarget(
+    private fun existingRecordAddress(
         legalEntity: LegalEntityUpsertPlan?,
         site: SiteUpsertPlan?,
         additionalAddress: AddressUpsertPlan?
     ): LogisticAddressDb? =
-        (additionalAddress as? AddressUpsertPlan.Update)?.target
-            ?: siteMainAddressTarget(site)
-            ?: legalEntityTarget(legalEntity)?.legalAddress
+        (additionalAddress as? AddressUpsertPlan.Update)?.existingAddress
+            ?: existingSiteMainAddress(site)
+            ?: existingLegalEntity(legalEntity)?.legalAddress
 
-    private fun siteMainAddressTarget(site: SiteUpsertPlan?): LogisticAddressDb? =
+    private fun existingSiteMainAddress(site: SiteUpsertPlan?): LogisticAddressDb? =
         when (site) {
-            is SiteUpsertPlan.Unchanged -> site.target.mainAddress
+            is SiteUpsertPlan.Unchanged -> site.existingSite.mainAddress
             is SiteUpsertPlan.CreateOnExistingAddress -> site.creation.mainAddress
-            is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.target.mainAddress
+            is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.existingSite.mainAddress
             is SiteUpsertPlan.UpdateOnLegalAddress -> site.update.target.mainAddress
             is SiteUpsertPlan.CreateWithOwnMainAddress, is SiteUpsertPlan.CreateOnLegalAddress, null -> null
         }

@@ -59,29 +59,27 @@ class SiteUpsertParser(
     @Transactional(readOnly = true)
     fun parse(
         request: SiteUpsertRequest,
-        legalEntityRequest: LegalEntityUpsertRequest
     ): ParseResult<SiteUpsertPlan, SiteUpsertParseError> {
         val errors = mutableListOf<SiteUpsertParseError>()
-        return parsePlan(request, legalEntityRequest, errors).orFailure(errors)
+        return parsePlan(request, errors).orFailure(errors)
     }
 
     private fun parsePlan(
         request: SiteUpsertRequest,
-        legalEntityRequest: LegalEntityUpsertRequest,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
-        val resolved = when (val result = siteReferenceParser.parse(request.reference)) {
+        val resolvedSite = when (val result = siteReferenceParser.parse(request.reference)) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }
-        val siteReference = resolved.reference
-        val target = resolved.target
+        val siteReference = resolvedSite.reference
+        val existingSite = resolvedSite.existingRecord
 
-        if (target != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
-            return SiteUpsertPlan.Unchanged(siteReference, target)
+        if (existingSite != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
+            return SiteUpsertPlan.Unchanged(siteReference, existingSite)
 
-        return if (target == null) parseCreate(request, siteReference, errors)
-        else parseUpdate(request, siteReference, target, errors)
+        return if (existingSite == null) parseCreate(request, siteReference, errors)
+        else parseUpdate(request, siteReference, existingSite, errors)
     }
 
     private fun parseCreate(
@@ -112,10 +110,10 @@ class SiteUpsertParser(
 
         // A new site whose main address already exists adopts that address instead of duplicating it, so several
         // sites can share one main address - a different creation, with a different parser.
-        val mainAddressTarget = resolvedMainAddress.target
-        if (mainAddressTarget != null) {
+        val existingMainAddress = resolvedMainAddress.existingRecord
+        if (existingMainAddress != null) {
             val createdOnExistingAddress = siteCreateOnExistingAddressParser
-                .parse(listOf(SiteCreateWithReferencedAddressAsMainRequest(mainAddressTarget.bpn, request.header, request.mainAddress.content)))
+                .parse(listOf(SiteCreateWithReferencedAddressAsMainRequest(existingMainAddress.bpn, request.header, request.mainAddress.content)))
                 .singleOrRecord(errors, ::toCreateError) ?: return null
             return SiteUpsertPlan.CreateOnExistingAddress(siteReference, resolvedMainAddress.reference, createdOnExistingAddress)
         }
@@ -130,27 +128,27 @@ class SiteUpsertParser(
     private fun parseUpdate(
         request: SiteUpsertRequest,
         siteReference: BpnReferenceParsed,
-        target: SiteDb,
+        existingSite: SiteDb,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
         return when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain ->
                 siteUpdateOnLegalAddressParser
-                    .parse(listOf(SiteUpdateOnLegalAddressRequest(target.bpn, request.header)))
+                    .parse(listOf(SiteUpdateOnLegalAddressRequest(existingSite.bpn, request.header)))
                     .singleOrRecord(errors, ::toUpdateError)
                     ?.let { SiteUpsertPlan.UpdateOnLegalAddress(siteReference, it) }
 
             is SiteUpsertRequest.WithOwnMainAddress ->
                 siteUpdateWithOwnMainAddressParser
                     .parseWithoutScriptVariantCoverage(
-                        listOf(SiteUpdateRequest(target.bpn, SiteContentRequest(request.header, request.mainAddress.content)))
+                        listOf(SiteUpdateRequest(existingSite.bpn, SiteContentRequest(request.header, request.mainAddress.content)))
                     )
                     .singleOrRecord(errors, ::toUpdateError)
                     ?.let {
                         SiteUpsertPlan.UpdateWithOwnMainAddress(
                             siteReference,
                             referenceResolutionParser.parse(request.mainAddress.reference),
-                            target,
+                            existingSite,
                             it.content
                         )
                     }
@@ -172,7 +170,7 @@ class SiteUpsertParser(
             is SiteContentParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)
             is SiteMainAddressNotLegalAddress -> SiteDoesNotSitOnLegalAddress(error.bpnSite, error.bpnMainAddress)
-            // The target was resolved before this parser was called.
+            // The existing site was resolved before this parser was called.
             is UnresolvableSite -> error("Unexpected unresolvable site ${error.bpn}")
         }
 }

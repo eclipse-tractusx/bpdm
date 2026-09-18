@@ -25,5 +25,5 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
  */
 data class ResolvedReference<T>(
     val reference: BpnReferenceParsed,
-    val target: T?
+    val existingRecord: T?
 )

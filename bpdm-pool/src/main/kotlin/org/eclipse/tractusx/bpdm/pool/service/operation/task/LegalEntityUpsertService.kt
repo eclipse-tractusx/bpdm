@@ -46,10 +46,10 @@ class LegalEntityUpsertService(
     @Transactional
     fun upsert(plan: LegalEntityUpsertPlan): UpsertResult<LegalEntityDb> =
         when (plan) {
-            is LegalEntityUpsertPlan.Unchanged -> UpsertResult(plan.target, UpsertType.NoChange)
+            is LegalEntityUpsertPlan.Unchanged -> UpsertResult(plan.existingLegalEntity, UpsertType.NoChange)
             is LegalEntityUpsertPlan.Create ->
                 UpsertResult(legalEntityCreateService.create(listOf(LegalEntityCreateParsed(plan.content))).single(), UpsertType.Created)
             is LegalEntityUpsertPlan.Update ->
-                legalEntityPayloadUpdateService.update(listOf(LegalEntityUpdateParsed(plan.target, plan.content))).single()
+                legalEntityPayloadUpdateService.update(listOf(LegalEntityUpdateParsed(plan.existingLegalEntity, plan.content))).single()
         }
 }

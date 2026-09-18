@@ -60,7 +60,7 @@ class GoldenRecordParentConsistencyValidator(
         // A membership stated without a site is rejected on its own, so judging its entries here would fault the same
         // statement twice.
         val additionalSiteBpns = request.recordSite.site
-            ?.let { request.recordSite.additionalSites.mapNotNull { stated -> resolveBpn(stated.reference) }.distinct() }
+            ?.let { request.recordSite.additionalSites.mapNotNull { additionalSite -> resolveBpn(additionalSite.reference) }.distinct() }
             ?: emptyList()
         val additionalAddressBpn = request.additionalAddress?.let { resolveBpn(it.reference) }
 

@@ -67,10 +67,10 @@ class GoldenRecordTaskUpsertParser(
     }
 
     private fun parseRecordSite(request: GoldenRecordUpsertRequest): ParseResult<RecordSitePlan?, GoldenRecordUpsertParseError> =
-        request.recordSite.site?.let { stated ->
+        request.recordSite.site?.let { siteRequest ->
             zipParseResults(
-                siteUpsertParser.parse(stated, request.legalEntity),
-                additionalSitesParser.parse(request.recordSite.additionalSites, stated.header.confidenceCriteria),
+                siteUpsertParser.parse(siteRequest),
+                additionalSitesParser.parse(request.recordSite.additionalSites, siteRequest.header.confidenceCriteria),
                 ::RecordSitePlan
             )
         } ?: ParseResult.Success(null)

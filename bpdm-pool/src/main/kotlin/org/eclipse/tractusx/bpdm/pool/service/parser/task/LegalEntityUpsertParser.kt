@@ -61,17 +61,17 @@ class LegalEntityUpsertParser(
         errors: MutableList<LegalEntityUpsertParseError>
     ): LegalEntityUpsertPlan? {
         val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference)
-        val resolved = when (val result = legalEntityReferenceParser.parse(request.reference)) {
+        val resolvedLegalEntity = when (val result = legalEntityReferenceParser.parse(request.reference)) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }
-        val legalEntityReference = resolved.reference
-        val target = resolved.target
+        val legalEntityReference = resolvedLegalEntity.reference
+        val existingLegalEntity = resolvedLegalEntity.existingRecord
 
-        if (target != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
-            return LegalEntityUpsertPlan.Unchanged(legalEntityReference, legalAddressReference, target)
+        if (existingLegalEntity != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
+            return LegalEntityUpsertPlan.Unchanged(legalEntityReference, legalAddressReference, existingLegalEntity)
 
-        if (target == null) {
+        if (existingLegalEntity == null) {
             val created = legalEntityCreateParser
                 .parseWithoutScriptVariantCoverage(listOf(LegalEntityCreateRequest(toContentRequest(request))))
                 .singleOrRecord(errors, ::toCreateError) ?: return null
@@ -79,10 +79,10 @@ class LegalEntityUpsertParser(
         }
 
         val updated = legalEntityUpdateParser
-            .parseWithoutScriptVariantCoverage(listOf(LegalEntityUpdateRequest(target.bpn, toContentRequest(request))))
+            .parseWithoutScriptVariantCoverage(listOf(LegalEntityUpdateRequest(existingLegalEntity.bpn, toContentRequest(request))))
             .singleOrRecord(errors, ::toUpdateError) ?: return null
 
-        return LegalEntityUpsertPlan.Update(legalEntityReference, legalAddressReference, target, updated.content)
+        return LegalEntityUpsertPlan.Update(legalEntityReference, legalAddressReference, existingLegalEntity, updated.content)
     }
 
     private fun toContentRequest(request: LegalEntityUpsertRequest) =
@@ -100,7 +100,7 @@ class LegalEntityUpsertParser(
             is AddressContentParseError -> LegalAddressContentInvalid(error)
             is MultipleUltimateOwnersInHierarchy -> MultipleUltimateOwners(error.conflictingBpnls)
             is AlternativeHeadquarterCannotOwnUltimately -> AlternativeHeadquarterCannotOwn(error.bpnl)
-            // The target was resolved before this parser was called.
+            // The existing legal entity was resolved before this parser was called.
             is UnresolvableLegalEntity -> error("Unexpected unresolvable legal entity ${error.bpn}")
         }
 }

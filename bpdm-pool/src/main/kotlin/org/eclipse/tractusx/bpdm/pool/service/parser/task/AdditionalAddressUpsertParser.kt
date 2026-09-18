@@ -58,26 +58,26 @@ class AdditionalAddressUpsertParser(
         request: AddressUpsertRequest,
         errors: MutableList<AdditionalAddressUpsertParseError>
     ): AddressUpsertPlan? {
-        val resolved = when (
+        val resolvedAddress = when (
             val result = addressReferenceParser.parse(request.reference, ::AdditionalAddressNotFound)
         ) {
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }
-        val target = resolved.target
+        val existingAddress = resolvedAddress.existingRecord
 
-        if (target == null) {
+        if (existingAddress == null) {
             val content = typedParentAddressCreateParser
                 .parseContent(listOf(request.content))
                 .singleOrRecord(errors, ::toCreateError) ?: return null
-            return AddressUpsertPlan.Create(resolved.reference, content)
+            return AddressUpsertPlan.Create(resolvedAddress.reference, content)
         }
 
         val updated = addressUpdateParser
-            .parseWithoutScriptVariantCoverage(listOf(AddressUpdateRequest(target.bpn, siteBpns = null, content = request.content)))
+            .parseWithoutScriptVariantCoverage(listOf(AddressUpdateRequest(existingAddress.bpn, siteBpns = null, content = request.content)))
             .singleOrRecord(errors, ::toUpdateError) ?: return null
 
-        return AddressUpsertPlan.Update(resolved.reference, target, updated.address)
+        return AddressUpsertPlan.Update(resolvedAddress.reference, existingAddress, updated.address)
     }
 
     private fun toCreateError(error: AddressCreateParseError): AdditionalAddressUpsertParseError =
@@ -93,7 +93,7 @@ class AdditionalAddressUpsertParser(
     private fun toUpdateError(error: AddressUpdateEntryParseError): AdditionalAddressUpsertParseError =
         when (error) {
             is AddressContentParseError -> AdditionalAddressContentInvalid(error)
-            // The target was resolved first, and membership is stated once for the record, not by this update.
+            // The existing address was resolved first, and membership is stated once for the record, not by this update.
             is UnresolvableAddress -> error("Unexpected unresolvable address ${error.bpn}")
             is UnresolvableSite -> error("Unexpected unresolvable site ${error.bpn}")
             is SiteMainAddressOmitted -> error("Unexpected omitted main address site ${error.siteBpn}")

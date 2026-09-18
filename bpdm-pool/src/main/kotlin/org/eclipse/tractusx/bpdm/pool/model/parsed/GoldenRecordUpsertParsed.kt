@@ -75,7 +75,7 @@ sealed interface LegalEntityUpsertPlan {
     data class Unchanged(
         override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
-        val target: LegalEntityDb
+        val existingLegalEntity: LegalEntityDb
     ) : LegalEntityUpsertPlan
 
     data class Create(
@@ -87,7 +87,7 @@ sealed interface LegalEntityUpsertPlan {
     data class Update(
         override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
-        val target: LegalEntityDb,
+        val existingLegalEntity: LegalEntityDb,
         val content: LegalEntityContentParsed
     ) : LegalEntityUpsertPlan
 }
@@ -97,7 +97,7 @@ sealed interface SiteUpsertPlan {
 
     data class Unchanged(
         override val siteReference: BpnReferenceParsed,
-        val target: SiteDb
+        val existingSite: SiteDb
     ) : SiteUpsertPlan
 
     data class CreateWithOwnMainAddress(
@@ -120,7 +120,7 @@ sealed interface SiteUpsertPlan {
     data class UpdateWithOwnMainAddress(
         override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
-        val target: SiteDb,
+        val existingSite: SiteDb,
         val content: SiteContentParsed
     ) : SiteUpsertPlan
 
@@ -140,7 +140,7 @@ sealed interface AddressUpsertPlan {
 
     data class Update(
         override val addressReference: BpnReferenceParsed,
-        val target: LogisticAddressDb,
+        val existingAddress: LogisticAddressDb,
         val content: LogisticAddressParsed
     ) : AddressUpsertPlan
 }

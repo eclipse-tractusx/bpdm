@@ -57,7 +57,7 @@ class AdditionalAddressUpsertService(
                 UpsertResult(addressCreateService.create(listOf(AddressCreateParsed(legalEntity, site, plan.content))).single(), UpsertType.Created)
             is AddressUpsertPlan.Update ->
                 // Site membership is stated once for the whole record, by the membership plan, so this update leaves it alone.
-                addressPayloadUpdateService.update(listOf(AddressUpdateParsed(plan.target, sites = null, address = plan.content)))
+                addressPayloadUpdateService.update(listOf(AddressUpdateParsed(plan.existingAddress, sites = null, address = plan.content)))
                     .single()
         }
 }

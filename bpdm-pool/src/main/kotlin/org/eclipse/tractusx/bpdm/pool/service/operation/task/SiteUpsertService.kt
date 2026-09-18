@@ -50,7 +50,7 @@ class SiteUpsertService(
     @Transactional
     fun upsert(plan: SiteUpsertPlan, legalEntity: LegalEntityDb): UpsertResult<SiteDb> =
         when (plan) {
-            is SiteUpsertPlan.Unchanged -> UpsertResult(plan.target, UpsertType.NoChange)
+            is SiteUpsertPlan.Unchanged -> UpsertResult(plan.existingSite, UpsertType.NoChange)
             is SiteUpsertPlan.CreateWithOwnMainAddress ->
                 UpsertResult(siteCreateService.create(listOf(SiteCreateParsed(legalEntity, plan.content))).single(), UpsertType.Created)
             is SiteUpsertPlan.CreateOnLegalAddress ->
@@ -63,7 +63,7 @@ class SiteUpsertService(
             is SiteUpsertPlan.CreateOnExistingAddress ->
                 UpsertResult(siteCreateWithReferencedAddressAsMainService.create(listOf(plan.creation)).single(), UpsertType.Created)
             is SiteUpsertPlan.UpdateWithOwnMainAddress ->
-                sitePayloadUpdateService.updateWithOwnMainAddress(listOf(SiteUpdateParsed(plan.target, plan.content))).single()
+                sitePayloadUpdateService.updateWithOwnMainAddress(listOf(SiteUpdateParsed(plan.existingSite, plan.content))).single()
             is SiteUpsertPlan.UpdateOnLegalAddress ->
                 sitePayloadUpdateService.updateOnLegalAddress(listOf(plan.update)).single()
         }
