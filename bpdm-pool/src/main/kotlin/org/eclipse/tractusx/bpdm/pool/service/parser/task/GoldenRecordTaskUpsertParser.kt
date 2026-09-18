@@ -52,30 +52,30 @@ class GoldenRecordTaskUpsertParser(
      */
     @Transactional(readOnly = true)
     fun parse(request: GoldenRecordUpsertRequest): ParseResult<GoldenRecordUpsertParsed, GoldenRecordUpsertParseError> {
-        val legalEntity: ParseResult<LegalEntityUpsertPlan, GoldenRecordUpsertParseError> =
-            legalEntityUpsertParser.parse(request.legalEntity)
-        val recordSite: ParseResult<RecordSitePlan?, GoldenRecordUpsertParseError> =
-            request.recordSite.site?.let { stated ->
-                zipParseResults(
-                    siteUpsertParser.parse(stated, request.legalEntity),
-                    additionalSitesParser.parse(request.recordSite.additionalSites, stated.header.confidenceCriteria),
-                    ::RecordSitePlan
-                )
-            } ?: ParseResult.Success(null)
-        val additionalAddress: ParseResult<AddressUpsertPlan?, GoldenRecordUpsertParseError> =
-            request.additionalAddress?.let { additionalAddressUpsertParser.parse(it) } ?: ParseResult.Success(null)
+        val legalEntity = legalEntityUpsertParser.parse(request.legalEntity)
+        val recordSite = parseRecordSite(request)
+        val additionalAddress = request.additionalAddress?.let { additionalAddressUpsertParser.parse(it) } ?: ParseResult.Success(null)
 
-        val parsed = listOf(legalEntity, recordSite, additionalAddress)
+        val partnerResults = listOf(legalEntity, recordSite, additionalAddress)
         val contradictions = crossPartnerValidator.validate(
-            request, legalEntity.parsedOrNull(), recordSite.parsedOrNull(), additionalAddress.parsedOrNull(), parsed.failureErrors()
+            request, legalEntity.parsedOrNull(), recordSite.parsedOrNull(), additionalAddress.parsedOrNull(), partnerResults.failureErrors()
         )
 
-        return zipParseResults(legalEntity, recordSite, additionalAddress) { entity, site, address ->
-            plan(request.sharingMemberRecordId, entity, site, address)
+        return zipParseResults(legalEntity, recordSite, additionalAddress) { legalEntityPlan, sitePlan, addressPlan ->
+            toUpsertParsed(request.sharingMemberRecordId, legalEntityPlan, sitePlan, addressPlan)
         }.combine(contradictions) { it }
     }
 
-    private fun plan(
+    private fun parseRecordSite(request: GoldenRecordUpsertRequest): ParseResult<RecordSitePlan?, GoldenRecordUpsertParseError> =
+        request.recordSite.site?.let { stated ->
+            zipParseResults(
+                siteUpsertParser.parse(stated, request.legalEntity),
+                additionalSitesParser.parse(request.recordSite.additionalSites, stated.header.confidenceCriteria),
+                ::RecordSitePlan
+            )
+        } ?: ParseResult.Success(null)
+
+    private fun toUpsertParsed(
         sharingMemberRecordId: String,
         legalEntity: LegalEntityUpsertPlan,
         recordSite: RecordSitePlan?,

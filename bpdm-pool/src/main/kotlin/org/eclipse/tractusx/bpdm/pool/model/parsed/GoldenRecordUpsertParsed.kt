@@ -69,23 +69,23 @@ sealed interface GoldenRecordUpsertParsed {
 }
 
 sealed interface LegalEntityUpsertPlan {
-    val reference: BpnReferenceParsed
+    val legalEntityReference: BpnReferenceParsed
     val legalAddressReference: BpnReferenceParsed
 
     data class Unchanged(
-        override val reference: BpnReferenceParsed,
+        override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
         val target: LegalEntityDb
     ) : LegalEntityUpsertPlan
 
     data class Create(
-        override val reference: BpnReferenceParsed,
+        override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
         val content: LegalEntityContentParsed
     ) : LegalEntityUpsertPlan
 
     data class Update(
-        override val reference: BpnReferenceParsed,
+        override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
         val target: LegalEntityDb,
         val content: LegalEntityContentParsed
@@ -93,53 +93,53 @@ sealed interface LegalEntityUpsertPlan {
 }
 
 sealed interface SiteUpsertPlan {
-    val reference: BpnReferenceParsed
+    val siteReference: BpnReferenceParsed
 
     data class Unchanged(
-        override val reference: BpnReferenceParsed,
+        override val siteReference: BpnReferenceParsed,
         val target: SiteDb
     ) : SiteUpsertPlan
 
     data class CreateWithOwnMainAddress(
-        override val reference: BpnReferenceParsed,
+        override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
         val content: SiteContentParsed
     ) : SiteUpsertPlan
 
     data class CreateOnLegalAddress(
-        override val reference: BpnReferenceParsed,
+        override val siteReference: BpnReferenceParsed,
         val header: SiteHeaderParsed
     ) : SiteUpsertPlan
 
     data class CreateOnExistingAddress(
-        override val reference: BpnReferenceParsed,
+        override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
         val creation: SiteCreateWithReferencedAddressAsMainParsed
     ) : SiteUpsertPlan
 
     data class UpdateWithOwnMainAddress(
-        override val reference: BpnReferenceParsed,
+        override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
         val target: SiteDb,
         val content: SiteContentParsed
     ) : SiteUpsertPlan
 
     data class UpdateOnLegalAddress(
-        override val reference: BpnReferenceParsed,
+        override val siteReference: BpnReferenceParsed,
         val update: SiteUpdateOnLegalAddressParsed
     ) : SiteUpsertPlan
 }
 
 sealed interface AddressUpsertPlan {
-    val reference: BpnReferenceParsed
+    val addressReference: BpnReferenceParsed
 
     data class Create(
-        override val reference: BpnReferenceParsed,
+        override val addressReference: BpnReferenceParsed,
         val content: LogisticAddressParsed
     ) : AddressUpsertPlan
 
     data class Update(
-        override val reference: BpnReferenceParsed,
+        override val addressReference: BpnReferenceParsed,
         val target: LogisticAddressDb,
         val content: LogisticAddressParsed
     ) : AddressUpsertPlan
@@ -162,6 +162,6 @@ data class AdditionalSitesPlan(
 )
 
 data class AdditionalSiteCreatePlan(
-    val reference: BpnReferenceParsed,
+    val siteReference: BpnReferenceParsed,
     val header: SiteHeaderParsed
 )

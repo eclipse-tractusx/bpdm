@@ -86,18 +86,18 @@ class AdditionalSitesParser(
         confidence: ConfidenceCriteriaRequest
     ): List<ParseResult<AdditionalSiteCreatePlan?, AdditionalSitesParseError>> {
         // An entry naming no site yet asks for one to be created on the record's address.
-        val stated = resolutions.withIndex().mapNotNull { (index, resolution) ->
+        val newSiteReferences = resolutions.withIndex().mapNotNull { (index, resolution) ->
             resolution.parsedOrNull()?.takeIf { it.target == null }?.let { index to it.reference }
         }
 
         val headers = siteHeaderParser.parse(
-            stated.map { (index, _) -> SiteHeaderRequest(statedOnce[index].name, emptyList(), confidence, emptyList()) }
+            newSiteReferences.map { (index, _) -> SiteHeaderRequest(statedOnce[index].name, emptyList(), confidence, emptyList()) }
         )
 
-        val creationByIndex = stated.zip(headers).associate { (entry, header) ->
-            val (index, reference) = entry
+        val creationByIndex = newSiteReferences.zip(headers).associate { (entry, header) ->
+            val (index, siteReference) = entry
             index to when (header) {
-                is ParseResult.Success -> ParseResult.Success(AdditionalSiteCreatePlan(reference, header.parsed))
+                is ParseResult.Success -> ParseResult.Success(AdditionalSiteCreatePlan(siteReference, header.parsed))
                 is ParseResult.Failure -> ParseResult.Failure(header.errors.map { AdditionalSiteContentInvalid(index, it) })
             }
         }

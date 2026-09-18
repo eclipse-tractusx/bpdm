@@ -62,10 +62,10 @@ class AdditionalSitesCompletenessValidator(
         return siteMainAddressConsistencyValidator.omittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
     }
 
-    private fun legalEntityTarget(plan: LegalEntityUpsertPlan?): LegalEntityDb? =
-        when (plan) {
-            is LegalEntityUpsertPlan.Unchanged -> plan.target
-            is LegalEntityUpsertPlan.Update -> plan.target
+    private fun legalEntityTarget(legalEntity: LegalEntityUpsertPlan?): LegalEntityDb? =
+        when (legalEntity) {
+            is LegalEntityUpsertPlan.Unchanged -> legalEntity.target
+            is LegalEntityUpsertPlan.Update -> legalEntity.target
             is LegalEntityUpsertPlan.Create, null -> null
         }
 

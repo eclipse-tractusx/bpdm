@@ -59,7 +59,7 @@ class GoldenRecordUpsertService(
         val issued = mutableMapOf<String, String>()
 
         val legalEntity = legalEntityUpsertService.upsert(parsed.legalEntity)
-        issued.issue(parsed.legalEntity.reference, legalEntity.value.bpn)
+        issued.issue(parsed.legalEntity.legalEntityReference, legalEntity.value.bpn)
         issued.issue(parsed.legalEntity.legalAddressReference, legalEntity.value.legalAddress.bpn)
 
         val records = when (parsed) {
@@ -71,7 +71,7 @@ class GoldenRecordUpsertService(
 
             is GoldenRecordUpsertParsed.LegalEntityAddressRecord -> {
                 val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site = null)
-                issued.issue(parsed.address.reference, address.value.bpn)
+                issued.issue(parsed.address.addressReference, address.value.bpn)
                 GoldenRecordUpsertResult.LegalEntityAddressRecord(
                     legalEntity,
                     address,
@@ -95,7 +95,7 @@ class GoldenRecordUpsertService(
                 val site = siteUpsertService.upsert(parsed.site, legalEntity.value)
                 issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
                 val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site.value)
-                issued.issue(parsed.address.reference, address.value.bpn)
+                issued.issue(parsed.address.addressReference, address.value.bpn)
                 val additionalSites = additionalSiteUpsertService.upsert(parsed.additionalSites, site.value, address.value)
                 issued.issueAdditionalSites(parsed.additionalSites, additionalSites)
                 GoldenRecordUpsertResult.SiteAddressRecord(
@@ -128,14 +128,14 @@ class GoldenRecordUpsertService(
     }
 
     private fun MutableMap<String, String>.issueSite(plan: SiteUpsertPlan, siteBpn: String, mainAddressBpn: String) {
-        issue(plan.reference, siteBpn)
+        issue(plan.siteReference, siteBpn)
         // A site whose main address is the legal address states no address of its own: that address is already
         // answering to the legal entity's legal address reference.
         mainAddressReference(plan)?.let { issue(it, mainAddressBpn) }
     }
 
     private fun MutableMap<String, String>.issueAdditionalSites(plan: AdditionalSitesPlan, createdSites: List<SiteDb>) {
-        plan.newSites.zip(createdSites).forEach { (planned, created) -> issue(planned.reference, created.bpn) }
+        plan.newSites.zip(createdSites).forEach { (planned, created) -> issue(planned.siteReference, created.bpn) }
     }
 
     private fun mainAddressReference(plan: SiteUpsertPlan): BpnReferenceParsed? =

@@ -59,20 +59,22 @@ class GoldenRecordParentConsistencyValidator(
         val siteBpn = request.recordSite.site?.let { resolveBpn(it.reference) }
         // A membership stated without a site is rejected on its own, so judging its entries here would fault the same
         // statement twice.
-        val membershipBpns = request.recordSite.site
+        val additionalSiteBpns = request.recordSite.site
             ?.let { request.recordSite.additionalSites.mapNotNull { stated -> resolveBpn(stated.reference) }.distinct() }
             ?: emptyList()
-        val addressBpn = request.additionalAddress?.let { resolveBpn(it.reference) }
+        val additionalAddressBpn = request.additionalAddress?.let { resolveBpn(it.reference) }
 
-        val sitesByBpn = resolveSitesPresent(listOfNotNull(siteBpn) + membershipBpns)
-        val address = addressBpn?.let { resolveAddressIfPresent(it) }
+        val sitesByBpn = resolveSitesPresent(listOfNotNull(siteBpn) + additionalSiteBpns)
+        val additionalAddress = additionalAddressBpn?.let { resolveAddressIfPresent(it) }
 
         return listOfNotNull(
             siteBpn?.let { sitesByBpn[it] }
                 ?.takeIf { it.legalEntity.bpn != legalEntityBpn }
                 ?.let { SiteNotInRequestLegalEntity(it.bpn, legalEntityBpn) },
-            address?.takeIf { it.legalEntity!!.bpn != legalEntityBpn }?.let { AdditionalAddressNotInRequestLegalEntity(it.bpn, legalEntityBpn) }
-        ) + membershipBpns.mapNotNull { bpn ->
+            additionalAddress
+                ?.takeIf { it.legalEntity!!.bpn != legalEntityBpn }
+                ?.let { AdditionalAddressNotInRequestLegalEntity(it.bpn, legalEntityBpn) }
+        ) + additionalSiteBpns.mapNotNull { bpn ->
             sitesByBpn[bpn]
                 ?.takeIf { it.legalEntity.bpn != legalEntityBpn }
                 ?.let { AdditionalSiteNotInLegalEntity(it.bpn, legalEntityBpn) }

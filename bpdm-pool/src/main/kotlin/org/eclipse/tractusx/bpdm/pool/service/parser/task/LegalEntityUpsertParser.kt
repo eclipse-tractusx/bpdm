@@ -65,24 +65,24 @@ class LegalEntityUpsertParser(
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }
-        val reference = resolved.reference
+        val legalEntityReference = resolved.reference
         val target = resolved.target
 
         if (target != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
-            return LegalEntityUpsertPlan.Unchanged(reference, legalAddressReference, target)
+            return LegalEntityUpsertPlan.Unchanged(legalEntityReference, legalAddressReference, target)
 
         if (target == null) {
             val created = legalEntityCreateParser
                 .parseWithoutScriptVariantCoverage(listOf(LegalEntityCreateRequest(toContentRequest(request))))
                 .singleOrRecord(errors, ::toCreateError) ?: return null
-            return LegalEntityUpsertPlan.Create(reference, legalAddressReference, created.content)
+            return LegalEntityUpsertPlan.Create(legalEntityReference, legalAddressReference, created.content)
         }
 
         val updated = legalEntityUpdateParser
             .parseWithoutScriptVariantCoverage(listOf(LegalEntityUpdateRequest(target.bpn, toContentRequest(request))))
             .singleOrRecord(errors, ::toUpdateError) ?: return null
 
-        return LegalEntityUpsertPlan.Update(reference, legalAddressReference, target, updated.content)
+        return LegalEntityUpsertPlan.Update(legalEntityReference, legalAddressReference, target, updated.content)
     }
 
     private fun toContentRequest(request: LegalEntityUpsertRequest) =

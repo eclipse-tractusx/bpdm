@@ -74,33 +74,33 @@ class SiteUpsertParser(
             is ParseResult.Failure -> { errors += result.errors; return null }
             is ParseResult.Success -> result.parsed
         }
-        val reference = resolved.reference
+        val siteReference = resolved.reference
         val target = resolved.target
 
         if (target != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
-            return SiteUpsertPlan.Unchanged(reference, target)
+            return SiteUpsertPlan.Unchanged(siteReference, target)
 
-        return if (target == null) parseCreate(request, reference, errors)
-        else parseUpdate(request, reference, target, errors)
+        return if (target == null) parseCreate(request, siteReference, errors)
+        else parseUpdate(request, siteReference, target, errors)
     }
 
     private fun parseCreate(
         request: SiteUpsertRequest,
-        reference: BpnReferenceParsed,
+        siteReference: BpnReferenceParsed,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? =
         when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain ->
                 siteCreateOnLegalAddressParser.parseContent(listOf(request.header))
                     .singleOrRecord(errors, ::toCreateError)
-                    ?.let { SiteUpsertPlan.CreateOnLegalAddress(reference, it) }
+                    ?.let { SiteUpsertPlan.CreateOnLegalAddress(siteReference, it) }
             is SiteUpsertRequest.WithOwnMainAddress ->
-                parseCreateWithOwnMainAddress(request, reference, errors)
+                parseCreateWithOwnMainAddress(request, siteReference, errors)
         }
 
     private fun parseCreateWithOwnMainAddress(
         request: SiteUpsertRequest.WithOwnMainAddress,
-        reference: BpnReferenceParsed,
+        siteReference: BpnReferenceParsed,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
         val resolvedMainAddress = when (
@@ -114,22 +114,22 @@ class SiteUpsertParser(
         // sites can share one main address - a different creation, with a different parser.
         val mainAddressTarget = resolvedMainAddress.target
         if (mainAddressTarget != null) {
-            val onAddress = siteCreateOnExistingAddressParser
+            val createdOnExistingAddress = siteCreateOnExistingAddressParser
                 .parse(listOf(SiteCreateWithReferencedAddressAsMainRequest(mainAddressTarget.bpn, request.header, request.mainAddress.content)))
                 .singleOrRecord(errors, ::toCreateError) ?: return null
-            return SiteUpsertPlan.CreateOnExistingAddress(reference, resolvedMainAddress.reference, onAddress)
+            return SiteUpsertPlan.CreateOnExistingAddress(siteReference, resolvedMainAddress.reference, createdOnExistingAddress)
         }
 
-        val content = siteCreateWithOwnMainAddressParser
+        val ownMainAddressContent = siteCreateWithOwnMainAddressParser
             .parseContent(listOf(SiteContentRequest(request.header, request.mainAddress.content)))
             .singleOrRecord(errors, ::toCreateError) ?: return null
 
-        return SiteUpsertPlan.CreateWithOwnMainAddress(reference, resolvedMainAddress.reference, content)
+        return SiteUpsertPlan.CreateWithOwnMainAddress(siteReference, resolvedMainAddress.reference, ownMainAddressContent)
     }
 
     private fun parseUpdate(
         request: SiteUpsertRequest,
-        reference: BpnReferenceParsed,
+        siteReference: BpnReferenceParsed,
         target: SiteDb,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
@@ -138,7 +138,7 @@ class SiteUpsertParser(
                 siteUpdateOnLegalAddressParser
                     .parse(listOf(SiteUpdateOnLegalAddressRequest(target.bpn, request.header)))
                     .singleOrRecord(errors, ::toUpdateError)
-                    ?.let { SiteUpsertPlan.UpdateOnLegalAddress(reference, it) }
+                    ?.let { SiteUpsertPlan.UpdateOnLegalAddress(siteReference, it) }
 
             is SiteUpsertRequest.WithOwnMainAddress ->
                 siteUpdateWithOwnMainAddressParser
@@ -148,7 +148,7 @@ class SiteUpsertParser(
                     .singleOrRecord(errors, ::toUpdateError)
                     ?.let {
                         SiteUpsertPlan.UpdateWithOwnMainAddress(
-                            reference,
+                            siteReference,
                             referenceResolutionParser.parse(request.mainAddress.reference),
                             target,
                             it.content

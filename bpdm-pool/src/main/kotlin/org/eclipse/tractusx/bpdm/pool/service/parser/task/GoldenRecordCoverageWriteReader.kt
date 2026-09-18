@@ -49,15 +49,15 @@ class GoldenRecordCoverageWriteReader(
      */
     @Transactional(readOnly = true)
     fun writesOf(request: GoldenRecordUpsertRequest): List<AddressCoverageWrite> {
-        val site = request.recordSite.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
+        val writtenSite = request.recordSite.site?.takeIf { it.intent == UpsertIntent.AlwaysWrite }
         val legalEntityWritten = request.legalEntity.intent == UpsertIntent.AlwaysWrite
 
         // A site sharing the legal address writes that one address too, with the legal entity's payload, so the
         // address ends up carrying the legal entity's script codes whichever of the two the request writes.
         val legalAddress = request.legalEntity.legalAddress.reference
-            .takeIf { legalEntityWritten || site is SiteUpsertRequest.WithLegalAddressAsMain }
+            .takeIf { legalEntityWritten || writtenSite is SiteUpsertRequest.WithLegalAddressAsMain }
             ?.let { resolveAddress(it) }
-        val siteMainAddress = (site as? SiteUpsertRequest.WithOwnMainAddress)
+        val siteMainAddress = (writtenSite as? SiteUpsertRequest.WithOwnMainAddress)
             ?.mainAddress?.reference
             ?.let { resolveAddress(it) }
         // An additional address is written whenever it is stated, so it needs no intent of its own.
@@ -66,14 +66,14 @@ class GoldenRecordCoverageWriteReader(
         val legalEntityPartner = request.legalEntity
             .takeIf { legalEntityWritten }
             ?.let { PartnerScriptCodes(resolveBpn(it.reference), it.header.scriptVariants.map { variant -> variant.scriptCode }) }
-        val sitePartner = site
+        val sitePartner = writtenSite
             ?.let { PartnerScriptCodes(resolveBpn(it.reference), it.header.scriptVariants.map { variant -> variant.scriptCode }) }
 
         return listOfNotNull(
             legalAddress?.let {
                 AddressCoverageWrite.Rewritten(
                     address = it,
-                    partners = listOfNotNull(legalEntityPartner, sitePartner.takeIf { site is SiteUpsertRequest.WithLegalAddressAsMain }),
+                    partners = listOfNotNull(legalEntityPartner, sitePartner.takeIf { writtenSite is SiteUpsertRequest.WithLegalAddressAsMain }),
                     scriptCodes = request.legalEntity.header.scriptVariants.map { variant -> variant.scriptCode }
                 )
             },
@@ -81,7 +81,7 @@ class GoldenRecordCoverageWriteReader(
                 AddressCoverageWrite.Rewritten(
                     address = it,
                     partners = listOfNotNull(sitePartner),
-                    scriptCodes = site.header.scriptVariants.map { variant -> variant.scriptCode }
+                    scriptCodes = writtenSite.header.scriptVariants.map { variant -> variant.scriptCode }
                 )
             },
             additionalAddress?.let {

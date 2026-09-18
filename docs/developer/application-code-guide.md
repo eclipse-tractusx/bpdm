@@ -134,6 +134,14 @@ sequenceDiagram
 
 The list is **positional throughout**: the same size in and out, and the i-th result always belongs to the i-th request. That order *is* the correlation between request and response — no separate identifier is needed.
 
+**When entries of a batch affect each other.** Batch-first assumes every entry can be judged on its own. Two kinds of dependence break that, and they have different answers.
+
+*The entries share a value.* Two entries of one batch state a value that may only exist once — the same identifier, or the "ultimate owner" flag within one ownership tree. Neither entry is wrong by itself; together they are. A parser can still decide this, because both values are in the request: it judges each entry against the state the *whole batch* would leave behind rather than against the state in the database today. Nothing about the flow changes — the batch is still parsed as a whole and then executed.
+
+*The entries share an entity that the batch itself creates.* Two golden record task entries of one reservation name the same business partner. The first one creates it, and it receives its BPN in that moment. The second one must then update that very business partner instead of creating a second one. So whether the second entry is a create or an update depends on whether the first entry has already run — and the parser cannot know that, because issuing the BPN is the operation layer's work and has not happened yet when parsing runs. Looking harder at the request does not answer the question.
+
+The second case is a real exception to the flow above: such an operation is processed **one entry at a time** — parse an entry, execute it, then parse the next one against the state the previous one left behind. Pool's `GoldenRecordTaskUpsertParser` is the example, and its class documentation states the reason. The request and response stay positional exactly as before; only the interleaving changes.
+
 ## 1.6 When this pattern applies
 
 This structure governs **operations** — create, read, search, update, and delete, and the composite operations built from them. It is the target for all of them across every service.
@@ -163,7 +171,7 @@ Background jobs and internal process orchestration are not request-driven operat
 - It MUST contain only orchestration and translation — no validation, no business rules, no persistence.
 - It MUST be the only layer that maps to or from API DTOs.
 - It MUST own the outer transaction boundary.
-- It MUST drive the flow through `parseAndExecute` (parse the whole batch, execute only successes) and preserve input order in the response.
+- It MUST drive the flow through `parseAndExecute` (parse the whole batch, execute only successes) and preserve input order in the response, unless the operation is one of the entry-at-a-time exceptions of [2.9](#29-batch--correlation-contract).
 
 ## 2.3 Parser layer
 
@@ -236,6 +244,12 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - Every layer MUST preserve order: the i-th response corresponds to the i-th request. A parser's verdict list and an operation's result list therefore have the same size as their input.
 - Every layer MUST query and write in batch, not once per entry: a lookup a batch shares — metadata, referenced entities, existing rows — is issued once for the whole batch. This applies to parsers and operation services alike.
 - New APIs MUST NOT introduce a client-supplied correlation index; request/response order is the correlation. Existing index fields are legacy and are not to be extended to new operations.
+- A validation rule whose scope is wider than one entry — a uniqueness rule, or an invariant over data the batch touches from several entries — MUST NOT be judged against the stored state alone. Judging each entry as if it were the only one accepts a request that leaves the invariant broken, and a rule of this kind rarely has a database constraint to catch it. Judge such a rule against the state the whole batch would leave behind, or reject the entries that interact with one another.
+- An operation whose entries can create the entities that later entries reference MAY be processed one entry at a time — parse and execute an entry before parsing the next — instead of parsing the whole batch first. Its parser MUST state that reason in its class documentation. For such an operation:
+  - The interleaving MUST live in the application service, which loops over the entries. A parser MUST NOT drive it, because interleaving means executing between parses and a parser neither writes nor calls the operation layer.
+  - That parser's entry point therefore takes **one entry** and returns **one verdict**, rather than a list of each. The positional contract holds where it is observable — the application service still answers the i-th request with the i-th response — not in the parser's own signature.
+  - The batch-query rule applies within the entry instead of across the request: the content parsers the entry delegates to stay batch-shaped and are handed that one entry's worth of input.
+  - The consequence to accept: when two entries conflict, only the later one is rejected, so reordering the request can change which entry fails.
 
 ---
 
