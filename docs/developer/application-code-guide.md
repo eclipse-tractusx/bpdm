@@ -98,6 +98,16 @@ The three run in that order — a value is normalized before it is judged, and j
 
 A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. The parser itself is pure (it only reads) and API-neutral (it never sees a DTO), which is what lets one parser serve every version and every context that embeds the same content: a standalone address, a site's main address, a legal entity's address.
 
+**What a `…Parsed` value promises**
+
+Holding a `…Parsed` value means the parser that made it has run all of its rules. The operation layer uses the value and checks nothing itself.
+
+Some rules are visible in the type: a `CountryCode` instead of a `String`, a resolved `LegalEntityDb` instead of a BPN. Others leave no trace in the value — identifier uniqueness, a consistency rule between two fields. For those the type name is the promise: `LegalEntityCreateParsed` comes only from `LegalEntityCreateParser`. One `…Parsed` type, one parser, one set of rules.
+
+**Parsers call other parsers**
+
+A parser calls the parsers that produce the `…Parsed` values it needs as parts of its own result, and holds those results rather than copying their fields. Parsers form a tree with the same shape as the parsed model. `LegalEntityCreateParser` calls the header parser, the identifier duplicate check and the address parser, and puts their results into `LegalEntityCreateParsed`.
+
 **Operation** — the execution layer. It carries out the operation against the service's data — reading, writing, or both — and in principle spans the full range of CRUD; one operation may be composite, combining several CRUD steps, sometimes across more than one entity. For any part that writes, the operation service is *the single authority* for that entity's write — the one place it happens — so BPN issuance, persistence, and changelog live in exactly one location. It works in internal domain and managed models and returns them, never response DTOs.
 
 *Why separate `…Request` from the DTO?* So the parser and operation never depend on a versioned API model. Every inbound source maps into the one `…Request`, and a single body of parsing and writing logic serves all of them.
@@ -157,7 +167,7 @@ Background jobs and internal process orchestration are not request-driven operat
 
 # Part 2 — Rules
 
-*Binding rules. MUST = required; MUST NOT = forbidden; SHOULD = strong default, deviate only with a documented reason. A few rules describe the target where current code differs; these are marked and are still the direction of travel.*
+*Binding rules. MUST = required; MUST NOT = forbidden; SHOULD = strong default, deviate only with a documented reason.*
 
 ## 2.1 Layering & dependencies
 
@@ -182,7 +192,7 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 
 - A parser MUST parse all data entering the application from outside its own database: both requests received on our API endpoints and responses received from calls the application makes to other services. Data read from our own database is trusted and MUST NOT require parsing.
 - A parser MUST be free of side effects other than database reads; it MUST NOT write.
-- A parser MUST be annotated `@Transactional(readOnly = true)` when a single parse issues more than one database query. *(Current gap: several parsers do multiple reads without this annotation.)*
+- A parser MUST be annotated `@Transactional(readOnly = true)` when a single parse issues more than one database query.
 
 **Normalization**
 
@@ -194,12 +204,21 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
 - A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.8](#28-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
 - An error a parser reports SHOULD quote the value as the caller sent it, not its normalized form, so the client recognises its own input.
+- A rule the parser can only decide against the current database state, such as identifier uniqueness, SHOULD also be enforced by a database constraint.
 - A parser that can reject nothing MAY return its `…Parsed` value directly instead of a `ParseResult`. Normalizing search criteria is the typical case: an unknown or malformed filter value simply matches nothing, so there is no verdict to report. As soon as one input can be rejected, the parser MUST return a `ParseResult`.
 
 **Resolution**
 
 - A parser SHOULD resolve the references it validates to the entities they name, rather than passing the identifier on for a later layer to look up.
 - A resolving parser MUST NOT offer optional resolution: A parser always reports a missing referenced object as a parse error. Where a reference is optional, the *caller* handles that.
+
+**Composition**
+
+- A parser MUST be named after the `…Parsed` type it produces, never after an operation that uses it.
+- A parser MUST call the parser that produces the type it needs, and no larger one.
+- A rule MUST sit in the parser that produces the `…Parsed` value the rule is about. A rule that only makes sense between two parts sits in the parser that has both.
+- A parser MUST NOT offer a method that skips one of its own rules.
+- A parser whose rule serves several callers SHOULD take their difference as a parameter rather than leave each caller to decide whether the rule applies — `LegalEntityIdentifierDuplicateValidator` takes an owner BPN that is `null` on create and the resolved target on update.
 
 ## 2.4 Operation layer
 
@@ -215,6 +234,10 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - Every representation MUST carry its suffix: `…Dto` (API), `…Request` (unified input), `…Parsed` (validated), `…Db` (entity).
 - The `…Request` model MUST be a superset that captures the content of all inbound sources (v6, v7, Orchestrator), so one parsing path feeds one domain model.
 - A `…Parsed` value MUST be fully validated, normalized and non-null — safe to persist without further checks, and carrying every value in its canonical form.
+- A `…Parsed` type MUST be produced by exactly one parser; that parser's rules are what the type promises.
+- A `…Parsed` value MUST NOT be created anywhere but in its own parser.
+- A parser SHOULD put a guarantee into the type wherever it can — a narrow value type, the resolved entity instead of the BPN naming it — and rely on the type name alone only for rules that leave no trace in the value.
+- A `…Parsed` built from other parsed values MUST hold them instead of copying their fields into one flat record.
 - Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types. Where an internal model duplicates the shape of an API DTO, it SHOULD reuse the shared value types and enums rather than cloning them — only the DTO wrapper is duplicated, not the vocabulary it is built from.
 - Types SHOULD be named domain-noun first, with the role/stage as a suffix (`AddressCreateParsed`, not `ParsedAddressCreate`).
 
@@ -252,7 +275,7 @@ Methods:
 - The reverse does not hold: a service MAY carry out a translation inline. Deterministic conversions — `Instant`↔`LocalDateTime`, enum and key formatting, restructuring — are translation wherever they live, and a one-off two-line conversion does not deserve its own mapper.
 - Translation SHOULD be extracted into a mapper once it grows beyond a few lines or is needed in more than one place. The threshold is a judgement call; extract before the mapping starts to obscure what the service does.
 - A mapper MUST cover exactly one direction: inbound (DTO → `…Request`), entity (`…Parsed` → `…Db`), or outbound (errors/results → response DTO / `ErrorInfo`). It MUST NOT merge two directions, and one direction MUST NOT be fragmented across several mappers for the same content.
-- Once extracted, mapping — including response shaping — MUST live in the `mapper` package as a proper `@Component` mapper. It MUST NOT be left as loose extension functions in a service package. *(Current gap: outbound response mapping still lives as extension functions outside the mapper package.)*
+- Once extracted, mapping — including response shaping — MUST live in the `mapper` package as a proper `@Component` mapper. It MUST NOT be left as loose extension functions in a service package.
 
 ## 2.8 Errors
 
