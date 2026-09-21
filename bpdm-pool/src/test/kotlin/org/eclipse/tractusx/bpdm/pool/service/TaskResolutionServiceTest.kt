@@ -115,6 +115,31 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors.size).isEqualTo(5)
     }
 
+    /**
+     * GIVEN a task naming a legal entity BPN that exists nowhere and stating no legal name
+     * WHEN the task is resolved
+     * THEN both the unresolved reference and the missing legal name are reported
+     */
+    @Test
+    fun `report an unresolved legal entity reference together with its content errors`() {
+        //GIVEN
+        val unknownBpnWithoutLegalName = with(minValidLegalEntity()) {
+            copy(
+                legalEntity = legalEntity.copy(
+                    bpnReference = BpnReference("BPNL0000000000XY", null, Bpn),
+                    legalName = null
+                )
+            )
+        }
+
+        //WHEN
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = unknownBpnWithoutLegalName)
+
+        //THEN
+        assertThat(result[0].errors.map { it.description })
+            .containsExactlyInAnyOrder("Legal entity BPNL0000000000XY not found", GoldenRecordTaskErrorMessage.LEGAL_NAME_IS_NULL.message)
+    }
+
     @Test
     fun `create legal entity without legal name`() {
 

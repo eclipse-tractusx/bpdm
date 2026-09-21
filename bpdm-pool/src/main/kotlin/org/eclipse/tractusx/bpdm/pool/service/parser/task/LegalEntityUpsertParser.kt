@@ -58,13 +58,9 @@ class LegalEntityUpsertParser(
         request: LegalEntityUpsertRequest,
         errors: MutableList<LegalEntityUpsertParseError>
     ): LegalEntityUpsertPlan? {
+        val legalEntityReference = referenceResolutionParser.parse(request.reference)
         val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference)
-        val resolvedLegalEntity = when (val result = legalEntityReferenceParser.parse(request.reference)) {
-            is ParseResult.Failure -> { errors += result.errors; return null }
-            is ParseResult.Success -> result.parsed
-        }
-        val legalEntityReference = resolvedLegalEntity.reference
-        val existingLegalEntity = resolvedLegalEntity.existingRecord
+        val existingLegalEntity = legalEntityReferenceParser.parse(request.reference).parsedOrRecord(errors)?.existingRecord
 
         if (existingLegalEntity != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
             return LegalEntityUpsertPlan.Unchanged(legalEntityReference, legalAddressReference, existingLegalEntity)

@@ -63,12 +63,8 @@ class SiteUpsertParser(
         request: SiteUpsertRequest,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
-        val resolvedSite = when (val result = siteReferenceParser.parse(request.reference)) {
-            is ParseResult.Failure -> { errors += result.errors; return null }
-            is ParseResult.Success -> result.parsed
-        }
-        val siteReference = resolvedSite.reference
-        val existingSite = resolvedSite.existingRecord
+        val siteReference = referenceResolutionParser.parse(request.reference)
+        val existingSite = siteReferenceParser.parse(request.reference).parsedOrRecord(errors)?.existingRecord
 
         if (existingSite != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
             return SiteUpsertPlan.Unchanged(siteReference, existingSite)
@@ -95,24 +91,21 @@ class SiteUpsertParser(
         siteReference: BpnReferenceParsed,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertPlan? {
-        val resolvedMainAddress = when (
-            val result = addressReferenceParser.parse(request.mainAddress.reference, ::SiteMainAddressNotFound)
-        ) {
-            is ParseResult.Failure -> { errors += result.errors; return null }
-            is ParseResult.Success -> result.parsed
-        }
+        val mainAddressReference = referenceResolutionParser.parse(request.mainAddress.reference)
+        val existingMainAddress = addressReferenceParser
+            .parse(request.mainAddress.reference, ::SiteMainAddressNotFound)
+            .parsedOrRecord(errors)?.existingRecord
 
         // A new site whose main address already exists adopts that address instead of duplicating it, so several
         // sites can share one main address - a different creation, with a different plan.
-        val existingMainAddress = resolvedMainAddress.existingRecord
         if (existingMainAddress != null)
-            return parseCreateOnExistingAddress(request, siteReference, resolvedMainAddress.reference, existingMainAddress, errors)
+            return parseCreateOnExistingAddress(request, siteReference, mainAddressReference, existingMainAddress, errors)
 
         val content = siteContentParser
             .parse(listOf(SiteContentRequest(request.header, request.mainAddress.content)), listOf(null))
             .singleOrRecord(errors, ::toContentError) ?: return null
 
-        return SiteUpsertPlan.CreateWithOwnMainAddress(siteReference, resolvedMainAddress.reference, content)
+        return SiteUpsertPlan.CreateWithOwnMainAddress(siteReference, mainAddressReference, content)
     }
 
     private fun parseCreateOnExistingAddress(

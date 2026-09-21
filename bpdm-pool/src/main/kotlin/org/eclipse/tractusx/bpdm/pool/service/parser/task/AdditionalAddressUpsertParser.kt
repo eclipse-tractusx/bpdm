@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AdditionalAddressUpsertParser(
     private val addressReferenceParser: AddressReferenceParser,
+    private val referenceResolutionParser: BpnReferenceResolutionParser,
     private val addressContentParser: AddressContentParser
 ) {
 
@@ -55,21 +56,18 @@ class AdditionalAddressUpsertParser(
         request: AddressUpsertRequest,
         errors: MutableList<AdditionalAddressUpsertParseError>
     ): AddressUpsertPlan? {
-        val resolvedAddress = when (
-            val result = addressReferenceParser.parse(request.reference, ::AdditionalAddressNotFound)
-        ) {
-            is ParseResult.Failure -> { errors += result.errors; return null }
-            is ParseResult.Success -> result.parsed
-        }
-        val existingAddress = resolvedAddress.existingRecord
+        val addressReference = referenceResolutionParser.parse(request.reference)
+        val existingAddress = addressReferenceParser
+            .parse(request.reference, ::AdditionalAddressNotFound)
+            .parsedOrRecord(errors)?.existingRecord
 
         val content = addressContentParser
             .parse(listOf(request.content), listOf(existingAddress?.bpn))
             .singleOrRecord(errors, ::AdditionalAddressContentInvalid) ?: return null
 
         return if (existingAddress == null)
-            AddressUpsertPlan.Create(resolvedAddress.reference, content)
+            AddressUpsertPlan.Create(addressReference, content)
         else
-            AddressUpsertPlan.Update(resolvedAddress.reference, existingAddress, content)
+            AddressUpsertPlan.Update(addressReference, existingAddress, content)
     }
 }
