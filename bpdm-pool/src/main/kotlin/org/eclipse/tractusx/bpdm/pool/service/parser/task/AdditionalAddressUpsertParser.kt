@@ -17,30 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressContentInvalid
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotFound
+import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpsertRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.TypedParentAddressCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Decides what a request asks to happen to its additional address: resolve the reference, then hand the content to
- * the parser that owns that operation.
+ * Decides what a request asks to happen to its additional address: create it or write over it.
  *
  * An additional address is written whenever it is stated, so unlike the other partners it has no unchanged case.
  */
 @Service
 class AdditionalAddressUpsertParser(
     private val addressReferenceParser: AddressReferenceParser,
-    private val typedParentAddressCreateParser: TypedParentAddressCreateParser,
-    private val addressUpdateParser: AddressUpdateParser
+    private val addressContentParser: AddressContentParser
 ) {
 
     /**
@@ -66,37 +63,13 @@ class AdditionalAddressUpsertParser(
         }
         val existingAddress = resolvedAddress.existingRecord
 
-        if (existingAddress == null) {
-            val content = typedParentAddressCreateParser
-                .parseContent(listOf(request.content))
-                .singleOrRecord(errors, ::toCreateError) ?: return null
-            return AddressUpsertPlan.Create(resolvedAddress.reference, content)
-        }
+        val content = addressContentParser
+            .parse(listOf(request.content), listOf(existingAddress?.bpn))
+            .singleOrRecord(errors, ::AdditionalAddressContentInvalid) ?: return null
 
-        val updated = addressUpdateParser
-            .parseWithoutScriptVariantCoverage(listOf(AddressUpdateRequest(existingAddress.bpn, siteBpns = null, content = request.content)))
-            .singleOrRecord(errors, ::toUpdateError) ?: return null
-
-        return AddressUpsertPlan.Update(resolvedAddress.reference, existingAddress, updated.address)
+        return if (existingAddress == null)
+            AddressUpsertPlan.Create(resolvedAddress.reference, content)
+        else
+            AddressUpsertPlan.Update(resolvedAddress.reference, existingAddress, content)
     }
-
-    private fun toCreateError(error: AddressCreateParseError): AdditionalAddressUpsertParseError =
-        when (error) {
-            is AddressContentParseError -> AdditionalAddressContentInvalid(error)
-            is UnresolvableLegalEntity -> LegalEntityNotFound(error.bpn)
-            is UnresolvableSite -> SiteNotFound(error.bpn)
-            // Parents are this request's own, so neither a mismatched nor an untyped parent can reach here.
-            is SiteNotInAddressLegalEntity -> error("Unexpected parent mismatch for site ${error.siteBpn}")
-            is InvalidParentBpn -> error("Unexpected untyped parent ${error.bpn}")
-        }
-
-    private fun toUpdateError(error: AddressUpdateEntryParseError): AdditionalAddressUpsertParseError =
-        when (error) {
-            is AddressContentParseError -> AdditionalAddressContentInvalid(error)
-            // The existing address was resolved first, and membership is stated once for the record, not by this update.
-            is UnresolvableAddress -> error("Unexpected unresolvable address ${error.bpn}")
-            is UnresolvableSite -> error("Unexpected unresolvable site ${error.bpn}")
-            is SiteMainAddressOmitted -> error("Unexpected omitted main address site ${error.siteBpn}")
-            is SiteNotInAddressLegalEntity -> error("Unexpected parent mismatch for site ${error.siteBpn}")
-        }
 }

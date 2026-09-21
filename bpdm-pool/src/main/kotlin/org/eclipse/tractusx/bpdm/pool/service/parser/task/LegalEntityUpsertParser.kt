@@ -17,32 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.UpsertIntent
-import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityContentParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityOwnershipValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Decides what a request asks to happen to its legal entity: resolve the reference, then hand the content to the
- * parser that owns that operation, or to none where nothing needs writing.
+ * Decides what a request asks to happen to its legal entity: create it, write over it, or leave it as it stands.
  */
 @Service
 class LegalEntityUpsertParser(
     private val legalEntityReferenceParser: LegalEntityReferenceParser,
     private val referenceResolutionParser: BpnReferenceResolutionParser,
-    private val legalEntityCreateParser: LegalEntityCreateParser,
-    private val legalEntityUpdateParser: LegalEntityUpdateParser
+    private val legalEntityContentParser: LegalEntityContentParser,
+    private val ownershipValidator: LegalEntityOwnershipValidator
 ) {
 
     /**
@@ -71,36 +69,35 @@ class LegalEntityUpsertParser(
         if (existingLegalEntity != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
             return LegalEntityUpsertPlan.Unchanged(legalEntityReference, legalAddressReference, existingLegalEntity)
 
-        if (existingLegalEntity == null) {
-            val created = legalEntityCreateParser
-                .parseWithoutScriptVariantCoverage(listOf(LegalEntityCreateRequest(toContentRequest(request))))
-                .singleOrRecord(errors, ::toCreateError) ?: return null
-            return LegalEntityUpsertPlan.Create(legalEntityReference, legalAddressReference, created.content)
-        }
+        val content = parseContent(request, existingLegalEntity, errors)
+        errors += ownershipValidator.validate(listOf(existingLegalEntity), listOf(request.header.ownershipUltimate))
+            .single().map(::toOwnershipError)
+        if (content == null) return null
 
-        val updated = legalEntityUpdateParser
-            .parseWithoutScriptVariantCoverage(listOf(LegalEntityUpdateRequest(existingLegalEntity.bpn, toContentRequest(request))))
-            .singleOrRecord(errors, ::toUpdateError) ?: return null
-
-        return LegalEntityUpsertPlan.Update(legalEntityReference, legalAddressReference, existingLegalEntity, updated.content)
+        return if (existingLegalEntity == null)
+            LegalEntityUpsertPlan.Create(legalEntityReference, legalAddressReference, content)
+        else
+            LegalEntityUpsertPlan.Update(legalEntityReference, legalAddressReference, existingLegalEntity, content)
     }
 
-    private fun toContentRequest(request: LegalEntityUpsertRequest) =
-        LegalEntityContentRequest(header = request.header, legalAddress = request.legalAddress.content)
+    private fun parseContent(
+        request: LegalEntityUpsertRequest,
+        existingLegalEntity: LegalEntityDb?,
+        errors: MutableList<LegalEntityUpsertParseError>
+    ): LegalEntityContentParsed? =
+        legalEntityContentParser
+            .parse(listOf(LegalEntityContentRequest(request.header, request.legalAddress.content)), listOf(existingLegalEntity))
+            .singleOrRecord(errors, ::toContentError)
 
-    private fun toCreateError(error: LegalEntityCreateEntryParseError): LegalEntityUpsertParseError =
+    private fun toOwnershipError(error: LegalEntityOwnershipParseError): LegalEntityUpsertParseError =
         when (error) {
-            is LegalEntityHeaderParseError -> LegalEntityContentInvalid(error)
-            is AddressContentParseError -> LegalAddressContentInvalid(error)
-        }
-
-    private fun toUpdateError(error: LegalEntityUpdateEntryParseError): LegalEntityUpsertParseError =
-        when (error) {
-            is LegalEntityHeaderParseError -> LegalEntityContentInvalid(error)
-            is AddressContentParseError -> LegalAddressContentInvalid(error)
             is MultipleUltimateOwnersInHierarchy -> MultipleUltimateOwners(error.conflictingBpnls)
             is AlternativeHeadquarterCannotOwnUltimately -> AlternativeHeadquarterCannotOwn(error.bpnl)
-            // The existing legal entity was resolved before this parser was called.
-            is UnresolvableLegalEntity -> error("Unexpected unresolvable legal entity ${error.bpn}")
+        }
+
+    private fun toContentError(error: LegalEntityContentParseError): LegalEntityUpsertParseError =
+        when (error) {
+            is LegalEntityHeaderParseError -> LegalEntityContentInvalid(error)
+            is AddressContentParseError -> LegalAddressContentInvalid(error)
         }
 }

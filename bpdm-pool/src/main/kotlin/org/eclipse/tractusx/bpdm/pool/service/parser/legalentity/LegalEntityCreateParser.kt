@@ -52,7 +52,7 @@ class LegalEntityCreateParser(
         requests: List<LegalEntityCreateRequest>
     ): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateEntryParseError>> {
         val contents = requests.map { it.content }
-        val contentResults = legalEntityContentParser.parse(contents, contents.map { null }, contents.map { null })
+        val contentResults = legalEntityContentParser.parse(contents, contents.map { null })
 
         return contentResults.map { result ->
             when (result) {

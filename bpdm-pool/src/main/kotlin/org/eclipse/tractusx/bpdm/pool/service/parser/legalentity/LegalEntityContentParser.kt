@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
@@ -40,20 +41,20 @@ class LegalEntityContentParser(
 
     /**
      * Validates each content and reports either the validated content or every problem found in that entry.
-     * [legalEntityBpns] and [legalAddressBpns] are positional with [contents]: null for a create, the record's own BPN
-     * for an update, so an update may re-submit its own existing identifiers.
+     * [existingLegalEntities] is positional with [contents]: null for a create, the legal entity being written over for
+     * an update, so an update may re-submit its own existing identifiers.
      */
     fun parse(
         contents: List<LegalEntityContentRequest>,
-        legalEntityBpns: List<String?>,
-        legalAddressBpns: List<String?>
+        existingLegalEntities: List<LegalEntityDb?>
     ): List<ParseResult<LegalEntityContentParsed, LegalEntityContentParseError>> {
         val headers = contents.map { it.header }
         val headerResults = legalEntityHeaderParser.parse(headers)
-        val duplicateErrors = duplicateValidator.validate(headers, legalEntityBpns)
+        val duplicateErrors = duplicateValidator.validate(headers, existingLegalEntities.map { it?.bpn })
         val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
 
-        val legalAddressResults = addressContentParser.parse(contents.map { it.legalAddress }, legalAddressBpns)
+        val legalAddressResults =
+            addressContentParser.parse(contents.map { it.legalAddress }, existingLegalEntities.map { it?.legalAddress?.bpn })
 
         return zipParseResults(mergedHeaderResults, legalAddressResults, ::LegalEntityContentParsed)
     }

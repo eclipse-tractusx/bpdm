@@ -26,9 +26,7 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
@@ -51,7 +49,8 @@ class TypedParentAddressCreateParser(
      * that entry.
      */
     fun parse(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
-        val contentResults = parseContent(requests.map { it.content })
+        val contents = requests.map { it.content }
+        val contentResults = addressContentParser.parse(contents, contents.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val siteResults = parseWherePresent(requests.map { it.siteBpn }, siteBpnParser::parse)
         val consistentSiteResults: List<ParseResult<SiteDb?, AddressCreateParseError>> =
@@ -63,10 +62,4 @@ class TypedParentAddressCreateParser(
             AddressCreateParsed(legalEntity, site, content)
         }
     }
-
-    /**
-     * Validates each address's content as a creation, whichever parents it turns out to be created under.
-     */
-    fun parseContent(requests: List<LogisticAddressRequest>): List<ParseResult<LogisticAddressParsed, AddressCreateParseError>> =
-        addressContentParser.parse(requests, requests.map { null })
 }

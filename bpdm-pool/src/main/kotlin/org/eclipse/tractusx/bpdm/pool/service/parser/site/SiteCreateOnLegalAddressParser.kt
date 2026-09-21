@@ -62,19 +62,13 @@ class SiteCreateOnLegalAddressParser(
     fun parseWithoutScriptVariantCoverage(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateEntryParseError>> {
-        val headerResults = parseContent(requests.map { it.header })
+        val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         return zipParseResults(legalEntityResults, headerResults) { legalEntity, header ->
             SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header, mainAddressContent = null)
         }
     }
-
-    /**
-     * Validates each site's own properties as a creation, whichever legal address it turns out to be created on.
-     */
-    fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteCreateEntryParseError>> =
-        siteHeaderParser.parse(requests)
 
     // What this write leaves behind, as script variant coverage sees it.
     private fun coverageWrites(parsed: SiteCreateWithReferencedAddressAsMainParsed): List<AddressCoverageWrite> =

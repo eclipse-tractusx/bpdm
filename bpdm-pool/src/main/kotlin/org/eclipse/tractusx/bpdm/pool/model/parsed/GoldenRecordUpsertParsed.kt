@@ -114,7 +114,9 @@ sealed interface SiteUpsertPlan {
     data class CreateOnExistingAddress(
         override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
-        val creation: SiteCreateWithReferencedAddressAsMainParsed
+        val existingMainAddress: LogisticAddressDb,
+        val header: SiteHeaderParsed,
+        val mainAddressContent: LogisticAddressParsed
     ) : SiteUpsertPlan
 
     data class UpdateWithOwnMainAddress(
@@ -126,7 +128,8 @@ sealed interface SiteUpsertPlan {
 
     data class UpdateOnLegalAddress(
         override val siteReference: BpnReferenceParsed,
-        val update: SiteUpdateOnLegalAddressParsed
+        val existingSite: SiteDb,
+        val header: SiteHeaderParsed
     ) : SiteUpsertPlan
 }
 

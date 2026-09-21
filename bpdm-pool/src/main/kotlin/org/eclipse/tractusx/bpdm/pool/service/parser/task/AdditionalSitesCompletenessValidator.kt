@@ -73,7 +73,7 @@ class AdditionalSitesCompletenessValidator(
         when (site) {
             is SiteUpsertPlan.Unchanged -> site.existingSite
             is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.existingSite
-            is SiteUpsertPlan.UpdateOnLegalAddress -> site.update.target
+            is SiteUpsertPlan.UpdateOnLegalAddress -> site.existingSite
             is SiteUpsertPlan.CreateWithOwnMainAddress,
             is SiteUpsertPlan.CreateOnLegalAddress,
             is SiteUpsertPlan.CreateOnExistingAddress -> null
@@ -91,9 +91,9 @@ class AdditionalSitesCompletenessValidator(
     private fun existingSiteMainAddress(site: SiteUpsertPlan?): LogisticAddressDb? =
         when (site) {
             is SiteUpsertPlan.Unchanged -> site.existingSite.mainAddress
-            is SiteUpsertPlan.CreateOnExistingAddress -> site.creation.mainAddress
+            is SiteUpsertPlan.CreateOnExistingAddress -> site.existingMainAddress
             is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.existingSite.mainAddress
-            is SiteUpsertPlan.UpdateOnLegalAddress -> site.update.target.mainAddress
+            is SiteUpsertPlan.UpdateOnLegalAddress -> site.existingSite.mainAddress
             is SiteUpsertPlan.CreateWithOwnMainAddress, is SiteUpsertPlan.CreateOnLegalAddress, null -> null
         }
 }

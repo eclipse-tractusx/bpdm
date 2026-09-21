@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
@@ -61,10 +62,17 @@ class SiteUpsertService(
                     UpsertType.Created
                 )
             is SiteUpsertPlan.CreateOnExistingAddress ->
-                UpsertResult(siteCreateWithReferencedAddressAsMainService.create(listOf(plan.creation)).single(), UpsertType.Created)
+                UpsertResult(
+                    siteCreateWithReferencedAddressAsMainService.create(
+                        listOf(SiteCreateWithReferencedAddressAsMainParsed(plan.existingMainAddress, plan.header, plan.mainAddressContent))
+                    ).single(),
+                    UpsertType.Created
+                )
             is SiteUpsertPlan.UpdateWithOwnMainAddress ->
                 sitePayloadUpdateService.updateWithOwnMainAddress(listOf(SiteUpdateParsed(plan.existingSite, plan.content))).single()
             is SiteUpsertPlan.UpdateOnLegalAddress ->
-                sitePayloadUpdateService.updateOnLegalAddress(listOf(plan.update)).single()
+                sitePayloadUpdateService.updateOnLegalAddress(
+                    listOf(SiteUpdateOnLegalAddressParsed(plan.existingSite, plan.header))
+                ).single()
         }
 }

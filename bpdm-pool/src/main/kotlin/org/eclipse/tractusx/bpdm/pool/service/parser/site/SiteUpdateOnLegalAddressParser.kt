@@ -25,9 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressNotLegalAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateEntryParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateOnLegalAddressRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -51,18 +49,12 @@ class SiteUpdateOnLegalAddressParser(
     @Transactional(readOnly = true)
     fun parse(requests: List<SiteUpdateOnLegalAddressRequest>): List<ParseResult<SiteUpdateOnLegalAddressParsed, SiteUpdateEntryParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn }).map(::requireSittingOnLegalAddress)
-        val headerResults = parseContent(requests.map { it.header })
+        val headerResults = siteHeaderParser.parse(requests.map { it.header })
 
         return zipParseResults(headerResults, targetResults) { header, target ->
             SiteUpdateOnLegalAddressParsed(target, header)
         }
     }
-
-    /**
-     * Validates each site's own properties as a change, whichever site they turn out to belong to.
-     */
-    fun parseContent(requests: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteUpdateEntryParseError>> =
-        siteHeaderParser.parse(requests)
 
     private fun requireSittingOnLegalAddress(
         result: ParseResult<SiteDb, SiteUpdateEntryParseError>
@@ -71,8 +63,7 @@ class SiteUpdateOnLegalAddressParser(
             is ParseResult.Failure -> result
             is ParseResult.Success -> {
                 val site = result.parsed
-                // Compared by BPN: a lazily loaded address is a proxy, which no identity comparison recognises.
-                if (site.mainAddress.bpn == site.legalEntity.legalAddress.bpn) result
+                if (site.sitsOnLegalAddress()) result
                 else ParseResult.ofSingleFailure(SiteMainAddressNotLegalAddress(site.bpn, site.mainAddress.bpn))
             }
         }

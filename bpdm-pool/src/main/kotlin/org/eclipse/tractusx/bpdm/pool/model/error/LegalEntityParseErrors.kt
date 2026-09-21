@@ -40,16 +40,21 @@ sealed interface LegalEntityGetParseError
 data class UnresolvableLegalEntityIdentifier(val identifierTypeKey: String, val identifierValue: String) : LegalEntityGetParseError
 
 /**
+ * The problems writing the ultimate-owner flag onto a legal entity that already exists can be faulted for.
+ */
+sealed interface LegalEntityOwnershipParseError : LegalEntityUpdateEntryParseError
+
+/**
  * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
  * being created has no ownership relations yet, so its tree is itself.
  */
-data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateEntryParseError
+data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityOwnershipParseError
 
 /**
  * An alternative headquarter cannot carry the ultimate-owner flag. Update-only: setting the flag on an alternative is rejected,
  * but clearing it stays allowed.
  */
-data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateEntryParseError
+data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityOwnershipParseError
 
 /**
  * The problems the content of one legal entity can be faulted for: its header and its legal address.
