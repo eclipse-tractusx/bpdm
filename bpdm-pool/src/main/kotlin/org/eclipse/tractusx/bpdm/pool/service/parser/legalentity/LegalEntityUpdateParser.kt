@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
@@ -57,14 +58,16 @@ class LegalEntityUpdateParser(
     ): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateEntryParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
-        val resolvedTargets = targetResults.map { (it as? ParseResult.Success)?.parsed }
-        val contentResults = legalEntityContentParser.parse(requests.map { it.content }, resolvedTargets)
+        val contentWrites = requests.zip(targetResults) { request, targetResult ->
+            LegalEntityContentWrite(request.content, (targetResult as? ParseResult.Success)?.parsed)
+        }
+        val contentResults = legalEntityContentParser.parse(contentWrites)
 
         val updateResults = zipParseResults(contentResults, targetResults) { content, target ->
             LegalEntityUpdateParsed(target, content)
         }
 
-        val ownershipViolations = ownershipValidator.validate(resolvedTargets, requests.map { it.content.header.ownershipUltimate })
+        val ownershipViolations = ownershipValidator.validate(contentWrites.map { it.headerWrite })
 
         return updateResults.zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }
     }

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityOwnershipParseError
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AlternativeHeadquarterValidator
 import org.springframework.stereotype.Service
@@ -38,13 +38,13 @@ class LegalEntityOwnershipValidator(
 ) {
 
     /**
-     * Reports, per entry, every ownership rule the stated flag would break, positional with [targets] and
-     * [requestedFlags]: an unresolved target or a flag left unstated by the request yields none.
+     * Reports, per entry, every ownership rule the stated flag would break: a write that creates its legal entity, or
+     * one leaving the flag unstated, yields none.
      */
     @Transactional(readOnly = true)
-    fun validate(targets: List<LegalEntityDb?>, requestedFlags: List<Boolean?>): List<List<LegalEntityOwnershipParseError>> {
-        val uniquenessViolations = ultimateOwnerUniquenessValidator.validate(targets, requestedFlags)
-        val alternativeViolations = alternativeHeadquarterValidator.validate(targets, requestedFlags)
+    fun validate(writes: List<LegalEntityHeaderWrite>): List<List<LegalEntityOwnershipParseError>> {
+        val uniquenessViolations = ultimateOwnerUniquenessValidator.validate(writes)
+        val alternativeViolations = alternativeHeadquarterValidator.validate(writes)
 
         return uniquenessViolations.zip(alternativeViolations) { uniqueness, alternative -> uniqueness + alternative }
     }

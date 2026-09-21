@@ -22,10 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service
 
@@ -41,20 +40,17 @@ class LegalEntityContentParser(
 
     /**
      * Validates each content and reports either the validated content or every problem found in that entry.
-     * [existingLegalEntities] is positional with [contents]: null for a create, the legal entity being written over for
-     * an update, so an update may re-submit its own existing identifiers.
      */
-    fun parse(
-        contents: List<LegalEntityContentRequest>,
-        existingLegalEntities: List<LegalEntityDb?>
-    ): List<ParseResult<LegalEntityContentParsed, LegalEntityContentParseError>> {
-        val headers = contents.map { it.header }
-        val headerResults = legalEntityHeaderParser.parse(headers)
-        val duplicateErrors = duplicateValidator.validate(headers, existingLegalEntities.map { it?.bpn })
+    fun parse(writes: List<LegalEntityContentWrite>): List<ParseResult<LegalEntityContentParsed, LegalEntityContentParseError>> {
+        val headerWrites = writes.map { it.headerWrite }
+        val headerResults = legalEntityHeaderParser.parse(headerWrites)
+        val duplicateErrors = duplicateValidator.validate(headerWrites)
         val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
 
-        val legalAddressResults =
-            addressContentParser.parse(contents.map { it.legalAddress }, existingLegalEntities.map { it?.legalAddress?.bpn })
+        val legalAddressResults = addressContentParser.parse(
+            writes.map { it.content.legalAddress },
+            writes.map { it.existingLegalEntity?.legalAddress?.bpn }
+        )
 
         return zipParseResults(mergedHeaderResults, legalAddressResults, ::LegalEntityContentParsed)
     }

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.AlternativeHeadquarterCannotOwnUltimately
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
@@ -64,8 +65,6 @@ class AlternativeHeadquarterValidator(
      * and if it's being set to ownershipUltimate = true. Returns violations for each entry.
      */
     @Transactional(readOnly = true)
-    fun validate(targets: List<LegalEntityDb?>, requestedFlags: List<Boolean?>): List<List<AlternativeHeadquarterCannotOwnUltimately>> {
-        require(targets.size == requestedFlags.size) { "targets and requestedFlags must be positionally aligned" }
-        return targets.zip(requestedFlags).map { (target, flag) -> validateFlagOnAlternative(target, flag) }
-    }
+    fun validate(writes: List<LegalEntityHeaderWrite>): List<List<AlternativeHeadquarterCannotOwnUltimately>> =
+        writes.map { validateFlagOnAlternative(it.existingLegalEntity, it.header.ownershipUltimate) }
 }

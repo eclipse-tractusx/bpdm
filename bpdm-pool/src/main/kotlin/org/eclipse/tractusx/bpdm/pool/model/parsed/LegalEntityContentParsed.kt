@@ -36,10 +36,8 @@ data class LegalEntityHeaderParsed(
     val identifiers: List<LegalEntityIdentifierParsed>,
     val states: List<LegalEntityState>,
     val confidenceCriteria: ConfidenceCriteriaParsed,
-    /** Null means the payload does not state the flag: keep the current value on update, default to false on create. */
-    val isDataSpaceParticipant: Boolean?,
-    /** Null means the payload does not state the flag: keep the current value on update, default to false on create. */
-    val ownershipUltimate: Boolean?,
+    val isDataSpaceParticipant: Boolean,
+    val ownershipUltimate: Boolean,
     val scriptVariants: List<LegalEntityScriptVariantParsed>
 ) {
     fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }

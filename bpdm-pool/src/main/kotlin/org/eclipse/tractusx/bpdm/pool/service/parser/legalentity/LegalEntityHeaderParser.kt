@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderWrite
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityHeaderParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
@@ -51,11 +52,12 @@ class LegalEntityHeaderParser(
 ) {
 
     /**
-     * Validates each header and reports either the validated header or every problem found in that entry.
+     * Validates each header and reports either the validated header or every problem found in that entry. A flag the
+     * payload leaves unstated keeps the value the legal entity being written over carries.
      */
-    fun parse(headers: List<LegalEntityHeaderRequest>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityHeaderParseError>> {
-        val metadata = fetchMetadata(headers)
-        return headers.map { parseEntry(it, metadata) }
+    fun parse(writes: List<LegalEntityHeaderWrite>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityHeaderParseError>> {
+        val metadata = fetchMetadata(writes.map { it.header })
+        return writes.map { parseEntry(it, metadata) }
     }
 
     private fun fetchMetadata(headers: List<LegalEntityHeaderRequest>): LegalEntityHeaderMetadata {
@@ -71,7 +73,11 @@ class LegalEntityHeaderParser(
         )
     }
 
-    private fun parseEntry(header: LegalEntityHeaderRequest, metadata: LegalEntityHeaderMetadata): ParseResult<LegalEntityHeaderParsed, LegalEntityHeaderParseError> {
+    private fun parseEntry(
+        write: LegalEntityHeaderWrite,
+        metadata: LegalEntityHeaderMetadata
+    ): ParseResult<LegalEntityHeaderParsed, LegalEntityHeaderParseError> {
+        val header = write.header
         val errors = mutableListOf<LegalEntityHeaderParseError>()
 
         val legalName = header.legalName ?: run { errors.add(LegalEntityHeaderParseError.NameMissing); null }
@@ -94,8 +100,8 @@ class LegalEntityHeaderParser(
                 identifiers = identifiers,
                 states = header.states,
                 confidenceCriteria = confidence!!,
-                isDataSpaceParticipant = header.isDataSpaceParticipant,
-                ownershipUltimate = header.ownershipUltimate,
+                isDataSpaceParticipant = header.isDataSpaceParticipant ?: write.existingLegalEntity?.isDataSpaceParticipant ?: false,
+                ownershipUltimate = header.ownershipUltimate ?: write.existingLegalEntity?.ownershipUltimate ?: false,
                 scriptVariants = scriptVariants
             )
         )

@@ -39,10 +39,8 @@ class LegalEntityHeaderUpdateMapper {
         legalShortName = FieldUpdate.Set(header.legalShortName),
         legalForm = FieldUpdate.Set(header.legalForm),
         confidenceCriteria = FieldUpdate.Set(header.confidenceCriteria),
-        // A payload that does not state the participation flag must not clear it (the golden record task can omit it).
-        isDataSpaceParticipant = header.isDataSpaceParticipant?.let { FieldUpdate.Set(it) } ?: FieldUpdate.NoOp,
-        // A payload that does not state the ownership flag must not clear it (V6 can never state it).
-        ownershipUltimate = header.ownershipUltimate?.let { FieldUpdate.Set(it) } ?: FieldUpdate.NoOp,
+        isDataSpaceParticipant = FieldUpdate.Set(header.isDataSpaceParticipant),
+        ownershipUltimate = FieldUpdate.Set(header.ownershipUltimate),
         ultimateOwnerBpnl = FieldUpdate.NoOp,
         currentness = FieldUpdate.Set(currentness),
         identifiers = FieldUpdate.Set(header.identifiers),

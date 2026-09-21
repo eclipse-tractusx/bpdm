@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
@@ -49,8 +50,7 @@ class LegalEntityCreateParser(
     private fun parseEntries(
         requests: List<LegalEntityCreateRequest>
     ): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateEntryParseError>> {
-        val contents = requests.map { it.content }
-        val contentResults = legalEntityContentParser.parse(contents, contents.map { null })
+        val contentResults = legalEntityContentParser.parse(requests.map { LegalEntityContentWrite(it.content, existingLegalEntity = null) })
 
         return contentResults.map { result ->
             when (result) {
