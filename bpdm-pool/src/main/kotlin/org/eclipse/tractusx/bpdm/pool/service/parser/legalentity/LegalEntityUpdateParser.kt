@@ -26,11 +26,9 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AlternativeHeadquarterValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,11 +40,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val legalEntityHeaderParser: LegalEntityHeaderParser,
-    private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
+    private val legalEntityContentParser: LegalEntityContentParser,
     private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
     private val alternativeHeadquarterValidator: AlternativeHeadquarterValidator,
-    private val addressContentParser: AddressContentParser,
     private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
@@ -68,24 +64,19 @@ class LegalEntityUpdateParser(
     ): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateEntryParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
-        val headers = requests.map { it.content.header }
-        val headerResults = legalEntityHeaderParser.parse(headers)
-        val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.bpn }
-        val duplicateErrors = duplicateValidator.validate(headers, ownerBpns)
-        val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
+        val legalEntityBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.bpn }
+        val legalAddressBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.legalAddress?.bpn }
+        val contentResults = legalEntityContentParser.parse(requests.map { it.content }, legalEntityBpns, legalAddressBpns)
 
-        val legalAddressOwnerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.legalAddress?.bpn }
-        val legalAddressResults = addressContentParser.parse(requests.map { it.content.legalAddress }, legalAddressOwnerBpns)
-
-        val updateResults = zipParseResults(mergedHeaderResults, targetResults, legalAddressResults) { header, target, legalAddress ->
-            LegalEntityUpdateParsed(target, LegalEntityContentParsed(header, legalAddress))
+        val updateResults = zipParseResults(contentResults, targetResults) { content, target ->
+            LegalEntityUpdateParsed(target, content)
         }
 
         // The ultimate-owner rule spans the whole batch and both the requested flag and the resolved target, so it is
         // folded in at this level rather than into the header result.
         val resolvedTargets = targetResults.map { (it as? ParseResult.Success)?.parsed }
-        val ownershipViolations = ultimateOwnerUniquenessValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
-        val alternativeViolations = alternativeHeadquarterValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
+        val ownershipViolations = ultimateOwnerUniquenessValidator.validate(resolvedTargets, requests.map { it.content.header.ownershipUltimate })
+        val alternativeViolations = alternativeHeadquarterValidator.validate(resolvedTargets, requests.map { it.content.header.ownershipUltimate })
 
         return updateResults
             .zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }

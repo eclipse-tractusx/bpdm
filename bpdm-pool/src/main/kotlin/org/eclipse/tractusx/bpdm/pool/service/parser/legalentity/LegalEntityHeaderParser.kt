@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityHeaderParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
@@ -53,7 +53,7 @@ class LegalEntityHeaderParser(
     /**
      * Validates each header and reports either the validated header or every problem found in that entry.
      */
-    fun parse(headers: List<LegalEntityHeaderRequest>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityContentParseError>> {
+    fun parse(headers: List<LegalEntityHeaderRequest>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityHeaderParseError>> {
         val metadata = fetchMetadata(headers)
         return headers.map { parseEntry(it, metadata) }
     }
@@ -71,12 +71,12 @@ class LegalEntityHeaderParser(
         )
     }
 
-    private fun parseEntry(header: LegalEntityHeaderRequest, metadata: LegalEntityHeaderMetadata): ParseResult<LegalEntityHeaderParsed, LegalEntityContentParseError> {
-        val errors = mutableListOf<LegalEntityContentParseError>()
+    private fun parseEntry(header: LegalEntityHeaderRequest, metadata: LegalEntityHeaderMetadata): ParseResult<LegalEntityHeaderParsed, LegalEntityHeaderParseError> {
+        val errors = mutableListOf<LegalEntityHeaderParseError>()
 
-        val legalName = header.legalName ?: run { errors.add(LegalEntityContentParseError.NameMissing); null }
+        val legalName = header.legalName ?: run { errors.add(LegalEntityHeaderParseError.NameMissing); null }
         val legalForm = parseLegalForm(header.legalForm, metadata, errors)
-        val confidence = when (val result = confidenceCriteriaParser.parse(header.confidenceCriteria, LegalEntityContentParseError.ConfidenceCriteriaMissing)) {
+        val confidence = when (val result = confidenceCriteriaParser.parse(header.confidenceCriteria, LegalEntityHeaderParseError.ConfidenceCriteriaMissing)) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> { errors += result.errors; null }
         }
@@ -104,26 +104,26 @@ class LegalEntityHeaderParser(
     private fun parseLegalForm(
         legalForm: String?,
         metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        errors: MutableList<LegalEntityHeaderParseError>
     ): LegalFormDb? {
         if (legalForm == null) return null
-        return metadata.legalForms[legalForm] ?: run { errors.add(LegalEntityContentParseError.LegalFormNotFound(legalForm)); null }
+        return metadata.legalForms[legalForm] ?: run { errors.add(LegalEntityHeaderParseError.LegalFormNotFound(legalForm)); null }
     }
 
     private fun parseIdentifiers(
         requests: List<LegalEntityIdentifier>,
         metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        errors: MutableList<LegalEntityHeaderParseError>
     ): List<LegalEntityIdentifierParsed> {
         if (requests.size > ValidationLimits.IDENTIFIER_AMOUNT_LIMIT) {
-            errors.add(LegalEntityContentParseError.IdentifiersTooMany(requests.size))
+            errors.add(LegalEntityHeaderParseError.IdentifiersTooMany(requests.size))
         }
         return requests.mapIndexedNotNull { index, request ->
-            val value = request.value ?: run { errors.add(LegalEntityContentParseError.IdentifierValueMissing(index)); null }
+            val value = request.value ?: run { errors.add(LegalEntityHeaderParseError.IdentifierValueMissing(index)); null }
             val type = request.type
             val typeEntity = when {
-                type == null -> { errors.add(LegalEntityContentParseError.IdentifierTypeMissing(index)); null }
-                else -> metadata.idTypes[type] ?: run { errors.add(LegalEntityContentParseError.IdentifierTypeNotFound(index, type)); null }
+                type == null -> { errors.add(LegalEntityHeaderParseError.IdentifierTypeMissing(index)); null }
+                else -> metadata.idTypes[type] ?: run { errors.add(LegalEntityHeaderParseError.IdentifierTypeNotFound(index, type)); null }
             }
             if (value == null || typeEntity == null) null else LegalEntityIdentifierParsed(value, typeEntity, request.issuingBody)
         }
@@ -132,12 +132,12 @@ class LegalEntityHeaderParser(
     private fun parseScriptVariants(
         requests: List<LegalEntityScriptVariant>,
         metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        errors: MutableList<LegalEntityHeaderParseError>
     ): List<LegalEntityScriptVariantParsed> {
         val claimedScriptCodes = mutableSetOf<String>()
         return requests.mapIndexedNotNull { index, variant ->
             if (!claimedScriptCodes.add(variant.scriptCode)) {
-                errors.add(LegalEntityContentParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
+                errors.add(LegalEntityHeaderParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
                 null
             } else {
                 parseScriptVariant(index, variant, metadata, errors)
@@ -149,12 +149,12 @@ class LegalEntityHeaderParser(
         index: Int,
         variant: LegalEntityScriptVariant,
         metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        errors: MutableList<LegalEntityHeaderParseError>
     ): LegalEntityScriptVariantParsed? {
         val scriptCode = metadata.scriptCodes[variant.scriptCode]
-            ?: run { errors.add(LegalEntityContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
+            ?: run { errors.add(LegalEntityHeaderParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
         val legalName = variant.legalName?.takeIf { it.isNotBlank() }
-            ?: run { errors.add(LegalEntityContentParseError.ScriptVariantLegalNameMissing(index)); null }
+            ?: run { errors.add(LegalEntityHeaderParseError.ScriptVariantLegalNameMissing(index)); null }
 
         if (scriptCode == null || legalName == null) return null
 

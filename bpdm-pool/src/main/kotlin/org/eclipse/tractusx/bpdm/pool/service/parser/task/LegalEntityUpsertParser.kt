@@ -90,13 +90,13 @@ class LegalEntityUpsertParser(
 
     private fun toCreateError(error: LegalEntityCreateEntryParseError): LegalEntityUpsertParseError =
         when (error) {
-            is LegalEntityContentParseError -> LegalEntityContentInvalid(error)
+            is LegalEntityHeaderParseError -> LegalEntityContentInvalid(error)
             is AddressContentParseError -> LegalAddressContentInvalid(error)
         }
 
     private fun toUpdateError(error: LegalEntityUpdateEntryParseError): LegalEntityUpsertParseError =
         when (error) {
-            is LegalEntityContentParseError -> LegalEntityContentInvalid(error)
+            is LegalEntityHeaderParseError -> LegalEntityContentInvalid(error)
             is AddressContentParseError -> LegalAddressContentInvalid(error)
             is MultipleUltimateOwnersInHierarchy -> MultipleUltimateOwners(error.conflictingBpnls)
             is AlternativeHeadquarterCannotOwnUltimately -> AlternativeHeadquarterCannotOwn(error.bpnl)

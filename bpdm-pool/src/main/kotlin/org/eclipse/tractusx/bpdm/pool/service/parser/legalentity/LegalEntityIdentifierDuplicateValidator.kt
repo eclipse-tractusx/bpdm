@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityHeaderParseError
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.springframework.stereotype.Service
@@ -41,7 +41,7 @@ class LegalEntityIdentifierDuplicateValidator(
      * [headers] — null for a create, the legal entity's own BPN for an update — and an identifier owned by the entry's
      * own BPN is not a duplicate.
      */
-    fun validate(headers: List<LegalEntityHeaderRequest>, ownerBpns: List<String?>): List<List<LegalEntityContentParseError>> {
+    fun validate(headers: List<LegalEntityHeaderRequest>, ownerBpns: List<String?>): List<List<LegalEntityHeaderParseError>> {
         require(headers.size == ownerBpns.size) { "headers and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(headers)
         return headers.mapIndexed { i, header -> duplicateErrorsFor(header, ownerBpns[i], candidates) }
@@ -51,7 +51,7 @@ class LegalEntityIdentifierDuplicateValidator(
         header: LegalEntityHeaderRequest,
         ownerBpn: String?,
         candidates: Map<Key, Candidate>
-    ): List<LegalEntityContentParseError> =
+    ): List<LegalEntityHeaderParseError> =
         header.identifiers.mapIndexedNotNull { index, identifier ->
             val type = identifier.type
             val value = identifier.value
@@ -59,7 +59,7 @@ class LegalEntityIdentifierDuplicateValidator(
 
             val candidate = candidates[Key(type, value)]
             if (candidate != null && (candidate.bpn == null || candidate.bpn != ownerBpn))
-                LegalEntityContentParseError.DuplicateIdentifier(index, type, value)
+                LegalEntityHeaderParseError.DuplicateIdentifier(index, type, value)
             else
                 null
         }

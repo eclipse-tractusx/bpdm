@@ -44,7 +44,7 @@ class LegalEntityParseErrorMapperV6(
         when (error) {
             is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityCreateErrorInfo(error, entityKey)
             is ScriptVariantCoverageParseError -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityCreateErrorV6.LegalFormNotFound,
@@ -71,7 +71,7 @@ class LegalEntityParseErrorMapperV6(
             // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
             is ScriptVariantCoverageStillNeeded -> throw internalError(error)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityUpdateErrorV6.LegalFormNotFound,
@@ -82,7 +82,7 @@ class LegalEntityParseErrorMapperV6(
         }
 
     private fun <E : ErrorCodeV6> contentErrorInfo(
-        error: LegalEntityContentParseError,
+        error: LegalEntityHeaderParseError,
         entityKey: String?,
         legalFormNotFound: E,
         identifierNotFound: E,
@@ -90,25 +90,25 @@ class LegalEntityParseErrorMapperV6(
         identifiersTooMany: E
     ): ErrorInfoV6<E> =
         when (error) {
-            is LegalEntityContentParseError.LegalFormNotFound ->
+            is LegalEntityHeaderParseError.LegalFormNotFound ->
                 ErrorInfoV6(legalFormNotFound, "Legal form '${error.legalForm}' does not exist", entityKey)
-            is LegalEntityContentParseError.IdentifierTypeNotFound ->
+            is LegalEntityHeaderParseError.IdentifierTypeNotFound ->
                 ErrorInfoV6(identifierNotFound, "Legal Entity Identifier Type '${error.type}' does not exist", entityKey)
-            is LegalEntityContentParseError.DuplicateIdentifier ->
+            is LegalEntityHeaderParseError.DuplicateIdentifier ->
                 ErrorInfoV6(
                     duplicateIdentifier,
                     "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'",
                     entityKey
                 )
-            is LegalEntityContentParseError.IdentifiersTooMany ->
+            is LegalEntityHeaderParseError.IdentifiersTooMany ->
                 ErrorInfoV6(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing,
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode,
-            is LegalEntityContentParseError.NameMissing,
-            is LegalEntityContentParseError.ConfidenceCriteriaMissing,
-            is LegalEntityContentParseError.IdentifierValueMissing,
-            is LegalEntityContentParseError.IdentifierTypeMissing,
-            is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is LegalEntityHeaderParseError.ScriptVariantLegalNameMissing,
+            is LegalEntityHeaderParseError.ScriptVariantDuplicateScriptCode,
+            is LegalEntityHeaderParseError.NameMissing,
+            is LegalEntityHeaderParseError.ConfidenceCriteriaMissing,
+            is LegalEntityHeaderParseError.IdentifierValueMissing,
+            is LegalEntityHeaderParseError.IdentifierTypeMissing,
+            is LegalEntityHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     private fun internalError(error: Any) =

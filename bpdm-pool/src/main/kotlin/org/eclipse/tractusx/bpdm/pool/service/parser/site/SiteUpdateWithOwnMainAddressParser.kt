@@ -25,11 +25,9 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,9 +37,8 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteUpdateWithOwnMainAddressParser(
-    private val siteHeaderParser: SiteHeaderParser,
+    private val siteContentParser: SiteContentParser,
     private val siteBpnParser: SiteBpnParser,
-    private val addressContentParser: AddressContentParser,
     private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
@@ -62,12 +59,11 @@ class SiteUpdateWithOwnMainAddressParser(
         requests: List<SiteUpdateRequest>
     ): List<ParseResult<SiteUpdateParsed, SiteUpdateEntryParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
-        val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
-        val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
-        val mainAddressResults = addressContentParser.parse(requests.map { it.content.mainAddress }, ownerBpns)
+        val mainAddressBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
+        val contentResults = siteContentParser.parse(requests.map { it.content }, mainAddressBpns)
 
-        return zipParseResults(headerResults, targetResults, mainAddressResults) { header, target, mainAddress ->
-            SiteUpdateParsed(target, SiteContentParsed(header, mainAddress))
+        return zipParseResults(contentResults, targetResults) { content, target ->
+            SiteUpdateParsed(target, content)
         }
     }
 

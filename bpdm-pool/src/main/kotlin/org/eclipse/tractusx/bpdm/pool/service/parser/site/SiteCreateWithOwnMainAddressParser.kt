@@ -25,12 +25,9 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 
@@ -40,9 +37,8 @@ import org.springframework.stereotype.Service
  */
 @Service
 class SiteCreateWithOwnMainAddressParser(
-    private val siteHeaderParser: SiteHeaderParser,
+    private val siteContentParser: SiteContentParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val addressContentParser: AddressContentParser,
     private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
@@ -60,24 +56,12 @@ class SiteCreateWithOwnMainAddressParser(
     fun parseWithoutScriptVariantCoverage(
         requests: List<SiteCreateRequest>
     ): List<ParseResult<SiteCreateParsed, SiteCreateEntryParseError>> {
-        val contentResults = parseContent(requests.map { it.content })
+        val contents = requests.map { it.content }
+        val contentResults = siteContentParser.parse(contents, contents.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         return zipParseResults(contentResults, legalEntityResults) { content, legalEntity ->
             SiteCreateParsed(legalEntity, content)
-        }
-    }
-
-    /**
-     * Validates each site's content as a creation, whichever legal entity it turns out to be created under.
-     */
-    fun parseContent(requests: List<SiteContentRequest>): List<ParseResult<SiteContentParsed, SiteCreateEntryParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.header })
-        val mainAddresses = requests.map { it.mainAddress }
-        val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
-
-        return zipParseResults(headerResults, mainAddressResults) { header, mainAddress ->
-            SiteContentParsed(header, mainAddress)
         }
     }
 

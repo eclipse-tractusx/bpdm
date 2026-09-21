@@ -55,7 +55,7 @@ class SiteParseErrorMapper(
                 )
             is UnresolvableAddress,
             is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is SiteContentParseError -> contentErrorInfo(
+            is SiteHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteCreateError.ScriptVariantNameMissing,
@@ -80,7 +80,7 @@ class SiteParseErrorMapper(
             // states the main address, so it can never be faulted for the site not owning one.
             is SiteMainAddressNotLegalAddress ->
                 throw BpdmValidationException("Unexpected site parse error (no public error code): $error")
-            is SiteContentParseError -> contentErrorInfo(
+            is SiteHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteUpdateError.ScriptVariantNameMissing,
@@ -89,19 +89,19 @@ class SiteParseErrorMapper(
         }
 
     private fun <E : ErrorCode> contentErrorInfo(
-        error: SiteContentParseError,
+        error: SiteHeaderParseError,
         entityKey: String?,
         scriptVariantNameMissing: E,
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
-            is SiteContentParseError.ScriptVariantNameMissing ->
+            is SiteHeaderParseError.ScriptVariantNameMissing ->
                 ErrorInfo(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+            is SiteHeaderParseError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
-            is SiteContentParseError.NameMissing,
-            is SiteContentParseError.ConfidenceCriteriaMissing,
-            is SiteContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is SiteHeaderParseError.NameMissing,
+            is SiteHeaderParseError.ConfidenceCriteriaMissing,
+            is SiteHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     private fun internalError(error: SiteCreateParseError) =

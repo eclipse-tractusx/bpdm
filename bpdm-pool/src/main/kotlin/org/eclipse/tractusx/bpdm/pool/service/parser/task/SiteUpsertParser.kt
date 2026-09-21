@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnExistingAddressParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnLegalAddressParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithOwnMainAddressParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateOnLegalAddressParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateWithOwnMainAddressParser
 import org.springframework.stereotype.Service
@@ -46,7 +46,7 @@ class SiteUpsertParser(
     private val siteReferenceParser: SiteReferenceParser,
     private val addressReferenceParser: AddressReferenceParser,
     private val referenceResolutionParser: BpnReferenceResolutionParser,
-    private val siteCreateWithOwnMainAddressParser: SiteCreateWithOwnMainAddressParser,
+    private val siteContentParser: SiteContentParser,
     private val siteCreateOnLegalAddressParser: SiteCreateOnLegalAddressParser,
     private val siteCreateOnExistingAddressParser: SiteCreateOnExistingAddressParser,
     private val siteUpdateWithOwnMainAddressParser: SiteUpdateWithOwnMainAddressParser,
@@ -118,8 +118,8 @@ class SiteUpsertParser(
             return SiteUpsertPlan.CreateOnExistingAddress(siteReference, resolvedMainAddress.reference, createdOnExistingAddress)
         }
 
-        val ownMainAddressContent = siteCreateWithOwnMainAddressParser
-            .parseContent(listOf(SiteContentRequest(request.header, request.mainAddress.content)))
+        val ownMainAddressContent = siteContentParser
+            .parse(listOf(SiteContentRequest(request.header, request.mainAddress.content)), listOf(null))
             .singleOrRecord(errors, ::toCreateError) ?: return null
 
         return SiteUpsertPlan.CreateWithOwnMainAddress(siteReference, resolvedMainAddress.reference, ownMainAddressContent)
@@ -157,7 +157,7 @@ class SiteUpsertParser(
 
     private fun toCreateError(error: SiteCreateEntryParseError): SiteUpsertParseError =
         when (error) {
-            is SiteContentParseError -> SiteContentInvalid(error)
+            is SiteHeaderParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)
             is UnresolvableLegalEntity -> LegalEntityNotFound(error.bpn)
             is UnresolvableAddress -> SiteMainAddressNotFound(error.bpn)
@@ -167,7 +167,7 @@ class SiteUpsertParser(
 
     private fun toUpdateError(error: SiteUpdateEntryParseError): SiteUpsertParseError =
         when (error) {
-            is SiteContentParseError -> SiteContentInvalid(error)
+            is SiteHeaderParseError -> SiteContentInvalid(error)
             is AddressContentParseError -> SiteMainAddressContentInvalid(error)
             is SiteMainAddressNotLegalAddress -> SiteDoesNotSitOnLegalAddress(error.bpnSite, error.bpnMainAddress)
             // The existing site was resolved before this parser was called.

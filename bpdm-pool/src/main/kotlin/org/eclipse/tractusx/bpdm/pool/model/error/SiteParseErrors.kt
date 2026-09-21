@@ -39,10 +39,15 @@ data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateEntry
 
 data class SiteMainAddressNotLegalAddress(val bpnSite: String, val bpnMainAddress: String) : SiteUpdateEntryParseError
 
-sealed interface SiteContentParseError : SiteCreateEntryParseError, SiteUpdateEntryParseError {
-    data object NameMissing : SiteContentParseError
-    data object ConfidenceCriteriaMissing : SiteContentParseError
-    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteContentParseError
-    data class ScriptVariantNameMissing(val index: Int) : SiteContentParseError
-    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteContentParseError
+/**
+ * The problems the content of one site can be faulted for: its header and its main address.
+ */
+sealed interface SiteContentParseError : SiteCreateEntryParseError, SiteUpdateEntryParseError
+
+sealed interface SiteHeaderParseError : SiteContentParseError {
+    data object NameMissing : SiteHeaderParseError
+    data object ConfidenceCriteriaMissing : SiteHeaderParseError
+    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteHeaderParseError
+    data class ScriptVariantNameMissing(val index: Int) : SiteHeaderParseError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteHeaderParseError
 }

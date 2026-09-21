@@ -44,7 +44,7 @@ class LegalEntityParseErrorMapper(
         when (error) {
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
             is ScriptVariantCoverageParseError -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityCreateError.LegalFormNotFound,
@@ -80,7 +80,7 @@ class LegalEntityParseErrorMapper(
                     entityKey
                 )
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityUpdateError.LegalFormNotFound,
@@ -93,7 +93,7 @@ class LegalEntityParseErrorMapper(
         }
 
     private fun <E : ErrorCode> contentErrorInfo(
-        error: LegalEntityContentParseError,
+        error: LegalEntityHeaderParseError,
         entityKey: String?,
         legalFormNotFound: E,
         identifierNotFound: E,
@@ -103,23 +103,23 @@ class LegalEntityParseErrorMapper(
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
-            is LegalEntityContentParseError.LegalFormNotFound ->
+            is LegalEntityHeaderParseError.LegalFormNotFound ->
                 ErrorInfo(legalFormNotFound, "Legal form '${error.legalForm}' does not exist", entityKey)
-            is LegalEntityContentParseError.IdentifierTypeNotFound ->
+            is LegalEntityHeaderParseError.IdentifierTypeNotFound ->
                 ErrorInfo(identifierNotFound, "Legal Entity Identifier Type '${error.type}' does not exist", entityKey)
-            is LegalEntityContentParseError.DuplicateIdentifier ->
+            is LegalEntityHeaderParseError.DuplicateIdentifier ->
                 ErrorInfo(duplicateIdentifier, "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
-            is LegalEntityContentParseError.IdentifiersTooMany ->
+            is LegalEntityHeaderParseError.IdentifiersTooMany ->
                 ErrorInfo(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing ->
+            is LegalEntityHeaderParseError.ScriptVariantLegalNameMissing ->
                 ErrorInfo(scriptVariantLegalNameMissing, "Script variant ${error.index} has no legal name", entityKey)
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+            is LegalEntityHeaderParseError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate legal entity script variant for script code '${error.scriptCode}'", entityKey)
-            is LegalEntityContentParseError.NameMissing,
-            is LegalEntityContentParseError.ConfidenceCriteriaMissing,
-            is LegalEntityContentParseError.IdentifierValueMissing,
-            is LegalEntityContentParseError.IdentifierTypeMissing,
-            is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is LegalEntityHeaderParseError.NameMissing,
+            is LegalEntityHeaderParseError.ConfidenceCriteriaMissing,
+            is LegalEntityHeaderParseError.IdentifierValueMissing,
+            is LegalEntityHeaderParseError.IdentifierTypeMissing,
+            is LegalEntityHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     private fun internalError(error: LegalEntityCreateParseError) =

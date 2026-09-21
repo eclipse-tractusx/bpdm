@@ -52,7 +52,7 @@ class SiteParseErrorMapperV6(
             is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
             is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is SiteContentParseError -> throw internalError(error)
+            is SiteHeaderParseError -> throw internalError(error)
         }
 
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
@@ -68,7 +68,7 @@ class SiteParseErrorMapperV6(
             // states the main address, so it can never be faulted for the site not owning one.
             is SiteMainAddressNotLegalAddress ->
                 throw BpdmValidationException("Unexpected site parse error (no v6 client error code): $error")
-            is SiteContentParseError -> throw internalError(error)
+            is SiteHeaderParseError -> throw internalError(error)
         }
 
     private fun internalError(error: SiteCreateParseError) =

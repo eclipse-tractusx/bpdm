@@ -20,17 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.combine
-import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service
 
 /**
@@ -38,9 +34,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class LegalEntityCreateParser(
-    private val legalEntityHeaderParser: LegalEntityHeaderParser,
-    private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
-    private val addressContentParser: AddressContentParser,
+    private val legalEntityContentParser: LegalEntityContentParser,
     private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
@@ -57,16 +51,14 @@ class LegalEntityCreateParser(
     fun parseWithoutScriptVariantCoverage(
         requests: List<LegalEntityCreateRequest>
     ): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateEntryParseError>> {
-        val headers = requests.map { it.content.header }
-        val headerResults = legalEntityHeaderParser.parse(headers)
-        val duplicateErrors = duplicateValidator.validate(headers, headers.map { null })
-        val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
+        val contents = requests.map { it.content }
+        val contentResults = legalEntityContentParser.parse(contents, contents.map { null }, contents.map { null })
 
-        val legalAddresses = requests.map { it.content.legalAddress }
-        val legalAddressResults = addressContentParser.parse(legalAddresses, legalAddresses.map { null })
-
-        return zipParseResults(mergedHeaderResults, legalAddressResults) { header, legalAddress ->
-            LegalEntityCreateParsed(LegalEntityContentParsed(header, legalAddress))
+        return contentResults.map { result ->
+            when (result) {
+                is ParseResult.Success -> ParseResult.Success(LegalEntityCreateParsed(result.parsed))
+                is ParseResult.Failure -> result
+            }
         }
     }
 

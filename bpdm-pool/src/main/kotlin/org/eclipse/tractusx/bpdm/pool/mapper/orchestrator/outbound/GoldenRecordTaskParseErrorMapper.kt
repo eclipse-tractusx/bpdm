@@ -128,29 +128,29 @@ class GoldenRecordTaskParseErrorMapper {
             is AddressScriptVariantParseError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
         }
 
-    private fun toLegalEntityContentDescription(error: LegalEntityContentParseError): String =
+    private fun toLegalEntityContentDescription(error: LegalEntityHeaderParseError): String =
         when (error) {
-            LegalEntityContentParseError.NameMissing -> GoldenRecordTaskErrorMessage.LEGAL_NAME_IS_NULL.message
-            LegalEntityContentParseError.ConfidenceCriteriaMissing -> GoldenRecordTaskErrorMessage.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message
-            is LegalEntityContentParseError.LegalFormNotFound -> "Legal form '${error.legalForm}' is not known"
-            is LegalEntityContentParseError.IdentifierValueMissing -> "Identifier value is null"
-            is LegalEntityContentParseError.IdentifierTypeMissing -> "Identifier type is null"
-            is LegalEntityContentParseError.IdentifierTypeNotFound -> "Legal entity identifier type '${error.type}' is not known"
-            is LegalEntityContentParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
-            is LegalEntityContentParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
-            is LegalEntityContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing -> "Script variant ${error.index} has no legal name"
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+            LegalEntityHeaderParseError.NameMissing -> GoldenRecordTaskErrorMessage.LEGAL_NAME_IS_NULL.message
+            LegalEntityHeaderParseError.ConfidenceCriteriaMissing -> GoldenRecordTaskErrorMessage.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message
+            is LegalEntityHeaderParseError.LegalFormNotFound -> "Legal form '${error.legalForm}' is not known"
+            is LegalEntityHeaderParseError.IdentifierValueMissing -> "Identifier value is null"
+            is LegalEntityHeaderParseError.IdentifierTypeMissing -> "Identifier type is null"
+            is LegalEntityHeaderParseError.IdentifierTypeNotFound -> "Legal entity identifier type '${error.type}' is not known"
+            is LegalEntityHeaderParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
+            is LegalEntityHeaderParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
+            is LegalEntityHeaderParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is LegalEntityHeaderParseError.ScriptVariantLegalNameMissing -> "Script variant ${error.index} has no legal name"
+            is LegalEntityHeaderParseError.ScriptVariantDuplicateScriptCode ->
                 "Duplicate legal entity script variant for script code '${error.scriptCode}'"
         }
 
-    private fun toSiteContentDescription(error: SiteContentParseError): String =
+    private fun toSiteContentDescription(error: SiteHeaderParseError): String =
         when (error) {
-            SiteContentParseError.NameMissing -> GoldenRecordTaskErrorMessage.SITE_NAME_MISSING.message
-            SiteContentParseError.ConfidenceCriteriaMissing -> GoldenRecordTaskErrorMessage.SITE_CONFIDENCE_CRITERIA_MISSING.message
-            is SiteContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
-            is SiteContentParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
+            SiteHeaderParseError.NameMissing -> GoldenRecordTaskErrorMessage.SITE_NAME_MISSING.message
+            SiteHeaderParseError.ConfidenceCriteriaMissing -> GoldenRecordTaskErrorMessage.SITE_CONFIDENCE_CRITERIA_MISSING.message
+            is SiteHeaderParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is SiteHeaderParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
+            is SiteHeaderParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
         }
 
     private fun toLegalAddressCoverageDescription(error: ScriptVariantCoverageParseError): String =

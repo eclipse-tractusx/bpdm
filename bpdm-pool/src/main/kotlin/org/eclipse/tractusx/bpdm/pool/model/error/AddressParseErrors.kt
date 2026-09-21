@@ -53,10 +53,8 @@ data class SiteMainAddressOmitted(val siteBpn: String) :
 sealed interface AddressContentParseError :
     AddressCreateParseError,
     AddressUpdateEntryParseError,
-    SiteCreateEntryParseError,
-    SiteUpdateEntryParseError,
-    LegalEntityCreateEntryParseError,
-    LegalEntityUpdateEntryParseError
+    SiteContentParseError,
+    LegalEntityContentParseError
 
 sealed interface AddressFieldParseError : AddressContentParseError {
     data object PhysicalCountryMissing : AddressFieldParseError

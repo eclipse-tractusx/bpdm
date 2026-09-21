@@ -52,20 +52,25 @@ data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>)
 data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateEntryParseError
 
 /**
+ * The problems the content of one legal entity can be faulted for: its header and its legal address.
+ */
+sealed interface LegalEntityContentParseError : LegalEntityCreateEntryParseError, LegalEntityUpdateEntryParseError
+
+/**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
  * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
  * [AddressContentParseError] directly.
  */
-sealed interface LegalEntityContentParseError : LegalEntityCreateEntryParseError, LegalEntityUpdateEntryParseError {
-    data object NameMissing : LegalEntityContentParseError
-    data object ConfidenceCriteriaMissing : LegalEntityContentParseError
-    data class LegalFormNotFound(val legalForm: String) : LegalEntityContentParseError
-    data class IdentifierValueMissing(val index: Int) : LegalEntityContentParseError
-    data class IdentifierTypeMissing(val index: Int) : LegalEntityContentParseError
-    data class IdentifierTypeNotFound(val index: Int, val type: String) : LegalEntityContentParseError
-    data class IdentifiersTooMany(val count: Int) : LegalEntityContentParseError
-    data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : LegalEntityContentParseError
-    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : LegalEntityContentParseError
-    data class ScriptVariantLegalNameMissing(val index: Int) : LegalEntityContentParseError
-    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : LegalEntityContentParseError
+sealed interface LegalEntityHeaderParseError : LegalEntityContentParseError {
+    data object NameMissing : LegalEntityHeaderParseError
+    data object ConfidenceCriteriaMissing : LegalEntityHeaderParseError
+    data class LegalFormNotFound(val legalForm: String) : LegalEntityHeaderParseError
+    data class IdentifierValueMissing(val index: Int) : LegalEntityHeaderParseError
+    data class IdentifierTypeMissing(val index: Int) : LegalEntityHeaderParseError
+    data class IdentifierTypeNotFound(val index: Int, val type: String) : LegalEntityHeaderParseError
+    data class IdentifiersTooMany(val count: Int) : LegalEntityHeaderParseError
+    data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : LegalEntityHeaderParseError
+    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : LegalEntityHeaderParseError
+    data class ScriptVariantLegalNameMissing(val index: Int) : LegalEntityHeaderParseError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : LegalEntityHeaderParseError
 }

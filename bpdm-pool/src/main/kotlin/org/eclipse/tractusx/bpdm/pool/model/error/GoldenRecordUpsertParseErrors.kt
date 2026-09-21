@@ -53,7 +53,7 @@ sealed interface StatedAddressDistinctnessParseError : CrossPartnerParseError
 /** The ways a partner one upsert states can turn out to belong to a different legal entity. */
 sealed interface ParentConsistencyParseError : CrossPartnerParseError
 
-data class LegalEntityContentInvalid(val error: LegalEntityContentParseError) : LegalEntityUpsertParseError
+data class LegalEntityContentInvalid(val error: LegalEntityHeaderParseError) : LegalEntityUpsertParseError
 
 data class LegalAddressContentInvalid(val error: AddressContentParseError) : LegalEntityUpsertParseError
 
@@ -61,7 +61,7 @@ data class MultipleUltimateOwners(val conflictingBpnls: List<String>) : LegalEnt
 
 data class AlternativeHeadquarterCannotOwn(val bpnl: String) : LegalEntityUpsertParseError
 
-data class SiteContentInvalid(val error: SiteContentParseError) : SiteUpsertParseError
+data class SiteContentInvalid(val error: SiteHeaderParseError) : SiteUpsertParseError
 
 data class SiteMainAddressContentInvalid(val error: AddressContentParseError) : SiteUpsertParseError
 
@@ -73,7 +73,7 @@ data class AdditionalAddressContentInvalid(val error: AddressContentParseError) 
 
 data class AdditionalAddressNotFound(val bpn: String) : AdditionalAddressUpsertParseError
 
-data class AdditionalSiteContentInvalid(val index: Int, val error: SiteContentParseError) : AdditionalSitesParseError
+data class AdditionalSiteContentInvalid(val index: Int, val error: SiteHeaderParseError) : AdditionalSitesParseError
 
 data class AdditionalSiteNotFound(val index: Int, val bpn: String) : AdditionalSitesParseError
 
