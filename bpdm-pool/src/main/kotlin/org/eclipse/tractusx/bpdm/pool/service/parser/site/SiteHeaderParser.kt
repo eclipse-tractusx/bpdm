@@ -22,13 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
+import org.eclipse.tractusx.bpdm.pool.service.parser.ConfidenceCriteriaParser
 import org.springframework.stereotype.Service
 
 /**
@@ -37,7 +36,8 @@ import org.springframework.stereotype.Service
  */
 @Service
 class SiteHeaderParser(
-    private val scriptCodeRepository: ScriptCodeRepository
+    private val scriptCodeRepository: ScriptCodeRepository,
+    private val confidenceCriteriaParser: ConfidenceCriteriaParser
 ) {
 
     /**
@@ -57,7 +57,10 @@ class SiteHeaderParser(
         val errors = mutableListOf<SiteContentParseError>()
 
         val name = header.name ?: run { errors.add(SiteContentParseError.NameMissing); null }
-        val confidence = parseConfidence(header.confidenceCriteria, errors)
+        val confidence = when (val result = confidenceCriteriaParser.parse(header.confidenceCriteria, SiteContentParseError.ConfidenceCriteriaMissing)) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> { errors += result.errors; null }
+        }
         val scriptVariants = parseScriptVariants(header.scriptVariants, scriptCodes, errors)
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
@@ -71,25 +74,6 @@ class SiteHeaderParser(
                 scriptVariants = scriptVariants
             )
         )
-    }
-
-    private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
-        errors: MutableList<SiteContentParseError>
-    ): ConfidenceCriteriaParsed? {
-        val sharedByOwner = request.sharedByOwner
-        val checkedByExternalDataSource = request.checkedByExternalDataSource
-        val lastConfidenceCheckAt = request.lastConfidenceCheckAt
-        val nextConfidenceCheckAt = request.nextConfidenceCheckAt
-
-        if (sharedByOwner == null || checkedByExternalDataSource == null ||
-            lastConfidenceCheckAt == null || nextConfidenceCheckAt == null
-        ) {
-            errors.add(SiteContentParseError.ConfidenceCriteriaMissing)
-            return null
-        }
-
-        return ConfidenceCriteriaParsed(sharedByOwner, checkedByExternalDataSource, lastConfidenceCheckAt, nextConfidenceCheckAt)
     }
 
     private fun parseScriptVariants(

@@ -219,6 +219,8 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - A rule MUST sit in the parser that produces the `…Parsed` value the rule is about. A rule that only makes sense between two parts sits in the parser that has both.
 - A parser MUST NOT offer a method that skips one of its own rules.
 - A parser whose rule serves several callers SHOULD take their difference as a parameter rather than leave each caller to decide whether the rule applies — `LegalEntityIdentifierDuplicateValidator` takes an owner BPN that is `null` on create and the resolved target on update.
+- A rule that produces errors but no `…Parsed` value is a **validation**. A parser MAY hold its validations itself.
+- A validation SHOULD be extracted into its own `…Validator` only where more than one parser needs it, or where it has grown complex enough to stand alone. A validator produces errors and never a `…Parsed` value.
 
 ## 2.4 Operation layer
 

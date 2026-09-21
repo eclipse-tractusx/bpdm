@@ -24,17 +24,16 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
+import org.eclipse.tractusx.bpdm.pool.service.parser.ConfidenceCriteriaParser
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
 
@@ -47,7 +46,8 @@ import org.springframework.stereotype.Service
 class LegalEntityHeaderParser(
     private val legalFormRepository: LegalFormRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
-    private val scriptCodeRepository: ScriptCodeRepository
+    private val scriptCodeRepository: ScriptCodeRepository,
+    private val confidenceCriteriaParser: ConfidenceCriteriaParser
 ) {
 
     /**
@@ -76,7 +76,10 @@ class LegalEntityHeaderParser(
 
         val legalName = header.legalName ?: run { errors.add(LegalEntityContentParseError.NameMissing); null }
         val legalForm = parseLegalForm(header.legalForm, metadata, errors)
-        val confidence = parseConfidence(header.confidenceCriteria, errors)
+        val confidence = when (val result = confidenceCriteriaParser.parse(header.confidenceCriteria, LegalEntityContentParseError.ConfidenceCriteriaMissing)) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> { errors += result.errors; null }
+        }
         val identifiers = parseIdentifiers(header.identifiers, metadata, errors)
         val scriptVariants = parseScriptVariants(header.scriptVariants, metadata, errors)
 
@@ -105,25 +108,6 @@ class LegalEntityHeaderParser(
     ): LegalFormDb? {
         if (legalForm == null) return null
         return metadata.legalForms[legalForm] ?: run { errors.add(LegalEntityContentParseError.LegalFormNotFound(legalForm)); null }
-    }
-
-    private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
-        errors: MutableList<LegalEntityContentParseError>
-    ): ConfidenceCriteriaParsed? {
-        val sharedByOwner = request.sharedByOwner
-        val checkedByExternalDataSource = request.checkedByExternalDataSource
-        val lastConfidenceCheckAt = request.lastConfidenceCheckAt
-        val nextConfidenceCheckAt = request.nextConfidenceCheckAt
-
-        if (sharedByOwner == null || checkedByExternalDataSource == null ||
-            lastConfidenceCheckAt == null || nextConfidenceCheckAt == null
-        ) {
-            errors.add(LegalEntityContentParseError.ConfidenceCriteriaMissing)
-            return null
-        }
-
-        return ConfidenceCriteriaParsed(sharedByOwner, checkedByExternalDataSource, lastConfidenceCheckAt, nextConfidenceCheckAt)
     }
 
     private fun parseIdentifiers(
