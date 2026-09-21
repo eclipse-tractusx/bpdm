@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteContentParser
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional
  * Decides what a request asks to happen to its site: create it, write over it, or leave it as it stands.
  *
  * Which of those the site's main address takes part in depends on whether the site brings one of its own, so the
- * variant of the request decides the plan as much as the site's own existence does.
+ * variant of the request decides what is written as much as the site's own existence does.
  */
 @Service
 class SiteUpsertParser(
@@ -49,25 +49,25 @@ class SiteUpsertParser(
 ) {
 
     /**
-     * Reports the plan for this site, or every reason it cannot be carried out.
+     * Reports what is to be written for this site, or every reason it cannot be carried out.
      */
     @Transactional(readOnly = true)
     fun parse(
         request: SiteUpsertRequest
-    ): ParseResult<SiteUpsertPlan, SiteUpsertParseError> {
+    ): ParseResult<SiteUpsertParsed, SiteUpsertParseError> {
         val errors = mutableListOf<SiteUpsertParseError>()
-        return parsePlan(request, errors).orFailure(errors)
+        return parseUpsert(request, errors).orFailure(errors)
     }
 
-    private fun parsePlan(
+    private fun parseUpsert(
         request: SiteUpsertRequest,
         errors: MutableList<SiteUpsertParseError>
-    ): SiteUpsertPlan? {
+    ): SiteUpsertParsed? {
         val siteReference = referenceResolutionParser.parse(request.reference)
         val existingSite = siteReferenceParser.parse(request.reference).parsedOrRecord(errors)?.existingRecord
 
         if (existingSite != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
-            return SiteUpsertPlan.Unchanged(siteReference, existingSite)
+            return SiteUpsertParsed.Unchanged(siteReference, existingSite)
 
         return if (existingSite == null) parseCreate(request, siteReference, errors)
         else parseUpdate(request, siteReference, existingSite, errors)
@@ -77,11 +77,11 @@ class SiteUpsertParser(
         request: SiteUpsertRequest,
         siteReference: BpnReferenceParsed,
         errors: MutableList<SiteUpsertParseError>
-    ): SiteUpsertPlan? =
+    ): SiteUpsertParsed? =
         when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain ->
                 parseHeader(request.header, errors)
-                    ?.let { SiteUpsertPlan.CreateOnLegalAddress(siteReference, it) }
+                    ?.let { SiteUpsertParsed.CreateOnLegalAddress(siteReference, it) }
             is SiteUpsertRequest.WithOwnMainAddress ->
                 parseCreateWithOwnMainAddress(request, siteReference, errors)
         }
@@ -90,14 +90,14 @@ class SiteUpsertParser(
         request: SiteUpsertRequest.WithOwnMainAddress,
         siteReference: BpnReferenceParsed,
         errors: MutableList<SiteUpsertParseError>
-    ): SiteUpsertPlan? {
+    ): SiteUpsertParsed? {
         val mainAddressReference = referenceResolutionParser.parse(request.mainAddress.reference)
         val existingMainAddress = addressReferenceParser
             .parse(request.mainAddress.reference, ::SiteMainAddressNotFound)
             .parsedOrRecord(errors)?.existingRecord
 
         // A new site whose main address already exists adopts that address instead of duplicating it, so several
-        // sites can share one main address - a different creation, with a different plan.
+        // sites can share one main address - a different creation, with a different variant.
         if (existingMainAddress != null)
             return parseCreateOnExistingAddress(request, siteReference, mainAddressReference, existingMainAddress, errors)
 
@@ -105,7 +105,7 @@ class SiteUpsertParser(
             .parse(listOf(SiteContentRequest(request.header, request.mainAddress.content)), listOf(null))
             .singleOrRecord(errors, ::toContentError) ?: return null
 
-        return SiteUpsertPlan.CreateWithOwnMainAddress(siteReference, mainAddressReference, content)
+        return SiteUpsertParsed.CreateWithOwnMainAddress(siteReference, mainAddressReference, content)
     }
 
     private fun parseCreateOnExistingAddress(
@@ -114,7 +114,7 @@ class SiteUpsertParser(
         mainAddressReference: BpnReferenceParsed,
         existingMainAddress: LogisticAddressDb,
         errors: MutableList<SiteUpsertParseError>
-    ): SiteUpsertPlan? {
+    ): SiteUpsertParsed? {
         val header = parseHeader(request.header, errors)
         val mainAddressContent = addressContentParser
             .parse(listOf(request.mainAddress.content), listOf(existingMainAddress.bpn))
@@ -122,7 +122,7 @@ class SiteUpsertParser(
 
         if (header == null || mainAddressContent == null) return null
 
-        return SiteUpsertPlan.CreateOnExistingAddress(
+        return SiteUpsertParsed.CreateOnExistingAddress(
             siteReference, mainAddressReference, existingMainAddress, header, mainAddressContent
         )
     }
@@ -132,13 +132,13 @@ class SiteUpsertParser(
         siteReference: BpnReferenceParsed,
         existingSite: SiteDb,
         errors: MutableList<SiteUpsertParseError>
-    ): SiteUpsertPlan? =
+    ): SiteUpsertParsed? =
         when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain -> {
                 if (!existingSite.sitsOnLegalAddress())
                     errors += SiteDoesNotSitOnLegalAddress(existingSite.bpn, existingSite.mainAddress.bpn)
                 parseHeader(request.header, errors)
-                    ?.let { SiteUpsertPlan.UpdateOnLegalAddress(siteReference, existingSite, it) }
+                    ?.let { SiteUpsertParsed.UpdateOnLegalAddress(siteReference, existingSite, it) }
             }
 
             is SiteUpsertRequest.WithOwnMainAddress ->
@@ -149,7 +149,7 @@ class SiteUpsertParser(
                     )
                     .singleOrRecord(errors, ::toContentError)
                     ?.let {
-                        SiteUpsertPlan.UpdateWithOwnMainAddress(
+                        SiteUpsertParsed.UpdateWithOwnMainAddress(
                             siteReference,
                             referenceResolutionParser.parse(request.mainAddress.reference),
                             existingSite,

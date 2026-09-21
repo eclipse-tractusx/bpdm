@@ -256,7 +256,7 @@ Properties and variables:
 - One word MUST NOT denote two different things within one scope.
 - A collection MUST be plural and MUST name its elements.
 - A name MUST describe the whole value. A pair or an indexed element MUST be named for the composite, not for the part destructured out of it on the next line.
-- A name established for a subject MUST be kept downstream, including in lambda parameters; it MUST NOT be abbreviated. Only the representation suffix (`…Request` / `…Parsed` / `…Plan` / `…Db`) distinguishes its forms.
+- A name established for a subject MUST be kept downstream, including in lambda parameters; it MUST NOT be abbreviated. Only the representation suffix (`…Request` / `…Parsed` / `…Db`) distinguishes its forms.
 - A layer-generic stand-in (`parsed`, `content`, `result`, `resolved`, `created`, `updated`) MAY stand alone only where the scope performs that operation exactly once. Count the operations the scope performs, not the types it declares.
 - A word naming a role or a provenance (`target`, `stated`, `existing`) MUST be used only where the contrasting case is present in the same scope.
 - A value MUST be named for what it is, never for what a later step will do to it.

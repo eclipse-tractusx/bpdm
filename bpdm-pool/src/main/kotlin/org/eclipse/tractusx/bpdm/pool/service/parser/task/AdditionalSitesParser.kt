@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSitesParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteContentInvalid
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteNotFound
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSiteCreatePlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteReferenceRequest
@@ -54,7 +54,7 @@ class AdditionalSitesParser(
     fun parse(
         siteReferences: List<SiteReferenceRequest>,
         borrowedConfidence: ConfidenceCriteriaRequest
-    ): ParseResult<AdditionalSitesPlan, AdditionalSitesParseError> {
+    ): ParseResult<AdditionalSitesParsed, AdditionalSitesParseError> {
         // The same site stated twice is one statement written twice, not two memberships. An entry is identified by
         // the reference it carries and, carrying none, by the name its site is to be created under.
         val distinctSiteReferences = siteReferences.distinctBy { it.reference.value ?: it.name }
@@ -66,7 +66,7 @@ class AdditionalSitesParser(
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
         return ParseResult.Success(
-            AdditionalSitesPlan(
+            AdditionalSitesParsed(
                 existingSites = resolutions.mapNotNull { it.parsedOrNull()?.existingRecord },
                 newSites = creations.mapNotNull { it.parsedOrNull() }
             )
@@ -84,7 +84,7 @@ class AdditionalSitesParser(
         distinctSiteReferences: List<SiteReferenceRequest>,
         resolutions: List<ParseResult<ResolvedReference<SiteDb>, AdditionalSitesParseError>>,
         borrowedConfidence: ConfidenceCriteriaRequest
-    ): List<ParseResult<AdditionalSiteCreatePlan?, AdditionalSitesParseError>> {
+    ): List<ParseResult<AdditionalSiteCreateParsed?, AdditionalSitesParseError>> {
         // An entry naming no site yet asks for one to be created on the record's address.
         val newSiteReferences = resolutions.withIndex().mapNotNull { (index, resolution) ->
             resolution.parsedOrNull()?.takeIf { it.existingRecord == null }?.let { index to it.reference }
@@ -97,7 +97,7 @@ class AdditionalSitesParser(
         val creationByIndex = newSiteReferences.zip(headers).associate { (indexedSiteReference, header) ->
             val (index, siteReference) = indexedSiteReference
             index to when (header) {
-                is ParseResult.Success -> ParseResult.Success(AdditionalSiteCreatePlan(siteReference, header.parsed))
+                is ParseResult.Success -> ParseResult.Success(AdditionalSiteCreateParsed(siteReference, header.parsed))
                 is ParseResult.Failure -> ParseResult.Failure(header.errors.map { AdditionalSiteContentInvalid(index, it) })
             }
         }

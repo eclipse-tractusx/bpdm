@@ -32,16 +32,16 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  */
 sealed interface GoldenRecordUpsertParseError
 
-/** What planning the legal entity of a golden record upsert can be faulted for. */
+/** What parsing the legal entity of a golden record upsert can be faulted for. */
 sealed interface LegalEntityUpsertParseError : GoldenRecordUpsertParseError
 
-/** What planning the site of a golden record upsert can be faulted for. */
+/** What parsing the site of a golden record upsert can be faulted for. */
 sealed interface SiteUpsertParseError : GoldenRecordUpsertParseError
 
-/** What planning the additional address of a golden record upsert can be faulted for. */
+/** What parsing the additional address of a golden record upsert can be faulted for. */
 sealed interface AdditionalAddressUpsertParseError : GoldenRecordUpsertParseError
 
-/** What planning the sites stated as sharing the record address can be faulted for. */
+/** What parsing the sites stated as sharing the record address can be faulted for. */
 sealed interface AdditionalSitesParseError : GoldenRecordUpsertParseError
 
 /** What the partners of one golden record upsert can contradict each other over. */
@@ -77,14 +77,14 @@ data class AdditionalSiteContentInvalid(val index: Int, val error: SiteHeaderPar
 
 data class AdditionalSiteNotFound(val index: Int, val bpn: String) : AdditionalSitesParseError
 
-// Resolving a legal entity is part of planning all three partners: the site and the additional address each state
+// Resolving a legal entity is part of parsing all three partners: the site and the additional address each state
 // which legal entity they belong under, and the legal entity states itself.
 data class LegalEntityNotFound(val bpn: String) :
     LegalEntityUpsertParseError,
     SiteUpsertParseError,
     AdditionalAddressUpsertParseError
 
-// An additional address states the site it sits on, so resolving a site is part of planning it too.
+// An additional address states the site it sits on, so resolving a site is part of parsing it too.
 data class SiteNotFound(val bpn: String) : SiteUpsertParseError, AdditionalAddressUpsertParseError
 
 data class SiteNotInRequestLegalEntity(val siteBpn: String, val legalEntityBpn: String?) : ParentConsistencyParseError

@@ -25,14 +25,14 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Carries out the legal entity a planned golden record upsert states.
+ * Carries out the legal entity a parsed golden record upsert states.
  */
 @Service
 class LegalEntityUpsertService(
@@ -41,15 +41,15 @@ class LegalEntityUpsertService(
 ) {
 
     /**
-     * Writes what [plan] states and reports the legal entity it leaves behind, and whether that write changed it.
+     * Writes what [legalEntity] states and reports the legal entity it leaves behind, and whether that write changed it.
      */
     @Transactional
-    fun upsert(plan: LegalEntityUpsertPlan): UpsertResult<LegalEntityDb> =
-        when (plan) {
-            is LegalEntityUpsertPlan.Unchanged -> UpsertResult(plan.existingLegalEntity, UpsertType.NoChange)
-            is LegalEntityUpsertPlan.Create ->
-                UpsertResult(legalEntityCreateService.create(listOf(LegalEntityCreateParsed(plan.content))).single(), UpsertType.Created)
-            is LegalEntityUpsertPlan.Update ->
-                legalEntityPayloadUpdateService.update(listOf(LegalEntityUpdateParsed(plan.existingLegalEntity, plan.content))).single()
+    fun upsert(legalEntity: LegalEntityUpsertParsed): UpsertResult<LegalEntityDb> =
+        when (legalEntity) {
+            is LegalEntityUpsertParsed.Unchanged -> UpsertResult(legalEntity.existingLegalEntity, UpsertType.NoChange)
+            is LegalEntityUpsertParsed.Create ->
+                UpsertResult(legalEntityCreateService.create(listOf(LegalEntityCreateParsed(legalEntity.content))).single(), UpsertType.Created)
+            is LegalEntityUpsertParsed.Update ->
+                legalEntityPayloadUpdateService.update(listOf(LegalEntityUpdateParsed(legalEntity.existingLegalEntity, legalEntity.content))).single()
         }
 }

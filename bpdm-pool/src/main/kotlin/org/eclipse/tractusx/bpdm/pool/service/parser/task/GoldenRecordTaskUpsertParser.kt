@@ -23,16 +23,16 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSitePlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Turns a golden record upsert request into the plan of what it will do, or into every reason it cannot be done.
+ * Turns a golden record upsert request into what it will do, or into every reason it cannot be done.
  *
  * One request at a time, not a batch: entries of one reservation may name the same request identifier and must then
  * reach the same record, which is only known once the earlier entry has been written. The request's own content is
@@ -48,7 +48,7 @@ class GoldenRecordTaskUpsertParser(
 ) {
 
     /**
-     * Reports the plan [request] amounts to, or every problem that stops it.
+     * Reports what [request] amounts to, or every problem that stops it.
      */
     @Transactional(readOnly = true)
     fun parse(request: GoldenRecordUpsertRequest): ParseResult<GoldenRecordUpsertParsed, GoldenRecordUpsertParseError> {
@@ -66,20 +66,20 @@ class GoldenRecordTaskUpsertParser(
         }.combine(contradictions) { it }
     }
 
-    private fun parseRecordSite(request: GoldenRecordUpsertRequest): ParseResult<RecordSitePlan?, GoldenRecordUpsertParseError> =
+    private fun parseRecordSite(request: GoldenRecordUpsertRequest): ParseResult<RecordSiteParsed?, GoldenRecordUpsertParseError> =
         request.recordSite.site?.let { siteRequest ->
             zipParseResults(
                 siteUpsertParser.parse(siteRequest),
                 additionalSitesParser.parse(request.recordSite.additionalSites, siteRequest.header.confidenceCriteria),
-                ::RecordSitePlan
+                ::RecordSiteParsed
             )
         } ?: ParseResult.Success(null)
 
     private fun toUpsertParsed(
         sharingMemberRecordId: String,
-        legalEntity: LegalEntityUpsertPlan,
-        recordSite: RecordSitePlan?,
-        additionalAddress: AddressUpsertPlan?
+        legalEntity: LegalEntityUpsertParsed,
+        recordSite: RecordSiteParsed?,
+        additionalAddress: AddressUpsertParsed?
     ): GoldenRecordUpsertParsed =
         when {
             recordSite != null && additionalAddress != null ->

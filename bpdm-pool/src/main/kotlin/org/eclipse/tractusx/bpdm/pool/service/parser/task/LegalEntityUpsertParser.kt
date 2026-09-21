@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.UpsertIntent
@@ -44,26 +44,26 @@ class LegalEntityUpsertParser(
 ) {
 
     /**
-     * Reports the plan for this legal entity, or every reason it cannot be carried out.
+     * Reports what is to be written for this legal entity, or every reason it cannot be carried out.
      */
     @Transactional(readOnly = true)
     fun parse(
         request: LegalEntityUpsertRequest
-    ): ParseResult<LegalEntityUpsertPlan, LegalEntityUpsertParseError> {
+    ): ParseResult<LegalEntityUpsertParsed, LegalEntityUpsertParseError> {
         val errors = mutableListOf<LegalEntityUpsertParseError>()
-        return parsePlan(request, errors).orFailure(errors)
+        return parseUpsert(request, errors).orFailure(errors)
     }
 
-    private fun parsePlan(
+    private fun parseUpsert(
         request: LegalEntityUpsertRequest,
         errors: MutableList<LegalEntityUpsertParseError>
-    ): LegalEntityUpsertPlan? {
+    ): LegalEntityUpsertParsed? {
         val legalEntityReference = referenceResolutionParser.parse(request.reference)
         val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference)
         val existingLegalEntity = legalEntityReferenceParser.parse(request.reference).parsedOrRecord(errors)?.existingRecord
 
         if (existingLegalEntity != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
-            return LegalEntityUpsertPlan.Unchanged(legalEntityReference, legalAddressReference, existingLegalEntity)
+            return LegalEntityUpsertParsed.Unchanged(legalEntityReference, legalAddressReference, existingLegalEntity)
 
         val contentWrite = LegalEntityContentWrite(
             LegalEntityContentRequest(request.header, request.legalAddress.content),
@@ -75,9 +75,9 @@ class LegalEntityUpsertParser(
         if (content == null) return null
 
         return if (existingLegalEntity == null)
-            LegalEntityUpsertPlan.Create(legalEntityReference, legalAddressReference, content)
+            LegalEntityUpsertParsed.Create(legalEntityReference, legalAddressReference, content)
         else
-            LegalEntityUpsertPlan.Update(legalEntityReference, legalAddressReference, existingLegalEntity, content)
+            LegalEntityUpsertParsed.Update(legalEntityReference, legalAddressReference, existingLegalEntity, content)
     }
 
     private fun parseContent(

@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteOmitted
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSitePlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
 import org.springframework.stereotype.Service
@@ -48,9 +48,9 @@ class AdditionalSitesCompletenessValidator(
      */
     @Transactional(readOnly = true)
     fun validate(
-        legalEntity: LegalEntityUpsertPlan?,
-        recordSite: RecordSitePlan?,
-        additionalAddress: AddressUpsertPlan?
+        legalEntity: LegalEntityUpsertParsed?,
+        recordSite: RecordSiteParsed?,
+        additionalAddress: AddressUpsertParsed?
     ): List<AdditionalSiteOmitted> {
         if (recordSite == null) return emptyList()
         // An address this request creates is not yet the main address of anything, so there is nothing to leave out.
@@ -62,38 +62,38 @@ class AdditionalSitesCompletenessValidator(
         return siteMainAddressConsistencyValidator.findOmittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
     }
 
-    private fun existingLegalEntity(legalEntity: LegalEntityUpsertPlan?): LegalEntityDb? =
+    private fun existingLegalEntity(legalEntity: LegalEntityUpsertParsed?): LegalEntityDb? =
         when (legalEntity) {
-            is LegalEntityUpsertPlan.Unchanged -> legalEntity.existingLegalEntity
-            is LegalEntityUpsertPlan.Update -> legalEntity.existingLegalEntity
-            is LegalEntityUpsertPlan.Create, null -> null
+            is LegalEntityUpsertParsed.Unchanged -> legalEntity.existingLegalEntity
+            is LegalEntityUpsertParsed.Update -> legalEntity.existingLegalEntity
+            is LegalEntityUpsertParsed.Create, null -> null
         }
 
-    private fun existingSite(site: SiteUpsertPlan): SiteDb? =
+    private fun existingSite(site: SiteUpsertParsed): SiteDb? =
         when (site) {
-            is SiteUpsertPlan.Unchanged -> site.existingSite
-            is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.existingSite
-            is SiteUpsertPlan.UpdateOnLegalAddress -> site.existingSite
-            is SiteUpsertPlan.CreateWithOwnMainAddress,
-            is SiteUpsertPlan.CreateOnLegalAddress,
-            is SiteUpsertPlan.CreateOnExistingAddress -> null
+            is SiteUpsertParsed.Unchanged -> site.existingSite
+            is SiteUpsertParsed.UpdateWithOwnMainAddress -> site.existingSite
+            is SiteUpsertParsed.UpdateOnLegalAddress -> site.existingSite
+            is SiteUpsertParsed.CreateWithOwnMainAddress,
+            is SiteUpsertParsed.CreateOnLegalAddress,
+            is SiteUpsertParsed.CreateOnExistingAddress -> null
         }
 
     private fun existingRecordAddress(
-        legalEntity: LegalEntityUpsertPlan?,
-        site: SiteUpsertPlan?,
-        additionalAddress: AddressUpsertPlan?
+        legalEntity: LegalEntityUpsertParsed?,
+        site: SiteUpsertParsed?,
+        additionalAddress: AddressUpsertParsed?
     ): LogisticAddressDb? =
-        (additionalAddress as? AddressUpsertPlan.Update)?.existingAddress
+        (additionalAddress as? AddressUpsertParsed.Update)?.existingAddress
             ?: existingSiteMainAddress(site)
             ?: existingLegalEntity(legalEntity)?.legalAddress
 
-    private fun existingSiteMainAddress(site: SiteUpsertPlan?): LogisticAddressDb? =
+    private fun existingSiteMainAddress(site: SiteUpsertParsed?): LogisticAddressDb? =
         when (site) {
-            is SiteUpsertPlan.Unchanged -> site.existingSite.mainAddress
-            is SiteUpsertPlan.CreateOnExistingAddress -> site.existingMainAddress
-            is SiteUpsertPlan.UpdateWithOwnMainAddress -> site.existingSite.mainAddress
-            is SiteUpsertPlan.UpdateOnLegalAddress -> site.existingSite.mainAddress
-            is SiteUpsertPlan.CreateWithOwnMainAddress, is SiteUpsertPlan.CreateOnLegalAddress, null -> null
+            is SiteUpsertParsed.Unchanged -> site.existingSite.mainAddress
+            is SiteUpsertParsed.CreateOnExistingAddress -> site.existingMainAddress
+            is SiteUpsertParsed.UpdateWithOwnMainAddress -> site.existingSite.mainAddress
+            is SiteUpsertParsed.UpdateOnLegalAddress -> site.existingSite.mainAddress
+            is SiteUpsertParsed.CreateWithOwnMainAddress, is SiteUpsertParsed.CreateOnLegalAddress, null -> null
         }
 }

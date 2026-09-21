@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Carries out the site a planned golden record upsert states.
+ * Carries out the site a parsed golden record upsert states.
  */
 @Service
 class SiteUpsertService(
@@ -46,33 +46,33 @@ class SiteUpsertService(
 ) {
 
     /**
-     * Writes what [plan] states under [legalEntity] and reports the site it leaves behind, and whether that write changed it.
+     * Writes what [site] states under [legalEntity] and reports the site it leaves behind, and whether that write changed it.
      */
     @Transactional
-    fun upsert(plan: SiteUpsertPlan, legalEntity: LegalEntityDb): UpsertResult<SiteDb> =
-        when (plan) {
-            is SiteUpsertPlan.Unchanged -> UpsertResult(plan.existingSite, UpsertType.NoChange)
-            is SiteUpsertPlan.CreateWithOwnMainAddress ->
-                UpsertResult(siteCreateService.create(listOf(SiteCreateParsed(legalEntity, plan.content))).single(), UpsertType.Created)
-            is SiteUpsertPlan.CreateOnLegalAddress ->
+    fun upsert(site: SiteUpsertParsed, legalEntity: LegalEntityDb): UpsertResult<SiteDb> =
+        when (site) {
+            is SiteUpsertParsed.Unchanged -> UpsertResult(site.existingSite, UpsertType.NoChange)
+            is SiteUpsertParsed.CreateWithOwnMainAddress ->
+                UpsertResult(siteCreateService.create(listOf(SiteCreateParsed(legalEntity, site.content))).single(), UpsertType.Created)
+            is SiteUpsertParsed.CreateOnLegalAddress ->
                 UpsertResult(
                     siteCreateWithReferencedAddressAsMainService.create(
-                        listOf(SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, plan.header, mainAddressContent = null))
+                        listOf(SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, site.header, mainAddressContent = null))
                     ).single(),
                     UpsertType.Created
                 )
-            is SiteUpsertPlan.CreateOnExistingAddress ->
+            is SiteUpsertParsed.CreateOnExistingAddress ->
                 UpsertResult(
                     siteCreateWithReferencedAddressAsMainService.create(
-                        listOf(SiteCreateWithReferencedAddressAsMainParsed(plan.existingMainAddress, plan.header, plan.mainAddressContent))
+                        listOf(SiteCreateWithReferencedAddressAsMainParsed(site.existingMainAddress, site.header, site.mainAddressContent))
                     ).single(),
                     UpsertType.Created
                 )
-            is SiteUpsertPlan.UpdateWithOwnMainAddress ->
-                sitePayloadUpdateService.updateWithOwnMainAddress(listOf(SiteUpdateParsed(plan.existingSite, plan.content))).single()
-            is SiteUpsertPlan.UpdateOnLegalAddress ->
+            is SiteUpsertParsed.UpdateWithOwnMainAddress ->
+                sitePayloadUpdateService.updateWithOwnMainAddress(listOf(SiteUpdateParsed(site.existingSite, site.content))).single()
+            is SiteUpsertParsed.UpdateOnLegalAddress ->
                 sitePayloadUpdateService.updateOnLegalAddress(
-                    listOf(SiteUpdateOnLegalAddressParsed(plan.existingSite, plan.header))
+                    listOf(SiteUpdateOnLegalAddressParsed(site.existingSite, site.header))
                 ).single()
         }
 }

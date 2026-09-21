@@ -24,18 +24,18 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityAssociationFetchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Carries out a planned golden record upsert against the Pool.
+ * Carries out a parsed golden record upsert against the Pool.
  *
- * It writes no partner itself: each plan variant names the services that own those writes, and this one only decides
- * the order and hands each step the parents the previous step produced. A request identifier the plan left pending is
+ * It writes no partner itself: each variant names the services that own those writes, and this one only decides
+ * the order and hands each step the parents the previous step produced. A request identifier the parse left pending is
  * registered here, as the record it names comes into existence, so that a later task naming it reaches that record
  * rather than creating a second one.
  */
@@ -51,7 +51,7 @@ class GoldenRecordUpsertService(
 ) {
 
     /**
-     * Writes what [parsed] plans and reports the records it leaves behind, loaded with what a report of them is built
+     * Writes what [parsed] states and reports the records it leaves behind, loaded with what a report of them is built
      * from.
      */
     @Transactional
@@ -127,22 +127,22 @@ class GoldenRecordUpsertService(
         if (reference is BpnReferenceParsed.Pending) putIfAbsent(reference.requestIdentifier, bpn)
     }
 
-    private fun MutableMap<String, String>.issueSite(plan: SiteUpsertPlan, siteBpn: String, mainAddressBpn: String) {
-        issue(plan.siteReference, siteBpn)
+    private fun MutableMap<String, String>.issueSite(site: SiteUpsertParsed, siteBpn: String, mainAddressBpn: String) {
+        issue(site.siteReference, siteBpn)
         // A site whose main address is the legal address states no address of its own: that address is already
         // answering to the legal entity's legal address reference.
-        mainAddressReference(plan)?.let { issue(it, mainAddressBpn) }
+        mainAddressReference(site)?.let { issue(it, mainAddressBpn) }
     }
 
-    private fun MutableMap<String, String>.issueAdditionalSites(plan: AdditionalSitesPlan, createdSites: List<SiteDb>) {
-        plan.newSites.zip(createdSites).forEach { (planned, created) -> issue(planned.siteReference, created.bpn) }
+    private fun MutableMap<String, String>.issueAdditionalSites(additionalSites: AdditionalSitesParsed, createdSites: List<SiteDb>) {
+        additionalSites.newSites.zip(createdSites).forEach { (newSite, created) -> issue(newSite.siteReference, created.bpn) }
     }
 
-    private fun mainAddressReference(plan: SiteUpsertPlan): BpnReferenceParsed? =
-        when (plan) {
-            is SiteUpsertPlan.CreateWithOwnMainAddress -> plan.mainAddressReference
-            is SiteUpsertPlan.CreateOnExistingAddress -> plan.mainAddressReference
-            is SiteUpsertPlan.UpdateWithOwnMainAddress -> plan.mainAddressReference
-            is SiteUpsertPlan.CreateOnLegalAddress, is SiteUpsertPlan.UpdateOnLegalAddress, is SiteUpsertPlan.Unchanged -> null
+    private fun mainAddressReference(site: SiteUpsertParsed): BpnReferenceParsed? =
+        when (site) {
+            is SiteUpsertParsed.CreateWithOwnMainAddress -> site.mainAddressReference
+            is SiteUpsertParsed.CreateOnExistingAddress -> site.mainAddressReference
+            is SiteUpsertParsed.UpdateWithOwnMainAddress -> site.mainAddressReference
+            is SiteUpsertParsed.CreateOnLegalAddress, is SiteUpsertParsed.UpdateOnLegalAddress, is SiteUpsertParsed.Unchanged -> null
         }
 }

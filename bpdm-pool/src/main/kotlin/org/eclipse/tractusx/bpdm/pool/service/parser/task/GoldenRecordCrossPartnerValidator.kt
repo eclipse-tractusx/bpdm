@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.model.error.*
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertPlan
-import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSitePlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.RecordSiteRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpsertRequest
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional
  * Reports where the partners one golden record upsert states contradict each other.
  *
  * Most of these rules read the partners as stated, but completeness of the additional sites is decidable only against
- * the address they will sit on, which is why the planned partners are taken as well.
+ * the address they will sit on, which is why the parsed partners are taken as well.
  */
 @Service
 class GoldenRecordCrossPartnerValidator(
@@ -48,15 +48,15 @@ class GoldenRecordCrossPartnerValidator(
 ) {
 
     /**
-     * Reports every contradiction between the partners [request] states and the partners planned from it, where
-     * [errorsSoFar] holds what planning those partners has already rejected.
+     * Reports every contradiction between the partners [request] states and the partners parsed from it, where
+     * [errorsSoFar] holds what parsing those partners has already rejected.
      */
     @Transactional(readOnly = true)
     fun validate(
         request: GoldenRecordUpsertRequest,
-        legalEntity: LegalEntityUpsertPlan?,
-        recordSite: RecordSitePlan?,
-        additionalAddress: AddressUpsertPlan?,
+        legalEntity: LegalEntityUpsertParsed?,
+        recordSite: RecordSiteParsed?,
+        additionalAddress: AddressUpsertParsed?,
         errorsSoFar: List<GoldenRecordUpsertParseError>
     ): List<CrossPartnerParseError> =
         sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.recordSite.site)

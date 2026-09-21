@@ -24,17 +24,17 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Puts the sites a planned golden record upsert states on the address the record shares.
+ * Puts the sites a parsed golden record upsert states on the address the record shares.
  *
- * The record's own site sits on that address whether or not the plan repeats it, so it is a member of what the plan
- * states rather than something the plan can leave out.
+ * The record's own site sits on that address whether or not the request repeats it, so it is a member of what is
+ * written rather than something a request can leave out.
  */
 @Service
 class AdditionalSiteUpsertService(
@@ -43,16 +43,16 @@ class AdditionalSiteUpsertService(
 ) {
 
     /**
-     * Creates the sites [plan] states anew on [recordAddress], makes that address the main address of exactly those
-     * sites and [recordSite], and reports the created sites in the order [plan] states them.
+     * Creates the sites [additionalSites] states anew on [recordAddress], makes that address the main address of exactly those
+     * sites and [recordSite], and reports the created sites in the order [additionalSites] states them.
      */
     @Transactional
-    fun upsert(plan: AdditionalSitesPlan, recordSite: SiteDb, recordAddress: LogisticAddressDb): List<SiteDb> {
+    fun upsert(additionalSites: AdditionalSitesParsed, recordSite: SiteDb, recordAddress: LogisticAddressDb): List<SiteDb> {
         val createdSites = siteCreateWithReferencedAddressAsMainService.create(
-            plan.newSites.map { SiteCreateWithReferencedAddressAsMainParsed(recordAddress, it.header, mainAddressContent = null) }
+            additionalSites.newSites.map { SiteCreateWithReferencedAddressAsMainParsed(recordAddress, it.header, mainAddressContent = null) }
         )
 
-        val membership = (listOf(recordSite) + plan.existingSites + createdSites).distinctBy { it.bpn }
+        val membership = (listOf(recordSite) + additionalSites.existingSites + createdSites).distinctBy { it.bpn }
         addressUpdateService.setSites(listOf(AddressSiteMembershipParsed(recordAddress, membership)))
 
         return createdSites

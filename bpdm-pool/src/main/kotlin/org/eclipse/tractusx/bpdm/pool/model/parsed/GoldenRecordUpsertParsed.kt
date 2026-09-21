@@ -31,44 +31,44 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
  * whether further sites can sit on that address. Each partner appears once and a variant maps to exactly one
  * sequence of operation service calls, so no combination of fields can describe a write that cannot be carried out.
  * Parents are not stated on the children: a request has one legal entity and at most one site, so whoever executes
- * the plan already holds them.
+ * the parse already holds them.
  */
 sealed interface GoldenRecordUpsertParsed {
     val sharingMemberRecordId: String
-    val legalEntity: LegalEntityUpsertPlan
+    val legalEntity: LegalEntityUpsertParsed
 
     /** A task about a legal entity: the record address is its legal address, and no site sits on that address. */
     data class LegalEntityRecord(
         override val sharingMemberRecordId: String,
-        override val legalEntity: LegalEntityUpsertPlan
+        override val legalEntity: LegalEntityUpsertParsed
     ) : GoldenRecordUpsertParsed
 
     /** A task about a site: the record address is the site's main address, shared with [additionalSites]. */
     data class SiteRecord(
         override val sharingMemberRecordId: String,
-        override val legalEntity: LegalEntityUpsertPlan,
-        val site: SiteUpsertPlan,
-        val additionalSites: AdditionalSitesPlan
+        override val legalEntity: LegalEntityUpsertParsed,
+        val site: SiteUpsertParsed,
+        val additionalSites: AdditionalSitesParsed
     ) : GoldenRecordUpsertParsed
 
     /** A task about an address of a legal entity: the record address is that address, and no site sits on it. */
     data class LegalEntityAddressRecord(
         override val sharingMemberRecordId: String,
-        override val legalEntity: LegalEntityUpsertPlan,
-        val address: AddressUpsertPlan
+        override val legalEntity: LegalEntityUpsertParsed,
+        val address: AddressUpsertParsed
     ) : GoldenRecordUpsertParsed
 
     /** A task about an address of a site: the record address is that address, shared with [additionalSites]. */
     data class SiteAddressRecord(
         override val sharingMemberRecordId: String,
-        override val legalEntity: LegalEntityUpsertPlan,
-        val site: SiteUpsertPlan,
-        val address: AddressUpsertPlan,
-        val additionalSites: AdditionalSitesPlan
+        override val legalEntity: LegalEntityUpsertParsed,
+        val site: SiteUpsertParsed,
+        val address: AddressUpsertParsed,
+        val additionalSites: AdditionalSitesParsed
     ) : GoldenRecordUpsertParsed
 }
 
-sealed interface LegalEntityUpsertPlan {
+sealed interface LegalEntityUpsertParsed {
     val legalEntityReference: BpnReferenceParsed
     val legalAddressReference: BpnReferenceParsed
 
@@ -76,40 +76,40 @@ sealed interface LegalEntityUpsertPlan {
         override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
         val existingLegalEntity: LegalEntityDb
-    ) : LegalEntityUpsertPlan
+    ) : LegalEntityUpsertParsed
 
     data class Create(
         override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
         val content: LegalEntityContentParsed
-    ) : LegalEntityUpsertPlan
+    ) : LegalEntityUpsertParsed
 
     data class Update(
         override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
         val existingLegalEntity: LegalEntityDb,
         val content: LegalEntityContentParsed
-    ) : LegalEntityUpsertPlan
+    ) : LegalEntityUpsertParsed
 }
 
-sealed interface SiteUpsertPlan {
+sealed interface SiteUpsertParsed {
     val siteReference: BpnReferenceParsed
 
     data class Unchanged(
         override val siteReference: BpnReferenceParsed,
         val existingSite: SiteDb
-    ) : SiteUpsertPlan
+    ) : SiteUpsertParsed
 
     data class CreateWithOwnMainAddress(
         override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
         val content: SiteContentParsed
-    ) : SiteUpsertPlan
+    ) : SiteUpsertParsed
 
     data class CreateOnLegalAddress(
         override val siteReference: BpnReferenceParsed,
         val header: SiteHeaderParsed
-    ) : SiteUpsertPlan
+    ) : SiteUpsertParsed
 
     data class CreateOnExistingAddress(
         override val siteReference: BpnReferenceParsed,
@@ -117,35 +117,35 @@ sealed interface SiteUpsertPlan {
         val existingMainAddress: LogisticAddressDb,
         val header: SiteHeaderParsed,
         val mainAddressContent: LogisticAddressParsed
-    ) : SiteUpsertPlan
+    ) : SiteUpsertParsed
 
     data class UpdateWithOwnMainAddress(
         override val siteReference: BpnReferenceParsed,
         val mainAddressReference: BpnReferenceParsed,
         val existingSite: SiteDb,
         val content: SiteContentParsed
-    ) : SiteUpsertPlan
+    ) : SiteUpsertParsed
 
     data class UpdateOnLegalAddress(
         override val siteReference: BpnReferenceParsed,
         val existingSite: SiteDb,
         val header: SiteHeaderParsed
-    ) : SiteUpsertPlan
+    ) : SiteUpsertParsed
 }
 
-sealed interface AddressUpsertPlan {
+sealed interface AddressUpsertParsed {
     val addressReference: BpnReferenceParsed
 
     data class Create(
         override val addressReference: BpnReferenceParsed,
         val content: LogisticAddressParsed
-    ) : AddressUpsertPlan
+    ) : AddressUpsertParsed
 
     data class Update(
         override val addressReference: BpnReferenceParsed,
         val existingAddress: LogisticAddressDb,
         val content: LogisticAddressParsed
-    ) : AddressUpsertPlan
+    ) : AddressUpsertParsed
 }
 
 /**
@@ -154,17 +154,17 @@ sealed interface AddressUpsertPlan {
  * [additionalSites] starts as what the request stated and is completed with the sites already bound to that address
  * by their own main-address relation, so it is broader than the list the request carried.
  */
-data class RecordSitePlan(
-    val site: SiteUpsertPlan,
-    val additionalSites: AdditionalSitesPlan
+data class RecordSiteParsed(
+    val site: SiteUpsertParsed,
+    val additionalSites: AdditionalSitesParsed
 )
 
-data class AdditionalSitesPlan(
+data class AdditionalSitesParsed(
     val existingSites: List<SiteDb>,
-    val newSites: List<AdditionalSiteCreatePlan>
+    val newSites: List<AdditionalSiteCreateParsed>
 )
 
-data class AdditionalSiteCreatePlan(
+data class AdditionalSiteCreateParsed(
     val siteReference: BpnReferenceParsed,
     val header: SiteHeaderParsed
 )

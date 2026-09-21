@@ -44,7 +44,7 @@ internal fun <T, E> ParseResult<T, E>.parsedOrRecord(errors: MutableList<in E>):
         is ParseResult.Failure -> { errors.addAll(this.errors); null }
     }
 
-/** The plan, or every reason it could not be made. */
+/** The parsed value, or every reason it could not be made. */
 internal fun <T, E> T?.orFailure(errors: List<E>): ParseResult<T, E> =
     if (this == null || errors.isNotEmpty()) ParseResult.Failure(errors) else ParseResult.Success(this)
 

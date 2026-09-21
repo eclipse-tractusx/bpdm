@@ -27,14 +27,14 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Carries out the address a planned golden record upsert states beside the legal address and any site main address.
+ * Carries out the address a parsed golden record upsert states beside the legal address and any site main address.
  */
 @Service
 class AdditionalAddressUpsertService(
@@ -43,21 +43,21 @@ class AdditionalAddressUpsertService(
 ) {
 
     /**
-     * Writes what [plan] states under [legalEntity] and [site], reporting the address it leaves behind and whether that write
+     * Writes what [address] states under [legalEntity] and [site], reporting the address it leaves behind and whether that write
      * changed it.
      */
     @Transactional
     fun upsert(
-        plan: AddressUpsertPlan,
+        address: AddressUpsertParsed,
         legalEntity: LegalEntityDb,
         site: SiteDb?
     ): UpsertResult<LogisticAddressDb> =
-        when (plan) {
-            is AddressUpsertPlan.Create ->
-                UpsertResult(addressCreateService.create(listOf(AddressCreateParsed(legalEntity, site, plan.content))).single(), UpsertType.Created)
-            is AddressUpsertPlan.Update ->
-                // Site membership is stated once for the whole record, by the membership plan, so this update leaves it alone.
-                addressPayloadUpdateService.update(listOf(AddressUpdateParsed(plan.existingAddress, sites = null, address = plan.content)))
+        when (address) {
+            is AddressUpsertParsed.Create ->
+                UpsertResult(addressCreateService.create(listOf(AddressCreateParsed(legalEntity, site, address.content))).single(), UpsertType.Created)
+            is AddressUpsertParsed.Update ->
+                // Site membership is stated once for the whole record, by the additional sites, so this update leaves it alone.
+                addressPayloadUpdateService.update(listOf(AddressUpdateParsed(address.existingAddress, sites = null, address = address.content)))
                     .single()
         }
 }

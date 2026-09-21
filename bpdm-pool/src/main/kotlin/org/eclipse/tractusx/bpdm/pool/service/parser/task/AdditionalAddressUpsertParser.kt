@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressContentInvalid
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressNotFound
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressUpsertParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertPlan
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.springframework.stereotype.Service
@@ -42,20 +42,20 @@ class AdditionalAddressUpsertParser(
 ) {
 
     /**
-     * Reports the plan for this additional address, or every reason it cannot be carried out.
+     * Reports what is to be written for this additional address, or every reason it cannot be carried out.
      */
     @Transactional(readOnly = true)
     fun parse(
         request: AddressUpsertRequest
-    ): ParseResult<AddressUpsertPlan, AdditionalAddressUpsertParseError> {
+    ): ParseResult<AddressUpsertParsed, AdditionalAddressUpsertParseError> {
         val errors = mutableListOf<AdditionalAddressUpsertParseError>()
-        return parsePlan(request, errors).orFailure(errors)
+        return parseUpsert(request, errors).orFailure(errors)
     }
 
-    private fun parsePlan(
+    private fun parseUpsert(
         request: AddressUpsertRequest,
         errors: MutableList<AdditionalAddressUpsertParseError>
-    ): AddressUpsertPlan? {
+    ): AddressUpsertParsed? {
         val addressReference = referenceResolutionParser.parse(request.reference)
         val existingAddress = addressReferenceParser
             .parse(request.reference, ::AdditionalAddressNotFound)
@@ -66,8 +66,8 @@ class AdditionalAddressUpsertParser(
             .singleOrRecord(errors, ::AdditionalAddressContentInvalid) ?: return null
 
         return if (existingAddress == null)
-            AddressUpsertPlan.Create(addressReference, content)
+            AddressUpsertParsed.Create(addressReference, content)
         else
-            AddressUpsertPlan.Update(addressReference, existingAddress, content)
+            AddressUpsertParsed.Update(addressReference, existingAddress, content)
     }
 }

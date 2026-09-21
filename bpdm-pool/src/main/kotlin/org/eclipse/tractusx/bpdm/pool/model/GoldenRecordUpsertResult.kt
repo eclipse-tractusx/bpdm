@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMem
 /**
  * The records a golden record upsert left behind, by the kind of business partner the task was about.
  *
- * The variant matches the plan that produced it, and the record address follows from the records the variant names,
+ * The variant matches the parse that produced it, and the record address follows from the records the variant names,
  * so no result can report an address that contradicts the partners beside it.
  */
 sealed interface GoldenRecordUpsertResult {
