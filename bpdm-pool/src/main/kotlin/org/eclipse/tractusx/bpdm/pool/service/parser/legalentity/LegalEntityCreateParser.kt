@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates legal-entity create requests: the header content with its identifier uniqueness and the legal address.
@@ -41,14 +42,11 @@ class LegalEntityCreateParser(
     /**
      * Validates each request and reports either the validated legal entity or every problem found in that entry.
      */
+    @Transactional(readOnly = true)
     fun parse(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> =
-        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
 
-    /**
-     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
-     * addresses and judges coverage over all of them together.
-     */
-    fun parseWithoutScriptVariantCoverage(
+    private fun parseEntries(
         requests: List<LegalEntityCreateRequest>
     ): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateEntryParseError>> {
         val contents = requests.map { it.content }

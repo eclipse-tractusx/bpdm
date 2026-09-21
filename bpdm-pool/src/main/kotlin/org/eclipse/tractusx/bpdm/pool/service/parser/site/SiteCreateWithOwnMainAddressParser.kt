@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates site-create requests that bring a main address of their own: the parent legal entity, the header content
@@ -46,14 +47,11 @@ class SiteCreateWithOwnMainAddressParser(
      * Validates each request and reports either the validated site with its resolved parent or every problem found in
      * that entry.
      */
+    @Transactional(readOnly = true)
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> =
-        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
 
-    /**
-     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
-     * addresses and judges coverage over all of them together.
-     */
-    fun parseWithoutScriptVariantCoverage(
+    private fun parseEntries(
         requests: List<SiteCreateRequest>
     ): List<ParseResult<SiteCreateParsed, SiteCreateEntryParseError>> {
         val contents = requests.map { it.content }

@@ -56,14 +56,9 @@ class AddressUpdateParser(
      */
     @Transactional(readOnly = true)
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> =
-        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
 
-    /**
-     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
-     * addresses and judges coverage over all of them together.
-     */
-    @Transactional(readOnly = true)
-    fun parseWithoutScriptVariantCoverage(
+    private fun parseEntries(
         requests: List<AddressUpdateRequest>
     ): List<ParseResult<AddressUpdateParsed, AddressUpdateEntryParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })

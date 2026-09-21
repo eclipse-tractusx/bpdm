@@ -48,14 +48,9 @@ class SiteUpdateWithOwnMainAddressParser(
      */
     @Transactional(readOnly = true)
     fun parse(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> =
-        coverageValidator.applyTo(parseWithoutScriptVariantCoverage(requests), ::coverageWrites) { it }
+        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
 
-    /**
-     * Validates each request as [parse] does, except for script variant coverage, for a caller that writes further
-     * addresses and judges coverage over all of them together.
-     */
-    @Transactional(readOnly = true)
-    fun parseWithoutScriptVariantCoverage(
+    private fun parseEntries(
         requests: List<SiteUpdateRequest>
     ): List<ParseResult<SiteUpdateParsed, SiteUpdateEntryParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
