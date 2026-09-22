@@ -29,6 +29,9 @@ import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.UpsertIntent
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityOwnershipValidator
+import org.eclipse.tractusx.bpdm.pool.util.orFailure
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrRecord
+import org.eclipse.tractusx.bpdm.pool.util.singleOrRecord
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

@@ -26,6 +26,9 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalAddressUpsertParseEr
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
+import org.eclipse.tractusx.bpdm.pool.util.orFailure
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrRecord
+import org.eclipse.tractusx.bpdm.pool.util.singleOrRecord
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

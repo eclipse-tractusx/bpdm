@@ -31,6 +31,8 @@ import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteReferenceRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteHeaderParser
+import org.eclipse.tractusx.bpdm.pool.util.failureErrors
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

@@ -17,11 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-
-package org.eclipse.tractusx.bpdm.pool.service.parser.task
+package org.eclipse.tractusx.bpdm.pool.util
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
 
 /**
  * The one parse result of a single-entry delegation, with its errors recorded against the entry being parsed.
