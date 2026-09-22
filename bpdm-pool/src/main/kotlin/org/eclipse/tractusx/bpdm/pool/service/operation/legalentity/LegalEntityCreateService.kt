@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
@@ -59,10 +59,10 @@ class LegalEntityCreateService(
      * Creates the given legal entities together with their legal addresses and returns the persisted entities.
      */
     @Transactional
-    fun create(parsed: List<LegalEntityCreateParsed>): List<LegalEntityDb> {
-        val legalEntities = createHeaders(parsed.map { it.content.header })
-        val stagedAddresses = addressCreateService.stageCreate(parsed.zip(legalEntities).map { (entry, legalEntity) ->
-            AddressCreateParsed(legalEntity, site = null, entry.content.legalAddress)
+    fun create(contents: List<LegalEntityContentParsed>): List<LegalEntityDb> {
+        val legalEntities = createHeaders(contents.map { it.header })
+        val stagedAddresses = addressCreateService.stageCreate(contents.zip(legalEntities).map { (content, legalEntity) ->
+            AddressCreateParsed(legalEntity, site = null, content.legalAddress)
         })
 
         legalEntities.zip(stagedAddresses).forEach { (legalEntity, stagedAddress) -> legalEntity.legalAddress = stagedAddress.address }

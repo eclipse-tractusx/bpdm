@@ -60,7 +60,7 @@ class LegalEntityCreateApplicationV7Service(
         requestList.zip(parseAndExecute(
             createRequests,
             legalEntityCreateParser::parse,
-            legalEntityCreateService::create
+            { parsed -> legalEntityCreateService.create(parsed.map { it.content }) }
         )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed, request.index))

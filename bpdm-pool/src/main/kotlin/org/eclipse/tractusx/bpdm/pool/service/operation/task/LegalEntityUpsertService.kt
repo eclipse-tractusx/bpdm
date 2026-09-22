@@ -23,7 +23,6 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.task
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
@@ -47,7 +46,7 @@ class LegalEntityUpsertService(
         when (legalEntity) {
             is LegalEntityUpsertParsed.Unchanged -> UpsertResult(legalEntity.existingLegalEntity, UpsertType.NoChange)
             is LegalEntityUpsertParsed.Create ->
-                UpsertResult(legalEntityCreateService.create(listOf(LegalEntityCreateParsed(legalEntity.content))).single(), UpsertType.Created)
+                UpsertResult(legalEntityCreateService.create(listOf(legalEntity.content)).single(), UpsertType.Created)
             is LegalEntityUpsertParsed.Update -> legalEntityPayloadUpdateService.update(listOf(legalEntity.update)).single()
         }
 }
