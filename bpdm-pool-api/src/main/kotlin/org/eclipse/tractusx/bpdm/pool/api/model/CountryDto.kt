@@ -17,12 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.migration.helper
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
-import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
+import io.swagger.v3.oas.annotations.media.Schema
 
-fun main(args: Array<String>) {
-    MigrationFileCreator().create()
-    CountryMigrationFileCreator().create()
-}
+@Schema(description = "Describes a country accepted by the Pool")
+data class CountryDto(
+    @Schema(description = "The country code")
+    val countryCode: String,
+    @Schema(description = "The name of the country")
+    val name: String,
+    @Schema(description = "Description of the assignment status when the code is not officially assigned under ISO 3166-1")
+    val description: String?
+)

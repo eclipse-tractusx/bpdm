@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AdministrativeAreaSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.CountrySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
@@ -48,7 +49,8 @@ class MetadataController(
     val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
     val administrativeAreaSearchApplicationV7Service: AdministrativeAreaSearchApplicationV7Service,
     val reasonCodeSearchApplicationV7Service: ReasonCodeSearchApplicationV7Service,
-    val scriptCodeSearchApplicationV7Service: ScriptCodeSearchApplicationV7Service
+    val scriptCodeSearchApplicationV7Service: ScriptCodeSearchApplicationV7Service,
+    val countrySearchApplicationV7Service: CountrySearchApplicationV7Service
 ) : PoolMetadataApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
@@ -93,6 +95,11 @@ class MetadataController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
         return scriptCodeSearchApplicationV7Service.searchScriptCodes(paginationRequest)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
+    override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryDto> {
+        return countrySearchApplicationV7Service.searchCountries(paginationRequest)
     }
 
 }

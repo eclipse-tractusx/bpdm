@@ -17,12 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.migration.helper
+package org.eclipse.tractusx.bpdm.migration.helper.country
 
-import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
-import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
+import com.opencsv.bean.CsvBindByName
+import org.eclipse.tractusx.bpdm.migration.helper.util.NoArg
 
-fun main(args: Array<String>) {
-    MigrationFileCreator().create()
-    CountryMigrationFileCreator().create()
-}
+@NoArg
+data class UnvalidatedCountryImportEntry(
+    @CsvBindByName(column = "countryCode")
+    val countryCode: String?,
+    @CsvBindByName(column = "name")
+    val name: String?,
+    @CsvBindByName(column = "description")
+    val description: String?
+)

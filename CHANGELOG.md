@@ -14,6 +14,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: New `/v7/countries` and `/v6/countries` metadata endpoints return the list of accepted country codes, names and descriptions from the provider-maintained country catalogue [#1862](https://github.com/eclipse-tractusx/bpdm/issues/1862)
+
 ### Changed
 
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown

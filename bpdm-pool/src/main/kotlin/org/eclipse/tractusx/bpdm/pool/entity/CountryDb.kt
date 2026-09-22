@@ -17,12 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.migration.helper
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
-import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
-fun main(args: Array<String>) {
-    MigrationFileCreator().create()
-    CountryMigrationFileCreator().create()
-}
+@Entity
+@Table(name = "countries")
+class CountryDb(
+    @Column(name = "country_code", unique = true, nullable = false)
+    val countryCode: String,
+    @Column(name = "name", nullable = false)
+    val name: String,
+    @Column(name = "description")
+    val description: String?
+): BaseEntity()

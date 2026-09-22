@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
@@ -62,4 +63,7 @@ interface MetadataV6ApiClient: PoolMetadataV6Api {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/administrative-areas-level1")
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6>
+
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/countries")
+    override fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
 }

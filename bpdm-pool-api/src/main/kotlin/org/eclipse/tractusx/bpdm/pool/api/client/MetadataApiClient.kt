@@ -62,4 +62,7 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/reason-codes")
     override fun getReasonCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>
+
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/countries")
+    override fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
 }
