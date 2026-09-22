@@ -17,47 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceKind
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 /**
- * Turns a stated BPN reference into the record it names.
+ * Decides what a stated BPN reference is: a BPN that exists, a request identifier still waiting for one, or nothing
+ * stated at all.
  *
- * Naming no record yet is not a rejection: it is how a request asks for one to be created. Only a reference that
- * names a record which does not exist is rejected, and the caller says which partner that is by supplying the error.
  * A request identifier names whichever record an earlier write registered it against, so a task of the same batch
- * resolves it to the record the task before it left behind.
+ * resolves it to the record the task before it left behind. Naming no record is not a rejection: it is how a request
+ * asks for one to be created, which is why this parser rejects nothing and the caller looking the record up decides
+ * what a reference to a missing record means.
  */
 @Service
-class BpnReferenceResolutionParser(
+class BpnReferenceParser(
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
 ) {
-
-    /**
-     * Reports the reference together with the record it names, or the caller's error where it names none that exists.
-     */
-    @Transactional(readOnly = true)
-    fun <T, E> parse(
-        reference: BpnReferenceRequest,
-        find: (String) -> T?,
-        notFound: (String) -> E
-    ): ParseResult<ResolvedReference<T>, E> {
-        val parsed = parse(reference)
-        val bpn = (parsed as? BpnReferenceParsed.Existing)?.bpn
-            ?: return ParseResult.Success(ResolvedReference(parsed, null))
-
-        val existingRecord = find(bpn) ?: return ParseResult.ofSingleFailure(notFound(bpn))
-        return ParseResult.Success(ResolvedReference(parsed, existingRecord))
-    }
 
     /**
      * Reports what the reference turned out to be, without looking for the record itself.

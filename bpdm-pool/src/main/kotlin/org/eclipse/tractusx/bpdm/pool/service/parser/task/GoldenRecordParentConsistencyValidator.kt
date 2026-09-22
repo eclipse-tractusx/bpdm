@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class GoldenRecordParentConsistencyValidator(
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val siteBpnParser: SiteBpnParser,
     private val addressBpnParser: AddressBpnParser
 ) {
@@ -82,7 +82,7 @@ class GoldenRecordParentConsistencyValidator(
     }
 
     private fun resolveBpn(reference: BpnReferenceRequest): String? =
-        (referenceResolutionParser.parse(reference) as? BpnReferenceParsed.Existing)?.bpn
+        (bpnReferenceParser.parse(reference) as? BpnReferenceParsed.Existing)?.bpn
 
     private fun resolveSitesPresent(siteBpns: List<String>): Map<String, SiteDb> {
         val distinctSiteBpns = siteBpns.distinct()

@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class GoldenRecordCrossPartnerValidator(
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val sharedLegalAddressScriptCodeValidator: SharedLegalAddressScriptCodeValidator,
     private val statedAddressDistinctnessValidator: StatedAddressDistinctnessValidator,
     private val parentConsistencyValidator: GoldenRecordParentConsistencyValidator,
@@ -73,9 +73,9 @@ class GoldenRecordCrossPartnerValidator(
 
     private fun validateStatedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
         statedAddressDistinctnessValidator.validate(
-            referenceResolutionParser.parse(request.legalEntity.legalAddress.reference),
-            (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { referenceResolutionParser.parse(it.mainAddress.reference) },
-            request.additionalAddress?.let { referenceResolutionParser.parse(it.reference) }
+            bpnReferenceParser.parse(request.legalEntity.legalAddress.reference),
+            (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { bpnReferenceParser.parse(it.mainAddress.reference) },
+            request.additionalAddress?.let { bpnReferenceParser.parse(it.reference) }
         )
 
     private fun validateCoverageNotLost(

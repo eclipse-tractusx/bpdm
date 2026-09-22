@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpsertParser(
     private val legalEntityReferenceParser: LegalEntityReferenceParser,
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val legalEntityContentParser: LegalEntityContentParser,
     private val updateContentParser: LegalEntityUpdateContentParser
 ) {
@@ -64,8 +64,8 @@ class LegalEntityUpsertParser(
         request: LegalEntityUpsertRequest,
         errors: MutableList<LegalEntityUpsertParseError>
     ): LegalEntityUpsertParsed? {
-        val legalEntityReference = referenceResolutionParser.parse(request.reference)
-        val legalAddressReference = referenceResolutionParser.parse(request.legalAddress.reference)
+        val legalEntityReference = bpnReferenceParser.parse(request.reference)
+        val legalAddressReference = bpnReferenceParser.parse(request.legalAddress.reference)
         val existingLegalEntity = legalEntityReferenceParser.parse(request.reference).parsedOrRecord(errors)?.existingRecord
 
         if (existingLegalEntity != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)

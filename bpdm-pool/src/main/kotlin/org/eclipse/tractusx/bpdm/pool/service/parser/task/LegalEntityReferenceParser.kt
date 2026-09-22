@@ -23,6 +23,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class LegalEntityReferenceParser(
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val legalEntityBpnParser: LegalEntityBpnParser
 ) {
 
@@ -42,10 +43,14 @@ class LegalEntityReferenceParser(
      */
     fun parse(
         reference: BpnReferenceRequest
-    ): ParseResult<ResolvedReference<LegalEntityDb>, LegalEntityNotFound> =
-        referenceResolutionParser.parse(
-            reference,
-            { bpn -> (legalEntityBpnParser.parse(listOf(bpn)).single() as? ParseResult.Success)?.parsed },
-            ::LegalEntityNotFound
-        )
+    ): ParseResult<ResolvedReference<LegalEntityDb>, LegalEntityNotFound> {
+        val parsed = bpnReferenceParser.parse(reference)
+        val bpn = (parsed as? BpnReferenceParsed.Existing)?.bpn
+            ?: return ParseResult.Success(ResolvedReference(parsed, existingRecord = null))
+
+        return when (val result = legalEntityBpnParser.parse(listOf(bpn)).single()) {
+            is ParseResult.Success -> ParseResult.Success(ResolvedReference(parsed, result.parsed))
+            is ParseResult.Failure -> ParseResult.ofSingleFailure(LegalEntityNotFound(bpn))
+        }
+    }
 }

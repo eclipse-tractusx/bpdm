@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional
 class SiteUpsertParser(
     private val siteReferenceParser: SiteReferenceParser,
     private val addressReferenceParser: AddressReferenceParser,
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val siteHeaderParser: SiteHeaderParser,
     private val siteContentParser: SiteContentParser,
     private val addressContentParser: AddressContentParser
@@ -66,7 +66,7 @@ class SiteUpsertParser(
         request: SiteUpsertRequest,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertParsed? {
-        val siteReference = referenceResolutionParser.parse(request.reference)
+        val siteReference = bpnReferenceParser.parse(request.reference)
         val existingSite = siteReferenceParser.parse(request.reference).parsedOrRecord(errors)?.existingRecord
 
         if (existingSite != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
@@ -94,10 +94,10 @@ class SiteUpsertParser(
         siteReference: BpnReferenceParsed,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertParsed? {
-        val mainAddressReference = referenceResolutionParser.parse(request.mainAddress.reference)
+        val mainAddressReference = bpnReferenceParser.parse(request.mainAddress.reference)
         val existingMainAddress = addressReferenceParser
-            .parse(request.mainAddress.reference, ::SiteMainAddressNotFound)
-            .parsedOrRecord(errors)?.existingRecord
+            .parse(request.mainAddress.reference)
+            .parsedOrRecord(errors) { SiteMainAddressNotFound(it.bpn) }?.existingRecord
 
         // A new site whose main address already exists adopts that address instead of duplicating it, so several
         // sites can share one main address - a different creation, with a different variant.
@@ -154,7 +154,7 @@ class SiteUpsertParser(
                     ?.let {
                         SiteUpsertParsed.UpdateWithOwnMainAddress(
                             siteReference,
-                            referenceResolutionParser.parse(request.mainAddress.reference),
+                            bpnReferenceParser.parse(request.mainAddress.reference),
                             existingSite,
                             it
                         )

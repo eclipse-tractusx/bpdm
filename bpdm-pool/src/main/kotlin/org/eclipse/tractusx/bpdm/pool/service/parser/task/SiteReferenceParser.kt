@@ -23,6 +23,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ResolvedReference
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class SiteReferenceParser(
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val siteBpnParser: SiteBpnParser
 ) {
 
@@ -42,10 +43,14 @@ class SiteReferenceParser(
      */
     fun parse(
         reference: BpnReferenceRequest
-    ): ParseResult<ResolvedReference<SiteDb>, SiteNotFound> =
-        referenceResolutionParser.parse(
-            reference,
-            { bpn -> (siteBpnParser.parse(listOf(bpn)).single() as? ParseResult.Success)?.parsed },
-            ::SiteNotFound
-        )
+    ): ParseResult<ResolvedReference<SiteDb>, SiteNotFound> {
+        val parsed = bpnReferenceParser.parse(reference)
+        val bpn = (parsed as? BpnReferenceParsed.Existing)?.bpn
+            ?: return ParseResult.Success(ResolvedReference(parsed, existingRecord = null))
+
+        return when (val result = siteBpnParser.parse(listOf(bpn)).single()) {
+            is ParseResult.Success -> ParseResult.Success(ResolvedReference(parsed, result.parsed))
+            is ParseResult.Failure -> ParseResult.ofSingleFailure(SiteNotFound(bpn))
+        }
+    }
 }

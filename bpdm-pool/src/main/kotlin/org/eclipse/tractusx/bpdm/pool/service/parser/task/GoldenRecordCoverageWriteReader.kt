@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class GoldenRecordCoverageWriteReader(
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val logisticAddressRepository: LogisticAddressRepository
 ) {
 
@@ -98,5 +98,5 @@ class GoldenRecordCoverageWriteReader(
         resolveBpn(reference)?.let { logisticAddressRepository.findByBpn(it) }
 
     private fun resolveBpn(reference: BpnReferenceRequest): String? =
-        (referenceResolutionParser.parse(reference) as? BpnReferenceParsed.Existing)?.bpn
+        (bpnReferenceParser.parse(reference) as? BpnReferenceParsed.Existing)?.bpn
 }

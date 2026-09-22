@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AdditionalAddressUpsertParser(
     private val addressReferenceParser: AddressReferenceParser,
-    private val referenceResolutionParser: BpnReferenceResolutionParser,
+    private val bpnReferenceParser: BpnReferenceParser,
     private val addressContentParser: AddressContentParser
 ) {
 
@@ -59,10 +59,10 @@ class AdditionalAddressUpsertParser(
         request: AddressUpsertRequest,
         errors: MutableList<AdditionalAddressUpsertParseError>
     ): AddressUpsertParsed? {
-        val addressReference = referenceResolutionParser.parse(request.reference)
+        val addressReference = bpnReferenceParser.parse(request.reference)
         val existingAddress = addressReferenceParser
-            .parse(request.reference, ::AdditionalAddressNotFound)
-            .parsedOrRecord(errors)?.existingRecord
+            .parse(request.reference)
+            .parsedOrRecord(errors) { AdditionalAddressNotFound(it.bpn) }?.existingRecord
 
         val content = addressContentParser
             .parse(listOf(request.content), listOf(existingAddress?.bpn))

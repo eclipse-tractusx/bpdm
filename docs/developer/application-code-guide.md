@@ -237,7 +237,7 @@ A parser has exactly three responsibilities — **normalization**, **validation*
 - The `…Request` model MUST be a superset that captures the content of all inbound sources (v6, v7, Orchestrator), so one parsing path feeds one domain model.
 - A `…Parsed` value MUST be fully validated, normalized and non-null — safe to persist without further checks, and carrying every value in its canonical form.
 - A `…Parsed` type MUST be produced by exactly one parser; that parser's rules are what the type promises.
-- A `…Parsed` value MUST NOT be created anywhere but in its own parser.
+- A `…Parsed` value MUST NOT be created outside its own parser from unvalidated data. Assembling one from values that are already `…Parsed` or read from our own database is permitted, unless the type carries a rule relating its fields.
 - A parser SHOULD put a guarantee into the type wherever it can — a narrow value type, the resolved entity instead of the BPN naming it — and rely on the type name alone only for rules that leave no trace in the value.
 - A `…Parsed` built from other parsed values MUST hold them instead of copying their fields into one flat record.
 - Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types. Where an internal model duplicates the shape of an API DTO, it SHOULD reuse the shared value types and enums rather than cloning them — only the DTO wrapper is duplicated, not the vocabulary it is built from.
