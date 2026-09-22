@@ -87,8 +87,7 @@ sealed interface LegalEntityUpsertParsed {
     data class Update(
         override val legalEntityReference: BpnReferenceParsed,
         override val legalAddressReference: BpnReferenceParsed,
-        val existingLegalEntity: LegalEntityDb,
-        val content: LegalEntityContentParsed
+        val update: LegalEntityUpdateParsed
     ) : LegalEntityUpsertParsed
 }
 

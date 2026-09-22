@@ -40,9 +40,15 @@ sealed interface LegalEntityGetParseError
 data class UnresolvableLegalEntityIdentifier(val identifierTypeKey: String, val identifierValue: String) : LegalEntityGetParseError
 
 /**
+ * The problems the content of one legal entity update can be faulted for: what any write of that content can be
+ * faulted for, plus the rules that only hold once the legal entity exists.
+ */
+sealed interface LegalEntityUpdateContentParseError : LegalEntityUpdateEntryParseError
+
+/**
  * The problems writing the ultimate-owner flag onto a legal entity that already exists can be faulted for.
  */
-sealed interface LegalEntityOwnershipParseError : LegalEntityUpdateEntryParseError
+sealed interface LegalEntityOwnershipParseError : LegalEntityUpdateContentParseError
 
 /**
  * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
@@ -59,7 +65,7 @@ data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEn
 /**
  * The problems the content of one legal entity can be faulted for: its header and its legal address.
  */
-sealed interface LegalEntityContentParseError : LegalEntityCreateEntryParseError, LegalEntityUpdateEntryParseError
+sealed interface LegalEntityContentParseError : LegalEntityCreateEntryParseError, LegalEntityUpdateContentParseError
 
 /**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/

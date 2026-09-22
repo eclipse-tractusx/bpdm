@@ -20,28 +20,27 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.combine
-import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.common.model.chainParseResults
 import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates legal-entity update requests: the target legal entity, the new header content with its identifier
- * uniqueness, and the new legal address.
+ * Validates legal-entity update requests: the target legal entity the request names, and the content the update states
+ * for it.
  */
 @Service
 class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val legalEntityContentParser: LegalEntityContentParser,
-    private val ownershipValidator: LegalEntityOwnershipValidator,
+    private val updateContentParser: LegalEntityUpdateContentParser,
     private val coverageValidator: ScriptVariantCoverageValidator
 ) {
 
@@ -57,19 +56,11 @@ class LegalEntityUpdateParser(
         requests: List<LegalEntityUpdateRequest>
     ): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateEntryParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-
-        val contentWrites = requests.zip(targetResults) { request, targetResult ->
-            LegalEntityContentWrite(request.content, (targetResult as? ParseResult.Success)?.parsed)
-        }
-        val contentResults = legalEntityContentParser.parse(contentWrites)
-
-        val updateResults = zipParseResults(contentResults, targetResults) { content, target ->
-            LegalEntityUpdateParsed(target, content)
+        val writes = requests.zip(targetResults) { request, targetResult ->
+            targetResult.parsedOrNull()?.let { LegalEntityUpdateContentWrite(request.content, it) }
         }
 
-        val ownershipViolations = ownershipValidator.validate(contentWrites.map { it.headerWrite })
-
-        return updateResults.zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }
+        return chainParseResults(targetResults) { updateContentParser.parse(writes.filterNotNull()) }
     }
 
     // What this write leaves behind, as script variant coverage sees it.

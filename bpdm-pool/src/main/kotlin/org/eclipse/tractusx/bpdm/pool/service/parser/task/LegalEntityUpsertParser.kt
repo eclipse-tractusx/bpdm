@@ -20,15 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.UpsertIntent
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityContentParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityOwnershipValidator
+import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateContentParser
 import org.eclipse.tractusx.bpdm.pool.util.orFailure
 import org.eclipse.tractusx.bpdm.pool.util.parsedOrRecord
 import org.eclipse.tractusx.bpdm.pool.util.singleOrRecord
@@ -43,7 +46,7 @@ class LegalEntityUpsertParser(
     private val legalEntityReferenceParser: LegalEntityReferenceParser,
     private val referenceResolutionParser: BpnReferenceResolutionParser,
     private val legalEntityContentParser: LegalEntityContentParser,
-    private val ownershipValidator: LegalEntityOwnershipValidator
+    private val updateContentParser: LegalEntityUpdateContentParser
 ) {
 
     /**
@@ -68,29 +71,33 @@ class LegalEntityUpsertParser(
         if (existingLegalEntity != null && request.intent == UpsertIntent.WriteOnlyIfAbsent)
             return LegalEntityUpsertParsed.Unchanged(legalEntityReference, legalAddressReference, existingLegalEntity)
 
-        val contentWrite = LegalEntityContentWrite(
-            LegalEntityContentRequest(request.header, request.legalAddress.content),
-            existingLegalEntity
-        )
+        val content = LegalEntityContentRequest(request.header, request.legalAddress.content)
 
-        val content = parseContent(contentWrite, errors)
-        errors += ownershipValidator.validate(listOf(contentWrite.headerWrite)).single().map(::toOwnershipError)
-        if (content == null) return null
-
-        return if (existingLegalEntity == null)
-            LegalEntityUpsertParsed.Create(legalEntityReference, legalAddressReference, content)
-        else
-            LegalEntityUpsertParsed.Update(legalEntityReference, legalAddressReference, existingLegalEntity, content)
+        return when (existingLegalEntity) {
+            null -> parseCreate(content, errors)?.let { LegalEntityUpsertParsed.Create(legalEntityReference, legalAddressReference, it) }
+            else -> parseUpdate(content, existingLegalEntity, errors)
+                ?.let { LegalEntityUpsertParsed.Update(legalEntityReference, legalAddressReference, it) }
+        }
     }
 
-    private fun parseContent(
-        write: LegalEntityContentWrite,
+    private fun parseCreate(
+        content: LegalEntityContentRequest,
         errors: MutableList<LegalEntityUpsertParseError>
     ): LegalEntityContentParsed? =
-        legalEntityContentParser.parse(listOf(write)).singleOrRecord(errors, ::toContentError)
+        legalEntityContentParser.parse(listOf(LegalEntityContentWrite(content, existingLegalEntity = null)))
+            .singleOrRecord(errors, ::toContentError)
 
-    private fun toOwnershipError(error: LegalEntityOwnershipParseError): LegalEntityUpsertParseError =
+    private fun parseUpdate(
+        content: LegalEntityContentRequest,
+        target: LegalEntityDb,
+        errors: MutableList<LegalEntityUpsertParseError>
+    ): LegalEntityUpdateParsed? =
+        updateContentParser.parse(listOf(LegalEntityUpdateContentWrite(content, target)))
+            .singleOrRecord(errors, ::toUpdateContentError)
+
+    private fun toUpdateContentError(error: LegalEntityUpdateContentParseError): LegalEntityUpsertParseError =
         when (error) {
+            is LegalEntityContentParseError -> toContentError(error)
             is MultipleUltimateOwnersInHierarchy -> MultipleUltimateOwners(error.conflictingBpnls)
             is AlternativeHeadquarterCannotOwnUltimately -> AlternativeHeadquarterCannotOwn(error.bpnl)
         }

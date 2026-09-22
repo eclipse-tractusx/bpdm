@@ -65,7 +65,7 @@ class AdditionalSitesCompletenessValidator(
     private fun existingLegalEntity(legalEntity: LegalEntityUpsertParsed?): LegalEntityDb? =
         when (legalEntity) {
             is LegalEntityUpsertParsed.Unchanged -> legalEntity.existingLegalEntity
-            is LegalEntityUpsertParsed.Update -> legalEntity.existingLegalEntity
+            is LegalEntityUpsertParsed.Update -> legalEntity.update.target
             is LegalEntityUpsertParsed.Create, null -> null
         }
 
