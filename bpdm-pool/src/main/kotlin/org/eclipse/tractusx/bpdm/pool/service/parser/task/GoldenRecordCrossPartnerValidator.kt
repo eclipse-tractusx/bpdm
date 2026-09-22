@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
 class GoldenRecordCrossPartnerValidator(
     private val bpnReferenceParser: BpnReferenceParser,
     private val sharedLegalAddressScriptCodeValidator: SharedLegalAddressScriptCodeValidator,
-    private val statedAddressDistinctnessValidator: StatedAddressDistinctnessValidator,
+    private val taskAddressDistinctnessValidator: TaskAddressDistinctnessValidator,
     private val parentConsistencyValidator: GoldenRecordParentConsistencyValidator,
     private val additionalSitesCompletenessValidator: AdditionalSitesCompletenessValidator,
     private val coverageWriteReader: GoldenRecordCoverageWriteReader,
@@ -72,7 +72,7 @@ class GoldenRecordCrossPartnerValidator(
         else emptyList()
 
     private fun validateStatedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
-        statedAddressDistinctnessValidator.validate(
+        taskAddressDistinctnessValidator.validate(
             bpnReferenceParser.parse(request.legalEntity.legalAddress.reference),
             (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { bpnReferenceParser.parse(it.mainAddress.reference) },
             request.additionalAddress?.let { bpnReferenceParser.parse(it.reference) }

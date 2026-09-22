@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service
  * a site's main address really is the legal address, the request says so by stating no main address of its own.
  */
 @Service
-class StatedAddressDistinctnessValidator {
+class TaskAddressDistinctnessValidator {
 
     /**
      * Reports every pair of stated addresses that turn out to be one address.
