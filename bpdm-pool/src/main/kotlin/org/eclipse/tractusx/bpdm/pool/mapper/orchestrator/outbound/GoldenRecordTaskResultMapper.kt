@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordTaskUpsertResult
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Component
 import java.time.ZoneOffset
@@ -50,7 +50,7 @@ class GoldenRecordTaskResultMapper(
      * Reports the records an upsert left behind as the task's business partner result, stated on top of the partner
      * the task carried.
      */
-    fun toTaskResult(stated: BusinessPartner, written: GoldenRecordUpsertResult): BusinessPartner {
+    fun toTaskResult(stated: BusinessPartner, written: GoldenRecordTaskUpsertResult): BusinessPartner {
         val legalEntityResult = toTaskResult(written.legalEntity)
         val siteResult = written.site?.let { toTaskResult(it) }
 

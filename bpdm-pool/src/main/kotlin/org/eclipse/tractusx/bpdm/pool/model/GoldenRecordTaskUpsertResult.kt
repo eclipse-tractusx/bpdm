@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMem
  * The variant matches the parse that produced it, and the record address follows from the records the variant names,
  * so no result can report an address that contradicts the partners beside it.
  */
-sealed interface GoldenRecordUpsertResult {
+sealed interface GoldenRecordTaskUpsertResult {
     val legalEntity: UpsertResult<LegalEntityDb>
     val confidenceUpdates: SharingMemberConfidenceService.Result
 
@@ -54,39 +54,39 @@ sealed interface GoldenRecordUpsertResult {
     val isSiteMainAddressTheLegalAddress: Boolean
         get() = site?.value?.mainAddress?.bpn == legalEntity.value.legalAddress.bpn
 
-    data class LegalEntityRecord(
+    data class LegalEntity(
         override val legalEntity: UpsertResult<LegalEntityDb>,
         override val confidenceUpdates: SharingMemberConfidenceService.Result
-    ) : GoldenRecordUpsertResult {
+    ) : GoldenRecordTaskUpsertResult {
         override val recordAddress: LogisticAddressDb get() = legalEntity.value.legalAddress
         override val site: UpsertResult<SiteDb>? get() = null
         override val additionalAddress: UpsertResult<LogisticAddressDb>? get() = null
     }
 
-    data class SiteRecord(
+    data class Site(
         override val legalEntity: UpsertResult<LegalEntityDb>,
         override val site: UpsertResult<SiteDb>,
         override val confidenceUpdates: SharingMemberConfidenceService.Result
-    ) : GoldenRecordUpsertResult {
+    ) : GoldenRecordTaskUpsertResult {
         override val recordAddress: LogisticAddressDb get() = site.value.mainAddress
         override val additionalAddress: UpsertResult<LogisticAddressDb>? get() = null
     }
 
-    data class LegalEntityAddressRecord(
+    data class LegalEntityAddress(
         override val legalEntity: UpsertResult<LegalEntityDb>,
         override val additionalAddress: UpsertResult<LogisticAddressDb>,
         override val confidenceUpdates: SharingMemberConfidenceService.Result
-    ) : GoldenRecordUpsertResult {
+    ) : GoldenRecordTaskUpsertResult {
         override val recordAddress: LogisticAddressDb get() = additionalAddress.value
         override val site: UpsertResult<SiteDb>? get() = null
     }
 
-    data class SiteAddressRecord(
+    data class SiteAddress(
         override val legalEntity: UpsertResult<LegalEntityDb>,
         override val site: UpsertResult<SiteDb>,
         override val additionalAddress: UpsertResult<LogisticAddressDb>,
         override val confidenceUpdates: SharingMemberConfidenceService.Result
-    ) : GoldenRecordUpsertResult {
+    ) : GoldenRecordTaskUpsertResult {
         override val recordAddress: LogisticAddressDb get() = additionalAddress.value
     }
 }

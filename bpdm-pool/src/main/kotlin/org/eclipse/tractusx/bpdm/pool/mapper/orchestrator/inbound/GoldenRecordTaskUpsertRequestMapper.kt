@@ -31,7 +31,7 @@ import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto as TaskEntry
 
 /**
- * Maps a reserved golden record task into the loose [GoldenRecordUpsertRequest], delegating each partner's content to
+ * Maps a reserved golden record task into the loose [GoldenRecordTaskUpsertRequest], delegating each partner's content to
  * the mapper that owns it.
  *
  * The task model states several things by omission, and each becomes a shape here: a site without a main address is a
@@ -48,9 +48,9 @@ class GoldenRecordTaskUpsertRequestMapper(
 ) {
 
     /** The upsert the task asks for, with every partner addressed by the reference the task gave it. */
-    fun toRequest(taskEntry: TaskEntry): GoldenRecordUpsertRequest {
+    fun toRequest(taskEntry: TaskEntry): GoldenRecordTaskUpsertRequest {
         val businessPartner = taskEntry.businessPartner
-        return GoldenRecordUpsertRequest(
+        return GoldenRecordTaskUpsertRequest(
             sharingMemberRecordId = taskEntry.recordId,
             legalEntity = toLegalEntityRequest(businessPartner.legalEntity),
             recordSite = RecordSiteRequest(

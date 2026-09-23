@@ -20,7 +20,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-data class GoldenRecordUpsertRequest(
+data class GoldenRecordTaskUpsertRequest(
     val sharingMemberRecordId: String,
     val legalEntity: LegalEntityUpsertRequest,
     val recordSite: RecordSiteRequest,

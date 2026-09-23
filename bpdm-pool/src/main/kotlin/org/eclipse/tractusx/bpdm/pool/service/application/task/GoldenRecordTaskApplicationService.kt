@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskUpsertRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoldenRecordTaskResultMapper
-import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
-import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordUpsertService
+import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordTaskUpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskUpsertParseError
+import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordTaskUpsertService
 import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskUpsertParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional
 class GoldenRecordTaskApplicationService(
     private val upsertRequestMapper: GoldenRecordTaskUpsertRequestMapper,
     private val upsertParser: GoldenRecordTaskUpsertParser,
-    private val upsertService: GoldenRecordUpsertService,
+    private val upsertService: GoldenRecordTaskUpsertService,
     private val parseErrorMapper: GoldenRecordTaskParseErrorMapper,
     private val taskResultMapper: GoldenRecordTaskResultMapper
 ) {
@@ -62,14 +62,14 @@ class GoldenRecordTaskApplicationService(
         }
     }
 
-    private fun toErrorReply(taskEntry: TaskStepReservationEntryDto, errors: List<GoldenRecordUpsertParseError>): TaskStepResultEntryDto =
+    private fun toErrorReply(taskEntry: TaskStepReservationEntryDto, errors: List<GoldenRecordTaskUpsertParseError>): TaskStepResultEntryDto =
         TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
             businessPartner = taskEntry.businessPartner,
             errors = errors.map { TaskErrorDto(TaskErrorType.Unspecified, parseErrorMapper.toUpsertDescription(it)) }
         )
 
-    private fun toSuccessReply(taskEntry: TaskStepReservationEntryDto, written: GoldenRecordUpsertResult): TaskStepResultEntryDto =
+    private fun toSuccessReply(taskEntry: TaskStepReservationEntryDto, written: GoldenRecordTaskUpsertResult): TaskStepResultEntryDto =
         TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
             businessPartner = taskResultMapper.toTaskResult(taskEntry.businessPartner, written),

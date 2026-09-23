@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component
 @Component
 class GoldenRecordTaskParseErrorMapper {
 
-    fun toUpsertDescription(error: GoldenRecordUpsertParseError): String =
+    fun toUpsertDescription(error: GoldenRecordTaskUpsertParseError): String =
         when (error) {
             is LegalEntityContentInvalid -> toLegalEntityContentDescription(error.error)
             is LegalAddressContentInvalid -> toAddressContentDescription(error.error)

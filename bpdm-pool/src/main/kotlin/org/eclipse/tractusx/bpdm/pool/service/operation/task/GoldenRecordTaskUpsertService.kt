@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordUpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordTaskUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordTaskUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AdditionalSitesParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityAssociationFetchService
@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
  * rather than creating a second one.
  */
 @Service
-class GoldenRecordUpsertService(
+class GoldenRecordTaskUpsertService(
     private val legalEntityUpsertService: LegalEntityUpsertService,
     private val siteUpsertService: SiteUpsertService,
     private val additionalAddressUpsertService: AdditionalAddressUpsertService,
@@ -55,7 +55,7 @@ class GoldenRecordUpsertService(
      * from.
      */
     @Transactional
-    fun upsert(parsed: GoldenRecordUpsertParsed): GoldenRecordUpsertResult {
+    fun upsert(parsed: GoldenRecordTaskUpsertParsed): GoldenRecordTaskUpsertResult {
         val issued = mutableMapOf<String, String>()
 
         val legalEntity = legalEntityUpsertService.upsert(parsed.legalEntity)
@@ -63,42 +63,42 @@ class GoldenRecordUpsertService(
         issued.issue(parsed.legalEntity.legalAddressReference, legalEntity.value.legalAddress.bpn)
 
         val records = when (parsed) {
-            is GoldenRecordUpsertParsed.LegalEntityRecord ->
-                GoldenRecordUpsertResult.LegalEntityRecord(
+            is GoldenRecordTaskUpsertParsed.LegalEntity ->
+                GoldenRecordTaskUpsertResult.LegalEntity(
                     legalEntity,
                     confidenceUpdates(parsed, legalEntity.value.legalAddress)
                 )
 
-            is GoldenRecordUpsertParsed.LegalEntityAddressRecord -> {
+            is GoldenRecordTaskUpsertParsed.LegalEntityAddress -> {
                 val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site = null)
                 issued.issue(parsed.address.addressReference, address.value.bpn)
-                GoldenRecordUpsertResult.LegalEntityAddressRecord(
+                GoldenRecordTaskUpsertResult.LegalEntityAddress(
                     legalEntity,
                     address,
                     confidenceUpdates(parsed, address.value)
                 )
             }
 
-            is GoldenRecordUpsertParsed.SiteRecord -> {
-                val site = siteUpsertService.upsert(parsed.site, legalEntity.value)
-                issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
-                val additionalSites = additionalSiteUpsertService.upsert(parsed.additionalSites, site.value, site.value.mainAddress)
-                issued.issueAdditionalSites(parsed.additionalSites, additionalSites)
-                GoldenRecordUpsertResult.SiteRecord(
+            is GoldenRecordTaskUpsertParsed.Site -> {
+                val site = siteUpsertService.upsert(parsed.sites.recordSite, legalEntity.value)
+                issued.issueSite(parsed.sites.recordSite, site.value.bpn, site.value.mainAddress.bpn)
+                val additionalSites = additionalSiteUpsertService.upsert(parsed.sites.additionalSites, site.value, site.value.mainAddress)
+                issued.issueAdditionalSites(parsed.sites.additionalSites, additionalSites)
+                GoldenRecordTaskUpsertResult.Site(
                     legalEntity,
                     site,
                     confidenceUpdates(parsed, site.value.mainAddress)
                 )
             }
 
-            is GoldenRecordUpsertParsed.SiteAddressRecord -> {
-                val site = siteUpsertService.upsert(parsed.site, legalEntity.value)
-                issued.issueSite(parsed.site, site.value.bpn, site.value.mainAddress.bpn)
+            is GoldenRecordTaskUpsertParsed.SiteAddress -> {
+                val site = siteUpsertService.upsert(parsed.sites.recordSite, legalEntity.value)
+                issued.issueSite(parsed.sites.recordSite, site.value.bpn, site.value.mainAddress.bpn)
                 val address = additionalAddressUpsertService.upsert(parsed.address, legalEntity.value, site.value)
                 issued.issue(parsed.address.addressReference, address.value.bpn)
-                val additionalSites = additionalSiteUpsertService.upsert(parsed.additionalSites, site.value, address.value)
-                issued.issueAdditionalSites(parsed.additionalSites, additionalSites)
-                GoldenRecordUpsertResult.SiteAddressRecord(
+                val additionalSites = additionalSiteUpsertService.upsert(parsed.sites.additionalSites, site.value, address.value)
+                issued.issueAdditionalSites(parsed.sites.additionalSites, additionalSites)
+                GoldenRecordTaskUpsertResult.SiteAddress(
                     legalEntity,
                     site,
                     address,
@@ -114,7 +114,7 @@ class GoldenRecordUpsertService(
     }
 
     private fun confidenceUpdates(
-        parsed: GoldenRecordUpsertParsed,
+        parsed: GoldenRecordTaskUpsertParsed,
         recordAddress: LogisticAddressDb
     ): SharingMemberConfidenceService.Result =
         // The record now shares the address it is about, which is what the count of sharing members per golden

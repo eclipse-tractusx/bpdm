@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteOmitted
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordAddressSitesParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
@@ -44,20 +44,21 @@ class AdditionalSitesCompletenessValidator(
 ) {
 
     /**
-     * Reports every site the record address is the main address of that [recordSite] leaves out.
+     * Reports every site the record address is the main address of that [recordAddressSites] leaves out.
      */
     @Transactional(readOnly = true)
     fun validate(
         legalEntity: LegalEntityUpsertParsed?,
-        recordSite: RecordSiteParsed?,
+        recordAddressSites: RecordAddressSitesParsed?,
         additionalAddress: AddressUpsertParsed?
     ): List<AdditionalSiteOmitted> {
-        if (recordSite == null) return emptyList()
+        if (recordAddressSites == null) return emptyList()
         // An address this request creates is not yet the main address of anything, so there is nothing to leave out.
-        val recordAddress = existingRecordAddress(legalEntity, recordSite.site, additionalAddress) ?: return emptyList()
+        val recordAddress = existingRecordAddress(legalEntity, recordAddressSites.recordSite, additionalAddress) ?: return emptyList()
 
         // The record's own site holds the record address whether or not the request repeats it.
-        val statedSites = recordSite.additionalSites.existingSites.plus(listOfNotNull(existingSite(recordSite.site)))
+        val statedSites = recordAddressSites.additionalSites.existingSites
+            .plus(listOfNotNull(existingSite(recordAddressSites.recordSite)))
 
         return siteMainAddressConsistencyValidator.findOmittedSites(recordAddress, statedSites).map { AdditionalSiteOmitted(it.bpn) }
     }

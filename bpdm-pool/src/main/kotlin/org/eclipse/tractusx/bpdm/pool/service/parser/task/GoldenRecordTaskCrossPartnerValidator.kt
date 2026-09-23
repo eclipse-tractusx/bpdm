@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordAddressSitesParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordTaskUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.RecordSiteRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpsertRequest
 import org.springframework.stereotype.Service
@@ -36,11 +36,11 @@ import org.springframework.transaction.annotation.Transactional
  * the address they will sit on, which is why the parsed partners are taken as well.
  */
 @Service
-class GoldenRecordCrossPartnerValidator(
+class GoldenRecordTaskCrossPartnerValidator(
     private val bpnReferenceParser: BpnReferenceParser,
     private val sharedLegalAddressScriptCodeValidator: SharedLegalAddressScriptCodeValidator,
     private val taskAddressDistinctnessValidator: TaskAddressDistinctnessValidator,
-    private val parentConsistencyValidator: GoldenRecordParentConsistencyValidator,
+    private val parentConsistencyValidator: GoldenRecordTaskParentConsistencyValidator,
     private val additionalSitesCompletenessValidator: AdditionalSitesCompletenessValidator
 ) {
 
@@ -49,23 +49,23 @@ class GoldenRecordCrossPartnerValidator(
      */
     @Transactional(readOnly = true)
     fun validate(
-        request: GoldenRecordUpsertRequest,
+        request: GoldenRecordTaskUpsertRequest,
         legalEntity: LegalEntityUpsertParsed?,
-        recordSite: RecordSiteParsed?,
+        recordAddressSites: RecordAddressSitesParsed?,
         additionalAddress: AddressUpsertParsed?
     ): List<CrossPartnerParseError> =
         sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.recordSite.site)
             .plus(validateStatedAddressDistinctness(request))
             .plus(validateAdditionalSitesHaveRecordSite(request.recordSite))
             .plus(parentConsistencyValidator.validate(request))
-            .plus(additionalSitesCompletenessValidator.validate(legalEntity, recordSite, additionalAddress))
+            .plus(additionalSitesCompletenessValidator.validate(legalEntity, recordAddressSites, additionalAddress))
 
     // The additional sites share the record address with the record's own site, so there has to be one.
     private fun validateAdditionalSitesHaveRecordSite(recordSite: RecordSiteRequest): List<CrossPartnerParseError> =
         if (recordSite.site == null && recordSite.additionalSites.isNotEmpty()) listOf(AdditionalSitesWithoutSite)
         else emptyList()
 
-    private fun validateStatedAddressDistinctness(request: GoldenRecordUpsertRequest): List<CrossPartnerParseError> =
+    private fun validateStatedAddressDistinctness(request: GoldenRecordTaskUpsertRequest): List<CrossPartnerParseError> =
         taskAddressDistinctnessValidator.validate(
             bpnReferenceParser.parse(request.legalEntity.legalAddress.reference),
             (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { bpnReferenceParser.parse(it.mainAddress.reference) },

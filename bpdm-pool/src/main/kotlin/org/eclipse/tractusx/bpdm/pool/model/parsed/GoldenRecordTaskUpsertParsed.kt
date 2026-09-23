@@ -33,39 +33,37 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
  * Parents are not stated on the children: a request has one legal entity and at most one site, so whoever executes
  * the parse already holds them.
  */
-sealed interface GoldenRecordUpsertParsed {
+sealed interface GoldenRecordTaskUpsertParsed {
     val sharingMemberRecordId: String
     val legalEntity: LegalEntityUpsertParsed
 
     /** A task about a legal entity: the record address is its legal address, and no site sits on that address. */
-    data class LegalEntityRecord(
+    data class LegalEntity(
         override val sharingMemberRecordId: String,
         override val legalEntity: LegalEntityUpsertParsed
-    ) : GoldenRecordUpsertParsed
+    ) : GoldenRecordTaskUpsertParsed
 
-    /** A task about a site: the record address is the site's main address, shared with [additionalSites]. */
-    data class SiteRecord(
+    /** A task about a site: the record address is the site's main address, shared with the further sites on it. */
+    data class Site(
         override val sharingMemberRecordId: String,
         override val legalEntity: LegalEntityUpsertParsed,
-        val site: SiteUpsertParsed,
-        val additionalSites: AdditionalSitesParsed
-    ) : GoldenRecordUpsertParsed
+        val sites: RecordAddressSitesParsed
+    ) : GoldenRecordTaskUpsertParsed
 
     /** A task about an address of a legal entity: the record address is that address, and no site sits on it. */
-    data class LegalEntityAddressRecord(
+    data class LegalEntityAddress(
         override val sharingMemberRecordId: String,
         override val legalEntity: LegalEntityUpsertParsed,
         val address: AddressUpsertParsed
-    ) : GoldenRecordUpsertParsed
+    ) : GoldenRecordTaskUpsertParsed
 
-    /** A task about an address of a site: the record address is that address, shared with [additionalSites]. */
-    data class SiteAddressRecord(
+    /** A task about an address of a site: the record address is that address, shared with the further sites on it. */
+    data class SiteAddress(
         override val sharingMemberRecordId: String,
         override val legalEntity: LegalEntityUpsertParsed,
-        val site: SiteUpsertParsed,
-        val address: AddressUpsertParsed,
-        val additionalSites: AdditionalSitesParsed
-    ) : GoldenRecordUpsertParsed
+        val sites: RecordAddressSitesParsed,
+        val address: AddressUpsertParsed
+    ) : GoldenRecordTaskUpsertParsed
 }
 
 sealed interface LegalEntityUpsertParsed {
@@ -148,13 +146,14 @@ sealed interface AddressUpsertParsed {
 }
 
 /**
- * The site a golden record upsert writes, together with the further sites its record address ends up shared with.
+ * Every site that ends up on the record address: the site the golden record upsert is about and the further sites
+ * sharing that address.
  *
  * [additionalSites] starts as what the request stated and is completed with the sites already bound to that address
  * by their own main-address relation, so it is broader than the list the request carried.
  */
-data class RecordSiteParsed(
-    val site: SiteUpsertParsed,
+data class RecordAddressSitesParsed(
+    val recordSite: SiteUpsertParsed,
     val additionalSites: AdditionalSitesParsed
 )
 

@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AdditionalSiteNotInLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInRequestLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnReferenceRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordTaskUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.springframework.stereotype.Service
@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional
  * for: its BPN resolves to none, so every site that does resolve belongs to a different legal entity.
  */
 @Service
-class GoldenRecordParentConsistencyValidator(
+class GoldenRecordTaskParentConsistencyValidator(
     private val bpnReferenceParser: BpnReferenceParser,
     private val siteBpnParser: SiteBpnParser,
     private val addressBpnParser: AddressBpnParser
@@ -54,7 +54,7 @@ class GoldenRecordParentConsistencyValidator(
      * Reports every violation of the rule in [request].
      */
     @Transactional(readOnly = true)
-    fun validate(request: GoldenRecordUpsertRequest): List<ParentConsistencyParseError> {
+    fun validate(request: GoldenRecordTaskUpsertRequest): List<ParentConsistencyParseError> {
         val legalEntityBpn = resolveBpn(request.legalEntity.reference)
         val siteBpn = request.recordSite.site?.let { resolveBpn(it.reference) }
         // A membership stated without a site is rejected on its own, so judging its entries here would fault the same

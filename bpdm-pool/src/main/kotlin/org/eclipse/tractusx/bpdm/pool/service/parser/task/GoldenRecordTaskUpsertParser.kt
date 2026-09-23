@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordUpsertParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordTaskUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordAddressSitesParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordTaskUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -45,52 +45,50 @@ class GoldenRecordTaskUpsertParser(
     private val siteUpsertParser: SiteUpsertParser,
     private val additionalAddressUpsertParser: AdditionalAddressUpsertParser,
     private val additionalSitesParser: AdditionalSitesParser,
-    private val crossPartnerValidator: GoldenRecordCrossPartnerValidator
+    private val crossPartnerValidator: GoldenRecordTaskCrossPartnerValidator
 ) {
 
     /**
      * Reports what [request] amounts to, or every problem that stops it.
      */
     @Transactional(readOnly = true)
-    fun parse(request: GoldenRecordUpsertRequest): ParseResult<GoldenRecordUpsertParsed, GoldenRecordUpsertParseError> {
+    fun parse(request: GoldenRecordTaskUpsertRequest): ParseResult<GoldenRecordTaskUpsertParsed, GoldenRecordTaskUpsertParseError> {
         val legalEntity = legalEntityUpsertParser.parse(request.legalEntity)
-        val recordSite = parseRecordSite(request)
+        val recordAddressSites = parseRecordAddressSites(request)
         val additionalAddress = request.additionalAddress?.let { additionalAddressUpsertParser.parse(it) } ?: ParseResult.Success(null)
 
         val contradictions = crossPartnerValidator.validate(
-            request, legalEntity.parsedOrNull(), recordSite.parsedOrNull(), additionalAddress.parsedOrNull()
+            request, legalEntity.parsedOrNull(), recordAddressSites.parsedOrNull(), additionalAddress.parsedOrNull()
         )
 
-        return zipParseResults(legalEntity, recordSite, additionalAddress) { legalEntityPlan, sitePlan, addressPlan ->
-            toUpsertParsed(request.sharingMemberRecordId, legalEntityPlan, sitePlan, addressPlan)
+        return zipParseResults(legalEntity, recordAddressSites, additionalAddress) { legalEntityPlan, sitesPlan, addressPlan ->
+            toUpsertParsed(request.sharingMemberRecordId, legalEntityPlan, sitesPlan, addressPlan)
         }.combine(contradictions) { it }
     }
 
-    private fun parseRecordSite(request: GoldenRecordUpsertRequest): ParseResult<RecordSiteParsed?, GoldenRecordUpsertParseError> =
+    private fun parseRecordAddressSites(request: GoldenRecordTaskUpsertRequest): ParseResult<RecordAddressSitesParsed?, GoldenRecordTaskUpsertParseError> =
         request.recordSite.site?.let { siteRequest ->
             zipParseResults(
                 siteUpsertParser.parse(siteRequest),
                 additionalSitesParser.parse(request.recordSite.additionalSites, siteRequest.header.confidenceCriteria),
-                ::RecordSiteParsed
+                ::RecordAddressSitesParsed
             )
         } ?: ParseResult.Success(null)
 
     private fun toUpsertParsed(
         sharingMemberRecordId: String,
         legalEntity: LegalEntityUpsertParsed,
-        recordSite: RecordSiteParsed?,
+        recordAddressSites: RecordAddressSitesParsed?,
         additionalAddress: AddressUpsertParsed?
-    ): GoldenRecordUpsertParsed =
+    ): GoldenRecordTaskUpsertParsed =
         when {
-            recordSite != null && additionalAddress != null ->
-                GoldenRecordUpsertParsed.SiteAddressRecord(
-                    sharingMemberRecordId, legalEntity, recordSite.site, additionalAddress, recordSite.additionalSites
-                )
-            recordSite != null ->
-                GoldenRecordUpsertParsed.SiteRecord(sharingMemberRecordId, legalEntity, recordSite.site, recordSite.additionalSites)
+            recordAddressSites != null && additionalAddress != null ->
+                GoldenRecordTaskUpsertParsed.SiteAddress(sharingMemberRecordId, legalEntity, recordAddressSites, additionalAddress)
+            recordAddressSites != null ->
+                GoldenRecordTaskUpsertParsed.Site(sharingMemberRecordId, legalEntity, recordAddressSites)
             additionalAddress != null ->
-                GoldenRecordUpsertParsed.LegalEntityAddressRecord(sharingMemberRecordId, legalEntity, additionalAddress)
+                GoldenRecordTaskUpsertParsed.LegalEntityAddress(sharingMemberRecordId, legalEntity, additionalAddress)
             else ->
-                GoldenRecordUpsertParsed.LegalEntityRecord(sharingMemberRecordId, legalEntity)
+                GoldenRecordTaskUpsertParsed.LegalEntity(sharingMemberRecordId, legalEntity)
         }
 }

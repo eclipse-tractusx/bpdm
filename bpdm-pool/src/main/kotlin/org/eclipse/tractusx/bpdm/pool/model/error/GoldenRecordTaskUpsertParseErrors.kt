@@ -30,22 +30,22 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  * parser's signature learns its whole range of rejections. An error several parsers can raise subtypes each of their
  * interfaces; only the parser that joins them all reports this one.
  */
-sealed interface GoldenRecordUpsertParseError
+sealed interface GoldenRecordTaskUpsertParseError
 
 /** What parsing the legal entity of a golden record upsert can be faulted for. */
-sealed interface LegalEntityUpsertParseError : GoldenRecordUpsertParseError
+sealed interface LegalEntityUpsertParseError : GoldenRecordTaskUpsertParseError
 
 /** What parsing the site of a golden record upsert can be faulted for. */
-sealed interface SiteUpsertParseError : GoldenRecordUpsertParseError
+sealed interface SiteUpsertParseError : GoldenRecordTaskUpsertParseError
 
 /** What parsing the additional address of a golden record upsert can be faulted for. */
-sealed interface AdditionalAddressUpsertParseError : GoldenRecordUpsertParseError
+sealed interface AdditionalAddressUpsertParseError : GoldenRecordTaskUpsertParseError
 
 /** What parsing the sites stated as sharing the record address can be faulted for. */
-sealed interface AdditionalSitesParseError : GoldenRecordUpsertParseError
+sealed interface AdditionalSitesParseError : GoldenRecordTaskUpsertParseError
 
 /** What the partners of one golden record upsert can contradict each other over. */
-sealed interface CrossPartnerParseError : GoldenRecordUpsertParseError
+sealed interface CrossPartnerParseError : GoldenRecordTaskUpsertParseError
 
 /** The ways two of the addresses one upsert states can turn out to be the same address. */
 sealed interface StatedAddressDistinctnessParseError : CrossPartnerParseError
