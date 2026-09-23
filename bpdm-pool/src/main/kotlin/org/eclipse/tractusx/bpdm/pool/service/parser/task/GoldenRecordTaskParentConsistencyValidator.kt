@@ -56,11 +56,11 @@ class GoldenRecordTaskParentConsistencyValidator(
     @Transactional(readOnly = true)
     fun validate(request: GoldenRecordTaskUpsertRequest): List<ParentConsistencyParseError> {
         val legalEntityBpn = resolveBpn(request.legalEntity.reference)
-        val siteBpn = request.recordSite.site?.let { resolveBpn(it.reference) }
+        val siteBpn = request.sites.recordSite?.let { resolveBpn(it.reference) }
         // A membership stated without a site is rejected on its own, so judging its entries here would fault the same
         // statement twice.
-        val additionalSiteBpns = request.recordSite.site
-            ?.let { request.recordSite.additionalSites.mapNotNull { additionalSite -> resolveBpn(additionalSite.reference) }.distinct() }
+        val additionalSiteBpns = request.sites.recordSite
+            ?.let { request.sites.additionalSites.mapNotNull { additionalSite -> resolveBpn(additionalSite.reference) }.distinct() }
             ?: emptyList()
         val additionalAddressBpn = request.additionalAddress?.let { resolveBpn(it.reference) }
 

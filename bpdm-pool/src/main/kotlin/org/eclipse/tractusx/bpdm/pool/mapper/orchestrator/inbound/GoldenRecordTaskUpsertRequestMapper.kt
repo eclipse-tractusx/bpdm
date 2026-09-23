@@ -53,8 +53,8 @@ class GoldenRecordTaskUpsertRequestMapper(
         return GoldenRecordTaskUpsertRequest(
             sharingMemberRecordId = taskEntry.recordId,
             legalEntity = toLegalEntityRequest(businessPartner.legalEntity),
-            recordSite = RecordSiteRequest(
-                site = businessPartner.site?.let { toSiteRequest(it) },
+            sites = RecordAddressSitesRequest(
+                recordSite = businessPartner.site?.let { toSiteRequest(it) },
                 additionalSites = businessPartner.additionalSites.map { toSiteReferenceRequest(it) }
             ),
             additionalAddress = businessPartner.additionalAddress?.let { toAddressRequest(it) }
