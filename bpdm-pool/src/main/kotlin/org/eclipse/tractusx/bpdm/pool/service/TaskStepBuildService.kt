@@ -91,7 +91,6 @@ class TaskStepBuildService(
     private val addressUpdateService: AddressUpdateService,
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
     private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
-    private val coverageValidator: TaskScriptVariantCoverageValidator
 ) {
 
     enum class CleaningError(val message: String) {
@@ -122,7 +121,6 @@ class TaskStepBuildService(
         val businessPartnerDto = taskEntry.businessPartner
 
         assertParentsConsistent(businessPartnerDto, taskEntryBpnMapping)
-        assertScriptVariantCoverage(businessPartnerDto, taskEntryBpnMapping)
 
         val legalEntityResult = processLegalEntity(businessPartnerDto, taskEntryBpnMapping)
         val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
@@ -285,7 +283,7 @@ class TaskStepBuildService(
 
     private fun updateLegalEntity(bpnL: String, legalEntity: LegalEntity): LegalEntityDb {
         val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
-        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parseWithoutCoverageCheck, legalEntityPayloadUpdateService::update).single()) {
+        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityUpdateError(it) })
         }
@@ -386,7 +384,7 @@ class TaskStepBuildService(
             createSite(legalEntityBpn, mergedSite, siteMainAddress, isSiteMainAndLegalAddress)
         }
         else {
-            updateSite(bpnS, mergedSite, siteMainAddress, businessPartner.legalAddressCoverageNotStatedBy(mergedSite))
+            updateSite(bpnS, mergedSite, siteMainAddress)
         }
 
         taskEntryBpnMapping.addMapping(bpnSReference, upsertedSite.bpn)
@@ -416,14 +414,9 @@ class TaskStepBuildService(
         }
     }
 
-    private fun updateSite(
-        bpnS: String,
-        site: Site,
-        mainAddress: PostalAddress,
-        additionalMainAddressScriptVariants: List<PostalAddressScriptVariantWithScriptCode>
-    ): SiteDb {
-        val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress, additionalMainAddressScriptVariants)
-        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parseWithoutCoverageCheck, sitePayloadUpdateService::update).single()) {
+    private fun updateSite(bpnS: String, site: Site, mainAddress: PostalAddress): SiteDb {
+        val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress)
+        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parse, sitePayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderSiteUpdateError(it) })
         }
@@ -557,7 +550,6 @@ class TaskStepBuildService(
 
     private fun renderAddressUpdateError(error: AddressUpdateParseError): String =
         when (error) {
-            is ScriptVariantCoverageParseError -> renderScriptVariantCoverageError(error)
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
             is AddressContentParseError -> renderAddressContentError(error)
@@ -611,7 +603,6 @@ class TaskStepBuildService(
 
     private fun renderLegalEntityCreateError(error: LegalEntityCreateParseError): String =
         when (error) {
-            is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
             is LegalEntityContentParseError -> renderLegalEntityContentError(error)
             is AddressContentParseError -> renderAddressContentError(error)
         }
@@ -624,7 +615,6 @@ class TaskStepBuildService(
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
             is AlternativeHeadquarterCannotOwnUltimately ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
-            is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
             is LegalEntityContentParseError -> renderLegalEntityContentError(error)
             is AddressContentParseError -> renderAddressContentError(error)
         }
@@ -650,7 +640,7 @@ class TaskStepBuildService(
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
-            is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
+            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
             is SiteContentParseError -> renderSiteContentError(error)
             is AddressContentParseError -> renderAddressContentError(error)
         }
@@ -658,28 +648,8 @@ class TaskStepBuildService(
     private fun renderSiteUpdateError(error: SiteUpdateParseError): String =
         when (error) {
             is UnresolvableSite -> "Site ${error.bpn} not found"
-            is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
             is SiteContentParseError -> renderSiteContentError(error)
             is AddressContentParseError -> renderAddressContentError(error)
-        }
-
-    private fun renderScriptVariantCoverageError(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"
-            is ScriptVariantCoverageStillNeeded ->
-                "Script code '${error.scriptCode}' must stay covered: business partner ${error.requiredByBpn} is named in that script"
-        }
-
-    private fun renderLegalAddressCoverageError(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the legal address"
-            is ScriptVariantCoverageStillNeeded -> renderScriptVariantCoverageError(error)
-        }
-
-    private fun renderMainAddressCoverageError(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
-            is ScriptVariantCoverageStillNeeded -> renderScriptVariantCoverageError(error)
         }
 
     private fun renderSiteContentError(error: SiteContentParseError): String =
@@ -776,25 +746,6 @@ class TaskStepBuildService(
             confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = legalEntityCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfSharingMembers ?: confidenceCriteria.numberOfSharingMembers),
             legalAddress = legalAddress.withUpdatedNumberOfSharingMembers(legalAddressCandidates)
         )
-    }
-
-    /**
-     * The legal address script variants of the script codes [site] does not state itself. A site whose main address is the
-     * legal address writes that one address, so its payload has to keep covering what the legal entity is named in -
-     * otherwise the last write of the task would decide which of the two partners stays readable.
-     */
-    private fun BusinessPartner.legalAddressCoverageNotStatedBy(site: Site): List<PostalAddressScriptVariantWithScriptCode> {
-        if (!site.siteMainIsLegalAddress) return emptyList()
-
-        val statedScriptCodes = site.scriptVariants.map { it.scriptCode }.toSet()
-        return legalEntity.scriptVariants
-            .filterNot { it.scriptCode in statedScriptCodes }
-            .map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.legalAddress) }
-    }
-
-    private fun assertScriptVariantCoverage(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
-        val violations = coverageValidator.validate(businessPartner, taskEntryBpnMapping)
-        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { renderScriptVariantCoverageError(it) })
     }
 
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {

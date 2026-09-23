@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
@@ -42,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressUpdateService(
     private val addressEntityMapper: AddressEntityMapper,
+    private val scriptVariantCoverageService: AddressScriptVariantCoverageService,
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
     /**
@@ -114,12 +116,15 @@ class AddressUpdateService(
             if (stateKeys(addressEntityMapper.toStates(it)) != stateKeys(target.states)) return true
         }
         update.scriptVariants.ifSet {
-            if (scriptVariantKeys(addressEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+            if (scriptVariantKeys(scriptVariantsAfter(target, it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
         update.sites.ifSet { if (siteKeys(it) != siteKeys(target.sites)) return true }
 
         return false
     }
+
+    private fun scriptVariantsAfter(target: LogisticAddressDb, stated: List<AddressScriptVariantParsed>): List<LogisticAddressScriptVariantDb> =
+        scriptVariantCoverageService.mergeScriptVariants(target, addressEntityMapper.toScriptVariants(stated))
 
     private fun physicalKey(address: PhysicalPostalAddressDb): List<Any?> =
         with(address) {
@@ -167,7 +172,7 @@ class AddressUpdateService(
         update.confidenceCriteria.ifSet { target.confidenceCriteria = addressEntityMapper.toConfidence(it, numberOfSharingMembers) }
         update.identifiers.ifSet { target.identifiers.replace(addressEntityMapper.toIdentifiers(it).onEach { id -> id.address = target }) }
         update.states.ifSet { target.states.replace(addressEntityMapper.toStates(it).onEach { state -> state.address = target }) }
-        update.scriptVariants.ifSet { target.scriptVariants.replace(addressEntityMapper.toScriptVariants(it)) }
+        update.scriptVariants.ifSet { target.scriptVariants.replace(scriptVariantsAfter(target, it)) }
         update.sites.ifSet { target.sites.replace(it) }
     }
 }

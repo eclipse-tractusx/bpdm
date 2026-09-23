@@ -17,6 +17,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Changed
 
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
+- BPDM Pool: An address now keeps the script variants its legal entity and sites are still named in and drops the rest, so a write no longer has to restate another business partner's scripts to keep it readable and the `ScriptVariantCoverageStillNeeded` error is gone
 
 ## [7.5.0] - 2026-09-08
 

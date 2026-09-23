@@ -61,6 +61,8 @@ class LegalEntityUpdateService(
     @Transactional
     fun update(requests: List<LegalEntityUpdate>): List<UpsertResult<LegalEntityDb>> {
         val headerUpdates = requests.map { updateHeader(it) }
+        // Before the address: the address keeps the script variants its partners are named in, so it has to see the
+        // legal entity's new scripts to let go of one it is dropping.
         val legalAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.legalEntity.legalAddress, it.legalAddress) })
 
         val legalEntityChangeResults = headerUpdates.zip(legalAddressUpdates) { headerResult, legalAddressResult ->

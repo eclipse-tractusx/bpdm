@@ -22,12 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateOnAddressRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional
 class SiteCreateOnAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val addressBpnParser: AddressBpnParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator
+    private val mainAddressCoverageValidator: SiteMainAddressCoverageValidator
 ) {
 
     /**
@@ -54,9 +52,10 @@ class SiteCreateOnAddressParser(
     fun parse(requests: List<SiteCreateOnAddressRequest>): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val mainAddressResults = addressBpnParser.parse(requests.map { it.mainAddressBpn })
+
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
-                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
+                mainAddressCoverageValidator.check(mainAddress, header)
             }
 
         return zipParseResults(mainAddressResults, coveredHeaderResults) { mainAddress, header ->

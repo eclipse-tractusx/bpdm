@@ -572,13 +572,34 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
-     * WHEN operator tries to update the legal entity with a script variant of another script code
-     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the site is still named in the script the
-     * update would stop covering on their shared address
+     * GIVEN participant legal entity named in one script
+     * WHEN operator updates it to be named in no script at all
+     * THEN its legal address drops that script variant, because no business partner is named in it any more
      */
     @Test
-    fun `update legal entity into a script its site does not cover`(){
+    fun `update legal entity out of its only script`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .let { it.copy(legalEntity = it.legalEntity.copy(scriptVariants = emptyList())) }
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        assertThat(response.errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(givenLegalEntity.legalAddress.bpna).scriptVariants).isEmpty()
+    }
+
+    /**
+     * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
+     * WHEN operator updates the legal entity into another script code
+     * THEN the update goes through and their shared legal address carries both scripts, because the address keeps the
+     * variant the site is still named in
+     */
+    @Test
+    fun `update legal entity into a script its site does not state`(){
         //GIVEN
         val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
         val coveredScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
@@ -587,16 +608,18 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val givenSite = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
 
         //WHEN
+        val addedScriptCode = scriptCodeOtherThan(setOf(coveredScriptCode))
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
             .withLegalForm(anyKnownLegalForm())
-            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+            .withScriptVariantScriptCode(addedScriptCode)
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        assertThat(response.errors).isEmpty()
 
-        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+        val sharedAddressBpn = poolClient.sites.getSite(givenSite.site.bpns).mainAddress.bpna
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(coveredScriptCode, addedScriptCode)
         assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode })
             .containsExactly(coveredScriptCode)
     }
