@@ -17,30 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.parser.address
+package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.springframework.stereotype.Service
 
 /**
- * Reads the business partners whose names an address has to cover.
+ * Rejects a site named in a script the address it adopts as its main address is not written in.
  */
 @Service
-class AddressPartnerScriptCodeReader {
+class SiteMainAddressCoverageValidator {
 
     /**
-     * Returns the script codes the partners built on [address] are named in today, leaving out every BPN in
-     * [rewrittenBpns] whose new script codes the caller states itself.
+     * Reports one violation per script code the site is named in that the address is not written in.
      */
-    fun storedPartners(address: LogisticAddressDb, rewrittenBpns: Set<String> = emptySet()): List<PartnerScriptCodes> {
-        val legalEntity = address.legalEntity
-            ?.takeIf { it.legalAddress == address && it.bpn !in rewrittenBpns }
-            ?.let { PartnerScriptCodes(it.bpn, it.scriptCodes()) }
-        val sites = address.sites
-            .filter { it.mainAddress == address && it.bpn !in rewrittenBpns }
-            .map { PartnerScriptCodes(it.bpn, it.scriptCodes()) }
-
-        return listOfNotNull(legalEntity).plus(sites)
+    fun check(mainAddress: LogisticAddressDb, header: SiteHeaderParsed): List<ScriptVariantNotCoveredByAddress> {
+        val coveredScriptCodes = mainAddress.scriptCodes().toSet()
+        return header.scriptCodes().filterNot { it in coveredScriptCodes }.map(::ScriptVariantNotCoveredByAddress)
     }
 }

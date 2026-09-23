@@ -345,12 +345,37 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN participant legal entity with a script variant
-     * WHEN operator tries to update its legal address without the script variant the legal entity is named in
-     * THEN operator sees ScriptVariantCoverageStillNeeded error
+     * GIVEN participant legal entity whose legal address also carries a script no business partner is named in
+     * WHEN operator updates that address stating no script variants
+     * THEN only the script its legal entity is named in survives
      */
     @Test
-    fun `try update legal address dropping a script variant its legal entity is named in`() {
+    fun `update legal address dropping a script variant no business partner is named in`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val neededScriptCode = legalEntityResponse.scriptVariants.first().scriptCode
+        val unneededScriptCode = scriptCodeOtherThan(setOf(neededScriptCode))
+        val addRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse)
+            .let { it.copy(scriptVariants = it.scriptVariants.map { variant -> variant.copy(scriptCode = unneededScriptCode) }) }
+        poolClient.addresses.updateAddresses(listOf(addRequest))
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).copy(scriptVariants = emptyList())
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        assertThat(addressResponse.errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(addressRequest.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactly(neededScriptCode)
+    }
+
+    /**
+     * GIVEN participant legal entity with a script variant
+     * WHEN operator updates its legal address without the script variant the legal entity is named in
+     * THEN the address keeps that variant, because omitting one only removes it once no partner needs it
+     */
+    @Test
+    fun `update legal address omitting a script variant its legal entity is named in`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
@@ -359,11 +384,9 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedErrors = legalEntityResponse.scriptVariants
-            .map { ErrorInfo(AddressUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", addressRequest.bpna) }
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
-
-        assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+        assertThat(addressResponse.errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(addressRequest.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrderElementsOf(legalEntityResponse.scriptVariants.map { it.scriptCode })
     }
 
     /**

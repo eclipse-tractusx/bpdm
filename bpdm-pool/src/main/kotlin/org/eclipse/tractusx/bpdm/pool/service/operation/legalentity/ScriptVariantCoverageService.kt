@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Keeps a legal entity named only in the scripts its legal address covers.
  *
- * Requests that would break the rule are rejected by the parsers instead. This maintainer exists for the one writer with
- * no request to reject — the headquarter relocation trigger, which moves a legal entity onto an address it never chose.
  * Call it *after* the write it reacts to; it reads the legal address as it now stands.
  */
 @Service

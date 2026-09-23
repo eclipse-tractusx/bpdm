@@ -20,29 +20,23 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 
 /**
- * Validates site-create requests: the parent legal entity, the header content, the new main address, and that the main
- * address covers every script code the header names.
+ * Validates site-create requests: the parent legal entity, the header content and the new main address.
  */
 @Service
 class SiteCreateParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val addressContentParser: AddressContentParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator
+    private val addressContentParser: AddressContentParser
 ) {
 
     /**
@@ -54,12 +48,8 @@ class SiteCreateParser(
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val mainAddresses = requests.map { it.content.mainAddress }
         val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
-        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
-            crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
-                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
-            }
 
-        return zipParseResults(coveredHeaderResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
+        return zipParseResults(headerResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
             SiteCreateParsed(legalEntity, SiteContentParsed(header, mainAddress))
         }
     }

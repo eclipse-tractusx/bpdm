@@ -49,10 +49,9 @@ class GoldenRecordTaskSiteRequestMapper(
     fun toUpdateRequest(
         siteBpn: String,
         site: TaskSite,
-        mainAddress: TaskPostalAddress,
-        additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
+        mainAddress: TaskPostalAddress
     ): SiteUpdateRequest =
-        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
+        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress))
 
     fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRequest =
         SiteCreateWithLegalAddressAsMainRequest(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site))
