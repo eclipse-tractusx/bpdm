@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes, delegating main-address errors to
- * [AddressParseErrorMapper].
+ * Maps the site services' sealed parse errors to the `/sites` error codes, delegating main-address errors to the
+ * address error mapper.
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
  * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
@@ -40,6 +40,7 @@ class SiteParseErrorMapper(
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
+    /** The error a failed site create reports for the given parse error. */
     fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
         when (error) {
             is UnresolvableLegalEntity ->
@@ -62,6 +63,7 @@ class SiteParseErrorMapper(
             )
         }
 
+    /** The error a failed site update reports for the given parse error. */
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
         when (error) {
             is UnresolvableSite ->

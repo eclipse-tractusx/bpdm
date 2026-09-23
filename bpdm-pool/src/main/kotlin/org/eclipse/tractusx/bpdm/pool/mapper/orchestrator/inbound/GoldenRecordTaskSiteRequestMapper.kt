@@ -30,20 +30,23 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWit
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 
 /**
- * Maps a cleaning task's site into the loose [SiteCreateRequest] / [SiteUpdateRequest] /
- * [SiteCreateWithReferencedAddressAsMainRequest]; the main address is delegated to
- * [GoldenRecordTaskAddressRequestMapper] and resolved by the caller (the site's own address, or the legal address when
- * the site main is the legal address). Unlike the pass-through elsewhere, a missing [SiteState] type throws here — the
- * loose request's type is non-null by contract.
+ * Maps a cleaning task's site into the loose site create and update requests, delegating the main address to the task's
+ * address mapper.
+ *
+ * Which address is the main address is the caller's to decide — the site's own, or the legal address where the site
+ * sits on it. Unlike the pass-through elsewhere, a missing business state type throws here, because the loose request's
+ * type is non-null by contract.
  */
 @Component
 class GoldenRecordTaskSiteRequestMapper(
     private val addressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
+    /** The request to create the site the task states, under the given legal entity and on the given main address. */
     fun toCreateRequest(legalEntityBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateRequest =
         SiteCreateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(site, mainAddress))
 
+    /** The request to write what the task states over the given site, main address included. */
     fun toUpdateRequest(
         siteBpn: String,
         site: TaskSite,

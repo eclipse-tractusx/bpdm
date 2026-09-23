@@ -19,4 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
+/**
+ * A site is named in a script that the address it sits on does not carry, so that name would have no address to go with
+ * it.
+ */
 data class ScriptVariantNotCoveredByAddress(val scriptCode: String) : SiteCreateParseError

@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes, delegating
- * legal-address errors to [AddressParseErrorMapper].
+ * Maps the legal-entity services' sealed parse errors to the `/legal-entities` error codes, delegating
+ * legal-address errors to the address error mapper.
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
  * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
@@ -40,6 +40,7 @@ class LegalEntityParseErrorMapper(
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
+    /** The error a failed legal-entity create reports for the given parse error. */
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
@@ -55,6 +56,7 @@ class LegalEntityParseErrorMapper(
             )
         }
 
+    /** The error a failed legal-entity update reports for the given parse error. */
     fun toUpdateErrorInfo(error: LegalEntityUpdateParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
         when (error) {
             is UnresolvableLegalEntity ->

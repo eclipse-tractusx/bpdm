@@ -31,14 +31,14 @@ import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto as TaskEntry
 
 /**
- * Maps a reserved golden record task into the loose [GoldenRecordTaskUpsertRequest], delegating each partner's content to
+ * Maps a reserved golden record task into the loose golden record upsert request, delegating each partner's content to
  * the mapper that owns it.
  *
  * The task model states several things by omission, and each becomes a shape here: a site without a main address is a
- * [SiteUpsertRequest.WithLegalAddressAsMain], and `hasChanged` is the [UpsertIntent] it actually expresses - it
- * suppresses an update, never a create. What the task states only implicitly and cannot be decided before its
- * references are resolved - create against update, a membership entry naming an existing site against a new one - is
- * left to the parser.
+ * site on the legal address, and `hasChanged` becomes the upsert intent it actually expresses — it suppresses an
+ * update, never a create. What the task states only implicitly and cannot be decided before its references are
+ * resolved — create against update, a membership entry naming an existing site against a new one — is left to the
+ * parser.
  */
 @Component
 class GoldenRecordTaskUpsertRequestMapper(

@@ -26,10 +26,11 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 
 /**
- * Builds a [LegalEntityHeaderUpdate] that fully replaces a legal entity's header from parsed content. Every payload
- * field is [FieldUpdate.Set]; the derived [LegalEntityHeaderUpdate.ultimateOwnerBpnl] is left [FieldUpdate.NoOp] because
- * it is maintained by ownership recalculation, not the payload. [currentness] is supplied by the caller (an impure
- * "now") to keep this mapper pure.
+ * Builds the header change that fully replaces a legal entity's header with the given parsed content.
+ *
+ * Every field the payload states is set; the derived ultimate-owner BPNL is left alone, because ownership recalculation
+ * maintains it rather than the payload. The caller supplies [currentness], an impure "now", so that this mapper stays
+ * pure.
  */
 @Component
 class LegalEntityHeaderUpdateMapper {

@@ -34,6 +34,13 @@ import org.springframework.web.reactive.function.client.WebClientException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
+/**
+ * Drives the Pool's side of the golden record process on a schedule: reserving tasks, answering them, and keeping the
+ * record of the ones still owed an answer.
+ *
+ * A task the Pool failed to answer is tracked rather than dropped, so a later round can close it out with an error and
+ * the Orchestrator is never left waiting on a step that will not come.
+ */
 @Service
 class TaskBatchResolutionService(
     private val taskStepFetchAndReserveService: TaskResolutionService,
@@ -57,6 +64,10 @@ class TaskBatchResolutionService(
     }
 
     @Scheduled(cron = "#{${GoldenRecordTaskConfigProperties.GET_CRON}}", zone = "UTC")
+    /**
+     * Works off one round of golden record tasks: the ones reserved now, the ones a previous round left hanging, and
+     * the bookkeeping of the ones already resolved.
+     */
     fun processTasks(){
         logger.debug { "Start golden record task processing schedule..." }
         reserveAndResolve()
@@ -65,6 +76,12 @@ class TaskBatchResolutionService(
     }
 
 
+    /**
+     * Reserves golden record tasks batch by batch until none are left and answers each with what the Pool made of it.
+     *
+     * A batch the Pool could not answer is recorded as pending instead of being lost, so [resolveUnresolved] can close
+     * it out later.
+     */
     fun reserveAndResolve(){
         var totalTasksProcessed = 0
         do{
@@ -93,6 +110,9 @@ class TaskBatchResolutionService(
             logger.debug { "No golden record tasks to process" }
     }
 
+    /**
+     * Closes out the tasks recorded as pending by answering each with a generic processing error.
+     */
     fun resolveUnresolved(){
         val scheduleTime = Instant.now()
 
@@ -131,6 +151,9 @@ class TaskBatchResolutionService(
             logger.debug { "Checked $processedTasks tasks, none needed resolving as errors" }
     }
 
+    /**
+     * Removes the tasks whose answer the Orchestrator has taken, so the record of pending tasks holds only open ones.
+     */
     fun deleteResolved(){
         // Each query re-asks what is left to delete, so a query has to see the preceding delete: keep this lazy.
         val tasksDeleted = generateSequence { goldenRecordTaskRepository.findFirstByIsResolved(true) }
@@ -151,6 +174,9 @@ class TaskBatchResolutionService(
     }
 }
 
+/**
+ * Answers one reservation of golden record tasks, reporting each task's outcome back to the Orchestrator.
+ */
 @Service
 class TaskResolutionService(
     private val orchestrationClient: OrchestrationApiClient,
@@ -159,13 +185,17 @@ class TaskResolutionService(
 ) {
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Answers each task of the given reservation with the records the Pool wrote for it, or with the reasons it wrote
+     * none.
+     */
     fun resolveTasks(taskStepReservation: TaskStepReservationResponse) {
             logger.debug { "${taskStepReservation.reservedTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
             if (taskStepReservation.reservedTasks.isNotEmpty()) {
                 val taskResults = upsertGoldenRecordIntoPool(taskStepReservation.reservedTasks)
 
-                //Limit the length of errors so for the Orchestrator to not reject it
+                // The Orchestrator rejects a result whose error descriptions exceed its own length limit.
                 val resultsWithSafeErrors = taskResults.map { result ->
                     result.copy(errors = result.errors.map { error ->
                         error.copy(description = error.description.take(250))
@@ -176,6 +206,10 @@ class TaskResolutionService(
             logger.debug { "Cleaning tasks processing completed for this iteration." }
     }
 
+    /**
+     * Writes what each reserved task asks for and reports, per task, the resulting records or the reasons it was not
+     * written.
+     */
     fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> =
         goldenRecordTaskApplicationService.upsert(taskEntries)
 }

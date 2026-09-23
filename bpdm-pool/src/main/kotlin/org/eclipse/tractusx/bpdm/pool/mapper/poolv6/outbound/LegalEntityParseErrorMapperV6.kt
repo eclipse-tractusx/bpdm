@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the legal-entity services' sealed parse errors to the v6 `/legal-entities` [ErrorInfoV6] codes, delegating
- * legal-address errors to [AddressParseErrorMapperV6].
+ * Maps the legal-entity services' sealed parse errors to the v6 `/legal-entities` error codes, delegating
+ * legal-address errors to the v6 address error mapper.
  *
  * The v6 error enums are frozen and predate both script variants and ultimate ownership, so those errors are thrown as
  * internal errors instead of getting a public code. The `when`s are exhaustive so a new error won't compile until it
@@ -40,6 +40,7 @@ class LegalEntityParseErrorMapperV6(
     private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
+    /** The v6 error a failed legal-entity create reports for the given parse error. */
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityCreateErrorInfo(error, entityKey)
@@ -53,6 +54,7 @@ class LegalEntityParseErrorMapperV6(
             )
         }
 
+    /** The v6 error a failed legal-entity update reports for the given parse error. */
     fun toUpdateErrorInfo(error: LegalEntityUpdateParseError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
         when (error) {
             is UnresolvableLegalEntity ->

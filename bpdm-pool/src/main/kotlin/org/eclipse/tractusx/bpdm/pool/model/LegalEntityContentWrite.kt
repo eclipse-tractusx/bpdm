@@ -36,13 +36,11 @@ data class LegalEntityContentWrite(
     val headerWrite get() = LegalEntityHeaderWrite(content.header, existingLegalEntity)
 }
 
-/** What an update states about one legal entity, together with the legal entity it rewrites. */
 data class LegalEntityUpdateContentWrite(
     val content: LegalEntityContentRequest,
     val target: LegalEntityDb
 )
 
-/** What a write states about one legal entity's header, together with the legal entity it lands on. */
 data class LegalEntityHeaderWrite(
     val header: LegalEntityHeaderRequest,
     val existingLegalEntity: LegalEntityDb?

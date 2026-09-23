@@ -59,8 +59,8 @@ sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, Leg
 
 /**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
- * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
- * [AddressContentParseError] directly.
+ * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own content errors
+ * directly.
  */
 sealed interface LegalEntityHeaderParseError : LegalEntityContentParseError {
     data object NameMissing : LegalEntityHeaderParseError

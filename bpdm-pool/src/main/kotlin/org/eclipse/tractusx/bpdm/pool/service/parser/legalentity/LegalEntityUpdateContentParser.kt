@@ -29,7 +29,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates the legal entity content of an update
+ * Validates the content one legal entity update states, together with the ownership rules that hold only once the legal
+ * entity exists.
  */
 @Service
 class LegalEntityUpdateContentParser(
