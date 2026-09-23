@@ -20,14 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentWrite
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -36,20 +32,14 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class LegalEntityCreateParser(
-    private val legalEntityContentParser: LegalEntityContentParser,
-    private val coverageValidator: ScriptVariantCoverageValidator
+    private val legalEntityContentParser: LegalEntityContentParser
 ) {
 
     /**
      * Validates each request and reports either the validated legal entity or every problem found in that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> =
-        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
-
-    private fun parseEntries(
-        requests: List<LegalEntityCreateRequest>
-    ): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateEntryParseError>> {
+    fun parse(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> {
         val contentResults = legalEntityContentParser.parse(requests.map { LegalEntityContentWrite(it.content, existingLegalEntity = null) })
 
         return contentResults.map { result ->
@@ -59,13 +49,4 @@ class LegalEntityCreateParser(
             }
         }
     }
-
-    // What this write leaves behind, as script variant coverage sees it.
-    private fun coverageWrites(parsed: LegalEntityCreateParsed): List<AddressCoverageWrite> =
-        listOf(
-            AddressCoverageWrite.Created(
-                partners = listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())),
-                scriptCodes = parsed.content.legalAddress.scriptCodes()
-            )
-        )
 }

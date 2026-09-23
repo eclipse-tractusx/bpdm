@@ -21,13 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -38,8 +34,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteUpdateWithOwnMainAddressParser(
     private val siteContentParser: SiteContentParser,
-    private val siteBpnParser: SiteBpnParser,
-    private val coverageValidator: ScriptVariantCoverageValidator
+    private val siteBpnParser: SiteBpnParser
 ) {
 
     /**
@@ -47,12 +42,7 @@ class SiteUpdateWithOwnMainAddressParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> =
-        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
-
-    private fun parseEntries(
-        requests: List<SiteUpdateRequest>
-    ): List<ParseResult<SiteUpdateParsed, SiteUpdateEntryParseError>> {
+    fun parse(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val mainAddressBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
         val contentResults = siteContentParser.parse(requests.map { it.content }, mainAddressBpns)
@@ -61,14 +51,4 @@ class SiteUpdateWithOwnMainAddressParser(
             SiteUpdateParsed(target, content)
         }
     }
-
-    // What this write leaves behind, as script variant coverage sees it.
-    private fun coverageWrites(parsed: SiteUpdateParsed): List<AddressCoverageWrite> =
-        listOf(
-            AddressCoverageWrite.Rewritten(
-                address = parsed.target.mainAddress,
-                partners = listOf(PartnerScriptCodes(parsed.target.bpn, parsed.content.header.scriptCodes())),
-                scriptCodes = parsed.content.mainAddress.scriptCodes()
-            )
-        )
 }

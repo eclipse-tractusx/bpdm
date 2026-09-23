@@ -49,9 +49,8 @@ class SiteParseErrorMapperV6(
                     entityKey
                 )
             is AddressContentParseError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
-            is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
+            is ScriptVariantNotCoveredByAddress,
             is SiteHeaderParseError -> throw internalError(error)
         }
 
@@ -60,10 +59,6 @@ class SiteParseErrorMapperV6(
             is UnresolvableSite ->
                 ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             // Only the golden record task updates a site on its legal address; a site update over the API always
             // states the main address, so it can never be faulted for the site not owning one.
             is SiteMainAddressNotLegalAddress ->

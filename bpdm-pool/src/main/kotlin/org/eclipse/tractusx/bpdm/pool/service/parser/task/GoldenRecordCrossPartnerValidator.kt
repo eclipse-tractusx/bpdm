@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.RecordSiteRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpsertRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,29 +41,24 @@ class GoldenRecordCrossPartnerValidator(
     private val sharedLegalAddressScriptCodeValidator: SharedLegalAddressScriptCodeValidator,
     private val taskAddressDistinctnessValidator: TaskAddressDistinctnessValidator,
     private val parentConsistencyValidator: GoldenRecordParentConsistencyValidator,
-    private val additionalSitesCompletenessValidator: AdditionalSitesCompletenessValidator,
-    private val coverageWriteReader: GoldenRecordCoverageWriteReader,
-    private val coverageValidator: ScriptVariantCoverageValidator
+    private val additionalSitesCompletenessValidator: AdditionalSitesCompletenessValidator
 ) {
 
     /**
-     * Reports every contradiction between the partners [request] states and the partners parsed from it, where
-     * [errorsSoFar] holds what parsing those partners has already rejected.
+     * Reports every contradiction between the partners [request] states and the partners parsed from it.
      */
     @Transactional(readOnly = true)
     fun validate(
         request: GoldenRecordUpsertRequest,
         legalEntity: LegalEntityUpsertParsed?,
         recordSite: RecordSiteParsed?,
-        additionalAddress: AddressUpsertParsed?,
-        errorsSoFar: List<GoldenRecordUpsertParseError>
+        additionalAddress: AddressUpsertParsed?
     ): List<CrossPartnerParseError> =
         sharedLegalAddressScriptCodeValidator.validate(request.legalEntity, request.recordSite.site)
             .plus(validateStatedAddressDistinctness(request))
             .plus(validateAdditionalSitesHaveRecordSite(request.recordSite))
             .plus(parentConsistencyValidator.validate(request))
             .plus(additionalSitesCompletenessValidator.validate(legalEntity, recordSite, additionalAddress))
-            .plus(validateCoverageNotLost(request, errorsSoFar))
 
     // The additional sites share the record address with the record's own site, so there has to be one.
     private fun validateAdditionalSitesHaveRecordSite(recordSite: RecordSiteRequest): List<CrossPartnerParseError> =
@@ -77,21 +71,4 @@ class GoldenRecordCrossPartnerValidator(
             (request.recordSite.site as? SiteUpsertRequest.WithOwnMainAddress)?.let { bpnReferenceParser.parse(it.mainAddress.reference) },
             request.additionalAddress?.let { bpnReferenceParser.parse(it.reference) }
         )
-
-    private fun validateCoverageNotLost(
-        request: GoldenRecordUpsertRequest,
-        errorsSoFar: List<GoldenRecordUpsertParseError>
-    ): List<CrossPartnerParseError> {
-        // Coverage reads the partners a written address is shared with. A partner this request failed to resolve is
-        // not among them as far as the check can tell, so it would report the request taking away coverage it never
-        // had. The other cross-partner checks resolve what they need themselves and stay meaningful.
-        val unresolved = errorsSoFar.any {
-            it is LegalEntityNotFound || it is SiteNotFound || it is SiteMainAddressNotFound || it is AdditionalAddressNotFound
-        }
-        if (unresolved) return emptyList()
-
-        return coverageValidator.validate(listOf(coverageWriteReader.collectWrites(request)))
-            .single()
-            .map { ScriptVariantCoverageLost(it) }
-    }
 }

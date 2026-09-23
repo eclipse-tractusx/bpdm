@@ -109,48 +109,10 @@ class RelationsGoldenRecordTaskService(
                 TaskRelationsStepReservationEntryDto(
                     task.uuid.toString(),
                     task.gateRecord.publicId.toString(),
-                    relationsResponseMapper.toBusinessPartneRelationsResult(task.businessPartnerRelations)
+                    relationsResponseMapper.toBusinessPartnerRelationsResult(task.businessPartnerRelations)
                 )
             }
             .let { reservations -> TaskRelationsStepReservationResponse(reservations, pendingTimeout) }
-    }
-
-    @Transactional
-    fun resolveStepResults(resultRequest: TaskRelationsStepResultRequest) {
-        logger.debug { "Step results for reserved relations golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
-        val uuids = resultRequest.results.map { toUUID(it.taskId) }
-        val foundTasks = relationsTaskRepository.findByUuidIn(uuids.toSet()).also { relationsTaskRepository.fetchRelationsData(it) }
-        val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
-
-        val resolvedTasks = resultRequest.results
-            .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
-            .filterNot { (task, _) -> task.processingState.resultState == RelationsGoldenRecordTaskDb.ResultState.Aborted }
-            .mapNotNull { (task, resultEntry) ->
-                val step = resultRequest.step
-                val errors = resultEntry.errors
-                val resultBusinessPartnerRelaitons = resultEntry.businessPartnerRelations
-
-                when{
-                    errors.isNotEmpty() -> relationsGoldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
-                    else ->  relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartnerRelaitons)
-                }
-            }
-
-        logResolvedTasks(resolvedTasks, resultRequest.step)
-    }
-
-    private fun logResolvedTasks(resolvedTasks: List<RelationsGoldenRecordTaskDb>, step: TaskStep) {
-        val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }
-
-        tasksByResultState[RelationsGoldenRecordTaskDb.ResultState.Pending]
-            ?.groupBy { it.processingState.step }
-            ?.forEach { (nextStep, tasks) ->
-                logger.info { "Advanced ${tasks.size} relation golden record tasks from step $step to step $nextStep: ${tasks.toLogIdentifiers()}" }
-            }
-        tasksByResultState[RelationsGoldenRecordTaskDb.ResultState.Success]
-            ?.let { tasks -> logger.info { "Completed ${tasks.size} relation golden record tasks after step $step: ${tasks.toLogIdentifiers()}" } }
-        tasksByResultState[RelationsGoldenRecordTaskDb.ResultState.Error]
-            ?.let { tasks -> logger.info { "Failed ${tasks.size} relation golden record tasks in step $step: ${tasks.toLogIdentifiers()}" } }
     }
 
     private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntry>): List<SharingMemberRecordDb> {

@@ -104,11 +104,3 @@ data object AdditionalSitesWithoutSite : CrossPartnerParseError
 data class AdditionalSiteOmitted(val siteBpn: String) : CrossPartnerParseError
 
 data class SiteScriptCodeNotStatedByLegalEntity(val scriptCode: String) : CrossPartnerParseError
-
-data class ScriptVariantCoverageLost(val error: ScriptVariantCoverageParseError) : CrossPartnerParseError
-
-// No parser raises these two: they are reported by the outbound mapper and left in place because establishing them as
-// dead is tool-only work that has not been run for them.
-data class LegalAddressCoverageLost(val error: ScriptVariantCoverageParseError) : GoldenRecordUpsertParseError
-
-data class SiteMainAddressCoverageLost(val error: ScriptVariantCoverageParseError) : GoldenRecordUpsertParseError

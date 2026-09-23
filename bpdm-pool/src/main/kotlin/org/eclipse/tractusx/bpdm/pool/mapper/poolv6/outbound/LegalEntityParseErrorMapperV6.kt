@@ -43,7 +43,6 @@ class LegalEntityParseErrorMapperV6(
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityCreateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageParseError -> throw internalError(error)
             is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
@@ -67,10 +66,6 @@ class LegalEntityParseErrorMapperV6(
             is MultipleUltimateOwnersInHierarchy -> throw internalError(error)
             // A v6 write never sets the ownership flag on an alternative headquarter, so this cannot be broken from v6.
             is AlternativeHeadquarterCannotOwnUltimately -> throw internalError(error)
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,

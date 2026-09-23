@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.parser
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartnerException
 import org.eclipse.tractusx.bpdm.orchestrator.model.error.GoldenRecordTaskResolveParseError
 import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskResolveParsed
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskResolveRequest
@@ -52,11 +53,11 @@ class GoldenRecordTaskResolveParser(
                         task.processingState.resultState == GoldenRecordTaskDb.ResultState.Aborted -> 
                             ParseResult.ofSingleFailure(GoldenRecordTaskResolveParseError.TaskAborted(resultEntry.taskId))
                         resultEntry.errors.isEmpty() -> {
-                            val validationError = validateAdditionalSitesHaveSite(resultEntry.businessPartner)
-                            if (validationError != null) {
-                                ParseResult.ofSingleFailure(GoldenRecordTaskResolveParseError.InvalidBusinessPartner(resultEntry.taskId, validationError))
-                            } else {
+                            try {
+                                assertAdditionalSitesHaveSite(resultEntry.businessPartner)
                                 ParseResult.Success(GoldenRecordTaskResolveParsed(resolveRequest.step, task, resultEntry))
+                            } catch (e: BpdmInvalidBusinessPartnerException) {
+                                ParseResult.ofSingleFailure(GoldenRecordTaskResolveParseError.InvalidBusinessPartner(resultEntry.taskId, e.message ?: "Invalid business partner"))
                             }
                         }
                         else -> ParseResult.Success(GoldenRecordTaskResolveParsed(resolveRequest.step, task, resultEntry))
@@ -66,11 +67,11 @@ class GoldenRecordTaskResolveParser(
         }
     }
 
-    private fun validateAdditionalSitesHaveSite(businessPartner: org.eclipse.tractusx.orchestrator.api.model.BusinessPartner): String? {
-        return if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null) {
-            "additional sites of its address are stated but no site of its own is, which they would be additional to"
-        } else {
-            null
+    private fun assertAdditionalSitesHaveSite(businessPartner: org.eclipse.tractusx.orchestrator.api.model.BusinessPartner) {
+        if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null) {
+            throw BpdmInvalidBusinessPartnerException(
+                "additional sites of its address are stated but no site of its own is, which they would be additional to"
+            )
         }
     }
 }

@@ -21,13 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,8 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteCreateWithOwnMainAddressParser(
     private val siteContentParser: SiteContentParser,
-    private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val coverageValidator: ScriptVariantCoverageValidator
+    private val legalEntityBpnParser: LegalEntityBpnParser
 ) {
 
     /**
@@ -48,12 +43,7 @@ class SiteCreateWithOwnMainAddressParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> =
-        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
-
-    private fun parseEntries(
-        requests: List<SiteCreateRequest>
-    ): List<ParseResult<SiteCreateParsed, SiteCreateEntryParseError>> {
+    fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
         val contents = requests.map { it.content }
         val contentResults = siteContentParser.parse(contents, contents.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
@@ -62,13 +52,4 @@ class SiteCreateWithOwnMainAddressParser(
             SiteCreateParsed(legalEntity, content)
         }
     }
-
-    // What this write leaves behind, as script variant coverage sees it.
-    private fun coverageWrites(parsed: SiteCreateParsed): List<AddressCoverageWrite> =
-        listOf(
-            AddressCoverageWrite.Created(
-                partners = listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())),
-                scriptCodes = parsed.content.mainAddress.scriptCodes()
-            )
-        )
 }

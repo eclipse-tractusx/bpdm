@@ -1447,7 +1447,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `try create second site sharing an existing site main address without covering the first site`() {
+    fun `create second site sharing an existing site main address without covering the first site`() {
         val leRef = "le-strand"
         val leAddressRef = "le-addr-strand"
         val sharedMainAddressRef = "shared-strand-addr"
@@ -1460,19 +1460,27 @@ class TaskResolutionServiceTest @Autowired constructor(
         val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
-        // Site B states the shared address's content but covers only its own script - which would leave site A named in
-        // a script its address no longer covers.
+        // Site B states the shared address's content but only in its own script - the address keeps site A's.
+        val siteAScriptCode = createSiteA.site!!.scriptVariants.first().scriptCode
         val siteBScriptVariant = createSiteA.site!!.scriptVariants.first().let { it.copy(scriptCode = scriptCodeOtherThan(it.scriptCode)) }
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences("site-b-strand".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
-            .let { it.copy(site = it.site!!.copy(scriptVariants = listOf(siteBScriptVariant)), additionalAddress = null) }
+            .let {
+                it.copy(
+                    site = it.site!!.copy(scriptVariants = listOf(siteBScriptVariant)),
+                    additionalAddress = null,
+                    // The address's membership is written as stated, so site A has to stay among its sites.
+                    additionalSites = listOf(AdditionalSite(BpnReference(siteABpns, null, BpnReferenceType.Bpn), null))
+                )
+            }
 
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
 
-        assertThat(resultB.single().errors.map { it.description })
-            .anyMatch { it.contains(siteABpns) && it.contains("must stay covered") }
-        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
+        assertThat(resultB.single().errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(siteAScriptCode, siteBScriptVariant.scriptCode)
+        assertThat(poolClient.sites.getSite(siteABpns).site.scriptVariants.map { it.scriptCode }).containsExactly(siteAScriptCode)
     }
 
     @Test
@@ -1538,7 +1546,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `try update legal entity into another script while its site keeps the old one`() {
+    fun `update legal entity into another script while its site keeps the old one`() {
         val leRef = "le-strand-site"
         val leAddressRef = "le-addr-strand-site"
         val siteRef = "site-strand-site"
@@ -1555,19 +1563,21 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = create)
         val bpnS = createResult[0].businessPartner.site?.bpnReference?.referenceValue!!
 
-        // A task for the legal entity alone: it rewrites the shared legal address but does not rewrite the site, so the
-        // site would be left named in a script its address no longer covers.
-        val legalEntityOnly = create
-            .inScriptCode(scriptCodeOtherThan(orchTestDataFactory.metadata!!.scriptCodes.first()))
-            .copy(site = null)
+        // A task for the legal entity alone: it rewrites the shared legal address without stating the site's script, so
+        // the address keeps that variant for the site while taking on the legal entity's new one.
+        val oldScriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
+        val newScriptCode = scriptCodeOtherThan(oldScriptCode)
+        val legalEntityOnly = create.inScriptCode(newScriptCode).copy(site = null)
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = legalEntityOnly)
 
-        assertThat(updateResult.single().errors.map { it.description })
-            .anyMatch { it.contains(bpnS) && it.contains("must stay covered") }
+        assertThat(updateResult.single().errors).isEmpty()
+        assertThat(poolClient.sites.getSite(bpnS).site.scriptVariants.map { it.scriptCode }).containsExactly(oldScriptCode)
+        assertThat(poolClient.addresses.getAddress(poolClient.sites.getSite(bpnS).mainAddress.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(oldScriptCode, newScriptCode)
     }
 
     @Test
-    fun `try update legal entity into another script while carrying its site as unchanged`() {
+    fun `update legal entity into another script while carrying its site as unchanged`() {
         val leRef = "le-strand-unchanged"
         val leAddressRef = "le-addr-strand-unchanged"
         val siteRef = "site-strand-unchanged"
@@ -1584,15 +1594,17 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = create)
         val bpnS = createResult[0].businessPartner.site?.bpnReference?.referenceValue!!
 
-        // The site travels with the task but is reported as unchanged, so nothing rewrites it: the legal entity's new
-        // script would leave the site named in a script its address no longer covers.
-        val legalEntityOnly = create
-            .inScriptCode(scriptCodeOtherThan(orchTestDataFactory.metadata!!.scriptCodes.first()))
-            .let { it.copy(site = it.site!!.copy(hasChanged = false)) }
+        // The site travels with the task but is reported as unchanged, so nothing rewrites it and the address keeps the
+        // script the site is still named in.
+        val oldScriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
+        val newScriptCode = scriptCodeOtherThan(oldScriptCode)
+        val legalEntityOnly = create.inScriptCode(newScriptCode).let { it.copy(site = it.site!!.copy(hasChanged = false)) }
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = legalEntityOnly)
 
-        assertThat(updateResult.single().errors.map { it.description })
-            .anyMatch { it.contains(bpnS) && it.contains("must stay covered") }
+        assertThat(updateResult.single().errors).isEmpty()
+        assertThat(poolClient.sites.getSite(bpnS).site.scriptVariants.map { it.scriptCode }).containsExactly(oldScriptCode)
+        assertThat(poolClient.addresses.getAddress(poolClient.sites.getSite(bpnS).mainAddress.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(oldScriptCode, newScriptCode)
     }
 
     /** The same business partner named in [scriptCode] alone - legal entity and site, so the shared address covers both. */
@@ -1620,7 +1632,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `reject an additional address update that strips a script its site still needs`() {
+    fun `keep a script its site still needs when an additional address update states none`() {
         val scriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
 
         // A site whose main address covers one script code, and a legal entity above it.
@@ -1637,7 +1649,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val legalAddressBpn = createdSite.legalEntity.legalAddress.bpnReference.referenceValue!!
 
         // A second record states that same address as its additional address, naming it in no script at all. The site
-        // is not part of this task, so it would be left named in a script its main address no longer covers.
+        // is not part of this task, so the address keeps the script the site is still named in.
         val strip = orchTestDataFactory.createFullBusinessPartner("addrCoverageStrip")
             .withLegalReferences(BpnReference(bpnL, null, Bpn), BpnReference(legalAddressBpn, null, Bpn))
             .withAdditionalAddressReference(BpnReference(mainAddressBpn, null, Bpn))
@@ -1651,8 +1663,9 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = strip)
 
-        assertThat(result[0].errors).extracting<String> { it.description }
-            .anyMatch { it.contains(bpnS) && it.contains("must stay covered") }
+        assertThat(result[0].errors).isEmpty()
+        assertThat(poolClient.sites.getSite(bpnS).site.scriptVariants.map { it.scriptCode }).containsExactly(scriptCode)
+        assertThat(poolClient.addresses.getAddress(mainAddressBpn).scriptVariants.map { it.scriptCode }).containsExactly(scriptCode)
     }
 
     private fun BusinessPartner.inScriptCode(scriptCode: String): BusinessPartner =

@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressNotLegalAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateEntryParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateOnLegalAddressRequest
 import org.springframework.stereotype.Service
@@ -47,7 +47,7 @@ class SiteUpdateOnLegalAddressParser(
      * found in that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteUpdateOnLegalAddressRequest>): List<ParseResult<SiteUpdateOnLegalAddressParsed, SiteUpdateEntryParseError>> {
+    fun parse(requests: List<SiteUpdateOnLegalAddressRequest>): List<ParseResult<SiteUpdateOnLegalAddressParsed, SiteUpdateParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn }).map(::requireSittingOnLegalAddress)
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
 
@@ -57,8 +57,8 @@ class SiteUpdateOnLegalAddressParser(
     }
 
     private fun requireSittingOnLegalAddress(
-        result: ParseResult<SiteDb, SiteUpdateEntryParseError>
-    ): ParseResult<SiteDb, SiteUpdateEntryParseError> =
+        result: ParseResult<SiteDb, SiteUpdateParseError>
+    ): ParseResult<SiteDb, SiteUpdateParseError> =
         when (result) {
             is ParseResult.Failure -> result
             is ParseResult.Success -> {

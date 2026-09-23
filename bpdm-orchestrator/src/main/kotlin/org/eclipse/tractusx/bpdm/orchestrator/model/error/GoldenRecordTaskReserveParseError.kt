@@ -17,7 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.orchestrator.model.error
 
-/** One business partner's script codes as they stand after the write; a null [bpn] marks the partner the request states. */
-data class PartnerScriptCodes(val bpn: String?, val scriptCodes: Collection<String>)
+sealed class GoldenRecordTaskReserveParseError {
+    // Currently no specific errors for reserve operation
+}

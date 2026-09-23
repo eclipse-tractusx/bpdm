@@ -21,14 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.chainParseResults
-import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateContentWrite
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateEntryParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,8 +36,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val updateContentParser: LegalEntityUpdateContentParser,
-    private val coverageValidator: ScriptVariantCoverageValidator
+    private val updateContentParser: LegalEntityUpdateContentParser
 ) {
 
     /**
@@ -49,12 +44,7 @@ class LegalEntityUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> =
-        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
-
-    private fun parseEntries(
-        requests: List<LegalEntityUpdateRequest>
-    ): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateEntryParseError>> {
+    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val writes = requests.zip(targetResults) { request, targetResult ->
             targetResult.parsedOrNull()?.let { LegalEntityUpdateContentWrite(request.content, it) }
@@ -62,14 +52,4 @@ class LegalEntityUpdateParser(
 
         return chainParseResults(targetResults) { updateContentParser.parse(writes.filterNotNull()) }
     }
-
-    // What this write leaves behind, as script variant coverage sees it.
-    private fun coverageWrites(parsed: LegalEntityUpdateParsed): List<AddressCoverageWrite> =
-        listOf(
-            AddressCoverageWrite.Rewritten(
-                address = parsed.target.legalAddress,
-                partners = listOf(PartnerScriptCodes(parsed.target.bpn, parsed.content.header.scriptCodes())),
-                scriptCodes = parsed.content.legalAddress.scriptCodes()
-            )
-        )
 }

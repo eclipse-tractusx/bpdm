@@ -19,41 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
-import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 
 @Service
 class StepSecurityService(
-    private val permissionConfigProperties: PermissionConfigProperties
+    private val securityOperation: StepSecurityOperation
 ) {
-
-    private val defaultPermissions = PermissionConfigProperties()
-
 
     //Is being used by Pre-Authorize annotations
     @Suppress("unused")
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep){
-        val authorities = authentication.authorities.mapNotNull { it.authority?.uppercase() }
-
-        val expectedAuthority = permissionConfigProperties.reservation[step]
-            ?: defaultPermissions.reservation[step]
-
-        expectedAuthority?.uppercase().takeIf { it in authorities }
-            ?: throw AccessDeniedException("Insufficient permissions")
+    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
+        securityOperation.assertHasReservationAuthority(authentication, step)
     }
 
     //Is being used by Pre-Authorize annotations
     @Suppress("unused")
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep){
-        val authorities = authentication.authorities.mapNotNull { it.authority?.uppercase() }
-
-        val expectedAuthority = permissionConfigProperties.result[step]
-            ?: defaultPermissions.result[step]
-
-        expectedAuthority?.uppercase().takeIf { it in authorities }
-            ?: throw AccessDeniedException("Insufficient permissions")
+    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
+        securityOperation.assertHasResultAuthority(authentication, step)
     }
 }

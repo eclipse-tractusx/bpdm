@@ -28,13 +28,13 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  */
 data class UnresolvableLegalEntity(val bpn: String) :
     AddressCreateParseError,
-    SiteCreateEntryParseError,
-    LegalEntityUpdateEntryParseError,
+    SiteCreateParseError,
+    LegalEntityUpdateParseError,
     LegalEntityGetParseError,
     DataSpaceParticipantUpdateParseError
 data class UnresolvableSite(val bpn: String) :
-    AddressCreateParseError, SiteUpdateEntryParseError, AddressUpdateEntryParseError, AddressSiteMembershipParseError
+    AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError, AddressSiteMembershipParseError
 data class UnresolvableAddress(val bpn: String) :
-    AddressUpdateEntryParseError, SiteCreateEntryParseError, AddressSiteMembershipParseError
+    AddressUpdateParseError, SiteCreateParseError, AddressSiteMembershipParseError
 
 data class InvalidParentBpn(val bpn: String) : AddressCreateParseError

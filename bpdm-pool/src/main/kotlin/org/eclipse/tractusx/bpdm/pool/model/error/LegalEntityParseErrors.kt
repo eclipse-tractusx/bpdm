@@ -21,19 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.model.error
 
 sealed interface LegalEntityCreateParseError
 
-/**
- * The problems one legal entity creation can be faulted for on its own. Script variant coverage is judged over every
- * address a caller writes, so it is not among them and subtypes [LegalEntityCreateParseError] directly.
- */
-sealed interface LegalEntityCreateEntryParseError : LegalEntityCreateParseError
 
 sealed interface LegalEntityUpdateParseError
 
-/**
- * The problems one legal entity update can be faulted for on its own. Script variant coverage is judged over every
- * address a caller writes, so it is not among them and subtypes [LegalEntityUpdateParseError] directly.
- */
-sealed interface LegalEntityUpdateEntryParseError : LegalEntityUpdateParseError
 
 sealed interface LegalEntityGetParseError
 
@@ -43,7 +33,7 @@ data class UnresolvableLegalEntityIdentifier(val identifierTypeKey: String, val 
  * The problems the content of one legal entity update can be faulted for: what any write of that content can be
  * faulted for, plus the rules that only hold once the legal entity exists.
  */
-sealed interface LegalEntityUpdateContentParseError : LegalEntityUpdateEntryParseError
+sealed interface LegalEntityUpdateContentParseError : LegalEntityUpdateParseError
 
 /**
  * The problems writing the ultimate-owner flag onto a legal entity that already exists can be faulted for.
@@ -65,7 +55,7 @@ data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEn
 /**
  * The problems the content of one legal entity can be faulted for: its header and its legal address.
  */
-sealed interface LegalEntityContentParseError : LegalEntityCreateEntryParseError, LegalEntityUpdateContentParseError
+sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, LegalEntityUpdateContentParseError
 
 /**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/

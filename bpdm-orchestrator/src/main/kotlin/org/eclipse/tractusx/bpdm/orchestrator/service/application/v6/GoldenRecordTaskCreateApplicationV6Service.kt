@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.service.application
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
@@ -27,30 +27,24 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordIdNotValid
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.v6.GoldenRecordTaskCreateInboundMapperV6
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.v6.GoldenRecordTaskCreateOutboundMapperV6
-import org.eclipse.tractusx.bpdm.orchestrator.mapper.v7.GoldenRecordTaskCreateInboundMapperV7
 import org.eclipse.tractusx.bpdm.orchestrator.model.error.GoldenRecordTaskCreateParseError
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest as TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponse as TaskCreateResponseV6
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest as TaskCreateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponse as TaskCreateResponseV6
 
 /**
- * The entry point for the "create golden record tasks" operation: binds the [GoldenRecordTaskCreateParser] and the
- * [GoldenRecordTaskCreateOperation] into the full validate-then-execute business logic, shared by the V6 and V7 API
- * versions via their respective inbound/outbound mappers.
+ * The REST-API boundary for the V6 "create golden record tasks" operation.
  */
 @Service
-class GoldenRecordTaskCreateApplicationService(
+class GoldenRecordTaskCreateApplicationV6Service(
     private val inboundMapperV6: GoldenRecordTaskCreateInboundMapperV6,
-    private val inboundMapperV7: GoldenRecordTaskCreateInboundMapperV7,
     private val outboundMapperV6: GoldenRecordTaskCreateOutboundMapperV6,
     private val parser: GoldenRecordTaskCreateParser,
     private val operation: GoldenRecordTaskCreateOperation,
@@ -59,26 +53,16 @@ class GoldenRecordTaskCreateApplicationService(
 ) {
 
     @Transactional
-    fun createTasksV7(createRequest: TaskCreateRequest): TaskCreateResponse {
-        val requests = createRequest.requests.map { inboundMapperV7.toRequest(it) }
-        val createdTasks = createTasks(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = null)
-
-        return createdTasks
-            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateResponse(createdTasks = it) }
-    }
-
-    @Transactional
-    fun createTasksV6(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {
+    fun createTasks(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {
         val requests = createRequest.requests.map { inboundMapperV6.toRequest(it) }
-        val createdTasks = createTasks(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = null)
+        val createdTasks = createTasksInternal(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = null)
 
         return createdTasks
             .map { task -> outboundMapperV6.toClientState(responseMapper.toClientState(task, calculateTaskRetentionTimeout(task))) }
             .let { TaskCreateResponseV6(createdTasks = it) }
     }
 
-    private fun createTasks(
+    private fun createTasksInternal(
         mode: TaskMode,
         requests: List<GoldenRecordTaskCreateRequest>,
         newGateRecordIsGoldenRecordCounted: Boolean?

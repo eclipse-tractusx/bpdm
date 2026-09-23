@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.GoldenRecordUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.RecordSiteParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.GoldenRecordUpsertRequest
-import org.eclipse.tractusx.bpdm.pool.util.failureErrors
 import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -58,9 +57,8 @@ class GoldenRecordTaskUpsertParser(
         val recordSite = parseRecordSite(request)
         val additionalAddress = request.additionalAddress?.let { additionalAddressUpsertParser.parse(it) } ?: ParseResult.Success(null)
 
-        val partnerResults = listOf(legalEntity, recordSite, additionalAddress)
         val contradictions = crossPartnerValidator.validate(
-            request, legalEntity.parsedOrNull(), recordSite.parsedOrNull(), additionalAddress.parsedOrNull(), partnerResults.failureErrors()
+            request, legalEntity.parsedOrNull(), recordSite.parsedOrNull(), additionalAddress.parsedOrNull()
         )
 
         return zipParseResults(legalEntity, recordSite, additionalAddress) { legalEntityPlan, sitePlan, addressPlan ->

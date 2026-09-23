@@ -23,7 +23,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.RelationsGoldenRecordTaskService
-import org.eclipse.tractusx.bpdm.orchestrator.service.application.RelationsGoldenRecordTaskCreateApplicationService
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.RelationsGoldenRecordTaskCreateApplicationV7Service
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.RelationsGoldenRecordTaskResolveApplicationV7Service
 import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.HttpStatus
@@ -35,7 +36,8 @@ import org.springframework.web.bind.annotation.RestController
 class RelationsGoldenRecordTaskController(
     val apiConfigProperties: ApiConfigProperties,
     val relationsGoldenRecordTaskService: RelationsGoldenRecordTaskService,
-    val relationsGoldenRecordTaskCreateApplicationService: RelationsGoldenRecordTaskCreateApplicationService
+    val relationsGoldenRecordTaskCreateApplicationService: RelationsGoldenRecordTaskCreateApplicationV7Service,
+    val relationsGoldenRecordTaskResolveApplicationService: RelationsGoldenRecordTaskResolveApplicationV7Service
 ) : RelationsGoldenRecordTaskApi{
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
@@ -70,7 +72,7 @@ class RelationsGoldenRecordTaskController(
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
 
-        relationsGoldenRecordTaskService.resolveStepResults(resultRequest)
+        relationsGoldenRecordTaskResolveApplicationService.resolveStepResults(resultRequest)
     }
 
 }

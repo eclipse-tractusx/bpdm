@@ -38,8 +38,6 @@ class GoldenRecordTaskParseErrorMapper {
             is SiteMainAddressContentInvalid -> toAddressContentDescription(error.error)
             is AdditionalAddressContentInvalid -> toAddressContentDescription(error.error)
             is AdditionalSiteContentInvalid -> toSiteContentDescription(error.error)
-            is LegalAddressCoverageLost -> toLegalAddressCoverageDescription(error.error)
-            is SiteMainAddressCoverageLost -> toMainAddressCoverageDescription(error.error)
             is LegalEntityNotFound -> "Legal entity ${error.bpn} not found"
             is SiteNotFound -> "Site ${error.bpn} not found"
             is SiteMainAddressNotFound -> "Address ${error.bpn} not found"
@@ -53,7 +51,6 @@ class GoldenRecordTaskParseErrorMapper {
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
             is AlternativeHeadquarterCannotOwn ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
-            is ScriptVariantCoverageLost -> toScriptVariantCoverageDescription(error.error)
             SiteMainAddressRestatesLegalAddress ->
                 "A site whose main address is the legal address must state no main address of its own"
             is SiteDoesNotSitOnLegalAddress ->
@@ -73,13 +70,6 @@ class GoldenRecordTaskParseErrorMapper {
                 "Additional sites can only be stated for a business partner that states a site of its own"
             is AdditionalSiteNotInLegalEntity ->
                 "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn ?: "of this record"}"
-        }
-
-    fun toScriptVariantCoverageDescription(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"
-            is ScriptVariantCoverageStillNeeded ->
-                "Script code '${error.scriptCode}' must stay covered: business partner ${error.requiredByBpn} is named in that script"
         }
 
     private fun toAddressContentDescription(error: AddressContentParseError): String =
@@ -151,17 +141,5 @@ class GoldenRecordTaskParseErrorMapper {
             is SiteHeaderParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
             is SiteHeaderParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
             is SiteHeaderParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
-        }
-
-    private fun toLegalAddressCoverageDescription(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the legal address"
-            is ScriptVariantCoverageStillNeeded -> toScriptVariantCoverageDescription(error)
-        }
-
-    private fun toMainAddressCoverageDescription(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
-            is ScriptVariantCoverageStillNeeded -> toScriptVariantCoverageDescription(error)
         }
 }

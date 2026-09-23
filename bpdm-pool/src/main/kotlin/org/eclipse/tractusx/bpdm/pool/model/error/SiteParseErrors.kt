@@ -21,28 +21,18 @@ package org.eclipse.tractusx.bpdm.pool.model.error
 
 sealed interface SiteCreateParseError
 
-/**
- * The problems one site creation can be faulted for on its own. Script variant coverage is judged over every address a
- * caller writes, so it is not among them and subtypes [SiteCreateParseError] directly.
- */
-sealed interface SiteCreateEntryParseError : SiteCreateParseError
 
 sealed interface SiteUpdateParseError
 
-/**
- * The problems one site update can be faulted for on its own. Script variant coverage is judged over every address a
- * caller writes, so it is not among them and subtypes [SiteUpdateParseError] directly.
- */
-sealed interface SiteUpdateEntryParseError : SiteUpdateParseError
 
-data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateEntryParseError
+data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateParseError
 
-data class SiteMainAddressNotLegalAddress(val bpnSite: String, val bpnMainAddress: String) : SiteUpdateEntryParseError
+data class SiteMainAddressNotLegalAddress(val bpnSite: String, val bpnMainAddress: String) : SiteUpdateParseError
 
 /**
  * The problems the content of one site can be faulted for: its header and its main address.
  */
-sealed interface SiteContentParseError : SiteCreateEntryParseError, SiteUpdateEntryParseError
+sealed interface SiteContentParseError : SiteCreateParseError, SiteUpdateParseError
 
 sealed interface SiteHeaderParseError : SiteContentParseError {
     data object NameMissing : SiteHeaderParseError

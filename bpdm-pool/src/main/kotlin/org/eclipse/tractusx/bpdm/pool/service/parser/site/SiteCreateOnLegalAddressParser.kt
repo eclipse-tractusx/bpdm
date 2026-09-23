@@ -20,16 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.AddressCoverageWrite
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateEntryParseError
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,8 +41,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteCreateOnLegalAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
-    private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val coverageValidator: ScriptVariantCoverageValidator
+    private val legalEntityBpnParser: LegalEntityBpnParser
 ) {
 
     /**
@@ -54,26 +51,22 @@ class SiteCreateOnLegalAddressParser(
     @Transactional(readOnly = true)
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
-    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> =
-        coverageValidator.applyTo(parseEntries(requests), ::coverageWrites) { it }
-
-    private fun parseEntries(
-        requests: List<SiteCreateWithLegalAddressAsMainRequest>
-    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateEntryParseError>> {
+    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
-        return zipParseResults(legalEntityResults, headerResults) { legalEntity, header ->
+        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+            crossValidateParseResults(legalEntityResults, headerResults) { legalEntity, header ->
+                validateScriptVariantCoverage(legalEntity.legalAddress, header)
+            }
+
+        return zipParseResults(legalEntityResults, coveredHeaderResults) { legalEntity, header ->
             SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header, mainAddressContent = null)
         }
     }
 
-    // What this write leaves behind, as script variant coverage sees it.
-    private fun coverageWrites(parsed: SiteCreateWithReferencedAddressAsMainParsed): List<AddressCoverageWrite> =
-        listOf(
-            AddressCoverageWrite.PartnerOnly(
-                address = parsed.mainAddress,
-                partners = listOf(PartnerScriptCodes(bpn = null, parsed.siteHeader.scriptCodes()))
-            )
-        )
+    private fun validateScriptVariantCoverage(mainAddress: LogisticAddressDb, header: SiteHeaderParsed): List<ScriptVariantNotCoveredByAddress> {
+        val coveredScriptCodes = mainAddress.scriptCodes().toSet()
+        return header.scriptCodes().filterNot { it in coveredScriptCodes }.map(::ScriptVariantNotCoveredByAddress)
+    }
 }

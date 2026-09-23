@@ -17,21 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.orchestrator.service.application.v6
+
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskEventOperation
+import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.springframework.stereotype.Service
+import java.time.Instant
 
 /**
- * The two ways a write can leave a business partner named in a script its address is not written in.
- *
- * Both subtype every operation that writes an address or a partner name, so one validator serves them all; where an
- * operation cannot reach one of them, its mapper turns it into an internal error.
+ * The REST-API boundary for the V6 "get relations finished task events" operation.
  */
-sealed interface ScriptVariantCoverageParseError :
-    LegalEntityCreateParseError,
-    LegalEntityUpdateParseError,
-    SiteCreateParseError,
-    SiteUpdateParseError,
-    AddressUpdateParseError
+@Service
+class RelationsGoldenRecordTaskEventApplicationV6Service(
+    private val eventOperation: RelationsGoldenRecordTaskEventOperation
+) {
 
-data class ScriptVariantNotCoveredByAddress(val scriptCode: String) : ScriptVariantCoverageParseError
-
-data class ScriptVariantCoverageStillNeeded(val scriptCode: String, val requiredByBpn: String) : ScriptVariantCoverageParseError
+    fun getRelationsFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+        return eventOperation.getRelationsFinishedTaskEvents(timestamp, paginationRequest)
+    }
+}

@@ -79,13 +79,6 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfo(
-                    AddressUpdateError.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
-                            "is named in that script",
-                    entityKey
-                )
             is UnresolvableSite ->
                 ErrorInfo(AddressUpdateError.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
             is SiteMainAddressOmitted ->
@@ -94,7 +87,6 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
                     entityKey
                 )
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
