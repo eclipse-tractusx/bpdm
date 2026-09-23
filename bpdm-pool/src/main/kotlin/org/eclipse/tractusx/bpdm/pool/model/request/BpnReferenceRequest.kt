@@ -17,9 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
+
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-data class SiteCreateOnAddressRequest(
-    val mainAddressBpn: String,
-    val header: SiteHeaderRequest
+data class BpnReferenceRequest(
+    val value: String?,
+    val type: BpnReferenceKind?
 )
+
+enum class BpnReferenceKind {
+    Bpn,
+    RequestIdentifier
+}

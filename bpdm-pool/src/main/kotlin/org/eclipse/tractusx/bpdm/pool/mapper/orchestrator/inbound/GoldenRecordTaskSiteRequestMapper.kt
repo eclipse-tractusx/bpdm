@@ -24,64 +24,35 @@ import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant as SiteScriptVariantRequest
-import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite as TaskAdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria as TaskConfidenceCriteria
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddress as TaskPostalAddress
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 
 /**
- * Maps a cleaning task's site into the loose [SiteCreateRequest] / [SiteUpdateRequest] /
- * [SiteCreateWithReferencedAddressAsMainRequest]; the main address is delegated to
- * [GoldenRecordTaskAddressRequestMapper] and resolved by the caller (the site's own address, or the legal address when
- * the site main is the legal address). Unlike the pass-through elsewhere, a missing [SiteState] type throws here — the
- * loose request's type is non-null by contract.
+ * Maps a cleaning task's site into the loose site create and update requests, delegating the main address to the task's
+ * address mapper.
+ *
+ * Which address is the main address is the caller's to decide — the site's own, or the legal address where the site
+ * sits on it. Unlike the pass-through elsewhere, a missing business state type throws here, because the loose request's
+ * type is non-null by contract.
  */
 @Component
 class GoldenRecordTaskSiteRequestMapper(
     private val addressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
+    /** The request to create the site the task states, under the given legal entity and on the given main address. */
     fun toCreateRequest(legalEntityBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateRequest =
         SiteCreateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(site, mainAddress))
 
+    /** The request to write what the task states over the given site, main address included. */
     fun toUpdateRequest(
         siteBpn: String,
         site: TaskSite,
-        mainAddress: TaskPostalAddress,
-        additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
-    ): SiteUpdateRequest =
-        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
-
-    fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRequest =
-        SiteCreateWithLegalAddressAsMainRequest(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site))
-
-    fun toCreateWithReferencedAddressAsMainRequest(
-        mainAddressBpn: String,
-        site: TaskSite,
         mainAddress: TaskPostalAddress
-    ): SiteCreateWithReferencedAddressAsMainRequest =
-        SiteCreateWithReferencedAddressAsMainRequest(
-            mainAddressBpn = mainAddressBpn,
-            header = toHeaderRequest(site),
-            mainAddress = toMainAddressRequest(site, mainAddress)
-        )
-
-    fun toCreateOnAddressRequest(
-        mainAddressBpn: String,
-        additionalSite: TaskAdditionalSite,
-        confidenceCriteria: TaskConfidenceCriteria
-    ): SiteCreateOnAddressRequest =
-        SiteCreateOnAddressRequest(
-            mainAddressBpn = mainAddressBpn,
-            header = SiteHeaderRequest(
-                name = additionalSite.siteName,
-                states = emptyList(),
-                confidenceCriteria = addressRequestMapper.toConfidenceRequest(confidenceCriteria),
-                scriptVariants = emptyList()
-            )
-        )
+    ): SiteUpdateRequest =
+        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress))
 
     private fun toContentRequest(
         site: TaskSite,
@@ -93,7 +64,8 @@ class GoldenRecordTaskSiteRequestMapper(
             mainAddress = toMainAddressRequest(site, mainAddress, additionalMainAddressScriptVariants)
         )
 
-    private fun toMainAddressRequest(
+    /** The site's main address content, carrying the main-address half of the site's script variants. */
+    fun toMainAddressRequest(
         site: TaskSite,
         mainAddress: TaskPostalAddress,
         additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
@@ -103,7 +75,8 @@ class GoldenRecordTaskSiteRequestMapper(
             site.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.mainAddress) } + additionalMainAddressScriptVariants
         )
 
-    private fun toHeaderRequest(site: TaskSite): SiteHeaderRequest =
+    /** The site's own properties as the task states them, without its main address. */
+    fun toHeaderRequest(site: TaskSite): SiteHeaderRequest =
         SiteHeaderRequest(
             name = site.siteName,
             states = site.states.map { toState(it) },

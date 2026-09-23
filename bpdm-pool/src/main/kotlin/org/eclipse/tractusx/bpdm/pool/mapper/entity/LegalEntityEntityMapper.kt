@@ -30,14 +30,17 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 /**
- * Builds only the legal-entity header; the legal address is [AddressEntityMapper]'s job. [toEntity] leaves `legalAddress`
- * unset (`lateinit`) — the create service assigns it after persisting the address (cyclic entity↔address relationship).
+ * Builds the legal-entity header as it is stored; the legal address is the address mapper's job.
+ *
+ * [toEntity] leaves `legalAddress` unset (`lateinit`): entity and address point at each other, so the create service
+ * assigns it once the address has been persisted.
  */
 @Component
 class LegalEntityEntityMapper(
     private val addressEntityMapper: AddressEntityMapper
 ) {
 
+    /** The stored legal entity the given header amounts to, its legal address still to be assigned. */
     fun toEntity(bpn: String, header: LegalEntityHeaderParsed, currentness: Instant, numberOfSharingMembers: Int): LegalEntityDb {
         val entity = LegalEntityDb(
             bpn = bpn,
@@ -46,7 +49,7 @@ class LegalEntityEntityMapper(
             currentness = currentness,
             confidenceCriteria = toConfidence(header.confidenceCriteria, numberOfSharingMembers),
             isDataSpaceParticipant = header.isDataSpaceParticipant,
-            ownershipUltimate = header.ownershipUltimate ?: false,
+            ownershipUltimate = header.ownershipUltimate,
             scriptVariants = toScriptVariants(header.scriptVariants).toMutableList()
         )
         entity.identifiers.addAll(toIdentifiers(header.identifiers, entity))
@@ -54,18 +57,23 @@ class LegalEntityEntityMapper(
         return entity
     }
 
+    /** The stored name a legal entity carries, its long and short form together. */
     fun toLegalName(header: LegalEntityHeaderParsed): NameDb =
         NameDb(value = header.legalName, shortName = header.legalShortName)
 
+    /** The stored confidence assessment, counting the sharing members the caller has established. */
     fun toConfidence(parsed: ConfidenceCriteriaParsed, numberOfSharingMembers: Int): ConfidenceCriteriaDb =
         addressEntityMapper.toConfidence(parsed, numberOfSharingMembers)
 
+    /** The stored identifiers of the given legal entity. */
     fun toIdentifiers(parsed: List<LegalEntityIdentifierParsed>, parent: LegalEntityDb): List<LegalEntityIdentifierDb> =
         parsed.map { LegalEntityIdentifierDb(value = it.value, type = it.type, issuingBody = it.issuingBody, legalEntity = parent) }
 
+    /** The stored business states of the given legal entity. */
     fun toStates(parsed: List<LegalEntityState>, parent: LegalEntityDb): List<LegalEntityStateDb> =
         parsed.map { LegalEntityStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type, legalEntity = parent) }
 
+    /** The stored script variants a legal entity is named in. */
     fun toScriptVariants(parsed: List<LegalEntityScriptVariantParsed>): List<LegalEntityScriptVariantDb> =
         parsed.map { LegalEntityScriptVariantDb(scriptCode = it.scriptCode, legalName = it.legalName, shortName = it.shortName) }
 

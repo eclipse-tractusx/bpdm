@@ -37,11 +37,16 @@ class SiteMainAddressConsistencyValidator {
     /**
      * Reports one violation per site the address is the main address of that the stated sites leave out.
      */
-    fun check(address: LogisticAddressDb, statedSites: List<SiteDb>): List<SiteMainAddressOmitted> {
+    fun check(address: LogisticAddressDb, statedSites: List<SiteDb>): List<SiteMainAddressOmitted> =
+        findOmittedSites(address, statedSites).map { SiteMainAddressOmitted(it.bpn) }
+
+    /**
+     * Reports the sites themselves that the address is the main address of and the stated sites leave out.
+     */
+    fun findOmittedSites(address: LogisticAddressDb, statedSites: List<SiteDb>): List<SiteDb> {
         val statedBpns = statedSites.map { it.bpn }.toSet()
         return address.sites
             .filter { it.mainAddress.bpn == address.bpn }
             .filterNot { statedBpns.contains(it.bpn) }
-            .map { SiteMainAddressOmitted(it.bpn) }
     }
 }

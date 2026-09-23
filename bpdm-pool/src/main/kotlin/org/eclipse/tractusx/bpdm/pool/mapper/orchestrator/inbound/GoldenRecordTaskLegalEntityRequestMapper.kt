@@ -29,32 +29,40 @@ import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as TaskLegalEntit
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 
 /**
- * Maps a cleaning task's legal entity into the loose [LegalEntityCreateRequest] / [LegalEntityUpdateRequest]; the legal
- * address is delegated to [GoldenRecordTaskAddressRequestMapper]. Unlike the pass-through elsewhere, a missing
- * [LegalEntityState] type throws here — the loose request's type is non-null by contract (matches the task path's prior
- * behavior).
+ * Maps a cleaning task's legal entity into the loose legal-entity create and update requests, delegating the legal
+ * address to the task's address mapper.
+ *
+ * Unlike the pass-through elsewhere, a missing business state type throws here, because the loose request's type is
+ * non-null by contract.
  */
 @Component
 class GoldenRecordTaskLegalEntityRequestMapper(
     private val addressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
+    /** The request to create the legal entity the task states, its legal address included. */
     fun toCreateRequest(legalEntity: TaskLegalEntity): LegalEntityCreateRequest =
         LegalEntityCreateRequest(content = toContentRequest(legalEntity))
 
+    /** The request to write what the task states over the given legal entity, its legal address included. */
     fun toUpdateRequest(legalEntityBpn: String, legalEntity: TaskLegalEntity): LegalEntityUpdateRequest =
         LegalEntityUpdateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(legalEntity))
 
     private fun toContentRequest(legalEntity: TaskLegalEntity): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
-            legalAddress = addressRequestMapper.toContentRequest(
-                legalEntity.legalAddress,
-                legalEntity.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.legalAddress) }
-            )
+            legalAddress = toLegalAddressRequest(legalEntity)
         )
 
-    private fun toHeaderRequest(legalEntity: TaskLegalEntity): LegalEntityHeaderRequest =
+    /** The legal address content, carrying the legal-address half of the legal entity's script variants. */
+    fun toLegalAddressRequest(legalEntity: TaskLegalEntity): LogisticAddressRequest =
+        addressRequestMapper.toContentRequest(
+            legalEntity.legalAddress,
+            legalEntity.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.legalAddress) }
+        )
+
+    /** The legal entity's own properties as the task states them, without its legal address. */
+    fun toHeaderRequest(legalEntity: TaskLegalEntity): LegalEntityHeaderRequest =
         LegalEntityHeaderRequest(
             legalName = legalEntity.legalName,
             legalShortName = legalEntity.legalShortName,
@@ -62,7 +70,7 @@ class GoldenRecordTaskLegalEntityRequestMapper(
             identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
             states = legalEntity.states.map { toState(it) },
             confidenceCriteria = addressRequestMapper.toConfidenceRequest(legalEntity.confidenceCriteria),
-            isDataSpaceParticipant = legalEntity.isParticipantData ?: false,
+            isDataSpaceParticipant = legalEntity.isParticipantData,
             ownershipUltimate = legalEntity.ownershipUltimate,
             scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRequest(it.scriptCode, it.legalName, it.legalShortName) }
         )

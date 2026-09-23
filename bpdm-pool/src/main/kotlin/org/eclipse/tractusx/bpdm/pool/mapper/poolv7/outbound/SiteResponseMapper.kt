@@ -80,8 +80,8 @@ class SiteResponseMapper(
     private fun toState(state: SiteStateDb): SiteStateVerboseDto =
         SiteStateVerboseDto(state.validFrom, state.validTo, state.type.toDto())
 
-    // The main address covers every script its site is named in: the parsers reject a variant it does not cover and
-    // ScriptVariantCoverageService prunes any the main address stops covering.
+    // The main address covers every script its site is named in, so a variant missing here is a Pool bug rather than
+    // anything the client sent.
     private fun toScriptVariants(site: SiteDb): List<SiteScriptVariantDto> {
         val mainAddressVariantsByCode = site.mainAddress.scriptVariants.associateBy { it.scriptCode.technicalKey }
 

@@ -17,7 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
 
-/** One business partner's script codes as they stand after the write; a null [bpn] marks the partner the request states. */
-data class PartnerScriptCodes(val bpn: String?, val scriptCodes: Collection<String>)
+package org.eclipse.tractusx.bpdm.pool.model.request
+
+data class SiteUpdateOnLegalAddressRequest(
+    val siteBpn: String,
+    val header: SiteHeaderRequest
+)

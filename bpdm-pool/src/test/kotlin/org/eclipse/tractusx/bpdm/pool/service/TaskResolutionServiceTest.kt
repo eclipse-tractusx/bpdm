@@ -27,12 +27,13 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskErrorMessage
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -74,7 +75,8 @@ class TaskResolutionServiceTest @Autowired constructor(
     val ownedByRelationUpsertService: OwnedByRelationUpsertService,
     val relationRepository: RelationRepository,
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
-    val transactionTemplate: TransactionTemplate
+    val transactionTemplate: TransactionTemplate,
+    val sharingMemberConfidenceService: SharingMemberConfidenceService
 ) {
 
     private lateinit var orchTestDataFactory: BusinessPartnerTestDataFactory
@@ -113,6 +115,31 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors.size).isEqualTo(5)
     }
 
+    /**
+     * GIVEN a task naming a legal entity BPN that exists nowhere and stating no legal name
+     * WHEN the task is resolved
+     * THEN both the unresolved reference and the missing legal name are reported
+     */
+    @Test
+    fun `report an unresolved legal entity reference together with its content errors`() {
+        //GIVEN
+        val unknownBpnWithoutLegalName = with(minValidLegalEntity()) {
+            copy(
+                legalEntity = legalEntity.copy(
+                    bpnReference = BpnReference("BPNL0000000000XY", null, Bpn),
+                    legalName = null
+                )
+            )
+        }
+
+        //WHEN
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = unknownBpnWithoutLegalName)
+
+        //THEN
+        assertThat(result[0].errors.map { it.description })
+            .containsExactlyInAnyOrder("Legal entity BPNL0000000000XY not found", GoldenRecordTaskErrorMessage.LEGAL_NAME_IS_NULL.message)
+    }
+
     @Test
     fun `create legal entity without legal name`() {
 
@@ -121,7 +148,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
-        assertTaskError(createResult[0], "TASK_1", CleaningError.LEGAL_NAME_IS_NULL)
+        assertTaskError(createResult[0], "TASK_1", GoldenRecordTaskErrorMessage.LEGAL_NAME_IS_NULL)
     }
 
     @Test
@@ -766,7 +793,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
 
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors).hasSize(1)
+        assertThat(createResult[0].errors).isNotEmpty
     }
 
     @Test
@@ -857,7 +884,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateSiteRequest)
-        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors).isNotEmpty
     }
 
     @Test
@@ -1000,8 +1027,8 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors).extracting<String> { it.description }
+            .contains(GoldenRecordTaskErrorMessage.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
     @Test
@@ -1020,23 +1047,31 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors).extracting<String> { it.description }
+            .contains(GoldenRecordTaskErrorMessage.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
 
-    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
+    fun upsertGoldenRecordIntoPool(
+        taskId: String,
+        businessPartner: BusinessPartner,
+        recordId: String = UUID.randomUUID().toString()
+    ): List<TaskStepResultEntryDto> {
 
-        val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
+        val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner, recordId = recordId)
         return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
     }
 
-    fun singleTaskStep(taskId: String, businessPartner: BusinessPartner): List<TaskStepReservationEntryDto> {
+    fun singleTaskStep(
+        taskId: String,
+        businessPartner: BusinessPartner,
+        recordId: String = UUID.randomUUID().toString()
+    ): List<TaskStepReservationEntryDto> {
 
         return listOf(
             TaskStepReservationEntryDto(
                 taskId = taskId,
-                recordId = UUID.randomUUID().toString(),
+                recordId = recordId,
                 businessPartner = businessPartner
             )
         )
@@ -1141,7 +1176,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
     }
 
-    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
+    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: GoldenRecordTaskErrorMessage) {
 
         assertThat(step.taskId).isEqualTo(taskId)
         assertThat(step.errors.size).isEqualTo(1)
@@ -1159,6 +1194,64 @@ class TaskResolutionServiceTest @Autowired constructor(
             nextConfidenceCheckAt = Instant.now().plus(1, ChronoUnit.DAYS),
             confidenceLevel = 10
         )
+
+    @Test
+    fun `report the sharing member count of the address the record moves to`() {
+        //GIVEN a counted sharing member record on a legal entity's legal address
+        val recordId = UUID.randomUUID().toString()
+        val legalEntityRef = "le-moved-record".toBpnRequest()
+        val legalAddressRef = "le-address-moved-record".toBpnRequest()
+        val legalEntityOnly = orchTestDataFactory.createFullBusinessPartner("moved-record")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .copy(site = null, additionalAddress = null)
+        upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = legalEntityOnly, recordId = recordId)
+        countSharingMemberRecord(recordId)
+
+        //WHEN the same record states an additional address it is now about
+        val movedToAdditionalAddress = orchTestDataFactory.createFullBusinessPartner("moved-record")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .withAdditionalAddressReference("additional-address-moved-record".toBpnRequest())
+            .copy(site = null)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = movedToAdditionalAddress, recordId = recordId)
+
+        //THEN the counts the task reports follow the record to the additional address
+        assertThat(result[0].errors).isEmpty()
+        val reported = result[0].businessPartner
+        assertThat(reported.additionalAddress!!.postalProperties.confidenceCriteria.numberOfSharingMembers).isEqualTo(1)
+        assertThat(reported.legalEntity.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+        assertThat(reported.legalEntity.legalAddress.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+    }
+
+    @Test
+    fun `report the sharing member count of the site main address the record moves to`() {
+        //GIVEN a counted sharing member record on a legal entity's legal address
+        val recordId = UUID.randomUUID().toString()
+        val legalEntityRef = "le-moved-to-site".toBpnRequest()
+        val legalAddressRef = "le-address-moved-to-site".toBpnRequest()
+        val legalEntityOnly = orchTestDataFactory.createFullBusinessPartner("moved-to-site")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .copy(site = null, additionalAddress = null)
+        upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = legalEntityOnly, recordId = recordId)
+        countSharingMemberRecord(recordId)
+
+        //WHEN the same record states a site with a main address of its own
+        val movedToSiteMainAddress = orchTestDataFactory.createFullBusinessPartner("moved-to-site")
+            .withLegalReferences(legalEntityRef, legalAddressRef)
+            .withSiteReferences("site-moved-to-site".toBpnRequest(), "site-address-moved-to-site".toBpnRequest())
+            .copy(additionalAddress = null)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = movedToSiteMainAddress, recordId = recordId)
+
+        //THEN the counts the task reports follow the record to the site main address
+        assertThat(result[0].errors).isEmpty()
+        val reported = result[0].businessPartner
+        assertThat(reported.site!!.siteMainAddress!!.confidenceCriteria.numberOfSharingMembers).isEqualTo(1)
+        assertThat(reported.legalEntity.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+        assertThat(reported.legalEntity.legalAddress.confidenceCriteria.numberOfSharingMembers).isEqualTo(0)
+    }
+
+    private fun countSharingMemberRecord(recordId: String) {
+        transactionTemplate.execute { sharingMemberConfidenceService.updateGoldenRecordCounted(recordId, true) }
+    }
 
     @Test
     fun `update additional address to site main address`(){
@@ -1186,6 +1279,91 @@ class TaskResolutionServiceTest @Autowired constructor(
         // The site states the content of the address it adopts, so the promoted address covers what the site is named in.
         assertThat(promotedAddress.scriptVariants.map { it.scriptCode })
             .containsExactlyInAnyOrderElementsOf(updateLinkageRequest.site!!.scriptVariants.map { it.scriptCode })
+    }
+
+    @Test
+    fun `reject site restating the legal address as its own main address by request identifier`() {
+        val sharedAddressRef = "shared-address"
+        val businessPartner = orchTestDataFactory.createSiteBusinessPartner("restated")
+            .copyWithBpnRequests()
+            .let {
+                it.copy(
+                    legalEntity = it.legalEntity.copy(legalAddress = it.legalEntity.legalAddress.copy(bpnReference = sharedAddressRef.toBpnRequest())),
+                    site = it.site!!.copy(siteMainAddress = it.site!!.siteMainAddress!!.copy(bpnReference = sharedAddressRef.toBpnRequest()))
+                )
+            }
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartner)
+
+        assertThat(result[0].errors).extracting<String> { it.description }
+            .contains("A site whose main address is the legal address must state no main address of its own")
+    }
+
+    @Test
+    fun `reject site restating the legal address as its own main address by bpn`() {
+        val created = upsertGoldenRecordIntoPool(
+            taskId = "TASK_1",
+            businessPartner = orchTestDataFactory.createLegalEntityBusinessPartner("restated-bpn").copyWithBpnRequests()
+        )
+        assertThat(created[0].errors).isEmpty()
+        val legalAddressBpn = created[0].businessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!
+        val legalEntityBpn = created[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+
+        val businessPartner = orchTestDataFactory.createSiteBusinessPartner("restated-bpn").copyWithBpnRequests()
+            .let {
+                it.copy(
+                    legalEntity = it.legalEntity.copy(
+                        bpnReference = BpnReference(legalEntityBpn, null, Bpn),
+                        legalAddress = it.legalEntity.legalAddress.copy(bpnReference = BpnReference(legalAddressBpn, null, Bpn))
+                    ),
+                    site = it.site!!.copy(siteMainAddress = it.site!!.siteMainAddress!!.copy(bpnReference = BpnReference(legalAddressBpn, null, Bpn)))
+                )
+            }
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = businessPartner)
+
+        assertThat(result[0].errors).extracting<String> { it.description }
+            .contains("A site whose main address is the legal address must state no main address of its own")
+    }
+
+    @Test
+    fun `reject additional address restating the legal address`() {
+        val sharedAddressRef = "shared-legal-and-additional"
+        val businessPartner = orchTestDataFactory.createFullBusinessPartner("restated-additional")
+            .copyWithBpnRequests()
+            .let {
+                it.copy(
+                    legalEntity = it.legalEntity.copy(legalAddress = it.legalEntity.legalAddress.copy(bpnReference = sharedAddressRef.toBpnRequest())),
+                    additionalAddress = it.additionalAddress!!.copyAsPostalAddress { address ->
+                        address.copy(bpnReference = sharedAddressRef.toBpnRequest())
+                    }
+                )
+            }
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartner)
+
+        assertThat(result[0].errors).extracting<String> { it.description }
+            .contains("An additional address must be a different address than the legal address")
+    }
+
+    @Test
+    fun `reject additional address restating the site main address`() {
+        val sharedAddressRef = "shared-main-and-additional"
+        val businessPartner = orchTestDataFactory.createFullBusinessPartner("restated-main")
+            .copyWithBpnRequests()
+            .let {
+                it.copy(
+                    site = it.site!!.copy(siteMainAddress = it.site!!.siteMainAddress!!.copy(bpnReference = sharedAddressRef.toBpnRequest())),
+                    additionalAddress = it.additionalAddress!!.copyAsPostalAddress { address ->
+                        address.copy(bpnReference = sharedAddressRef.toBpnRequest())
+                    }
+                )
+            }
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartner)
+
+        assertThat(result[0].errors).extracting<String> { it.description }
+            .contains("An additional address must be a different address than the site main address")
     }
 
     @Test
@@ -1269,7 +1447,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `try create second site sharing an existing site main address without covering the first site`() {
+    fun `create second site sharing an existing site main address without covering the first site`() {
         val leRef = "le-strand"
         val leAddressRef = "le-addr-strand"
         val sharedMainAddressRef = "shared-strand-addr"
@@ -1282,23 +1460,31 @@ class TaskResolutionServiceTest @Autowired constructor(
         val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
-        // Site B states the shared address's content but covers only its own script - which would leave site A named in
-        // a script its address no longer covers.
+        // Site B states the shared address's content but only in its own script - the address keeps site A's.
+        val siteAScriptCode = createSiteA.site!!.scriptVariants.first().scriptCode
         val siteBScriptVariant = createSiteA.site!!.scriptVariants.first().let { it.copy(scriptCode = scriptCodeOtherThan(it.scriptCode)) }
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences("site-b-strand".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
-            .let { it.copy(site = it.site!!.copy(scriptVariants = listOf(siteBScriptVariant)), additionalAddress = null) }
+            .let {
+                it.copy(
+                    site = it.site!!.copy(scriptVariants = listOf(siteBScriptVariant)),
+                    additionalAddress = null,
+                    // The address's membership is written as stated, so site A has to stay among its sites.
+                    additionalSites = listOf(AdditionalSite(BpnReference(siteABpns, null, BpnReferenceType.Bpn), null))
+                )
+            }
 
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
 
-        assertThat(resultB.single().errors.map { it.description })
-            .anyMatch { it.contains(siteABpns) && it.contains("must stay covered") }
-        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
+        assertThat(resultB.single().errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(siteAScriptCode, siteBScriptVariant.scriptCode)
+        assertThat(poolClient.sites.getSite(siteABpns).site.scriptVariants.map { it.scriptCode }).containsExactly(siteAScriptCode)
     }
 
     @Test
-    fun `try create second site sharing an existing site main address without stating the first site`() {
+    fun `create second site sharing an existing site main address rejects leaving the first site unstated`() {
         val leRef = "le-unstated"
         val leAddressRef = "le-addr-unstated"
         val sharedMainAddressRef = "shared-unstated-addr"
@@ -1311,8 +1497,8 @@ class TaskResolutionServiceTest @Autowired constructor(
         val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
-        // Site B takes over the same address without saying that site A still uses it, which would take the address away
-        // from the site it is the main address of.
+        // Site B takes over the same address without saying that site A still uses it. Site A is bound to the address
+        // by its own main-address relation, so stating the membership without it contradicts what is stored.
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences("site-b-unstated".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
@@ -1321,8 +1507,8 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
 
-        assertThat(resultB.single().errors.map { it.description })
-            .anyMatch { it.contains(siteABpns) && it.contains("must be stated") }
+        assertThat(resultB.single().errors).hasSize(1)
+        assertThat(resultB.single().errors.single().description).contains(siteABpns)
         assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
     }
 
@@ -1360,7 +1546,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `try update legal entity into another script while its site keeps the old one`() {
+    fun `update legal entity into another script while its site keeps the old one`() {
         val leRef = "le-strand-site"
         val leAddressRef = "le-addr-strand-site"
         val siteRef = "site-strand-site"
@@ -1377,19 +1563,21 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = create)
         val bpnS = createResult[0].businessPartner.site?.bpnReference?.referenceValue!!
 
-        // A task for the legal entity alone: it rewrites the shared legal address but does not rewrite the site, so the
-        // site would be left named in a script its address no longer covers.
-        val legalEntityOnly = create
-            .inScriptCode(scriptCodeOtherThan(orchTestDataFactory.metadata!!.scriptCodes.first()))
-            .copy(site = null)
+        // A task for the legal entity alone: it rewrites the shared legal address without stating the site's script, so
+        // the address keeps that variant for the site while taking on the legal entity's new one.
+        val oldScriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
+        val newScriptCode = scriptCodeOtherThan(oldScriptCode)
+        val legalEntityOnly = create.inScriptCode(newScriptCode).copy(site = null)
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = legalEntityOnly)
 
-        assertThat(updateResult.single().errors.map { it.description })
-            .anyMatch { it.contains(bpnS) && it.contains("must stay covered") }
+        assertThat(updateResult.single().errors).isEmpty()
+        assertThat(poolClient.sites.getSite(bpnS).site.scriptVariants.map { it.scriptCode }).containsExactly(oldScriptCode)
+        assertThat(poolClient.addresses.getAddress(poolClient.sites.getSite(bpnS).mainAddress.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(oldScriptCode, newScriptCode)
     }
 
     @Test
-    fun `try update legal entity into another script while carrying its site as unchanged`() {
+    fun `update legal entity into another script while carrying its site as unchanged`() {
         val leRef = "le-strand-unchanged"
         val leAddressRef = "le-addr-strand-unchanged"
         val siteRef = "site-strand-unchanged"
@@ -1406,18 +1594,80 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = create)
         val bpnS = createResult[0].businessPartner.site?.bpnReference?.referenceValue!!
 
-        // The site travels with the task but is reported as unchanged, so nothing rewrites it: the legal entity's new
-        // script would leave the site named in a script its address no longer covers.
-        val legalEntityOnly = create
-            .inScriptCode(scriptCodeOtherThan(orchTestDataFactory.metadata!!.scriptCodes.first()))
-            .let { it.copy(site = it.site!!.copy(hasChanged = false)) }
+        // The site travels with the task but is reported as unchanged, so nothing rewrites it and the address keeps the
+        // script the site is still named in.
+        val oldScriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
+        val newScriptCode = scriptCodeOtherThan(oldScriptCode)
+        val legalEntityOnly = create.inScriptCode(newScriptCode).let { it.copy(site = it.site!!.copy(hasChanged = false)) }
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = legalEntityOnly)
 
-        assertThat(updateResult.single().errors.map { it.description })
-            .anyMatch { it.contains(bpnS) && it.contains("must stay covered") }
+        assertThat(updateResult.single().errors).isEmpty()
+        assertThat(poolClient.sites.getSite(bpnS).site.scriptVariants.map { it.scriptCode }).containsExactly(oldScriptCode)
+        assertThat(poolClient.addresses.getAddress(poolClient.sites.getSite(bpnS).mainAddress.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(oldScriptCode, newScriptCode)
     }
 
     /** The same business partner named in [scriptCode] alone - legal entity and site, so the shared address covers both. */
+    @Test
+    fun `reject a site sharing the legal address named in a script the legal entity does not state`() {
+        val legalScriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
+        val siteScriptCode = scriptCodeOtherThan(legalScriptCode)
+
+        val businessPartner = orchTestDataFactory.createFullBusinessPartner("sharedScript")
+            .copyWithBpnRequests()
+            .let { it.copy(site = it.site!!.copy(siteMainAddress = null), additionalAddress = null) }
+            .inScriptCode(legalScriptCode)
+            .let { partner ->
+                partner.copy(
+                    site = partner.site!!.copy(
+                        scriptVariants = partner.site!!.scriptVariants.map { it.copy(scriptCode = siteScriptCode) }
+                    )
+                )
+            }
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartner)
+
+        assertThat(result[0].errors).extracting<String> { it.description }
+            .anyMatch { it.contains(siteScriptCode) && it.contains("can only be named in scripts the legal entity") }
+    }
+
+    @Test
+    fun `keep a script its site still needs when an additional address update states none`() {
+        val scriptCode = orchTestDataFactory.metadata!!.scriptCodes.first()
+
+        // A site whose main address covers one script code, and a legal entity above it.
+        val createSite = orchTestDataFactory.createSiteBusinessPartner("addrCoverage")
+            .copyWithBpnRequests()
+            .inScriptCode(scriptCode)
+        val siteResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSite)
+        assertThat(siteResult.single().errors).isEmpty()
+
+        val createdSite = siteResult[0].businessPartner
+        val bpnS = createdSite.site!!.bpnReference.referenceValue!!
+        val mainAddressBpn = createdSite.site!!.siteMainAddress!!.bpnReference.referenceValue!!
+        val bpnL = createdSite.legalEntity.bpnReference.referenceValue!!
+        val legalAddressBpn = createdSite.legalEntity.legalAddress.bpnReference.referenceValue!!
+
+        // A second record states that same address as its additional address, naming it in no script at all. The site
+        // is not part of this task, so the address keeps the script the site is still named in.
+        val strip = orchTestDataFactory.createFullBusinessPartner("addrCoverageStrip")
+            .withLegalReferences(BpnReference(bpnL, null, Bpn), BpnReference(legalAddressBpn, null, Bpn))
+            .withAdditionalAddressReference(BpnReference(mainAddressBpn, null, Bpn))
+            .let { partner ->
+                partner.copy(
+                    legalEntity = partner.legalEntity.copy(hasChanged = false),
+                    site = null,
+                    additionalAddress = partner.additionalAddress!!.copy(scriptVariants = emptyList())
+                )
+            }
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = strip)
+
+        assertThat(result[0].errors).isEmpty()
+        assertThat(poolClient.sites.getSite(bpnS).site.scriptVariants.map { it.scriptCode }).containsExactly(scriptCode)
+        assertThat(poolClient.addresses.getAddress(mainAddressBpn).scriptVariants.map { it.scriptCode }).containsExactly(scriptCode)
+    }
+
     private fun BusinessPartner.inScriptCode(scriptCode: String): BusinessPartner =
         copy(
             legalEntity = legalEntity.copy(scriptVariants = legalEntity.scriptVariants.take(1).map { it.copy(scriptCode = scriptCode) }),

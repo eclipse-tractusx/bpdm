@@ -17,8 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.exception
 
-class BpdmMultiValidationException(
-    val validationErrors: List<String>
-) : RuntimeException("Following validation errors found: ${validationErrors.joinToString("\n")}")
+package org.eclipse.tractusx.bpdm.pool.model.parsed
+
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+
+data class SiteUpdateOnLegalAddressParsed(
+    val target: SiteDb,
+    val header: SiteHeaderParsed
+)
