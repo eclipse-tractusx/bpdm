@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 
 @Schema(description = "Task reservation entry")
-data class TaskStepReservationEntryDto(
+data class TaskStepReservationEntryDtoV6(
 
     @get:Schema(description = "The identifier of the reserved task")
     val taskId: String,
@@ -32,7 +32,7 @@ data class TaskStepReservationEntryDto(
     val recordId: String,
 
     @get:Schema(description = "The business partner data to process")
-    val businessPartner: BusinessPartner
+    val businessPartner: BusinessPartnerV6
 ) : RequestWithKey {
     override fun getRequestKey(): String {
         return taskId

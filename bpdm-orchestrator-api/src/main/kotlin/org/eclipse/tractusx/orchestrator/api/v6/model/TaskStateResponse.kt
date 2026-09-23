@@ -22,7 +22,7 @@ package org.eclipse.tractusx.orchestrator.api.v6.model
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Response object for giving a list of task states")
-data class TaskStateResponse(
+data class TaskStateResponseV6(
 
-    val tasks: List<TaskClientStateDto>
+    val tasks: List<TaskClientStateDtoV6>
 )

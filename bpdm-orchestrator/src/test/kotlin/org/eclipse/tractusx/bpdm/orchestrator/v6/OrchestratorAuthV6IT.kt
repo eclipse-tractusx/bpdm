@@ -27,12 +27,13 @@ import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType.*
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskModeV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Instant
@@ -71,7 +72,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(TaskMode.UpdateFromPool, emptyList()))
+            orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequestV6(TaskModeV6.UpdateFromPool, emptyList()))
         }
     }
 
@@ -83,7 +84,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(emptyList()))
+            orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateRequestV6(emptyList()))
         }
     }
 
@@ -95,7 +96,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequestV6(step = TaskStepV6.PoolSync))
         }
     }
 
@@ -107,7 +108,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.CleanAndSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequestV6(step = TaskStepV6.CleanAndSync))
         }
     }
 
@@ -119,7 +120,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.Clean))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequestV6(step = TaskStepV6.Clean))
         }
     }
 
@@ -131,7 +132,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.PoolSync, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequestV6(TaskStepV6.PoolSync, emptyList()))
         }
     }
 
@@ -143,7 +144,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.CleanAndSync, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequestV6(TaskStepV6.CleanAndSync, emptyList()))
         }
     }
 
@@ -155,7 +156,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.Clean, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequestV6(TaskStepV6.Clean, emptyList()))
         }
     }
 

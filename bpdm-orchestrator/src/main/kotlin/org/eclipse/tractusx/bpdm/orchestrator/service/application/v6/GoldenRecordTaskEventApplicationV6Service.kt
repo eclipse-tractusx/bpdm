@@ -21,7 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskEventOperation
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -33,7 +34,25 @@ class GoldenRecordTaskEventApplicationV6Service(
     private val eventOperation: GoldenRecordTaskEventOperation
 ) {
 
-    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
-        return eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponseV6 {
+        val response = eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
+
+        return FinishedTaskEventsResponseV6(
+            totalElements = response.totalElements,
+            totalPages = response.totalPages,
+            page = response.page,
+            contentSize = response.contentSize,
+            content = response.content.map {
+                FinishedTaskEventsResponseV6.Event(
+                    timestamp = it.timestamp,
+                    resultState = when (it.resultState) {
+                        org.eclipse.tractusx.orchestrator.api.model.ResultState.Pending -> ResultStateV6.Pending
+                        org.eclipse.tractusx.orchestrator.api.model.ResultState.Success -> ResultStateV6.Success
+                        org.eclipse.tractusx.orchestrator.api.model.ResultState.Error -> ResultStateV6.Error
+                    },
+                    taskId = it.taskId
+                )
+            }
+        )
     }
 }

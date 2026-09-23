@@ -25,19 +25,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.*
+import org.eclipse.tractusx.orchestrator.api.TagClient
+import org.eclipse.tractusx.orchestrator.api.TagWorker
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
-const val TagClient = "Task Client"
-const val TagWorker = "Task Worker"
-
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-interface GoldenRecordTaskApi {
+interface GoldenRecordTaskApiV6 {
 
     @Operation(
         summary = "Create new golden record tasks for given business partner data",
@@ -58,7 +63,7 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagClient)
     @PostMapping(value = [ApiCommons.BASE_PATH_V6])
-    fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
+    fun createTasks(@RequestBody createRequest: TaskCreateRequestV6): TaskCreateResponseV6
 
     @Operation(
         summary = "Search for the state of golden record tasks by task identifiers",
@@ -75,7 +80,24 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagClient)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/state/search"])
-    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
+    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequestV6): TaskStateResponseV6
+
+    @Operation(
+        summary = "Search for result states by giving a list of task IDs",
+        description = ""
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
+        ]
+    )
+    @Tag(name = TagClient)
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/result-state/search"])
+    fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchRequestV6): TaskResultStateSearchResponseV6
 
     @Operation(
         summary = "Reserve the next golden record tasks waiting in the given step queue",
@@ -95,7 +117,7 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagWorker)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-reservations"])
-    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
+    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequestV6): TaskStepReservationResponseV6
 
     @Operation(
         summary = "Post step results for reserved golden record tasks in the given step queue",
@@ -120,5 +142,5 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagWorker)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-results"])
-    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
+    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequestV6)
 }

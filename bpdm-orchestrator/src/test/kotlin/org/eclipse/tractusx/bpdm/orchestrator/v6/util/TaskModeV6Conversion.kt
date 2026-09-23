@@ -17,21 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
-import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskModeV6
 
-@Schema(description = "The golden record task's processing state together with optional business partner data in case processing is done")
-data class TaskClientStateDtoV6(
-
-    @get:Schema(required = true)
-    val taskId: String,
-
-    @get:Schema(required = true, description = "The identifier of the gate record for which this task has been created")
-    val recordId: String,
-
-    val businessPartnerResult: BusinessPartnerV6,
-
-    @get:Schema(required = true)
-    val processingState: TaskProcessingStateDtoV6
-)
+internal fun TaskMode.toV6(): TaskModeV6 =
+    when (this) {
+        TaskMode.UpdateFromSharingMember -> TaskModeV6.UpdateFromSharingMember
+        TaskMode.UpdateFromPool -> TaskModeV6.UpdateFromPool
+    }

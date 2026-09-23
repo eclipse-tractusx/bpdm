@@ -20,9 +20,10 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.orchestrator.v6.util.toV6
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponse
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -38,11 +39,11 @@ class TaskCreationV6IT: UnscheduledOrchestratorTestBaseV6() {
     fun `create new sharing member update task for new sharing member record`(taskMode: TaskMode){
         //WHEN
         val newTask = requestFactory.buildTaskCreate(testName).copy(recordId = null)
-        val createRequest = TaskCreateRequest(taskMode, listOf(newTask))
+        val createRequest = TaskCreateRequestV6(taskMode.toV6(), listOf(newTask))
         val createResult = orchestratorClient.goldenRecordTasks.createTasks(createRequest)
 
         //THEN
-        val expectedResult = TaskCreateResponse(listOf(expectedResultFactory.buildCreatedTaskClientState(createRequest.requests.single().businessPartner, taskMode)))
+        val expectedResult = TaskCreateResponseV6(listOf(expectedResultFactory.buildCreatedTaskClientState(createRequest.requests.single().businessPartner, taskMode)))
         assertRepository.assertCreatedTasksForNewSharingMemberRecords(createResult, expectedResult)
     }
 
@@ -59,11 +60,11 @@ class TaskCreationV6IT: UnscheduledOrchestratorTestBaseV6() {
 
         //WHEN
         val newTask = requestFactory.buildTaskCreate(testName).copy(recordId = recordId)
-        val createRequest = TaskCreateRequest(taskMode, listOf(newTask))
+        val createRequest = TaskCreateRequestV6(taskMode.toV6(), listOf(newTask))
         val createResult = orchestratorClient.goldenRecordTasks.createTasks(createRequest)
 
         //THEN
-        val expectedResult = TaskCreateResponse(listOf(expectedResultFactory.buildCreatedTaskClientState(
+        val expectedResult = TaskCreateResponseV6(listOf(expectedResultFactory.buildCreatedTaskClientState(
             businessPartner = createRequest.requests.single().businessPartner,
             taskMode = taskMode,
             recordId = recordId
@@ -80,7 +81,7 @@ class TaskCreationV6IT: UnscheduledOrchestratorTestBaseV6() {
     fun `try create task for not existing sharing member record`(taskMode: TaskMode){
         //WHEN
         val newTask = requestFactory.buildTaskCreate(testName).copy(recordId = "NOT EXISTING")
-        val requestBody = TaskCreateRequest(taskMode, listOf(newTask))
+        val requestBody = TaskCreateRequestV6(taskMode.toV6(), listOf(newTask))
         val createRequest: () -> Unit
                 =  { orchestratorClient.goldenRecordTasks.createTasks(requestBody) }
 

@@ -17,21 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.v6.client
+package org.eclipse.tractusx.bpdm.orchestrator.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.orchestrator.api.ApiCommons
+import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.service.application.v6.GoldenRecordTaskEventApplicationV6Service
 import org.eclipse.tractusx.orchestrator.api.v6.FinishedTaskEventApiV6
 import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
-import org.springdoc.core.annotations.ParameterObject
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
-@HttpExchange
-interface FinishedTaskEventApiClientV6: FinishedTaskEventApiV6 {
+@RestController
+class FinishedTaskEventControllerV6(
+    private val taskEventApplicationService: GoldenRecordTaskEventApplicationV6Service
+): FinishedTaskEventApiV6 {
 
-    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/finished-events")
-    override fun getEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponseV6
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
+    override fun getEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponseV6 {
+        return taskEventApplicationService.getFinishedTaskEvents(timestamp, paginationRequest)
+    }
 }

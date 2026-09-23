@@ -20,32 +20,43 @@
 package org.eclipse.tractusx.orchestrator.api.v6.client
 
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.v6.model.*
+import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApiV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.PostExchange
 
-interface GoldenRecordTaskApiClientV6: GoldenRecordTaskApi {
+interface GoldenRecordTaskApiClientV6: GoldenRecordTaskApiV6 {
 
     @PostExchange(value = ApiCommons.BASE_PATH_V6)
     override fun createTasks(
-        @RequestBody createRequest: TaskCreateRequest
-    ): TaskCreateResponse
+        @RequestBody createRequest: TaskCreateRequestV6
+    ): TaskCreateResponseV6
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/step-reservations")
     override fun reserveTasksForStep(
-        @RequestBody reservationRequest: TaskStepReservationRequest
-    ): TaskStepReservationResponse
+        @RequestBody reservationRequest: TaskStepReservationRequestV6
+    ): TaskStepReservationResponseV6
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/step-results")
     override fun resolveStepResults(
-        @RequestBody resultRequest: TaskStepResultRequest
+        @RequestBody resultRequest: TaskStepResultRequestV6
     )
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/state/search")
     override fun searchTaskStates(
-        @RequestBody stateRequest: TaskStateRequest
-    ): TaskStateResponse
+        @RequestBody stateRequest: TaskStateRequestV6
+    ): TaskStateResponseV6
+
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/result-state/search")
+    override fun searchTaskResultStates(
+        @RequestBody stateRequest: TaskResultStateSearchRequestV6
+    ): TaskResultStateSearchResponseV6
 }

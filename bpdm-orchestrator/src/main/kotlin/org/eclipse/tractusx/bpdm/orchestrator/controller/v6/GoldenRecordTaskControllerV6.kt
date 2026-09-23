@@ -23,24 +23,30 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v6.GoldenRecordTaskCreateApplicationV6Service
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.v6.model.*
+import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApiV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("GoldenRecordTaskControllerLegacy")
-class GoldenRecordTaskController(
+class GoldenRecordTaskControllerV6(
     val goldenRecordTaskLegacyServiceMapper: GoldenRecordTaskLegacyServiceMapper,
     val apiConfigProperties: ApiConfigProperties,
     val goldenRecordTaskCreateApplicationService: GoldenRecordTaskCreateApplicationV6Service
-) : GoldenRecordTaskApi {
+) : GoldenRecordTaskApiV6 {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
-    override fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
+    override fun createTasks(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {
         if (createRequest.requests.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
@@ -48,7 +54,7 @@ class GoldenRecordTaskController(
     }
 
     @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")
-    override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
+    override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequestV6): TaskStepReservationResponseV6 {
         if (reservationRequest.amount > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
 
@@ -57,7 +63,7 @@ class GoldenRecordTaskController(
 
     @PreAuthorize("@stepSecurityService.assertHasResultAuthority(authentication, #resultRequest.step)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    override fun resolveStepResults(resultRequest: TaskStepResultRequest) {
+    override fun resolveStepResults(resultRequest: TaskStepResultRequestV6) {
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
 
@@ -65,8 +71,12 @@ class GoldenRecordTaskController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
+    override fun searchTaskStates(stateRequest: TaskStateRequestV6): TaskStateResponseV6 {
         return goldenRecordTaskLegacyServiceMapper.searchTaskStates(stateRequest)
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
+    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequestV6): TaskResultStateSearchResponseV6 {
+        return goldenRecordTaskLegacyServiceMapper.searchTaskResultStates(stateRequest)
+    }
 }
