@@ -3901,7 +3901,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -3923,7 +3923,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -3944,7 +3944,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -3965,7 +3965,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -4698,7 +4698,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressUpdateError",
-            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded", "StatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4734,7 +4734,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "LegalEntityUpdateError",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded", "StatesContradictSuccession", "StatesContradictOwnership", "StatesContradictDataManagement", "StatesContradictAlternativeHeadquarter", "LegalAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4770,7 +4770,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "SiteUpdateError",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded", "StatesContradictSuccession", "MainAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4810,7 +4810,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "AddressUpdateErrorV6",
-            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
+            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "StatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4850,7 +4850,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "LegalEntityUpdateErrorV6",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "StatesContradictSuccession", "StatesContradictOwnership", "StatesContradictDataManagement", "StatesContradictAlternativeHeadquarter", "LegalAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4890,7 +4890,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "SiteUpdateErrorV6",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "StatesContradictSuccession", "MainAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -5766,7 +5766,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -5788,7 +5788,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -5809,7 +5809,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -5830,7 +5830,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -7543,7 +7543,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date",
-            "description" : "The date until which the relation is valid."
+            "description" : "The date up to, but not including, which the relation is valid."
           }
         }
       },
@@ -8128,7 +8128,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -8150,7 +8150,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -8171,7 +8171,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -8192,7 +8192,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",

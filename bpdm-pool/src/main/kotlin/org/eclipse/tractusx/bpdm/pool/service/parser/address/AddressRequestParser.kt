@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
+import org.eclipse.tractusx.bpdm.pool.service.parser.ConfidenceCriteriaParser
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
 
@@ -48,7 +49,8 @@ import org.springframework.stereotype.Service
 class AddressRequestParser(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val regionRepository: RegionRepository,
-    private val scriptCodeRepository: ScriptCodeRepository
+    private val scriptCodeRepository: ScriptCodeRepository,
+    private val confidenceCriteriaParser: ConfidenceCriteriaParser
 ) {
 
     /**
@@ -87,7 +89,10 @@ class AddressRequestParser(
 
         val physical = parsePhysical(request.physicalPostalAddress, metadata, errors)
         val alternative = request.alternativePostalAddress?.let { parseAlternative(it, metadata, errors) }
-        val confidence = parseConfidence(request.confidenceCriteria, errors)
+        val confidence = when (val result = confidenceCriteriaParser.parse(request.confidenceCriteria, AddressFieldParseError.ConfidenceCriteriaMissing)) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> { errors += result.errors; null }
+        }
         val identifiers = parseIdentifiers(request.identifiers, metadata, errors)
         val states = parseStates(request.states, errors)
         val parsedScriptVariants = parseScriptVariants(request.scriptVariants, metadata, errors)
@@ -162,30 +167,6 @@ class AddressRequestParser(
             deliveryServiceType = deliveryServiceType,
             deliveryServiceQualifier = request.deliveryServiceQualifier,
             deliveryServiceNumber = deliveryServiceNumber
-        )
-    }
-
-    private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
-        errors: MutableList<AddressContentParseError>
-    ): ConfidenceCriteriaParsed? {
-        val sharedByOwner = request.sharedByOwner
-        val checkedByExternalDataSource = request.checkedByExternalDataSource
-        val lastConfidenceCheckAt = request.lastConfidenceCheckAt
-        val nextConfidenceCheckAt = request.nextConfidenceCheckAt
-
-        if (sharedByOwner == null || checkedByExternalDataSource == null ||
-            lastConfidenceCheckAt == null || nextConfidenceCheckAt == null
-        ) {
-            errors.add(AddressFieldParseError.ConfidenceCriteriaMissing)
-            return null
-        }
-
-        return ConfidenceCriteriaParsed(
-            sharedByOwner = sharedByOwner,
-            checkedByExternalDataSource = checkedByExternalDataSource,
-            lastConfidenceCheckAt = lastConfidenceCheckAt,
-            nextConfidenceCheckAt = nextConfidenceCheckAt
         )
     }
 

@@ -55,4 +55,10 @@ interface AddressRelationRepository : JpaRepository<AddressRelationDb, Long>, Jp
     fun findInSourceOrTarget(addressRelationType: AddressRelationType, address: LogisticAddressDb): Set<AddressRelationDb>
 
     fun findByTypeAndStartAddress(addressRelationType: AddressRelationType, address: LogisticAddressDb): Set<AddressRelationDb>
+
+    @Query(
+        "SELECT r FROM AddressRelationDb r JOIN FETCH r.startAddress JOIN FETCH r.endAddress LEFT JOIN FETCH r.validityPeriods " +
+                "WHERE r.startAddress.bpn IN :addressBpns OR r.endAddress.bpn IN :addressBpns"
+    )
+    fun findByStartAddressBpnInOrEndAddressBpnIn(addressBpns: Collection<String>): Set<AddressRelationDb>
 }

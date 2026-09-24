@@ -65,6 +65,8 @@ class SiteUpdateService(
     @Transactional
     fun update(requests: List<SiteUpdate>): List<UpsertResult<SiteDb>> {
         val headerUpdates = requests.map { updateHeader(it) }
+        // Before the address: the address keeps the script variants its partners are named in, so it has to see the
+        // site's new scripts to let go of one it is dropping.
         val mainAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.site.mainAddress, it.mainAddress) })
 
         val siteChangeResults = headerUpdates.zip(mainAddressUpdates) { headerResult, mainAddressResult ->

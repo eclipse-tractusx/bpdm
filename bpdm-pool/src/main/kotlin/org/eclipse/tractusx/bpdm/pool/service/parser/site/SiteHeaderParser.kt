@@ -21,15 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.common.model.combine
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteHeaderParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
+import org.eclipse.tractusx.bpdm.pool.service.parser.ConfidenceCriteriaParser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates the fields of a site header against the script codes they reference. The header only: the main address is
@@ -37,15 +38,21 @@ import org.springframework.stereotype.Service
  */
 @Service
 class SiteHeaderParser(
-    private val scriptCodeRepository: ScriptCodeRepository
+    private val scriptCodeRepository: ScriptCodeRepository,
+    private val confidenceCriteriaParser: ConfidenceCriteriaParser,
+    private val stateRelationValidator: SiteStateRelationValidator
 ) {
 
     /**
-     * Validates each header and reports either the validated header or every problem found in that entry.
+     * Validates each header and reports either the validated header or every problem found in that entry. [siteBpns] is
+     * positional with [headers]: null for a create, the site's own BPN for an update, so an update has its states judged
+     * against the successions the site takes part in.
      */
-    fun parse(headers: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteContentParseError>> {
+    @Transactional(readOnly = true)
+    fun parse(headers: List<SiteHeaderRequest>, siteBpns: List<String?>): List<ParseResult<SiteHeaderParsed, SiteHeaderParseError>> {
         val scriptCodes = fetchScriptCodes(headers)
-        return headers.map { parseEntry(it, scriptCodes) }
+        val stateRelationErrors = stateRelationValidator.validate(headers, siteBpns)
+        return headers.mapIndexed { index, header -> parseEntry(header, scriptCodes).combine(stateRelationErrors[index]) { it } }
     }
 
     private fun fetchScriptCodes(headers: List<SiteHeaderRequest>): Map<String, ScriptCodeDb> {
@@ -53,11 +60,14 @@ class SiteHeaderParser(
         return scriptCodeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
     }
 
-    private fun parseEntry(header: SiteHeaderRequest, scriptCodes: Map<String, ScriptCodeDb>): ParseResult<SiteHeaderParsed, SiteContentParseError> {
-        val errors = mutableListOf<SiteContentParseError>()
+    private fun parseEntry(header: SiteHeaderRequest, scriptCodes: Map<String, ScriptCodeDb>): ParseResult<SiteHeaderParsed, SiteHeaderParseError> {
+        val errors = mutableListOf<SiteHeaderParseError>()
 
-        val name = header.name ?: run { errors.add(SiteContentParseError.NameMissing); null }
-        val confidence = parseConfidence(header.confidenceCriteria, errors)
+        val name = header.name ?: run { errors.add(SiteHeaderParseError.NameMissing); null }
+        val confidence = when (val result = confidenceCriteriaParser.parse(header.confidenceCriteria, SiteHeaderParseError.ConfidenceCriteriaMissing)) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> { errors += result.errors; null }
+        }
         val scriptVariants = parseScriptVariants(header.scriptVariants, scriptCodes, errors)
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
@@ -73,34 +83,15 @@ class SiteHeaderParser(
         )
     }
 
-    private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
-        errors: MutableList<SiteContentParseError>
-    ): ConfidenceCriteriaParsed? {
-        val sharedByOwner = request.sharedByOwner
-        val checkedByExternalDataSource = request.checkedByExternalDataSource
-        val lastConfidenceCheckAt = request.lastConfidenceCheckAt
-        val nextConfidenceCheckAt = request.nextConfidenceCheckAt
-
-        if (sharedByOwner == null || checkedByExternalDataSource == null ||
-            lastConfidenceCheckAt == null || nextConfidenceCheckAt == null
-        ) {
-            errors.add(SiteContentParseError.ConfidenceCriteriaMissing)
-            return null
-        }
-
-        return ConfidenceCriteriaParsed(sharedByOwner, checkedByExternalDataSource, lastConfidenceCheckAt, nextConfidenceCheckAt)
-    }
-
     private fun parseScriptVariants(
         requests: List<SiteScriptVariant>,
         scriptCodes: Map<String, ScriptCodeDb>,
-        errors: MutableList<SiteContentParseError>
+        errors: MutableList<SiteHeaderParseError>
     ): List<SiteScriptVariantParsed> {
         val claimedScriptCodes = mutableSetOf<String>()
         return requests.mapIndexedNotNull { index, variant ->
             if (!claimedScriptCodes.add(variant.scriptCode)) {
-                errors.add(SiteContentParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
+                errors.add(SiteHeaderParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
                 null
             } else {
                 parseScriptVariant(index, variant, scriptCodes, errors)
@@ -112,12 +103,12 @@ class SiteHeaderParser(
         index: Int,
         variant: SiteScriptVariant,
         scriptCodes: Map<String, ScriptCodeDb>,
-        errors: MutableList<SiteContentParseError>
+        errors: MutableList<SiteHeaderParseError>
     ): SiteScriptVariantParsed? {
         val scriptCode = scriptCodes[variant.scriptCode]
-            ?: run { errors.add(SiteContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
+            ?: run { errors.add(SiteHeaderParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
         val name = variant.name.takeIf { it.isNotBlank() }
-            ?: run { errors.add(SiteContentParseError.ScriptVariantNameMissing(index)); null }
+            ?: run { errors.add(SiteHeaderParseError.ScriptVariantNameMissing(index)); null }
 
         if (scriptCode == null || name == null) return null
 

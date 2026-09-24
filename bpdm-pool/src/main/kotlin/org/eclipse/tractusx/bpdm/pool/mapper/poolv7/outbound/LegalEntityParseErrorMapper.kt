@@ -24,12 +24,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes, delegating
- * legal-address errors to [AddressParseErrorMapper].
+ * Maps the legal-entity services' sealed parse errors to the `/legal-entities` error codes, delegating
+ * legal-address errors to the address error mapper.
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
  * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
@@ -37,14 +38,15 @@ import org.springframework.stereotype.Component
  */
 @Component
 class LegalEntityParseErrorMapper(
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
 ) {
 
+    /** The error a failed legal-entity create reports for the given parse error. */
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageParseError -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityCreateError.LegalFormNotFound,
@@ -56,6 +58,7 @@ class LegalEntityParseErrorMapper(
             )
         }
 
+    /** The error a failed legal-entity update reports for the given parse error. */
     fun toUpdateErrorInfo(error: LegalEntityUpdateParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
         when (error) {
             is UnresolvableLegalEntity ->
@@ -71,16 +74,10 @@ class LegalEntityParseErrorMapper(
                 "Legal entity '${error.bpnl}' cannot carry the ultimate-owner flag because it is an alternative headquarter",
                 entityKey
             )
+            is LegalEntityStateRelationParseError ->
+                ErrorInfo(toStatesContradictionCode(error), stateRelationErrorMapper.toDescription(error), entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfo(
-                    LegalEntityUpdateError.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the legal address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityUpdateError.LegalFormNotFound,
@@ -93,7 +90,7 @@ class LegalEntityParseErrorMapper(
         }
 
     private fun <E : ErrorCode> contentErrorInfo(
-        error: LegalEntityContentParseError,
+        error: LegalEntityHeaderParseError,
         entityKey: String?,
         legalFormNotFound: E,
         identifierNotFound: E,
@@ -103,23 +100,32 @@ class LegalEntityParseErrorMapper(
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
-            is LegalEntityContentParseError.LegalFormNotFound ->
+            is LegalEntityHeaderParseError.LegalFormNotFound ->
                 ErrorInfo(legalFormNotFound, "Legal form '${error.legalForm}' does not exist", entityKey)
-            is LegalEntityContentParseError.IdentifierTypeNotFound ->
+            is LegalEntityHeaderParseError.IdentifierTypeNotFound ->
                 ErrorInfo(identifierNotFound, "Legal Entity Identifier Type '${error.type}' does not exist", entityKey)
-            is LegalEntityContentParseError.DuplicateIdentifier ->
+            is LegalEntityHeaderParseError.DuplicateIdentifier ->
                 ErrorInfo(duplicateIdentifier, "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
-            is LegalEntityContentParseError.IdentifiersTooMany ->
+            is LegalEntityHeaderParseError.IdentifiersTooMany ->
                 ErrorInfo(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing ->
+            is LegalEntityHeaderParseError.ScriptVariantLegalNameMissing ->
                 ErrorInfo(scriptVariantLegalNameMissing, "Script variant ${error.index} has no legal name", entityKey)
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+            is LegalEntityHeaderParseError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate legal entity script variant for script code '${error.scriptCode}'", entityKey)
-            is LegalEntityContentParseError.NameMissing,
-            is LegalEntityContentParseError.ConfidenceCriteriaMissing,
-            is LegalEntityContentParseError.IdentifierValueMissing,
-            is LegalEntityContentParseError.IdentifierTypeMissing,
-            is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is LegalEntityHeaderParseError.NameMissing,
+            is LegalEntityHeaderParseError.ConfidenceCriteriaMissing,
+            is LegalEntityHeaderParseError.IdentifierValueMissing,
+            is LegalEntityHeaderParseError.IdentifierTypeMissing,
+            is LegalEntityHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
+        }
+
+    private fun toStatesContradictionCode(error: LegalEntityStateRelationParseError): LegalEntityUpdateError =
+        when (error) {
+            is ReplacedLegalEntityRecordedActive, is ReplacingLegalEntityRecordedInactive -> LegalEntityUpdateError.StatesContradictSuccession
+            is OwnerRecordedInactive -> LegalEntityUpdateError.StatesContradictOwnership
+            is ManagerRecordedInactive -> LegalEntityUpdateError.StatesContradictDataManagement
+            is AlternativeHeadquarterRecordedInactive, is MainHeadquarterRecordedInactive ->
+                LegalEntityUpdateError.StatesContradictAlternativeHeadquarter
         }
 
     private fun internalError(error: LegalEntityCreateParseError) =

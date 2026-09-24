@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates the descriptive content of an address — the shared entry point reused for standalone addresses,
@@ -33,17 +34,21 @@ import org.springframework.stereotype.Service
 @Service
 class AddressContentParser(
     private val addressRequestParser: AddressRequestParser,
-    private val duplicateValidator: AddressIdentifierDuplicateValidator
+    private val duplicateValidator: AddressIdentifierDuplicateValidator,
+    private val stateRelationValidator: AddressStateRelationValidator
 ) {
 
     /**
      * Validates each address content, including its identifier uniqueness, and reports either the validated address or
      * every problem found in that entry. [ownerBpns] is positional with [contents]: null for a create, the address's own
-     * BPN for an update, so an update may re-submit its own existing identifiers.
+     * BPN for an update, so an update may re-submit its own existing identifiers and has its states judged against the
+     * successions the address takes part in.
      */
+    @Transactional(readOnly = true)
     fun parse(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<ParseResult<LogisticAddressParsed, AddressContentParseError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns)
-        return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }
+        val stateRelationErrors = stateRelationValidator.validate(contents, ownerBpns)
+        return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index] + stateRelationErrors[index]) { it } }
     }
 }

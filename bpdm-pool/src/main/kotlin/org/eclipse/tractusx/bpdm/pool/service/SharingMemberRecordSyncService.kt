@@ -28,12 +28,19 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 
+/**
+ * Keeps the Pool's sharing member records in step with the Orchestrator's on a schedule.
+ *
+ * Progress is tracked as the update time of the last record taken over, so a run continues where the previous one
+ * stopped rather than re-reading everything.
+ */
 @Service
 class SharingMemberRecordSyncService(
     private val orchestrationApiClient: OrchestrationApiClient,
@@ -57,6 +64,10 @@ class SharingMemberRecordSyncService(
     }
 
     @Scheduled(cron = "#{${SharingMemberRecordSyncConfigProperties.GET_CRON}}", zone = "UTC")
+    /**
+     * Takes over every sharing member record the Orchestrator has updated since the last run, page by page until none
+     * are left.
+     */
     fun synchronize(){
         var hasMore = false
         do{

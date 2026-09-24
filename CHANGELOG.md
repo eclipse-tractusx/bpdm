@@ -1,4 +1,4 @@
-# Changelog 
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -10,13 +10,24 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Breaking
 
+- BPDM Pool: A golden record task that states a site without a main address is now rejected when that site already owns a main address of its own, instead of silently updating only the site's properties
+- BPDM Pool: A golden record task that states additional sites without stating a site of its own is now rejected, instead of silently discarding those additional sites
+- BPDM Pool: A golden record task must state every site its record address is the main address of among the additional sites; leaving one out is now rejected instead of silently keeping it
 - BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
+- BPDM Pool: A succession is now validated against the states of the two business partners it relates, at legal entity, site and address level alike: it is rejected when the predecessor is still recorded as active on or after the succession's start date, when the successor is recorded as inactive on that date, or when the succession carries an end date or more than one validity period [#1858](https://github.com/eclipse-tractusx/bpdm/issues/1858)
+- BPDM Pool: An ownership or data management relation is now rejected when its owner or manager is recorded as inactive during any of its validity periods [#1859](https://github.com/eclipse-tractusx/bpdm/issues/1859)
+- BPDM Pool: An alternative headquarter relation is now rejected when either of its two legal entities is recorded as inactive during any of its validity periods [#1860](https://github.com/eclipse-tractusx/bpdm/issues/1860)
+- BPDM Pool: A legal entity, site or address update is now rejected when the states it states contradict a relation the business partner already takes part in: a replaced partner recorded as active again, a successor recorded as inactive on the day it takes over, or an owner, data manager or alternative headquarter partner recorded as inactive while its relation holds. The rejection names the relation and the other partner; deactivating an owned or managed partner stays possible [#1861](https://github.com/eclipse-tractusx/bpdm/issues/1861)
 
 ### Added
+
+- BPDM Pool: The legal entity, site and address update endpoints of both API versions report the new `StatesContradictSuccession`, `StatesContradictOwnership`, `StatesContradictDataManagement`, `StatesContradictAlternativeHeadquarter`, `LegalAddressStatesContradictSuccession` and `MainAddressStatesContradictSuccession` error codes [#1861](https://github.com/eclipse-tractusx/bpdm/issues/1861)
 
 ### Changed
 
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
+- BPDM Pool: An address now keeps the script variants its legal entity and sites are still named in and drops the rest, so a write no longer has to restate another business partner's scripts to keep it readable and the `ScriptVariantCoverageStillNeeded` error is gone
+- BPDM Pool: A relation's `validTo` is now read exclusively wherever the Pool asks whether a relation holds on a date, so a relation ending on a date no longer holds on that date but on the day before, and two periods meeting on one date are consecutive instead of overlapping [#1857](https://github.com/eclipse-tractusx/bpdm/issues/1857)
 
 ## [7.5.0] - 2026-09-08
 

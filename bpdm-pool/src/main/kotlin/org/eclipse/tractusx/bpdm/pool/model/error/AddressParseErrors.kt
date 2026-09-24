@@ -19,9 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
+import java.time.LocalDate
+
 sealed interface AddressCreateParseError
 
 sealed interface AddressUpdateParseError
+
 
 sealed interface AddressSiteMembershipParseError
 
@@ -47,10 +50,8 @@ data class SiteMainAddressOmitted(val siteBpn: String) :
 sealed interface AddressContentParseError :
     AddressCreateParseError,
     AddressUpdateParseError,
-    SiteCreateParseError,
-    SiteUpdateParseError,
-    LegalEntityCreateParseError,
-    LegalEntityUpdateParseError
+    SiteContentParseError,
+    LegalEntityContentParseError
 
 sealed interface AddressFieldParseError : AddressContentParseError {
     data object PhysicalCountryMissing : AddressFieldParseError
@@ -86,4 +87,13 @@ sealed interface AddressScriptVariantParseError : AddressContentParseError {
     data class PhysicalCityMissing(val index: Int) : AddressScriptVariantParseError
     data class AlternativeCityMissing(val index: Int) : AddressScriptVariantParseError
     data class DuplicateScriptCode(val index: Int, val scriptCode: String) : AddressScriptVariantParseError
+}
+
+/**
+ * The ways the states an address write states can contradict a succession the address already takes part in.
+ */
+sealed interface AddressStateRelationParseError : AddressContentParseError {
+    data class ReplacedAddressRecordedActive(val bpn: String, val successorBpn: String, val validFrom: LocalDate) : AddressStateRelationParseError
+    data class ReplacingAddressRecordedInactive(val bpn: String, val predecessorBpn: String, val validFrom: LocalDate) :
+        AddressStateRelationParseError
 }

@@ -49,7 +49,12 @@ enum class LegalEntityUpdateErrorV6 : ErrorCodeV6 {
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
-    LegalAddressIdentifiersTooMany
+    LegalAddressIdentifiersTooMany,
+    StatesContradictSuccession,
+    StatesContradictOwnership,
+    StatesContradictDataManagement,
+    StatesContradictAlternativeHeadquarter,
+    LegalAddressStatesContradictSuccession
 }
 
 @Schema(description = "SiteCreateErrorV6", deprecated = true)
@@ -67,7 +72,9 @@ enum class SiteUpdateErrorV6 : ErrorCodeV6 {
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
     MainAddressDuplicateIdentifier,
-    MainAddressIdentifiersTooMany
+    MainAddressIdentifiersTooMany,
+    StatesContradictSuccession,
+    MainAddressStatesContradictSuccession
 }
 
 @Schema(description = "AddressCreateErrorV6", deprecated = true)
@@ -89,5 +96,6 @@ enum class AddressUpdateErrorV6 : ErrorCodeV6 {
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
-    IdentifiersTooMany
+    IdentifiersTooMany,
+    StatesContradictSuccession
 }

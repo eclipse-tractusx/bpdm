@@ -59,5 +59,11 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
 
     fun findByTypeAndEndNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
+    @Query(
+        "SELECT r FROM RelationDb r JOIN FETCH r.startNode JOIN FETCH r.endNode LEFT JOIN FETCH r.validityPeriods " +
+                "WHERE r.startNode IN :legalEntities OR r.endNode IN :legalEntities"
+    )
+    fun findByStartNodeInOrEndNodeIn(legalEntities: Collection<LegalEntityDb>): Set<RelationDb>
+
     fun existsByReasonCode(reasonCode: ReasonCodeDb): Boolean
 }

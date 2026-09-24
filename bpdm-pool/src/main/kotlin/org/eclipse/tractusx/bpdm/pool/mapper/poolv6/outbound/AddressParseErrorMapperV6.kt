@@ -21,18 +21,22 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the address services' sealed parse errors to the v6 `/addresses` [ErrorInfoV6] codes.
+ * Maps the address services' sealed parse errors to the v6 `/addresses` error codes.
  *
  * The v6 error enums are frozen and predate script variants, so every script-variant error is thrown as an internal
  * error instead of getting a public code. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
-class AddressParseErrorMapperV6 {
+class AddressParseErrorMapperV6(
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
+) {
 
+    /** The v6 error a failed address create reports for the given parse error. */
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
         when (error) {
             is InvalidParentBpn ->
@@ -53,10 +57,12 @@ class AddressParseErrorMapperV6 {
                 regionNotFound = AddressCreateErrorV6.RegionNotFound,
                 identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
                 duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
+                identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany,
+                statesContradictSuccession = null
             )
         }
 
+    /** The v6 error a failed address update reports for the given parse error. */
     fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
         when (error) {
             is UnresolvableAddress ->
@@ -67,7 +73,8 @@ class AddressParseErrorMapperV6 {
                 regionNotFound = AddressUpdateErrorV6.RegionNotFound,
                 identifierNotFound = AddressUpdateErrorV6.IdentifierNotFound,
                 duplicateIdentifier = AddressUpdateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
+                identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany,
+                statesContradictSuccession = AddressUpdateErrorV6.StatesContradictSuccession
             )
             is SiteNotInAddressLegalEntity ->
                 ErrorInfoV6(
@@ -75,14 +82,11 @@ class AddressParseErrorMapperV6 {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
             is UnresolvableSite,
-            is SiteMainAddressOmitted,
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+            is SiteMainAddressOmitted -> throw internalError(error)
         }
 
+    /** The v6 error a failed legal-entity create reports for the given error found on its legal address. */
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         sharedErrorInfo(
             error,
@@ -90,9 +94,11 @@ class AddressParseErrorMapperV6 {
             regionNotFound = LegalEntityCreateErrorV6.LegalAddressRegionNotFound,
             identifierNotFound = LegalEntityCreateErrorV6.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityCreateErrorV6.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany
+            identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany,
+            statesContradictSuccession = null
         )
 
+    /** The v6 error a failed legal-entity update reports for the given error found on its legal address. */
     fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
         sharedErrorInfo(
             error,
@@ -100,9 +106,11 @@ class AddressParseErrorMapperV6 {
             regionNotFound = LegalEntityUpdateErrorV6.LegalAddressRegionNotFound,
             identifierNotFound = LegalEntityUpdateErrorV6.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityUpdateErrorV6.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany
+            identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany,
+            statesContradictSuccession = LegalEntityUpdateErrorV6.LegalAddressStatesContradictSuccession
         )
 
+    /** The v6 error a failed site create reports for the given error found on its main address. */
     fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
         sharedErrorInfo(
             error,
@@ -110,9 +118,11 @@ class AddressParseErrorMapperV6 {
             regionNotFound = SiteCreateErrorV6.MainAddressRegionNotFound,
             identifierNotFound = SiteCreateErrorV6.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteCreateErrorV6.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany
+            identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany,
+            statesContradictSuccession = null
         )
 
+    /** The v6 error a failed site update reports for the given error found on its main address. */
     fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         sharedErrorInfo(
             error,
@@ -120,7 +130,8 @@ class AddressParseErrorMapperV6 {
             regionNotFound = SiteUpdateErrorV6.MainAddressRegionNotFound,
             identifierNotFound = SiteUpdateErrorV6.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteUpdateErrorV6.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteUpdateErrorV6.MainAddressIdentifiersTooMany
+            identifiersTooMany = SiteUpdateErrorV6.MainAddressIdentifiersTooMany,
+            statesContradictSuccession = SiteUpdateErrorV6.MainAddressStatesContradictSuccession
         )
 
     private fun <E : ErrorCodeV6> sharedErrorInfo(
@@ -129,7 +140,8 @@ class AddressParseErrorMapperV6 {
         regionNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
-        identifiersTooMany: E
+        identifiersTooMany: E,
+        statesContradictSuccession: E?
     ): ErrorInfoV6<E> =
         when (error) {
             is AddressFieldParseError -> throw internalError(error)
@@ -149,6 +161,8 @@ class AddressParseErrorMapperV6 {
                     ErrorInfoV6(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             }
             is AddressScriptVariantParseError -> throw internalError(error)
+            is AddressStateRelationParseError ->
+                ErrorInfoV6(statesContradictSuccession ?: throw internalError(error), stateRelationErrorMapper.toDescription(error), entityKey)
         }
 
     private fun internalError(error: Any) =
