@@ -46,6 +46,7 @@ The Pool now judges data by rules it did not apply when your sharing members sha
 
 - A relation's `validTo` is now read strictly as non-inclusive everywhere, as it should be: a relation valid from 2026-01-01 to 2026-03-10 holds on 2026-03-09 and no longer holds on 2026-03-10. Previously one part of the Pool read the end date as inclusive and another as exclusive, so relations that contradict each other on the day two periods meet were accepted.
 - A succession is rejected when its predecessor is still recorded as active on or after its start date, when its successor is recorded as inactive on that date, or when it carries an end date or more than one validity period.
+- An ownership or data management relation is rejected when its owner or manager is recorded as inactive during any of its validity periods.
 
 Nothing removes or blocks those records: they stay readable, and they are rejected the next time they are shared.
 

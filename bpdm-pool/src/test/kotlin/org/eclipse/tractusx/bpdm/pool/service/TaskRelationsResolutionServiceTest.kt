@@ -105,8 +105,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerTargetBpn = BusinessPartnerVerboseValues.secondBpnL
         )
 
-        // Succession reports every partner it could not resolve, the other relation families stop at the source.
-        val expectedErrorCount = if (relationType == LegalEntityRelationType.IsReplacedBy) 2 else 1
+        // Alternative headquarter designations stop at the source, the other relation families report every partner
+        // they could not resolve.
+        val expectedErrorCount = if (relationType == LegalEntityRelationType.IsAlternativeHeadquarterFor) 1 else 2
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
@@ -239,22 +240,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     @Test
     fun `IsManagedBy relation - handle all validity scenarios`() {
         // Step 1: Create three legal entities A, B, C
-        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entityB = with(BusinessPartnerNonVerboseValues.legalEntityCreate2){
-            copy(
-                legalEntity = legalEntity.copy(header = legalEntity.header.copy(isParticipantData = true))
-            )
-        }
-        val entityC = with(BusinessPartnerNonVerboseValues.legalEntityCreate3){
-            copy(
-                legalEntity = legalEntity.copy(header = legalEntity.header.copy(isParticipantData = true))
-            )
-        }
-
-        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
-        val savedA = response.entities.toList()[0]
-        val savedB = response.entities.toList()[1]
-        val savedC = response.entities.toList()[2]
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
 
         val nowDate = LocalDate.now()
 
@@ -339,13 +327,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
      */
     @Test
     fun `create IsManagedBy relation - violate dataspace participant role`(){
-        // Step 1: Create three legal entities A and B
-        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
-
-        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB))
-        val savedA = response.entities.toList()[0]
-        val savedB = response.entities.toList()[1]
+        // Step 1: Create two legal entities A and B
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B", isParticipant = false)
 
         // Step 2: Try to make A is managed by B -> should fail because of only dataspace participants can manage other entities
         val violatingDataspaceParticipantRole = buildAlwaysActiveRelationRequest(
@@ -359,7 +343,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         //Step4: Assert error
         assertThat(resultDataspaceParticipantViolation.size).isEqualTo(1)
         val violationResult = resultDataspaceParticipantViolation.first()
-        assertThat(violationResult.errors.size).isEqualTo(1)
+        assertThat(violationResult.errors.map { it.description })
+            .anySatisfy { assertThat(it).contains(savedB.legalEntity.header.bpnl).contains("not a dataspace participant") }
     }
 
     /**
@@ -370,14 +355,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     @Test
     fun `create IsOwnedBy relation - violate single parent`(){
         // Step 1: Create three legal entities A, B, C
-        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
-        val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
-
-        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
-        val savedA = response.entities.toList()[0]
-        val savedB = response.entities.toList()[1]
-        val savedC = response.entities.toList()[2]
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
 
         // Step 2: Create valid IsOwnedBy relation: A is owned by B
         val validRelation = buildAlwaysActiveRelationRequest(
@@ -410,14 +390,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     @Test
     fun `create IsOwnedBy relation - violate no cycles`(){
         // Step 1: Create three legal entities A, B, C
-        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
-        val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
-
-        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
-        val savedA = response.entities.toList()[0]
-        val savedB = response.entities.toList()[1]
-        val savedC = response.entities.toList()[2]
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
 
         // Step 2: Create valid IsOwnedBy relation: A is owned by B
         val validAOwnedByB = buildAlwaysActiveRelationRequest(
@@ -459,14 +434,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     @Test
     fun `create IsOwnedBy relation - chain extension and update existing`() {
         // Step 1: Create three legal entities A, B, C
-        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
-        val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
-
-        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
-        val savedA = response.entities.toList()[0]
-        val savedB = response.entities.toList()[1]
-        val savedC = response.entities.toList()[2]
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
 
         // Step 2: Create initial IsOwnedBy relation: A is owned by B
         val relationAOwnedByB = buildAlwaysActiveRelationRequest(
@@ -663,7 +633,27 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(value = LegalEntityRelationType::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = LegalEntityRelationType::class, names = ["IsOwnedBy", "IsManagedBy"])
+    fun `reject ownership and data management between addresses as naming no legal entity`(relationType: LegalEntityRelationType) {
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.legalAddress.bpna,
+            businessPartnerTargetBpn = additionalAddress1.address.bpna
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
+        assertThat(result[0].taskId).isEqualTo("TASK_1")
+        assertThat(result[0].errors.map { it.description })
+            .hasSize(2)
+            .allSatisfy { assertThat(it).startsWith("No legal entity") }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = LegalEntityRelationType::class, names = ["IsAlternativeHeadquarterFor"])
     fun `reject unsupported address relation type`(relationType: LegalEntityRelationType) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
@@ -1350,8 +1340,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
     // Partners here record no states at all, so a succession against them is judged on the relation alone: what this
     // class covers is the shape of the succession graph, and the rules on partner states have their own tests.
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
-        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
+    private fun createLegalEntity(seed: String, isParticipant: Boolean = true): LegalEntityPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, isParticipant)
             .withStates(emptyList())
             .withLegalAddressStates(emptyList())
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()

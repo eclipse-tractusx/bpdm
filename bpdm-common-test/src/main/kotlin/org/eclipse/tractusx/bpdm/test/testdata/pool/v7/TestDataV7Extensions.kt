@@ -348,6 +348,9 @@ fun AddressPartnerUpdateRequest.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
 
+fun LegalEntityDto.withStates(states: List<LegalEntityStateDto>) =
+    copy(header = header.copy(states = states))
+
 fun LegalEntityPartnerCreateRequest.withStates(states: List<LegalEntityStateDto>) =
     copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states)))
 

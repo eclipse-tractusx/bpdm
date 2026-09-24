@@ -91,7 +91,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -142,7 +142,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -167,7 +167,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertSuccession(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -193,13 +193,13 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertSuccession(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(legalEntity1.legalEntity.legalAddress.bpna)
         assertThat(result.errors.size).isEqualTo(0)
     }
 
-    // Partners here record no states at all, so what a succession is routed to is not decided by whether they are in use.
+    // Partners here record no states at all, so what a relation is routed to is not decided by whether they are in use.
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
             .withStates(emptyList())
@@ -218,8 +218,9 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         return taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
     }
 
-    // Succession no longer reaches the dispatcher: it is routed to its own write path one level above.
-    private fun upsertSuccession(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto =
+    // Succession, ownership and data management no longer reach the dispatcher: they are routed to their own write
+    // paths one level above.
+    private fun upsertThroughRelationTask(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto =
         relationTaskApplicationService.upsert(listOf(singleTaskStep(taskId, businessPartnerRelations))).single()
 
     private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelations): TaskRelationsStepReservationEntryDto {

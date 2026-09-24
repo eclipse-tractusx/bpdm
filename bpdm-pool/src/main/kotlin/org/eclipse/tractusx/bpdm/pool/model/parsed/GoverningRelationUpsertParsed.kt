@@ -17,11 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-data class SuccessionUpsertRequest(
-    val predecessorBpn: String,
-    val successorBpn: String,
-    val validityPeriods: List<RelationValidityPeriodRequest>,
-    val reasonCode: String?
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+
+data class OwnershipUpsertParsed(
+    val owned: LegalEntityDb,
+    val owner: LegalEntityDb,
+    val validityPeriods: List<RelationValidityPeriodDb>,
+    val reasonCode: ReasonCodeDb?,
+    val existingRelation: RelationDb?
+)
+
+data class DataManagementUpsertParsed(
+    val managed: LegalEntityDb,
+    val manager: LegalEntityDb,
+    val validityPeriods: List<RelationValidityPeriodDb>,
+    val reasonCode: ReasonCodeDb?,
+    val existingRelation: RelationDb?
 )

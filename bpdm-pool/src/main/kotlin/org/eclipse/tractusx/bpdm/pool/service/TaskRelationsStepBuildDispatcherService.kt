@@ -49,8 +49,6 @@ class TaskRelationsStepBuildDispatcherService(
     }
 
     private val LEGAL_ENTITY_RELATION_TYPES = setOf(
-        RelationType.IsAlternativeHeadquarterFor,
-        RelationType.IsManagedBy,
-        RelationType.IsOwnedBy
+        RelationType.IsAlternativeHeadquarterFor
     )
 }

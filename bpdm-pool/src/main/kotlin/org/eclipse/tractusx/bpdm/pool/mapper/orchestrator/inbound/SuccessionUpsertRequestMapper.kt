@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
+import org.eclipse.tractusx.bpdm.pool.model.request.RelationValidityPeriodRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SuccessionUpsertRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SuccessionValidityPeriodRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.springframework.stereotype.Component
 
@@ -37,7 +37,7 @@ class SuccessionUpsertRequestMapper {
         SuccessionUpsertRequest(
             predecessorBpn = relations.businessPartnerSourceBpn,
             successorBpn = relations.businessPartnerTargetBpn,
-            validityPeriods = relations.validityPeriods.map { SuccessionValidityPeriodRequest(it.validFrom, it.validTo) },
+            validityPeriods = relations.validityPeriods.map { RelationValidityPeriodRequest(it.validFrom, it.validTo) },
             reasonCode = relations.reasonCode
         )
 }

@@ -611,6 +611,10 @@ What the network expects you to establish before you report it:
 * The owner or manager is active for the whole time the relation is valid, so the `validFrom` is no
   earlier than its own active start.
   `POST /v7/input/business-partners/search` for that record shows its periods.
+  The Pool checks this: a relation is rejected when its owner or manager is recorded as inactive on
+  any day of any of its validity periods, and the rejection names each such period.
+  Only the owner or manager is checked - the owned or managed partner may be out of use - and a
+  partner that records no state at all is not blocked.
 * A managed partner has one manager at a time, and data management does not chain: a partner that is
   itself managed cannot be someone else's manager for the same period.
   A search by source over `IsManagedBy` answers that.

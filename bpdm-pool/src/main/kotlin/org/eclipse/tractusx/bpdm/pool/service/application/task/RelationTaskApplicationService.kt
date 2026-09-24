@@ -22,11 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.task
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsStepBuildDispatcherService
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
 /**
@@ -38,6 +34,8 @@ import org.springframework.stereotype.Service
 @Service
 class RelationTaskApplicationService(
     private val successionUpsertApplicationService: SuccessionUpsertApplicationService,
+    private val ownershipUpsertApplicationService: OwnershipUpsertApplicationService,
+    private val dataManagementUpsertApplicationService: DataManagementUpsertApplicationService,
     private val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService
 ) {
 
@@ -51,11 +49,13 @@ class RelationTaskApplicationService(
 
     private fun upsert(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto =
         try {
-            // Only succession is parsed and written through the layered path so far; the remaining relation families
-            // still reject by throwing, and move over in the tasks that own them.
+            // Alternative headquarter designations are not yet parsed and written through the layered path; they still
+            // reject by throwing, and move over in the task that owns them.
             when (taskEntry.businessPartnerRelations.relationType) {
                 RelationType.IsReplacedBy -> successionUpsertApplicationService.upsert(taskEntry)
-                else -> taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
+                RelationType.IsOwnedBy -> ownershipUpsertApplicationService.upsert(taskEntry)
+                RelationType.IsManagedBy -> dataManagementUpsertApplicationService.upsert(taskEntry)
+                RelationType.IsAlternativeHeadquarterFor -> taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
             }
         } catch (ex: BpdmValidationException) {
             toErrorReply(taskEntry, ex.message ?: "")

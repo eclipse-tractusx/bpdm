@@ -24,18 +24,10 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.error.PredecessorAndSuccessorIdentical
-import org.eclipse.tractusx.bpdm.pool.model.error.PredecessorNotFound
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionCarriesEndDate
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionPartnerTypesDiffer
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionReasonCodeNotFound
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionUpsertParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionValidityPeriodMissing
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionValidityPeriodsMultiple
-import org.eclipse.tractusx.bpdm.pool.model.error.SuccessorNotFound
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SuccessionUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.RelationValidityPeriodRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SuccessionUpsertRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SuccessionValidityPeriodRequest
 import org.eclipse.tractusx.bpdm.pool.repository.ReasonCodeRepository
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnTypeResolver
 import org.springframework.stereotype.Service
@@ -102,7 +94,7 @@ class SuccessionUpsertParser(
     }
 
     private fun parseValidityPeriod(
-        requests: List<SuccessionValidityPeriodRequest>,
+        requests: List<RelationValidityPeriodRequest>,
         errors: MutableList<SuccessionUpsertParseError>
     ): RelationValidityPeriodDb? {
         val period = when (requests.size) {

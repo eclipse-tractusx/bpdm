@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.model
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.pool.entity.AddressStateDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
+import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import java.time.LocalDateTime
 
 /**
@@ -62,3 +65,24 @@ data class RecordedState(
     val validTo: LocalDateTime?,
     val type: BusinessStateType
 )
+
+/**
+ * Returns what these legal entity states record about the legal entity being in use.
+ */
+@JvmName("legalEntityStatesToActivityTimeline")
+fun Collection<LegalEntityStateDb>.toActivityTimeline() =
+    PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
+
+/**
+ * Returns what these site states record about the site being in use.
+ */
+@JvmName("siteStatesToActivityTimeline")
+fun Collection<SiteStateDb>.toActivityTimeline() =
+    PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
+
+/**
+ * Returns what these address states record about the address being in use.
+ */
+@JvmName("addressStatesToActivityTimeline")
+fun Collection<AddressStateDb>.toActivityTimeline() =
+    PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })

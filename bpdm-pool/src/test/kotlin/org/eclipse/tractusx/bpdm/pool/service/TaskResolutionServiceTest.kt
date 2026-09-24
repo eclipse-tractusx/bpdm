@@ -22,19 +22,24 @@ package org.eclipse.tractusx.bpdm.pool.service
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.error.GoldenRecordTaskErrorMessage
+import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
+import org.eclipse.tractusx.bpdm.pool.model.request.OwnershipUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.RelationValidityPeriodRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
-import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.OwnershipUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.parser.relation.OwnershipUpsertParser
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
@@ -72,7 +77,8 @@ class TaskResolutionServiceTest @Autowired constructor(
     val poolDataHelper: PoolDataHelper,
     val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
     val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
-    val ownedByRelationUpsertService: OwnedByRelationUpsertService,
+    val ownershipUpsertParser: OwnershipUpsertParser,
+    val ownershipUpsertService: OwnershipUpsertService,
     val relationRepository: RelationRepository,
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
     val transactionTemplate: TransactionTemplate,
@@ -2093,22 +2099,20 @@ class TaskResolutionServiceTest @Autowired constructor(
 
     private fun createIsOwnedByRelationViaService(sourceBpn: String, targetBpn: String) {
         transactionTemplate.execute {
-            val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
-            val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
-
-            val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
-                source = sourceEntity,
-                target = targetEntity,
-                validityPeriods = listOf(currentValidityPeriod()),
-                existingRelation = null,
-                reasonCode = null
-            )
-            val result = ownedByRelationUpsertService.upsertRelation(upsertRequest)
-            result.value.validityPeriods.size
+            val parseResult = ownershipUpsertParser.parse(currentOwnershipRequest(sourceBpn, targetBpn))
+            ownershipUpsertService.upsert((parseResult as ParseResult.Success).parsed)
         }
     }
 
-    // Production rejects relations without validity periods (see RelationValidityPeriodValidator),
+    private fun currentOwnershipRequest(ownedBpn: String, ownerBpn: String) =
+        OwnershipUpsertRequest(
+            ownedBpn = ownedBpn,
+            ownerBpn = ownerBpn,
+            validityPeriods = listOf(RelationValidityPeriodRequest(currentValidityPeriod().validFrom, null)),
+            reasonCode = null
+        )
+
+    // Production rejects relations without validity periods (see RelationValidityPeriodsValidator),
     // so fixtures must supply a currently-active, open-ended period to mirror that guarantee.
     private fun currentValidityPeriod() =
         org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb(
@@ -2398,24 +2402,10 @@ class TaskResolutionServiceTest @Autowired constructor(
         legalEntityRepository.save(rootADb)
         legalEntityRepository.save(rootBDb)
 
-        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
-            transactionTemplate.execute {
-                val source = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
-                val target = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        val parseResult = ownershipUpsertParser.parse(currentOwnershipRequest(rootA.legalEntity.header.bpnl, rootB.legalEntity.header.bpnl))
 
-                ownedByRelationUpsertService.upsertRelation(
-                    IRelationUpsertStrategyService.UpsertRequest(
-                        source = source,
-                        target = target,
-                        validityPeriods = listOf(currentValidityPeriod()),
-                        existingRelation = null,
-                        reasonCode = null
-                    )
-                )
-            }
-        }
-
-        assertThat(exception.message).contains("Multiple ultimate owners in entity hierarchy")
+        assertThat(parseResult).isInstanceOf(ParseResult.Failure::class.java)
+        assertThat((parseResult as ParseResult.Failure).errors).singleElement().isInstanceOf(MultipleUltimateOwnersInHierarchy::class.java)
 
         val sourceAfter = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
         val targetAfter = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!

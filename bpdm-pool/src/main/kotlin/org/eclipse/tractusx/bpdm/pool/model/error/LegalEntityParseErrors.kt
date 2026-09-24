@@ -41,10 +41,12 @@ sealed interface LegalEntityUpdateContentParseError : LegalEntityUpdateParseErro
 sealed interface LegalEntityOwnershipParseError : LegalEntityUpdateContentParseError
 
 /**
- * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
- * being created has no ownership relations yet, so its tree is itself.
+ * More than one legal entity in the same ownership tree would carry the ultimate-owner flag, whether a flag is set or an
+ * ownership joins two trees. Among legal entity writes it is update-only: a legal entity being created has no ownership
+ * relations yet, so its tree is itself.
  */
-data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityOwnershipParseError
+data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityOwnershipParseError,
+    OwnershipUpsertParseError
 
 /**
  * An alternative headquarter cannot carry the ultimate-owner flag. Update-only: setting the flag on an alternative is rejected,

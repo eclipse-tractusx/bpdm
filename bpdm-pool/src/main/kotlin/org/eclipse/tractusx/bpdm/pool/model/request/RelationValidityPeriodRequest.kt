@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-data class SuccessionUpsertRequest(
-    val predecessorBpn: String,
-    val successorBpn: String,
-    val validityPeriods: List<RelationValidityPeriodRequest>,
-    val reasonCode: String?
+import java.time.LocalDate
+
+data class RelationValidityPeriodRequest(
+    val validFrom: LocalDate,
+    val validTo: LocalDate?
 )

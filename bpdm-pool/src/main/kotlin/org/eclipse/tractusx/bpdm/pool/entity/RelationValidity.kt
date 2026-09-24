@@ -35,5 +35,16 @@ fun RelationDb.isValidOn(date: LocalDate): Boolean =
 fun RelationValidityPeriodDb.hasOverlap(others: Collection<RelationValidityPeriodDb>): Boolean =
     others.any { other -> asTimePeriod().hasOverlap(other.asTimePeriod()) }
 
+/**
+ * Keeps the relations overlapping any of [validityPeriods], leaving out [relationToRestate], whose periods a write
+ * restating it replaces rather than competes with.
+ */
+fun Collection<RelationDb>.filterOverlapping(
+    validityPeriods: Collection<RelationValidityPeriodDb>,
+    relationToRestate: RelationDb?
+): List<RelationDb> =
+    filterNot { it.id == relationToRestate?.id }
+        .filter { relation -> validityPeriods.any { it.hasOverlap(relation.validityPeriods) } }
+
 private fun RelationValidityPeriodDb.asTimePeriod(): RelationTimePeriod =
     RelationTimePeriod.fromUnlimited(validFrom, validTo)

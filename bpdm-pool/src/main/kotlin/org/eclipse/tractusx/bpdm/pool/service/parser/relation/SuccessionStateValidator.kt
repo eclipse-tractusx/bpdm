@@ -19,18 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
-import org.eclipse.tractusx.bpdm.pool.entity.AddressStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.eclipse.tractusx.bpdm.pool.model.PartnerActivityTimeline
-import org.eclipse.tractusx.bpdm.pool.model.RecordedState
 import org.eclipse.tractusx.bpdm.pool.model.error.PredecessorRecordedActive
 import org.eclipse.tractusx.bpdm.pool.model.error.SuccessionContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SuccessorRecordedInactive
+import org.eclipse.tractusx.bpdm.pool.model.toActivityTimeline
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -45,19 +42,19 @@ class SuccessionStateValidator {
      * Reports what the two legal entities' states say against a succession starting on [validFrom].
      */
     fun validate(predecessor: LegalEntityDb, successor: LegalEntityDb, validFrom: LocalDate): List<SuccessionContentParseError> =
-        validate(predecessor.bpn, predecessor.states.toTimeline(), successor.bpn, successor.states.toTimeline(), validFrom)
+        validate(predecessor.bpn, predecessor.states.toActivityTimeline(), successor.bpn, successor.states.toActivityTimeline(), validFrom)
 
     /**
      * Reports what the two sites' states say against a succession starting on [validFrom].
      */
     fun validate(predecessor: SiteDb, successor: SiteDb, validFrom: LocalDate): List<SuccessionContentParseError> =
-        validate(predecessor.bpn, predecessor.states.toTimeline(), successor.bpn, successor.states.toTimeline(), validFrom)
+        validate(predecessor.bpn, predecessor.states.toActivityTimeline(), successor.bpn, successor.states.toActivityTimeline(), validFrom)
 
     /**
      * Reports what the two addresses' states say against a succession starting on [validFrom].
      */
     fun validate(predecessor: LogisticAddressDb, successor: LogisticAddressDb, validFrom: LocalDate): List<SuccessionContentParseError> =
-        validate(predecessor.bpn, predecessor.states.toTimeline(), successor.bpn, successor.states.toTimeline(), validFrom)
+        validate(predecessor.bpn, predecessor.states.toActivityTimeline(), successor.bpn, successor.states.toActivityTimeline(), validFrom)
 
     private fun validate(
         predecessorBpn: String,
@@ -76,16 +73,4 @@ class SuccessionStateValidator {
 
         return errors
     }
-
-    @JvmName("legalEntityStatesToTimeline")
-    private fun Collection<LegalEntityStateDb>.toTimeline() =
-        PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
-
-    @JvmName("siteStatesToTimeline")
-    private fun Collection<SiteStateDb>.toTimeline() =
-        PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
-
-    @JvmName("addressStatesToTimeline")
-    private fun Collection<AddressStateDb>.toTimeline() =
-        PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
 }

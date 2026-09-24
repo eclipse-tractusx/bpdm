@@ -19,9 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-data class SuccessionUpsertRequest(
-    val predecessorBpn: String,
-    val successorBpn: String,
+data class OwnershipUpsertRequest(
+    val ownedBpn: String,
+    val ownerBpn: String,
+    val validityPeriods: List<RelationValidityPeriodRequest>,
+    val reasonCode: String?
+)
+
+data class DataManagementUpsertRequest(
+    val managedBpn: String,
+    val managerBpn: String,
     val validityPeriods: List<RelationValidityPeriodRequest>,
     val reasonCode: String?
 )

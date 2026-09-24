@@ -159,6 +159,33 @@ class TestDataClientV7(
         return taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskEntry)).flatMap { it.errors }
     }
 
+    /**
+     * Reports what stands in the way of relating [sourceBpn] to [targetBpn] by [relationType] over the given
+     * [validityPeriods].
+     * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
+     */
+    fun createRelationToErrors(
+        relationType: RelationType,
+        sourceBpn: String,
+        targetBpn: String,
+        validityPeriods: List<OrchestratorRelationValidityPeriod>
+    ): List<TaskRelationsErrorDto> {
+        val relations = BusinessPartnerRelations(
+            relationType = relationType,
+            businessPartnerSourceBpn = sourceBpn,
+            businessPartnerTargetBpn = targetBpn,
+            validityPeriods = validityPeriods,
+            reasonCode = null
+        )
+        val taskEntry = TaskRelationsStepReservationEntryDto(
+            taskId = "$sourceBpn $relationType $targetBpn",
+            recordId = UUID.randomUUID().toString(),
+            businessPartnerRelations = relations
+        )
+
+        return taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskEntry)).flatMap { it.errors }
+    }
+
     fun createSite(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): SitePartnerCreateVerboseDto {
         val request = requestFactory.buildSiteCreateRequest(seed, legalEntity)
         return poolClient.sites.createSite(listOf(request)).entities.first()
