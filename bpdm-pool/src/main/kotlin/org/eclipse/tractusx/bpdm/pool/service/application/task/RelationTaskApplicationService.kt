@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.service.application.task
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsStepBuildDispatcherService
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -36,7 +35,7 @@ class RelationTaskApplicationService(
     private val successionUpsertApplicationService: SuccessionUpsertApplicationService,
     private val ownershipUpsertApplicationService: OwnershipUpsertApplicationService,
     private val dataManagementUpsertApplicationService: DataManagementUpsertApplicationService,
-    private val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService
+    private val alternativeHeadquarterUpsertApplicationService: AlternativeHeadquarterUpsertApplicationService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -49,13 +48,11 @@ class RelationTaskApplicationService(
 
     private fun upsert(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto =
         try {
-            // Alternative headquarter designations are not yet parsed and written through the layered path; they still
-            // reject by throwing, and move over in the task that owns them.
             when (taskEntry.businessPartnerRelations.relationType) {
                 RelationType.IsReplacedBy -> successionUpsertApplicationService.upsert(taskEntry)
                 RelationType.IsOwnedBy -> ownershipUpsertApplicationService.upsert(taskEntry)
                 RelationType.IsManagedBy -> dataManagementUpsertApplicationService.upsert(taskEntry)
-                RelationType.IsAlternativeHeadquarterFor -> taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
+                RelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterUpsertApplicationService.upsert(taskEntry)
             }
         } catch (ex: BpdmValidationException) {
             toErrorReply(taskEntry, ex.message ?: "")

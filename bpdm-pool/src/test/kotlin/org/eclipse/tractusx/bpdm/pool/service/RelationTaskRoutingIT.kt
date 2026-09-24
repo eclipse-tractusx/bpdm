@@ -54,8 +54,7 @@ import java.util.*
 @ActiveProfiles("test-no-auth")
 @Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
-    val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService,
+class RelationTaskRoutingIT @Autowired constructor(
     val relationTaskApplicationService: RelationTaskApplicationService,
     val poolClient: PoolApiClient,
     private val dataHelper: PoolDataHelper,
@@ -116,7 +115,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -213,13 +212,6 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
-    private fun upsertBusinessPartnerRelations(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto {
-        val taskEntry = singleTaskStep(taskId, businessPartnerRelations)
-        return taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
-    }
-
-    // Succession, ownership and data management no longer reach the dispatcher: they are routed to their own write
-    // paths one level above.
     private fun upsertThroughRelationTask(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto =
         relationTaskApplicationService.upsert(listOf(singleTaskStep(taskId, businessPartnerRelations))).single()
 

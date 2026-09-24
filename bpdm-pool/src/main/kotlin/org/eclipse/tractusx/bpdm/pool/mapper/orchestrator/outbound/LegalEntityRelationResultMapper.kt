@@ -27,10 +27,10 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.springframework.stereotype.Component
 
 /**
- * Turns a written ownership or data management relation into the relation a golden record relation task reports back.
+ * Turns a written legal entity relation into the relation a golden record relation task reports back.
  */
 @Component
-class GoverningRelationResultMapper {
+class LegalEntityRelationResultMapper {
 
     /**
      * Reports the relation as it now stands.

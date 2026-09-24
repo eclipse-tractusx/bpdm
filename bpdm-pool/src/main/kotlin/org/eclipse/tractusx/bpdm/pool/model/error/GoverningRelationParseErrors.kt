@@ -34,7 +34,7 @@ sealed interface GoverningRelationParseError : OwnershipUpsertParseError, DataMa
 /**
  * What the validity periods a relation states can be faulted for, independently of the partners it relates.
  */
-sealed interface RelationValidityPeriodParseError : GoverningRelationParseError
+sealed interface RelationValidityPeriodParseError : GoverningRelationParseError, AlternativeHeadquarterUpsertParseError
 
 data class GovernedPartnerNotFound(val bpn: String) : GoverningRelationParseError
 
@@ -42,7 +42,7 @@ data class GoverningPartnerNotFound(val bpn: String) : GoverningRelationParseErr
 
 data class GovernedByItself(val bpn: String) : GoverningRelationParseError
 
-data class RelationReasonCodeNotFound(val reasonCode: String) : GoverningRelationParseError
+data class RelationReasonCodeNotFound(val reasonCode: String) : GoverningRelationParseError, AlternativeHeadquarterUpsertParseError
 
 data class GoverningPartnerRecordedInactive(val bpn: String, val validFrom: LocalDate, val validTo: LocalDate?) :
     GoverningRelationParseError

@@ -16,6 +16,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
 - BPDM Pool: A succession is now validated against the states of the two business partners it relates, at legal entity, site and address level alike: it is rejected when the predecessor is still recorded as active on or after the succession's start date, when the successor is recorded as inactive on that date, or when the succession carries an end date or more than one validity period [#1858](https://github.com/eclipse-tractusx/bpdm/issues/1858)
 - BPDM Pool: An ownership or data management relation is now rejected when its owner or manager is recorded as inactive during any of its validity periods [#1859](https://github.com/eclipse-tractusx/bpdm/issues/1859)
+- BPDM Pool: An alternative headquarter relation is now rejected when either of its two legal entities is recorded as inactive during any of its validity periods [#1860](https://github.com/eclipse-tractusx/bpdm/issues/1860)
 
 ### Added
 

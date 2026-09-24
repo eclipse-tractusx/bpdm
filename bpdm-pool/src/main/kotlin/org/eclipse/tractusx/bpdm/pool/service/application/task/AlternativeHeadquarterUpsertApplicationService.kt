@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoverningRelationUpsertRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoverningRelationParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.AlternativeHeadquarterUpsertRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.AlternativeHeadquarterParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.LegalEntityRelationResultMapper
-import org.eclipse.tractusx.bpdm.pool.model.error.DataManagementUpsertParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.DataManagementUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.service.operation.relation.DataManagementUpsertService
-import org.eclipse.tractusx.bpdm.pool.service.parser.relation.DataManagementUpsertParser
+import org.eclipse.tractusx.bpdm.pool.model.error.AlternativeHeadquarterUpsertParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AlternativeHeadquarterUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.AlternativeHeadquarterUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.parser.relation.AlternativeHeadquarterUpsertParser
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
@@ -35,32 +35,31 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Answers a reserved golden record relation task that states a data management relation with the relation as it now
- * stands.
+ * Answers a reserved golden record relation task that states an alternative headquarter designation with the
+ * designation as it now stands.
  */
 @Service
-class DataManagementUpsertApplicationService(
-    private val upsertRequestMapper: GoverningRelationUpsertRequestMapper,
-    private val upsertParser: DataManagementUpsertParser,
-    private val dataManagementUpsertService: DataManagementUpsertService,
-    private val parseErrorMapper: GoverningRelationParseErrorMapper,
+class AlternativeHeadquarterUpsertApplicationService(
+    private val upsertRequestMapper: AlternativeHeadquarterUpsertRequestMapper,
+    private val upsertParser: AlternativeHeadquarterUpsertParser,
+    private val alternativeHeadquarterUpsertService: AlternativeHeadquarterUpsertService,
+    private val parseErrorMapper: AlternativeHeadquarterParseErrorMapper,
     private val resultMapper: LegalEntityRelationResultMapper
 ) {
 
     /**
-     * Writes the data management relation the task states and reports it back, or reports that task's reasons for not
-     * writing it.
+     * Writes the designation the task states and reports it back, or reports that task's reasons for not writing it.
      */
     @Transactional
     fun upsert(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto =
-        when (val result = upsertParser.parse(upsertRequestMapper.toDataManagementRequest(taskEntry.businessPartnerRelations))) {
+        when (val result = upsertParser.parse(upsertRequestMapper.toRequest(taskEntry.businessPartnerRelations))) {
             is ParseResult.Failure -> toErrorReply(taskEntry, result.errors)
             is ParseResult.Success -> toSuccessReply(taskEntry, result.parsed)
         }
 
     private fun toErrorReply(
         taskEntry: TaskRelationsStepReservationEntryDto,
-        errors: List<DataManagementUpsertParseError>
+        errors: List<AlternativeHeadquarterUpsertParseError>
     ): TaskRelationsStepResultEntryDto =
         TaskRelationsStepResultEntryDto(
             taskId = taskEntry.taskId,
@@ -70,11 +69,11 @@ class DataManagementUpsertApplicationService(
 
     private fun toSuccessReply(
         taskEntry: TaskRelationsStepReservationEntryDto,
-        parsed: DataManagementUpsertParsed
+        parsed: AlternativeHeadquarterUpsertParsed
     ): TaskRelationsStepResultEntryDto =
         TaskRelationsStepResultEntryDto(
             taskId = taskEntry.taskId,
-            businessPartnerRelations = resultMapper.toTaskResult(dataManagementUpsertService.upsert(parsed).value),
+            businessPartnerRelations = resultMapper.toTaskResult(alternativeHeadquarterUpsertService.upsert(parsed).value),
             errors = emptyList()
         )
 }

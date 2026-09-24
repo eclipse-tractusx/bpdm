@@ -87,7 +87,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
+        assertThat(result[0].errors.map { it.description })
+            .hasSize(3)
+            .anySatisfy { assertThat(it).isEqualTo("Relation validity periods cannot be empty, at least one validity needed.") }
     }
 
     /*
@@ -105,13 +107,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerTargetBpn = BusinessPartnerVerboseValues.secondBpnL
         )
 
-        // Alternative headquarter designations stop at the source, the other relation families report every partner
-        // they could not resolve.
-        val expectedErrorCount = if (relationType == LegalEntityRelationType.IsAlternativeHeadquarterFor) 1 else 2
-
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(expectedErrorCount)
+        assertThat(result[0].errors.size).isEqualTo(2)
     }
 
     /*
@@ -176,14 +174,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     fun `create relations with provided source and target legal entity`() {
 
         // Step 1: Create two legal entities
-        val entity1 = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entity2 = BusinessPartnerNonVerboseValues.legalEntityCreate2
-
-        val response = poolClient.legalEntities.createBusinessPartners(listOf(entity1, entity2))
-
-        assertThat(response.entities.size).isEqualTo(2)
-        val savedEntity1 = response.entities.toList()[0]
-        val savedEntity2 = response.entities.toList()[1]
+        val savedEntity1 = createLegalEntity("$testName 1")
+        val savedEntity2 = createLegalEntity("$testName 2")
 
         // Step 2: Create a relation request
         val createRelationsRequest = buildAlwaysActiveRelationRequest(
@@ -633,8 +625,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(value = LegalEntityRelationType::class, names = ["IsOwnedBy", "IsManagedBy"])
-    fun `reject ownership and data management between addresses as naming no legal entity`(relationType: LegalEntityRelationType) {
+    @EnumSource(value = LegalEntityRelationType::class, names = ["IsOwnedBy", "IsManagedBy", "IsAlternativeHeadquarterFor"])
+    fun `reject legal entity relation between addresses as naming no legal entity`(relationType: LegalEntityRelationType) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -650,29 +642,6 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors.map { it.description })
             .hasSize(2)
             .allSatisfy { assertThat(it).startsWith("No legal entity") }
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = LegalEntityRelationType::class, names = ["IsAlternativeHeadquarterFor"])
-    fun `reject unsupported address relation type`(relationType: LegalEntityRelationType) {
-        //Given
-        val legalEntity1 = createLegalEntity("$testName 1")
-        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
-
-        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
-            relationType = relationType,
-            businessPartnerSourceBpn = legalEntity1.legalEntity.legalAddress.bpna,
-            businessPartnerTargetBpn = additionalAddress1.address.bpna
-        )
-
-        val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).isEqualTo(
-            "Invalid relation: source and target must be of the same business partner type and carry a relation type supported for it " +
-                    "(source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn}, " +
-                    "relationType=${createAddressRelationsRequest.relationType})"
-        )
     }
 
     @ParameterizedTest

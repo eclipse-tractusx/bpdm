@@ -38,9 +38,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.PastValidityPeriodAdded
 import org.eclipse.tractusx.bpdm.pool.model.error.PastValidityPeriodEndMoved
 import org.eclipse.tractusx.bpdm.pool.model.error.PastValidityPeriodRemoved
 import org.eclipse.tractusx.bpdm.pool.model.error.RelationReasonCodeNotFound
-import org.eclipse.tractusx.bpdm.pool.model.error.RelationValidityPeriodEndsBeforeStart
-import org.eclipse.tractusx.bpdm.pool.model.error.RelationValidityPeriodsMissing
-import org.eclipse.tractusx.bpdm.pool.model.error.RelationValidityPeriodsOverlap
+import org.eclipse.tractusx.bpdm.pool.model.error.RelationValidityPeriodParseError
 import org.springframework.stereotype.Component
 
 /**
@@ -50,7 +48,9 @@ import org.springframework.stereotype.Component
  * The `when`s are exhaustive so a new error won't compile until it gets a description.
  */
 @Component
-class GoverningRelationParseErrorMapper {
+class GoverningRelationParseErrorMapper(
+    private val validityPeriodErrorMapper: RelationValidityPeriodParseErrorMapper
+) {
 
     /**
      * States why the ownership was not written, naming the legal entity it faults.
@@ -109,10 +109,7 @@ class GoverningRelationParseErrorMapper {
                 "Legal entity '${error.bpn}' is recorded as inactive during the validity period starting " +
                         "'${error.validFrom}'${error.validTo?.let { " and ending '$it'" } ?: ""}, so it cannot " +
                         "${roles.governingVerb} another legal entity during that period"
-            RelationValidityPeriodsMissing -> "Relation validity periods cannot be empty, at least one validity needed."
-            is RelationValidityPeriodEndsBeforeStart ->
-                "Relation validity period validFrom '${error.validFrom}' cannot be after validTo '${error.validTo}'."
-            RelationValidityPeriodsOverlap -> "Relation validity periods must not overlap."
+            is RelationValidityPeriodParseError -> validityPeriodErrorMapper.toUpsertDescription(error)
         }
 
     private data class Roles(val governedParticiple: String, val governingVerb: String)

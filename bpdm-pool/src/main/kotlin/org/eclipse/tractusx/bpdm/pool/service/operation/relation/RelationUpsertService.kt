@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.IRelationUpsertStrategyService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -107,29 +106,6 @@ class RelationUpsertService(
         return existingValidityPeriods.zip(newValidityPeriods).any { (e, n) ->
             e.validFrom != n.validFrom || e.validTo != n.validTo
         }
-    }
-
-    fun filterOverlappingRelations(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relations: Collection<RelationDb>): Collection<RelationDb>{
-        val relationsWithoutSelf = relations.filterNot { isTheSameRelation(relationToUpsert, it) }
-        val overlappingRelations = relationsWithoutSelf.filter { hasOverlap(relationToUpsert, it) }
-
-        return overlappingRelations
-    }
-
-
-    private fun isTheSameRelation(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
-        val existingRelation = relationToUpsert.existingRelation ?: return false
-        return existingRelation.id == relation.id
-    }
-
-    private fun hasOverlap(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
-        return relationToUpsert.validityPeriods.any{ validity1 -> relation.validityPeriods.any { validity2 -> hasOverlap(validity1, validity2) } }
-
-    }
-
-    private fun hasOverlap(validity1: RelationValidityPeriodDb, validity2: RelationValidityPeriodDb): Boolean {
-        return RelationTimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
-            .hasOverlap(RelationTimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
     }
 
     data class UpsertRequest(

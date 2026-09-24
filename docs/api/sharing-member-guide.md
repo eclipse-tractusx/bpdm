@@ -504,8 +504,7 @@ Four properties of that call shape everything below:
 
 * **Direction carries the meaning.** Every relation runs from the dependent business partner to the
   governing one: from the predecessor to the successor, from the owned company to its owner, from the
-  managed partner to its manager. An alternative headquarter designation names two equal partners, so
-  either may sit at either end.
+  managed partner to its manager, from the alternative headquarter to its main.
 * **A relation replaces its whole validity list.** Adding a period means sending the relation again
   with all of its periods, the old ones included. Sending only the new one deletes the rest.
 * **Relations need no ready call.** A `PUT` puts them in the queue straight away, and a relation is
@@ -739,11 +738,13 @@ This is the one relation where both sides are constrained: it starts no earlier 
 two active starts and ends where either of them ends, and you work that window out yourself from
 `POST /v7/input/business-partners/search` - the payload has no way of saying "wherever the two
 overlap".
+The Pool checks this: a designation is rejected when either legal entity is recorded as inactive on
+any day of any of its validity periods, and the rejection names each such legal entity and period.
+A legal entity that records no state at all is not blocked.
 
-Either partner may go in source and the other in target.
-Whichever way you send it fixes the direction and the `externalId` you reuse for every later
-correction, so one pair means one designation: sending the same two partners again the other way
-round duplicates it.
+The alternative goes in source and the main in target.
+The pair is fixed by that direction and by the `externalId` you reuse for every later correction:
+sending the same two partners the other way round while the designation holds is rejected.
 
 More than two legal entities can belong to one group of alternatives, as long as every designation
 in it names the same shared partner.

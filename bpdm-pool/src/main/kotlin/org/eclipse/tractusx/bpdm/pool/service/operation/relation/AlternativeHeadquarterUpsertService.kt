@@ -23,41 +23,41 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
-import org.eclipse.tractusx.bpdm.pool.model.parsed.OwnershipUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AlternativeHeadquarterUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The single authority for writing an ownership between two legal entities.
+ * The single authority for writing an alternative headquarter designation between two legal entities.
  */
 @Service
-class OwnershipUpsertService(
+class AlternativeHeadquarterUpsertService(
     private val relationUpsertService: RelationUpsertService,
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
     private val relationValidityBoundaryTriggerService: RelationValidityBoundaryTriggerService
 ) {
 
     /**
-     * Persists the ownership, brings the owned legal entity's ultimate owner in line with it and schedules a
+     * Persists the designation, brings the alternative's ultimate owner in line with its main and schedules a
      * recalculation for each future date on which it starts or stops holding, reporting whether it was created, whether
      * its validity changed, or whether it already stood as stated.
      */
     @Transactional
-    fun upsert(parsed: OwnershipUpsertParsed): UpsertResult<RelationDb> {
+    fun upsert(parsed: AlternativeHeadquarterUpsertParsed): UpsertResult<RelationDb> {
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
-                source = parsed.owned,
-                target = parsed.owner,
-                legalEntityRelationType = LegalEntityRelationType.IsOwnedBy,
+                source = parsed.alternative,
+                target = parsed.main,
+                legalEntityRelationType = LegalEntityRelationType.IsAlternativeHeadquarterFor,
                 validityPeriods = parsed.validityPeriods,
                 existingRelation = parsed.existingRelation,
                 reasonCode = parsed.reasonCode
             )
         )
 
-        ultimateOwnerRecalculationService.recalculate(listOf(parsed.owned))
-        relationValidityBoundaryTriggerService.reconcile(result.value, TriggerEventType.OwnershipValidityBoundary)
+        ultimateOwnerRecalculationService.recalculate(listOf(parsed.alternative))
+        relationValidityBoundaryTriggerService.reconcile(result.value, TriggerEventType.AlternativeHeadquarterValidityBoundary)
 
         return result
     }

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.task
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoverningRelationUpsertRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoverningRelationParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.GoverningRelationResultMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.LegalEntityRelationResultMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.OwnershipUpsertParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.OwnershipUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.relation.OwnershipUpsertService
@@ -43,7 +43,7 @@ class OwnershipUpsertApplicationService(
     private val upsertParser: OwnershipUpsertParser,
     private val ownershipUpsertService: OwnershipUpsertService,
     private val parseErrorMapper: GoverningRelationParseErrorMapper,
-    private val resultMapper: GoverningRelationResultMapper
+    private val resultMapper: LegalEntityRelationResultMapper
 ) {
 
     /**
