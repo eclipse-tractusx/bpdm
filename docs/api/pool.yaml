@@ -6141,6 +6141,7 @@ components:
             - ScriptVariantCityMissing
             - ScriptVariantDuplicateScriptCode
             - ScriptVariantCoverageStillNeeded
+            - StatesContradictSuccession
         message:
           type: string
         entityKey:
@@ -6199,6 +6200,11 @@ components:
             - LegalAddressScriptVariantCityMissing
             - LegalAddressScriptVariantDuplicateScriptCode
             - ScriptVariantCoverageStillNeeded
+            - StatesContradictSuccession
+            - StatesContradictOwnership
+            - StatesContradictDataManagement
+            - StatesContradictAlternativeHeadquarter
+            - LegalAddressStatesContradictSuccession
         message:
           type: string
         entityKey:
@@ -6249,6 +6255,8 @@ components:
             - MainAddressScriptVariantCityMissing
             - MainAddressScriptVariantDuplicateScriptCode
             - ScriptVariantCoverageStillNeeded
+            - StatesContradictSuccession
+            - MainAddressStatesContradictSuccession
         message:
           type: string
         entityKey:
@@ -6297,6 +6305,7 @@ components:
             - IdentifierNotFound
             - AddressDuplicateIdentifier
             - IdentifiersTooMany
+            - StatesContradictSuccession
         message:
           type: string
         entityKey:
@@ -6348,6 +6357,11 @@ components:
             - LegalAddressDuplicateIdentifier
             - LegalEntityIdentifiersTooMany
             - LegalAddressIdentifiersTooMany
+            - StatesContradictSuccession
+            - StatesContradictOwnership
+            - StatesContradictDataManagement
+            - StatesContradictAlternativeHeadquarter
+            - LegalAddressStatesContradictSuccession
         message:
           type: string
         entityKey:
@@ -6392,6 +6406,8 @@ components:
             - MainAddressRegionNotFound
             - MainAddressDuplicateIdentifier
             - MainAddressIdentifiersTooMany
+            - StatesContradictSuccession
+            - MainAddressStatesContradictSuccession
         message:
           type: string
         entityKey:

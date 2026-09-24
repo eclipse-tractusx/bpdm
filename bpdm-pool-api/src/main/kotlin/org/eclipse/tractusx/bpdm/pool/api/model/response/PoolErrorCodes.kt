@@ -61,7 +61,12 @@ enum class LegalEntityUpdateError : ErrorCode {
     ScriptVariantLegalNameMissing,
     ScriptVariantDuplicateScriptCode,
     LegalAddressScriptVariantCityMissing,
-    LegalAddressScriptVariantDuplicateScriptCode
+    LegalAddressScriptVariantDuplicateScriptCode,
+    StatesContradictSuccession,
+    StatesContradictOwnership,
+    StatesContradictDataManagement,
+    StatesContradictAlternativeHeadquarter,
+    LegalAddressStatesContradictSuccession
 }
 
 @Schema(description = "SiteCreateError")
@@ -88,7 +93,9 @@ enum class SiteUpdateError : ErrorCode {
     ScriptVariantNameMissing,
     ScriptVariantDuplicateScriptCode,
     MainAddressScriptVariantCityMissing,
-    MainAddressScriptVariantDuplicateScriptCode
+    MainAddressScriptVariantDuplicateScriptCode,
+    StatesContradictSuccession,
+    MainAddressStatesContradictSuccession
 }
 
 @Schema(description = "AddressCreateError")
@@ -116,5 +123,6 @@ enum class AddressUpdateError : ErrorCode {
     AddressDuplicateIdentifier,
     IdentifiersTooMany,
     ScriptVariantCityMissing,
-    ScriptVariantDuplicateScriptCode
+    ScriptVariantDuplicateScriptCode,
+    StatesContradictSuccession
 }

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound
 
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
@@ -28,7 +29,9 @@ import org.springframework.stereotype.Component
  * The `when`s are exhaustive so a new error won't compile until it gets a description.
  */
 @Component
-class GoldenRecordTaskParseErrorMapper {
+class GoldenRecordTaskParseErrorMapper(
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
+) {
 
     fun toUpsertDescription(error: GoldenRecordTaskUpsertParseError): String =
         when (error) {
@@ -51,6 +54,7 @@ class GoldenRecordTaskParseErrorMapper {
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
             is AlternativeHeadquarterCannotOwn ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
+            is LegalEntityStatesContradictRelation -> stateRelationErrorMapper.toDescription(error.error)
             SiteMainAddressRestatesLegalAddress ->
                 "A site whose main address is the legal address must state no main address of its own"
             is SiteDoesNotSitOnLegalAddress ->
@@ -78,6 +82,7 @@ class GoldenRecordTaskParseErrorMapper {
             is AddressMetadataParseError -> toAddressMetadataDescription(error)
             is AddressConstraintParseError -> toAddressConstraintDescription(error)
             is AddressScriptVariantParseError -> toAddressScriptVariantDescription(error)
+            is AddressStateRelationParseError -> stateRelationErrorMapper.toDescription(error)
         }
 
     private fun toAddressFieldDescription(error: AddressFieldParseError): String =
@@ -141,5 +146,6 @@ class GoldenRecordTaskParseErrorMapper {
             is SiteHeaderParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
             is SiteHeaderParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
             is SiteHeaderParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
+            is SiteStateRelationParseError -> stateRelationErrorMapper.toDescription(error)
         }
 }

@@ -23,11 +23,16 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressStateRequest
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
- * What a business partner's states record about it being in use, over the days a rule asks about.
+ * What a business partner's states record about it being in use, judged against the relations that depend on it.
  *
  * The two questions are answered independently rather than resolved against each other, because nothing stops a
  * partner from recording both over the same time: a day recorded active and inactive at once answers yes to both, and
@@ -37,16 +42,24 @@ data class PartnerActivityTimeline(
     private val recordedStates: List<RecordedState>
 ) {
     /**
-     * Whether the partner is recorded as active on any day of [span].
+     * Whether the partner is recorded as active on any day from [validFrom] on, which contradicts it being replaced from
+     * that date.
      */
-    fun isRecordedActiveWithin(span: RelationTimePeriod): Boolean =
-        isRecordedWithin(BusinessStateType.ACTIVE, span)
+    fun isRecordedActiveOnceReplacedFrom(validFrom: LocalDate): Boolean =
+        isRecordedWithin(BusinessStateType.ACTIVE, RelationTimePeriod.fromUnlimited(validFrom, null))
 
     /**
-     * Whether the partner is recorded as inactive on any day of [span].
+     * Whether the partner is recorded as inactive on [validFrom], which contradicts it replacing another from that date.
      */
-    fun isRecordedInactiveWithin(span: RelationTimePeriod): Boolean =
-        isRecordedWithin(BusinessStateType.INACTIVE, span)
+    fun isRecordedInactiveWhenReplacingFrom(validFrom: LocalDate): Boolean =
+        isRecordedWithin(BusinessStateType.INACTIVE, RelationTimePeriod(validFrom, validFrom.plusDays(1)))
+
+    /**
+     * Whether the partner is recorded as inactive on any day of [validityPeriod], which contradicts it governing another
+     * or being designated as a headquarter during that period.
+     */
+    fun isRecordedInactiveDuring(validityPeriod: RelationValidityPeriodDb): Boolean =
+        isRecordedWithin(BusinessStateType.INACTIVE, RelationTimePeriod.fromUnlimited(validityPeriod.validFrom, validityPeriod.validTo))
 
     private fun isRecordedWithin(type: BusinessStateType, span: RelationTimePeriod): Boolean {
         val spanStart = span.validFrom.atStartOfDay()
@@ -67,22 +80,48 @@ data class RecordedState(
 )
 
 /**
- * Returns what these legal entity states record about the legal entity being in use.
+ * Returns what these stored legal entity states record about the legal entity being in use.
  */
 @JvmName("legalEntityStatesToActivityTimeline")
 fun Collection<LegalEntityStateDb>.toActivityTimeline() =
     PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
 
 /**
- * Returns what these site states record about the site being in use.
+ * Returns what these stored site states record about the site being in use.
  */
 @JvmName("siteStatesToActivityTimeline")
 fun Collection<SiteStateDb>.toActivityTimeline() =
     PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
 
 /**
- * Returns what these address states record about the address being in use.
+ * Returns what these stored address states record about the address being in use.
  */
 @JvmName("addressStatesToActivityTimeline")
 fun Collection<AddressStateDb>.toActivityTimeline() =
     PartnerActivityTimeline(map { RecordedState(it.validFrom, it.validTo, it.type) })
+
+/**
+ * Returns what these legal entity states would record about the legal entity being in use once written.
+ */
+@JvmName("legalEntityStateRequestsToActivityTimeline")
+fun Collection<LegalEntityState>.toActivityTimeline() =
+    PartnerActivityTimeline(map { RecordedState(it.validFrom?.toStoredDateTime(), it.validTo?.toStoredDateTime(), it.type) })
+
+/**
+ * Returns what these site states would record about the site being in use once written.
+ */
+@JvmName("siteStateRequestsToActivityTimeline")
+fun Collection<SiteState>.toActivityTimeline() =
+    PartnerActivityTimeline(map { RecordedState(it.validFrom?.toStoredDateTime(), it.validTo?.toStoredDateTime(), it.type) })
+
+/**
+ * Returns what these address states would record about the address being in use once written, leaving out a state that
+ * states no type, since such a state is never written.
+ */
+@JvmName("addressStateRequestsToActivityTimeline")
+fun Collection<AddressStateRequest>.toActivityTimeline() =
+    PartnerActivityTimeline(mapNotNull { state ->
+        state.type?.let { RecordedState(state.validFrom?.toStoredDateTime(), state.validTo?.toStoredDateTime(), it) }
+    })
+
+private fun Instant.toStoredDateTime(): LocalDateTime = atZone(ZoneOffset.UTC).toLocalDateTime()

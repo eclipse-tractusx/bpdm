@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.model.error.GoverningPartnerRecordedInactive
 import org.eclipse.tractusx.bpdm.pool.model.toActivityTimeline
@@ -46,7 +45,7 @@ class GoverningPartnerStateValidator {
 
         return validityPeriods
             .sortedBy { it.validFrom }
-            .filter { activity.isRecordedInactiveWithin(RelationTimePeriod.fromUnlimited(it.validFrom, it.validTo)) }
+            .filter { activity.isRecordedInactiveDuring(it) }
             .map { GoverningPartnerRecordedInactive(governingPartner.bpn, it.validFrom, it.validTo) }
     }
 }

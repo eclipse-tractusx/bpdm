@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -44,8 +45,12 @@ class SiteUpdateWithOwnMainAddressParser(
     @Transactional(readOnly = true)
     fun parse(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
-        val mainAddressBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
-        val contentResults = siteContentParser.parse(requests.map { it.content }, mainAddressBpns)
+        val targets = targetResults.map { it.parsedOrNull() }
+        val contentResults = siteContentParser.parse(
+            requests.map { it.content },
+            siteBpns = targets.map { it?.bpn },
+            mainAddressBpns = targets.map { it?.mainAddress?.bpn }
+        )
 
         return zipParseResults(contentResults, targetResults) { content, target ->
             SiteUpdateParsed(target, content)

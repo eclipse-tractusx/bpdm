@@ -83,7 +83,7 @@ class SiteUpsertParser(
     ): SiteUpsertParsed? =
         when (request) {
             is SiteUpsertRequest.WithLegalAddressAsMain ->
-                parseHeader(request.header, errors)
+                parseHeader(request.header, siteBpn = null, errors)
                     ?.let { SiteUpsertParsed.CreateOnLegalAddress(siteReference, it) }
             is SiteUpsertRequest.WithOwnMainAddress ->
                 parseCreateWithOwnMainAddress(request, siteReference, errors)
@@ -105,7 +105,11 @@ class SiteUpsertParser(
             return parseCreateOnExistingAddress(request, siteReference, mainAddressReference, existingMainAddress, errors)
 
         val content = siteContentParser
-            .parse(listOf(SiteContentRequest(request.header, request.mainAddress.content)), listOf(null))
+            .parse(
+                listOf(SiteContentRequest(request.header, request.mainAddress.content)),
+                siteBpns = listOf(null),
+                mainAddressBpns = listOf(null)
+            )
             .singleOrRecord(errors, ::toContentError) ?: return null
 
         return SiteUpsertParsed.CreateWithOwnMainAddress(siteReference, mainAddressReference, content)
@@ -118,7 +122,7 @@ class SiteUpsertParser(
         existingMainAddress: LogisticAddressDb,
         errors: MutableList<SiteUpsertParseError>
     ): SiteUpsertParsed? {
-        val header = parseHeader(request.header, errors)
+        val header = parseHeader(request.header, siteBpn = null, errors)
         val mainAddressContent = addressContentParser
             .parse(listOf(request.mainAddress.content), listOf(existingMainAddress.bpn))
             .singleOrRecord(errors, ::SiteMainAddressContentInvalid)
@@ -140,7 +144,7 @@ class SiteUpsertParser(
             is SiteUpsertRequest.WithLegalAddressAsMain -> {
                 if (!existingSite.sitsOnLegalAddress())
                     errors += SiteDoesNotSitOnLegalAddress(existingSite.bpn, existingSite.mainAddress.bpn)
-                parseHeader(request.header, errors)
+                parseHeader(request.header, existingSite.bpn, errors)
                     ?.let { SiteUpsertParsed.UpdateOnLegalAddress(siteReference, existingSite, it) }
             }
 
@@ -148,7 +152,8 @@ class SiteUpsertParser(
                 siteContentParser
                     .parse(
                         listOf(SiteContentRequest(request.header, request.mainAddress.content)),
-                        listOf(existingSite.mainAddress.bpn)
+                        siteBpns = listOf(existingSite.bpn),
+                        mainAddressBpns = listOf(existingSite.mainAddress.bpn)
                     )
                     .singleOrRecord(errors, ::toContentError)
                     ?.let {
@@ -161,8 +166,8 @@ class SiteUpsertParser(
                     }
         }
 
-    private fun parseHeader(header: SiteHeaderRequest, errors: MutableList<SiteUpsertParseError>) =
-        siteHeaderParser.parse(listOf(header)).singleOrRecord(errors, ::SiteContentInvalid)
+    private fun parseHeader(header: SiteHeaderRequest, siteBpn: String?, errors: MutableList<SiteUpsertParseError>) =
+        siteHeaderParser.parse(listOf(header), listOf(siteBpn)).singleOrRecord(errors, ::SiteContentInvalid)
 
     private fun toContentError(error: SiteContentParseError): SiteUpsertParseError =
         when (error) {

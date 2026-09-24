@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteHeaderParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
@@ -29,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.eclipse.tractusx.bpdm.pool.service.parser.ConfidenceCriteriaParser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates the fields of a site header against the script codes they reference. The header only: the main address is
@@ -37,15 +39,20 @@ import org.springframework.stereotype.Service
 @Service
 class SiteHeaderParser(
     private val scriptCodeRepository: ScriptCodeRepository,
-    private val confidenceCriteriaParser: ConfidenceCriteriaParser
+    private val confidenceCriteriaParser: ConfidenceCriteriaParser,
+    private val stateRelationValidator: SiteStateRelationValidator
 ) {
 
     /**
-     * Validates each header and reports either the validated header or every problem found in that entry.
+     * Validates each header and reports either the validated header or every problem found in that entry. [siteBpns] is
+     * positional with [headers]: null for a create, the site's own BPN for an update, so an update has its states judged
+     * against the successions the site takes part in.
      */
-    fun parse(headers: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteHeaderParseError>> {
+    @Transactional(readOnly = true)
+    fun parse(headers: List<SiteHeaderRequest>, siteBpns: List<String?>): List<ParseResult<SiteHeaderParsed, SiteHeaderParseError>> {
         val scriptCodes = fetchScriptCodes(headers)
-        return headers.map { parseEntry(it, scriptCodes) }
+        val stateRelationErrors = stateRelationValidator.validate(headers, siteBpns)
+        return headers.mapIndexed { index, header -> parseEntry(header, scriptCodes).combine(stateRelationErrors[index]) { it } }
     }
 
     private fun fetchScriptCodes(headers: List<SiteHeaderRequest>): Map<String, ScriptCodeDb> {

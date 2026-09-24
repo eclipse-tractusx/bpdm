@@ -52,7 +52,7 @@ class SiteCreateOnLegalAddressParser(
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.header })
+        val headerResults = siteHeaderParser.parse(requests.map { it.header }, requests.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =

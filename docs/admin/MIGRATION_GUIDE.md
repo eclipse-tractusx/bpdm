@@ -48,6 +48,7 @@ The Pool now judges data by rules it did not apply when your sharing members sha
 - A succession is rejected when its predecessor is still recorded as active on or after its start date, when its successor is recorded as inactive on that date, or when it carries an end date or more than one validity period.
 - An ownership or data management relation is rejected when its owner or manager is recorded as inactive during any of its validity periods.
 - An alternative headquarter relation is rejected when either of its two legal entities is recorded as inactive during any of its validity periods.
+- A legal entity, site or address is rejected when its states contradict a relation it already takes part in, for example an owner recorded as inactive while it owns another legal entity.
 
 Nothing removes or blocks those records: they stay readable, and they are rejected the next time they are shared.
 

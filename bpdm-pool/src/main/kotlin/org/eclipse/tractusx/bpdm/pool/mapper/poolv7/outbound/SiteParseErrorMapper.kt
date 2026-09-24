@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
@@ -37,7 +38,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SiteParseErrorMapper(
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
 ) {
 
     /** The error a failed site create reports for the given parse error. */
@@ -59,7 +61,8 @@ class SiteParseErrorMapper(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteCreateError.ScriptVariantNameMissing,
-                scriptVariantDuplicateScriptCode = SiteCreateError.ScriptVariantDuplicateScriptCode
+                scriptVariantDuplicateScriptCode = SiteCreateError.ScriptVariantDuplicateScriptCode,
+                statesContradictSuccession = null
             )
         }
 
@@ -77,7 +80,8 @@ class SiteParseErrorMapper(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteUpdateError.ScriptVariantNameMissing,
-                scriptVariantDuplicateScriptCode = SiteUpdateError.ScriptVariantDuplicateScriptCode
+                scriptVariantDuplicateScriptCode = SiteUpdateError.ScriptVariantDuplicateScriptCode,
+                statesContradictSuccession = SiteUpdateError.StatesContradictSuccession
             )
         }
 
@@ -85,13 +89,16 @@ class SiteParseErrorMapper(
         error: SiteHeaderParseError,
         entityKey: String?,
         scriptVariantNameMissing: E,
-        scriptVariantDuplicateScriptCode: E
+        scriptVariantDuplicateScriptCode: E,
+        statesContradictSuccession: E?
     ): ErrorInfo<E> =
         when (error) {
             is SiteHeaderParseError.ScriptVariantNameMissing ->
                 ErrorInfo(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
             is SiteHeaderParseError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
+            is SiteStateRelationParseError ->
+                ErrorInfo(statesContradictSuccession ?: throw internalError(error), stateRelationErrorMapper.toDescription(error), entityKey)
             is SiteHeaderParseError.NameMissing,
             is SiteHeaderParseError.ConfidenceCriteriaMissing,
             is SiteHeaderParseError.ScriptCodeNotFound -> throw internalError(error)

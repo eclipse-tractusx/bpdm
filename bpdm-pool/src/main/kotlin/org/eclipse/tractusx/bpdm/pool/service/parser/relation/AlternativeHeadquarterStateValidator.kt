@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.model.error.AlternativeRecordedInactive
 import org.eclipse.tractusx.bpdm.pool.model.error.DesignatedPartnerRecordedInactive
@@ -49,12 +48,11 @@ class AlternativeHeadquarterStateValidator {
         return validityPeriods
             .sortedBy { it.validFrom }
             .flatMap { validityPeriod ->
-                val span = RelationTimePeriod.fromUnlimited(validityPeriod.validFrom, validityPeriod.validTo)
                 listOfNotNull(
-                    if (alternativeActivity.isRecordedInactiveWithin(span))
+                    if (alternativeActivity.isRecordedInactiveDuring(validityPeriod))
                         AlternativeRecordedInactive(alternative.bpn, validityPeriod.validFrom, validityPeriod.validTo)
                     else null,
-                    if (mainActivity.isRecordedInactiveWithin(span))
+                    if (mainActivity.isRecordedInactiveDuring(validityPeriod))
                         MainRecordedInactive(main.bpn, validityPeriod.validFrom, validityPeriod.validTo)
                     else null
                 )

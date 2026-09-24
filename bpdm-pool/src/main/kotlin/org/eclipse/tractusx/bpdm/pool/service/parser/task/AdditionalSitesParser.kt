@@ -93,7 +93,8 @@ class AdditionalSitesParser(
         }
 
         val headers = siteHeaderParser.parse(
-            newSiteReferences.map { (index, _) -> SiteHeaderRequest(distinctSiteReferences[index].name, emptyList(), borrowedConfidence, emptyList()) }
+            newSiteReferences.map { (index, _) -> SiteHeaderRequest(distinctSiteReferences[index].name, emptyList(), borrowedConfidence, emptyList()) },
+            newSiteReferences.map { null }
         )
 
         val creationByIndex = newSiteReferences.zip(headers).associate { (indexedSiteReference, header) ->

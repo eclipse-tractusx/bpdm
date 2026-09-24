@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteMainAddressConsistencyValidator
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -52,8 +53,8 @@ class AddressUpdateParser(
      */
     @Transactional(readOnly = true)
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
-        val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
+        val contentResults = addressContentParser.parse(requests.map { it.content }, targetResults.map { it.parsedOrNull()?.bpn })
         val siteResults = parseWherePresent(requests.map { it.siteBpns }, siteBpnParser::parseAll)
         val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateParseError>> =
             crossValidateParseResults(targetResults, siteResults) { target, sites ->

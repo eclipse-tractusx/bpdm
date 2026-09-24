@@ -550,6 +550,9 @@ starts, and rejected when its successor is recorded as inactive on that date.
 An active period the predecessor never closed therefore blocks every succession against it, and a
 period closed on the succession's start date does not, because a state no longer covers its end.
 A partner that records no state at all is not blocked either.
+The check holds in the other direction too: once the succession is processed, sharing the predecessor
+as active again, or the successor as inactive on the start date, is rejected on that business
+partner's sharing state, and the rejection names the succession and the other partner.
 Only the successor has to be a golden record before the succession is processed; the other two
 reports are independent of each other and can be made in either order.
 A succession does not expire, so it carries no `validTo` - one that ended would say the predecessor
@@ -703,7 +706,9 @@ nothing and represents nobody.
 4. Only then share the business partner itself with its closed active and new inactive state.
 
 What does matter is that step 4 comes last.
-Deactivating the partner first leaves relations pointing at a partner that is already out of use.
+Deactivating the partner first would leave relations pointing at a partner that is already out of
+use, so the Pool rejects it: the business partner's sharing state fails and names the relation that
+still depends on it, and you share the partner again once that relation is closed.
 
 Relations that start at this partner are untouched - being owned or managed while out of use is
 allowed - and ending a relation moves the role nowhere. A successor as owner or manager is a new
@@ -759,9 +764,11 @@ Both have to be active for the designation to hold, so either one going out of u
 ownership and data management, which are only cut when the governing side goes.
 
 1. Send the designation again under its existing `externalId`, its open period now carrying a
-   `validTo` of that date.
+   `validTo` of that date, and wait for it to succeed.
 2. Then share the business partner that goes out of use with its closed active and new inactive
    state.
+   Shared while the designation still holds over that time, it is rejected, naming the designation
+   and the other legal entity.
 3. Watch both sharing states, the relation's and the business partner's.
    They are separate calls, and each can fail without the other.
 

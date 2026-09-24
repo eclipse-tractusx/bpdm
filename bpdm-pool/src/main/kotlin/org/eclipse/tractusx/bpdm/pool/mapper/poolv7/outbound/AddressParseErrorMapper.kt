@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
@@ -31,7 +32,9 @@ import org.springframework.stereotype.Component
  * an internal error instead. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
-class AddressParseErrorMapper {
+class AddressParseErrorMapper(
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
+) {
 
     /** The error a failed address create reports for the given parse error. */
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfo<AddressCreateError> =
@@ -56,7 +59,8 @@ class AddressParseErrorMapper {
                 duplicateIdentifier = AddressCreateError.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressCreateError.IdentifiersTooMany,
                 scriptVariantCityMissing = AddressCreateError.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressCreateError.ScriptVariantDuplicateScriptCode
+                scriptVariantDuplicateScriptCode = AddressCreateError.ScriptVariantDuplicateScriptCode,
+                statesContradictSuccession = null
             )
         }
 
@@ -73,7 +77,8 @@ class AddressParseErrorMapper {
                 duplicateIdentifier = AddressUpdateError.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressUpdateError.IdentifiersTooMany,
                 scriptVariantCityMissing = AddressUpdateError.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressUpdateError.ScriptVariantDuplicateScriptCode
+                scriptVariantDuplicateScriptCode = AddressUpdateError.ScriptVariantDuplicateScriptCode,
+                statesContradictSuccession = AddressUpdateError.StatesContradictSuccession
             )
             is SiteNotInAddressLegalEntity ->
                 ErrorInfo(
@@ -101,7 +106,8 @@ class AddressParseErrorMapper {
             duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany,
             scriptVariantCityMissing = LegalEntityCreateError.LegalAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode
+            scriptVariantDuplicateScriptCode = LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode,
+            statesContradictSuccession = null
         )
 
     /** The error a failed legal-entity update reports for the given error found on its legal address. */
@@ -114,7 +120,8 @@ class AddressParseErrorMapper {
             duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany,
             scriptVariantCityMissing = LegalEntityUpdateError.LegalAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode
+            scriptVariantDuplicateScriptCode = LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode,
+            statesContradictSuccession = LegalEntityUpdateError.LegalAddressStatesContradictSuccession
         )
 
     /** The error a failed site create reports for the given error found on its main address. */
@@ -127,7 +134,8 @@ class AddressParseErrorMapper {
             duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany,
             scriptVariantCityMissing = SiteCreateError.MainAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = SiteCreateError.MainAddressScriptVariantDuplicateScriptCode
+            scriptVariantDuplicateScriptCode = SiteCreateError.MainAddressScriptVariantDuplicateScriptCode,
+            statesContradictSuccession = null
         )
 
     /** The error a failed site update reports for the given error found on its main address. */
@@ -140,7 +148,8 @@ class AddressParseErrorMapper {
             duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany,
             scriptVariantCityMissing = SiteUpdateError.MainAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode
+            scriptVariantDuplicateScriptCode = SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode,
+            statesContradictSuccession = SiteUpdateError.MainAddressStatesContradictSuccession
         )
 
     private fun <E : ErrorCode> sharedErrorInfo(
@@ -151,7 +160,8 @@ class AddressParseErrorMapper {
         duplicateIdentifier: E,
         identifiersTooMany: E,
         scriptVariantCityMissing: E,
-        scriptVariantDuplicateScriptCode: E
+        scriptVariantDuplicateScriptCode: E,
+        statesContradictSuccession: E?
     ): ErrorInfo<E> =
         when (error) {
             is AddressFieldParseError -> throw internalError(error)
@@ -178,6 +188,8 @@ class AddressParseErrorMapper {
                 is AddressScriptVariantParseError.DuplicateScriptCode ->
                     ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate address script variant for script code '${error.scriptCode}'", entityKey)
             }
+            is AddressStateRelationParseError ->
+                ErrorInfo(statesContradictSuccession ?: throw internalError(error), stateRelationErrorMapper.toDescription(error), entityKey)
         }
 
     private fun internalError(error: Any) =

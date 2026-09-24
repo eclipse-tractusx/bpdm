@@ -61,6 +61,8 @@ data class MultipleUltimateOwners(val conflictingBpnls: List<String>) : LegalEnt
 
 data class AlternativeHeadquarterCannotOwn(val bpnl: String) : LegalEntityUpsertParseError
 
+data class LegalEntityStatesContradictRelation(val error: LegalEntityStateRelationParseError) : LegalEntityUpsertParseError
+
 data class SiteContentInvalid(val error: SiteHeaderParseError) : SiteUpsertParseError
 
 data class SiteMainAddressContentInvalid(val error: AddressContentParseError) : SiteUpsertParseError

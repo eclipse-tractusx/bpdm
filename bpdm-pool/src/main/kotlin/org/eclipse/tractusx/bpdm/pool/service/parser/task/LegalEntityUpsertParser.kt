@@ -100,6 +100,7 @@ class LegalEntityUpsertParser(
             is LegalEntityContentParseError -> toContentError(error)
             is MultipleUltimateOwnersInHierarchy -> MultipleUltimateOwners(error.conflictingBpnls)
             is AlternativeHeadquarterCannotOwnUltimately -> AlternativeHeadquarterCannotOwn(error.bpnl)
+            is LegalEntityStateRelationParseError -> LegalEntityStatesContradictRelation(error)
         }
 
     private fun toContentError(error: LegalEntityContentParseError): LegalEntityUpsertParseError =

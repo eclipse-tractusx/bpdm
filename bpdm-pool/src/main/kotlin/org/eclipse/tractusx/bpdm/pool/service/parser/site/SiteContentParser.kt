@@ -37,15 +37,17 @@ class SiteContentParser(
 ) {
 
     /**
-     * Validates each content and reports either the validated content or every problem found in that entry.
-     * [mainAddressBpns] is positional with [contents]: null for a create, the main address's own BPN for an update, so
-     * an update may re-submit its own existing identifiers.
+     * Validates each content and reports either the validated content or every problem found in that entry. [siteBpns]
+     * and [mainAddressBpns] are positional with [contents]: null for a create, the site's and its main address's own
+     * BPNs for an update, so an update may re-submit its own existing identifiers and has its states judged against the
+     * successions both take part in.
      */
     fun parse(
         contents: List<SiteContentRequest>,
+        siteBpns: List<String?>,
         mainAddressBpns: List<String?>
     ): List<ParseResult<SiteContentParsed, SiteContentParseError>> {
-        val headerResults = siteHeaderParser.parse(contents.map { it.header })
+        val headerResults = siteHeaderParser.parse(contents.map { it.header }, siteBpns)
         val mainAddressResults = addressContentParser.parse(contents.map { it.mainAddress }, mainAddressBpns)
 
         return zipParseResults(headerResults, mainAddressResults, ::SiteContentParsed)

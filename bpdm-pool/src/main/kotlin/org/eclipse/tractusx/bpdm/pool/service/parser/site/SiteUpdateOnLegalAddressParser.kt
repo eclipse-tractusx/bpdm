@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressNotLegalAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateOnLegalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateOnLegalAddressRequest
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -49,7 +50,7 @@ class SiteUpdateOnLegalAddressParser(
     @Transactional(readOnly = true)
     fun parse(requests: List<SiteUpdateOnLegalAddressRequest>): List<ParseResult<SiteUpdateOnLegalAddressParsed, SiteUpdateParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn }).map(::requireSittingOnLegalAddress)
-        val headerResults = siteHeaderParser.parse(requests.map { it.header })
+        val headerResults = siteHeaderParser.parse(requests.map { it.header }, targetResults.map { it.parsedOrNull()?.bpn })
 
         return zipParseResults(headerResults, targetResults) { header, target ->
             SiteUpdateOnLegalAddressParsed(target, header)

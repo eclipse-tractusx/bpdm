@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
@@ -31,7 +32,9 @@ import org.springframework.stereotype.Component
  * error instead of getting a public code. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
-class AddressParseErrorMapperV6 {
+class AddressParseErrorMapperV6(
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
+) {
 
     /** The v6 error a failed address create reports for the given parse error. */
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
@@ -54,7 +57,8 @@ class AddressParseErrorMapperV6 {
                 regionNotFound = AddressCreateErrorV6.RegionNotFound,
                 identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
                 duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
+                identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany,
+                statesContradictSuccession = null
             )
         }
 
@@ -69,7 +73,8 @@ class AddressParseErrorMapperV6 {
                 regionNotFound = AddressUpdateErrorV6.RegionNotFound,
                 identifierNotFound = AddressUpdateErrorV6.IdentifierNotFound,
                 duplicateIdentifier = AddressUpdateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
+                identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany,
+                statesContradictSuccession = AddressUpdateErrorV6.StatesContradictSuccession
             )
             is SiteNotInAddressLegalEntity ->
                 ErrorInfoV6(
@@ -89,7 +94,8 @@ class AddressParseErrorMapperV6 {
             regionNotFound = LegalEntityCreateErrorV6.LegalAddressRegionNotFound,
             identifierNotFound = LegalEntityCreateErrorV6.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityCreateErrorV6.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany
+            identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany,
+            statesContradictSuccession = null
         )
 
     /** The v6 error a failed legal-entity update reports for the given error found on its legal address. */
@@ -100,7 +106,8 @@ class AddressParseErrorMapperV6 {
             regionNotFound = LegalEntityUpdateErrorV6.LegalAddressRegionNotFound,
             identifierNotFound = LegalEntityUpdateErrorV6.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityUpdateErrorV6.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany
+            identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany,
+            statesContradictSuccession = LegalEntityUpdateErrorV6.LegalAddressStatesContradictSuccession
         )
 
     /** The v6 error a failed site create reports for the given error found on its main address. */
@@ -111,7 +118,8 @@ class AddressParseErrorMapperV6 {
             regionNotFound = SiteCreateErrorV6.MainAddressRegionNotFound,
             identifierNotFound = SiteCreateErrorV6.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteCreateErrorV6.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany
+            identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany,
+            statesContradictSuccession = null
         )
 
     /** The v6 error a failed site update reports for the given error found on its main address. */
@@ -122,7 +130,8 @@ class AddressParseErrorMapperV6 {
             regionNotFound = SiteUpdateErrorV6.MainAddressRegionNotFound,
             identifierNotFound = SiteUpdateErrorV6.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteUpdateErrorV6.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteUpdateErrorV6.MainAddressIdentifiersTooMany
+            identifiersTooMany = SiteUpdateErrorV6.MainAddressIdentifiersTooMany,
+            statesContradictSuccession = SiteUpdateErrorV6.MainAddressStatesContradictSuccession
         )
 
     private fun <E : ErrorCodeV6> sharedErrorInfo(
@@ -131,7 +140,8 @@ class AddressParseErrorMapperV6 {
         regionNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
-        identifiersTooMany: E
+        identifiersTooMany: E,
+        statesContradictSuccession: E?
     ): ErrorInfoV6<E> =
         when (error) {
             is AddressFieldParseError -> throw internalError(error)
@@ -151,6 +161,8 @@ class AddressParseErrorMapperV6 {
                     ErrorInfoV6(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             }
             is AddressScriptVariantParseError -> throw internalError(error)
+            is AddressStateRelationParseError ->
+                ErrorInfoV6(statesContradictSuccession ?: throw internalError(error), stateRelationErrorMapper.toDescription(error), entityKey)
         }
 
     private fun internalError(error: Any) =

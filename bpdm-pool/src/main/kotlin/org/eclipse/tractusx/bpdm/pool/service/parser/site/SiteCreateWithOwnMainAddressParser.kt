@@ -45,7 +45,7 @@ class SiteCreateWithOwnMainAddressParser(
     @Transactional(readOnly = true)
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
         val contents = requests.map { it.content }
-        val contentResults = siteContentParser.parse(contents, contents.map { null })
+        val contentResults = siteContentParser.parse(contents, siteBpns = contents.map { null }, mainAddressBpns = contents.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         return zipParseResults(contentResults, legalEntityResults) { content, legalEntity ->

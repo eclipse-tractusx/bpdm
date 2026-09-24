@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
@@ -37,7 +38,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class LegalEntityParseErrorMapperV6(
-    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6,
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
 ) {
 
     /** The v6 error a failed legal-entity create reports for the given parse error. */
@@ -68,6 +70,8 @@ class LegalEntityParseErrorMapperV6(
             is MultipleUltimateOwnersInHierarchy -> throw internalError(error)
             // A v6 write never sets the ownership flag on an alternative headquarter, so this cannot be broken from v6.
             is AlternativeHeadquarterCannotOwnUltimately -> throw internalError(error)
+            is LegalEntityStateRelationParseError ->
+                ErrorInfoV6(toStatesContradictionCode(error), stateRelationErrorMapper.toDescription(error), entityKey)
             is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
@@ -106,6 +110,15 @@ class LegalEntityParseErrorMapperV6(
             is LegalEntityHeaderParseError.IdentifierValueMissing,
             is LegalEntityHeaderParseError.IdentifierTypeMissing,
             is LegalEntityHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
+        }
+
+    private fun toStatesContradictionCode(error: LegalEntityStateRelationParseError): LegalEntityUpdateErrorV6 =
+        when (error) {
+            is ReplacedLegalEntityRecordedActive, is ReplacingLegalEntityRecordedInactive -> LegalEntityUpdateErrorV6.StatesContradictSuccession
+            is OwnerRecordedInactive -> LegalEntityUpdateErrorV6.StatesContradictOwnership
+            is ManagerRecordedInactive -> LegalEntityUpdateErrorV6.StatesContradictDataManagement
+            is AlternativeHeadquarterRecordedInactive, is MainHeadquarterRecordedInactive ->
+                LegalEntityUpdateErrorV6.StatesContradictAlternativeHeadquarter
         }
 
     private fun internalError(error: Any) =

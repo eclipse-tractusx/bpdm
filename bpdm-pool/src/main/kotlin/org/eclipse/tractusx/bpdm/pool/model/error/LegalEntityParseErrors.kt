@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
+import java.time.LocalDate
+
 sealed interface LegalEntityCreateParseError
 
 
@@ -53,6 +55,29 @@ data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>)
  * but clearing it stays allowed.
  */
 data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityOwnershipParseError
+
+/**
+ * The ways the states a legal entity update states can contradict a relation the legal entity already has.
+ */
+sealed interface LegalEntityStateRelationParseError : LegalEntityUpdateContentParseError
+
+data class ReplacedLegalEntityRecordedActive(val bpn: String, val successorBpn: String, val validFrom: LocalDate) :
+    LegalEntityStateRelationParseError
+
+data class ReplacingLegalEntityRecordedInactive(val bpn: String, val predecessorBpn: String, val validFrom: LocalDate) :
+    LegalEntityStateRelationParseError
+
+data class OwnerRecordedInactive(val bpn: String, val ownedBpn: String, val validFrom: LocalDate, val validTo: LocalDate?) :
+    LegalEntityStateRelationParseError
+
+data class ManagerRecordedInactive(val bpn: String, val managedBpn: String, val validFrom: LocalDate, val validTo: LocalDate?) :
+    LegalEntityStateRelationParseError
+
+data class AlternativeHeadquarterRecordedInactive(val bpn: String, val mainBpn: String, val validFrom: LocalDate, val validTo: LocalDate?) :
+    LegalEntityStateRelationParseError
+
+data class MainHeadquarterRecordedInactive(val bpn: String, val alternativeBpn: String, val validFrom: LocalDate, val validTo: LocalDate?) :
+    LegalEntityStateRelationParseError
 
 /**
  * The problems the content of one legal entity can be faulted for: its header and its legal address.

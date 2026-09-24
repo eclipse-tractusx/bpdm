@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.PartnerActivityTimeline
 import org.eclipse.tractusx.bpdm.pool.model.error.PredecessorRecordedActive
@@ -65,10 +64,10 @@ class SuccessionStateValidator {
     ): List<SuccessionContentParseError> {
         val errors = mutableListOf<SuccessionContentParseError>()
 
-        if (predecessorActivity.isRecordedActiveWithin(RelationTimePeriod.fromUnlimited(validFrom, null)))
+        if (predecessorActivity.isRecordedActiveOnceReplacedFrom(validFrom))
             errors.add(PredecessorRecordedActive(predecessorBpn, validFrom))
 
-        if (successorActivity.isRecordedInactiveWithin(RelationTimePeriod(validFrom, validFrom.plusDays(1))))
+        if (successorActivity.isRecordedInactiveWhenReplacingFrom(validFrom))
             errors.add(SuccessorRecordedInactive(successorBpn, validFrom))
 
         return errors

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Query
 
 interface SiteRelationRepository : JpaRepository<SiteRelationDb, Long>, JpaSpecificationExecutor<SiteRelationDb> {
 
@@ -51,4 +52,10 @@ interface SiteRelationRepository : JpaRepository<SiteRelationDb, Long>, JpaSpeci
     }
 
     fun findByTypeAndStartSite(type: SiteRelationType, site: SiteDb): Set<SiteRelationDb>
+
+    @Query(
+        "SELECT r FROM SiteRelationDb r JOIN FETCH r.startSite JOIN FETCH r.endSite LEFT JOIN FETCH r.validityPeriods " +
+                "WHERE r.startSite.bpn IN :siteBpns OR r.endSite.bpn IN :siteBpns"
+    )
+    fun findByStartSiteBpnInOrEndSiteBpnIn(siteBpns: Collection<String>): Set<SiteRelationDb>
 }

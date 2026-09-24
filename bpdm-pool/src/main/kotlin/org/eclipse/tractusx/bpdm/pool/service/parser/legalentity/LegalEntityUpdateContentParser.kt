@@ -29,13 +29,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates the content one legal entity update states, together with the ownership rules that hold only once the legal
- * entity exists.
+ * Validates the content one legal entity update states, together with the ownership and relation rules that hold only
+ * once the legal entity exists.
  */
 @Service
 class LegalEntityUpdateContentParser(
     private val legalEntityContentParser: LegalEntityContentParser,
-    private val ownershipValidator: LegalEntityOwnershipValidator
+    private val ownershipValidator: LegalEntityOwnershipValidator,
+    private val stateRelationValidator: LegalEntityStateRelationValidator
 ) {
 
     /**
@@ -47,9 +48,10 @@ class LegalEntityUpdateContentParser(
         val contentWrites = writes.map { LegalEntityContentWrite(it.content, it.target) }
         val contentResults = legalEntityContentParser.parse(contentWrites)
         val ownershipViolations = ownershipValidator.validate(contentWrites.map { it.headerWrite })
+        val stateRelationViolations = stateRelationValidator.validate(writes)
 
         return writes.indices.map { index ->
-            contentResults[index].combine(ownershipViolations[index]) { content ->
+            contentResults[index].combine(ownershipViolations[index] + stateRelationViolations[index]) { content ->
                 LegalEntityUpdateParsed(writes[index].target, content)
             }
         }

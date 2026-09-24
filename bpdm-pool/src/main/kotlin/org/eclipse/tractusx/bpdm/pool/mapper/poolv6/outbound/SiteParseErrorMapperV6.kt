@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.StateRelationParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
@@ -35,7 +36,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SiteParseErrorMapperV6(
-    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6,
+    private val stateRelationErrorMapper: StateRelationParseErrorMapper
 ) {
 
     /** The v6 error a failed site create reports for the given parse error. */
@@ -65,6 +67,8 @@ class SiteParseErrorMapperV6(
             // states the main address, so it can never be faulted for the site not owning one.
             is SiteMainAddressNotLegalAddress ->
                 throw BpdmValidationException("Unexpected site parse error (no v6 client error code): $error")
+            is SiteStateRelationParseError ->
+                ErrorInfoV6(SiteUpdateErrorV6.StatesContradictSuccession, stateRelationErrorMapper.toDescription(error), entityKey)
             is SiteHeaderParseError -> throw internalError(error)
         }
 

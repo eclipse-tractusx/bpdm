@@ -4698,7 +4698,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressUpdateError",
-            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded", "StatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4734,7 +4734,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "LegalEntityUpdateError",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded", "StatesContradictSuccession", "StatesContradictOwnership", "StatesContradictDataManagement", "StatesContradictAlternativeHeadquarter", "LegalAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4770,7 +4770,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "SiteUpdateError",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded", "StatesContradictSuccession", "MainAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4810,7 +4810,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "AddressUpdateErrorV6",
-            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
+            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "StatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4850,7 +4850,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "LegalEntityUpdateErrorV6",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "StatesContradictSuccession", "StatesContradictOwnership", "StatesContradictDataManagement", "StatesContradictAlternativeHeadquarter", "LegalAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"
@@ -4890,7 +4890,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "SiteUpdateErrorV6",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "StatesContradictSuccession", "MainAddressStatesContradictSuccession" ]
           },
           "message" : {
             "type" : "string"

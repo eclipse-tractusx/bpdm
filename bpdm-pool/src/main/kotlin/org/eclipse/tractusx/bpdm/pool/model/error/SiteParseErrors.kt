@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
+import java.time.LocalDate
+
 sealed interface SiteCreateParseError
 
 
@@ -40,4 +42,12 @@ sealed interface SiteHeaderParseError : SiteContentParseError {
     data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteHeaderParseError
     data class ScriptVariantNameMissing(val index: Int) : SiteHeaderParseError
     data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteHeaderParseError
+}
+
+/**
+ * The ways the states a site write states can contradict a succession the site already takes part in.
+ */
+sealed interface SiteStateRelationParseError : SiteHeaderParseError {
+    data class ReplacedSiteRecordedActive(val bpn: String, val successorBpn: String, val validFrom: LocalDate) : SiteStateRelationParseError
+    data class ReplacingSiteRecordedInactive(val bpn: String, val predecessorBpn: String, val validFrom: LocalDate) : SiteStateRelationParseError
 }
