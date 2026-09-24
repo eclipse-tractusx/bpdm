@@ -28,3 +28,12 @@ import java.time.LocalDate
  */
 fun RelationDb.isValidOn(date: LocalDate): Boolean =
     validityPeriods.any { period -> date >= period.validFrom && (period.validTo == null || date < period.validTo) }
+
+/**
+ * Whether this period and any of [others] intersect, where periods meeting on a single shared date do not.
+ */
+fun RelationValidityPeriodDb.hasOverlap(others: Collection<RelationValidityPeriodDb>): Boolean =
+    others.any { other -> asTimePeriod().hasOverlap(other.asTimePeriod()) }
+
+private fun RelationValidityPeriodDb.asTimePeriod(): RelationTimePeriod =
+    RelationTimePeriod.fromUnlimited(validFrom, validTo)

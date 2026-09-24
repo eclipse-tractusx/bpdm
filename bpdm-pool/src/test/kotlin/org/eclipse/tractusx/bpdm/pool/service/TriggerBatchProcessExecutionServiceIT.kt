@@ -39,6 +39,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactor
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withStates
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolAssertHelper
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
@@ -94,10 +96,10 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     @Test
     fun `event trigger invokes headquarter relocation`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
@@ -126,7 +128,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     @Test
     fun `not yet ready event trigger is ignored`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
         val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl)

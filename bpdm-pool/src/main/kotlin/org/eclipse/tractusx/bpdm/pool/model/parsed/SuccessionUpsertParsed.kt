@@ -17,22 +17,39 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 
-interface IAddressRelationUpsertStratergyService {
+sealed interface SuccessionUpsertParsed
 
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<AddressRelationDb>
+data class LegalEntitySuccessionParsed(
+    val predecessor: LegalEntityDb,
+    val successor: LegalEntityDb,
+    val validityPeriod: RelationValidityPeriodDb,
+    val reasonCode: ReasonCodeDb?,
+    val existingRelation: RelationDb?
+) : SuccessionUpsertParsed
 
-    data class UpsertRequest(
-        val source: LogisticAddressDb,
-        val target: LogisticAddressDb,
-        val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val reasonCode: ReasonCodeDb?
-    )
-}
+data class SiteSuccessionParsed(
+    val predecessor: SiteDb,
+    val successor: SiteDb,
+    val validityPeriod: RelationValidityPeriodDb,
+    val reasonCode: ReasonCodeDb?,
+    val existingRelation: SiteRelationDb?
+) : SuccessionUpsertParsed
+
+data class AddressSuccessionParsed(
+    val predecessor: LogisticAddressDb,
+    val successor: LogisticAddressDb,
+    val validityPeriod: RelationValidityPeriodDb,
+    val reasonCode: ReasonCodeDb?,
+    val existingRelation: AddressRelationDb?
+) : SuccessionUpsertParsed

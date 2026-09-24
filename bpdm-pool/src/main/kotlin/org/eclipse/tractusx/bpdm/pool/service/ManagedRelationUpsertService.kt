@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.RelationUpsertService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate

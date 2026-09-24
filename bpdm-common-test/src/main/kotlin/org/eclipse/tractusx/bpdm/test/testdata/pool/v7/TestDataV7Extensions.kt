@@ -347,3 +347,27 @@ fun AddressPartnerCreateRequest.withDuplicateScriptVariants() =
 fun AddressPartnerUpdateRequest.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
+
+fun LegalEntityPartnerCreateRequest.withStates(states: List<LegalEntityStateDto>) =
+    copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states)))
+
+fun LegalEntityPartnerUpdateRequest.withStates(states: List<LegalEntityStateDto>) =
+    copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states)))
+
+fun SitePartnerCreateRequest.withStates(states: List<SiteStateDto>) =
+    copy(site = site.copy(states = states))
+
+fun SitePartnerUpdateRequest.withStates(states: List<SiteStateDto>) =
+    copy(site = site.copy(states = states))
+
+fun AddressPartnerCreateRequest.withStates(states: List<AddressStateDto>) =
+    copy(address = address.copy(states = states))
+
+fun AddressPartnerUpdateRequest.withStates(states: List<AddressStateDto>) =
+    copy(address = address.copy(states = states))
+
+fun LegalEntityPartnerCreateRequest.withLegalAddressStates(states: List<AddressStateDto>) =
+    copy(legalEntity = legalEntity.copy(legalAddress = legalEntity.legalAddress.copy(states = states)))
+
+fun SitePartnerCreateRequest.withMainAddressStates(states: List<AddressStateDto>) =
+    copy(site = site.copy(mainAddress = site.mainAddress.copy(states = states)))

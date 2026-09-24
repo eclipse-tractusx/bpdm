@@ -14,6 +14,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: A golden record task that states additional sites without stating a site of its own is now rejected, instead of silently discarding those additional sites
 - BPDM Pool: A golden record task must state every site its record address is the main address of among the additional sites; leaving one out is now rejected instead of silently keeping it
 - BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
+- BPDM Pool: A succession is now validated against the states of the two business partners it relates, at legal entity, site and address level alike: it is rejected when the predecessor is still recorded as active on or after the succession's start date, when the successor is recorded as inactive on that date, or when the succession carries an end date or more than one validity period [#1858](https://github.com/eclipse-tractusx/bpdm/issues/1858)
 
 ### Added
 

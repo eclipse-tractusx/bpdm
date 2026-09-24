@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withStates
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
@@ -83,12 +85,12 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
     @Test
     fun `succession between two additional addresses keeps headquarter and address types`() {
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
         val legalEntityBpnl = createdLegalEntity.legalEntity.header.bpnl
 
-        val predecessorRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName A", legalEntityBpnl).copy(scriptVariants = emptyList())
-        val successorRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName B", legalEntityBpnl).copy(scriptVariants = emptyList())
+        val predecessorRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName A", legalEntityBpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
+        val successorRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName B", legalEntityBpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
         val createdAddresses = poolApiClient.addresses.createAddresses(listOf(predecessorRequest, successorRequest)).entities.toList()
         val predecessor = createdAddresses[0]
         val successor = createdAddresses[1]
@@ -113,13 +115,14 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
     @Test
     fun `succession from additional address to legal address keeps headquarter and address types`() {
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
         val legalAddressBpna = createdLegalEntity.legalEntity.legalAddress.bpna
 
         val predecessorRequest = requestFactory
             .buildAdditionalAddressCreateRequest("$testName A", createdLegalEntity.legalEntity.header.bpnl)
             .copy(scriptVariants = emptyList())
+            .withStates(emptyList())
         val predecessor = poolApiClient.addresses.createAddresses(listOf(predecessorRequest)).entities.single()
 
         //WHEN

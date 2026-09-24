@@ -34,6 +34,9 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withMainAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withStates
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
@@ -102,9 +105,12 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerTargetBpn = BusinessPartnerVerboseValues.secondBpnL
         )
 
+        // Succession reports every partner it could not resolve, the other relation families stop at the source.
+        val expectedErrorCount = if (relationType == LegalEntityRelationType.IsReplacedBy) 2 else 1
+
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
+        assertThat(result[0].errors.size).isEqualTo(expectedErrorCount)
     }
 
     /*
@@ -130,10 +136,16 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerTargetBpn = savedEntity1.legalEntity.header.bpnl
         )
 
+        val bpnl = savedEntity1.legalEntity.header.bpnl
+        val expectedDescription = when (relationType) {
+            LegalEntityRelationType.IsReplacedBy -> "Business partner '$bpnl' cannot replace itself"
+            else -> "A legal entity cannot have a relation to itself (BPNL: $bpnl)."
+        }
+
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).isEqualTo("A legal entity cannot have a relation to itself (BPNL: ${savedEntity1.legalEntity.header.bpnl}).")
+        assertThat(result[0].errors[0].description).isEqualTo(expectedDescription)
     }
 
     @ParameterizedTest
@@ -151,7 +163,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).isEqualTo("An Address cannot have a relation to itself (BPNA: ${createRelationsRequest.businessPartnerSourceBpn}).")
+        assertThat(result[0].errors[0].description).isEqualTo("Business partner '${createRelationsRequest.businessPartnerSourceBpn}' cannot replace itself")
     }
 
     /*
@@ -690,9 +702,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
         assertThat(result[0].errors[0].description).isEqualTo(
-            "Invalid relation: source and target must be of the same business partner type and carry a relation type supported for it " +
-                    "(source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn}, " +
-                    "relationType=${createAddressRelationsRequest.relationType})"
+            "A succession relates two business partners of the same kind, but " +
+                    "'${createAddressRelationsRequest.businessPartnerSourceBpn}' and " +
+                    "'${createAddressRelationsRequest.businessPartnerTargetBpn}' are of different kinds"
         )
     }
 
@@ -783,7 +795,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         //THEN
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Multiple successors assigned to the same address")
+        assertThat(result.errors[0].description).contains("is already replaced by")
     }
 
     /**
@@ -857,7 +869,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         //THEN
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Circular replacement detected")
+        assertThat(result.errors[0].description).contains("is already replacing")
     }
 
     /**
@@ -920,7 +932,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).contains("Invalid 'IsReplacedBy' relation:")
+        assertThat(result[0].errors[0].description).contains("belong to different legal entities")
     }
 
     /**
@@ -970,8 +982,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool("TASK_UNKNOWN_SITES", unknownSiteRelation).single()
 
         //THEN
-        assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Source site BPNS BPNS0000000000XY not found")
+        assertThat(result.errors.map { it.description })
+            .containsExactly("No business partner 'BPNS0000000000XY' to be replaced", "No business partner 'BPNS0000000000ZY' to replace it")
     }
 
     /**
@@ -996,7 +1008,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         //THEN
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("A site cannot have a relation to itself")
+        assertThat(result.errors[0].description).contains("cannot replace itself")
     }
 
     /**
@@ -1023,7 +1035,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         //THEN
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("do not belong to the same Legal Entity")
+        assertThat(result.errors[0].description).contains("belong to different legal entities")
     }
 
     /**
@@ -1057,7 +1069,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         //THEN
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Multiple successors assigned to the same site")
+        assertThat(result.errors[0].description).contains("is already replaced by")
     }
 
     /**
@@ -1131,7 +1143,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         //THEN
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Circular replacement detected")
+        assertThat(result.errors[0].description).contains("is already replacing")
     }
 
     /**
@@ -1336,18 +1348,25 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
 
+    // Partners here record no states at all, so a succession against them is judged on the relation alone: what this
+    // class covers is the shape of the succession graph, and the rules on partner states have their own tests.
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
+            .withStates(emptyList())
+            .withLegalAddressStates(emptyList())
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
 
     private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
+            .withStates(emptyList())
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
     private fun createSite(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.buildSiteCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
+            .withStates(emptyList())
+            .withMainAddressStates(emptyList())
         return poolClient.sites.createSite(listOf(request)).entities.single()
     }
 
@@ -1405,7 +1424,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.of(1970, 1, 1),
-                    validTo = LocalDate.of(9999, 12, 31)
+                    validTo = null
                 )
             )
         )

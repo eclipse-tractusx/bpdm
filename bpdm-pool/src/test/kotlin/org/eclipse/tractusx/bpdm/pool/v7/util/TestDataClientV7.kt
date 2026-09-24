@@ -23,9 +23,12 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
@@ -35,6 +38,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
 import org.eclipse.tractusx.orchestrator.api.model.*
+import java.time.LocalDate
 import java.util.*
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod as OrchestratorRelationValidityPeriod
 
@@ -118,6 +122,43 @@ class TestDataClientV7(
         check(errors.isEmpty()) { "Could not make '$alternativeBpnL' alternative headquarter of '$mainBpnL': $errors" }
     }
 
+    /**
+     * Reports what stands in the way of replacing [predecessorBpn] by [successorBpn] over the given validity periods.
+     * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
+     */
+    fun createSuccessionToErrors(
+        predecessorBpn: String,
+        successorBpn: String,
+        validFrom: LocalDate = TestDataV7.currentRelationValidFrom,
+        validTo: LocalDate? = null
+    ): List<TaskRelationsErrorDto> =
+        createSuccessionToErrors(predecessorBpn, successorBpn, listOf(OrchestratorRelationValidityPeriod(validFrom, validTo)))
+
+    /**
+     * Reports what stands in the way of replacing [predecessorBpn] by [successorBpn] over the given [validityPeriods].
+     * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
+     */
+    fun createSuccessionToErrors(
+        predecessorBpn: String,
+        successorBpn: String,
+        validityPeriods: List<OrchestratorRelationValidityPeriod>
+    ): List<TaskRelationsErrorDto> {
+        val relations = BusinessPartnerRelations(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = predecessorBpn,
+            businessPartnerTargetBpn = successorBpn,
+            validityPeriods = validityPeriods,
+            reasonCode = null
+        )
+        val taskEntry = TaskRelationsStepReservationEntryDto(
+            taskId = "$predecessorBpn IsReplacedBy $successorBpn",
+            recordId = UUID.randomUUID().toString(),
+            businessPartnerRelations = relations
+        )
+
+        return taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskEntry)).flatMap { it.errors }
+    }
+
     fun createSite(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): SitePartnerCreateVerboseDto {
         val request = requestFactory.buildSiteCreateRequest(seed, legalEntity)
         return poolClient.sites.createSite(listOf(request)).entities.first()
@@ -130,8 +171,17 @@ class TestDataClientV7(
 
     fun updateSite(existingSite: SitePartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto {
         val request = requestFactory.createSiteUpdateRequest(seed, existingSite)
-        return poolClient.sites.updateSite(listOf(request)).entities.first()
+        return updateSite(request)
     }
+
+    fun updateSite(request: SitePartnerUpdateRequest): SitePartnerCreateVerboseDto =
+        poolClient.sites.updateSite(listOf(request)).entities.first()
+
+    fun updateLegalEntity(request: LegalEntityPartnerUpdateRequest): LegalEntityWithLegalAddressVerboseDto =
+        poolClient.legalEntities.updateBusinessPartners(listOf(request)).entities.first().legalEntity
+
+    fun updateAddress(request: AddressPartnerUpdateRequest): AddressPartnerUpdateVerboseDto =
+        poolClient.addresses.updateAddresses(listOf(request)).entities.first()
 
     fun createAdditionalAddress(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): AddressPartnerCreateVerboseDto {
         val request = requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity)

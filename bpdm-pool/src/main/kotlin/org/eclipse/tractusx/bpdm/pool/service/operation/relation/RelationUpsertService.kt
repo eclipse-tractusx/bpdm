@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.IRelationUpsertStrategyService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

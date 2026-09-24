@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.common.BusinessPartnerCommonRequestFactory
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
@@ -77,8 +78,7 @@ class BusinessPartnerRequestFactory(
                 .mapNotNull{ it }
                 .mapIndexed { index, idKey -> LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed") },
             states = listOf(
-                LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                LegalEntityStateDto(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
