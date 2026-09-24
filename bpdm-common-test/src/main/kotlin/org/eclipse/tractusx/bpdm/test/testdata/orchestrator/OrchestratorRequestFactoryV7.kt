@@ -89,12 +89,25 @@ class OrchestratorRequestFactoryV7(
     }
 
     fun buildLegalAddressSiteBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartner {
+        val legalEntity = buildLegalEntityProperties(seed, random)
+        val site = commonFactory.buildSite(seed, random)
+
         return BusinessPartner(
             nameParts = commonFactory.buildNameParts(seed),
             owningCompany = "BPNLOwner",
             uncategorized = UncategorizedProperties.empty,
-            legalEntity = buildLegalEntityProperties(seed, random),
-            site = commonFactory.buildSite(seed, random).copy(siteMainAddress = null),
+            legalEntity = legalEntity,
+            // The site shares the legal address, so it can only be named in the scripts the legal entity is named in.
+            site = site.copy(
+                siteMainAddress = null,
+                scriptVariants = legalEntity.scriptVariants.map { legalVariant ->
+                    SiteScriptVariant(
+                        scriptCode = legalVariant.scriptCode,
+                        siteName = "${site.siteName} ${legalVariant.scriptCode}",
+                        mainAddress = legalVariant.legalAddress
+                    )
+                }
+            ),
             additionalAddress = null
         )
     }

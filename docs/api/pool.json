@@ -3901,7 +3901,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -3923,7 +3923,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -3944,7 +3944,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -3965,7 +3965,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -5766,7 +5766,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -5788,7 +5788,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -5809,7 +5809,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -5830,7 +5830,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -7543,7 +7543,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date",
-            "description" : "The date until which the relation is valid."
+            "description" : "The date up to, but not including, which the relation is valid."
           }
         }
       },
@@ -8128,7 +8128,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -8150,7 +8150,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "type" : "string",
@@ -8171,7 +8171,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
@@ -8192,7 +8192,7 @@
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date up to, but not including, which the state is valid."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",

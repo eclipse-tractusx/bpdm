@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
@@ -27,8 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
@@ -60,7 +60,11 @@ class AddressUpdateApplicationV7Service(
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            updateRequests,
+            addressUpdateParser::parse,
+            addressPayloadUpdateService::update
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(addressResponseMapper.toUpdateResponse(result.parsed.value))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })

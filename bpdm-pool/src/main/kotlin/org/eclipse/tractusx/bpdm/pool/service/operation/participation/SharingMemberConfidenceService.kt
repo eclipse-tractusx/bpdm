@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation.participation
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
@@ -34,6 +34,13 @@ import org.eclipse.tractusx.bpdm.pool.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 
+/**
+ * The single authority for how many sharing members stand behind an address, and behind the legal entity that address is
+ * the legal address of.
+ *
+ * The count is derived from the sharing member records the Pool holds, never stated by a payload, so every write that
+ * can change it goes through here and each recount emits its own UPDATE changelog.
+ */
 @Service
 class SharingMemberConfidenceService(
     private val sharingMemberRecordRepository: SharingMemberRecordRepository,
@@ -61,6 +68,10 @@ class SharingMemberConfidenceService(
         return UpsertResult(foundSharingMemberRecord, if(hasChanges) UpsertType.Updated else UpsertType.NoChange)
     }
 
+    /**
+     * Puts the sharing member record on the given address, recounting the address it joins and the one it leaves, and
+     * reports the business partners that recount changed.
+     */
     fun updateAddress(recordId: String, addressBpn: String): Result{
         val address = logisticAddressRepository.findByBpn(addressBpn)!!
         val existingSharingMemberRecord = sharingMemberRecordRepository.findByRecordId(recordId)
@@ -114,6 +125,9 @@ class SharingMemberConfidenceService(
         return Result(listOf(address), if(legalEntity.legalAddress == address) listOf(legalEntity) else emptyList())
     }
 
+    /**
+     * Reports how many sharing member records of the given address count towards its confidence.
+     */
     fun countSharingMembers(address: LogisticAddressDb): Int{
         val sharingMemberRecords = sharingMemberRecordRepository.findByAddress(address)
         return sharingMemberRecords.count{ it.isGoldenRecordCounted ?: false }

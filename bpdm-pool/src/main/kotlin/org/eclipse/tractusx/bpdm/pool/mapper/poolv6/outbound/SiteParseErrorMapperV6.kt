@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the site services' sealed parse errors to the v6 `/sites` [ErrorInfoV6] codes, delegating main-address errors to
- * [AddressParseErrorMapperV6].
+ * Maps the site services' sealed parse errors to the v6 `/sites` error codes, delegating main-address errors to the v6
+ * address error mapper.
  *
  * The v6 error enums are frozen and predate script variants, so every script-variant error is thrown as an internal
  * error instead of getting a public code. The `when`s are exhaustive so a new error won't compile until it gets a code.
@@ -38,6 +38,7 @@ class SiteParseErrorMapperV6(
     private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
+    /** The v6 error a failed site create reports for the given parse error. */
     fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
         when (error) {
             is UnresolvableLegalEntity ->
@@ -49,22 +50,22 @@ class SiteParseErrorMapperV6(
                     entityKey
                 )
             is AddressContentParseError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
-            is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is SiteContentParseError -> throw internalError(error)
+            is ScriptVariantNotCoveredByAddress,
+            is SiteHeaderParseError -> throw internalError(error)
         }
 
+    /** The v6 error a failed site update reports for the given parse error. */
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is SiteContentParseError -> throw internalError(error)
+            // Only the golden record task updates a site on its legal address; a site update over the API always
+            // states the main address, so it can never be faulted for the site not owning one.
+            is SiteMainAddressNotLegalAddress ->
+                throw BpdmValidationException("Unexpected site parse error (no v6 client error code): $error")
+            is SiteHeaderParseError -> throw internalError(error)
         }
 
     private fun internalError(error: SiteCreateParseError) =

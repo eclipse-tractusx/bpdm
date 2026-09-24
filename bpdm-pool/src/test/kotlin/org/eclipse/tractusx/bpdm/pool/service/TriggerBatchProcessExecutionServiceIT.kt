@@ -179,6 +179,36 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         assertThat(alternativeAfter.header.ultimateOwnerBpnl).isEqualTo(main.legalEntity.header.bpnl)
     }
 
+    @Test
+    fun `ownership validity trigger clears ultimate owner on end date`() {
+        val owned = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Owned", true))).entities.single()
+        val owner = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Owner", true))).entities.single()
+
+        val ownerDb = legalEntityRepository.findByBpnIgnoreCase(owner.legalEntity.header.bpnl)!!
+        ownerDb.ownershipUltimate = true
+        legalEntityRepository.save(ownerDb)
+
+        val endingTomorrow = listOf(RelationValidityPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
+        val ownershipRelation = BusinessPartnerRelations(
+            RelationType.IsOwnedBy,
+            owned.legalEntity.header.bpnl,
+            owner.legalEntity.header.bpnl,
+            endingTomorrow,
+            anyReasonCode()
+        )
+
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", ownershipRelation)
+        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+
+        val ownedBefore = poolApiClient.legalEntities.getLegalEntity(owned.legalEntity.header.bpnl)
+        assertThat(ownedBefore.header.ultimateOwnerBpnl).isEqualTo(owner.legalEntity.header.bpnl)
+
+        executeAtDate(LocalDate.now().plusDays(1)) { triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
+
+        val ownedAfter = poolApiClient.legalEntities.getLegalEntity(owned.legalEntity.header.bpnl)
+        assertThat(ownedAfter.header.ultimateOwnerBpnl).isNull()
+    }
+
     private fun executeAtDate(executionDate: LocalDate, methodToExecute: () -> Unit){
         val offset = Duration.between(Instant.now(), executionDate.atStartOfDay(ZoneOffset.UTC).toInstant())
         val offsetClock = Clock.offset(Clock.systemUTC(), offset)

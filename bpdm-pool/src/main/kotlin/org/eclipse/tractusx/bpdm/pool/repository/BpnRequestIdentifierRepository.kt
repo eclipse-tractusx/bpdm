@@ -23,9 +23,16 @@ import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
+/**
+ * Holds which BPN each request identifier a golden record task stated was answered with.
+ */
 interface BpnRequestIdentifierRepository : PagingAndSortingRepository<BpnRequestIdentifierMappingDb, Long>,
     CrudRepository<BpnRequestIdentifierMappingDb, Long> {
 
+    /** The mappings of the given request identifiers, leaving out the ones no BPN was issued for. */
     fun findDistinctByRequestIdentifierIn(requestIdentifiers: Collection<String>): Set<BpnRequestIdentifierMappingDb>
+
+    /** The mapping of the given request identifier, or null where no BPN was issued for it. */
+    fun findByRequestIdentifier(requestIdentifier: String): BpnRequestIdentifierMappingDb?
 
 }

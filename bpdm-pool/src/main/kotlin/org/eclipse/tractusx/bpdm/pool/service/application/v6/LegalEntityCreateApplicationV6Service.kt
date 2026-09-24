@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
@@ -27,8 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCr
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
@@ -57,7 +57,11 @@ class LegalEntityCreateApplicationV6Service(
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfoV6<LegalEntityCreateErrorV6>>()
-        requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            createRequests,
+            legalEntityCreateParser::parse,
+            { parsed -> legalEntityCreateService.create(parsed.map { it.content }) }
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(legalEntityResponseMapperV6.toUpsertResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapperV6.toCreateErrorInfo(it, request.index) })

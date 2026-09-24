@@ -22,8 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import java.time.LocalDate
 
 /**
- * Whether this relation counts on [date]: one of its validity periods must cover the date, so a relation without any
- * period never counts. Shared by everything that walks the ownership graph, so they all agree on which edges exist.
+ * Whether this relation counts on [date]: one of its validity periods must cover the date, from its start on and up to
+ * but not including its end, so a relation without any period never counts and one ending on [date] no longer counts.
+ * Shared by everything that walks the ownership graph, so they all agree on which edges exist.
  */
 fun RelationDb.isValidOn(date: LocalDate): Boolean =
-    validityPeriods.any { period -> date >= period.validFrom && (period.validTo == null || date <= period.validTo) }
+    validityPeriods.any { period -> date >= period.validFrom && (period.validTo == null || date < period.validTo) }

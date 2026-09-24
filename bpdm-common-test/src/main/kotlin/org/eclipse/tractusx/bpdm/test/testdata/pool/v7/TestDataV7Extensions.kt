@@ -114,14 +114,28 @@ fun LegalEntityWithLegalAddressVerboseDto.withUltimateOwner(ownershipUltimate: B
 fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
     copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL))
 
+fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(
+    ownedBpnL: String,
+    owningBpnL: String,
+    validityPeriods: List<RelationValidityPeriod>
+) =
+    copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL, validityPeriods))
+
 fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+    withIsOwnedByRelation(ownedBpnL, owningBpnL, listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)))
+
+fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(
+    ownedBpnL: String,
+    owningBpnL: String,
+    validityPeriods: List<RelationValidityPeriod>
+) =
     copy(
         header = header.copy(
             relations = header.relations + RelationVerboseDto(
                 type = LegalEntityRelationType.IsOwnedBy,
                 businessPartnerSourceBpnl = ownedBpnL,
                 businessPartnerTargetBpnl = owningBpnL,
-                validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+                validityPeriods = validityPeriods,
                 reasonCode = null
             )
         )

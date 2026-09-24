@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes, delegating main-address errors to
- * [AddressParseErrorMapper].
+ * Maps the site services' sealed parse errors to the `/sites` error codes, delegating main-address errors to the
+ * address error mapper.
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
  * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
@@ -40,6 +40,7 @@ class SiteParseErrorMapper(
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
+    /** The error a failed site create reports for the given parse error. */
     fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
         when (error) {
             is UnresolvableLegalEntity ->
@@ -53,9 +54,8 @@ class SiteParseErrorMapper(
                     "Script code '${error.scriptCode}' is not covered by the site's main address",
                     entityKey
                 )
-            is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is SiteContentParseError -> contentErrorInfo(
+            is UnresolvableAddress -> throw internalError(error)
+            is SiteHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteCreateError.ScriptVariantNameMissing,
@@ -63,20 +63,17 @@ class SiteParseErrorMapper(
             )
         }
 
+    /** The error a failed site update reports for the given parse error. */
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
         when (error) {
             is UnresolvableSite ->
                 ErrorInfo(SiteUpdateError.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfo(
-                    SiteUpdateError.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is SiteContentParseError -> contentErrorInfo(
+            // Only the golden record task updates a site on its legal address; a site update over the API always
+            // states the main address, so it can never be faulted for the site not owning one.
+            is SiteMainAddressNotLegalAddress ->
+                throw BpdmValidationException("Unexpected site parse error (no public error code): $error")
+            is SiteHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteUpdateError.ScriptVariantNameMissing,
@@ -85,19 +82,19 @@ class SiteParseErrorMapper(
         }
 
     private fun <E : ErrorCode> contentErrorInfo(
-        error: SiteContentParseError,
+        error: SiteHeaderParseError,
         entityKey: String?,
         scriptVariantNameMissing: E,
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
-            is SiteContentParseError.ScriptVariantNameMissing ->
+            is SiteHeaderParseError.ScriptVariantNameMissing ->
                 ErrorInfo(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+            is SiteHeaderParseError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
-            is SiteContentParseError.NameMissing,
-            is SiteContentParseError.ConfidenceCriteriaMissing,
-            is SiteContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is SiteHeaderParseError.NameMissing,
+            is SiteHeaderParseError.ConfidenceCriteriaMissing,
+            is SiteHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     private fun internalError(error: SiteCreateParseError) =

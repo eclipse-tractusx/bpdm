@@ -22,14 +22,15 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates site-create requests that take the parent legal entity's legal address as the site main address.
@@ -38,31 +39,34 @@ import org.springframework.stereotype.Service
  * address, so it needs no operation of its own.
  */
 @Service
-class SiteCreateWithLegalAddressAsMainParser(
+class SiteCreateOnLegalAddressParser(
     private val siteHeaderParser: SiteHeaderParser,
-    private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
+    private val legalEntityBpnParser: LegalEntityBpnParser
 ) {
 
     /**
      * Validates each request and reports either the validated site on its parent's legal address or every problem found
      * in that entry.
      */
+    @Transactional(readOnly = true)
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
+
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(legalEntityResults, headerResults) { legalEntity, header ->
-                scriptVariantCoverageValidator.check(
-                    legalEntity.legalAddress.scriptCodes(),
-                    listOf(PartnerScriptCodes(bpn = null, header.scriptCodes()))
-                )
+                validateScriptVariantCoverage(legalEntity.legalAddress, header)
             }
 
         return zipParseResults(legalEntityResults, coveredHeaderResults) { legalEntity, header ->
             SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header, mainAddressContent = null)
         }
+    }
+
+    private fun validateScriptVariantCoverage(mainAddress: LogisticAddressDb, header: SiteHeaderParsed): List<ScriptVariantNotCoveredByAddress> {
+        val coveredScriptCodes = mainAddress.scriptCodes().toSet()
+        return header.scriptCodes().filterNot { it in coveredScriptCodes }.map(::ScriptVariantNotCoveredByAddress)
     }
 }

@@ -33,7 +33,8 @@ data class LegalEntityHeaderRequest(
     val identifiers: List<LegalEntityIdentifier>,
     val states: List<LegalEntityState>,
     val confidenceCriteria: ConfidenceCriteriaRequest,
-    val isDataSpaceParticipant: Boolean,
+    /** Null means the request does not state the flag, so a create defaults it and an update leaves it untouched. */
+    val isDataSpaceParticipant: Boolean?,
     /** Null means the request does not state the flag, so an update leaves it untouched (v6 cannot express it at all). */
     val ownershipUltimate: Boolean?,
     val scriptVariants: List<LegalEntityScriptVariant>

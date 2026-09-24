@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.util
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
@@ -33,13 +34,9 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockData
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import java.util.UUID
+import org.eclipse.tractusx.orchestrator.api.model.*
+import java.util.*
+import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod as OrchestratorRelationValidityPeriod
 
 class TestDataClientV7(
     private val poolClient: PoolApiClient,
@@ -74,12 +71,19 @@ class TestDataClientV7(
      * Makes [ownedBpnL] owned by [owningBpnL], valid from [TestDataV7.currentRelationValidFrom] on and open-ended.
      * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
      */
-    fun createIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) {
+    fun createIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+        createIsOwnedByRelation(ownedBpnL, owningBpnL, listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)))
+
+    /**
+     * Makes [ownedBpnL] owned by [owningBpnL] for the given [validityPeriods].
+     * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
+     */
+    fun createIsOwnedByRelation(ownedBpnL: String, owningBpnL: String, validityPeriods: List<RelationValidityPeriod>) {
         val relations = BusinessPartnerRelations(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = ownedBpnL,
             businessPartnerTargetBpn = owningBpnL,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+            validityPeriods = validityPeriods.map { OrchestratorRelationValidityPeriod(it.validFrom, it.validTo) },
             reasonCode = null
         )
         val taskEntry = TaskRelationsStepReservationEntryDto(
@@ -101,7 +105,7 @@ class TestDataClientV7(
             relationType = RelationType.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeBpnL,
             businessPartnerTargetBpn = mainBpnL,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+            validityPeriods = listOf(OrchestratorRelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
             reasonCode = null
         )
         val taskEntry = TaskRelationsStepReservationEntryDto(

@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates address-create requests that name their parent with a single BPN, whatever kind of business partner that BPN
@@ -40,6 +41,7 @@ class UntypedParentAddressCreateParser(
      * Validates each request and reports either the validated address with its resolved parents or every problem found in
      * that entry.
      */
+    @Transactional(readOnly = true)
     fun parse(requests: List<AddressCreateUntypedParentRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> =
         chainParseResults(addressParentResolutionParser.parse(requests)) { typed -> typedParentAddressCreateParser.parse(typed) }
 }

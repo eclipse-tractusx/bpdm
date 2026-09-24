@@ -23,6 +23,7 @@ sealed interface AddressCreateParseError
 
 sealed interface AddressUpdateParseError
 
+
 sealed interface AddressSiteMembershipParseError
 
 /**
@@ -47,10 +48,8 @@ data class SiteMainAddressOmitted(val siteBpn: String) :
 sealed interface AddressContentParseError :
     AddressCreateParseError,
     AddressUpdateParseError,
-    SiteCreateParseError,
-    SiteUpdateParseError,
-    LegalEntityCreateParseError,
-    LegalEntityUpdateParseError
+    SiteContentParseError,
+    LegalEntityContentParseError
 
 sealed interface AddressFieldParseError : AddressContentParseError {
     data object PhysicalCountryMissing : AddressFieldParseError
