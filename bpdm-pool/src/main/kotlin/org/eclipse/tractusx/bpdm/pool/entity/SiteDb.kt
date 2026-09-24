@@ -63,4 +63,10 @@ class SiteDb(
     lateinit var mainAddress: LogisticAddressDb
 
     fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
+
+    /** Whether this site sits on its legal entity's legal address rather than owning a main address of its own. */
+    fun sitsOnLegalAddress(): Boolean =
+        // Compared by BPN, not by reference: navigating to an address yields a lazy proxy while the legal entity holds
+        // the unproxied instance, so a reference comparison reports a false mismatch.
+        mainAddress.bpn == legalEntity.legalAddress.bpn
 }

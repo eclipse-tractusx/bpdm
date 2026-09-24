@@ -23,4 +23,7 @@ package org.eclipse.tractusx.bpdm.pool.dto
 data class UpsertResult<T>(
     val value: T,
     val upsertType: UpsertType
-)
+){
+    /** Whether the write this reports changed the record it names. */
+    val hasChanged: Boolean get() = upsertType != UpsertType.NoChange
+}

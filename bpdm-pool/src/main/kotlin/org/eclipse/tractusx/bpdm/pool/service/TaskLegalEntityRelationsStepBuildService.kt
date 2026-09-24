@@ -40,7 +40,6 @@ class TaskLegalEntityRelationsStepBuildService(
     private val legalEntityRepository: LegalEntityRepository,
     private val managedRelationUpsertService: ManagedRelationUpsertService,
     private val ownedByRelationService: OwnedByRelationUpsertService,
-    private val isReplacedByRelationService: IsReplacedByRelationUpsertService,
     private val relationRepository: RelationRepository,
     private val reasonCodeRepository: ReasonCodeRepository,
     private val relationValidityPeriodValidator: RelationValidityPeriodValidator
@@ -100,7 +99,7 @@ class TaskLegalEntityRelationsStepBuildService(
             LegalEntityRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
             LegalEntityRelationType.IsManagedBy -> managedRelationUpsertService
             LegalEntityRelationType.IsOwnedBy -> ownedByRelationService
-            LegalEntityRelationType.IsReplacedBy -> isReplacedByRelationService
+            LegalEntityRelationType.IsReplacedBy -> throw BpdmValidationException("Succession is not written through this path")
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)

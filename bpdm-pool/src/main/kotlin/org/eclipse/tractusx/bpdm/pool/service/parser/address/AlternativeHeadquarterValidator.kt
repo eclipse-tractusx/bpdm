@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.AlternativeHeadquarterCannotOwnUltimately
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
@@ -29,9 +30,11 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 /**
- * Validates that an alternative headquarter cannot carry the ultimate-owner flag.
- * An entity is considered an alternative if it is the source (startNode) in an IsAlternativeHeadquarterFor relation
- * that is valid today.
+ * The rule that an alternative headquarter cannot carry the ultimate-owner flag.
+ *
+ * Only relations valid today make a legal entity an alternative, matching how the designation is read everywhere else.
+ * Clearing the flag stays allowed, so a legal entity that became an alternative while already flagged can still be
+ * brought into line.
  */
 @Service
 class AlternativeHeadquarterValidator(
@@ -39,8 +42,8 @@ class AlternativeHeadquarterValidator(
 ) {
 
     /**
-     * Checks if a legal entity is an alternative headquarter today and if it's being set to ownershipUltimate = true.
-     * Returns a violation if both conditions are true.
+     * Reports the violation that setting the flag on this legal entity would cause: a write that creates its legal
+     * entity, or one that does not set the flag, yields none.
      */
     @Transactional(readOnly = true)
     fun validateFlagOnAlternative(target: LegalEntityDb?, requestedFlag: Boolean?): List<AlternativeHeadquarterCannotOwnUltimately> {
@@ -60,12 +63,9 @@ class AlternativeHeadquarterValidator(
     }
 
     /**
-     * Validates each target-flag pair in batch: checks if each legal entity is an alternative headquarter today
-     * and if it's being set to ownershipUltimate = true. Returns violations for each entry.
+     * Reports, per entry of a legal-entity write batch, the violation its stated flag would cause.
      */
     @Transactional(readOnly = true)
-    fun validate(targets: List<LegalEntityDb?>, requestedFlags: List<Boolean?>): List<List<AlternativeHeadquarterCannotOwnUltimately>> {
-        require(targets.size == requestedFlags.size) { "targets and requestedFlags must be positionally aligned" }
-        return targets.zip(requestedFlags).map { (target, flag) -> validateFlagOnAlternative(target, flag) }
-    }
+    fun validate(writes: List<LegalEntityHeaderWrite>): List<List<AlternativeHeadquarterCannotOwnUltimately>> =
+        writes.map { validateFlagOnAlternative(it.existingLegalEntity, it.header.ownershipUltimate) }
 }

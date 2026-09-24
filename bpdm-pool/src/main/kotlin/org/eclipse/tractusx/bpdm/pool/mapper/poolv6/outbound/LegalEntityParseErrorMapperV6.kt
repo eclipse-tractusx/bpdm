@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the legal-entity services' sealed parse errors to the v6 `/legal-entities` [ErrorInfoV6] codes, delegating
- * legal-address errors to [AddressParseErrorMapperV6].
+ * Maps the legal-entity services' sealed parse errors to the v6 `/legal-entities` error codes, delegating
+ * legal-address errors to the v6 address error mapper.
  *
  * The v6 error enums are frozen and predate both script variants and ultimate ownership, so those errors are thrown as
  * internal errors instead of getting a public code. The `when`s are exhaustive so a new error won't compile until it
@@ -40,11 +40,11 @@ class LegalEntityParseErrorMapperV6(
     private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
+    /** The v6 error a failed legal-entity create reports for the given parse error. */
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityCreateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageParseError -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityCreateErrorV6.LegalFormNotFound,
@@ -54,6 +54,7 @@ class LegalEntityParseErrorMapperV6(
             )
         }
 
+    /** The v6 error a failed legal-entity update reports for the given parse error. */
     fun toUpdateErrorInfo(error: LegalEntityUpdateParseError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
         when (error) {
             is UnresolvableLegalEntity ->
@@ -67,11 +68,7 @@ class LegalEntityParseErrorMapperV6(
             is MultipleUltimateOwnersInHierarchy -> throw internalError(error)
             // A v6 write never sets the ownership flag on an alternative headquarter, so this cannot be broken from v6.
             is AlternativeHeadquarterCannotOwnUltimately -> throw internalError(error)
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is LegalEntityContentParseError -> contentErrorInfo(
+            is LegalEntityHeaderParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityUpdateErrorV6.LegalFormNotFound,
@@ -82,7 +79,7 @@ class LegalEntityParseErrorMapperV6(
         }
 
     private fun <E : ErrorCodeV6> contentErrorInfo(
-        error: LegalEntityContentParseError,
+        error: LegalEntityHeaderParseError,
         entityKey: String?,
         legalFormNotFound: E,
         identifierNotFound: E,
@@ -90,25 +87,25 @@ class LegalEntityParseErrorMapperV6(
         identifiersTooMany: E
     ): ErrorInfoV6<E> =
         when (error) {
-            is LegalEntityContentParseError.LegalFormNotFound ->
+            is LegalEntityHeaderParseError.LegalFormNotFound ->
                 ErrorInfoV6(legalFormNotFound, "Legal form '${error.legalForm}' does not exist", entityKey)
-            is LegalEntityContentParseError.IdentifierTypeNotFound ->
+            is LegalEntityHeaderParseError.IdentifierTypeNotFound ->
                 ErrorInfoV6(identifierNotFound, "Legal Entity Identifier Type '${error.type}' does not exist", entityKey)
-            is LegalEntityContentParseError.DuplicateIdentifier ->
+            is LegalEntityHeaderParseError.DuplicateIdentifier ->
                 ErrorInfoV6(
                     duplicateIdentifier,
                     "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'",
                     entityKey
                 )
-            is LegalEntityContentParseError.IdentifiersTooMany ->
+            is LegalEntityHeaderParseError.IdentifiersTooMany ->
                 ErrorInfoV6(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing,
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode,
-            is LegalEntityContentParseError.NameMissing,
-            is LegalEntityContentParseError.ConfidenceCriteriaMissing,
-            is LegalEntityContentParseError.IdentifierValueMissing,
-            is LegalEntityContentParseError.IdentifierTypeMissing,
-            is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is LegalEntityHeaderParseError.ScriptVariantLegalNameMissing,
+            is LegalEntityHeaderParseError.ScriptVariantDuplicateScriptCode,
+            is LegalEntityHeaderParseError.NameMissing,
+            is LegalEntityHeaderParseError.ConfidenceCriteriaMissing,
+            is LegalEntityHeaderParseError.IdentifierValueMissing,
+            is LegalEntityHeaderParseError.IdentifierTypeMissing,
+            is LegalEntityHeaderParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     private fun internalError(error: Any) =

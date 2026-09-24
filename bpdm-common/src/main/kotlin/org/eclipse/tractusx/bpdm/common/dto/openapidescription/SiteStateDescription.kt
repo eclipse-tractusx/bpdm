@@ -26,6 +26,6 @@ object SiteStateDescription {
 
     const val description = "The description from the original source indicating the state of the site."
     const val validFrom = "The date from which the state is valid."
-    const val validTo = "The date until the state is valid."
+    const val validTo = "The date up to, but not including, which the state is valid."
     const val type = "One of the state types: active, inactive."
 }

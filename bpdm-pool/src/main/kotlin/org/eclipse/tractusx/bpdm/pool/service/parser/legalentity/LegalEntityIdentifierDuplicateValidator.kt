@@ -20,7 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityHeaderParseError
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderWrite
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.springframework.stereotype.Service
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Service
  * Reports legal-entity identifiers that are already taken — by a legal entity in the database or by another entry of the
  * same batch.
  *
- * Split from the header parser because it needs each entry's owner BPN, which only the create and update parsers know.
+ * Split from the header parser because an identifier owned by the legal entity being written over is not a duplicate.
  */
 @Service
 class LegalEntityIdentifierDuplicateValidator(
@@ -37,21 +38,18 @@ class LegalEntityIdentifierDuplicateValidator(
 ) {
 
     /**
-     * Reports, per entry, every identifier that duplicates an existing or in-batch one. [ownerBpns] is positional with
-     * [headers] — null for a create, the legal entity's own BPN for an update — and an identifier owned by the entry's
-     * own BPN is not a duplicate.
+     * Reports, per entry, every identifier that duplicates an existing or in-batch one.
      */
-    fun validate(headers: List<LegalEntityHeaderRequest>, ownerBpns: List<String?>): List<List<LegalEntityContentParseError>> {
-        require(headers.size == ownerBpns.size) { "headers and ownerBpns must be positionally aligned" }
-        val candidates = buildCandidates(headers)
-        return headers.mapIndexed { i, header -> duplicateErrorsFor(header, ownerBpns[i], candidates) }
+    fun validate(writes: List<LegalEntityHeaderWrite>): List<List<LegalEntityHeaderParseError>> {
+        val candidates = buildCandidates(writes.map { it.header })
+        return writes.map { duplicateErrorsFor(it.header, it.existingLegalEntity?.bpn, candidates) }
     }
 
     private fun duplicateErrorsFor(
         header: LegalEntityHeaderRequest,
         ownerBpn: String?,
         candidates: Map<Key, Candidate>
-    ): List<LegalEntityContentParseError> =
+    ): List<LegalEntityHeaderParseError> =
         header.identifiers.mapIndexedNotNull { index, identifier ->
             val type = identifier.type
             val value = identifier.value
@@ -59,7 +57,7 @@ class LegalEntityIdentifierDuplicateValidator(
 
             val candidate = candidates[Key(type, value)]
             if (candidate != null && (candidate.bpn == null || candidate.bpn != ownerBpn))
-                LegalEntityContentParseError.DuplicateIdentifier(index, type, value)
+                LegalEntityHeaderParseError.DuplicateIdentifier(index, type, value)
             else
                 null
         }

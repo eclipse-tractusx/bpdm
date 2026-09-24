@@ -39,6 +39,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactor
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withStates
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolAssertHelper
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
@@ -94,10 +96,10 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     @Test
     fun `event trigger invokes headquarter relocation`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
@@ -126,7 +128,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     @Test
     fun `not yet ready event trigger is ignored`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
         val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl)
@@ -177,6 +179,36 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
 
         val alternativeAfter = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
         assertThat(alternativeAfter.header.ultimateOwnerBpnl).isEqualTo(main.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `ownership validity trigger clears ultimate owner on end date`() {
+        val owned = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Owned", true))).entities.single()
+        val owner = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Owner", true))).entities.single()
+
+        val ownerDb = legalEntityRepository.findByBpnIgnoreCase(owner.legalEntity.header.bpnl)!!
+        ownerDb.ownershipUltimate = true
+        legalEntityRepository.save(ownerDb)
+
+        val endingTomorrow = listOf(RelationValidityPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
+        val ownershipRelation = BusinessPartnerRelations(
+            RelationType.IsOwnedBy,
+            owned.legalEntity.header.bpnl,
+            owner.legalEntity.header.bpnl,
+            endingTomorrow,
+            anyReasonCode()
+        )
+
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", ownershipRelation)
+        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+
+        val ownedBefore = poolApiClient.legalEntities.getLegalEntity(owned.legalEntity.header.bpnl)
+        assertThat(ownedBefore.header.ultimateOwnerBpnl).isEqualTo(owner.legalEntity.header.bpnl)
+
+        executeAtDate(LocalDate.now().plusDays(1)) { triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
+
+        val ownedAfter = poolApiClient.legalEntities.getLegalEntity(owned.legalEntity.header.bpnl)
+        assertThat(ownedAfter.header.ultimateOwnerBpnl).isNull()
     }
 
     private fun executeAtDate(executionDate: LocalDate, methodToExecute: () -> Unit){

@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.RelationUpsertService
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.UltimateOwnerUniquenessValidator
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -74,7 +75,7 @@ class OwnedByRelationUpsertService(
      * Reconcile the unprocessed OwnershipValidityBoundary triggers for the relation against the set derived
      * from its current validity periods:
      * - validFrom > today  →  trigger on validFrom (relation becomes active)
-     * - validTo != null && validTo+1 > today  →  trigger on validTo+1 (relation expires)
+     * - validTo != null && validTo > today  →  trigger on validTo (relation expires)
      *
      * Only the difference is applied (delete stale dates, insert missing ones); triggers whose date is
      * unchanged are left in place. A blind delete+reinsert would collide on the
@@ -90,7 +91,6 @@ class OwnedByRelationUpsertService(
 
         val expiryDates = relation.validityPeriods
             .mapNotNull { it.validTo }
-            .map { it.plusDays(1) }
             .filter { it > today }
 
         val desiredTriggerDates = (validFromDates + expiryDates).toSet()
