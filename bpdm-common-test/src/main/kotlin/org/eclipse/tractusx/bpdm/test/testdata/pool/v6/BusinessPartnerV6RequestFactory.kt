@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
@@ -75,8 +76,7 @@ class BusinessPartnerV6RequestFactory(
             legalForm = availableLegalForms.randomOrNull(random),
             identifiers = listOf(createLegalEntityIdentifier(seed, 0, random), createLegalEntityIdentifier(seed, 1, random)),
             states = listOf(
-                LegalEntityStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                LegalEntityStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                LegalEntityStateDtoV6(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             confidenceCriteria = ConfidenceCriteriaDtoV6(
                 sharedByOwner = true,
@@ -127,8 +127,7 @@ class BusinessPartnerV6RequestFactory(
         return SiteDtoV6(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateDtoV6(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
             confidenceCriteria = ConfidenceCriteriaDtoV6(
@@ -153,8 +152,7 @@ class BusinessPartnerV6RequestFactory(
             name = "Site Name $seed",
             bpnLParent = bpnL,
             states = listOf(
-                SiteStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateDtoV6(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             confidenceCriteria = ConfidenceCriteriaDtoV6(
                 sharedByOwner = true,
@@ -199,8 +197,7 @@ class BusinessPartnerV6RequestFactory(
         return LogisticAddressDtoV6(
             name = "Address Name $seed",
             states = listOf(
-                AddressStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                AddressStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                AddressStateDtoV6(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDtoV6(

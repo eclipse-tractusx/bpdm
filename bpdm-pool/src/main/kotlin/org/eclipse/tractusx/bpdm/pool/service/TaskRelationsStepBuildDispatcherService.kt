@@ -27,9 +27,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class TaskRelationsStepBuildDispatcherService(
-    private val taskLegalEntityRelationsStepBuildService: TaskLegalEntityRelationsStepBuildService,
-    private val taskAddressRelationsStepBuildService: TaskAddressRelationsStepBuildService,
-    private val taskSiteRelationsStepBuildService: TaskSiteRelationsStepBuildService
+    private val taskLegalEntityRelationsStepBuildService: TaskLegalEntityRelationsStepBuildService
 ) {
 
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto) : TaskRelationsStepResultEntryDto {
@@ -41,12 +39,6 @@ class TaskRelationsStepBuildDispatcherService(
             source.startsWith("BPNL", true) && target.startsWith("BPNL", true) && relationType in LEGAL_ENTITY_RELATION_TYPES-> {
                 taskLegalEntityRelationsStepBuildService.upsertBusinessPartnerRelations(taskEntry)
             }
-            source.startsWith("BPNA", true) && target.startsWith("BPNA", true) && relationType in ADDRESS_RELATION_TYPES-> {
-                taskAddressRelationsStepBuildService.upsertAddressRelations(taskEntry)
-            }
-            source.startsWith("BPNS", true) && target.startsWith("BPNS", true) && relationType in SITE_RELATION_TYPES-> {
-                taskSiteRelationsStepBuildService.upsertSiteRelations(taskEntry)
-            }
             else -> {
                 throw BpdmValidationException(
                     "Invalid relation: source and target must be of the same business partner type and carry a relation type " +
@@ -57,17 +49,6 @@ class TaskRelationsStepBuildDispatcherService(
     }
 
     private val LEGAL_ENTITY_RELATION_TYPES = setOf(
-        RelationType.IsAlternativeHeadquarterFor,
-        RelationType.IsManagedBy,
-        RelationType.IsOwnedBy,
-        RelationType.IsReplacedBy
-    )
-
-    private val ADDRESS_RELATION_TYPES = setOf(
-        RelationType.IsReplacedBy
-    )
-
-    private val SITE_RELATION_TYPES = setOf(
-        RelationType.IsReplacedBy
+        RelationType.IsAlternativeHeadquarterFor
     )
 }

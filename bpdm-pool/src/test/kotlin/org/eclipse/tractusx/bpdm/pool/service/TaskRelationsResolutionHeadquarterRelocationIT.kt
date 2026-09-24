@@ -40,6 +40,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactor
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withStates
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolAssertHelper
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
@@ -97,10 +99,10 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     @Test
     fun `replaced legal address changes headquarter`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         //WHEN
@@ -126,7 +128,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     @Test
     fun `legal address replaced by site main address changes headquarter`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
         val siteRequest = requestFactory.buildSiteCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl)
@@ -156,10 +158,10 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     @Test
     fun `replacing legal address in the future does not change headquarter`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         //WHEN
@@ -189,10 +191,10 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     @Test
     fun `replaced legal address logs each affected business partner once`(){
         //GIVEN
-        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true).withLegalAddressStates(emptyList())
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList()).withStates(emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         val beforeRelocation = Instant.now()

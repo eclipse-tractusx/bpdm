@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
@@ -283,13 +284,43 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN a site whose main address is the legal address, both named in the same script
-     * WHEN operator tries to update the site with a script variant of another script code
-     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the legal entity is still named in the script
-     * the update would stop covering on their shared address
+     * GIVEN a site on its legal entity's legal address, the site named in a script the legal entity is not named in
+     * WHEN operator updates the site back into the legal entity's script
+     * THEN the shared legal address drops the site's former script, because no business partner is named in it any more
      */
     @Test
-    fun `try update legal address site into a script its legal entity does not cover`() {
+    fun `update legal address site back out of a script only it was named in`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val legalEntityScriptCode = legalEntityResponse.scriptVariants.first().scriptCode
+        val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", legalEntityResponse)
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(legalEntityScriptCode, "Site Name $testName"))) }
+        val siteCreateResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
+
+        val siteOnlyScriptCode = scriptCodeOtherThan(setOf(legalEntityScriptCode))
+        poolClient.sites.updateSite(
+            listOf(requestFactory.createSiteUpdateRequest("Site $testName", siteCreateResponse).withScriptVariantScriptCode(siteOnlyScriptCode))
+        )
+
+        //WHEN
+        val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
+            .withScriptVariantScriptCode(legalEntityScriptCode)
+        val response = poolClient.sites.updateSite(listOf(updateRequest))
+
+        //THEN
+        assertThat(response.errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(poolClient.sites.getSite(updateRequest.bpns).mainAddress.bpna).scriptVariants.map { it.scriptCode })
+            .containsExactly(legalEntityScriptCode)
+    }
+
+    /**
+     * GIVEN a site whose main address is the legal address, both named in the same script
+     * WHEN operator updates the site into another script code
+     * THEN the update goes through and their shared legal address carries both scripts, because the address keeps the
+     * variant the legal entity is still named in
+     */
+    @Test
+    fun `update legal address site into a script its legal entity does not state`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
         val coveredScriptCode = legalEntityResponse.scriptVariants.first().scriptCode
@@ -298,14 +329,16 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val siteCreateResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
 
         //WHEN
+        val addedScriptCode = scriptCodeOtherThan(setOf(coveredScriptCode))
         val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
-            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+            .withScriptVariantScriptCode(addedScriptCode)
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        assertThat(response.errors).isEmpty()
 
-        assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
+        val sharedAddressBpn = poolClient.sites.getSite(updateRequest.bpns).mainAddress.bpna
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(coveredScriptCode, addedScriptCode)
     }
 }

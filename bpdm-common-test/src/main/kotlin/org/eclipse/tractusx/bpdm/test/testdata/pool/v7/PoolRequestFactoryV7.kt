@@ -78,8 +78,7 @@ class PoolRequestFactoryV7(
             legalForm = testMetadata.legalForms.random(random).technicalKey,
             identifiers = listOf(buildLegalEntityIdentifier(seed, 0, random), buildLegalEntityIdentifier(seed, 1, random)),
             states = listOf(
-                LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                LegalEntityStateDto(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = false,
@@ -159,8 +158,7 @@ class PoolRequestFactoryV7(
         return SiteCreateRequestWithLegalAddressAsMain(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateDto(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             scriptVariants = availableScriptCodes.shuffled(random).take(2).map { scriptCode ->
                 SiteHeaderScriptVariantDto(
@@ -201,8 +199,7 @@ class PoolRequestFactoryV7(
         return SiteDto(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateDto(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
             scriptVariants = listOfNotNull(buildSiteScriptVariant(seed, random)),
@@ -224,8 +221,7 @@ class PoolRequestFactoryV7(
             name = "Site Name $seed",
             bpnLParent = bpnL,
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateDto(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
@@ -259,8 +255,7 @@ class PoolRequestFactoryV7(
         return LogisticAddressDto(
             name = "Address Name $seed",
             states = listOf(
-                AddressStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                AddressStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                AddressStateDto(validFrom = TestDataV7.currentStateValidFrom, validTo = null, BusinessStateType.ACTIVE)
             ),
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDto(

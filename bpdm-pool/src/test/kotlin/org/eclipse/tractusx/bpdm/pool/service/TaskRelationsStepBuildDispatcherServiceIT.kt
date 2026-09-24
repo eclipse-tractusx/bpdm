@@ -26,10 +26,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.service.application.task.RelationTaskApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalAddressStates
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withStates
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
@@ -53,6 +56,7 @@ import java.util.*
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
     val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService,
+    val relationTaskApplicationService: RelationTaskApplicationService,
     val poolClient: PoolApiClient,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
@@ -87,7 +91,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -138,7 +142,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -157,13 +161,13 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             validityPeriods = listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
+                    validTo = null
                 )
             ),
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).contains("BPNL")
         assertThat(result.errors.size).isEqualTo(0)
@@ -183,25 +187,29 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
             validityPeriods = listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
+                    validTo = null
                 )
             ),
             reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
-        val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
+        val result = upsertThroughRelationTask(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(legalEntity1.legalEntity.legalAddress.bpna)
         assertThat(result.errors.size).isEqualTo(0)
     }
 
+    // Partners here record no states at all, so what a relation is routed to is not decided by whether they are in use.
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
+            .withStates(emptyList())
+            .withLegalAddressStates(emptyList())
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
 
     private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto{
         val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
+            .withStates(emptyList())
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
@@ -209,6 +217,11 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         val taskEntry = singleTaskStep(taskId, businessPartnerRelations)
         return taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
     }
+
+    // Succession, ownership and data management no longer reach the dispatcher: they are routed to their own write
+    // paths one level above.
+    private fun upsertThroughRelationTask(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto =
+        relationTaskApplicationService.upsert(listOf(singleTaskStep(taskId, businessPartnerRelations))).single()
 
     private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelations): TaskRelationsStepReservationEntryDto {
 

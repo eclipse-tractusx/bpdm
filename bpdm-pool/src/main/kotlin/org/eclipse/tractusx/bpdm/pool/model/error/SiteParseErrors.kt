@@ -21,14 +21,23 @@ package org.eclipse.tractusx.bpdm.pool.model.error
 
 sealed interface SiteCreateParseError
 
+
 sealed interface SiteUpdateParseError
+
 
 data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateParseError
 
-sealed interface SiteContentParseError : SiteCreateParseError, SiteUpdateParseError {
-    data object NameMissing : SiteContentParseError
-    data object ConfidenceCriteriaMissing : SiteContentParseError
-    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteContentParseError
-    data class ScriptVariantNameMissing(val index: Int) : SiteContentParseError
-    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteContentParseError
+data class SiteMainAddressNotLegalAddress(val bpnSite: String, val bpnMainAddress: String) : SiteUpdateParseError
+
+/**
+ * The problems the content of one site can be faulted for: its header and its main address.
+ */
+sealed interface SiteContentParseError : SiteCreateParseError, SiteUpdateParseError
+
+sealed interface SiteHeaderParseError : SiteContentParseError {
+    data object NameMissing : SiteHeaderParseError
+    data object ConfidenceCriteriaMissing : SiteHeaderParseError
+    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteHeaderParseError
+    data class ScriptVariantNameMissing(val index: Int) : SiteHeaderParseError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteHeaderParseError
 }
