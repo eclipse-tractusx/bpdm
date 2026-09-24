@@ -21,6 +21,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
 - BPDM Pool: An address now keeps the script variants its legal entity and sites are still named in and drops the rest, so a write no longer has to restate another business partner's scripts to keep it readable and the `ScriptVariantCoverageStillNeeded` error is gone
+- BPDM Pool: A relation's `validTo` is now read exclusively wherever the Pool asks whether a relation holds on a date, so a relation ending on a date no longer holds on that date but on the day before, and two periods meeting on one date are consecutive instead of overlapping [#1857](https://github.com/eclipse-tractusx/bpdm/issues/1857)
 
 ## [7.5.0] - 2026-09-08
 

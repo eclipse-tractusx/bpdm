@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
@@ -30,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
@@ -498,6 +500,90 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity, the ownership ending today
+     * WHEN operator updates the owned legal entity
+     * THEN legal entity is returned without an ultimate owner
+     */
+    @Test
+    fun `update legal entity whose ownership ends today`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        val endingToday = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = LocalDate.now()))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingToday)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = null)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingToday)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity, the ownership ending tomorrow
+     * WHEN operator updates the owned legal entity
+     * THEN legal entity is returned with the owning legal entity as its ultimate owner
+     */
+    @Test
+    fun `update legal entity whose ownership ends tomorrow`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        val endingTomorrow = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = LocalDate.now().plusDays(1)))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingTomorrow)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingTomorrow)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity over two validity periods meeting on one date
+     * WHEN operator updates the owned legal entity
+     * THEN both periods are returned, so periods meeting on one date are accepted as consecutive
+     */
+    @Test
+    fun `update legal entity whose ownership periods meet on one date`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        val meetingOnOneDate = listOf(
+            RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = LocalDate.now()),
+            RelationValidityPeriod(validFrom = LocalDate.now(), validTo = null)
+        )
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, meetingOnOneDate)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, meetingOnOneDate)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
 
     /**
      * GIVEN legal entity

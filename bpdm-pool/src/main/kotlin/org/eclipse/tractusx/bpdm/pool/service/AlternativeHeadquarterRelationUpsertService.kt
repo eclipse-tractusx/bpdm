@@ -76,7 +76,6 @@ class AlternativeHeadquarterRelationUpsertService(
 
         val expiryDates = relation.validityPeriods
             .mapNotNull { it.validTo }
-            .map { it.plusDays(1) }
             .filter { it > today }
 
         val desiredTriggerDates = (validFromDates + expiryDates).toSet()

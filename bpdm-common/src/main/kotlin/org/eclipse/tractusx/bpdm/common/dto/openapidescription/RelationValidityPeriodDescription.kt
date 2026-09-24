@@ -24,5 +24,5 @@ object RelationValidityPeriodDescription {
 
     const val validFrom = "The date from which the relation is valid."
 
-    const val validTo = "The date until which the relation is valid."
+    const val validTo = "The date up to, but not including, which the relation is valid."
 }

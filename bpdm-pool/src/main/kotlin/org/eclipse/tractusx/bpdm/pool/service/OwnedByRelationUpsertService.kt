@@ -74,7 +74,7 @@ class OwnedByRelationUpsertService(
      * Reconcile the unprocessed OwnershipValidityBoundary triggers for the relation against the set derived
      * from its current validity periods:
      * - validFrom > today  →  trigger on validFrom (relation becomes active)
-     * - validTo != null && validTo+1 > today  →  trigger on validTo+1 (relation expires)
+     * - validTo != null && validTo > today  →  trigger on validTo (relation expires)
      *
      * Only the difference is applied (delete stale dates, insert missing ones); triggers whose date is
      * unchanged are left in place. A blind delete+reinsert would collide on the
@@ -90,7 +90,6 @@ class OwnedByRelationUpsertService(
 
         val expiryDates = relation.validityPeriods
             .mapNotNull { it.validTo }
-            .map { it.plusDays(1) }
             .filter { it > today }
 
         val desiredTriggerDates = (validFromDates + expiryDates).toSet()
