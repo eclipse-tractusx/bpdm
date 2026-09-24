@@ -114,14 +114,28 @@ fun LegalEntityWithLegalAddressVerboseDto.withUltimateOwner(ownershipUltimate: B
 fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
     copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL))
 
+fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(
+    ownedBpnL: String,
+    owningBpnL: String,
+    validityPeriods: List<RelationValidityPeriod>
+) =
+    copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL, validityPeriods))
+
 fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+    withIsOwnedByRelation(ownedBpnL, owningBpnL, listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)))
+
+fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(
+    ownedBpnL: String,
+    owningBpnL: String,
+    validityPeriods: List<RelationValidityPeriod>
+) =
     copy(
         header = header.copy(
             relations = header.relations + RelationVerboseDto(
                 type = LegalEntityRelationType.IsOwnedBy,
                 businessPartnerSourceBpnl = ownedBpnL,
                 businessPartnerTargetBpnl = owningBpnL,
-                validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+                validityPeriods = validityPeriods,
                 reasonCode = null
             )
         )
@@ -333,3 +347,30 @@ fun AddressPartnerCreateRequest.withDuplicateScriptVariants() =
 fun AddressPartnerUpdateRequest.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
+
+fun LegalEntityDto.withStates(states: List<LegalEntityStateDto>) =
+    copy(header = header.copy(states = states))
+
+fun LegalEntityPartnerCreateRequest.withStates(states: List<LegalEntityStateDto>) =
+    copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states)))
+
+fun LegalEntityPartnerUpdateRequest.withStates(states: List<LegalEntityStateDto>) =
+    copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states)))
+
+fun SitePartnerCreateRequest.withStates(states: List<SiteStateDto>) =
+    copy(site = site.copy(states = states))
+
+fun SitePartnerUpdateRequest.withStates(states: List<SiteStateDto>) =
+    copy(site = site.copy(states = states))
+
+fun AddressPartnerCreateRequest.withStates(states: List<AddressStateDto>) =
+    copy(address = address.copy(states = states))
+
+fun AddressPartnerUpdateRequest.withStates(states: List<AddressStateDto>) =
+    copy(address = address.copy(states = states))
+
+fun LegalEntityPartnerCreateRequest.withLegalAddressStates(states: List<AddressStateDto>) =
+    copy(legalEntity = legalEntity.copy(legalAddress = legalEntity.legalAddress.copy(states = states)))
+
+fun SitePartnerCreateRequest.withMainAddressStates(states: List<AddressStateDto>) =
+    copy(site = site.copy(mainAddress = site.mainAddress.copy(states = states)))

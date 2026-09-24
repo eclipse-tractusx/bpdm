@@ -22,8 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
- * For each endpoint a separate enum class is defined extending this marker interface.
- * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
+ * Marks an enum of the error codes one endpoint can answer with.
+ *
+ * Each endpoint gets an enum of its own so that the generated Swagger schema lists exactly the codes that endpoint can
+ * return.
  */
 interface ErrorCode
 
@@ -59,8 +61,7 @@ enum class LegalEntityUpdateError : ErrorCode {
     ScriptVariantLegalNameMissing,
     ScriptVariantDuplicateScriptCode,
     LegalAddressScriptVariantCityMissing,
-    LegalAddressScriptVariantDuplicateScriptCode,
-    ScriptVariantCoverageStillNeeded
+    LegalAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "SiteCreateError")
@@ -87,8 +88,7 @@ enum class SiteUpdateError : ErrorCode {
     ScriptVariantNameMissing,
     ScriptVariantDuplicateScriptCode,
     MainAddressScriptVariantCityMissing,
-    MainAddressScriptVariantDuplicateScriptCode,
-    ScriptVariantCoverageStillNeeded
+    MainAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "AddressCreateError")
@@ -116,6 +116,5 @@ enum class AddressUpdateError : ErrorCode {
     AddressDuplicateIdentifier,
     IdentifiersTooMany,
     ScriptVariantCityMissing,
-    ScriptVariantDuplicateScriptCode,
-    ScriptVariantCoverageStillNeeded
+    ScriptVariantDuplicateScriptCode
 }

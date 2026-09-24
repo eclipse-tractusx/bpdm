@@ -1,0 +1,140 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.service.operation.participation
+
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SharingMemberRecordDb
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SharingMemberRecordRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
+import org.springframework.stereotype.Service
+
+/**
+ * The single authority for how many sharing members stand behind an address, and behind the legal entity that address is
+ * the legal address of.
+ *
+ * The count is derived from the sharing member records the Pool holds, never stated by a payload, so every write that
+ * can change it goes through here and each recount emits its own UPDATE changelog.
+ */
+@Service
+class SharingMemberConfidenceService(
+    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
+    private val logisticAddressRepository: LogisticAddressRepository,
+    private val legalEntityRepository: LegalEntityRepository,
+    private val changelogCreateService: ChangelogCreateService,
+) {
+
+    private val logger = KotlinLogging.logger { }
+
+    /**
+     * Applies whether the sharing member record counts towards its address's confidence and reports whether that
+     * changed the record; an unknown record id yields null.
+     */
+    fun updateGoldenRecordCounted(recordId: String, isGoldenRecordCounted: Boolean?): UpsertResult<SharingMemberRecordDb>?{
+        val foundSharingMemberRecord = sharingMemberRecordRepository.findByRecordId(recordId) ?: return null
+
+        val hasChanges = foundSharingMemberRecord.isGoldenRecordCounted != isGoldenRecordCounted
+        if(hasChanges){
+            foundSharingMemberRecord.isGoldenRecordCounted = isGoldenRecordCounted
+            sharingMemberRecordRepository.save(foundSharingMemberRecord)
+            updateNumberOfSharingMembers(foundSharingMemberRecord.address)
+        }
+
+        return UpsertResult(foundSharingMemberRecord, if(hasChanges) UpsertType.Updated else UpsertType.NoChange)
+    }
+
+    /**
+     * Puts the sharing member record on the given address, recounting the address it joins and the one it leaves, and
+     * reports the business partners that recount changed.
+     */
+    fun updateAddress(recordId: String, addressBpn: String): Result{
+        val address = logisticAddressRepository.findByBpn(addressBpn)!!
+        val existingSharingMemberRecord = sharingMemberRecordRepository.findByRecordId(recordId)
+        val previousAddress = existingSharingMemberRecord?.address
+        val hasChanges = previousAddress != address
+
+        val sharingMemberRecord = existingSharingMemberRecord?.apply {
+            this.address = address
+        } ?: SharingMemberRecordDb(recordId, null, address)
+
+        sharingMemberRecordRepository.saveAndFlush(sharingMemberRecord)
+
+        val businessPartnerUpdateResults = if(hasChanges){
+            val addressResults = updateNumberOfSharingMembers(address)
+            val previousAddressResults = previousAddress?.let { updateNumberOfSharingMembers(previousAddress) }
+                ?: Result(emptyList(), emptyList())
+
+            Result(
+                addressResults.updatedAddresses + previousAddressResults.updatedAddresses,
+                addressResults.updatedLegalEntities + previousAddressResults.updatedLegalEntities
+            )
+        }else{
+            Result(emptyList(), emptyList())
+        }
+
+        return businessPartnerUpdateResults
+    }
+
+    private fun updateNumberOfSharingMembers(address: LogisticAddressDb): Result{
+        val newNumberOfSharingMembers = countSharingMembers(address)
+        val addressHasChanges = address.confidenceCriteria.numberOfSharingMembers != newNumberOfSharingMembers
+
+        if(addressHasChanges){
+            address.confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
+            logisticAddressRepository.save(address)
+            changelogCreateService.record(ChangelogRecord(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            logger.debug { "Updated number of sharing members of address '${address.bpn}' to $newNumberOfSharingMembers" }
+        }
+
+        val legalEntity = address.legalEntity!!
+        if(legalEntity.legalAddress == address){
+            val legalEntityHasChanges = legalEntity.confidenceCriteria.numberOfSharingMembers != newNumberOfSharingMembers
+            if(legalEntityHasChanges){
+                legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
+                legalEntityRepository.save(legalEntity)
+                changelogCreateService.record(ChangelogRecord(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+                logger.debug { "Updated number of sharing members of legal entity '${legalEntity.bpn}' to $newNumberOfSharingMembers" }
+            }
+        }
+
+        return Result(listOf(address), if(legalEntity.legalAddress == address) listOf(legalEntity) else emptyList())
+    }
+
+    /**
+     * Reports how many sharing member records of the given address count towards its confidence.
+     */
+    fun countSharingMembers(address: LogisticAddressDb): Int{
+        val sharingMemberRecords = sharingMemberRecordRepository.findByAddress(address)
+        return sharingMemberRecords.count{ it.isGoldenRecordCounted ?: false }
+    }
+
+    data class Result(
+        val updatedAddresses: List<LogisticAddressDb>,
+        val updatedLegalEntities: List<LegalEntityDb>
+    )
+}

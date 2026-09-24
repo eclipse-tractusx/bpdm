@@ -504,8 +504,7 @@ Four properties of that call shape everything below:
 
 * **Direction carries the meaning.** Every relation runs from the dependent business partner to the
   governing one: from the predecessor to the successor, from the owned company to its owner, from the
-  managed partner to its manager. An alternative headquarter designation names two equal partners, so
-  either may sit at either end.
+  managed partner to its manager, from the alternative headquarter to its main.
 * **A relation replaces its whole validity list.** Adding a period means sending the relation again
   with all of its periods, the old ones included. Sending only the new one deletes the rest.
 * **Relations need no ready call.** A `PUT` puts them in the queue straight away, and a relation is
@@ -545,11 +544,17 @@ Report all of it on one agreed date:
 3. The succession itself: an `IsReplacedBy` relation from the predecessor to the successor, with
    exactly one validity period starting on that date and no `validTo`.
 
-The deactivation is part of what the succession says, not an afterthought.
+The deactivation is part of what the succession says, not an afterthought, and the Pool checks it:
+a succession is rejected while its predecessor is still recorded as active on or after the date it
+starts, and rejected when its successor is recorded as inactive on that date.
+An active period the predecessor never closed therefore blocks every succession against it, and a
+period closed on the succession's start date does not, because a state no longer covers its end.
+A partner that records no state at all is not blocked either.
 Only the successor has to be a golden record before the succession is processed; the other two
 reports are independent of each other and can be made in either order.
 A succession does not expire, so it carries no `validTo` - one that ended would say the predecessor
-comes back and takes the successor's place - and the predecessor does not become active again.
+comes back and takes the successor's place - and stating one is rejected, as is stating more than
+one validity period.
 Correct a wrong date by sending the same relation again with the one corrected period, never by
 adding a second one.
 
@@ -567,6 +572,8 @@ Report it as a legal entity succession, with two differences:
 * Only the site goes out of use.
   The legal entity behind it keeps trading, so the state change belongs in `site.states` and the
   `legalEntity` part of both records is shared unchanged.
+  `site.states` is also where the Pool reads whether the two sites are in use when it judges the
+  succession.
 
 Nothing in the relation says "site": the type is `IsReplacedBy` and the level follows from both
 records being `SiteMainAddress` records.
@@ -575,8 +582,9 @@ records being `SiteMainAddress` records.
 
 An address stops being used and another takes its place - a delivery gate that moves, an office the
 company vacates.
-Report it as above, with the state change in `address.states`, and check what the two records are
-before you do:
+Report it as above, with the state change in `address.states` - which is also where the Pool reads
+whether the two addresses are in use when it judges the succession - and check what the two records
+are before you do:
 
 * Both addresses belong to the same legal entity.
 * Two legal entity records are read as a legal entity being replaced and two site main address
@@ -602,6 +610,10 @@ What the network expects you to establish before you report it:
 * The owner or manager is active for the whole time the relation is valid, so the `validFrom` is no
   earlier than its own active start.
   `POST /v7/input/business-partners/search` for that record shows its periods.
+  The Pool checks this: a relation is rejected when its owner or manager is recorded as inactive on
+  any day of any of its validity periods, and the rejection names each such period.
+  Only the owner or manager is checked - the owned or managed partner may be out of use - and a
+  partner that records no state at all is not blocked.
 * A managed partner has one manager at a time, and data management does not chain: a partner that is
   itself managed cannot be someone else's manager for the same period.
   A search by source over `IsManagedBy` answers that.
@@ -726,11 +738,13 @@ This is the one relation where both sides are constrained: it starts no earlier 
 two active starts and ends where either of them ends, and you work that window out yourself from
 `POST /v7/input/business-partners/search` - the payload has no way of saying "wherever the two
 overlap".
+The Pool checks this: a designation is rejected when either legal entity is recorded as inactive on
+any day of any of its validity periods, and the rejection names each such legal entity and period.
+A legal entity that records no state at all is not blocked.
 
-Either partner may go in source and the other in target.
-Whichever way you send it fixes the direction and the `externalId` you reuse for every later
-correction, so one pair means one designation: sending the same two partners again the other way
-round duplicates it.
+The alternative goes in source and the main in target.
+The pair is fixed by that direction and by the `externalId` you reuse for every later correction:
+sending the same two partners the other way round while the designation holds is rejected.
 
 More than two legal entities can belong to one group of alternatives, as long as every designation
 in it names the same shared partner.

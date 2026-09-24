@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
@@ -28,12 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerbos
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithOwnMainAddressParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateOnLegalAddressParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,9 +42,9 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateApplicationV7Service(
-    private val siteCreateParser: SiteCreateParser,
+    private val siteCreateWithOwnMainAddressParser: SiteCreateWithOwnMainAddressParser,
     private val siteCreateService: SiteCreateService,
-    private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
+    private val siteCreateOnLegalAddressParser: SiteCreateOnLegalAddressParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
@@ -62,7 +62,11 @@ class SiteCreateApplicationV7Service(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(
+            createRequests,
+            siteCreateWithOwnMainAddressParser::parse,
+            siteCreateService::create
+        )).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
@@ -83,7 +87,11 @@ class SiteCreateApplicationV7Service(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).forEachIndexed { index, result ->
+        parseAndExecute(
+            createRequests,
+            siteCreateOnLegalAddressParser::parse,
+            siteCreateWithReferencedAddressAsMainService::create
+        ).forEachIndexed { index, result ->
             val entityKey = index.toString()
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, entityKey))

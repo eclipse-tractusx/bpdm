@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the address services' sealed parse errors to the v6 `/addresses` [ErrorInfoV6] codes.
+ * Maps the address services' sealed parse errors to the v6 `/addresses` error codes.
  *
  * The v6 error enums are frozen and predate script variants, so every script-variant error is thrown as an internal
  * error instead of getting a public code. The `when`s are exhaustive so a new error won't compile until it gets a code.
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapperV6 {
 
+    /** The v6 error a failed address create reports for the given parse error. */
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
         when (error) {
             is InvalidParentBpn ->
@@ -57,6 +58,7 @@ class AddressParseErrorMapperV6 {
             )
         }
 
+    /** The v6 error a failed address update reports for the given parse error. */
     fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
         when (error) {
             is UnresolvableAddress ->
@@ -75,14 +77,11 @@ class AddressParseErrorMapperV6 {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
             is UnresolvableSite,
-            is SiteMainAddressOmitted,
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+            is SiteMainAddressOmitted -> throw internalError(error)
         }
 
+    /** The v6 error a failed legal-entity create reports for the given error found on its legal address. */
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         sharedErrorInfo(
             error,
@@ -93,6 +92,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany
         )
 
+    /** The v6 error a failed legal-entity update reports for the given error found on its legal address. */
     fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
         sharedErrorInfo(
             error,
@@ -103,6 +103,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany
         )
 
+    /** The v6 error a failed site create reports for the given error found on its main address. */
     fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
         sharedErrorInfo(
             error,
@@ -113,6 +114,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany
         )
 
+    /** The v6 error a failed site update reports for the given error found on its main address. */
     fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         sharedErrorInfo(
             error,

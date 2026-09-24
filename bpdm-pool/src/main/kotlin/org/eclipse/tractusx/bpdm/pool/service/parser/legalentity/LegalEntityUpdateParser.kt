@@ -20,35 +20,23 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.combine
-import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.common.model.chainParseResults
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateContentWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AlternativeHeadquarterValidator
+import org.eclipse.tractusx.bpdm.pool.util.parsedOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates legal-entity update requests: the target legal entity, the new header content with its identifier
- * uniqueness, the new legal address, and that the new legal address still covers every script code the header and the
- * address's other partners name.
+ * Validates legal-entity update requests: the target legal entity the request names, and the content the update states
+ * for it.
  */
 @Service
 class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val legalEntityHeaderParser: LegalEntityHeaderParser,
-    private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
-    private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
-    private val alternativeHeadquarterValidator: AlternativeHeadquarterValidator,
-    private val addressContentParser: AddressContentParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
-    private val partnerReader: AddressPartnerScriptCodeReader
+    private val updateContentParser: LegalEntityUpdateContentParser
 ) {
 
     /**
@@ -56,48 +44,12 @@ class LegalEntityUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> =
-        parseWithoutCoverageCheck(requests).map { result -> result.combine(scriptCodeCoverageErrors(result)) { it } }
-
-    /**
-     * Validates each request without judging script variant coverage — for a caller that rewrites several partners of
-     * the legal address in one operation set and therefore decides coverage at its own scope.
-     */
-    @Transactional(readOnly = true)
-    fun parseWithoutCoverageCheck(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
+    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-
-        val headers = requests.map { it.content.header }
-        val headerResults = legalEntityHeaderParser.parse(headers)
-        val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.bpn }
-        val duplicateErrors = duplicateValidator.validate(headers, ownerBpns)
-        val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
-
-        val legalAddressOwnerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.legalAddress?.bpn }
-        val legalAddressResults = addressContentParser.parse(requests.map { it.content.legalAddress }, legalAddressOwnerBpns)
-
-        val updateResults = zipParseResults(mergedHeaderResults, targetResults, legalAddressResults) { header, target, legalAddress ->
-            LegalEntityUpdateParsed(target, LegalEntityContentParsed(header, legalAddress))
+        val writes = requests.zip(targetResults) { request, targetResult ->
+            targetResult.parsedOrNull()?.let { LegalEntityUpdateContentWrite(request.content, it) }
         }
 
-        // The ultimate-owner rule spans the whole batch and both the requested flag and the resolved target, so it is
-        // folded in at this level rather than into the header result.
-        val resolvedTargets = targetResults.map { (it as? ParseResult.Success)?.parsed }
-        val ownershipViolations = ultimateOwnerUniquenessValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
-        val alternativeViolations = alternativeHeadquarterValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
-
-        return updateResults
-            .zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }
-            .zip(alternativeViolations) { result, violations -> result.combine(violations) { it } }
-    }
-
-    private fun scriptCodeCoverageErrors(result: ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>): List<LegalEntityUpdateParseError> {
-        val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
-        val otherPartners = partnerReader.storedPartners(parsed.target.legalAddress, rewrittenBpns = setOf(parsed.target.bpn))
-
-        return scriptVariantCoverageValidator.check(
-            parsed.content.legalAddress.scriptCodes(),
-            listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())).plus(otherPartners)
-        )
+        return chainParseResults(targetResults) { updateContentParser.parse(writes.filterNotNull()) }
     }
 }

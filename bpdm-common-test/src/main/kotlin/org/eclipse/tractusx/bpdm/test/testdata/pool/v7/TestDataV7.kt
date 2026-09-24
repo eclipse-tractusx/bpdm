@@ -29,6 +29,12 @@ object TestDataV7 {
     /** Start of the validity a test-data relation gets: already active, so it counts wherever only current relations do. */
     val currentRelationValidFrom: LocalDate = LocalDate.now().minusDays(1)
 
+    /**
+     * Start of the state a test-data business partner gets: recorded as active from then on and never closed, so a rule
+     * that reads whether a partner is in use has to be told otherwise by the test that depends on it.
+     */
+    val currentStateValidFrom: LocalDateTime = LocalDateTime.of(2020, 1, 1, 0, 0)
+
     val NoConfidence = CalculatedConfidence(
         numberOfSharingMembers = 0,
         confidenceLevel = 0

@@ -1,0 +1,119 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.service.operation.relation
+
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Service
+class RelationUpsertService(
+    private val relationRepository: RelationRepository,
+    private val changelogCreateService: ChangelogCreateService
+) {
+    private val logger = KotlinLogging.logger { }
+
+    @Transactional
+    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+        val existingRelation = upsertRequest.existingRelation
+
+        // Prevent self-referencing relations
+        if (source == target) {
+            throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${source.bpn}).")
+        }
+
+        val upsertResult = if (existingRelation != null) {
+            // Update validity periods if changed
+            if (validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
+                existingRelation.validityPeriods.clear()
+                existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
+                relationRepository.save(existingRelation)
+                UpsertResult(existingRelation, UpsertType.Updated)
+            } else {
+                UpsertResult(existingRelation, UpsertType.NoChange)
+            }
+        } else {
+            UpsertResult(createNewRelation(upsertRequest), UpsertType.Created)
+        }
+
+        val relation = "${upsertRequest.legalEntityRelationType} relation from legal entity '${source.bpn}' to '${target.bpn}'"
+        when (upsertResult.upsertType) {
+            UpsertType.Created -> logger.info { "Created $relation" }
+            UpsertType.Updated -> logger.info { "Updated validity periods of $relation" }
+            UpsertType.NoChange -> logger.debug { "Left $relation unchanged" }
+        }
+
+        return upsertResult
+    }
+
+    private fun createNewRelation(upsertRequest: UpsertRequest): RelationDb{
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+        val validityPeriods = upsertRequest.validityPeriods.map {
+            RelationValidityPeriodDb(
+                validFrom = it.validFrom,
+                validTo = it.validTo
+            )
+        }.toMutableList()
+
+        val newRelation = RelationDb(
+            type = upsertRequest.legalEntityRelationType,
+            startNode = source,
+            endNode = target,
+            validityPeriods = validityPeriods,
+            reasonCode = upsertRequest.reasonCode
+        )
+
+        relationRepository.save(newRelation)
+
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+
+        return newRelation
+    }
+
+    private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
+        if (existingValidityPeriods.size != newValidityPeriods.size) return true
+        return existingValidityPeriods.zip(newValidityPeriods).any { (e, n) ->
+            e.validFrom != n.validFrom || e.validTo != n.validTo
+        }
+    }
+
+    data class UpsertRequest(
+        val source: LegalEntityDb,
+        val target: LegalEntityDb,
+        val legalEntityRelationType: LegalEntityRelationType,
+        val validityPeriods: Collection<RelationValidityPeriodDb>,
+        val existingRelation: RelationDb?,
+        val reasonCode: ReasonCodeDb?
+    )
+}

@@ -24,8 +24,8 @@ import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.GoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.pool.service.application.task.RelationTaskApplicationService
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.scheduling.annotation.Scheduled
@@ -154,7 +154,7 @@ class TaskRelationsBatchResolutionService(
 class TaskRelationsResolutionService(
     private val orchestrationClient: OrchestrationApiClient,
     private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
-    private val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService
+    private val relationTaskApplicationService: RelationTaskApplicationService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -175,39 +175,7 @@ class TaskRelationsResolutionService(
         logger.debug { "Cleaning tasks processing completed for this iteration." }
     }
 
-    fun upsertRelationsGoldenRecordIntoPool(taskEntries: List<TaskRelationsStepReservationEntryDto>) : List<TaskRelationsStepResultEntryDto> {
-        val taskResults = taskEntries.map { businessPartnerRelationsTaskResult(it) }
-
-        return taskResults
-    }
-
-    private fun businessPartnerRelationsTaskResult(taskStep: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
-        return try {
-            taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskStep)
-        }catch (ex: BpdmValidationException) {
-            TaskRelationsStepResultEntryDto(
-                taskId = taskStep.taskId,
-                errors = listOf(
-                    TaskRelationsErrorDto(
-                        type = TaskRelationsErrorType.Unspecified,
-                        description = ex.message ?: ""
-                    )
-                ),
-                businessPartnerRelations = taskStep.businessPartnerRelations
-            )
-        } catch (ex: Throwable) {
-            logger.error(ex) { "An unexpected error occurred during golden record task processing" }
-            TaskRelationsStepResultEntryDto(
-                taskId = taskStep.taskId,
-                errors = listOf(
-                    TaskRelationsErrorDto(
-                        type = TaskRelationsErrorType.Unspecified,
-                        description = "An unexpected error occurred during Pool update"
-                    )
-                ),
-                businessPartnerRelations = taskStep.businessPartnerRelations
-            )
-        }
-    }
+    fun upsertRelationsGoldenRecordIntoPool(taskEntries: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> =
+        relationTaskApplicationService.upsert(taskEntries)
 
 }

@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
@@ -30,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
@@ -498,6 +500,90 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity, the ownership ending today
+     * WHEN operator updates the owned legal entity
+     * THEN legal entity is returned without an ultimate owner
+     */
+    @Test
+    fun `update legal entity whose ownership ends today`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        val endingToday = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = LocalDate.now()))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingToday)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = null)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingToday)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity, the ownership ending tomorrow
+     * WHEN operator updates the owned legal entity
+     * THEN legal entity is returned with the owning legal entity as its ultimate owner
+     */
+    @Test
+    fun `update legal entity whose ownership ends tomorrow`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        val endingTomorrow = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = LocalDate.now().plusDays(1)))
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingTomorrow)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, endingTomorrow)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity owned by an ultimate owner legal entity over two validity periods meeting on one date
+     * WHEN operator updates the owned legal entity
+     * THEN both periods are returned, so periods meeting on one date are accepted as consecutive
+     */
+    @Test
+    fun `update legal entity whose ownership periods meet on one date`(){
+        //GIVEN
+        val owningLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owner"))
+        val ownedLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName owned"))
+        testDataClient.updateLegalEntity(owningLegalEntity.header.bpnl, requestFactory.buildLegalEntity("$testName owner").withOwnershipUltimate(true))
+        val meetingOnOneDate = listOf(
+            RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = LocalDate.now()),
+            RelationValidityPeriod(validFrom = LocalDate.now(), validTo = null)
+        )
+        testDataClient.createIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, meetingOnOneDate)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", ownedLegalEntity.header.bpnl).withOwnershipUltimate(false)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
+            .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
+            .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl, meetingOnOneDate)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
 
     /**
      * GIVEN legal entity
@@ -572,13 +658,34 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
-     * WHEN operator tries to update the legal entity with a script variant of another script code
-     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the site is still named in the script the
-     * update would stop covering on their shared address
+     * GIVEN participant legal entity named in one script
+     * WHEN operator updates it to be named in no script at all
+     * THEN its legal address drops that script variant, because no business partner is named in it any more
      */
     @Test
-    fun `update legal entity into a script its site does not cover`(){
+    fun `update legal entity out of its only script`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .let { it.copy(legalEntity = it.legalEntity.copy(scriptVariants = emptyList())) }
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        assertThat(response.errors).isEmpty()
+        assertThat(poolClient.addresses.getAddress(givenLegalEntity.legalAddress.bpna).scriptVariants).isEmpty()
+    }
+
+    /**
+     * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
+     * WHEN operator updates the legal entity into another script code
+     * THEN the update goes through and their shared legal address carries both scripts, because the address keeps the
+     * variant the site is still named in
+     */
+    @Test
+    fun `update legal entity into a script its site does not state`(){
         //GIVEN
         val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
         val coveredScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
@@ -587,16 +694,18 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val givenSite = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
 
         //WHEN
+        val addedScriptCode = scriptCodeOtherThan(setOf(coveredScriptCode))
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
             .withLegalForm(anyKnownLegalForm())
-            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+            .withScriptVariantScriptCode(addedScriptCode)
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        assertThat(response.errors).isEmpty()
 
-        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+        val sharedAddressBpn = poolClient.sites.getSite(givenSite.site.bpns).mainAddress.bpna
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrder(coveredScriptCode, addedScriptCode)
         assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode })
             .containsExactly(coveredScriptCode)
     }

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderWrite
 import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
@@ -43,12 +44,13 @@ class UltimateOwnerUniquenessValidator(
 ) {
 
     /**
-     * The violations each entry of a legal-entity update batch would cause, positional with [targets] and
-     * [requestedFlags]: an unresolved target or a flag left unstated by the request yields none.
+     * The violations each entry of a legal-entity write batch would cause: a write that creates its legal entity, or one
+     * leaving the flag unstated, yields none.
      */
     @Transactional(readOnly = true)
-    fun validate(targets: List<LegalEntityDb?>, requestedFlags: List<Boolean?>): List<List<MultipleUltimateOwnersInHierarchy>> {
-        require(targets.size == requestedFlags.size) { "targets and requestedFlags must be positionally aligned" }
+    fun validate(writes: List<LegalEntityHeaderWrite>): List<List<MultipleUltimateOwnersInHierarchy>> {
+        val targets = writes.map { it.existingLegalEntity }
+        val requestedFlags = writes.map { it.header.ownershipUltimate }
 
         // Entries of the same batch can sit in one tree, so an entry is judged against what its neighbours will be flagged
         // as after this batch, not against what they are flagged as now.

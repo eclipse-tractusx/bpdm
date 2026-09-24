@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes.
+ * Maps the address services' sealed parse errors to the `/addresses` error codes.
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
  * an internal error instead. The `when`s are exhaustive so a new error won't compile until it gets a code.
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapper {
 
+    /** The error a failed address create reports for the given parse error. */
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfo<AddressCreateError> =
         when (error) {
             is InvalidParentBpn ->
@@ -59,6 +60,7 @@ class AddressParseErrorMapper {
             )
         }
 
+    /** The error a failed address update reports for the given parse error. */
     fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfo<AddressUpdateError> =
         when (error) {
             is UnresolvableAddress ->
@@ -79,13 +81,6 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfo(
-                    AddressUpdateError.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
-                            "is named in that script",
-                    entityKey
-                )
             is UnresolvableSite ->
                 ErrorInfo(AddressUpdateError.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
             is SiteMainAddressOmitted ->
@@ -94,9 +89,9 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
                     entityKey
                 )
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
+    /** The error a failed legal-entity create reports for the given error found on its legal address. */
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         sharedErrorInfo(
             error,
@@ -109,6 +104,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode
         )
 
+    /** The error a failed legal-entity update reports for the given error found on its legal address. */
     fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
         sharedErrorInfo(
             error,
@@ -121,6 +117,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode
         )
 
+    /** The error a failed site create reports for the given error found on its main address. */
     fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
         sharedErrorInfo(
             error,
@@ -133,6 +130,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = SiteCreateError.MainAddressScriptVariantDuplicateScriptCode
         )
 
+    /** The error a failed site update reports for the given error found on its main address. */
     fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
         sharedErrorInfo(
             error,
