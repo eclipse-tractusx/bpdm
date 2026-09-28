@@ -158,4 +158,18 @@ interface PoolMetadataApi {
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/reason-codes"])
     fun getReasonCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>
 
+    @Operation(
+        summary = "Returns all countries",
+        description = "Lists all currently known countries in a paginated result"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing countries, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/countries"])
+    fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
+
 }

@@ -2836,6 +2836,51 @@
         }
       }
     },
+    "/v7/countries" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Returns all countries",
+        "description" : "Lists all currently known countries in a paginated result",
+        "operationId" : "getCountries",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "0",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "10",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing countries, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoCountryDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      }
+    },
     "/v7/administrative-areas-level1" : {
       "get" : {
         "tags" : [ "Metadata Controller" ],
@@ -3137,6 +3182,52 @@
                   "items" : {
                     "$ref" : "#/components/schemas/FieldQualityRuleDtoV6"
                   }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        },
+        "deprecated" : true
+      }
+    },
+    "/v6/countries" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Returns all countries",
+        "description" : "Lists all currently known countries in a paginated result",
+        "operationId" : "getCountries_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "0",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "10",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing countries, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoCountryDto"
                 }
               }
             }
@@ -4585,6 +4676,21 @@
           "confidenceLevel" : {
             "type" : "integer",
             "format" : "int32"
+          }
+        }
+      },
+      "CountryDto" : {
+        "type" : "object",
+        "description" : "Describes a country accepted by the Pool",
+        "properties" : {
+          "countryCode" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : [ "string", "null" ]
           }
         }
       },
@@ -6499,6 +6605,39 @@
             "description" : "Collection of results in the page",
             "items" : {
               "$ref" : "#/components/schemas/ChangelogEntryVerboseDtoV6"
+            }
+          }
+        }
+      },
+      "PageDtoCountryDto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/CountryDto"
             }
           }
         }

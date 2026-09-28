@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
@@ -31,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AdministrativeAreaSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.CountrySearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.FieldQualityRuleSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeSearchApplicationV6Service
@@ -48,7 +50,8 @@ class MetadataV6Controller(
     val legalFormCreateApplicationV6Service: LegalFormCreateApplicationV6Service,
     val legalFormSearchApplicationV6Service: LegalFormSearchApplicationV6Service,
     val fieldQualityRuleSearchApplicationV6Service: FieldQualityRuleSearchApplicationV6Service,
-    val administrativeAreaSearchApplicationV6Service: AdministrativeAreaSearchApplicationV6Service
+    val administrativeAreaSearchApplicationV6Service: AdministrativeAreaSearchApplicationV6Service,
+    val countrySearchApplicationV6Service: CountrySearchApplicationV6Service
 ) : PoolMetadataV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
@@ -83,6 +86,11 @@ class MetadataV6Controller(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> {
         return administrativeAreaSearchApplicationV6Service.searchAdministrativeAreas(paginationRequest)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
+    override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryDto> {
+        return countrySearchApplicationV6Service.searchCountries(paginationRequest)
     }
 
 }

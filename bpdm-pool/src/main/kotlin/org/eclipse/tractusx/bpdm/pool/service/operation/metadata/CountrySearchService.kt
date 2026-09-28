@@ -17,12 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.migration.helper
+package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 
-import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
-import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-fun main(args: Array<String>) {
-    MigrationFileCreator().create()
-    CountryMigrationFileCreator().create()
+/**
+ * Queries the countries the Pool accepts.
+ */
+@Service
+class CountrySearchService(
+    private val countryRepository: CountryRepository
+) {
+
+    /**
+     * Returns the requested page of all known countries.
+     */
+    @Transactional(readOnly = true)
+    fun search(pageable: Pageable): Page<CountryDb> =
+        countryRepository.findAll(pageable)
+
 }

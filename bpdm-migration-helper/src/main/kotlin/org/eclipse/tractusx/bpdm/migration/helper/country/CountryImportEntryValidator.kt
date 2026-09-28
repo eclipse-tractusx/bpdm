@@ -17,12 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.migration.helper
+package org.eclipse.tractusx.bpdm.migration.helper.country
 
-import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
-import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
+class CountryImportEntryValidator {
 
-fun main(args: Array<String>) {
-    MigrationFileCreator().create()
-    CountryMigrationFileCreator().create()
+    fun validate(unvalidatedCountryImportEntry: UnvalidatedCountryImportEntry): ValidatedCountryImportEntry {
+        return ValidatedCountryImportEntry(
+            countryCode = unvalidatedCountryImportEntry.countryCode?.takeIf { it.isNotBlank() }!!,
+            name = unvalidatedCountryImportEntry.name?.takeIf { it.isNotBlank() }!!,
+            description = unvalidatedCountryImportEntry.description?.takeIf { it.isNotBlank() }
+        )
+    }
+
 }

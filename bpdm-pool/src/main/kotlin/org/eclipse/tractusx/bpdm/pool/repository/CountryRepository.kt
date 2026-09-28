@@ -17,12 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.migration.helper
+package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
-import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 
-fun main(args: Array<String>) {
-    MigrationFileCreator().create()
-    CountryMigrationFileCreator().create()
+interface CountryRepository : PagingAndSortingRepository<CountryDb, Long>, CrudRepository<CountryDb, Long> {
+
+    fun findByCountryCode(countryCode: String): CountryDb?
+
 }
