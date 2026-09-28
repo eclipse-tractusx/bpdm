@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.toCountryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
@@ -41,6 +40,7 @@ class ExpectedBusinessPartnerResultFactory(
     private val expectedLegalForms: Collection<LegalFormDto> = expectedMetadata.legalForms
     private val expectedLegalEntityIdentifierTypes: Collection<IdentifierTypeDto> = expectedMetadata.legalEntityIdentifierTypes
     private val expectedAddressIdentifierTypes: Collection<IdentifierTypeDto> = expectedMetadata.addressIdentifierTypes
+    private val expectedCountries: List<CountryDto> = expectedMetadata.countries
 
     fun mapToExpectedLegalEntity(
         givenRequest: LegalEntityPartnerCreateRequest,
@@ -220,7 +220,7 @@ class ExpectedBusinessPartnerResultFactory(
         return with(givenRequest) {
             PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = country.toCountryVerboseDto(),
+                countryVerbose = expectedCountries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
                 administrativeAreaLevel2,
                 administrativeAreaLevel3,
@@ -242,7 +242,7 @@ class ExpectedBusinessPartnerResultFactory(
         return with(givenRequest) {
             AlternativePostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = country.toCountryVerboseDto(),
+                countryVerbose = expectedCountries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
                 postalCode, city, deliveryServiceType, deliveryServiceQualifier, deliveryServiceNumber
             )

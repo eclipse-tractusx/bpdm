@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
@@ -39,15 +41,17 @@ class TestDataV6Configuration {
     fun testDataV6Factory(
         legalFormEntryImporter: LegalFormEntryImporter,
         adminAreaLevel1EntryImporter: AdminAreaLevel1EntryImporter,
-        identifierTypeEntryImporter: IdentifierTypeEntryImporter
+        identifierTypeEntryImporter: IdentifierTypeEntryImporter,
+        countryRepository: CountryRepository
     ): TestDataV6Factory{
         val legalFormImporterV6 = LegalFormImporterV6(legalFormEntryImporter)
         val adminAreaImporter = AdminAreaLevel1ImporterV6(adminAreaLevel1EntryImporter)
         val identifierTypeImporter = IdentifierTypeImporterV6(identifierTypeEntryImporter)
 
         val testMetadataV6Provider = TestMetadataV6FromResourceProvider(legalFormImporterV6, adminAreaImporter, identifierTypeImporter)
+        val countries = countryRepository.findAll().map { CountryDto(countryCode = it.countryCode, name = it.name, description = it.description) }
 
-        return TestDataV6Factory(testMetadataV6Provider.createMetadata())
+        return TestDataV6Factory(testMetadataV6Provider.createMetadata(countries))
     }
 
     @Bean

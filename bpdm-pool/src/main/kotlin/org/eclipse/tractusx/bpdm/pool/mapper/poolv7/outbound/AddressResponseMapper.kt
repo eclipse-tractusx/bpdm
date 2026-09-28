@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.service.toCountryVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.CountryResponseMapper
 import org.springframework.stereotype.Component
 
 /**
@@ -35,7 +35,8 @@ import org.springframework.stereotype.Component
 class AddressResponseMapper(
     private val confidenceCriteriaResponseMapper: ConfidenceCriteriaResponseMapper,
     private val identifierTypeResponseMapper: IdentifierTypeResponseMapper,
-    private val relationResponseMapper: RelationResponseMapper
+    private val relationResponseMapper: RelationResponseMapper,
+    private val countryResponseMapper: CountryResponseMapper
 ) {
 
     /**
@@ -111,7 +112,7 @@ class AddressResponseMapper(
         with(address) {
             PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = country.toCountryVerboseDto(),
+                countryVerbose = countryResponseMapper.toCountryVerbose(country),
                 postalCode = postCode,
                 city = city,
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
@@ -132,7 +133,7 @@ class AddressResponseMapper(
         with(address) {
             AlternativePostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = country.toCountryVerboseDto(),
+                countryVerbose = countryResponseMapper.toCountryVerbose(country),
                 postalCode = postCode,
                 city = city,
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },

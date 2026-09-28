@@ -17,18 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
+package org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
+import org.springframework.stereotype.Component
 
+@Component
+class CountryResponseMapper(private val countryRepository: CountryRepository) {
 
-data class TestMetadataV6(
-    val legalForms: List<LegalFormDtoV6>,
-    val legalEntityIdentifierTypes: List<IdentifierTypeDtoV6>,
-    val addressIdentifierTypes: List<IdentifierTypeDtoV6>,
-    val adminAreas: List<CountrySubdivisionDtoV6>,
-    val countries: List<CountryDto> = emptyList()
-)
+    fun toCountryVerbose(countryCode: String): TypeKeyNameVerboseDto<String> =
+        TypeKeyNameVerboseDto(countryCode, countryRepository.findByCountryCode(countryCode)?.name ?: countryCode)
+}

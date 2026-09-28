@@ -40,22 +40,6 @@ fun LanguageCode.toDto(): TypeKeyNameVerboseDto<LanguageCode> {
 fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
     return TypeKeyNameVerboseDto(this, getName())
 }
-
-/**
- * Resolves the display name of an ISO 3166-1 alpha-2 country code held as a plain string. Falls back to the code itself
- * when it is not an ISO code, so stored values stay readable even when they are no longer part of the maintained list.
- */
-fun String.toCountryVerboseDto(): TypeKeyNameVerboseDto<String> {
-    val name = try {
-        CountryCode.getByAlpha2Code(this)
-            ?.takeIf { it != CountryCode.UNDEFINED }
-            ?.getName()
-    } catch (_: IllegalArgumentException) {
-        null
-    } ?: this
-    return TypeKeyNameVerboseDto(this, name)
-}
-
 fun PaginationRequest.toPageRequest(sort: Sort = Sort.unsorted()) =
     PageRequest.of(page, size, sort)
 

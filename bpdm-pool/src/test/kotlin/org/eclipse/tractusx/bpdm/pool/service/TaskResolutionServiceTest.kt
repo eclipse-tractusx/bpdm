@@ -400,6 +400,27 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `create legal entity with unknown address country`() {
+
+        val createLegalEntityRequest = with(minValidLegalEntity()){
+            copy(
+                legalEntity = legalEntity.copy(
+                    legalAddress = legalEntity.legalAddress.copy(
+                        physicalAddress = legalEntity.legalAddress.physicalAddress.copy(
+                            country = "ZZ"
+                        )
+                    )
+                )
+            )
+        }.withLegalReferences("987".toBpnRequest(), "654".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Country 'ZZ' in physical address is not known")
+    }
+
+    @Test
     fun `create legal entity with invalid address identifier`() {
 
         val createLegalEntityRequest = with(minValidLegalEntity()){
