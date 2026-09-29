@@ -109,7 +109,7 @@ class BusinessPartnerInputRequestV7Factory(
                     latitude = random.nextDouble(-90.0, 90.0),
                     altitude = random.nextDouble(0.0, 5000.0)
                 ),
-                country = CountryCode.entries.random(random),
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -142,7 +142,7 @@ class BusinessPartnerInputRequestV7Factory(
                     latitude = random.nextDouble(-90.0, 90.0),
                     altitude = random.nextDouble(0.0, 5000.0)
                 ),
-                country = CountryCode.entries.random(random),
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",

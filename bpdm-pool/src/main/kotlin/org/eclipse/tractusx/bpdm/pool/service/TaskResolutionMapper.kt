@@ -117,7 +117,7 @@ class TaskResolutionMapper {
         return with(physicalAddress){
             PhysicalAddress(
                 geographicCoordinates = geographicCoordinates?.let { with(it){ GeoCoordinate(longitude, latitude, altitude) } } ?: GeoCoordinate.empty,
-                country = physicalAddress.country.alpha2,
+                country = physicalAddress.country,
                 administrativeAreaLevel1 = physicalAddress.administrativeAreaLevel1,
                 administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
                 administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
@@ -140,7 +140,7 @@ class TaskResolutionMapper {
         return with(alternativeAddress){
             AlternativeAddress(
                 geographicCoordinates = geographicCoordinates?.let { with(it){ GeoCoordinate(longitude, latitude, altitude) } } ?: GeoCoordinate.empty,
-                country = country.alpha2,
+                country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
                 postalCode = postalCode,
                 city = city,

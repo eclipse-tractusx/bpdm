@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
@@ -30,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 data class AlternativePostalAddressDto(
 
     override val geographicCoordinates: GeoCoordinateDto? = null,
-    override val country: CountryCode? = null,
+    override val country: String? = null,
     override val administrativeAreaLevel1: String? = null,
     override val postalCode: String? = null,
     override val city: String? = null,

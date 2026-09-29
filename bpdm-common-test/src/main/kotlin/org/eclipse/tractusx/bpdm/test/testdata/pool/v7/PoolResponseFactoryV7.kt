@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.toCountryVerbose
 import java.time.Instant
 
 class PoolResponseFactoryV7(
@@ -408,7 +409,7 @@ class PoolResponseFactoryV7(
         return with(withValuesFrom) {
             PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { buildAdminArea(it) },
                 administrativeAreaLevel2,
                 administrativeAreaLevel3,
@@ -430,7 +431,7 @@ class PoolResponseFactoryV7(
         return with(withValuesFrom) {
             AlternativePostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { buildAdminArea(it) },
                 postalCode, city, deliveryServiceType, deliveryServiceQualifier, deliveryServiceNumber
             )

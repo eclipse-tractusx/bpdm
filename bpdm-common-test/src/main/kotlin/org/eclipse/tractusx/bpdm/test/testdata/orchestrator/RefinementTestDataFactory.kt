@@ -213,7 +213,7 @@ class RefinementTestDataFactory {
     private fun buildPhysicalAddress(physicalPostalAddress: PhysicalPostalAddressVerboseDto): PhysicalAddress{
         return PhysicalAddress(
             geographicCoordinates = physicalPostalAddress.geographicCoordinates?.let { GeoCoordinate(it.longitude, it.latitude, it.altitude) } ?: GeoCoordinate.empty,
-            country = physicalPostalAddress.country.alpha2,
+            country = physicalPostalAddress.country,
             administrativeAreaLevel1 = physicalPostalAddress.administrativeAreaLevel1,
             administrativeAreaLevel2 = physicalPostalAddress.administrativeAreaLevel2,
             administrativeAreaLevel3 = physicalPostalAddress.administrativeAreaLevel3,
@@ -233,7 +233,7 @@ class RefinementTestDataFactory {
     private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativeAddress{
         return AlternativeAddress(
             geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeoCoordinate(it.longitude, it.latitude, it.altitude) } ?: GeoCoordinate.empty,
-            country = alternativeAddress.country.alpha2,
+            country = alternativeAddress.country,
             administrativeAreaLevel1 =  alternativeAddress.administrativeAreaLevel1,
             postalCode = alternativeAddress.postalCode,
             city = alternativeAddress.city,

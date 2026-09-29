@@ -19,12 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
 data class AlternativeAddress(
     val geographicCoordinates: GeoCoordinate?,
-    val country: CountryCode,
+    val country: String,
     val administrativeAreaLevel1: String?,
     val postalCode: String?,
     val city: String,

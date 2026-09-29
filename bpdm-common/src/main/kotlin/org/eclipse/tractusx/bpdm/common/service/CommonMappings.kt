@@ -40,7 +40,6 @@ fun LanguageCode.toDto(): TypeKeyNameVerboseDto<LanguageCode> {
 fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
     return TypeKeyNameVerboseDto(this, getName())
 }
-
 fun PaginationRequest.toPageRequest(sort: Sort = Sort.unsorted()) =
     PageRequest.of(page, size, sort)
 

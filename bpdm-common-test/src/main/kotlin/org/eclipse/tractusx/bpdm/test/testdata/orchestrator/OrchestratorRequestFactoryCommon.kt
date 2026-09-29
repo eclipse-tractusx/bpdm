@@ -77,7 +77,7 @@ class OrchestratorRequestFactoryCommon(
             confidenceCriteria = buildConfidenceCriteria(random),
             physicalAddress = PhysicalAddress(
                 geographicCoordinates = GeoCoordinate(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.toTypedArray().random(random).alpha2,
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 = getAdminAreaReference(seed, random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -104,7 +104,7 @@ class OrchestratorRequestFactoryCommon(
             ),
             alternativeAddress = AlternativeAddress(
                 geographicCoordinates = GeoCoordinate(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.toTypedArray().random(random).alpha2,
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 =  getAdminAreaReference(seed, random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",

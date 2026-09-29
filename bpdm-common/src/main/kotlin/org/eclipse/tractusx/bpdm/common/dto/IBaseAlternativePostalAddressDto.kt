@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -33,7 +32,7 @@ interface IBaseAlternativePostalAddressDto {
     val geographicCoordinates: GeoCoordinateDto?
 
     @get:Schema(description = PostalAddressDescription.country)
-    val country: CountryCode?
+    val country: String?
 
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
     val administrativeAreaLevel1: String?

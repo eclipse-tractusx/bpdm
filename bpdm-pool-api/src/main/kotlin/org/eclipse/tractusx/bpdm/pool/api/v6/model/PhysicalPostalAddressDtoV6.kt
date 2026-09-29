@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.model
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.IBasePhysicalPostalAddressDto
@@ -29,7 +28,7 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDesc
 data class PhysicalPostalAddressDtoV6(
 
     override val geographicCoordinates: GeoCoordinateDto?,
-    override val country: CountryCode,
+    override val country: String,
     override val administrativeAreaLevel1: String?,
     override val administrativeAreaLevel2: String?,
     override val administrativeAreaLevel3: String?,

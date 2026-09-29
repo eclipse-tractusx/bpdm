@@ -108,7 +108,7 @@ class GateInputFactory(
         private fun createPhysicalAddress(): PhysicalPostalAddressDto{
             return PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.random(random),
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -138,7 +138,7 @@ class GateInputFactory(
         private fun createAlternativeAddress(): AlternativePostalAddressDto{
             return AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.random(random),
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 =  testMetadata.adminAreas.random(random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",

@@ -260,6 +260,28 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
+     * WHEN operator tries to create a new additional address with an unknown physical country
+     * THEN operator sees country not found error
+     */
+    @Test
+    fun `try create additional address with unknown physical country`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
+            .withPhysicalCountry("ZZ")
+        val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressCreateError.CountryNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
      * WHEN operator tries to create a new additional address with too many identifiers
      * THEN operator sees too many identifiers error
      */

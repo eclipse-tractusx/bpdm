@@ -219,6 +219,12 @@ fun AddressPartnerCreateRequest.withPhysicalAdminArea(code: String?) =
 fun AddressPartnerCreateRequest.withAlternativeAdminArea(code: String?) =
     copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(administrativeAreaLevel1 = code)))
 
+fun AddressPartnerCreateRequest.withPhysicalCountry(country: String) =
+    copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(country = country)))
+
+fun AddressPartnerCreateRequest.withAlternativeCountry(country: String) =
+    copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(country = country)))
+
 fun AddressPartnerUpdateRequest.withIdentifiers(identifiers: List<AddressIdentifierDto>) =
     copy(address = address.copy(identifiers = identifiers))
 

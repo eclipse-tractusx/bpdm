@@ -19,11 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
-import com.neovisionaries.i18n.CountryCode
 
 data class PhysicalPostalAddress(
     val geographicCoordinates: GeoCoordinate?,
-    val country: CountryCode,
+    val country: String,
     val administrativeAreaLevel1: String?,
     val administrativeAreaLevel2: String?,
     val administrativeAreaLevel3: String?,

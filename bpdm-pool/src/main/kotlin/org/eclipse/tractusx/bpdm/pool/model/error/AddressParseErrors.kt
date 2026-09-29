@@ -60,7 +60,6 @@ sealed interface AddressFieldParseError : AddressContentParseError {
     data object AlternativeDeliveryServiceTypeMissing : AddressFieldParseError
     data object AlternativeDeliveryServiceNumberMissing : AddressFieldParseError
     data object ConfidenceCriteriaMissing : AddressFieldParseError
-    data class CountryCodeNotRecognized(val value: String) : AddressFieldParseError
     data class IdentifierValueMissing(val index: Int) : AddressFieldParseError
     data class IdentifierTypeMissing(val index: Int) : AddressFieldParseError
     data class StateTypeMissing(val index: Int) : AddressFieldParseError
@@ -68,6 +67,8 @@ sealed interface AddressFieldParseError : AddressContentParseError {
 
 sealed interface AddressMetadataParseError : AddressContentParseError {
     data class IdentifierTypeNotFound(val index: Int, val type: String) : AddressMetadataParseError
+    data class PhysicalCountryNotFound(val country: String) : AddressMetadataParseError
+    data class AlternativeCountryNotFound(val country: String) : AddressMetadataParseError
     data class PhysicalRegionNotFound(val regionCode: String) : AddressMetadataParseError
     data class AlternativeRegionNotFound(val regionCode: String) : AddressMetadataParseError
     data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : AddressMetadataParseError

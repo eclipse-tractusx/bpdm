@@ -94,14 +94,14 @@ fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseDto, a
         assertThat(verbosePhysicalAddress.street).usingRecursiveComparison().isEqualTo(address?.physicalAddress?.street)
     }
 
-    assertThat(verbosePhysicalAddress.country.name).isEqualTo(physicalAddress?.country)
+    assertThat(verbosePhysicalAddress.country).isEqualTo(physicalAddress?.country)
     assertThat(verbosePhysicalAddress.administrativeAreaLevel1).isEqualTo(physicalAddress?.administrativeAreaLevel1)
     val verboseAlternAddress = verboseAddress.alternativePostalAddress
     val alternAddress = address?.alternativeAddress
     assertThat(verboseAlternAddress).usingRecursiveComparison()
         .ignoringFields(AlternativePostalAddressVerboseDto::countryVerbose.name, AlternativePostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
         .isEqualTo(alternAddress)
-    assertThat(verboseAlternAddress?.country?.name).isEqualTo(alternAddress?.country)
+    assertThat(verboseAlternAddress?.country).isEqualTo(alternAddress?.country)
     assertThat(verboseAlternAddress?.administrativeAreaLevel1).isEqualTo(alternAddress?.administrativeAreaLevel1)
 }
 

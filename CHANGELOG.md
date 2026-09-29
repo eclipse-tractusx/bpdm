@@ -19,6 +19,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Changed
 
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
+- BPDM Pool: Address countries are validated against the provider-maintained country catalogue at request time. The address country schema is now a string instead of an enumeration, so generated API clients must be regenerated.
 
 ## [7.5.0] - 2026-09-08
 

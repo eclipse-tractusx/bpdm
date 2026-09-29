@@ -190,7 +190,7 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                 addressType = AddressType.SiteMainAddress,
                 physicalPostalAddress =  PhysicalPostalAddressDto(
                     geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
-                    country = CountryCode.US,
+                    country = CountryCode.US.alpha2,
                     postalCode = "70547",
                     city = "Atlanta",
                     administrativeAreaLevel1 = "adminAreaLevel1RegionCode_2",
@@ -205,7 +205,7 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                     street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
                 ),
                 alternativePostalAddress = AlternativePostalAddressDto(
-                    country = CountryCode.DE,
+                    country = CountryCode.DE.alpha2,
                     city = "Stuttgart",
                     deliveryServiceType = DeliveryServiceType.PO_BOX,
                     deliveryServiceQualifier = "DHL",

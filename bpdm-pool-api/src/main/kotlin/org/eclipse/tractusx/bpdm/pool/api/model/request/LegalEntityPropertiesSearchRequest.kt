@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -41,7 +40,7 @@ data class LegalEntityPropertiesSearchRequest(
     val city: String?,
 
     @field:Parameter(description = "Filter business partners by country code ISO 3166-1.")
-    val country: CountryCode?,
+    val country: String?,
 
     ) {
     companion object {

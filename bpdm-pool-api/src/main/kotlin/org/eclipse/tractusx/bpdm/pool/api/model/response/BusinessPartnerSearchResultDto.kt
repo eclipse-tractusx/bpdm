@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -85,7 +84,7 @@ data class BusinessPartnerStateDto(
 
 data class PhysicalPostalAddressDto(
     val geographicCoordinates: GeoCoordinateDto? = null,
-    val country: CountryCode? = null,
+    val country: String? = null,
     val administrativeAreaLevel1: String? = null,
     val administrativeAreaLevel2: String? = null,
     val administrativeAreaLevel3: String? = null,
@@ -103,7 +102,7 @@ data class PhysicalPostalAddressDto(
 
 data class AlternativePostalAddressDto(
     val geographicCoordinates: GeoCoordinateDto? = null,
-    val country: CountryCode? = null,
+    val country: String? = null,
     val administrativeAreaLevel1: String? = null,
     val postalCode: String? = null,
     val city: String? = null,

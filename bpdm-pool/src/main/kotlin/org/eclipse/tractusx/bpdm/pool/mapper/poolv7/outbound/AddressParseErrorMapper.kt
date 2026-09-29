@@ -51,6 +51,7 @@ class AddressParseErrorMapper {
                 error,
                 entityKey,
                 regionNotFound = AddressCreateError.RegionNotFound,
+                countryNotFound = AddressCreateError.CountryNotFound,
                 identifierNotFound = AddressCreateError.IdentifierNotFound,
                 duplicateIdentifier = AddressCreateError.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressCreateError.IdentifiersTooMany,
@@ -67,6 +68,7 @@ class AddressParseErrorMapper {
                 error,
                 entityKey,
                 regionNotFound = AddressUpdateError.RegionNotFound,
+                countryNotFound = AddressUpdateError.CountryNotFound,
                 identifierNotFound = AddressUpdateError.IdentifierNotFound,
                 duplicateIdentifier = AddressUpdateError.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressUpdateError.IdentifiersTooMany,
@@ -102,6 +104,7 @@ class AddressParseErrorMapper {
             error,
             entityKey,
             regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityCreateError.LegalAddressCountryNotFound,
             identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany,
@@ -114,6 +117,7 @@ class AddressParseErrorMapper {
             error,
             entityKey,
             regionNotFound = LegalEntityUpdateError.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityUpdateError.LegalAddressCountryNotFound,
             identifierNotFound = LegalEntityUpdateError.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany,
@@ -126,6 +130,7 @@ class AddressParseErrorMapper {
             error,
             entityKey,
             regionNotFound = SiteCreateError.MainAddressRegionNotFound,
+            countryNotFound = SiteCreateError.MainAddressCountryNotFound,
             identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany,
@@ -138,6 +143,7 @@ class AddressParseErrorMapper {
             error,
             entityKey,
             regionNotFound = SiteUpdateError.MainAddressRegionNotFound,
+            countryNotFound = SiteUpdateError.MainAddressCountryNotFound,
             identifierNotFound = SiteUpdateError.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany,
@@ -149,6 +155,7 @@ class AddressParseErrorMapper {
         error: AddressContentParseError,
         entityKey: String?,
         regionNotFound: E,
+        countryNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
         identifiersTooMany: E,
@@ -160,6 +167,10 @@ class AddressParseErrorMapper {
             is AddressMetadataParseError -> when (error) {
                 is AddressMetadataParseError.IdentifierTypeNotFound ->
                     ErrorInfo(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
+                is AddressMetadataParseError.PhysicalCountryNotFound ->
+                    ErrorInfo(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                is AddressMetadataParseError.AlternativeCountryNotFound ->
+                    ErrorInfo(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
                 is AddressMetadataParseError.PhysicalRegionNotFound ->
                     ErrorInfo(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
                 is AddressMetadataParseError.AlternativeRegionNotFound ->

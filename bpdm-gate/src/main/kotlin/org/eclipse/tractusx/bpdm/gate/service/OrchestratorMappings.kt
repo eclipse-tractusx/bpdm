@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
@@ -109,7 +108,7 @@ class OrchestratorMappings(
                 with(it) {
                     PhysicalAddress(
                         geographicCoordinates = toGeographicCoordinates(geographicCoordinates),
-                        country = country?.alpha2,
+                        country = country,
                         administrativeAreaLevel1 = administrativeAreaLevel1,
                         administrativeAreaLevel2 = administrativeAreaLevel2,
                         administrativeAreaLevel3 = administrativeAreaLevel3,
@@ -130,7 +129,7 @@ class OrchestratorMappings(
                 with(it) {
                     AlternativeAddress(
                         geographicCoordinates = toGeographicCoordinates(geographicCoordinates),
-                        country = country?.alpha2,
+                        country = country,
                         administrativeAreaLevel1,
                         postalCode,
                         city,
@@ -360,7 +359,11 @@ class OrchestratorMappings(
     private fun toPhysicalPostalAddress(dto: PhysicalAddress) =
         PhysicalPostalAddress(
             geographicCoordinates = toGeographicCoordinate(dto.geographicCoordinates),
-            country = CountryCode.getByAlpha2Code(dto.country),
+            country = dto.country ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                OutputUpsertData::class,
+                PhysicalAddress::country
+            ),
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
             administrativeAreaLevel2 = dto.administrativeAreaLevel2,
             administrativeAreaLevel3 = dto.administrativeAreaLevel3,
@@ -379,7 +382,11 @@ class OrchestratorMappings(
     private fun toAlternativePostalAddress(dto: AlternativeAddress) =
         org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress(
             geographicCoordinates = toGeographicCoordinate(dto.geographicCoordinates),
-            country = CountryCode.getByAlpha2Code(dto.country),
+            country = dto.country ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                OutputUpsertData::class,
+                AlternativeAddress::country
+            ),
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
             postalCode = dto.postalCode,
             city = dto.city ?: throw BpdmNullMappingException(BusinessPartner::class, OutputUpsertData::class, AlternativeAddress::city),

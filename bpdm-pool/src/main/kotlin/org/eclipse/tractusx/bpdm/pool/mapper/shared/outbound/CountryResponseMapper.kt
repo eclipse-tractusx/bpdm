@@ -17,16 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.repository
+package org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound
 
-import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.PagingAndSortingRepository
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
+import org.springframework.stereotype.Component
 
-interface CountryRepository : PagingAndSortingRepository<CountryDb, Long>, CrudRepository<CountryDb, Long> {
+@Component
+class CountryResponseMapper(private val countryRepository: CountryRepository) {
 
-    fun findByCountryCode(countryCode: String): CountryDb?
-
-    fun findByCountryCodeIn(countryCodes: Set<String>): List<CountryDb>
-
+    fun toCountryVerbose(countryCode: String): TypeKeyNameVerboseDto<String> =
+        TypeKeyNameVerboseDto(countryCode, countryRepository.findByCountryCode(countryCode)?.name ?: countryCode)
 }

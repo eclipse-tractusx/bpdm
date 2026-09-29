@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
+import org.eclipse.tractusx.bpdm.test.testdata.pool.toCountryVerbose
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import java.time.Instant
 
@@ -370,7 +371,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         return with(givenRequest) {
             PhysicalPostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
                 administrativeAreaLevel2,
                 administrativeAreaLevel3,
@@ -392,7 +393,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         return with(givenRequest) {
             AlternativePostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
                 postalCode, city, deliveryServiceType, deliveryServiceQualifier, deliveryServiceNumber
             )

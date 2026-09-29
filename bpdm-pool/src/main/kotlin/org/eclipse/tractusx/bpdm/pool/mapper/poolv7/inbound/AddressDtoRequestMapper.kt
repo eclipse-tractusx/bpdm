@@ -54,7 +54,7 @@ class AddressDtoRequestMapper {
     private fun toPhysicalRequest(physical: PhysicalPostalAddressDto): PhysicalPostalAddressRequest =
         PhysicalPostalAddressRequest(
             geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
-            country = physical.country.alpha2,
+            country = physical.country,
             administrativeAreaLevel1 = physical.administrativeAreaLevel1,
             administrativeAreaLevel2 = physical.administrativeAreaLevel2,
             administrativeAreaLevel3 = physical.administrativeAreaLevel3,
@@ -73,7 +73,7 @@ class AddressDtoRequestMapper {
     private fun toAlternativeRequest(alternative: AlternativePostalAddressDto): AlternativePostalAddressRequest =
         AlternativePostalAddressRequest(
             geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
-            country = alternative.country.alpha2,
+            country = alternative.country,
             administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
             postalCode = alternative.postalCode,
             city = alternative.city,

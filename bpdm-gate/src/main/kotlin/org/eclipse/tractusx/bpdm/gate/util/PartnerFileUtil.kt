@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import com.neovisionaries.i18n.CountryCode
 import com.opencsv.bean.CsvToBeanBuilder
 import jakarta.validation.Validation
 import jakarta.validation.Validator
@@ -195,7 +194,7 @@ object PartnerFileUtil {
                     latitude = physicalPostalAddressLatitude?.toDoubleOrNull() ?: 0.0,
                     altitude = physicalPostalAddressAltitude?.toDoubleOrNull() ?: 0.0
                 ),
-                country = physicalPostalAddressCountry?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.PHYSICAL_POSTAL_ADDRESS_COUNTRY) },
+                country = physicalPostalAddressCountry,
                 administrativeAreaLevel1 = physicalPostalAddressAdminArea1?.takeIf { it.isNotEmpty() },
                 administrativeAreaLevel2 = physicalPostalAddressAdminArea2?.takeIf { it.isNotEmpty() },
                 administrativeAreaLevel3 = physicalPostalAddressAdminArea3?.takeIf { it.isNotEmpty() },
@@ -225,7 +224,7 @@ object PartnerFileUtil {
                     latitude = alternativePostalAddressLatitude?.toDoubleOrNull() ?: 0.0,
                     altitude = alternativePostalAddressAltitude?.toDoubleOrNull() ?: 0.0
                 ),
-                country = alternativePostalAddressCountry?.takeIf { it.isNotBlank() }?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.ALTERNATIVE_POSTAL_ADDRESS_COUNTRY) },
+                country = alternativePostalAddressCountry?.takeIf { it.isNotBlank() },
                 administrativeAreaLevel1 = alternativePostalAddressAdminArea1?.takeIf { it.isNotEmpty() },
                 postalCode = alternativePostalAddressPostalCode?.takeIf { it.isNotEmpty() },
                 city = alternativePostalAddressCity?.takeIf { it.isNotEmpty() },

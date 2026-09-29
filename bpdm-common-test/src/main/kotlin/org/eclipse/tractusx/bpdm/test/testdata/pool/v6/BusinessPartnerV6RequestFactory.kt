@@ -205,7 +205,7 @@ class BusinessPartnerV6RequestFactory(
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDtoV6(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.random(random),
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -232,7 +232,7 @@ class BusinessPartnerV6RequestFactory(
             ),
             alternativePostalAddress = AlternativePostalAddressDtoV6(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.random(random),
+                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 postalCode = "Postal Code $seed",
                 city = "City $seed",

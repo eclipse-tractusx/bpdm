@@ -95,7 +95,7 @@ object BusinessPartnerInputRequestValues {
             addressType = null,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = geoCoordinate,
-                country = CountryCode.UNDEFINED,
+                country = CountryCode.UNDEFINED.alpha2,
                 administrativeAreaLevel1 = "AD-02",
                 administrativeAreaLevel2 = "string",
                 administrativeAreaLevel3 = "string",
@@ -112,7 +112,7 @@ object BusinessPartnerInputRequestValues {
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = geoCoordinate,
-                country = CountryCode.UNDEFINED,
+                country = CountryCode.UNDEFINED.alpha2,
                 administrativeAreaLevel1 = "AD-02",
                 postalCode = "string",
                 city = "string",

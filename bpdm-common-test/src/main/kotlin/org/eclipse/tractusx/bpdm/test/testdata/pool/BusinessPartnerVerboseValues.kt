@@ -52,9 +52,9 @@ object BusinessPartnerVerboseValues {
 
     private val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
 
-    private val country1 = TypeKeyNameVerboseDto(CountryCode.DE, CountryCode.DE.getName())
-    private val country2 = TypeKeyNameVerboseDto(CountryCode.FR, CountryCode.FR.getName())
-    private val country3 = TypeKeyNameVerboseDto(CountryCode.PL, CountryCode.PL.getName())
+    private val country1 = TypeKeyNameVerboseDto(CountryCode.DE.alpha2, CountryCode.DE.getName())
+    private val country2 = TypeKeyNameVerboseDto(CountryCode.FR.alpha2, CountryCode.FR.getName())
+    private val country3 = TypeKeyNameVerboseDto(CountryCode.PL.alpha2, CountryCode.PL.getName())
 
     val identifierType1 = TypeKeyNameVerboseDto("DE_EU_VAT_ID", "European Union Value-added Tax Identification Number")
     val identifierType2 = TypeKeyNameVerboseDto("DE_HR", "Handelsregisternummer")

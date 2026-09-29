@@ -51,6 +51,7 @@ class AddressParseErrorMapperV6 {
                 error,
                 entityKey,
                 regionNotFound = AddressCreateErrorV6.RegionNotFound,
+                countryNotFound = AddressCreateErrorV6.CountryNotFound,
                 identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
                 duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
@@ -65,6 +66,7 @@ class AddressParseErrorMapperV6 {
                 error,
                 entityKey,
                 regionNotFound = AddressUpdateErrorV6.RegionNotFound,
+                countryNotFound = AddressUpdateErrorV6.CountryNotFound,
                 identifierNotFound = AddressUpdateErrorV6.IdentifierNotFound,
                 duplicateIdentifier = AddressUpdateErrorV6.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
@@ -88,6 +90,7 @@ class AddressParseErrorMapperV6 {
             error,
             entityKey,
             regionNotFound = LegalEntityCreateErrorV6.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityCreateErrorV6.LegalAddressCountryNotFound,
             identifierNotFound = LegalEntityCreateErrorV6.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityCreateErrorV6.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany
@@ -98,6 +101,7 @@ class AddressParseErrorMapperV6 {
             error,
             entityKey,
             regionNotFound = LegalEntityUpdateErrorV6.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityUpdateErrorV6.LegalAddressCountryNotFound,
             identifierNotFound = LegalEntityUpdateErrorV6.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityUpdateErrorV6.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany
@@ -108,6 +112,7 @@ class AddressParseErrorMapperV6 {
             error,
             entityKey,
             regionNotFound = SiteCreateErrorV6.MainAddressRegionNotFound,
+            countryNotFound = SiteCreateErrorV6.MainAddressCountryNotFound,
             identifierNotFound = SiteCreateErrorV6.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteCreateErrorV6.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany
@@ -118,6 +123,7 @@ class AddressParseErrorMapperV6 {
             error,
             entityKey,
             regionNotFound = SiteUpdateErrorV6.MainAddressRegionNotFound,
+            countryNotFound = SiteUpdateErrorV6.MainAddressCountryNotFound,
             identifierNotFound = SiteUpdateErrorV6.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteUpdateErrorV6.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteUpdateErrorV6.MainAddressIdentifiersTooMany
@@ -127,6 +133,7 @@ class AddressParseErrorMapperV6 {
         error: AddressContentParseError,
         entityKey: String?,
         regionNotFound: E,
+        countryNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
         identifiersTooMany: E
@@ -136,6 +143,10 @@ class AddressParseErrorMapperV6 {
             is AddressMetadataParseError -> when (error) {
                 is AddressMetadataParseError.IdentifierTypeNotFound ->
                     ErrorInfoV6(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
+                is AddressMetadataParseError.PhysicalCountryNotFound ->
+                    ErrorInfoV6(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                is AddressMetadataParseError.AlternativeCountryNotFound ->
+                    ErrorInfoV6(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
                 is AddressMetadataParseError.PhysicalRegionNotFound ->
                     ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
                 is AddressMetadataParseError.AlternativeRegionNotFound ->
