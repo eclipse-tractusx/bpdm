@@ -53,6 +53,11 @@ class GoldenRecordProcessMockConfig {
                 CountrySubdivisionDto(CountryCode.US, "adminArea2", "adminArea2"),
                 CountrySubdivisionDto(CountryCode.CN, "adminArea3", "adminArea3"),
             ),
+            countries = listOf(
+                CountryDto("DE", "Germany", null),
+                CountryDto("US", "United States", null),
+                CountryDto("CN", "China", null),
+            ),
             scriptCodes = listOf(
                 ScriptCodeDto("Test", "Test Description")
             ),

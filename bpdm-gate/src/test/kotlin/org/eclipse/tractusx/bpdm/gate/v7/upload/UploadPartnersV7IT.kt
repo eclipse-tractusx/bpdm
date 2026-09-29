@@ -227,5 +227,29 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
             address = validEntry1.address.copy(addressBpn = "BPNA0000000002XY"),
 
         )
+
+        val unmaintainedCountryEntry = validEntry1.copy(
+            externalId = "external-unmaintained",
+            address = validEntry1.address.copy(
+                physicalPostalAddress = validEntry1.address.physicalPostalAddress.copy(country = "XX"),
+                alternativePostalAddress = validEntry1.address.alternativePostalAddress?.copy(country = "YY")
+            )
+        )
+    }
+
+    /**
+     * WHEN uploading CSV file containing unmaintained country code
+     * THEN business partner inputs returned without parsing failure
+     */
+    @Test
+    fun `upload CSV file with unmaintained country code`() {
+        //WHEN
+        val partnerUploadFile = ClassPathResource("testData/unmaintained_country_partner_data.csv")
+        val response = gateClient.partnerUpload.uploadPartnerCsvFile(partnerUploadFile).body!!
+
+        //THEN
+        val expectedResponse = listOf(ExpectedResponses.unmaintainedCountryEntry)
+
+        assertRepo.assertBusinessPartnerInput(response, expectedResponse)
     }
 }

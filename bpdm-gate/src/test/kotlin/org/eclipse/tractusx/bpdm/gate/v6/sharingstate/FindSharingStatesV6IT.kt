@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
+import org.eclipse.tractusx.bpdm.test.testdata.gate.withPhysicalCountry
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 
@@ -197,6 +198,42 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
             SharingStateType.Error,
             BusinessPartnerSharingError.NaturalPersonError,
             errorTask.processingState.errors.single().description,
+            null,
+            errorTask.taskId
+        )
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN business partner with unmaintained country
+     * WHEN input consumer searches sharing states after Pool rejection
+     * THEN input consumer sees error sharing state specifying the unmaintained country
+     */
+    @Test
+    fun `find error sharing state with unmaintained country error`() {
+        //GIVEN
+        val unmaintainedCountry = "XX"
+        val request = requestFactory.createFullValid(testName).withPhysicalCountry(unmaintainedCountry)
+        val input = testDataClient.createBusinessPartnerInput(request)
+        val errorMessage = "Country '$unmaintainedCountry' not found in catalogue"
+        val errorTask = testDataClient.setStateToError(
+            input.externalId,
+            seed = input.externalId,
+            errorType = TaskErrorType.MandatoryFieldValidationFailed,
+            errorMessage = errorMessage
+        )
+
+        //WHEN
+        val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
+
+        //THEN
+        val expectedSharingState = SharingStateDto(
+            input.externalId,
+            SharingStateType.Error,
+            BusinessPartnerSharingError.MandatoryFieldValidationFailed,
+            errorMessage,
             null,
             errorTask.taskId
         )

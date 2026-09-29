@@ -109,7 +109,7 @@ class BusinessPartnerInputRequestV7Factory(
                     latitude = random.nextDouble(-90.0, 90.0),
                     altitude = random.nextDouble(0.0, 5000.0)
                 ),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -142,7 +142,7 @@ class BusinessPartnerInputRequestV7Factory(
                     latitude = random.nextDouble(-90.0, 90.0),
                     altitude = random.nextDouble(0.0, 5000.0)
                 ),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",
@@ -150,6 +150,10 @@ class BusinessPartnerInputRequestV7Factory(
                 deliveryServiceType = DeliveryServiceType.entries.random(random),
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             )
+
+        private fun getCountryReference(): String =
+            testMetadata.countries.takeIf { it.isNotEmpty() }?.random(random)
+                ?: CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2
 
         private fun createScriptVariants(): List<BusinessPartnerScriptVariantDto> =
             testMetadata.scriptVariants.shuffled(random).take(2).mapIndexed { idx, scriptCode ->

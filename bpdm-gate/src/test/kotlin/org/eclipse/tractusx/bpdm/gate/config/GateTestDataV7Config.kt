@@ -38,6 +38,7 @@ class GateTestDataV7Config {
             legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY"),
             reasonCodes = listOf("HEADQUARTER_RELOCATION", "OTHER"),
+            countries = listOf("DE", "US", "CN")
         )
     }
 
@@ -54,6 +55,7 @@ class GateTestDataV7Config {
             adminAreas = listOf("DE-BW", "DE-BY"),
             scriptVariants = listOf("Latn", "Arab", "Hans", "Cyrl"),
             reasonCodes = listOf("HEADQUARTER_RELOCATION", "OTHER"),
+            countries = listOf("DE", "US", "CN")
         )
     }
 

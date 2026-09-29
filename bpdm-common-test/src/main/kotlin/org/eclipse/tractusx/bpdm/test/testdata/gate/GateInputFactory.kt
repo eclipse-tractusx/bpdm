@@ -108,7 +108,7 @@ class GateInputFactory(
         private fun createPhysicalAddress(): PhysicalPostalAddressDto{
             return PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -138,7 +138,7 @@ class GateInputFactory(
         private fun createAlternativeAddress(): AlternativePostalAddressDto{
             return AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(),
                 administrativeAreaLevel1 =  testMetadata.adminAreas.random(random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",
@@ -147,6 +147,10 @@ class GateInputFactory(
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             )
         }
+
+        private fun getCountryReference(): String =
+            testMetadata.countries.takeIf { it.isNotEmpty() }?.random(random)
+                ?: CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2
     }
 }
 
@@ -159,7 +163,8 @@ data class TestMetadata(
     val identifierTypes: List<String>,
     val legalForms: List<String>,
     val adminAreas: List<String>,
-    val reasonCodes: List<String>
+    val reasonCodes: List<String>,
+    val countries: List<String> = emptyList()
 )
 
 fun BusinessPartnerInputRequest.withoutAnyBpn() = withoutLegalEntityBpn().withoutSiteBpn().withoutAddressBpn()
@@ -167,3 +172,5 @@ fun BusinessPartnerInputRequest.withAddressType(addressType: AddressType?) = cop
 fun BusinessPartnerInputRequest.withoutLegalEntityBpn() = copy(legalEntity = legalEntity.copy(legalEntityBpn = null))
 fun BusinessPartnerInputRequest.withoutSiteBpn() = copy(site = site.copy(siteBpn = null))
 fun BusinessPartnerInputRequest.withoutAddressBpn() = copy(address = address.copy(addressBpn = null))
+fun BusinessPartnerInputRequest.withPhysicalCountry(country: String?) = copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(country = country)))
+fun BusinessPartnerInputRequest.withAlternativeCountry(country: String?) = copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(country = country)))

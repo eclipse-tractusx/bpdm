@@ -196,8 +196,8 @@ class GateTestDataClientV6 (
         setStateToError(externalId, seed, TaskErrorType.entries.random(random))
     }
 
-    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto{
-        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType, errorMessage: String = "$seed Description"): TaskClientStateDto{
+        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType, errorMessage)
 
         setStateToReady(externalId)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
