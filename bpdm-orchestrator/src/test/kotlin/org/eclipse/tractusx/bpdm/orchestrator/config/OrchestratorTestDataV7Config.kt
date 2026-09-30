@@ -39,7 +39,8 @@ class OrchestratorTestDataV7Config {
             addressIdentifierTypes = listOf("ADDID1", "ADDID2", "ADDID3"),
             adminAreas = listOf("ADMINAREA1", "ADMINAREA2", "ADMINAREA3"),
             scriptCodes = listOf("CHINESE_SIMPLIFIED", "CHINESE_TRADITIONAL", "JAPANESE"),
-            reasonCodes = listOf("REASON1", "REASON2", "REASON3")
+            reasonCodes = listOf("REASON1", "REASON2", "REASON3"),
+            countries = listOf("DE")
         )
         val commonRequestFactory = OrchestratorRequestFactoryCommon(metadata)
         return OrchestratorRequestFactoryV7(businessPartnerTestDataFactory, commonRequestFactory)

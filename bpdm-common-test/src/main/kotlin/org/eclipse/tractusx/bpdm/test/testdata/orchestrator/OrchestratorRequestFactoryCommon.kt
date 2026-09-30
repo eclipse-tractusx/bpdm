@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -30,7 +29,8 @@ import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 class OrchestratorRequestFactoryCommon(
-    val metadata: TestMetadataReferences? = null
+    val metadata: TestMetadataReferences? = null,
+    private val countries: List<String> = metadata?.countries ?: emptyList()
 ) {
     fun buildUncategorizedProperties(seed: String, random: Random = createRandomFromSeed(seed)): UncategorizedProperties{
         return UncategorizedProperties(
@@ -257,8 +257,7 @@ class OrchestratorRequestFactoryCommon(
     }
 
     fun getCountryReference(seed: String, random: Random = createRandomFromSeed(seed)): String{
-        return metadata?.countries?.takeIf { it.isNotEmpty() }?.random(random)
-            ?: CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2
+        return countries.random(random)
     }
 
     fun getLegalIdentifierTypeReference(seed: String, random: Random = createRandomFromSeed(seed)): String{
@@ -291,5 +290,5 @@ data class TestMetadataReferences(
     val adminAreas: List<String>,
     val scriptCodes: List<String>,
     val reasonCodes: List<String>,
-    val countries: List<String> = emptyList()
+    val countries: List<String>
 )

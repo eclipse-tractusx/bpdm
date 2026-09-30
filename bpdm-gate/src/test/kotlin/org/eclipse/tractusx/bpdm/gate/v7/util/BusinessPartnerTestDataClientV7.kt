@@ -80,8 +80,8 @@ class BusinessPartnerTestDataClientV7(
         return refinement.taskState
     }
 
-    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType, errorMessage: String = "$seed Description"): TaskClientStateDto {
-        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType, errorMessage)
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {
+        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
         setStateToReady(externalId)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
         taskResolutionBatchService.resolveTasks()

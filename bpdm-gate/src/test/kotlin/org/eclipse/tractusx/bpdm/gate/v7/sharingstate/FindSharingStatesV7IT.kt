@@ -187,46 +187,4 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }
-
-    /**
-     * GIVEN business partner with unmaintained country
-     * WHEN input consumer searches sharing states after Pool rejection
-     * THEN input consumer sees error sharing state specifying the unmaintained country
-     */
-    @Test
-    fun `find error sharing state with unmaintained country error`() {
-        //GIVEN
-        val unmaintainedCountry = "XX"
-        val original = testData.businessPartner.input.request.fromSeed(testName)
-        val request = original.copy(
-            address = original.address.copy(
-                physicalPostalAddress = original.address.physicalPostalAddress.copy(
-                    country = unmaintainedCountry
-                )
-            )
-        )
-        val input = testDataClient.businessPartner.upsertInput(request)
-        val errorMessage = "Country '$unmaintainedCountry' not found in catalogue"
-        val errorTask = testDataClient.businessPartner.setStateToError(
-            input.externalId,
-            errorType = TaskErrorType.MandatoryFieldValidationFailed,
-            errorMessage = errorMessage
-        )
-
-        //WHEN
-        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
-
-        //THEN
-        val expectedSharingState = SharingStateDto(
-            externalId = input.externalId,
-            sharingStateType = SharingStateType.Error,
-            sharingErrorCode = BusinessPartnerSharingError.MandatoryFieldValidationFailed,
-            sharingErrorMessage = errorMessage,
-            taskId = errorTask.taskId,
-            updatedAt = Instant.MIN
-        )
-        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
-
-        assertRepo.assertSharingStates(actualResponse, expectedResponse)
-    }
 }

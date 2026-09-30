@@ -29,6 +29,6 @@ class OrchestratorTestDataConfiguration {
 
     @Bean
     fun orchestratorTestdataFactory(): BusinessPartnerTestDataFactory =
-        BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
+        BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon(countries = listOf("DE")))
 
 }

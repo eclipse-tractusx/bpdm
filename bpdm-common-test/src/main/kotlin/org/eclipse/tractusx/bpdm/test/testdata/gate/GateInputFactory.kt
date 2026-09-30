@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -149,8 +148,7 @@ class GateInputFactory(
         }
 
         private fun getCountryReference(): String =
-            testMetadata.countries.takeIf { it.isNotEmpty() }?.random(random)
-                ?: CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2
+            testMetadata.countries.random(random)
     }
 }
 
@@ -164,7 +162,7 @@ data class TestMetadata(
     val legalForms: List<String>,
     val adminAreas: List<String>,
     val reasonCodes: List<String>,
-    val countries: List<String> = emptyList()
+    val countries: List<String>
 )
 
 fun BusinessPartnerInputRequest.withoutAnyBpn() = withoutLegalEntityBpn().withoutSiteBpn().withoutAddressBpn()
@@ -172,5 +170,3 @@ fun BusinessPartnerInputRequest.withAddressType(addressType: AddressType?) = cop
 fun BusinessPartnerInputRequest.withoutLegalEntityBpn() = copy(legalEntity = legalEntity.copy(legalEntityBpn = null))
 fun BusinessPartnerInputRequest.withoutSiteBpn() = copy(site = site.copy(siteBpn = null))
 fun BusinessPartnerInputRequest.withoutAddressBpn() = copy(address = address.copy(addressBpn = null))
-fun BusinessPartnerInputRequest.withPhysicalCountry(country: String?) = copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(country = country)))
-fun BusinessPartnerInputRequest.withAlternativeCountry(country: String?) = copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(country = country)))

@@ -207,7 +207,7 @@ class OrchestratorMockDataFactory(
         return mockedRefinedTasks.tasks.single()
     }
 
-    fun mockSharingError(seed: String, errorType: TaskErrorType, errorMessage: String = "$seed Description"): TaskClientStateDto{
+    fun mockSharingError(seed: String, errorType: TaskErrorType): TaskClientStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTask = mockCreateTask(seed)
@@ -220,7 +220,7 @@ class OrchestratorMockDataFactory(
             )
         )))
 
-        val mockedErrorTasks = buildErrorTaskState(seed, errorType, errorMessage)
+        val mockedErrorTasks = buildErrorTaskState(seed, errorType)
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
             jsonMapper.writeValueAsString(mockedErrorTasks)
         )))
@@ -390,7 +390,7 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    private fun buildErrorTaskState(seed: String, errorType: TaskErrorType, errorMessage: String = "$seed Description"): TaskStateResponse{
+    private fun buildErrorTaskState(seed: String, errorType: TaskErrorType): TaskStateResponse{
         return TaskStateResponse(
             listOf(
                 TaskClientStateDto(
@@ -401,7 +401,7 @@ class OrchestratorMockDataFactory(
                         ResultState.Error,
                         TaskStep.PoolSync,
                         StepState.Error,
-                        listOf(TaskErrorDto(errorType, errorMessage)),
+                        listOf(TaskErrorDto(errorType, "$seed Description")),
                         Instant.now(),
                         Instant.now(),
                         Instant.now()

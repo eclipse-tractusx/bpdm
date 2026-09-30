@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -152,8 +151,7 @@ class BusinessPartnerInputRequestV7Factory(
             )
 
         private fun getCountryReference(): String =
-            testMetadata.countries.takeIf { it.isNotEmpty() }?.random(random)
-                ?: CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2
+            testMetadata.countries.random(random)
 
         private fun createScriptVariants(): List<BusinessPartnerScriptVariantDto> =
             testMetadata.scriptVariants.shuffled(random).take(2).mapIndexed { idx, scriptCode ->

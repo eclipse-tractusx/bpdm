@@ -25,5 +25,5 @@ data class GateTestMetadataV7(
     val adminAreas: List<String>,
     val scriptVariants: List<String>,
     val reasonCodes: List<String>,
-    val countries: List<String> = emptyList()
+    val countries: List<String>
 )
