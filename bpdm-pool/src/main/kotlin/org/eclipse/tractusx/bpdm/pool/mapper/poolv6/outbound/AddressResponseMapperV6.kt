@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.CountryResponseMapper
 import org.springframework.stereotype.Component
 
 /**
@@ -33,8 +32,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class AddressResponseMapperV6(
-    private val confidenceCriteriaResponseMapperV6: ConfidenceCriteriaResponseMapperV6,
-    private val countryResponseMapper: CountryResponseMapper
+    private val confidenceCriteriaResponseMapperV6: ConfidenceCriteriaResponseMapperV6
 ) {
 
     /**
@@ -77,7 +75,7 @@ class AddressResponseMapperV6(
         with(address) {
             PhysicalPostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = countryResponseMapper.toCountryVerbose(country),
+                countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { toRegion(it) },
                 administrativeAreaLevel2 = administrativeAreaLevel2,
                 administrativeAreaLevel3 = administrativeAreaLevel3,
@@ -98,7 +96,7 @@ class AddressResponseMapperV6(
         with(address) {
             AlternativePostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = countryResponseMapper.toCountryVerbose(country),
+                countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { toRegion(it) },
                 postalCode = postCode,
                 city = city,

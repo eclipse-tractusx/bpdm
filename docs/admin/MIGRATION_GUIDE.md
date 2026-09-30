@@ -38,6 +38,9 @@ A new Flyway migration seeds the table with the same values the previous release
 Operators should review the seeded list and adapt it to the countries their network accepts before consumers rely on the new `/v7/countries` and `/v6/countries` endpoints.
 Entries that are not officially assigned are recognisable from their description.
 
+Before upgrading, ensure every stored Pool address uses a country in the maintained list, including any alternative address.
+The address-country foreign-key migration fails and names the unresolved codes (including `UNDEFINED`) if any are missing; add the intended countries to the list or correct the addresses before upgrading.
+
 ## 7.4.x to 7.5.x
 
 ### Alternative Headquarter Relation Directionality
