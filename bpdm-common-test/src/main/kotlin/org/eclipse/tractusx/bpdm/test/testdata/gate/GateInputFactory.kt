@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -108,7 +107,7 @@ class GateInputFactory(
         private fun createPhysicalAddress(): PhysicalPostalAddressDto{
             return PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -138,7 +137,7 @@ class GateInputFactory(
         private fun createAlternativeAddress(): AlternativePostalAddressDto{
             return AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(),
                 administrativeAreaLevel1 =  testMetadata.adminAreas.random(random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",
@@ -147,6 +146,9 @@ class GateInputFactory(
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             )
         }
+
+        private fun getCountryReference(): String =
+            testMetadata.countries.random(random)
     }
 }
 
@@ -159,7 +161,8 @@ data class TestMetadata(
     val identifierTypes: List<String>,
     val legalForms: List<String>,
     val adminAreas: List<String>,
-    val reasonCodes: List<String>
+    val reasonCodes: List<String>,
+    val countries: List<String>
 )
 
 fun BusinessPartnerInputRequest.withoutAnyBpn() = withoutLegalEntityBpn().withoutSiteBpn().withoutAddressBpn()

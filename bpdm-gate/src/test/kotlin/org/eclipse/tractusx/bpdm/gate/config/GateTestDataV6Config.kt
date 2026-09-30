@@ -45,7 +45,8 @@ class GateTestDataV6Config {
                     identifierTypes = testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
                     legalForms = testMetadataV7.legalForms.map { it.technicalKey },
                     adminAreas = testMetadataV7.adminAreas.map { it.code },
-                    reasonCodes = testMetadataV7.reasonCodes.map { it.technicalKey }
+                    reasonCodes = testMetadataV7.reasonCodes.map { it.technicalKey },
+                    countries = testMetadataV7.countries.map { it.countryCode }
                 ),
                 testRunData = null
             ),

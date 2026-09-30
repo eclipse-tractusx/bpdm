@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -30,7 +29,8 @@ import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 class OrchestratorRequestFactoryCommon(
-    val metadata: TestMetadataReferences? = null
+    val metadata: TestMetadataReferences? = null,
+    private val countries: List<String> = metadata?.countries ?: emptyList()
 ) {
     fun buildUncategorizedProperties(seed: String, random: Random = createRandomFromSeed(seed)): UncategorizedProperties{
         return UncategorizedProperties(
@@ -77,7 +77,7 @@ class OrchestratorRequestFactoryCommon(
             confidenceCriteria = buildConfidenceCriteria(random),
             physicalAddress = PhysicalAddress(
                 geographicCoordinates = GeoCoordinate(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(seed, random),
                 administrativeAreaLevel1 = getAdminAreaReference(seed, random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -104,7 +104,7 @@ class OrchestratorRequestFactoryCommon(
             ),
             alternativeAddress = AlternativeAddress(
                 geographicCoordinates = GeoCoordinate(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = getCountryReference(seed, random),
                 administrativeAreaLevel1 =  getAdminAreaReference(seed, random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",
@@ -256,6 +256,10 @@ class OrchestratorRequestFactoryCommon(
         )
     }
 
+    fun getCountryReference(seed: String, random: Random = createRandomFromSeed(seed)): String{
+        return countries.random(random)
+    }
+
     fun getLegalIdentifierTypeReference(seed: String, random: Random = createRandomFromSeed(seed)): String{
         return metadata?.legalEntityIdentifierTypes?.random(random) ?: "Legal Identifier Type $seed"
     }
@@ -285,5 +289,6 @@ data class TestMetadataReferences(
     val addressIdentifierTypes: List<String>,
     val adminAreas: List<String>,
     val scriptCodes: List<String>,
-    val reasonCodes: List<String>
+    val reasonCodes: List<String>,
+    val countries: List<String>
 )

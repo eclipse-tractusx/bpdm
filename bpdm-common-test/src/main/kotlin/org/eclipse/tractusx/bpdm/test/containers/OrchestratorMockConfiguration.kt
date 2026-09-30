@@ -58,7 +58,8 @@ class OrchestratorMockConfiguration {
             addressIdentifierTypes = testMetadataV7.addressIdentifierTypes.map { it.technicalKey },
             adminAreas = testMetadataV7.adminAreas.map { it.code },
             scriptCodes = testMetadataV7.scriptCodes.map { it.technicalKey },
-            reasonCodes = testMetadataV7.reasonCodes.map { it.technicalKey }
+            reasonCodes = testMetadataV7.reasonCodes.map { it.technicalKey },
+            countries = testMetadataV7.countries.map { it.countryCode }
         )
         return OrchestratorRequestFactoryCommon(metadata)
     }
