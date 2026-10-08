@@ -19,13 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.springframework.data.repository.CrudRepository
 
 interface FieldQualityRuleRepository : CrudRepository<FieldQualityRuleDb, Long> {
 
-    fun findByCountryCodeOrderBySchemaNameAscFieldPathAsc(countryCode: CountryCode): List<FieldQualityRuleDb>
+    fun findByCountryCodeOrderBySchemaNameAscFieldPathAsc(countryCode: String): List<FieldQualityRuleDb>
 
     /**
      * Find country independent default rules

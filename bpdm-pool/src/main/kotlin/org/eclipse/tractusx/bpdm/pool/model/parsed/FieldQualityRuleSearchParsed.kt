@@ -19,8 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import com.neovisionaries.i18n.CountryCode
 
 data class FieldQualityRuleSearchParsed(
-    val country: CountryCode
+    val country: String
 )

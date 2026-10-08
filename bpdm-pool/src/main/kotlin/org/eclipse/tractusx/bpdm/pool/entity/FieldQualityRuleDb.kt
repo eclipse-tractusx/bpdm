@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
@@ -34,9 +33,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 )
 class FieldQualityRuleDb(
 
-    @Column(name = "country_code", nullable = false)
-    @Enumerated(EnumType.STRING)
-    var countryCode: CountryCode?,
+    @Column(name = "country_code")
+    var countryCode: String?,
 
     @Column(name = "schema_name", nullable = false)
     var schemaName: String,

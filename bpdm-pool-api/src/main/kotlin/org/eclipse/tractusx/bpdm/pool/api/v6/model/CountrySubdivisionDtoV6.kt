@@ -19,14 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.model
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Country subdivision", deprecated = true)
 data class CountrySubdivisionDtoV6(
 
-    @get:Schema(description = "Country code")
-    val countryCode: CountryCode,
+    @get:Schema(description = "Country code from the maintained country catalogue")
+    val countryCode: String,
 
     @get:Schema(description = "The country subdivision code according to ISO 3166-2")
     val code: String,
