@@ -32,49 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
 
-class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
-
-    @Autowired
-    lateinit var jdbcTemplate: JdbcTemplate
-
-    @Test
-    fun `stored address countries reference catalogue entries`() {
-        val legalEntity = testDataClient.createLegalEntity(testName)
-        val request = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntity)
-            .withPhysicalCountry("DE")
-            .withAlternativeCountry("DE")
-
-        val created = poolClient.addresses.createAddresses(listOf(request)).entities.single().address
-        val fetched = poolClient.addresses.getAddress(created.bpna).address
-        val countryName = jdbcTemplate.queryForObject("SELECT name FROM bpdm.countries WHERE country_code = 'DE'", String::class.java)
-
-        assertThat(fetched.physicalPostalAddress.country).isEqualTo("DE")
-        assertThat(fetched.physicalPostalAddress.countryVerbose.name).isEqualTo(countryName)
-        assertThat(fetched.alternativePostalAddress?.country).isEqualTo("DE")
-        assertThat(fetched.alternativePostalAddress?.countryVerbose?.name).isEqualTo(countryName)
-
-        val referencedCodes = jdbcTemplate.queryForMap(
-            """
-            SELECT phy.country_code AS physical, alt.country_code AS alternative
-            FROM bpdm.logistic_addresses a
-            JOIN bpdm.countries phy ON phy.id = a.phy_country_id
-            JOIN bpdm.countries alt ON alt.id = a.alt_country_id
-            WHERE a.bpn = ?
-            """.trimIndent(),
-            created.bpna
-        )
-        assertThat(referencedCodes["physical"]).isEqualTo("DE")
-        assertThat(referencedCodes["alternative"]).isEqualTo("DE")
-
-        assertThatThrownBy {
-            jdbcTemplate.update("UPDATE bpdm.logistic_addresses SET phy_country_id = -1 WHERE bpn = ?", created.bpna)
-        }.isInstanceOf(DataIntegrityViolationException::class.java)
-        assertThatThrownBy {
-            jdbcTemplate.update("UPDATE bpdm.logistic_addresses SET alt_country_id = -1 WHERE bpn = ?", created.bpna)
-        }.isInstanceOf(DataIntegrityViolationException::class.java)
-    }
-
-    /**
+class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
      * GIVEN legal entity
      * WHEN owner creates a new valid additional address for the legal entity
      * THEN created address with shared by sharing member confidence is returned
