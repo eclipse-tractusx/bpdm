@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.FieldQualityRuleResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
@@ -42,7 +41,7 @@ class FieldQualityRuleSearchApplicationV7Service(
      * Returns the field quality rules that apply in the given country.
      */
     @Transactional(readOnly = true)
-    fun searchFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDto> {
+    fun searchFieldQualityRules(country: String): Collection<FieldQualityRuleDto> {
         val criteria = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))
 
         return fieldQualityRuleSearchService.search(criteria).map { fieldQualityRuleResponseMapper.toFieldQualityRule(it) }

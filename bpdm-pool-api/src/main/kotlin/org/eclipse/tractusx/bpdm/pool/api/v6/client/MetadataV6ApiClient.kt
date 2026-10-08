@@ -59,7 +59,7 @@ interface MetadataV6ApiClient: PoolMetadataV6Api {
     override fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDtoV6>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/field-quality-rules/")
-    override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
+    override fun getFieldQualityRules(@RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/administrative-areas-level1")
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6>

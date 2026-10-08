@@ -263,7 +263,7 @@ class BusinessPartnerSearchService(
                         altitude = it.altitude
                     )},
                 country = alternative?.country?.countryCode,
-                administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.countryCode?.name,
+                administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.countryCode,
                 postalCode = alternative?.postCode,
                 city = alternative?.city,
                 deliveryServiceType =  alternative?.deliveryServiceType,

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
@@ -28,9 +27,8 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
     name = "regions",
 )
 class RegionDb(
-    @Column(name = "country_code")
-    @Enumerated(EnumType.STRING)
-    val countryCode: CountryCode,
+    @Column(name = "country_code", nullable = false)
+    val countryCode: String,
 
     @Column(name = "region_code")
     val regionCode: String,

@@ -19,14 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.model
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Region within a country", deprecated = true)
 data class RegionDtoV6(
 
-    @get:Schema(description = "Country code")
-    val countryCode: CountryCode,
+    @get:Schema(description = "Country code from the maintained country catalogue")
+    val countryCode: String,
 
     @get:Schema(description = "Abbreviation or shorthand of the area")
     val regionCode: String,

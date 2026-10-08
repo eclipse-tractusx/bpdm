@@ -19,22 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.model.parsed.FieldQualityRuleSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 
 /**
- * Turns loose field quality rule search criteria into the form the search operation queries with.
- *
- * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
- * can be rejected — a country no rule applies to falls back to the default rules — so there is no failure to report.
+ * Resolves the country against the maintained catalogue before searching its field quality rules.
  */
 @Service
-class FieldQualityRuleSearchParser {
+class FieldQualityRuleSearchParser(private val countryRepository: CountryRepository) {
 
     /**
      * Returns the criteria the search filters field quality rules by.
      */
-    fun parse(request: FieldQualityRuleSearchRequest): FieldQualityRuleSearchParsed =
-        FieldQualityRuleSearchParsed(country = request.country)
+    fun parse(request: FieldQualityRuleSearchRequest): FieldQualityRuleSearchParsed {
+        val country = countryRepository.findByCountryCode(request.country)
+            ?: throw BpdmNotFoundException("Country", request.country)
+        return FieldQualityRuleSearchParsed(country = country.countryCode)
+    }
 }

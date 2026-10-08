@@ -300,7 +300,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Authorized
         ){
-            poolClient.metadata.getFieldQualityRules(CountryCode.UNDEFINED)
+            poolClient.metadata.getFieldQualityRules(CountryCode.DE.alpha2)
         }
     }
 

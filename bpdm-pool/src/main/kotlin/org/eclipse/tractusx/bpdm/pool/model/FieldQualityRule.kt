@@ -19,12 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 
 data class FieldQualityRule(
     val fieldPath: String,
     val schemaName: String,
-    val country: CountryCode,
+    val country: String,
     val qualityLevel: QualityLevel
 )

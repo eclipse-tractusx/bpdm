@@ -49,9 +49,9 @@ class GoldenRecordProcessMockConfig {
                 IdentifierTypeDto("addressIdType3", IdentifierBusinessPartnerType.ADDRESS, "addressIdType3", null, null, null, null, sortedSetOf(), emptyList())
             ),
             adminAreas = listOf(
-                CountrySubdivisionDto(CountryCode.DE, "adminArea1", "adminArea1"),
-                CountrySubdivisionDto(CountryCode.US, "adminArea2", "adminArea2"),
-                CountrySubdivisionDto(CountryCode.CN, "adminArea3", "adminArea3"),
+                CountrySubdivisionDto(CountryCode.DE.alpha2, "adminArea1", "adminArea1"),
+                CountrySubdivisionDto(CountryCode.US.alpha2, "adminArea2", "adminArea2"),
+                CountrySubdivisionDto(CountryCode.CN.alpha2, "adminArea3", "adminArea3"),
             ),
             countries = listOf(
                 CountryDto("DE", "Germany", null),
