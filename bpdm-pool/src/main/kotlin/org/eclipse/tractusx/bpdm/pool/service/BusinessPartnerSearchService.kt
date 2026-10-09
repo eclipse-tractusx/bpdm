@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 
 /**
@@ -47,6 +48,7 @@ class BusinessPartnerSearchService(
      * @see searchBusinessPartner
      *
      */
+    @Transactional(readOnly = true)
     override fun searchBusinessPartner(
         searchRequest: LegalEntityPropertiesSearchRequest,
         searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
@@ -92,6 +94,9 @@ class BusinessPartnerSearchService(
             pageable
         )
 
+        if (matchedAddress.hasContent()) {
+            logisticAddressRepository.joinCountries(matchedAddress.content.toSet())
+        }
         results.addAll(matchedAddress.map{ searchAddressResultMapping(it) })
 
         return PageDto(
@@ -241,7 +246,7 @@ class BusinessPartnerSearchService(
                 street = streetDto,
                 postalCode = physical.postCode,
                 city = physical.city,
-                country = physical.country,
+                country = physical.country.countryCode,
                 district = physical.districtLevel1,
                 companyPostalCode = physical.companyPostCode,
                 industrialZone = physical.industrialZone,
@@ -257,7 +262,7 @@ class BusinessPartnerSearchService(
                         latitude = it.latitude,
                         altitude = it.altitude
                     )},
-                country = alternative?.country,
+                country = alternative?.country?.countryCode,
                 administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.countryCode?.name,
                 postalCode = alternative?.postCode,
                 city = alternative?.city,

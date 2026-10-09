@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadata
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
@@ -310,17 +311,18 @@ class AddressRequestParser(
         errors: MutableList<AddressContentParseError>,
         missingError: AddressFieldParseError,
         notFound: (String) -> AddressMetadataParseError
-    ): String? {
+    ): CountryDb? {
         if (value == null) {
             errors.add(missingError)
             return null
         }
         // The country is valid exactly when it is in the maintained list, like any other metadata reference.
-        if (!metadata.countries.containsKey(value)) {
+        val country = metadata.countries[value]
+        if (country == null) {
             errors.add(notFound(value))
             return null
         }
-        return value
+        return country
     }
 
     private fun parseGeoCoordinate(request: GeoCoordinateRequest): GeoCoordinate? {

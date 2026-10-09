@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.address
 
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
@@ -26,10 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.jdbc.core.JdbcTemplate
 
-class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
-
-    /**
+class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
      * GIVEN legal entity
      * WHEN owner creates a new valid additional address for the legal entity
      * THEN created address with shared by sharing member confidence is returned

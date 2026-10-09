@@ -30,8 +30,9 @@ class AlternativePostalAddressDb(
     @AttributeOverride(name = "altitude", column = Column(name = "alt_altitude"))
     val geographicCoordinates: GeographicCoordinateDb?,
 
-    @Column(name = "alt_country")
-    val country: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "alt_country_id")
+    val country: CountryDb,
 
     /**
      * Region within the country

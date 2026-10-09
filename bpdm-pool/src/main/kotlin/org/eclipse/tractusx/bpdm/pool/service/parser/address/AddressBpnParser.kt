@@ -47,8 +47,9 @@ class AddressBpnParser(
         }
     }
 
-    private fun resolve(addressBpns: List<String>): Map<String, LogisticAddressDb> =
-        logisticAddressRepository
-            .findDistinctByBpnIn(addressBpns.mapTo(mutableSetOf()) { it.uppercase() })
-            .associateBy { it.bpn }
+    private fun resolve(addressBpns: List<String>): Map<String, LogisticAddressDb> {
+        val addresses = logisticAddressRepository.findDistinctByBpnIn(addressBpns.mapTo(mutableSetOf()) { it.uppercase() })
+        if (addresses.isNotEmpty()) logisticAddressRepository.joinCountries(addresses)
+        return addresses.associateBy { it.bpn }
+    }
 }
