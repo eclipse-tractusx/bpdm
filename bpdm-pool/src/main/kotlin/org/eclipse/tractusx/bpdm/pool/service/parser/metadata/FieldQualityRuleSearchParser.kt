@@ -19,7 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.error.FieldQualityRuleSearchParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.FieldQualityRuleSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
@@ -34,9 +35,9 @@ class FieldQualityRuleSearchParser(private val countryRepository: CountryReposit
     /**
      * Returns the criteria the search filters field quality rules by.
      */
-    fun parse(request: FieldQualityRuleSearchRequest): FieldQualityRuleSearchParsed {
+    fun parse(request: FieldQualityRuleSearchRequest): ParseResult<FieldQualityRuleSearchParsed, FieldQualityRuleSearchParseError> {
         val country = countryRepository.findByCountryCode(request.country)
-            ?: throw BpdmNotFoundException("Country", request.country)
-        return FieldQualityRuleSearchParsed(country = country.countryCode)
+            ?: return ParseResult.ofSingleFailure(FieldQualityRuleSearchParseError.CountryNotFound(request.country))
+        return ParseResult.Success(FieldQualityRuleSearchParsed(country = country))
     }
 }

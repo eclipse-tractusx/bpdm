@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.error.FieldQualityRuleSearchParseError
 import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.FieldQualityRuleResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
@@ -42,7 +45,12 @@ class FieldQualityRuleSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchFieldQualityRules(country: String): Collection<FieldQualityRuleDto> {
-        val criteria = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))
+        val criteria = when (val result = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> when (val error = result.errors.first()) {
+                is FieldQualityRuleSearchParseError.CountryNotFound -> throw BpdmNotFoundException("Country", error.country)
+            }
+        }
 
         return fieldQualityRuleSearchService.search(criteria).map { fieldQualityRuleResponseMapper.toFieldQualityRule(it) }
     }

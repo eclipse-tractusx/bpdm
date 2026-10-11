@@ -33,8 +33,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 )
 class FieldQualityRuleDb(
 
-    @Column(name = "country_code")
-    var countryCode: String?,
+    @ManyToOne
+    @JoinColumn(name = "country_code", referencedColumnName = "country_code")
+    var country: CountryDb?,
 
     @Column(name = "schema_name", nullable = false)
     var schemaName: String,

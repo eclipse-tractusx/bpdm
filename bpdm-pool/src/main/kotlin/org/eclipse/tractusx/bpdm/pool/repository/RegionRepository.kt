@@ -27,7 +27,7 @@ import org.springframework.data.repository.PagingAndSortingRepository
 interface RegionRepository : PagingAndSortingRepository<RegionDb, Long>, CrudRepository<RegionDb, Long> {
 
     companion object {
-        val DEFAULT_SORTING = Sort.by(RegionDb::countryCode.name, RegionDb::regionCode.name)
+        val DEFAULT_SORTING = Sort.by("${RegionDb::country.name}.countryCode", RegionDb::regionCode.name)
     }
 
     fun findByRegionCodeIn(regionCodes: Set<String>): Set<RegionDb>

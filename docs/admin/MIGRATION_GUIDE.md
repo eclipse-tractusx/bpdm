@@ -3,6 +3,8 @@
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [7.5.x to 7.6.x](#75x-to-76x)
+    * [Country Catalogue](#country-catalogue)
+    * [Region and Field Quality Rule Countries](#region-and-field-quality-rule-countries)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
@@ -40,6 +42,12 @@ Entries that are not officially assigned are recognisable from their description
 
 Before upgrading, ensure every stored Pool address uses a country in the maintained list, including any alternative address.
 The address-country foreign-key migration fails and names the unresolved codes (including `UNDEFINED`) if any are missing; add the intended countries to the list or correct the addresses before upgrading.
+
+### Region and Field Quality Rule Countries
+
+Before upgrading, ensure every region's `country_code` and every non-null `country_code` in `field_quality_rule` exists in the maintained `countries` catalogue.
+The migration adds foreign keys without changing these codes. If a code cannot be resolved, the upgrade fails with an error naming the unresolved codes; add the intended countries or correct the metadata before retrying.
+Null-country field quality rules remain valid as country-independent defaults.
 
 ## 7.4.x to 7.5.x
 

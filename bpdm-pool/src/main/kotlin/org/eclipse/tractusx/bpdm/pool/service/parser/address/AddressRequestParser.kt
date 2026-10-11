@@ -66,6 +66,9 @@ class AddressRequestParser(
 
         val idTypeKeys = contents.flatMap { it.identifiers }.mapNotNull { it.type }.toSet()
         // The maintained country list is read per request, so a country added to it is usable without a restart.
+        val countryKeys = contents.flatMap {
+            listOfNotNull(it.physicalPostalAddress.country, it.alternativePostalAddress?.country)
+        }.toSet()
         val regionKeys = contents.flatMap {
             listOfNotNull(it.physicalPostalAddress.administrativeAreaLevel1, it.alternativePostalAddress?.administrativeAreaLevel1)
         }.toSet()
@@ -73,9 +76,6 @@ class AddressRequestParser(
 
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
-        val countryKeys = contents.flatMap {
-            listOfNotNull(it.physicalPostalAddress.country, it.alternativePostalAddress?.country)
-        }.toSet() + regions.map { it.countryCode }
         val countries = countryRepository.findByCountryCodeIn(countryKeys)
         val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(scriptCodeKeys)
 
@@ -123,11 +123,7 @@ class AddressRequestParser(
     ): PhysicalPostalAddressParsed? {
         val country = parseCountry(request.country, metadata, errors, AddressFieldParseError.PhysicalCountryMissing) { AddressMetadataParseError.PhysicalCountryNotFound(it) }
         val city = request.city ?: run { errors.add(AddressFieldParseError.PhysicalCityMissing); null }
-        val region = parseRegion(
-            request.administrativeAreaLevel1, metadata, errors,
-            { AddressMetadataParseError.PhysicalRegionNotFound(it) },
-            { AddressMetadataParseError.PhysicalCountryNotFound(it) }
-        )
+        val region = parseRegion(request.administrativeAreaLevel1, metadata, errors) { AddressMetadataParseError.PhysicalRegionNotFound(it) }
 
         if (country == null || city == null) return null
 
@@ -161,11 +157,7 @@ class AddressRequestParser(
             ?: run { errors.add(AddressFieldParseError.AlternativeDeliveryServiceTypeMissing); null }
         val deliveryServiceNumber = request.deliveryServiceNumber
             ?: run { errors.add(AddressFieldParseError.AlternativeDeliveryServiceNumberMissing); null }
-        val region = parseRegion(
-            request.administrativeAreaLevel1, metadata, errors,
-            { AddressMetadataParseError.AlternativeRegionNotFound(it) },
-            { AddressMetadataParseError.AlternativeCountryNotFound(it) }
-        )
+        val region = parseRegion(request.administrativeAreaLevel1, metadata, errors) { AddressMetadataParseError.AlternativeRegionNotFound(it) }
 
         if (country == null || city == null || deliveryServiceType == null || deliveryServiceNumber == null) return null
 
@@ -307,17 +299,10 @@ class AddressRequestParser(
         regionCode: String?,
         metadata: AddressMetadata,
         errors: MutableList<AddressContentParseError>,
-        notFound: (String) -> AddressMetadataParseError,
-        countryNotFound: (String) -> AddressMetadataParseError
+        notFound: (String) -> AddressMetadataParseError
     ): RegionDb? {
         if (regionCode == null) return null
-        val region = metadata.regions[regionCode]
-            ?: run { errors.add(notFound(regionCode)); return null }
-        if (!metadata.countries.containsKey(region.countryCode)) {
-            errors.add(countryNotFound(region.countryCode))
-            return null
-        }
-        return region
+        return metadata.regions[regionCode] ?: run { errors.add(notFound(regionCode)); null }
     }
 
     private fun parseCountry(

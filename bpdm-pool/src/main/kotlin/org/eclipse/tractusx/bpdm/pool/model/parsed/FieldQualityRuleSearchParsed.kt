@@ -19,7 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 
 data class FieldQualityRuleSearchParsed(
-    val country: String
+    val country: CountryDb
 )

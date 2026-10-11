@@ -27,8 +27,9 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
     name = "regions",
 )
 class RegionDb(
-    @Column(name = "country_code", nullable = false)
-    val countryCode: String,
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "country_code", referencedColumnName = "country_code", nullable = false)
+    val country: CountryDb,
 
     @Column(name = "region_code")
     val regionCode: String,
