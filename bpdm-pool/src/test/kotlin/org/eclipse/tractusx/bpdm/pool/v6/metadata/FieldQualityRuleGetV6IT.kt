@@ -13,7 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -23,18 +22,27 @@ class FieldQualityRuleGetV6IT : UnscheduledPoolTestBaseV6() {
 
     @Test
     fun `search field quality rules for a maintained country`() {
-        val rules = requireNotNull(poolClient.metadata.getFieldQualityRules("DE").body)
+        //GIVEN
+        val country = "DE"
 
-        assertThat(rules).isNotEmpty()
-        assertThat(rules).allSatisfy { assertThat(it.country).isEqualTo("DE") }
+        //WHEN
+        val response = poolClient.metadata.getFieldQualityRules(country)
+
+        //THEN
+        assertRepository.assertFieldQualityRules(requireNotNull(response.body), country)
     }
 
     @Test
     fun `search field quality rules rejects an unknown country by name`() {
+        //GIVEN
+        val unknownCountry = "ZZ"
+
+        //WHEN
         val error = assertThrows<WebClientResponseException.NotFound> {
-            poolClient.metadata.getFieldQualityRules("ZZ")
+            poolClient.metadata.getFieldQualityRules(unknownCountry)
         }
 
-        assertThat(error.responseBodyAsString).contains("Country", "ZZ")
+        //THEN
+        assertRepository.assertNotFound(error, "Country with following identifiers not found: $unknownCountry")
     }
 }

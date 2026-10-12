@@ -23,12 +23,16 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.ObjectAssert
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.LocalDateTime
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 /**
  * Offers util functionalities for comparing complex API V6 objects under test
@@ -36,6 +40,35 @@ import java.time.LocalDateTime
 class AssertRepositoryV6(
     private val localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
 ) {
+    fun assertCountryPage(actual: PageDto<CountryDto>, page: Int, pageSize: Int) {
+        Assertions.assertThat(actual.page).isEqualTo(page)
+        Assertions.assertThat(actual.totalElements).isGreaterThan((page * pageSize).toLong())
+        Assertions.assertThat(actual.totalPages).isEqualTo(((actual.totalElements + pageSize - 1) / pageSize).toInt())
+        val expectedSize = minOf(pageSize.toLong(), actual.totalElements - page.toLong() * pageSize).toInt()
+        Assertions.assertThat(actual.contentSize).isEqualTo(expectedSize)
+        Assertions.assertThat(actual.content).hasSize(expectedSize)
+        Assertions.assertThat(actual.content.map { it.countryCode }).isSorted()
+    }
+
+    fun assertCountryCatalog(actual: Collection<CountryDto>, expectedCountry: CountryDto) {
+        Assertions.assertThat(actual).contains(expectedCountry)
+        Assertions.assertThat(actual).allSatisfy {
+            Assertions.assertThat(it.countryCode).isNotBlank()
+            Assertions.assertThat(it.name).isNotBlank()
+        }
+    }
+
+    fun assertFieldQualityRules(actual: Collection<FieldQualityRuleDtoV6>, country: String) {
+        Assertions.assertThat(actual).isNotEmpty()
+        Assertions.assertThat(actual).allSatisfy {
+            Assertions.assertThat(it.country).isEqualTo(country)
+            Assertions.assertThat(it.qualityLevel).isNotEqualTo(QualityLevel.FORBIDDEN)
+        }
+    }
+
+    fun assertNotFound(actual: WebClientResponseException.NotFound, expectedDetail: String) {
+        Assertions.assertThat(actual.responseBodyAsString).contains(expectedDetail)
+    }
     companion object{
         private object LegalEntityUpsertResponsePaths{
             val entities: String = LegalEntityPartnerCreateResponseWrapperV6::entities.name

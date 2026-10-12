@@ -28,13 +28,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
     name = "field_quality_rule",
     uniqueConstraints = [UniqueConstraint(
         name = "uc_field_quality_rule_country_schema_field_id",
-        columnNames = ["country_code", "schema_name", "field_path"]
+        columnNames = ["country_id", "schema_name", "field_path"]
     )]
 )
 class FieldQualityRuleDb(
 
     @ManyToOne
-    @JoinColumn(name = "country_code", referencedColumnName = "country_code")
+    @JoinColumn(name = "country_id")
     var country: CountryDb?,
 
     @Column(name = "schema_name", nullable = false)

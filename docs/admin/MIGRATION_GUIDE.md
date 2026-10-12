@@ -46,7 +46,8 @@ The address-country foreign-key migration fails and names the unresolved codes (
 ### Region and Field Quality Rule Countries
 
 Before upgrading, ensure every region's `country_code` and every non-null `country_code` in `field_quality_rule` exists in the maintained `countries` catalogue.
-The migration adds foreign keys without changing these codes. If a code cannot be resolved, the upgrade fails with an error naming the unresolved codes; add the intended countries or correct the metadata before retrying.
+The migration resolves these codes to `countries.id`, replaces the stored `country_code` columns with `country_id` foreign keys, and preserves the country codes returned by the API.
+If a code cannot be resolved, the upgrade fails with an error naming the unresolved codes; add the intended countries or correct the metadata before retrying.
 Null-country field quality rules remain valid as country-independent defaults.
 
 ## 7.4.x to 7.5.x

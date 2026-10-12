@@ -13,7 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
@@ -21,30 +20,39 @@ import org.junit.jupiter.api.Test
 
 class CountryGetV7IT : UnscheduledPoolTestBaseV7() {
 
+    /**
+     * GIVEN the country catalogue populated by Flyway
+     * WHEN a client requests the first country page
+     * THEN the page contains the maintained Germany entry and consistent pagination metadata
+     */
     @Test
-    fun `search country metadata returns maintained country codes and names`() {
-        val firstPage = poolClient.metadata.getCountries(PaginationRequest(size = 100))
-        val countries = firstPage.content + (1 until firstPage.totalPages).flatMap {
-            poolClient.metadata.getCountries(PaginationRequest(page = it, size = 100)).content
-        }
+    fun `get countries returns the maintained catalogue`() {
+        //GIVEN
+        val pageSize = 100
 
-        assertThat(countries).contains(CountryDto("DE", "Germany", null))
-        assertThat(countries).allSatisfy {
-            assertThat(it.countryCode).isNotBlank()
-            assertThat(it.name).isNotBlank()
-        }
-        assertThat(countries).hasSize(firstPage.totalElements.toInt())
+        //WHEN
+        val response = poolClient.metadata.getCountries(PaginationRequest(page = 0, size = pageSize))
+
+        //THEN
+        assertRepository.assertCountryPage(response, 0, pageSize)
+        assertRepository.assertCountryCatalog(response.content, CountryDto("DE", "Germany", null))
     }
 
+    /**
+     * GIVEN the country catalogue contains more entries than one page
+     * WHEN a client requests the second country page with one entry per page
+     * THEN the response identifies page one and contains exactly one country
+     */
     @Test
-    fun `search country metadata respects pagination`() {
-        val firstPage = poolClient.metadata.getCountries(PaginationRequest(page = 0, size = 1))
-        val secondPage = poolClient.metadata.getCountries(PaginationRequest(page = 1, size = 1))
+    fun `get countries returns the requested page`() {
+        //GIVEN
+        val requestedPage = 1
+        val pageSize = 1
 
-        assertThat(firstPage.content).hasSize(1)
-        assertThat(secondPage.content).hasSize(1)
-        assertThat(firstPage.totalElements).isGreaterThan(1)
-        assertThat(secondPage.page).isEqualTo(1)
-        assertThat(secondPage.content.single().countryCode).isNotEqualTo(firstPage.content.single().countryCode)
+        //WHEN
+        val response = poolClient.metadata.getCountries(PaginationRequest(page = requestedPage, size = pageSize))
+
+        //THEN
+        assertRepository.assertCountryPage(response, requestedPage, pageSize)
     }
 }
