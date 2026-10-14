@@ -79,7 +79,7 @@ class MetadataV6Controller(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDtoV6>> {
+    override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>> {
         return ResponseEntity(fieldQualityRuleSearchApplicationV6Service.searchFieldQualityRules(country), HttpStatus.OK)
     }
 

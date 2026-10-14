@@ -125,19 +125,20 @@ interface PoolMetadataV6Api {
 
     @Operation(
         deprecated = true,
-        summary = "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
+        summary = "Get all field quality rules filtered by a maintained country code",
         description = "List the country specific data rules for entity fields." +
                 "All fields that are not in this list are considered to be forbidden."
     )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "List of the existing rules for the given country"),
+            ApiResponse(responseCode = "404", description = "Country code not found in the maintained catalogue", content = [Content()]),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/field-quality-rules/"])
-    fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
+    fun getFieldQualityRules(@Parameter(description = "Country code from the maintained country catalogue") @RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
 
     @Operation(
         deprecated = true,

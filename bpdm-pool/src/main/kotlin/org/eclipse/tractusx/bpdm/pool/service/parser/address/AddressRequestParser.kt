@@ -75,8 +75,8 @@ class AddressRequestParser(
         val scriptCodeKeys = scriptVariants.map { it.scriptCode }.toSet()
 
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
-        val countries = countryRepository.findByCountryCodeIn(countryKeys)
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
+        val countries = countryRepository.findByCountryCodeIn(countryKeys)
         val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(scriptCodeKeys)
 
         return AddressMetadata(

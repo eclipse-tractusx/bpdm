@@ -41,9 +41,9 @@ class FieldQualityRuleSearchService(
      */
     @Transactional(readOnly = true)
     fun search(criteria: FieldQualityRuleSearchParsed): List<FieldQualityRule> {
-        val defaultRulesByField = fieldQualityRuleRepository.findByCountryCodeIsNullOrderBySchemaNameAscFieldPathAsc()
+        val defaultRulesByField = fieldQualityRuleRepository.findByCountryIsNullOrderBySchemaNameAscFieldPathAsc()
             .associateBy { it.field() }
-        val countryRulesByField = fieldQualityRuleRepository.findByCountryCodeOrderBySchemaNameAscFieldPathAsc(criteria.country)
+        val countryRulesByField = fieldQualityRuleRepository.findByCountryOrderBySchemaNameAscFieldPathAsc(criteria.country)
             .associateBy { it.field() }
 
         return (defaultRulesByField.keys + countryRulesByField.keys)
@@ -53,7 +53,7 @@ class FieldQualityRuleSearchService(
                 FieldQualityRule(
                     fieldPath = rule.fieldPath,
                     schemaName = rule.schemaName,
-                    country = rule.countryCode ?: criteria.country,
+                    country = (rule.country ?: criteria.country).countryCode,
                     qualityLevel = rule.qualityLevel
                 )
             }

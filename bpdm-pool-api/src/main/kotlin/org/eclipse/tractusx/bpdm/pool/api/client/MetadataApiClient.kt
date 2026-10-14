@@ -45,7 +45,7 @@ interface MetadataApiClient: PoolMetadataApi {
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/field-quality-rules/")
-    override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
+    override fun getFieldQualityRules(@RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDto>>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/identifier-types")
     override fun getIdentifierTypes(

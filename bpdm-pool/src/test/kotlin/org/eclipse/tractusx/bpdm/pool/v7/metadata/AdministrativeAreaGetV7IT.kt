@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
@@ -65,11 +64,16 @@ class AdministrativeAreaGetV7IT : UnscheduledPoolTestBaseV7() {
     fun `search administrative areas level 1 returns valid entries`() {
         //WHEN
         val response = poolClient.metadata.getAdminAreasLevel1(PaginationRequest(size = 100))
+        val firstCountryPage = poolClient.metadata.getCountries(PaginationRequest(size = 100))
+        val countries = firstCountryPage.content + (1 until firstCountryPage.totalPages).flatMap {
+            poolClient.metadata.getCountries(PaginationRequest(page = it, size = 100)).content
+        }
+        val countryCodes = countries.map { it.countryCode }
 
         //THEN
         response.content.forEach { area ->
             Assertions.assertThat(area.countryCode).isNotNull
-            Assertions.assertThat(area.countryCode).isIn(*CountryCode.entries.toTypedArray())
+            Assertions.assertThat(area.countryCode).isIn(countryCodes)
             Assertions.assertThat(area.code).isNotBlank
             Assertions.assertThat(area.name).isNotBlank
         }

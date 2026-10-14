@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.model.response
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 
@@ -32,8 +31,8 @@ data class FieldQualityRuleDtoV6(
     @get:Schema(description = "Schema name of the entity the field belongs to")
     val schemaName: String?,
 
-    @get:Schema(description = "Country for wich the rule is valid")
-    val country: CountryCode,
+    @get:Schema(description = "Maintained country code for which the rule is valid")
+    val country: String,
 
     @get:Schema(description = "Quality level of the field")
     val qualityLevel: QualityLevel

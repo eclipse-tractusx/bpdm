@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.error.FieldQualityRuleSearchParseError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.FieldQualityRuleResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
@@ -42,8 +44,13 @@ class FieldQualityRuleSearchApplicationV6Service(
      * Returns the field quality rules that apply in the given country.
      */
     @Transactional(readOnly = true)
-    fun searchFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDtoV6> {
-        val criteria = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))
+    fun searchFieldQualityRules(country: String): Collection<FieldQualityRuleDtoV6> {
+        val criteria = when (val result = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> when (val error = result.errors.first()) {
+                is FieldQualityRuleSearchParseError.CountryNotFound -> throw BpdmNotFoundException("Country", error.country)
+            }
+        }
 
         return fieldQualityRuleSearchService.search(criteria).map { fieldQualityRuleResponseMapperV6.toFieldQualityRule(it) }
     }

@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.util
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
@@ -33,11 +35,38 @@ import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.Instant
 import java.time.LocalDateTime
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class AssertRepositoryV7(
     instantSecondsComparator: InstantSecondsComparator,
     localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
 ) {
+
+    fun assertCountryPage(actual: PageDto<CountryDto>, page: Int, pageSize: Int) {
+        Assertions.assertThat(actual.page).isEqualTo(page)
+        Assertions.assertThat(actual.totalElements).isGreaterThan((page * pageSize).toLong())
+        Assertions.assertThat(actual.totalPages).isEqualTo(((actual.totalElements + pageSize - 1) / pageSize).toInt())
+        val expectedSize = minOf(pageSize.toLong(), actual.totalElements - page.toLong() * pageSize).toInt()
+        Assertions.assertThat(actual.contentSize).isEqualTo(expectedSize)
+        Assertions.assertThat(actual.content).hasSize(expectedSize)
+        Assertions.assertThat(actual.content.map { it.countryCode }).isSorted()
+    }
+
+    fun assertCountryCatalog(actual: Collection<CountryDto>, expectedCountry: CountryDto) {
+        Assertions.assertThat(actual).contains(expectedCountry)
+        Assertions.assertThat(actual).allSatisfy {
+            Assertions.assertThat(it.countryCode).isNotBlank()
+            Assertions.assertThat(it.name).isNotBlank()
+        }
+    }
+
+    fun assertFieldQualityRules(actual: Collection<FieldQualityRuleDto>, expected: Collection<FieldQualityRuleDto>) {
+        Assertions.assertThat(actual).containsExactlyInAnyOrderElementsOf(expected)
+    }
+
+    fun assertNotFound(actual: WebClientResponseException.NotFound, expectedDetail: String) {
+        Assertions.assertThat(actual.responseBodyAsString).contains(expectedDetail)
+    }
 
     val comparisonConfigurationForCreated: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withIgnoredFieldsMatchingRegexes(

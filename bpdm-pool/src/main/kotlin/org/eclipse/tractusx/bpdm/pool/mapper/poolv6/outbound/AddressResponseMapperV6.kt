@@ -107,7 +107,7 @@ class AddressResponseMapperV6(
         }
 
     private fun toRegion(region: RegionDb): RegionDtoV6 =
-        RegionDtoV6(region.countryCode, region.regionCode, region.regionName)
+        RegionDtoV6(region.country.countryCode, region.regionCode, region.regionName)
 
     private fun toGeoCoordinate(coordinate: GeographicCoordinateDb): GeoCoordinateDto =
         GeoCoordinateDto(coordinate.longitude, coordinate.latitude, coordinate.altitude)

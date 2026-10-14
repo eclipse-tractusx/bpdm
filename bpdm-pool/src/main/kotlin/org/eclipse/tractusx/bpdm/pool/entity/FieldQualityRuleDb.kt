@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
@@ -29,14 +28,14 @@ import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
     name = "field_quality_rule",
     uniqueConstraints = [UniqueConstraint(
         name = "uc_field_quality_rule_country_schema_field_id",
-        columnNames = ["country_code", "schema_name", "field_path"]
+        columnNames = ["country_id", "schema_name", "field_path"]
     )]
 )
 class FieldQualityRuleDb(
 
-    @Column(name = "country_code", nullable = false)
-    @Enumerated(EnumType.STRING)
-    var countryCode: CountryCode?,
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    var country: CountryDb?,
 
     @Column(name = "schema_name", nullable = false)
     var schemaName: String,
