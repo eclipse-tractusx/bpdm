@@ -69,15 +69,13 @@ class BusinessPartnerInputUpsertOperationService(
     private fun create(request: BusinessPartnerInputUpsertParsed, sharingState: SharingStateDb): Created {
         val input = BusinessPartnerDb.createEmpty(sharingState, StageType.Input)
         write(request, input)
-        businessPartnerRepository.save(input)
-        recordChange(input, ChangelogType.CREATE)
+        persist(input, ChangelogType.CREATE)
         return Created(input)
     }
 
-    // The input is managed, so its changes are flushed with the transaction without an explicit save.
     private fun update(request: BusinessPartnerInputUpsertParsed, input: BusinessPartnerDb): Updated {
         write(request, input)
-        recordChange(input, ChangelogType.UPDATE)
+        persist(input, ChangelogType.UPDATE)
         return Updated(input)
     }
 
@@ -95,8 +93,9 @@ class BusinessPartnerInputUpsertOperationService(
     private fun hasChanged(request: BusinessPartnerInputUpsertParsed, existing: BusinessPartnerDb) =
         contentMapper.toContent(existing) != request.content
 
-    private fun recordChange(input: BusinessPartnerDb, changeType: ChangelogType) {
+    private fun persist(input: BusinessPartnerDb, changeType: ChangelogType) {
         val sharingState = input.sharingState
+        businessPartnerRepository.save(input)
         changelogCreateService.record(
             ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, StageType.Input, GoldenRecordType.BusinessPartner)
         )
