@@ -39,7 +39,7 @@ class GateExceptionHandler : BpdmExceptionHandler() {
 
     @ExceptionHandler(BpdmBusinessPartnerInputUpsertException::class)
     fun handleBusinessPartnerInputUpsertException(ex: BpdmBusinessPartnerInputUpsertException, request: WebRequest): ResponseEntity<GateErrorResponse> {
-        val errorResponse = createResponse(ex.errors.map { it.message }, request)
+        val errorResponse = createResponse(ex.messages, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 

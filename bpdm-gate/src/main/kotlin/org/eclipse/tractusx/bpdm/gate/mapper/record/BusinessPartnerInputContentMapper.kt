@@ -120,7 +120,7 @@ class BusinessPartnerInputContentMapper {
             alternativeAddressCity = scriptVariant.alternativeAddress?.city
         )
 
-    // An all-empty embeddable is read back as null, while a request always states the physical script variant address
+    // An all-empty embeddable is read back as null, while a request always states the physical script variant address.
     private fun toValue(address: PhysicalPostalAddressScriptVariantDb?) =
         BusinessPartnerInputValues.PhysicalAddressScriptVariant(
             city = address?.city,

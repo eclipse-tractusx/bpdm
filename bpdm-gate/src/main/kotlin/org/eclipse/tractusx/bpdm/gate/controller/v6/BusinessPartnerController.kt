@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
@@ -42,7 +43,8 @@ class BusinessPartnerController(
     val businessPartnerLegacyMapper: BusinessPartnerLegacyMapper,
     val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
     val inputRequestMapper: BusinessPartnerInputRequestMapper,
-    val inputDtoMapper: BusinessPartnerInputDtoMapper
+    val inputDtoMapper: BusinessPartnerInputDtoMapper,
+    val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
@@ -50,7 +52,7 @@ class BusinessPartnerController(
         val requests = businessPartners.map(inputRequestMapper::toUpsertIn)
         return when (val result = inputUpsertApplicationService.upsert(requests, getCurrentUserBpn())) {
             is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
-            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmBusinessPartnerInputUpsertException(result.errors)
+            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmBusinessPartnerInputUpsertException(result.errors.map(inputErrorMapper::toMessage))
         }
     }
 

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileHeader
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerUploadException
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileRow
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
@@ -44,6 +45,7 @@ class PartnerUploadService(
     private val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
     private val inputRequestMapper: BusinessPartnerInputRequestMapper,
     private val inputDtoMapper: BusinessPartnerInputDtoMapper,
+    private val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper,
     private val poolApiClient: PoolApiClient
 ) {
 
@@ -62,7 +64,7 @@ class PartnerUploadService(
         val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData, tenantBpnl, legalName)
         return when (val result = inputUpsertApplicationService.upsert(businessPartnerDtos.map(inputRequestMapper::toUpsertIn), tenantBpnl)) {
             is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
-            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map { it.message })
+            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map(inputErrorMapper::toMessage))
         }
     }
 

@@ -13,8 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.exception
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-
 class BpdmBusinessPartnerInputUpsertException(
-    val errors: List<BusinessPartnerInputUpsertError>
-) : RuntimeException("Business partner input upsert rejected: ${errors.joinToString("; ") { it.message }}")
+    val messages: List<String>
+) : RuntimeException("Business partner input upsert rejected: ${messages.joinToString("; ")}")
