@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.util
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 
-fun <T> List<T>.containsDuplicates(): Boolean = size != distinct().size
-
 fun getCurrentUserBpn(): String? {
     val authentication = SecurityContextHolder.getContext().authentication
     if (authentication is JwtAuthenticationToken) {

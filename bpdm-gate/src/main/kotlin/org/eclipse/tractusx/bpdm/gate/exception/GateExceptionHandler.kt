@@ -37,6 +37,12 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
+    @ExceptionHandler(BpdmBusinessPartnerInputUpsertException::class)
+    fun handleBusinessPartnerInputUpsertException(ex: BpdmBusinessPartnerInputUpsertException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.errors.map { it.message }, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
     @ExceptionHandler(BpdmRelationAlreadyExistsException::class)
     fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
         val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.CONFLICT)

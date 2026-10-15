@@ -53,7 +53,7 @@ interface GateBusinessPartnerApi {
             ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
         ]
     )
-    @PutMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners", "${ApiCommons.BASE_PATH_V7}/input/business-partners"])
+    @PutMapping(value = ["${ApiCommons.BASE_PATH_V7}/input/business-partners"])
     fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @Operation(

@@ -26,12 +26,14 @@ import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
-import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
+import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -39,16 +41,18 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class BusinessPartnerController(
     val businessPartnerService: BusinessPartnerService,
-    val apiConfigProperties: ApiConfigProperties
+    val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
+    val inputRequestMapper: BusinessPartnerInputRequestMapper,
+    val inputDtoMapper: BusinessPartnerInputDtoMapper
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
     override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
-        if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
-            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        val requests = businessPartners.map(inputRequestMapper::toUpsertIn)
+        return when (val result = inputUpsertApplicationService.upsert(requests, getCurrentUserBpn())) {
+            is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
+            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmBusinessPartnerInputUpsertException(result.errors)
         }
-        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners.toList(), getCurrentUserBpn())
-        return ResponseEntity.ok(result)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_PARTNER})")

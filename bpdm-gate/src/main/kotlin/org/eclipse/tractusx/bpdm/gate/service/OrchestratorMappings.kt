@@ -404,7 +404,7 @@ class OrchestratorMappings(
         )
 
     private fun toStreet(dto: Street) =
-        org.eclipse.tractusx.bpdm.gate.model.upsert.output.Street(
+        org.eclipse.tractusx.bpdm.gate.model.value.Street(
             name = dto.name,
             houseNumber = dto.houseNumber,
             houseNumberSupplement = dto.houseNumberSupplement,
@@ -443,7 +443,7 @@ class OrchestratorMappings(
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
             dto.longitude?.let {  lon ->
-                org.eclipse.tractusx.bpdm.gate.model.upsert.output.GeoCoordinate(latitude = lat, longitude = lon, altitude = dto.altitude)
+                org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate(latitude = lat, longitude = lon, altitude = dto.altitude)
             }
         }
 

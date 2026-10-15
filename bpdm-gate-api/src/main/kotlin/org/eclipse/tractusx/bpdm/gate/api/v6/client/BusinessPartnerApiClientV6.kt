@@ -36,7 +36,7 @@ import org.springframework.web.service.annotation.PutExchange
 
 interface BusinessPartnerApiClientV6: GateBusinessPartnerApi {
     @PutExchange(value = "${ApiCommons.BASE_PATH_V6}/input/business-partners")
-    fun upsertBusinessPartnersInput(
+    override fun upsertBusinessPartnersInput(
         @RequestBody businessPartners: Collection<BusinessPartnerInputRequest>
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
 

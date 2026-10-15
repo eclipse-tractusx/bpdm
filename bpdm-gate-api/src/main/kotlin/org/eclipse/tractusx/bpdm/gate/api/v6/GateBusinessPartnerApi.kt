@@ -27,15 +27,35 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateBusinessPartnerApi {
+
+    @Operation(
+        summary = "Create or update business partner with given external ID",
+        description = "Create or update generic business partner. " +
+                "Updates instead of creating a new business partner if an already existing external ID is used. " +
+                "The same external ID may not occur more than once in a single request. " +
+                "For a single request, the maximum number of business partners in the request is limited to \${bpdm.api.upsert-limit} entries."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Business partner were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
+        ]
+    )
+    @PutMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners"])
+    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @Operation(
         summary = "Search business partners by an array of external IDs from the output stage",

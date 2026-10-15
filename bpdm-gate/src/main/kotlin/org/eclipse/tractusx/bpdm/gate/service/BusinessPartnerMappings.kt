@@ -22,11 +22,9 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
@@ -104,43 +102,6 @@ class BusinessPartnerMappings {
             ),
             name = additionalSite.name
         )
-
-    fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest, sharingState: SharingStateDb): BusinessPartnerDb {
-        val businessPartner = BusinessPartnerDb(
-            stage = StageType.Input,
-            nameParts = dto.nameParts.toMutableList(),
-            roles = dto.roles.toSortedSet(),
-            identifiers = dto.identifiers.mapNotNull{toIdentifier(it, BusinessPartnerType.GENERIC)}.toSortedSet(),
-            states = dto.states.asSequence().mapNotNull{toState(it, BusinessPartnerType.GENERIC)}
-                .plus(dto.legalEntity.states.mapNotNull { toState(it, BusinessPartnerType.LEGAL_ENTITY) })
-                .plus(dto.site.states.mapNotNull { toState(it, BusinessPartnerType.SITE) })
-                .plus(dto.address.states.mapNotNull { toState(it, BusinessPartnerType.ADDRESS) })
-                .toSortedSet(),
-            shortName = dto.legalEntity.shortName,
-            legalName = dto.legalEntity.legalName,
-            siteName = dto.site.name,
-            addressName = dto.address.name,
-            legalForm = dto.legalEntity.legalForm,
-            isOwnCompanyData = dto.isOwnCompanyData,
-            bpnL = dto.legalEntity.legalEntityBpn,
-            bpnS = dto.site.siteBpn,
-            bpnA = dto.address.addressBpn,
-            ownershipUltimate = dto.legalEntity.ownershipUltimate,
-            ultimateOwnerBpnl = dto.legalEntity.ultimateOwnerBpnl,
-            postalAddress = toPostalAddress(dto.address),
-            externalSequenceTimestamp = dto.externalSequenceTimestamp,
-            legalEntityConfidence = null,
-            siteConfidence = null,
-            addressConfidence = null,
-            sharingState = sharingState
-        )
-        val scriptVariants = dto.scriptVariants.map { variant ->  toScriptVariantDb(businessPartner, variant) }
-        scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
-
-        dto.additionalSites.mapTo(businessPartner.additionalSites) { AdditionalSiteDb(bpn = it.siteBpn, name = it.name) }
-
-        return businessPartner
-    }
 
     private fun toLegalEntityComponentInputDto(entity: BusinessPartnerDb): LegalEntityRepresentationInputDto {
         return LegalEntityRepresentationInputDto(
@@ -249,13 +210,6 @@ class BusinessPartnerMappings {
         )
 
 
-    private fun toPostalAddress(dto: AddressRepresentationInputDto) =
-        PostalAddressDb(
-            addressType = dto.addressType,
-            physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress),
-            alternativePostalAddress = normalize(dto.alternativePostalAddress)?.let(::toAlternativePostalAddress)
-        )
-
     fun toScriptVariantDto(entity: BusinessPartnerScriptVariantDb): BusinessPartnerScriptVariantDto{
         return BusinessPartnerScriptVariantDto(
             scriptCode = entity.scriptCode,
@@ -360,81 +314,14 @@ class BusinessPartnerMappings {
         )
     }
 
-    // convert empty DTO to null
-    private fun normalize(dto: PhysicalPostalAddressDto?) =
-        if (dto != PhysicalPostalAddressDto()) dto
-        else null
-
-    private fun normalize(dto: AlternativePostalAddressDto?) =
-        if (dto != AlternativePostalAddressDto()) dto
-        else null
-
-    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressDto) =
-        PhysicalPostalAddressDb(
-            geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
-            country = dto.country,
-            administrativeAreaLevel1 = dto.administrativeAreaLevel1,
-            administrativeAreaLevel2 = dto.administrativeAreaLevel2,
-            administrativeAreaLevel3 = dto.administrativeAreaLevel3,
-            postalCode = dto.postalCode,
-            city = dto.city,
-            district = dto.district,
-            street = dto.street?.let(::toStreet),
-            companyPostalCode = dto.companyPostalCode,
-            industrialZone = dto.industrialZone,
-            building = dto.building,
-            floor = dto.floor,
-            door = dto.door,
-            taxJurisdictionCode = dto.taxJurisdictionCode
-        )
-
-    private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
-        AlternativePostalAddressDb(
-            geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
-            country = dto.country,
-            administrativeAreaLevel1 = dto.administrativeAreaLevel1,
-            postalCode = dto.postalCode,
-            city = dto.city,
-            deliveryServiceType = dto.deliveryServiceType,
-            deliveryServiceQualifier = dto.deliveryServiceQualifier,
-            deliveryServiceNumber = dto.deliveryServiceNumber
-        )
-
-
-    private fun toStreet(dto: StreetDto) =
-        StreetDb(
-            name = dto.name,
-            houseNumber = dto.houseNumber,
-            houseNumberSupplement = dto.houseNumberSupplement,
-            milestone = dto.milestone,
-            direction = dto.direction,
-            namePrefix = dto.namePrefix,
-            additionalNamePrefix = dto.additionalNamePrefix,
-            nameSuffix = dto.nameSuffix,
-            additionalNameSuffix = dto.additionalNameSuffix
-        )
-
     private fun toIdentifierDto(entity: IdentifierDb) =
         BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
-
-    private fun toIdentifier(dto: BusinessPartnerIdentifierDto, businessPartnerType: BusinessPartnerType) =
-        dto.type?.let { type ->
-            dto.value?.let { value ->
-                IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody, businessPartnerType)
-            }
-        }
 
     private fun toStateDtos(entities: Collection<StateDb>, businessPartnerType: BusinessPartnerType) =
         entities.filter { it.businessPartnerTyp == businessPartnerType }.map(::toStateDto)
 
     private fun toStateDto(entity: StateDb) =
         BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
-
-    private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
-        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp = businessPartnerType) }
-
-    private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
-        GeographicCoordinateDb(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
 
     private fun toLeRelationType(type: LegalEntityGoldenRecordRelationType) =
         when (type) {

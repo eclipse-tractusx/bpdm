@@ -23,6 +23,8 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
 import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation

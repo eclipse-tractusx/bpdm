@@ -23,7 +23,12 @@ import com.opencsv.CSVWriter
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileHeader
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerUploadException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileRow
+import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PartnerFileUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
@@ -36,7 +41,9 @@ import java.io.OutputStreamWriter
 
 @Service
 class PartnerUploadService(
-    private val businessPartnerService: BusinessPartnerService,
+    private val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
+    private val inputRequestMapper: BusinessPartnerInputRequestMapper,
+    private val inputDtoMapper: BusinessPartnerInputDtoMapper,
     private val poolApiClient: PoolApiClient
 ) {
 
@@ -53,8 +60,10 @@ class PartnerUploadService(
             .first().header.legalName
         val csvData: List<PartnerUploadFileRow> = PartnerFileUtil.parseCsv(file)
         val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData, tenantBpnl, legalName)
-        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartnerDtos, tenantBpnl)
-        return ResponseEntity.ok(result)
+        return when (val result = inputUpsertApplicationService.upsert(businessPartnerDtos.map(inputRequestMapper::toUpsertIn), tenantBpnl)) {
+            is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
+            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map { it.message })
+        }
     }
 
     fun generatePartnerCsvTemplate(): ByteArrayResource {

@@ -82,9 +82,11 @@ class SharingStateService(
         }
     }
 
-    fun getOrCreateStates(sharingStateIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
-        return getOrCreate(sharingStateIds, ownerBpnl)
-    }
+    /**
+     * Returns the sharing state of [externalId] for [ownerBpnl], creating it in its initial state if it does not exist yet.
+     */
+    fun getOrCreateState(externalId: String, ownerBpnl: String?): SharingStateDb =
+        getOrCreate(listOf(externalId), ownerBpnl).single()
 
     fun setReady(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
         val existingSharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)

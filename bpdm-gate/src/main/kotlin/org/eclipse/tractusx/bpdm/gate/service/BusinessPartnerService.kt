@@ -26,8 +26,6 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
@@ -49,7 +47,6 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val businessPartnerMappings: BusinessPartnerMappings,
-    private val sharingStateService: SharingStateService,
     private val changelogCreateService: ChangelogCreateService,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val compareUtil: BusinessPartnerComparisonUtil,
@@ -67,33 +64,6 @@ class BusinessPartnerService(
         logger.debug { "Executing getBusinessPartnersOutput() with parameters $pageRequest and $externalIds" }
 
         return getBusinessPartners(pageRequest, externalIds, StageType.Output, tenantBpnl).toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
-    }
-
-    @Transactional
-    fun upsertBusinessPartnersInput(requests: List<BusinessPartnerInputRequest>, tenantBpnl: String?): List<BusinessPartnerInputDto> {
-        logger.debug { "Executing upsertBusinessPartnersInput() with parameters $requests" }
-
-        requests.forEach { assertAdditionalSitesHaveSite(it) }
-
-        val sharingStates = sharingStateService.getOrCreateStates(requests.map { it.externalId }, tenantBpnl)
-        val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
-        val existingInputs = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
-        val existingInputsByExternalId = existingInputs.associateBy { it.sharingState.externalId }
-
-        val upsertResults = requests.mapNotNull { request ->
-            val sharingState = sharingStatesByExternalId[request.externalId]!!
-            val updatedData = businessPartnerMappings.toBusinessPartnerInput(request, sharingState)
-            val existingInput = existingInputsByExternalId[request.externalId]
-
-
-            upsertFromEntity(existingInput, updatedData)
-                .takeIf {  it.shouldUpdate && (it.hadChanges || sharingState.sharingStateType == SharingStateType.Error) }
-                ?.also { sharingStateService.setInitial(sharingState) }
-        }
-
-        reportWrites(upsertResults, StageType.Input)
-
-        return upsertResults.map { businessPartnerMappings.toBusinessPartnerInputDto(it.businessPartner) }
     }
 
     @Transactional
@@ -126,19 +96,6 @@ class BusinessPartnerService(
         return upsertFromEntity(businessPartner, updatedData)
     }
 
-
-    /**
-     * Rejects a business partner that states further sites of its address without stating a site of its own, which those
-     * sites would be additional to.
-     */
-    private fun assertAdditionalSitesHaveSite(request: BusinessPartnerInputRequest) {
-        val statesSite = request.site.siteBpn != null || request.site.name != null
-        if (request.additionalSites.isNotEmpty() && !statesSite)
-            throw BpdmInvalidPartnerException(
-                request.externalId,
-                "additional sites of its address are stated but no site of its own is, which they would be additional to"
-            )
-    }
 
     private fun upsertFromEntity(existingPartner: BusinessPartnerDb?, upsertData: BusinessPartnerDb): UpsertResult {
         val sharingState = upsertData.sharingState

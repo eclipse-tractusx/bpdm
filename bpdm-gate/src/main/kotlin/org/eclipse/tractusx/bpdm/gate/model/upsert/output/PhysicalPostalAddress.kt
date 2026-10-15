@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
+import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.value.Street
+
 
 data class PhysicalPostalAddress(
     val geographicCoordinates: GeoCoordinate?,

@@ -34,9 +34,9 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.GeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Street
+import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient

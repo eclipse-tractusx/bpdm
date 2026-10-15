@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 
 data class AlternativeAddress(
     val geographicCoordinates: GeoCoordinate?,
