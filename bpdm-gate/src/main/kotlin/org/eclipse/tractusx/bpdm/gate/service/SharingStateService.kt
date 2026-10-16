@@ -19,29 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.bySharingStateTypes
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byTenantBpnl
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byUpdatedAfter
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
-import java.time.Instant
 import java.time.LocalDateTime
 
 
@@ -51,40 +39,6 @@ class SharingStateService(
     private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
     private val changeLogger: PersistedChangeLogger
 ) {
-
-    private val logger = KotlinLogging.logger { }
-
-    fun findSharingStates(
-        paginationRequest: PaginationRequest,
-        externalIds: Collection<String>?,
-        sharingStateTypes: Collection<SharingStateType>?,
-        updatedAfter: Instant?,
-        ownerBpnl: String?
-    ): PageDto<SharingStateDto> {
-
-        logger.debug { "findSharingStates()" }
-
-        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val spec = Specification.allOf(
-            byExternalIdsIn(externalIds),
-            byTenantBpnl(ownerBpnl),
-            bySharingStateTypes(sharingStateTypes),
-            byUpdatedAfter(updatedAfter)
-        )
-        val sharingStatePage = stateRepository.findAll(spec, pageRequest)
-
-        return sharingStatePage.toPageDto {
-            SharingStateDto(
-                externalId = it.externalId,
-                sharingStateType = it.sharingStateType,
-                sharingErrorCode = it.sharingErrorCode,
-                sharingErrorMessage = it.sharingErrorMessage,
-                sharingProcessStarted = it.sharingProcessStarted,
-                taskId = it.taskId,
-                updatedAt = it.updatedAt
-            )
-        }
-    }
 
     fun setReady(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
         val existingSharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)

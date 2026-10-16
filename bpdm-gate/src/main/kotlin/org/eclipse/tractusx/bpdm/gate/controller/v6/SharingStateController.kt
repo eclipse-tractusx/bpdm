@@ -21,18 +21,22 @@ package org.eclipse.tractusx.bpdm.gate.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.SharingStateDtoMapperV6
+import org.eclipse.tractusx.bpdm.gate.model.search.SharingStateSearchRequest
+import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto as SharingStateDtoV7
 
 @RestController("SharingStateControllerLegacy")
 class SharingStateController(
-    private val sharingStateService: SharingStateService,
+    private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
+    private val sharingStateDtoMapper: SharingStateDtoMapperV6,
     private val principalUtil: PrincipalUtil
 ): GateSharingStateApi {
 
@@ -41,21 +45,8 @@ class SharingStateController(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
-        return sharingStateService.findSharingStates(paginationRequest, externalIds, null, null, principalUtil.resolveTenantBpnl().value)
-            .let { PageDto(it.totalElements, it.totalPages, it.page, it.contentSize, content = it.content.map(::toV6Dto)) }
+        val request = SharingStateSearchRequest(externalIds, sharingStateTypes = null, updatedAfter = null)
+        return sharingStateSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+            .toPageDto(sharingStateDtoMapper::toDto)
     }
-
-    private fun toV6Dto(sharingStateV7: SharingStateDtoV7): SharingStateDto{
-        return with(sharingStateV7){
-            SharingStateDto(
-                externalId = externalId,
-                sharingStateType = sharingStateType,
-                sharingErrorCode = sharingErrorCode,
-                sharingErrorMessage = sharingErrorMessage,
-                sharingProcessStarted = sharingProcessStarted,
-                taskId = taskId
-            )
-        }
-    }
-
 }
