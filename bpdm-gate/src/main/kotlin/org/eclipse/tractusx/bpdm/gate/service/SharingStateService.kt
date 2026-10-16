@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -30,6 +32,7 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
+import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.bySharingStateTypes
@@ -45,7 +48,8 @@ import java.time.LocalDateTime
 @Service
 class SharingStateService(
     private val stateRepository: SharingStateRepository,
-    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties
+    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
+    private val changeLogger: PersistedChangeLogger
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -82,12 +86,6 @@ class SharingStateService(
         }
     }
 
-    /**
-     * Returns the sharing state of [externalId] for [ownerBpnl], creating it in its initial state if it does not exist yet.
-     */
-    fun getOrCreateState(externalId: String, ownerBpnl: String?): SharingStateDb =
-        getOrCreate(listOf(externalId), ownerBpnl).single()
-
     fun setReady(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
         val existingSharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)
         val existingIds = existingSharingStates.map { it.externalId }.toSet()
@@ -121,6 +119,7 @@ class SharingStateService(
         sharingState.taskId = null
 
         return stateRepository.save(sharingState)
+            .also { logChange(it, PersistedChangeType.Updated) }
     }
 
     fun setSuccess(sharingState: SharingStateDb, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
@@ -170,25 +169,37 @@ class SharingStateService(
     }
 
 
-    private fun getOrCreate(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
+    /**
+     * Returns the sharing states of [externalIds] for [ownerBpnl] in the same order, creating each missing one in its
+     * initial state.
+     */
+    fun getOrCreateStates(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
         val sharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
 
         return externalIds.map { externalId ->
             sharingStatesByExternalId[externalId]
-                ?: setInitial(
-                    SharingStateDb(
-                        externalId,
-                        sharingStateType = SharingStateType.Ready,
-                        orchestratorRecordId = null,
-                        sharingErrorCode = null,
-                        sharingErrorMessage = null,
-                        sharingProcessStarted = null,
-                        tenantBpnl = ownerBpnl,
-                        isGoldenRecordCounted = null,
-                        syncedIsGoldenRecordCounted = null
-                    )
-                )
+                ?: createInitial(externalId, ownerBpnl)
         }
+    }
+
+    private fun createInitial(externalId: String, ownerBpnl: String?): SharingStateDb {
+        val sharingState = SharingStateDb(
+            externalId,
+            sharingStateType = SharingStateType.Ready,
+            orchestratorRecordId = null,
+            sharingErrorCode = null,
+            sharingErrorMessage = null,
+            sharingProcessStarted = null,
+            tenantBpnl = ownerBpnl,
+            isGoldenRecordCounted = null,
+            syncedIsGoldenRecordCounted = null
+        )
+        return setInitial(sharingState)
+            .also { logChange(it, PersistedChangeType.Created) }
+    }
+
+    private fun logChange(sharingState: SharingStateDb, type: PersistedChangeType) {
+        changeLogger.log(BusinessPartnerChange(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.SharingState))
     }
 }

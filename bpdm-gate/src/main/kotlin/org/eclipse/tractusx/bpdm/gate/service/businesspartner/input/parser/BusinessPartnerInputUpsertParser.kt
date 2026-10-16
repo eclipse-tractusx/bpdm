@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser.valid
 import org.springframework.stereotype.Service
 
 /**
- * Turns business partner upsert entries into their parsed form, or into every rule violation they contain.
+ * Turns a batch of business partner upsert entries into their parsed form, or into every rule violation it contains.
  */
 @Service
 class BusinessPartnerInputUpsertParser(
@@ -34,20 +34,18 @@ class BusinessPartnerInputUpsertParser(
 ) {
 
     /**
-     * Returns the violations of the rules over the batch's shape, or an empty list if the batch as a whole is sound.
+     * Parses [requests] as a whole, succeeding only if every entry is valid and failing with the violations of every
+     * entry otherwise.
      */
-    fun validateBatch(requests: List<BusinessPartnerInputUpsertIn>): List<BusinessPartnerInputUpsertError> =
-        batchValidators.flatMap { it.validate(requests) }
+    fun parse(requests: List<BusinessPartnerInputUpsertIn>): ParseResult<List<BusinessPartnerInputUpsertParsed>, BusinessPartnerInputUpsertError> {
+        val batchErrors = batchValidators.flatMap { it.validate(requests) }
+        if (batchErrors.isNotEmpty()) return ParseResult.Failure(batchErrors)
 
-    /**
-     * Parses a single entry, failing with the violations of every rule it breaks.
-     */
-    fun parse(request: BusinessPartnerInputUpsertIn): ParseResult<BusinessPartnerInputUpsertParsed, BusinessPartnerInputUpsertError> {
-        val normalized = normalizer.normalize(request)
-        val errors = validators.flatMap { it.validate(normalized) }
+        val normalized = requests.map(normalizer::normalize)
+        val errors = normalized.flatMap { request -> validators.flatMap { it.validate(request) } }
 
         return if (errors.isEmpty())
-            ParseResult.Success(parsedMapper.toParsed(normalized))
+            ParseResult.Success(normalized.map(parsedMapper::toParsed))
         else
             ParseResult.Failure(errors)
     }

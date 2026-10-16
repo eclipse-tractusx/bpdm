@@ -14,6 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.operation
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
@@ -22,6 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
+import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult.*
@@ -34,7 +37,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Writes a parsed business partner into the input stage of its tenant.
+ * Writes parsed business partners into the input stage of their tenant.
  */
 @Service
 class BusinessPartnerInputUpsertOperationService(
@@ -42,19 +45,31 @@ class BusinessPartnerInputUpsertOperationService(
     private val sharingStateService: SharingStateService,
     private val changelogCreateService: ChangelogCreateService,
     private val contentMapper: BusinessPartnerInputContentMapper,
-    private val entityMapper: BusinessPartnerInputEntityMapper
+    private val entityMapper: BusinessPartnerInputEntityMapper,
+    private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Creates or updates the input of [request] for [tenantBpnl] and resets its sharing state, resubmits an unchanged
-     * input whose sharing failed, or skips a request that is outdated or changes nothing.
+     * Creates or updates the input of each of [requests] for [tenantBpnl] and resets its sharing state, resubmits an
+     * unchanged input whose sharing failed, or skips a request that is outdated or changes nothing.
      */
     @Transactional
-    fun upsert(request: BusinessPartnerInputUpsertParsed, tenantBpnl: String?): BusinessPartnerInputUpsertEntryResult {
-        val sharingState = sharingStateService.getOrCreateState(request.externalId, tenantBpnl)
-        val existing = businessPartnerRepository.findBySharingStateAndStage(sharingState, StageType.Input)
+    fun upsert(requests: List<BusinessPartnerInputUpsertParsed>, tenantBpnl: String?): List<BusinessPartnerInputUpsertEntryResult> {
+        val sharingStates = sharingStateService.getOrCreateStates(requests.map { it.externalId }, tenantBpnl)
+        val existingByExternalId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
+            .associateBy { it.sharingState.externalId }
 
+        return requests.zip(sharingStates) { request, sharingState ->
+            upsert(request, sharingState, existingByExternalId[request.externalId])
+        }
+    }
+
+    private fun upsert(
+        request: BusinessPartnerInputUpsertParsed,
+        sharingState: SharingStateDb,
+        existing: BusinessPartnerDb?
+    ): BusinessPartnerInputUpsertEntryResult {
         val result = when {
             existing == null -> create(request, sharingState)
             isOutdated(request, existing) -> Skipped(request.externalId, SkipReason.Outdated)
@@ -62,7 +77,7 @@ class BusinessPartnerInputUpsertOperationService(
             sharingState.sharingStateType == SharingStateType.Error -> resubmit(existing)
             else -> Skipped(request.externalId, SkipReason.Unchanged)
         }
-        logger.debug { describe(result) }
+        logDebug(result)
         return result
     }
 
@@ -70,12 +85,14 @@ class BusinessPartnerInputUpsertOperationService(
         val input = BusinessPartnerDb.createEmpty(sharingState, StageType.Input)
         write(request, input)
         persist(input, ChangelogType.CREATE)
+        logChange(input, PersistedChangeType.Created)
         return Created(input)
     }
 
     private fun update(request: BusinessPartnerInputUpsertParsed, input: BusinessPartnerDb): Updated {
         write(request, input)
         persist(input, ChangelogType.UPDATE)
+        logChange(input, PersistedChangeType.Updated)
         return Updated(input)
     }
 
@@ -102,12 +119,19 @@ class BusinessPartnerInputUpsertOperationService(
         sharingStateService.setInitial(sharingState)
     }
 
-    private fun describe(result: BusinessPartnerInputUpsertEntryResult) =
-        when (result) {
-            is Created -> "Created business partner input ${result.input.toInputLogIdentifier()}"
-            is Updated -> "Updated business partner input ${result.input.toInputLogIdentifier()}"
-            is Resubmitted -> "Resubmitted unchanged business partner input ${result.input.toInputLogIdentifier()} after a sharing error"
-            is Skipped -> "Skipped business partner input ${result.externalId}: ${result.reason}"
+    private fun logChange(input: BusinessPartnerDb, type: PersistedChangeType) {
+        val sharingState = input.sharingState
+        changeLogger.log(BusinessPartnerChange(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.Input))
+    }
+
+    private fun logDebug(result: BusinessPartnerInputUpsertEntryResult) =
+        logger.debug {
+            when (result) {
+                is Created -> "Created business partner input ${result.input.toInputLogIdentifier()}"
+                is Updated -> "Updated business partner input ${result.input.toInputLogIdentifier()}"
+                is Resubmitted -> "Resubmitted unchanged business partner input ${result.input.toInputLogIdentifier()} after a sharing error"
+                is Skipped -> "Skipped business partner input ${result.externalId}: ${result.reason}"
+            }
         }
 
     private fun write(request: BusinessPartnerInputUpsertParsed, input: BusinessPartnerDb) {
@@ -167,10 +191,7 @@ class BusinessPartnerInputUpsertOperationService(
     }
 }
 
-/**
- * Returns the identifiers a log line names this business partner input by: its external ID and any BPNs it states.
- */
-internal fun BusinessPartnerDb.toInputLogIdentifier(): String {
+private fun BusinessPartnerDb.toInputLogIdentifier(): String {
     val bpns = listOfNotNull(bpnL, bpnS, bpnA)
     return if (bpns.isEmpty()) sharingState.externalId else "${sharingState.externalId} (${bpns.joinToString("/")})"
 }

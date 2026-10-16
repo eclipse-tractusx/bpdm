@@ -72,7 +72,7 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 - An INFO line MUST report one of exactly three things: **a persisted change**, **effective configuration at startup**, or **a process lifecycle transition**. Nothing else may use INFO.
 - A persisted-change line MUST state an **outcome**, not an intent: it is written after the write, in the past tense, and names the subject ([1.2](#12-what-counts-as-a-subject)) by its identifier. `Created legal form 'LLC'`, never `Create new legal form`.
 - A line MUST NOT be emitted before the work it describes. A statement at the top of a method describing what the method is about to do is an intent line and MUST be DEBUG or deleted.
-- A batch MUST produce one INFO line for the batch, not one per entry. Per-entry detail belongs at DEBUG.
+- A batch MUST produce one INFO line for the batch, not one per entry. Per-entry detail belongs at DEBUG. `PersistedChangeLogger` does this by itself: it logs once per transaction.
 - A run that changed nothing MUST NOT log at INFO. Zero counts, empty poll results and `UpsertType.NoChange` are DEBUG.
 - A rejected request MUST NOT log at INFO. It persisted nothing and the caller was already told; its parse errors are DEBUG.
 - A line SHOULD name the aspect that changed when the write is partial and the `FieldUpdate` masks make it available — `LEGAL_ENTITY UPDATE (participation)`.
@@ -95,7 +95,9 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 ## 2.4 Where a line lives
 
 - A persisted-change line MUST be emitted by the **write authority** for that subject — the operation service that persists it. This is the same single-authority rule as [`application-code-guide.md` §2.4](application-code-guide.md#24-operation-layer), read as a logging rule.
-- Where the write authority persists one entry at a time and its caller drives the batch, that caller MUST emit the batch line and the write authority MUST report its entry at DEBUG. The Orchestrator's task state machine and its callers are the reference.
+- New code MUST log a persisted change by passing a typed `PersistedChange` to `PersistedChangeLogger`, not by writing the INFO line itself. The change carries the subject's identifiers as domain values and renders them once; the logger writes the line after the transaction commits, under the class whose method opened the transaction.
+- A writer MUST log only the aspect it writes. Changes to the same subject within one transaction merge into one entry naming every changed aspect — writing a Gate business partner input and resetting its sharing state read as `Updated 1 business partner: X@BPNL… (input, sharing state)`. The Gate business partner input upsert is the reference.
+- Where the write authority still logs inline, persists one entry at a time and its caller drives the batch, that caller MUST emit the batch line and the write authority MUST report its entry at DEBUG. The Orchestrator's task state machine and its callers are the reference.
 - Application services MUST NOT log at INFO. They are per API version, so a line there is duplicated across v6 and v7, and they are bypassed entirely by the golden record task path — a line there would miss most production writes.
 - Parsers MUST NOT log at INFO. They decide; they never persist.
 - Every subject MUST log its own persisted-change line, whether or not that write also emits a changelog entry. Business partners, relations, metadata and tasks then all read the same way.
@@ -122,8 +124,8 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 
 *Accepted, not oversights. Each is a candidate for a later contribution.*
 
-- **Inline lines can lie on rollback.** Persisted-change lines are written inside the transaction, so a rollback leaves a line claiming a change that did not happen; there is always an ERROR alongside it. Making them exact needs a transaction-scoped commit hook; it was deliberately deferred.
-- **Aspects are not reported for business partner writes.** The write services hold the `FieldUpdate` masks but report subject and change type only, so the aspect rule in [2.1](#21-info) is unmet there.
+- **Inline lines can lie on rollback.** Persisted-change lines still written inline are emitted inside the transaction, so a rollback leaves a line claiming a change that did not happen; there is always an ERROR alongside it. Lines logged through `PersistedChangeLogger` are exact; the remaining writers move over one by one.
+- **Aspects are not reported for Pool business partner writes.** The write services hold the `FieldUpdate` masks but report subject and change type only, so the aspect rule in [2.1](#21-info) is unmet there.
 - **A request id stops at the service boundary.** `RequestLoggingFilter` ignores any inbound header and the BPDM clients send none, so one golden record flow appears under a different id in each service.
 - **Derived sharing member counts are DEBUG.** `SharingMemberConfidenceService` recalculates one address and its legal entity per call, so an INFO line there would be one per entry; the scheduled sync reports the records it changed instead.
 - **Not every write reports a count.** `GoldenRecordConsistencyService` and the Pool trigger batch plumbing return no number of changes, so their runs stay silent at DEBUG rather than reporting an outcome.
