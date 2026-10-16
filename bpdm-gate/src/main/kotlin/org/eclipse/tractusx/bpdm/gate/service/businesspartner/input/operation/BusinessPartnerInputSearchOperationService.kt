@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.operation
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.search.input.BusinessPartnerInputSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -35,7 +35,7 @@ class BusinessPartnerInputSearchOperationService(
      * Returns the page of [tenantBpnl]'s business partner inputs that match [criteria].
      */
     @Transactional(readOnly = true)
-    fun search(criteria: BusinessPartnerInputSearchParsed, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerDb> {
+    fun search(criteria: BusinessPartnerSearchParsed, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerDb> {
         val spec = Specification.allOf(
             BusinessPartnerRepository.Specs.byExternalIdsIn(criteria.externalIds),
             BusinessPartnerRepository.Specs.byTenantBpnl(tenantBpnl),

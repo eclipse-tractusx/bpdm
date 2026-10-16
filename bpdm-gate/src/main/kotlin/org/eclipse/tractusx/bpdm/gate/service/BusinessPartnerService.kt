@@ -20,13 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
@@ -36,28 +33,18 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BusinessPartnerService(
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val businessPartnerMappings: BusinessPartnerMappings,
     private val changelogCreateService: ChangelogCreateService,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val compareUtil: BusinessPartnerComparisonUtil,
     private val outputUpsertMappings: OutputUpsertMappings
 ) {
     private val logger = KotlinLogging.logger { }
-
-    fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?, tenantBpnl: String?): PageDto<BusinessPartnerOutputDto> {
-        logger.debug { "Executing getBusinessPartnersOutput() with parameters $pageRequest and $externalIds" }
-
-        return getBusinessPartners(pageRequest, externalIds, StageType.Output, tenantBpnl).toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
-    }
 
     @Transactional
     fun upsertBusinessPartnersOutput(requests: List<OutputUpsertRequest>): List<UpsertResult> {
@@ -142,21 +129,6 @@ class BusinessPartnerService(
     private fun BusinessPartnerDb.toLogIdentifier(): String {
         val bpns = listOfNotNull(bpnL, bpnS, bpnA)
         return if (bpns.isEmpty()) sharingState.externalId else "${sharingState.externalId} (${bpns.joinToString("/")})"
-    }
-
-    private fun getBusinessPartners(
-        pageRequest: PageRequest,
-        externalIds: Collection<String>?,
-        stage: StageType,
-        tenantBpnl: String?
-    ): Page<BusinessPartnerDb> {
-        val spec = Specification.allOf(
-            BusinessPartnerRepository.Specs.byExternalIdsIn(externalIds),
-            BusinessPartnerRepository.Specs.byTenantBpnl(tenantBpnl),
-            BusinessPartnerRepository.Specs.byStage(stage)
-        )
-
-        return businessPartnerRepository.findAll(spec, pageRequest)
     }
 
     data class UpsertResult(

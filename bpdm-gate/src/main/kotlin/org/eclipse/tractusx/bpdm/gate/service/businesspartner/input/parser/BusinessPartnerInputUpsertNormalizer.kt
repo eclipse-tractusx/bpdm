@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser
 
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputValues
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Component
 
@@ -57,13 +57,13 @@ class BusinessPartnerInputUpsertNormalizer {
             namePrefix = null, additionalNamePrefix = null, name = null, nameSuffix = null, additionalNameSuffix = null,
             houseNumber = null, houseNumberSupplement = null, milestone = null, direction = null
         )
-        val EMPTY_PHYSICAL_ADDRESS = BusinessPartnerInputValues.PhysicalPostalAddress(
+        val EMPTY_PHYSICAL_ADDRESS = BusinessPartnerValues.PhysicalPostalAddress(
             geographicCoordinates = null, country = null, administrativeAreaLevel1 = null, administrativeAreaLevel2 = null,
             administrativeAreaLevel3 = null, postalCode = null, city = null, district = null, street = null,
             companyPostalCode = null, industrialZone = null, building = null, floor = null, door = null,
             taxJurisdictionCode = null
         )
-        val EMPTY_ALTERNATIVE_ADDRESS = BusinessPartnerInputValues.AlternativePostalAddress(
+        val EMPTY_ALTERNATIVE_ADDRESS = BusinessPartnerValues.AlternativePostalAddress(
             geographicCoordinates = null, country = null, administrativeAreaLevel1 = null, postalCode = null, city = null,
             deliveryServiceType = null, deliveryServiceQualifier = null, deliveryServiceNumber = null
         )

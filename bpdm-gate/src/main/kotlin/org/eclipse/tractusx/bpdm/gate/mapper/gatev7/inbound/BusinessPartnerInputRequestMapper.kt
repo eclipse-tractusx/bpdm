@@ -17,7 +17,7 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputValues
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Component
@@ -63,7 +63,7 @@ class BusinessPartnerInputRequestMapper {
             },
             externalSequenceTimestamp = request.externalSequenceTimestamp,
             scriptVariants = request.scriptVariants.map(::toValue),
-            additionalSites = request.additionalSites.map { BusinessPartnerInputValues.AdditionalSite(bpn = it.siteBpn, name = it.name) }
+            additionalSites = request.additionalSites.map { BusinessPartnerValues.AdditionalSite(bpn = it.siteBpn, name = it.name) }
         )
 
     private fun toStates(states: Collection<BusinessPartnerStateDto>) =
@@ -71,7 +71,7 @@ class BusinessPartnerInputRequestMapper {
 
     private fun toValue(address: PhysicalPostalAddressDto) =
         with(address) {
-            BusinessPartnerInputValues.PhysicalPostalAddress(
+            BusinessPartnerValues.PhysicalPostalAddress(
                 geographicCoordinates = geographicCoordinates?.let(::toValue),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -92,7 +92,7 @@ class BusinessPartnerInputRequestMapper {
 
     private fun toValue(address: AlternativePostalAddressDto) =
         with(address) {
-            BusinessPartnerInputValues.AlternativePostalAddress(
+            BusinessPartnerValues.AlternativePostalAddress(
                 geographicCoordinates = geographicCoordinates?.let(::toValue),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -124,7 +124,7 @@ class BusinessPartnerInputRequestMapper {
 
     private fun toValue(scriptVariant: BusinessPartnerScriptVariantDto) =
         with(scriptVariant) {
-            BusinessPartnerInputValues.ScriptVariant(
+            BusinessPartnerValues.ScriptVariant(
                 scriptCode = scriptCode,
                 nameParts = nameParts,
                 legalName = legalEntity.legalName,
@@ -132,11 +132,11 @@ class BusinessPartnerInputRequestMapper {
                 siteName = site.name,
                 addressName = address.name,
                 physicalAddress = with(address.physicalAddress) {
-                    BusinessPartnerInputValues.PhysicalAddressScriptVariant(
+                    BusinessPartnerValues.PhysicalAddressScriptVariant(
                         city = city,
                         district = district,
                         street = with(street) {
-                            BusinessPartnerInputValues.StreetScriptVariant(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
+                            BusinessPartnerValues.StreetScriptVariant(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
                         },
                         industrialZone = industrialZone,
                         building = building,

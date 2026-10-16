@@ -19,63 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.entity.*
-
-
-fun AlternativePostalAddressDb.toAlternativePostalAddressDto() =
-    AlternativePostalAddressDto(
-        deliveryServiceType = deliveryServiceType,
-        deliveryServiceNumber = deliveryServiceNumber,
-        deliveryServiceQualifier = deliveryServiceQualifier,
-        administrativeAreaLevel1 = administrativeAreaLevel1,
-        geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
-        country = country,
-        postalCode = postalCode,
-        city = city
-    )
-
-fun PhysicalPostalAddressDb.toPhysicalPostalAddress(): PhysicalPostalAddressDto =
-    PhysicalPostalAddressDto(
-        geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
-        country = country,
-        postalCode = postalCode,
-        city = city,
-        administrativeAreaLevel1 = administrativeAreaLevel1,
-        administrativeAreaLevel2 = administrativeAreaLevel2,
-        administrativeAreaLevel3 = administrativeAreaLevel3,
-        district = district,
-        companyPostalCode = companyPostalCode,
-        industrialZone = industrialZone,
-        building = building,
-        floor = floor,
-        door = door,
-        street = street?.toStreetDto(),
-        taxJurisdictionCode = taxJurisdictionCode
-    )
-
-fun GeographicCoordinateDb.toGeographicCoordinateDto(): GeoCoordinateDto {
-    return GeoCoordinateDto(longitude, latitude, altitude)
-}
-
-fun StreetDb.toStreetDto(): StreetDto {
-
-    return StreetDto(
-        name = name,
-        houseNumber = houseNumber,
-        houseNumberSupplement = houseNumberSupplement,
-        milestone = milestone,
-        direction = direction,
-        namePrefix = namePrefix,
-        additionalNamePrefix = additionalNamePrefix,
-        nameSuffix = nameSuffix,
-        additionalNameSuffix = additionalNameSuffix
-    )
-}
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 
 fun ChangelogEntryDb.toGateDto(): ChangelogGateDto {
     return ChangelogGateDto(

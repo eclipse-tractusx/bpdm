@@ -32,11 +32,12 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertEx
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.input.BusinessPartnerInputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerOutputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
-import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.businesspartner.output.BusinessPartnerOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -44,11 +45,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class BusinessPartnerController(
-    val businessPartnerService: BusinessPartnerService,
     val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
     val inputSearchApplicationService: BusinessPartnerInputSearchApplicationService,
+    val outputSearchApplicationService: BusinessPartnerOutputSearchApplicationService,
     val inputRequestMapper: BusinessPartnerInputRequestMapper,
     val inputDtoMapper: BusinessPartnerInputDtoMapper,
+    val outputDtoMapper: BusinessPartnerOutputDtoMapper,
     val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper
 ) : GateBusinessPartnerApi {
 
@@ -66,7 +68,7 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerInputDto> {
-        val request = BusinessPartnerInputSearchRequest(externalIds)
+        val request = BusinessPartnerSearchRequest(externalIds)
         return inputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(inputDtoMapper::toDto)
     }
@@ -76,6 +78,8 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto> {
-        return businessPartnerService.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds,  getCurrentUserBpn())
+        val request = BusinessPartnerSearchRequest(externalIds)
+        return outputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
+            .toPageDto(outputDtoMapper::toDto)
     }
 }

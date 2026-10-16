@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.input
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -30,8 +31,8 @@ data class BusinessPartnerInputUpsertIn(
     val site: Site,
     val address: Address,
     val externalSequenceTimestamp: Instant?,
-    val scriptVariants: List<BusinessPartnerInputValues.ScriptVariant>,
-    val additionalSites: List<BusinessPartnerInputValues.AdditionalSite>
+    val scriptVariants: List<BusinessPartnerValues.ScriptVariant>,
+    val additionalSites: List<BusinessPartnerValues.AdditionalSite>
 ) {
     data class LegalEntity(
         val bpn: String?,
@@ -53,8 +54,8 @@ data class BusinessPartnerInputUpsertIn(
         val bpn: String?,
         val name: String?,
         val addressType: AddressType?,
-        val physicalPostalAddress: BusinessPartnerInputValues.PhysicalPostalAddress?,
-        val alternativePostalAddress: BusinessPartnerInputValues.AlternativePostalAddress?,
+        val physicalPostalAddress: BusinessPartnerValues.PhysicalPostalAddress?,
+        val alternativePostalAddress: BusinessPartnerValues.AlternativePostalAddress?,
         val states: List<State>
     )
 

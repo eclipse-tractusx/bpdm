@@ -19,7 +19,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.AdditionalSiteDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputValues
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Component
@@ -45,13 +45,13 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of [additionalSite].
      */
-    fun toEntity(additionalSite: BusinessPartnerInputValues.AdditionalSite): AdditionalSiteDb =
+    fun toEntity(additionalSite: BusinessPartnerValues.AdditionalSite): AdditionalSiteDb =
         AdditionalSiteDb(bpn = additionalSite.bpn, name = additionalSite.name)
 
     /**
      * Returns the stored form of the physical postal [address].
      */
-    fun toEntity(address: BusinessPartnerInputValues.PhysicalPostalAddress): PhysicalPostalAddressDb =
+    fun toEntity(address: BusinessPartnerValues.PhysicalPostalAddress): PhysicalPostalAddressDb =
         PhysicalPostalAddressDb(
             geographicCoordinates = address.geographicCoordinates?.let(::toEntity),
             country = address.country,
@@ -73,7 +73,7 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of the alternative postal [address].
      */
-    fun toEntity(address: BusinessPartnerInputValues.AlternativePostalAddress): AlternativePostalAddressDb =
+    fun toEntity(address: BusinessPartnerValues.AlternativePostalAddress): AlternativePostalAddressDb =
         AlternativePostalAddressDb(
             geographicCoordinates = address.geographicCoordinates?.let(::toEntity),
             country = address.country,
@@ -88,7 +88,7 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of a script variant's physical [address].
      */
-    fun toEntity(address: BusinessPartnerInputValues.PhysicalAddressScriptVariant): PhysicalPostalAddressScriptVariantDb =
+    fun toEntity(address: BusinessPartnerValues.PhysicalAddressScriptVariant): PhysicalPostalAddressScriptVariantDb =
         PhysicalPostalAddressScriptVariantDb(
             city = address.city,
             district = address.district,

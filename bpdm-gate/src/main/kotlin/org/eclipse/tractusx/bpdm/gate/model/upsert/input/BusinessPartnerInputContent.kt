@@ -17,6 +17,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import java.time.LocalDateTime
 
 /**
@@ -31,8 +32,8 @@ data class BusinessPartnerInputContent(
     val legalEntity: LegalEntity,
     val site: Site,
     val address: Address,
-    val scriptVariants: Set<BusinessPartnerInputValues.ScriptVariant>,
-    val additionalSites: Set<BusinessPartnerInputValues.AdditionalSite>
+    val scriptVariants: Set<BusinessPartnerValues.ScriptVariant>,
+    val additionalSites: Set<BusinessPartnerValues.AdditionalSite>
 ) {
     data class LegalEntity(
         val bpn: String?,
@@ -52,8 +53,8 @@ data class BusinessPartnerInputContent(
         val bpn: String?,
         val name: String?,
         val addressType: AddressType?,
-        val physicalPostalAddress: BusinessPartnerInputValues.PhysicalPostalAddress?,
-        val alternativePostalAddress: BusinessPartnerInputValues.AlternativePostalAddress?
+        val physicalPostalAddress: BusinessPartnerValues.PhysicalPostalAddress?,
+        val alternativePostalAddress: BusinessPartnerValues.AlternativePostalAddress?
     )
 
     data class Identifier(

@@ -11,16 +11,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.input
+package org.eclipse.tractusx.bpdm.gate.model.value
 
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
 
 /**
- * Value types of a business partner input that parsing passes through unchanged, shared by the unparsed and parsed models.
+ * Value types a business partner carries unchanged through every stage and representation.
  */
-object BusinessPartnerInputValues {
+object BusinessPartnerValues {
     data class PhysicalPostalAddress(
         val geographicCoordinates: GeoCoordinate?,
         val country: String?,

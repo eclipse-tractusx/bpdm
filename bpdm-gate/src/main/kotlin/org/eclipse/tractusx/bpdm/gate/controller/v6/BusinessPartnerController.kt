@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -28,11 +29,14 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.BusinessPartnerOutputDtoMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.businesspartner.output.BusinessPartnerOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -40,11 +44,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("businessPartnerControllerLegacy")
 class BusinessPartnerController(
-    val businessPartnerLegacyMapper: BusinessPartnerLegacyMapper,
     val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
     val inputRequestMapper: BusinessPartnerInputRequestMapper,
     val inputDtoMapper: BusinessPartnerInputDtoMapper,
-    val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper
+    val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper,
+    val outputSearchApplicationService: BusinessPartnerOutputSearchApplicationService,
+    val outputDtoMapper: BusinessPartnerOutputDtoMapperV6
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
@@ -61,6 +66,8 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto> {
-        return businessPartnerLegacyMapper.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds,  getCurrentUserBpn())
+        val request = BusinessPartnerSearchRequest(externalIds)
+        return outputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
+            .toPageDto(outputDtoMapper::toDto)
     }
 }

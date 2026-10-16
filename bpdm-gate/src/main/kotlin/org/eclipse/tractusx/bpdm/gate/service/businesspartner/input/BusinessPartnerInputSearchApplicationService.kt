@@ -14,10 +14,10 @@
 package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input
 
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.input.BusinessPartnerInputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputRecord
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.operation.BusinessPartnerInputSearchOperationService
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser.BusinessPartnerInputSearchParser
+import org.eclipse.tractusx.bpdm.gate.service.businesspartner.parser.BusinessPartnerSearchParser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class BusinessPartnerInputSearchApplicationService(
-    private val parser: BusinessPartnerInputSearchParser,
+    private val parser: BusinessPartnerSearchParser,
     private val operationService: BusinessPartnerInputSearchOperationService,
     private val recordMapper: BusinessPartnerInputRecordMapper
 ) {
@@ -37,7 +37,7 @@ class BusinessPartnerInputSearchApplicationService(
      * Returns the page of [tenantBpnl]'s business partner inputs that match [request].
      */
     @Transactional(readOnly = true)
-    fun search(request: BusinessPartnerInputSearchRequest, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerInputRecord> =
+    fun search(request: BusinessPartnerSearchRequest, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerInputRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
             .map(recordMapper::toRecord)
 }
