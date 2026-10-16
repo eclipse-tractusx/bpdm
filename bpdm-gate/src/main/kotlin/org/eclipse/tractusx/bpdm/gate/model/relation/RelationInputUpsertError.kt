@@ -20,6 +20,7 @@ import java.time.LocalDate
  * Reason a relation input upsert is rejected, either for the batch as a whole or for one of its entries.
  */
 sealed interface RelationInputUpsertError {
+    data class UpsertLimitExceeded(val limit: Int, val actual: Int) : RelationInputUpsertError
     data class DuplicateExternalIds(val externalIds: Set<String>) : RelationInputUpsertError
     data class NotFound(val externalId: String) : RelationInputUpsertError
     data class SourceNotFound(val externalId: String, val sourceExternalId: String) : RelationInputUpsertError

@@ -29,6 +29,8 @@ class RelationInputUpsertErrorMapper {
      */
     fun toMessage(error: RelationInputUpsertError): String =
         when (error) {
+            is UpsertLimitExceeded ->
+                "At most ${error.limit} relations may be upserted at once, but ${error.actual} were given"
             is DuplicateExternalIds ->
                 "External IDs occur more than once in the batch: ${error.externalIds.joinToString { "'$it'" }}"
             is NotFound ->

@@ -17,6 +17,7 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.relation
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertError
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class RelationInputUpsertParser(
+    private val apiConfigProperties: ApiConfigProperties,
     private val relationStageRepository: RelationStageRepository,
     private val sharingStateRepository: SharingStateRepository
 ) {
@@ -50,6 +52,8 @@ class RelationInputUpsertParser(
         tenantBpnl: String,
         createIfNotExist: Boolean
     ): ParseResult<List<RelationInputUpsertParsed>, RelationInputUpsertError> {
+        val limit = apiConfigProperties.upsertLimit
+        if (requests.size > limit) return ParseResult.ofSingleFailure(UpsertLimitExceeded(limit, requests.size))
         val duplicates = requests.groupingBy { it.externalId }.eachCount().filterValues { it > 1 }.keys
         if (duplicates.isNotEmpty()) return ParseResult.ofSingleFailure(DuplicateExternalIds(duplicates))
         if (requests.isEmpty()) return ParseResult.Success(emptyList())

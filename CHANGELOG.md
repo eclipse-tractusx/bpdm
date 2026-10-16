@@ -26,7 +26,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Searching the business partner and relation changelogs ignores unknown external IDs instead of reporting them as errors. The response fields `invalidEntries` and `errors` are deprecated and always `0` and empty.
 - BPDM Gate: Setting business partners ready to be shared reports every unknown external ID and every business partner in a state that cannot be set ready at once, with one error message each, instead of only the first kind of problem found.
 - BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error. A malformed or incomplete geographic coordinate is now reported as an error instead of being stored as `0.0`.
-- BPDM Gate: Upserting input relations through the V7 API reports every invalid relation at once, with one error message for each problem, instead of only the first one found. A request that names the same external ID more than once is rejected instead of letting the later entry win.
+- BPDM Gate: Upserting input relations through the V7 API reports every invalid relation at once, with one error message for each problem, instead of only the first one found. A request that names the same external ID more than once is rejected instead of letting the later entry win, and a request with more relations than the configured upsert limit (`bpdm.api.upsert-limit`, 100 by default) is rejected.
 
 ### Fixed
 

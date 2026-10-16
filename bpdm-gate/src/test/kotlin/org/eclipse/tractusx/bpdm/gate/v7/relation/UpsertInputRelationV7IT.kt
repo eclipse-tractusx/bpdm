@@ -35,10 +35,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException.BadRequest
 import java.time.LocalDate
 
 class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
+
+    @Autowired
+    lateinit var apiConfigProperties: ApiConfigProperties
 
     /**
      * GIVEN two business partner inputs
@@ -346,6 +351,22 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         //WHEN + THEN
         assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(request, request)))
+        }
+    }
+
+    /**
+     * GIVEN the configured upsert limit
+     * WHEN input manager upserts one relation more than the limit allows in one request
+     * THEN a bad request error is returned
+     */
+    @Test
+    fun `try upsert more relations than the upsert limit allows`() {
+        //GIVEN
+        val entries = (0..apiConfigProperties.upsertLimit).map { testData.relation.input.request.fromSeed("$testName $it") }
+
+        //WHEN + THEN
+        assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
+            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(entries))
         }
     }
 
