@@ -10,14 +10,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.service.changelog
+package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogEntryRecord
 import org.eclipse.tractusx.bpdm.gate.model.search.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.service.changelog.operation.ChangelogSearchOperationService
-import org.eclipse.tractusx.bpdm.gate.service.changelog.parser.ChangelogSearchParser
+import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogSearchOperationService
+import org.eclipse.tractusx.bpdm.gate.service.parser.changelog.ChangelogSearchParser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service

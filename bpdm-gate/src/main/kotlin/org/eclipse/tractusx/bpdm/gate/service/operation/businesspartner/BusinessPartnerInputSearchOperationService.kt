@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.operation
+package org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb

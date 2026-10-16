@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInpu
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileRow
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PartnerFileUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest

@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser
+package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
 import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues

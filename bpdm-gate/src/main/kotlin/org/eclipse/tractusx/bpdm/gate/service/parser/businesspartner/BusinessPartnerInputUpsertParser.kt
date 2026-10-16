@@ -11,15 +11,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser
+package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.mapper.parsed.BusinessPartnerInputUpsertParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertParsed
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser.validator.BusinessPartnerInputUpsertBatchValidator
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser.validator.BusinessPartnerInputUpsertValidator
+import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator.BusinessPartnerInputUpsertBatchValidator
+import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator.BusinessPartnerInputUpsertValidator
 import org.springframework.stereotype.Service
 
 /**

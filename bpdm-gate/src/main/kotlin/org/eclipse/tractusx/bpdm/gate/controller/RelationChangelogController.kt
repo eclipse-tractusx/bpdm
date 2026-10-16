@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.ChangelogDtoMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.service.changelog.ChangelogSearchApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.ChangelogSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController

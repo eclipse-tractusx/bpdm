@@ -11,25 +11,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.parser.validator
+package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator
 
-import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
 import org.springframework.stereotype.Component
 
 /**
- * Rejects a batch larger than the configured upsert limit.
+ * Rejects a batch in which the same external ID occurs more than once.
  */
 @Component
-class UpsertLimitValidator(
-    private val apiConfigProperties: ApiConfigProperties
-) : BusinessPartnerInputUpsertBatchValidator {
+class UniqueExternalIdsValidator : BusinessPartnerInputUpsertBatchValidator {
 
     override fun validate(requests: List<BusinessPartnerInputUpsertIn>): List<BusinessPartnerInputUpsertError> {
-        val limit = apiConfigProperties.upsertLimit
-        return if (requests.size > limit)
-            listOf(BusinessPartnerInputUpsertError.UpsertLimitExceeded(limit, requests.size))
+        val duplicates = requests.groupingBy { it.externalId }.eachCount().filterValues { it > 1 }.keys
+        return if (duplicates.isNotEmpty())
+            listOf(BusinessPartnerInputUpsertError.DuplicateExternalIds(duplicates))
         else
             emptyList()
     }

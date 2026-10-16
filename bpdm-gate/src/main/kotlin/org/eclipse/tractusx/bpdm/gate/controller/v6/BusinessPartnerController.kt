@@ -35,8 +35,8 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInpu
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.output.BusinessPartnerOutputSearchApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputUpsertApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

@@ -11,13 +11,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.service.businesspartner.input
+package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputRecordMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputRecord
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.operation.BusinessPartnerInputSearchOperationService
-import org.eclipse.tractusx.bpdm.gate.service.businesspartner.parser.BusinessPartnerSearchParser
+import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerInputSearchOperationService
+import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.BusinessPartnerSearchParser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
