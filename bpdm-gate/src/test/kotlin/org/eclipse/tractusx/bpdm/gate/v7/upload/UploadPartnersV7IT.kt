@@ -23,9 +23,11 @@ import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
@@ -140,6 +142,27 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
         Assertions.assertThatExceptionOfType(WebClientResponseException.BadRequest::class.java).isThrownBy(uploadRequest)
     }
 
+    /**
+     * GIVEN the Pool knows no legal entity of the uploading tenant
+     * WHEN uploading valid business partner CSV file
+     * THEN user sees 400 HTTP error
+     */
+    @Test
+    fun `try to upload CSV file for tenant unknown to the Pool`() {
+        //GIVEN
+        poolMockDataFactory.mockNoLegalEntitySearchResult()
+
+        //WHEN
+        val uploadRequest = {
+            val partnerUploadFile = ClassPathResource("testData/valid_partner_data.csv")
+            gateClient.partnerUpload.uploadPartnerCsvFile(partnerUploadFile).body!!
+            Unit
+        }
+
+        //THEN
+        Assertions.assertThatExceptionOfType(WebClientResponseException.BadRequest::class.java).isThrownBy(uploadRequest)
+    }
+
     private fun mockExpectedTenantLegalEntity(){
         poolMockDataFactory.configureWireMock()
         val tenantLegalEntityRequest = with(poolMockDataFactory.requestFactory.createLegalEntityRequest(testName)) { copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(legalName = ExpectedResponses.tenantLegalName))) }
@@ -202,7 +225,13 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                     building = "Building Two",
                     floor = "Floor Two",
                     door = "Door Two",
-                    street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
+                    street = StreetDto(
+                        namePrefix = "Prefix",
+                        additionalNamePrefix = "Additional Prefix",
+                        name = "TODO",
+                        direction = "direction1",
+                        houseNumberSupplement = "B"
+                    ),
                 ),
                 alternativePostalAddress = AlternativePostalAddressDto(
                     country = CountryCode.DE.alpha2,
@@ -223,9 +252,17 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
 
         val validEntry2 = validEntry1.copy(
             externalId = "external-2",
-            site = validEntry1.site.copy(name = "Site Name 2"),
-            address = validEntry1.address.copy(addressBpn = "BPNA0000000002XY"),
-
+            site = validEntry1.site.copy(
+                name = "Site Name 2",
+                states = listOf(BusinessPartnerStateDto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
+            ),
+            address = validEntry1.address.copy(
+                addressBpn = "BPNA0000000002XY",
+                physicalPostalAddress = validEntry1.address.physicalPostalAddress.copy(
+                    street = StreetDto(name = "TODO", direction = "direction1", houseNumberSupplement = "B")
+                ),
+                alternativePostalAddress = null
+            )
         )
 
         val unmaintainedCountryEntry = validEntry1.copy(

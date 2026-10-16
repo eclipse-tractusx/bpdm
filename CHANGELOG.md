@@ -25,6 +25,13 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Regions, subdivisions and field quality rules use plain country codes validated against the provider-maintained country catalogue instead of the compiled enum. Unknown countries are rejected with an error naming the code.
 - BPDM Gate: Searching the business partner and relation changelogs ignores unknown external IDs instead of reporting them as errors. The response fields `invalidEntries` and `errors` are deprecated and always `0` and empty.
 - BPDM Gate: Setting business partners ready to be shared reports every unknown external ID and every business partner in a state that cannot be set ready at once, with one error message each, instead of only the first kind of problem found.
+- BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error. A malformed or incomplete geographic coordinate is now reported as an error instead of being stored as `0.0`.
+
+### Fixed
+
+- BPDM Gate: The CSV upload stores the street name prefix and additional name prefix from their own columns. Before, the name prefix column was ignored and both prefixes were filled from the wrong columns.
+- BPDM Gate: The CSV upload no longer adds an empty alternative postal address, or coordinates of `0.0`, to business partners whose CSV row leaves those columns blank.
+- BPDM Gate: The CSV upload keeps a site or address state that has a type but no validity dates, instead of dropping it, and stores an empty house number as absent.
 
 ## [7.5.0] - 2026-09-08
 

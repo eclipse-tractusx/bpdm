@@ -16,7 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.input
 /**
  * Reason a business partner input upsert is rejected, either for the batch as a whole or for one of its entries.
  */
-sealed interface BusinessPartnerInputUpsertError {
+sealed interface BusinessPartnerInputUpsertError : BusinessPartnerCsvUpsertError {
     data class UpsertLimitExceeded(val limit: Int, val actual: Int) : BusinessPartnerInputUpsertError
     data class DuplicateExternalIds(val externalIds: Set<String>) : BusinessPartnerInputUpsertError
     data class AdditionalSitesWithoutOwnSite(val externalId: String) : BusinessPartnerInputUpsertError

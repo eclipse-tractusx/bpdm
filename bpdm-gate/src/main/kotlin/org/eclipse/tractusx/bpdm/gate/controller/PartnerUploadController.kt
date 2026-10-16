@@ -22,7 +22,13 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.gate.api.GatePartnerUploadApi
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.PartnerUploadService
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerUploadException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerCsvReader
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerCsvTemplateWriter
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerCsvUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvUpsertResult
+import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerCsvUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpHeaders
@@ -35,23 +41,29 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 class PartnerUploadController(
-    val partnerUploadService: PartnerUploadService
+    val csvUpsertApplicationService: BusinessPartnerCsvUpsertApplicationService,
+    val csvReader: BusinessPartnerCsvReader,
+    val csvTemplateWriter: BusinessPartnerCsvTemplateWriter,
+    val inputDtoMapper: BusinessPartnerInputDtoMapper,
+    val csvErrorMapper: BusinessPartnerCsvUpsertErrorMapper
 ) : GatePartnerUploadApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.UPLOAD_INPUT_PARTNER})")
     override fun uploadPartnerCsvFile(
         file: MultipartFile
     ): ResponseEntity<Collection<BusinessPartnerInputDto>> {
-        return when {
-            file.isEmpty -> ResponseEntity(HttpStatus.BAD_REQUEST)
-            !file.contentType.equals("text/csv", ignoreCase = true) -> ResponseEntity(HttpStatus.BAD_REQUEST)
-            else -> partnerUploadService.processFile(file, getCurrentUserBpn())
+        if (file.isEmpty || !file.contentType.equals("text/csv", ignoreCase = true))
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+
+        return when (val result = csvUpsertApplicationService.upload(csvReader.read(file), getCurrentUserBpn())) {
+            is BusinessPartnerCsvUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
+            is BusinessPartnerCsvUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map(csvErrorMapper::toMessage))
         }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.UPLOAD_INPUT_PARTNER})")
     override fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource> {
-        val resource = partnerUploadService.generatePartnerCsvTemplate()
+        val resource = csvTemplateWriter.write()
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=partner-upload-template.csv")
             .contentType(MediaType.parseMediaType("text/csv"))
