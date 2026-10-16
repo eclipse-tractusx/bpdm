@@ -24,6 +24,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Stored address countries now reference the maintained country catalogue through foreign keys. There is no API change.
 - BPDM Pool: Regions, subdivisions and field quality rules use plain country codes validated against the provider-maintained country catalogue instead of the compiled enum. Unknown countries are rejected with an error naming the code.
 - BPDM Gate: Searching the business partner and relation changelogs ignores unknown external IDs instead of reporting them as errors. The response fields `invalidEntries` and `errors` are deprecated and always `0` and empty.
+- BPDM Gate: Setting business partners ready to be shared reports every unknown external ID and every business partner in a state that cannot be set ready at once, with one error message each, instead of only the first kind of problem found.
 
 ## [7.5.0] - 2026-09-08
 

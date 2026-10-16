@@ -228,6 +228,13 @@ class GateAssertRepositoryV7(
             .isEqualTo(expected)
     }
 
+    fun assertErrorPerExternalId(actual: GateErrorResponse, externalIds: Collection<String>) {
+        Assertions.assertThat(actual.error).hasSameSizeAs(externalIds)
+        externalIds.forEach { externalId ->
+            Assertions.assertThat(actual.error).anySatisfy { Assertions.assertThat(it).contains("'$externalId'") }
+        }
+    }
+
     fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse) {
         Assertions.assertThat(actual).isEqualTo(expected)
     }
