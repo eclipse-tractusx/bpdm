@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
@@ -53,12 +52,6 @@ class BusinessPartnerService(
     private val outputUpsertMappings: OutputUpsertMappings
 ) {
     private val logger = KotlinLogging.logger { }
-
-    fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?, tenantBpnl: String?): PageDto<BusinessPartnerInputDto> {
-        logger.debug { "Executing getBusinessPartnersInput() with parameters $pageRequest and $externalIds" }
-
-        return getBusinessPartners(pageRequest, externalIds, StageType.Input, tenantBpnl).toPageDto(businessPartnerMappings::toBusinessPartnerInputDto)
-    }
 
     fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?, tenantBpnl: String?): PageDto<BusinessPartnerOutputDto> {
         logger.debug { "Executing getBusinessPartnersOutput() with parameters $pageRequest and $externalIds" }

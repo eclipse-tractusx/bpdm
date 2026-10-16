@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -31,8 +32,10 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertEx
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.model.search.input.BusinessPartnerInputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
+import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.businesspartner.input.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.http.ResponseEntity
@@ -43,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController
 class BusinessPartnerController(
     val businessPartnerService: BusinessPartnerService,
     val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
+    val inputSearchApplicationService: BusinessPartnerInputSearchApplicationService,
     val inputRequestMapper: BusinessPartnerInputRequestMapper,
     val inputDtoMapper: BusinessPartnerInputDtoMapper,
     val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper
@@ -62,7 +66,9 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerInputDto> {
-        return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds,  getCurrentUserBpn())
+        val request = BusinessPartnerInputSearchRequest(externalIds)
+        return inputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
+            .toPageDto(inputDtoMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")

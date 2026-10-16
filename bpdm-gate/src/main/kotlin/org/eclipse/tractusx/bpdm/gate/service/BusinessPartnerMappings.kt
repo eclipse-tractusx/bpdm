@@ -38,25 +38,6 @@ import java.time.Instant
 @Service
 class BusinessPartnerMappings {
 
-    fun toBusinessPartnerInputDto(entity: BusinessPartnerDb): BusinessPartnerInputDto {
-        return BusinessPartnerInputDto(
-            externalId = entity.sharingState.externalId,
-            nameParts = entity.nameParts,
-            identifiers = entity.identifiers.map(::toIdentifierDto),
-            states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }.map(::toStateDto),
-            roles = entity.roles,
-            isOwnCompanyData = entity.isOwnCompanyData,
-            legalEntity = toLegalEntityComponentInputDto(entity),
-            site = toSiteComponentInputDto(entity),
-            address = toAddressComponentInputDto(entity),
-            externalSequenceTimestamp = entity.externalSequenceTimestamp,
-            scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
-            additionalSites = entity.additionalSites.map { AdditionalSiteInputDto(siteBpn = it.bpn, name = it.name) },
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt
-        )
-    }
-
     fun toBusinessPartnerOutputDto(entity: BusinessPartnerDb): BusinessPartnerOutputDto {
         return BusinessPartnerOutputDto(
             externalId = entity.sharingState.externalId,
@@ -102,37 +83,6 @@ class BusinessPartnerMappings {
             ),
             name = additionalSite.name
         )
-
-    private fun toLegalEntityComponentInputDto(entity: BusinessPartnerDb): LegalEntityRepresentationInputDto {
-        return LegalEntityRepresentationInputDto(
-            legalEntityBpn = entity.bpnL,
-            legalName = entity.legalName,
-            shortName = entity.shortName,
-            legalForm = entity.legalForm,
-            ownershipUltimate = entity.ownershipUltimate,
-            ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
-            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
-        )
-    }
-
-    private fun toSiteComponentInputDto(entity: BusinessPartnerDb): SiteRepresentationInputDto {
-        return SiteRepresentationInputDto(
-            siteBpn = entity.bpnS,
-            name = entity.siteName,
-            states = toStateDtos(entity.states, BusinessPartnerType.SITE)
-        )
-    }
-
-    private fun toAddressComponentInputDto(entity: BusinessPartnerDb): AddressRepresentationInputDto {
-        return AddressRepresentationInputDto(
-            addressBpn = entity.bpnA,
-            name = entity.addressName,
-            addressType = entity.postalAddress.addressType,
-            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto(),
-            states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS)
-        )
-    }
 
     private fun toLegalEntityComponentOutputDto(entity: BusinessPartnerDb): LegalEntityRepresentationOutputDto {
         return LegalEntityRepresentationOutputDto(
