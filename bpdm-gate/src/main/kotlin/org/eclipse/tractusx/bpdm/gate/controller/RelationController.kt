@@ -27,7 +27,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.RelationInputRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.IRelationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -35,7 +41,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class RelationController(
     private val relationshipService: IRelationService,
-    private val principalUtil: PrincipalUtil
+    private val principalUtil: PrincipalUtil,
+    private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
+    private val inputRequestMapper: RelationInputRequestMapper,
+    private val inputDtoMapper: RelationInputDtoMapper,
+    private val inputErrorMapper: RelationInputUpsertErrorMapper
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
@@ -59,18 +69,10 @@ class RelationController(
         createIfNotExist: Boolean,
         requestBody: RelationPutRequest
     ): RelationPutResponse {
-        val upsertedRelations = if(createIfNotExist){
-            relationshipService.upsertInputRelations(
-                tenantBpnL = principalUtil.resolveTenantBpnl(),
-                relations = requestBody.relations
-            )
-        }else{
-            relationshipService.updateInputRelations(
-                tenantBpnL = principalUtil.resolveTenantBpnl(),
-                relations = requestBody.relations
-            )
+        val requests = requestBody.relations.map(inputRequestMapper::toUpsertRequest)
+        return when (val result = inputUpsertApplicationService.upsert(requests, principalUtil.resolveTenantBpnl().value, createIfNotExist)) {
+            is RelationInputUpsertResult.Written -> RelationPutResponse(result.relations.map(inputDtoMapper::toDto))
+            is RelationInputUpsertResult.Rejected -> throw BpdmRelationInputUpsertException(result.errors.map(inputErrorMapper::toMessage))
         }
-
-        return RelationPutResponse(upsertedRelations)
     }
 }

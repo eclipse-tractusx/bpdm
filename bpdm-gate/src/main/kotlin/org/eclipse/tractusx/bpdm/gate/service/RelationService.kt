@@ -136,7 +136,7 @@ class RelationService(
     }
 
     @Transactional
-    override fun upsertInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto> {
+    fun upsertInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto> {
         val writes = relations.map {
                 with(it){
                     upsertInputStage(
@@ -157,7 +157,7 @@ class RelationService(
     }
 
     @Transactional
-    override fun updateInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto> {
+    fun updateInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto> {
         val writes = relations.map {
                 with(it){
                     updateInputStage(

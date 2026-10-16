@@ -22,13 +22,17 @@ package org.eclipse.tractusx.bpdm.gate.v7.relation
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withTarget
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withValidityPeriods
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException.BadRequest
@@ -297,5 +301,76 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             testDataClient.relation.upsertRelationInput(request)
         }
+    }
+
+    /**
+     * GIVEN a business partner input
+     * WHEN input manager upserts a relation to an unknown target and a relation from that business partner to itself
+     * THEN input manager sees one error for each of the relations
+     */
+    @Test
+    fun `try upsert several invalid relations`() {
+        //GIVEN
+        val businessPartner = testDataClient.businessPartner.upsertInput(testName)
+        val unknownTarget = testData.relation.input.request.fromSeed("$testName unknown target")
+            .withSource(businessPartner.externalId)
+            .withTarget("NON_EXISTING_EXTERNAL_ID")
+        val selfRelation = testData.relation.input.request.fromSeed("$testName self relation")
+            .withSource(businessPartner.externalId)
+            .withTarget(businessPartner.externalId)
+
+        //WHEN
+        val response = assertThrows<BadRequest> {
+            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(unknownTarget, selfRelation)))
+        }
+
+        //THEN
+        assertRepo.assertErrorPerExternalId(
+            response.getResponseBodyAs(GateErrorResponse::class.java)!!,
+            listOf(unknownTarget.externalId, selfRelation.externalId)
+        )
+    }
+
+    /**
+     * GIVEN two business partner inputs
+     * WHEN input manager upserts two relations with the same external ID in one request
+     * THEN a bad request error is returned
+     */
+    @Test
+    fun `try upsert relations with duplicate external IDs`() {
+        //GIVEN
+        val request = testData.relation.input.request.fromSeed(testName)
+        testDataClient.businessPartner.upsertInput(request.businessPartnerSourceExternalId)
+        testDataClient.businessPartner.upsertInput(request.businessPartnerTargetExternalId)
+
+        //WHEN + THEN
+        assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
+            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(request, request)))
+        }
+    }
+
+    /**
+     * GIVEN two business partner inputs
+     * WHEN input manager upserts a valid relation together with a relation from an unknown source
+     * THEN neither relation exists
+     */
+    @Test
+    fun `upsert no relation when any relation is invalid`() {
+        //GIVEN
+        val valid = testData.relation.input.request.fromSeed("$testName valid")
+        testDataClient.businessPartner.upsertInput(valid.businessPartnerSourceExternalId)
+        testDataClient.businessPartner.upsertInput(valid.businessPartnerTargetExternalId)
+        val invalid = testData.relation.input.request.fromSeed("$testName invalid")
+            .withSource("NON_EXISTING_EXTERNAL_ID")
+            .withTarget(valid.businessPartnerTargetExternalId)
+
+        //WHEN
+        assertThrows<BadRequest> {
+            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(valid, invalid)))
+        }
+
+        //THEN
+        val actualResponse = gateClient.relation.postSearch(RelationSearchRequest(externalIds = listOf(valid.externalId, invalid.externalId)))
+        assertRepo.assertRelations(actualResponse, PageDto(0, 0, 0, 0, emptyList()))
     }
 }

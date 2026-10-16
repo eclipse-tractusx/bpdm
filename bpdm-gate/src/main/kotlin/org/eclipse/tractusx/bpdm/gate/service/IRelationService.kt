@@ -23,7 +23,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import java.time.Instant
 
@@ -48,10 +47,6 @@ interface IRelationService {
         updatedAtFrom: Instant? = null,
         paginationRequest: PaginationRequest
     ): PageDto<RelationOutputDto>
-
-    fun upsertInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto>
-
-    fun updateInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto>
 
     fun upsertOutputRelations(relations: List<RelationUpsertRequest>): List<RelationDb>
 
