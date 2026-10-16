@@ -28,9 +28,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateReadyErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.SharingStateSearchRequest
-import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyResult
+import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateReadyApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,10 +43,11 @@ import java.time.Instant
 
 @RestController
 class SharingStateController(
-    private val sharingStateService: SharingStateService,
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
-    private val sharingStateDtoMapper: SharingStateDtoMapper
-) : GateSharingStateApi {
+    private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
+    private val sharingStateDtoMapper: SharingStateDtoMapper,
+    private val sharingStateReadyErrorMapper: SharingStateReadyErrorMapper
+): GateSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
@@ -59,6 +64,10 @@ class SharingStateController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
-        sharingStateService.setReady(request.externalIds,  getCurrentUserBpn())
+        val readyRequest = SharingStateReadyRequest(request.externalIds)
+        when (val result = sharingStateReadyApplicationService.setReady(readyRequest, getCurrentUserBpn())) {
+            is SharingStateReadyResult.Readied -> Unit
+            is SharingStateReadyResult.Rejected -> throw BpdmSharingStateReadyException(result.errors.map(sharingStateReadyErrorMapper::toMessage))
+        }
     }
 }

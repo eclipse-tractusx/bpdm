@@ -25,8 +25,6 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.stereotype.Service
@@ -39,26 +37,6 @@ class SharingStateService(
     private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
     private val changeLogger: PersistedChangeLogger
 ) {
-
-    fun setReady(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
-        val existingSharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)
-        val existingIds = existingSharingStates.map { it.externalId }.toSet()
-        val missingIds = externalIds.minus(existingIds)
-
-        if (missingIds.isNotEmpty())
-            throw BpdmMissingPartnerException(missingIds)
-
-
-        val (correctStates, incorrectStates) = existingSharingStates.partition {
-            it.sharingStateType == SharingStateType.Initial
-                    || it.sharingStateType == SharingStateType.Error
-        }
-
-        if (incorrectStates.isNotEmpty())
-            throw BpdmInvalidStateException(incorrectStates.map { BpdmInvalidStateException.InvalidState(it.externalId, it.sharingStateType) })
-
-        return correctStates.map { setReady(it) }
-    }
 
     fun setInitial(sharingState: SharingStateDb): SharingStateDb {
         sharingState.sharingStateType =
@@ -106,18 +84,6 @@ class SharingStateService(
         sharingState.sharingErrorCode = sharingErrorCode
         sharingState.sharingErrorMessage = sharingErrorMessage
         sharingState.sharingProcessStarted = startTimeOverwrite ?: sharingState.sharingProcessStarted ?: LocalDateTime.now()
-
-        return stateRepository.save(sharingState)
-    }
-
-    fun setReady(
-        sharingState: SharingStateDb
-    ): SharingStateDb {
-        sharingState.sharingStateType = SharingStateType.Ready
-        sharingState.sharingErrorCode = null
-        sharingState.sharingErrorMessage = null
-        sharingState.sharingProcessStarted = null
-        sharingState.taskId = null
 
         return stateRepository.save(sharingState)
     }

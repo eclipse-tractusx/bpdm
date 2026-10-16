@@ -43,6 +43,12 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
+    @ExceptionHandler(BpdmSharingStateReadyException::class)
+    fun handleSharingStateReadyException(ex: BpdmSharingStateReadyException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.messages, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
     @ExceptionHandler(BpdmRelationAlreadyExistsException::class)
     fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
         val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.CONFLICT)
