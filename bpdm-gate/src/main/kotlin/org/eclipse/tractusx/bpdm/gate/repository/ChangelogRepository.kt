@@ -76,8 +76,4 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
             }
 
     }
-
-    fun findDistinctByExternalIdInAndTenantBpnl(externalIdList: Collection<String>, tenantBpnl: String?): Set<ChangelogEntryDb>
-
-
 }

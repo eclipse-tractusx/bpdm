@@ -42,9 +42,15 @@ data class PageChangeLogDto<T>(
     @get:ArraySchema(arraySchema = Schema(description = "Collection of results in the page"))
     val content: Collection<T>,
 
-    @get:Schema(description = "Number of entries in the page that have been omitted due to being invalid (error)")
+    @get:Schema(
+        description = "Deprecated: always 0, since unknown external IDs are ignored by the search.",
+        deprecated = true
+    )
     val invalidEntries: Int,
 
-    @get:Schema(description = "Infos about the entries with errors")
+    @get:Schema(
+        description = "Deprecated: always empty, since unknown external IDs are ignored by the search.",
+        deprecated = true
+    )
     val errors: Collection<ErrorInfo<ChangeLogOutputError>>,
 )

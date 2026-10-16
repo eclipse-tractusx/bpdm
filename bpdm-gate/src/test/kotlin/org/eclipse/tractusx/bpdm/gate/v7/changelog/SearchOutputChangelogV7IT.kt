@@ -157,10 +157,10 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     /**
      * GIVEN no changelog entry exists for a given external-ID
      * WHEN output consumer searches for changelogs by that external-ID
-     * THEN output consumer gets an empty page with an error entry for the unknown external-ID
+     * THEN output consumer gets an empty page without errors
      */
     @Test
-    fun `return error for non-existing external-ID in output changelog`() {
+    fun `ignore non-existing external-ID in output changelog`() {
         //GIVEN
         testDataClient.businessPartner.createOutput(testName)
         val unknownExternalId = "non-existing-external-id"
@@ -176,8 +176,8 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
             page = 0,
             contentSize = 0,
             content = emptyList<ChangelogGateDto>(),
-            invalidEntries = 1,
-            errors = listOf(ErrorInfo(ChangeLogOutputError.ExternalIdNotFound, "$unknownExternalId not found", unknownExternalId))
+            invalidEntries = 0,
+            errors = emptyList<ErrorInfo<ChangeLogOutputError>>()
         )
         assertRepo.assertChangelog(response, expected)
     }
