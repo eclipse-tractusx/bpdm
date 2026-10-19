@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.springframework.data.jpa.domain.Specification
@@ -37,7 +37,7 @@ interface IdentifierTypeRepository :
                 builder.equal(root.get<IdentifierBusinessPartnerType>(IdentifierTypeDb::businessPartnerType.name), businessPartnerType)
             }
 
-        fun byCountry(countryCode: CountryCode?) =
+        fun byCountry(countryCode: CountryDb?) =
             countryCode?.let {
                 Specification<IdentifierTypeDb> { root, query, builder ->
                     val subquery = query!!.subquery(IdentifierTypeDetailDb::class.java)
@@ -51,9 +51,9 @@ interface IdentifierTypeRepository :
                                 root
                             ),
                             builder.or(
-                                subRoot.get<CountryCode>(IdentifierTypeDetailDb::countryCode.name).isNull,
+                                subRoot.get<CountryDb>(IdentifierTypeDetailDb::countryCode.name).isNull,
                                 builder.equal(
-                                    subRoot.get<CountryCode>(IdentifierTypeDetailDb::countryCode.name),
+                                    subRoot.get<CountryDb>(IdentifierTypeDetailDb::countryCode.name),
                                     countryCode
                                 )
                             )

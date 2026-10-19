@@ -18,6 +18,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Changed
 
+- BPDM Pool: Legal-form and identifier-type country schemas in V6 and V7 are strings validated against the country catalogue, including identifier-type search filters. Stored countries reference the catalogue by foreign key. Legal-form languages are strings validated against a BPDM-owned ISO 639-1 list; regenerate API clients.
+- BPDM: Removed the unmaintained `com.neovisionaries:nv-i18n` dependency and the unused legal-form seed generator. Country values no longer depend on a compiled list.
 - BPDM Gate: Address country codes in the V6 and V7 input and output schemas are strings instead of an enumeration. Sharing members can submit provider-maintained countries through the API or CSV upload; generated API clients must be regenerated.
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
 - BPDM Pool: Address countries are validated against the provider-maintained country catalogue at request time. The address country schema is now a string instead of an enumeration, so generated API clients must be regenerated.

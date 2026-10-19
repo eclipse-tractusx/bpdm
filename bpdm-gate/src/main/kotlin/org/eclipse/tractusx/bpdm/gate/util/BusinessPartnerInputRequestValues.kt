@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
@@ -95,7 +94,7 @@ object BusinessPartnerInputRequestValues {
             addressType = null,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = geoCoordinate,
-                country = CountryCode.UNDEFINED.alpha2,
+                country = "DE",
                 administrativeAreaLevel1 = "AD-02",
                 administrativeAreaLevel2 = "string",
                 administrativeAreaLevel3 = "string",
@@ -112,7 +111,7 @@ object BusinessPartnerInputRequestValues {
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = geoCoordinate,
-                country = CountryCode.UNDEFINED.alpha2,
+                country = "DE",
                 administrativeAreaLevel1 = "AD-02",
                 postalCode = "string",
                 city = "string",

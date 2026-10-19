@@ -22,7 +22,6 @@ maven/mavencentral/com.github.java-json-tools/msg-simple/1.2, Apache-2.0 OR LGPL
 maven/mavencentral/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache-2.0, approved, CQ21949
 maven/mavencentral/com.ibm.async/asyncutil/0.1.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.jayway.jsonpath/json-path/2.10.0, Apache-2.0, approved, clearlydefined
-maven/mavencentral/com.neovisionaries/nv-i18n/1.29, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/content-type/2.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/lang-tag/1.7, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/nimbus-jose-jwt/10.9.1, Apache-2.0, approved, #29000

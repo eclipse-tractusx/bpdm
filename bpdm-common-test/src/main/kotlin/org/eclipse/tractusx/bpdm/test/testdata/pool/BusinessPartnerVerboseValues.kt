@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
@@ -52,9 +50,9 @@ object BusinessPartnerVerboseValues {
 
     private val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
 
-    private val country1 = TypeKeyNameVerboseDto(CountryCode.DE.alpha2, CountryCode.DE.getName())
-    private val country2 = TypeKeyNameVerboseDto(CountryCode.FR.alpha2, CountryCode.FR.getName())
-    private val country3 = TypeKeyNameVerboseDto(CountryCode.PL.alpha2, CountryCode.PL.getName())
+    private val country1 = TypeKeyNameVerboseDto("DE", "Germany")
+    private val country2 = TypeKeyNameVerboseDto("FR", "France")
+    private val country3 = TypeKeyNameVerboseDto("PL", "Poland")
 
     val identifierType1 = TypeKeyNameVerboseDto("DE_EU_VAT_ID", "European Union Value-added Tax Identification Number")
     val identifierType2 = TypeKeyNameVerboseDto("DE_HR", "Handelsregisternummer")
@@ -91,8 +89,8 @@ object BusinessPartnerVerboseValues {
         name = "Limited Liability Company",
         abbreviations = "LLC;L.L.C.",
         transliteratedName = "Limited Liability Company",
-        country = CountryCode.US,
-        language = LanguageCode.en,
+        country = "US",
+        language = "en",
         administrativeAreaLevel1 = "US-CA",
         transliteratedAbbreviations = null,
         isActive = true,
@@ -103,8 +101,8 @@ object BusinessPartnerVerboseValues {
         name = "Gesellschaft mit beschränkter Haftung",
         abbreviations = "GmbH",
         transliteratedName = "Gesellschaft mit beschränkter Haftung",
-        country = CountryCode.DE,
-        language = LanguageCode.de,
+        country = "DE",
+        language = "de",
         administrativeAreaLevel1 = null,
         transliteratedAbbreviations = null,
         isActive = true
@@ -114,8 +112,8 @@ object BusinessPartnerVerboseValues {
         name = "基金会",
         abbreviations = null,
         transliteratedName = "ji jin hui",
-        country = CountryCode.CN,
-        language = LanguageCode.zh,
+        country = "CN",
+        language = "zh",
         administrativeAreaLevel1 = null,
         transliteratedAbbreviations = null,
         isActive = true

@@ -5,6 +5,7 @@
   * [7.5.x to 7.6.x](#75x-to-76x)
     * [Country Catalogue](#country-catalogue)
     * [Region and Field Quality Rule Countries](#region-and-field-quality-rule-countries)
+    * [Legal Form and Identifier Type Countries](#legal-form-and-identifier-type-countries)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
@@ -49,6 +50,14 @@ Before upgrading, ensure every region's `country_code` and every non-null `count
 The migration resolves these codes to `countries.id`, replaces the stored `country_code` columns with `country_id` foreign keys, and preserves the country codes returned by the API.
 If a code cannot be resolved, the upgrade fails with an error naming the unresolved codes; add the intended countries or correct the metadata before retrying.
 Null-country field quality rules remain valid as country-independent defaults.
+
+### Legal Form and Identifier Type Countries
+
+Before upgrading, correct or clear every non-null `country_code` in `legal_forms` and `identifier_type_details` that is absent from the `countries` catalogue.
+Migration `V7_6_0_4` resolves codes to `countries.id` and replaces both columns with nullable `country_id` foreign keys.
+It fails and names unresolved codes rather than discarding them. Null countries remain valid, including universal identifier types.
+The V6 and V7 legal-form and identifier-type country schemas (including search parameters) and legal-form language schemas are now strings instead of enumerations; regenerate API clients.
+Legal-form languages accept BPDM's ISO 639-1 list. Existing language strings and the checked-in country and legal-form seeds are preserved; no runtime generator or `nv-i18n` library is required.
 
 ## 7.4.x to 7.5.x
 
