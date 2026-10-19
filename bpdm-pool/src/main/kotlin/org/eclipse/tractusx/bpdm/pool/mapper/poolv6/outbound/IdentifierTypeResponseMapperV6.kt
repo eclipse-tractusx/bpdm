@@ -43,7 +43,7 @@ class IdentifierTypeResponseMapperV6 {
                 abbreviation = abbreviation,
                 transliteratedName = transliteratedName,
                 transliteratedAbbreviation = transliteratedAbbreviation,
-                details = details.map { IdentifierTypeDetailDtoV6(country = it.countryCode?.countryCode, mandatory = it.mandatory) }
+                details = details.map { IdentifierTypeDetailDtoV6(country = it.country?.countryCode, mandatory = it.mandatory) }
             )
         }
 }

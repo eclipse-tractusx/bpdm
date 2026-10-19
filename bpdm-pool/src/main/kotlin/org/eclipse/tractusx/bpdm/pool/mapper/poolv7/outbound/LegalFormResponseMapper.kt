@@ -40,7 +40,7 @@ class LegalFormResponseMapper {
                 transliteratedName = transliteratedName,
                 abbreviations = abbreviation,
                 transliteratedAbbreviations = transliteratedAbbreviations,
-                country = countryCode?.countryCode,
+                country = country?.countryCode,
                 language = languageCode,
                 administrativeAreaLevel1 = administrativeArea?.regionCode,
                 isActive = isActive

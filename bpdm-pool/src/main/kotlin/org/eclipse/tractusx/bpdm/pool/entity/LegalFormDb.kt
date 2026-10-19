@@ -42,7 +42,7 @@ class LegalFormDb(
 
     @ManyToOne
     @JoinColumn(name = "country_id")
-    val countryCode: CountryDb?,
+    val country: CountryDb?,
 
     @Column(name = "language_code")
     val languageCode: String?,

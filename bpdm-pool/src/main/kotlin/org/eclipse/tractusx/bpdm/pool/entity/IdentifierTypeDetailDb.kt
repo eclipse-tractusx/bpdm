@@ -41,7 +41,7 @@ class IdentifierTypeDetailDb(
     // null for universal identifiers
     @ManyToOne
     @JoinColumn(name = "country_id")
-    var countryCode: CountryDb?,
+    var country: CountryDb?,
 
     @Column(name = "mandatory", nullable = false)
     var mandatory: Boolean

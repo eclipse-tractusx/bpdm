@@ -43,7 +43,7 @@ interface IdentifierTypeRepository :
                     val subquery = query!!.subquery(IdentifierTypeDetailDb::class.java)
                     val subRoot = subquery.from(subquery.resultType)
 
-                    // Check if an IdentifierTypeDetail exists for the IdentifierType where the countryCode is null or equal to given countryCode
+                    // Check if an IdentifierTypeDetail exists for the IdentifierType where the country is null or equal to the requested country
                     builder.exists(
                         subquery.where(
                             builder.equal(
@@ -51,9 +51,9 @@ interface IdentifierTypeRepository :
                                 root
                             ),
                             builder.or(
-                                subRoot.get<CountryDb>(IdentifierTypeDetailDb::countryCode.name).isNull,
+                                subRoot.get<CountryDb>(IdentifierTypeDetailDb::country.name).isNull,
                                 builder.equal(
-                                    subRoot.get<CountryDb>(IdentifierTypeDetailDb::countryCode.name),
+                                    subRoot.get<CountryDb>(IdentifierTypeDetailDb::country.name),
                                     countryCode
                                 )
                             )

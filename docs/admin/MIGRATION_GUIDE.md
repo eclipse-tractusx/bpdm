@@ -54,10 +54,7 @@ Null-country field quality rules remain valid as country-independent defaults.
 ### Legal Form and Identifier Type Countries
 
 Before upgrading, correct or clear every non-null `country_code` in `legal_forms` and `identifier_type_details` that is absent from the `countries` catalogue.
-Migration `V7_6_0_4` resolves codes to `countries.id` and replaces both columns with nullable `country_id` foreign keys.
-It fails and names unresolved codes rather than discarding them. Null countries remain valid, including universal identifier types.
-The V6 and V7 legal-form and identifier-type country schemas (including search parameters) and legal-form language schemas are now strings instead of enumerations; regenerate API clients.
-Legal-form languages accept BPDM's ISO 639-1 list. Existing language strings and the checked-in country and legal-form seeds are preserved; no runtime generator or `nv-i18n` library is required.
+The migration fails and names any unresolved codes, so add intended countries to the catalogue or correct the affected metadata before upgrading.
 
 ## 7.4.x to 7.5.x
 

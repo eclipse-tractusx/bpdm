@@ -44,7 +44,7 @@ class IdentifierTypeResponseMapper {
             transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
             format = identifierType.format,
             categories = identifierType.categories.toSortedSet(),
-            details = identifierType.details.map { IdentifierTypeDetailDto(it.countryCode?.countryCode, it.mandatory) }
+            details = identifierType.details.map { IdentifierTypeDetailDto(it.country?.countryCode, it.mandatory) }
         )
 
     /**
