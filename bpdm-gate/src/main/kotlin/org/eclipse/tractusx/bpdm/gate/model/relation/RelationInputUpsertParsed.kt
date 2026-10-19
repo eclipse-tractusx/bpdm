@@ -19,7 +19,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 
 data class RelationInputUpsertParsed(
-    val externalId: String,
+    val externalId: String?,
     val existing: RelationStageDb?,
     val relationType: RelationType,
     val source: SharingStateDb,

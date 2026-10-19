@@ -22,9 +22,10 @@ import java.time.LocalDate
 sealed interface RelationInputUpsertError {
     data class UpsertLimitExceeded(val limit: Int, val actual: Int) : RelationInputUpsertError
     data class DuplicateExternalIds(val externalIds: Set<String>) : RelationInputUpsertError
-    data class NotFound(val externalId: String) : RelationInputUpsertError
-    data class SourceNotFound(val externalId: String, val sourceExternalId: String) : RelationInputUpsertError
-    data class TargetNotFound(val externalId: String, val targetExternalId: String) : RelationInputUpsertError
-    data class SourceEqualsTarget(val externalId: String, val businessPartnerExternalId: String) : RelationInputUpsertError
-    data class InvalidValidityPeriod(val externalId: String, val validFrom: LocalDate, val validTo: LocalDate) : RelationInputUpsertError
+    data class NotFound(val externalId: String?) : RelationInputUpsertError
+    data class AlreadyExists(val externalId: String) : RelationInputUpsertError
+    data class SourceNotFound(val externalId: String?, val sourceExternalId: String) : RelationInputUpsertError
+    data class TargetNotFound(val externalId: String?, val targetExternalId: String) : RelationInputUpsertError
+    data class SourceEqualsTarget(val externalId: String?, val businessPartnerExternalId: String) : RelationInputUpsertError
+    data class InvalidValidityPeriod(val externalId: String?, val validFrom: LocalDate, val validTo: LocalDate) : RelationInputUpsertError
 }

@@ -21,14 +21,31 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
+import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import java.time.Instant
+import java.time.LocalDate
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class RelationUpsertV6IT: UnscheduledGateV6TestBase() {
+
+    @Autowired
+    lateinit var testClientProviderV7: GateTestClientProviderV7
+    @Autowired
+    lateinit var assertRepoV7: GateAssertRepositoryV7
 
     /**
      * GIVEN two business partners
@@ -161,6 +178,31 @@ class RelationUpsertV6IT: UnscheduledGateV6TestBase() {
 
         //THEN
         Assertions.assertThatThrownBy(request).isInstanceOf(WebClientResponseException.BadRequest::class.java)
+    }
+
+    /**
+     * GIVEN relation with a reason code between two business partners
+     * WHEN input manager updates the relation with a validity period
+     * THEN input manager sees the relation with that validity period and without reason code in the current API
+     */
+    @Test
+    fun `update relation with validity period`() {
+        //GIVEN
+        val gateClientV7 = testClientProviderV7.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
+        val sourceInput = testDataClient.createBusinessPartnerInput("$testName 1")
+        val targetInput = testDataClient.createBusinessPartnerInput("$testName 2")
+        val givenRelation = RelationPutEntry(testName, RelationType.IsManagedBy, sourceInput.externalId, targetInput.externalId, reasonCode = "$testName reason")
+        gateClientV7.relation.put(true, RelationPutRequest(listOf(givenRelation)))
+
+        //WHEN
+        val validityPeriods = listOf(RelationValidityPeriodDto(validFrom = LocalDate.of(2024, 1, 1), validTo = null))
+        gateClient.relations.put(false, RelationPutEntryV6(testName, RelationType.IsManagedBy, sourceInput.externalId, targetInput.externalId, validityPeriods))
+
+        //THEN
+        val actual = gateClientV7.relation.postSearch(RelationSearchRequest(externalIds = listOf(testName))).content.single()
+        val expected = RelationDto(testName, RelationType.IsManagedBy, sourceInput.externalId, targetInput.externalId, validityPeriods, null, Instant.now(), Instant.now())
+
+        assertRepoV7.assertRelation(actual, expected)
     }
 
     private fun RelationType.toNewType() = RelationType.entries.find { it != this }!!

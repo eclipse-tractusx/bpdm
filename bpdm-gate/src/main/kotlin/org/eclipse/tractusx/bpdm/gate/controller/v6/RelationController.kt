@@ -22,13 +22,19 @@ package org.eclipse.tractusx.bpdm.gate.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.inbound.RelationInputRequestMapperV6
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDtoMapperV6
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputUpsertErrorMapperV6
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.RelationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -38,7 +44,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto as RelationV7Dto
 @RestController("RelationControllerLegacy")
 class RelationController(
     private val relationshipService: RelationService,
-    private val principalUtil: PrincipalUtil
+    private val principalUtil: PrincipalUtil,
+    private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
+    private val inputRequestMapper: RelationInputRequestMapperV6,
+    private val inputDtoMapper: RelationInputDtoMapperV6,
+    private val inputErrorMapper: RelationInputUpsertErrorMapperV6
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
@@ -64,48 +74,16 @@ class RelationController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun post(
         requestBody: RelationPostRequest
-    ): RelationDto {
-        return relationshipService.createInputRelations(
-            tenantBpnL = principalUtil.resolveTenantBpnl(),
-            externalId = requestBody.externalId,
-            relationType = requestBody.relationType,
-            sourceBusinessPartnerExternalId = requestBody.businessPartnerSourceExternalId,
-            targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId,
-            reasonCode = ""
-        ).toV6Dto()
-
-    }
+    ): RelationDto =
+        upsert(inputRequestMapper.toUpsertRequest(requestBody), RelationInputUpsertMode.CreateOnly)
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun put(
         createIfNotExist: Boolean,
         requestBody: RelationPutEntryV6
     ): RelationDto {
-        val upsertedRelation = if(createIfNotExist) {
-            relationshipService.upsertInputRelations(
-                tenantBpnL = principalUtil.resolveTenantBpnl(),
-                relations = listOf(RelationPutEntry(
-                    externalId = requestBody.externalId,
-                    relationType = requestBody.relationType,
-                    businessPartnerSourceExternalId = requestBody.businessPartnerSourceExternalId,
-                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId,
-                    reasonCode = ""
-                ))
-            ).single()
-        } else {
-            relationshipService.updateInputRelations(
-                tenantBpnL = principalUtil.resolveTenantBpnl(),
-                relations = listOf(RelationPutEntry(
-                    externalId = requestBody.externalId,
-                    relationType = requestBody.relationType,
-                    businessPartnerSourceExternalId = requestBody.businessPartnerSourceExternalId,
-                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId,
-                    reasonCode = ""
-                ))
-            ).single()
-        }
-
-        return upsertedRelation.toV6Dto()
+        val mode = if (createIfNotExist) RelationInputUpsertMode.CreateOrUpdate else RelationInputUpsertMode.UpdateOnly
+        return upsert(inputRequestMapper.toUpsertRequest(requestBody), mode)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
@@ -116,6 +94,11 @@ class RelationController(
         )
     }
 
+    private fun upsert(request: RelationInputUpsertRequest, mode: RelationInputUpsertMode): RelationDto =
+        when (val result = inputUpsertApplicationService.upsert(listOf(request), principalUtil.resolveTenantBpnl().value, mode)) {
+            is RelationInputUpsertResult.Written -> inputDtoMapper.toDto(result.relations.single())
+            is RelationInputUpsertResult.Rejected -> throw inputErrorMapper.toException(result.errors)
+        }
 
     private fun PageDto<RelationV7Dto>.toV6Dto(): PageDto<RelationDto>{
         return PageDto(

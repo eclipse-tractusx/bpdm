@@ -76,6 +76,28 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
         assertRepo.assertRelations(searchResponse, expected)
     }
 
+    /**
+     * GIVEN two business partners
+     * WHEN input manager posts a new relation without external ID
+     * THEN input manager can find the relation under the external ID assigned to it
+     */
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun `create relation without external ID`(relationType: RelationType) {
+        //GIVEN
+        val input1 = testDataClient.createBusinessPartnerInput("$testName 1")
+        val input2 = testDataClient.createBusinessPartnerInput("$testName 2")
+
+        //WHEN
+        val response = gateClient.relations.post(RelationPostRequest(null, relationType, input1.externalId, input2.externalId))
+
+        //THEN
+        val searchResponse = gateClient.relations.get(externalIds = listOf(response.externalId))
+        val expected = PageDto(1, 1, 0, 1, listOf(RelationDto(response.externalId, relationType, input1.externalId, input2.externalId, Instant.now(), Instant.now())))
+
+        assertRepo.assertRelations(searchResponse, expected)
+    }
+
 
 
     /**

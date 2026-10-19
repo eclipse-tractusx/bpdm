@@ -32,9 +32,12 @@ import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.util.*
 
 /**
  * Writes parsed relations into the input stage of their tenant.
+ *
+ * A relation created without an external ID is assigned a new random one.
  */
 @Service
 class RelationInputUpsertOperationService(
@@ -66,7 +69,7 @@ class RelationInputUpsertOperationService(
     }
 
     private fun create(request: RelationInputUpsertParsed, tenantBpnl: String): Created {
-        val relation = RelationDb(externalId = request.externalId, tenantBpnL = tenantBpnl, sharingState = null, output = null)
+        val relation = RelationDb(externalId = request.externalId ?: UUID.randomUUID().toString(), tenantBpnL = tenantBpnl, sharingState = null, output = null)
         relationSharingStateService.setInitial(relation, request.relationType)
 
         val input = RelationStageDb(

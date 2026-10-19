@@ -20,11 +20,8 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.relation.*
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertError.*
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertParsed
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.data.jpa.domain.Specification
@@ -43,18 +40,18 @@ class RelationInputUpsertParser(
 
     /**
      * Parses [requests] of [tenantBpnl] as a whole, succeeding only if every entry is valid and failing with the
-     * violations of every entry otherwise; an entry naming a relation the tenant does not have is a violation unless
-     * [createIfNotExist] is set.
+     * violations of every entry otherwise; [mode] decides whether naming a relation the tenant does or does not have
+     * yet is a violation.
      */
     @Transactional(readOnly = true)
     fun parse(
         requests: List<RelationInputUpsertRequest>,
         tenantBpnl: String,
-        createIfNotExist: Boolean
+        mode: RelationInputUpsertMode
     ): ParseResult<List<RelationInputUpsertParsed>, RelationInputUpsertError> {
         val limit = apiConfigProperties.upsertLimit
         if (requests.size > limit) return ParseResult.ofSingleFailure(UpsertLimitExceeded(limit, requests.size))
-        val duplicates = requests.groupingBy { it.externalId }.eachCount().filterValues { it > 1 }.keys
+        val duplicates = requests.mapNotNull { it.externalId }.groupingBy { it }.eachCount().filterValues { it > 1 }.keys
         if (duplicates.isNotEmpty()) return ParseResult.ofSingleFailure(DuplicateExternalIds(duplicates))
         if (requests.isEmpty()) return ParseResult.Success(emptyList())
 
@@ -63,7 +60,7 @@ class RelationInputUpsertParser(
 
         val results = requests.map { request ->
             zipParseResults(
-                resolveExisting(request, existingByExternalId[request.externalId], createIfNotExist),
+                resolveExisting(request, existingByExternalId[request.externalId], mode),
                 resolveEndpoints(request, businessPartnersByExternalId),
                 validateValidityPeriods(request)
             ) { existing, (source, target), validityPeriods ->
@@ -91,7 +88,7 @@ class RelationInputUpsertParser(
             Specification.allOf(
                 RelationStageRepository.Specs.byTenantBpnL(tenantBpnl),
                 RelationStageRepository.Specs.byStage(StageType.Input),
-                RelationStageRepository.Specs.byExternalIds(requests.map { it.externalId })
+                RelationStageRepository.Specs.byExternalIds(requests.mapNotNull { it.externalId })
             )
         ).associateBy { it.relation.externalId }
 
@@ -103,12 +100,13 @@ class RelationInputUpsertParser(
     private fun resolveExisting(
         request: RelationInputUpsertRequest,
         existing: RelationStageDb?,
-        createIfNotExist: Boolean
+        mode: RelationInputUpsertMode
     ): ParseResult<RelationStageDb?, RelationInputUpsertError> =
-        if (existing == null && !createIfNotExist)
-            ParseResult.ofSingleFailure(NotFound(request.externalId))
-        else
-            ParseResult.Success(existing)
+        when {
+            existing == null && mode == RelationInputUpsertMode.UpdateOnly -> ParseResult.ofSingleFailure(NotFound(request.externalId))
+            existing != null && mode == RelationInputUpsertMode.CreateOnly -> ParseResult.ofSingleFailure(AlreadyExists(existing.relation.externalId))
+            else -> ParseResult.Success(existing)
+        }
 
     private fun resolveEndpoints(
         request: RelationInputUpsertRequest,

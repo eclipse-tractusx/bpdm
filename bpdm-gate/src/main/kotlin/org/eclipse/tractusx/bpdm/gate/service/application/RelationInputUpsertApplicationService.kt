@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.mapper.record.RelationInputRecordMapper
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationInputUpsertOperationService
@@ -34,13 +35,12 @@ class RelationInputUpsertApplicationService(
 ) {
 
     /**
-     * Upserts [requests] for [tenantBpnl] and returns every requested relation input, or writes nothing and returns the
-     * violations of every entry if any entry is invalid; a relation the tenant does not have yet is only created if
-     * [createIfNotExist] is set.
+     * Upserts [requests] for [tenantBpnl] as far as [mode] allows and returns every requested relation input, or writes
+     * nothing and returns the violations of every entry if any entry is invalid.
      */
     @Transactional
-    fun upsert(requests: List<RelationInputUpsertRequest>, tenantBpnl: String, createIfNotExist: Boolean): RelationInputUpsertResult =
-        when (val parseResult = parser.parse(requests, tenantBpnl, createIfNotExist)) {
+    fun upsert(requests: List<RelationInputUpsertRequest>, tenantBpnl: String, mode: RelationInputUpsertMode): RelationInputUpsertResult =
+        when (val parseResult = parser.parse(requests, tenantBpnl, mode)) {
             is ParseResult.Failure -> RelationInputUpsertResult.Rejected(parseResult.errors)
             is ParseResult.Success -> RelationInputUpsertResult.Written(
                 operationService.upsert(parseResult.parsed, tenantBpnl).map { recordMapper.toRecord(it.input) }

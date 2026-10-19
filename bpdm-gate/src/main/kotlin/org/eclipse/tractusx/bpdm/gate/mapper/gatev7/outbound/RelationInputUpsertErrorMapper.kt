@@ -34,14 +34,19 @@ class RelationInputUpsertErrorMapper {
             is DuplicateExternalIds ->
                 "External IDs occur more than once in the batch: ${error.externalIds.joinToString { "'$it'" }}"
             is NotFound ->
-                "Relation '${error.externalId}' can not be found."
+                "${relation(error.externalId)} can not be found."
+            is AlreadyExists ->
+                "Relation '${error.externalId}' already exists."
             is SourceNotFound ->
-                "Relation '${error.externalId}' is invalid: its source business partner '${error.sourceExternalId}' does not exist"
+                "${relation(error.externalId)} is invalid: its source business partner '${error.sourceExternalId}' does not exist"
             is TargetNotFound ->
-                "Relation '${error.externalId}' is invalid: its target business partner '${error.targetExternalId}' does not exist"
+                "${relation(error.externalId)} is invalid: its target business partner '${error.targetExternalId}' does not exist"
             is SourceEqualsTarget ->
-                "Relation '${error.externalId}' is invalid: business partner '${error.businessPartnerExternalId}' is both its source and its target"
+                "${relation(error.externalId)} is invalid: business partner '${error.businessPartnerExternalId}' is both its source and its target"
             is InvalidValidityPeriod ->
-                "Relation '${error.externalId}' is invalid: validFrom '${error.validFrom}' of a validity period is not before its validTo '${error.validTo}'"
+                "${relation(error.externalId)} is invalid: validFrom '${error.validFrom}' of a validity period is not before its validTo '${error.validTo}'"
         }
+
+    private fun relation(externalId: String?) =
+        if (externalId != null) "Relation '$externalId'" else "Relation without external ID"
 }

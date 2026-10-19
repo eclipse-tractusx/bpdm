@@ -27,12 +27,14 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Setting business partners ready to be shared reports every unknown external ID and every business partner in a state that cannot be set ready at once, with one error message each, instead of only the first kind of problem found.
 - BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error. A malformed or incomplete geographic coordinate is now reported as an error instead of being stored as `0.0`.
 - BPDM Gate: Upserting input relations through the V7 API reports every invalid relation at once, with one error message for each problem, instead of only the first one found. A request that names the same external ID more than once is rejected instead of letting the later entry win, and a request with more relations than the configured upsert limit (`bpdm.api.upsert-limit`, 100 by default) is rejected.
+- BPDM Gate: Creating or updating an input relation through the V6 API stores it without a reason code instead of an empty one, so the V7 API returns `null` as its reason code. Errors other than an already existing relation report every problem of the relation at once.
 
 ### Fixed
 
 - BPDM Gate: The CSV upload stores the street name prefix and additional name prefix from their own columns. Before, the name prefix column was ignored and both prefixes were filled from the wrong columns.
 - BPDM Gate: The CSV upload no longer adds an empty alternative postal address, or coordinates of `0.0`, to business partners whose CSV row leaves those columns blank.
 - BPDM Gate: The CSV upload keeps a site or address state that has a type but no validity dates, instead of dropping it, and stores an empty house number as absent.
+- BPDM Gate: Updating an input relation through the V6 API stores the validity periods given in the request. Before, they were ignored and the relation's validity periods were removed.
 
 ## [7.5.0] - 2026-09-08
 

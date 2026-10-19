@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.RelationInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.IRelationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
@@ -70,7 +71,8 @@ class RelationController(
         requestBody: RelationPutRequest
     ): RelationPutResponse {
         val requests = requestBody.relations.map(inputRequestMapper::toUpsertRequest)
-        return when (val result = inputUpsertApplicationService.upsert(requests, principalUtil.resolveTenantBpnl().value, createIfNotExist)) {
+        val mode = if (createIfNotExist) RelationInputUpsertMode.CreateOrUpdate else RelationInputUpsertMode.UpdateOnly
+        return when (val result = inputUpsertApplicationService.upsert(requests, principalUtil.resolveTenantBpnl().value, mode)) {
             is RelationInputUpsertResult.Written -> RelationPutResponse(result.relations.map(inputDtoMapper::toDto))
             is RelationInputUpsertResult.Rejected -> throw BpdmRelationInputUpsertException(result.errors.map(inputErrorMapper::toMessage))
         }
