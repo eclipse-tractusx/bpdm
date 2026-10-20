@@ -21,79 +21,26 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.entity.*
-import org.eclipse.tractusx.bpdm.gate.exception.*
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidRelationException
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
 class RelationService(
     private val relationRepository: RelationRepository,
-    private val relationStageRepository: RelationStageRepository,
     private val relationSharingStateService: RelationSharingStateService,
     private val changelogCreateService: ChangelogCreateService
 ): IRelationService {
 
     private val logger = KotlinLogging.logger { }
-
-    override fun findInputRelations(
-        tenantBpnL: BpnLString,
-        externalIds: List<String>,
-        relationType: RelationType?,
-        sourceBusinessPartnerExternalIds: List<String>,
-        targetBusinessPartnerExternalIds: List<String>,
-        updatedAtFrom: Instant?,
-        paginationRequest: PaginationRequest
-    ): PageDto<RelationDto>{
-
-        val querySpecs = Specification.allOf(
-            RelationStageRepository.Specs.byTenantBpnL(tenantBpnL.value),
-            RelationStageRepository.Specs.byStage(StageType.Input),
-            RelationStageRepository.Specs.byExternalIds(externalIds),
-            RelationStageRepository.Specs.byRelationshipType(relationType),
-            RelationStageRepository.Specs.bySourceExternalIds(sourceBusinessPartnerExternalIds),
-            RelationStageRepository.Specs.byTargetExternalIds(targetBusinessPartnerExternalIds),
-            RelationStageRepository.Specs.byUpdatedAfter(updatedAtFrom)
-        )
-
-        return relationStageRepository.findAll(querySpecs, paginationRequest.toPageRequest())
-            .toPageDto { toDto(it) }
-    }
-
-    override fun findOutputRelations(
-        tenantBpnL: BpnLString,
-        externalIds: List<String>,
-        relationType: SharableRelationType?,
-        sourceBpnLs: List<String>,
-        targetBpnLs: List<String>,
-        updatedAtFrom: Instant?,
-        paginationRequest: PaginationRequest
-    ): PageDto<RelationOutputDto> {
-        val querySpecs = Specification.allOf(
-            RelationRepository.Specs.byOutputIsNotNull(),
-            RelationRepository.Specs.byTenantBpnL(tenantBpnL.value),
-            RelationRepository.Specs.byExternalIds(externalIds),
-            RelationRepository.Specs.byOutputRelationType(relationType),
-            RelationRepository.Specs.byOutputSourceBpnLs(sourceBpnLs),
-            RelationRepository.Specs.byOutputTargetBpnLs(targetBpnLs),
-            RelationRepository.Specs.byOutputUpdatedAfter(updatedAtFrom)
-        )
-
-        return relationRepository.findAll(querySpecs, paginationRequest.toPageRequest())
-            .toPageDto { toOutputDto(it) }
-    }
 
     @Transactional
     override fun upsertOutputRelations(relations: List<IRelationService.RelationUpsertRequest>): List<RelationDb> {
@@ -164,38 +111,6 @@ class RelationService(
         return RelationWrite(relationRepository.save(relation), changelogType, "${relation.externalId} ($sourceBpnL -> $targetBpnL)")
     }
 
-
-    private fun toDto(entity: RelationStageDb): RelationDto{
-        return RelationDto(
-            externalId = entity.relation.externalId,
-            relationType = entity.relationType,
-            businessPartnerSourceExternalId = entity.source.externalId,
-            businessPartnerTargetExternalId = entity.target.externalId,
-            validityPeriods = entity.validityPeriods.map { it.toDto() },
-            updatedAt = entity.updatedAt,
-            createdAt = entity.createdAt,
-            reasonCode = entity.reasonCode
-        )
-    }
-
-    private fun RelationValidityPeriodDb.toDto(): RelationValidityPeriodDto {
-        return RelationValidityPeriodDto(
-            validFrom = validFrom,
-            validTo = validTo
-        )
-    }
-
-    private fun toOutputDto(entity: RelationDb): RelationOutputDto{
-        return RelationOutputDto(
-            externalId = entity.externalId,
-            relationType = entity.output!!.relationType,
-            sourceBpn = entity.output!!.sourceBpn,
-            targetBpn = entity.output!!.targetBpn,
-            validityPeriods = entity.output!!.validityPeriods.map { it.toDto() },
-            updatedAt = entity.output!!.resultUpdatedAt,
-            reasonCode = entity.output!!.reasonCode
-        )
-    }
 
     /**
      * The outcome of writing one relation: what was persisted, and no change type where nothing was.

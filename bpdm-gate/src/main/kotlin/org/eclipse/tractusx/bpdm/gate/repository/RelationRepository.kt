@@ -92,8 +92,8 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 }
             } ?: Specification.unrestricted()
 
-        fun byOutputSourceBpnLs(sourceBpnLs: List<String>) =
-            sourceBpnLs.takeIf { it.isNotEmpty() }?.let {
+        fun byOutputSourceBpnLs(sourceBpnLs: Collection<String>?) =
+            sourceBpnLs?.takeIf { it.isNotEmpty() }?.let {
                 Specification<RelationDb> { root, _, builder ->
                     root
                         .get<RelationOutputDb>(RelationDb::output.name)
@@ -102,8 +102,8 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 }
             } ?: Specification.unrestricted()
 
-        fun byOutputTargetBpnLs(targetBpnLs: List<String>) =
-            targetBpnLs.takeIf { it.isNotEmpty() }?.let {
+        fun byOutputTargetBpnLs(targetBpnLs: Collection<String>?) =
+            targetBpnLs?.takeIf { it.isNotEmpty() }?.let {
                 Specification<RelationDb> { root, _, builder ->
                    root
                         .get<RelationOutputDb>(RelationDb::output.name)

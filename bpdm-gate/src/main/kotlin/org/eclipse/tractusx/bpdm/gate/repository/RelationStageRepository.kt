@@ -48,7 +48,7 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
                 }
             }
 
-        fun bySourceExternalIds(sourceBusinessPartnerExternalIds: List<String>?) =
+        fun bySourceExternalIds(sourceBusinessPartnerExternalIds: Collection<String>?) =
             Specification<RelationStageDb> { root, _, _ ->
                 sourceBusinessPartnerExternalIds?.takeIf { it.isNotEmpty() }?.let {
                     root
@@ -58,7 +58,7 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
                 }
             }
 
-        fun byTargetExternalIds(targetBusinessPartnerExternalIds: List<String>?) =
+        fun byTargetExternalIds(targetBusinessPartnerExternalIds: Collection<String>?) =
             Specification<RelationStageDb> { root, _, _ ->
                 targetBusinessPartnerExternalIds?.takeIf { it.isNotEmpty() }?.let {
                     root

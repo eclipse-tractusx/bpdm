@@ -19,34 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
-import java.time.Instant
 
 interface IRelationService {
-
-    fun findInputRelations(
-        tenantBpnL: BpnLString,
-        externalIds: List<String> = emptyList(),
-        relationType: RelationType? = null,
-        sourceBusinessPartnerExternalIds: List<String> = emptyList(),
-        targetBusinessPartnerExternalIds: List<String> = emptyList(),
-        updatedAtFrom: Instant? = null,
-        paginationRequest: PaginationRequest
-    ): PageDto<RelationDto>
-
-    fun findOutputRelations(
-        tenantBpnL: BpnLString,
-        externalIds: List<String> = emptyList(),
-        relationType: SharableRelationType? = null,
-        sourceBpnLs: List<String> = emptyList(),
-        targetBpnLs: List<String> = emptyList(),
-        updatedAtFrom: Instant? = null,
-        paginationRequest: PaginationRequest
-    ): PageDto<RelationOutputDto>
 
     fun upsertOutputRelations(relations: List<RelationUpsertRequest>): List<RelationDb>
 

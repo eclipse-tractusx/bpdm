@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
@@ -31,24 +33,20 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.inbound.RelationInputRequest
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDeleteErrorMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDtoMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputUpsertErrorMapperV6
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteResult
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
-import org.eclipse.tractusx.bpdm.gate.service.RelationService
+import org.eclipse.tractusx.bpdm.gate.model.relation.*
+import org.eclipse.tractusx.bpdm.gate.model.search.RelationInputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputDeleteApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto as RelationV7Dto
 
 @RestController("RelationControllerLegacy")
 class RelationController(
-    private val relationshipService: RelationService,
     private val principalUtil: PrincipalUtil,
+    private val inputSearchApplicationService: RelationInputSearchApplicationService,
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val inputRequestMapper: RelationInputRequestMapperV6,
     private val inputDtoMapper: RelationInputDtoMapperV6,
@@ -66,15 +64,15 @@ class RelationController(
         updatedAtFrom: Instant?,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
-        return relationshipService.findInputRelations(
-            tenantBpnL = principalUtil.resolveTenantBpnl(),
-            externalIds = externalIds ?: emptyList(),
+        val request = RelationInputSearchRequest(
+            externalIds = externalIds,
             relationType = relationType,
-            sourceBusinessPartnerExternalIds = businessPartnerSourceExternalIds ?: emptyList(),
-            targetBusinessPartnerExternalIds = businessPartnerTargetExternalIds ?: emptyList(),
-            updatedAtFrom = updatedAtFrom,
-            paginationRequest = paginationRequest
-        ).toV6Dto()
+            sourceExternalIds = businessPartnerSourceExternalIds,
+            targetExternalIds = businessPartnerTargetExternalIds,
+            updatedAfter = updatedAtFrom
+        )
+        return inputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+            .toPageDto(inputDtoMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
@@ -105,25 +103,4 @@ class RelationController(
             is RelationInputUpsertResult.Written -> inputDtoMapper.toDto(result.relations.single())
             is RelationInputUpsertResult.Rejected -> throw inputErrorMapper.toException(result.errors)
         }
-
-    private fun PageDto<RelationV7Dto>.toV6Dto(): PageDto<RelationDto>{
-        return PageDto(
-            totalElements = totalElements,
-            totalPages = totalPages,
-            page = page,
-            contentSize = contentSize,
-            content = content.map { it.toV6Dto() }
-        )
-    }
-
-    private fun RelationV7Dto.toV6Dto(): RelationDto{
-        return RelationDto(
-                externalId = externalId,
-                relationType = relationType,
-                businessPartnerSourceExternalId = businessPartnerSourceExternalId,
-                businessPartnerTargetExternalId = businessPartnerTargetExternalId,
-                updatedAt = updatedAt,
-                createdAt = createdAt
-            )
-    }
 }

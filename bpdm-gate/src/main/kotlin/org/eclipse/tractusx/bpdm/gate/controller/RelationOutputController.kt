@@ -21,34 +21,39 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.IRelationService
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationOutputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest as RelationOutputSearchRequestDto
 
 @RestController
 class RelationOutputController(
-    private val relationService: IRelationService,
-    private val principalUtil: PrincipalUtil
+    private val principalUtil: PrincipalUtil,
+    private val outputSearchApplicationService: RelationOutputSearchApplicationService,
+    private val outputDtoMapper: RelationOutputDtoMapper
 ): GateRelationOutputApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
     override fun postSearch(
-        searchRequest: RelationOutputSearchRequest,
+        searchRequest: RelationOutputSearchRequestDto,
         paginationRequest: PaginationRequest
     ): PageDto<RelationOutputDto> {
-        return relationService.findOutputRelations(
-            tenantBpnL = principalUtil.resolveTenantBpnl(),
-            externalIds = searchRequest.externalIds ?: emptyList(),
+        val request = RelationOutputSearchRequest(
+            externalIds = searchRequest.externalIds,
             relationType = searchRequest.relationType,
-            sourceBpnLs = searchRequest.sourceBpns ?: emptyList(),
-            targetBpnLs = searchRequest.targetBpns ?:emptyList(),
-            updatedAtFrom = searchRequest.updatedAtFrom,
-            paginationRequest
+            sourceBpns = searchRequest.sourceBpns,
+            targetBpns = searchRequest.targetBpns,
+            updatedAfter = searchRequest.updatedAtFrom
         )
+        return outputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+            .toPageDto(outputDtoMapper::toDto)
     }
 }

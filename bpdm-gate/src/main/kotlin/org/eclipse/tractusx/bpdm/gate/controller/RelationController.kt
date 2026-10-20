@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
@@ -33,7 +35,8 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputDtoMap
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputUpsertErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
-import org.eclipse.tractusx.bpdm.gate.service.IRelationService
+import org.eclipse.tractusx.bpdm.gate.model.search.RelationInputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
@@ -41,8 +44,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class RelationController(
-    private val relationshipService: IRelationService,
     private val principalUtil: PrincipalUtil,
+    private val inputSearchApplicationService: RelationInputSearchApplicationService,
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val inputRequestMapper: RelationInputRequestMapper,
     private val inputDtoMapper: RelationInputDtoMapper,
@@ -54,15 +57,15 @@ class RelationController(
         searchRequest: RelationSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
-       return relationshipService.findInputRelations(
-           tenantBpnL = principalUtil.resolveTenantBpnl(),
-           externalIds = searchRequest.externalIds ?: emptyList(),
-           relationType = searchRequest.relationType,
-           sourceBusinessPartnerExternalIds = searchRequest.businessPartnerSourceExternalIds ?: emptyList(),
-           targetBusinessPartnerExternalIds = searchRequest.businessPartnerTargetExternalIds ?: emptyList(),
-           updatedAtFrom = searchRequest.updatedAtFrom,
-           paginationRequest = paginationRequest
-       )
+        val request = RelationInputSearchRequest(
+            externalIds = searchRequest.externalIds,
+            relationType = searchRequest.relationType,
+            sourceExternalIds = searchRequest.businessPartnerSourceExternalIds,
+            targetExternalIds = searchRequest.businessPartnerTargetExternalIds,
+            updatedAfter = searchRequest.updatedAtFrom
+        )
+        return inputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+            .toPageDto(inputDtoMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
