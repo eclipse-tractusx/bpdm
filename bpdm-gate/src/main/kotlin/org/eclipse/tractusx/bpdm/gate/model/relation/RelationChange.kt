@@ -22,14 +22,14 @@ data class RelationChange(
     override val type: PersistedChangeType,
     val externalId: String,
     val tenantBpnl: String,
-    val aspect: Aspect
+    val aspect: Aspect?
 ) : PersistedChange {
 
     override val subject = SUBJECT
 
     override fun identifierForLog() = "$externalId@$tenantBpnl"
 
-    override fun aspectForLog() = aspect.logName
+    override fun aspectForLog() = aspect?.logName
 
     enum class Aspect(val logName: String) {
         Input("input"),

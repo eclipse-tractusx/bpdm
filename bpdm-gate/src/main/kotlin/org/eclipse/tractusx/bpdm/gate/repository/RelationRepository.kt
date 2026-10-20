@@ -134,8 +134,6 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
     }
 
 
-    fun findByTenantBpnLAndExternalId(tenantBpnL: String,  externalId: String): RelationDb?
-
     @Query("SELECT r FROM RelationDb r WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = :isStaged")
     fun findBySharingStateAndStaged(sharingStateType: RelationSharingStateType, isStaged: Boolean, pageable: Pageable): Page<RelationDb>
 

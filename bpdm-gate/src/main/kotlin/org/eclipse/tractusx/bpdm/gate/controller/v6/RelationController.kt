@@ -28,12 +28,16 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.inbound.RelationInputRequestMapperV6
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDeleteErrorMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDtoMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputUpsertErrorMapperV6
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteRequest
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteResult
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.RelationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputDeleteApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
@@ -48,7 +52,9 @@ class RelationController(
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val inputRequestMapper: RelationInputRequestMapperV6,
     private val inputDtoMapper: RelationInputDtoMapperV6,
-    private val inputErrorMapper: RelationInputUpsertErrorMapperV6
+    private val inputErrorMapper: RelationInputUpsertErrorMapperV6,
+    private val inputDeleteApplicationService: RelationInputDeleteApplicationService,
+    private val inputDeleteErrorMapper: RelationInputDeleteErrorMapperV6
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
@@ -88,10 +94,10 @@ class RelationController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun delete(externalId: String) {
-        relationshipService.deleteRelation(
-            tenantBpnL = principalUtil.resolveTenantBpnl(),
-            externalId = externalId
-        )
+        when (val result = inputDeleteApplicationService.delete(RelationInputDeleteRequest(externalId), principalUtil.resolveTenantBpnl().value)) {
+            is RelationInputDeleteResult.Deleted -> Unit
+            is RelationInputDeleteResult.Rejected -> throw inputDeleteErrorMapper.toException(result.errors)
+        }
     }
 
     private fun upsert(request: RelationInputUpsertRequest, mode: RelationInputUpsertMode): RelationDto =

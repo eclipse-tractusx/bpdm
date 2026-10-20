@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
@@ -133,6 +134,13 @@ class GateAssertRepositoryV6 {
                 RelationDto::updatedAt.name
             )
             .isEqualTo(expected)
+    }
+
+    fun assertErrorPerExternalId(actual: GateErrorResponse, externalIds: Collection<String>) {
+        Assertions.assertThat(actual.error).hasSameSizeAs(externalIds)
+        externalIds.forEach { externalId ->
+            Assertions.assertThat(actual.error).anySatisfy { Assertions.assertThat(it).contains("'$externalId'") }
+        }
     }
 
     private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){

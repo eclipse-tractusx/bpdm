@@ -19,12 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.relation
 
-import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -54,15 +56,38 @@ class RelationDeletionV6IT: UnscheduledGateV6TestBase() {
 
 
     /**
+     * GIVEN deleted relation between two business partners
+     * WHEN input manager creates a relation with the same external ID between the same business partners
+     * THEN input manager sees the new relation
+     */
+    @Test
+    fun `create relation again after deletion`(){
+        // GIVEN
+        val givenRelation = testDataClient.createRelationWithBusinessPartners(testName, RelationType.IsManagedBy)
+        gateClient.relations.delete(givenRelation.externalId)
+
+        //WHEN
+        val response = gateClient.relations.post(RelationPostRequest(
+            givenRelation.externalId,
+            givenRelation.relationType,
+            givenRelation.businessPartnerSourceExternalId,
+            givenRelation.businessPartnerTargetExternalId
+        ))
+
+        //THEN
+        assertRepo.assertRelation(response, givenRelation)
+    }
+
+    /**
      * WHEN input manager requests deletion of not existing relation
-     * THEN input manager sees 400 HTTP error response
+     * THEN input manager sees 400 HTTP error response naming that relation
      */
     @Test
     fun `try delete not-existing relation`(){
         //WHEN
-        val request: () -> Unit  = { gateClient.relations.delete("NOT EXISTING") }
+        val response = assertThrows<WebClientResponseException.BadRequest> { gateClient.relations.delete("NOT EXISTING") }
 
         //THEN
-        Assertions.assertThatThrownBy(request).isInstanceOf(WebClientResponseException.BadRequest::class.java)
+        assertRepo.assertErrorPerExternalId(response.getResponseBodyAs(GateErrorResponse::class.java)!!, listOf("NOT EXISTING"))
     }
 }

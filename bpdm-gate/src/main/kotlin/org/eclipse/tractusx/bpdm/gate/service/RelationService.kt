@@ -96,15 +96,6 @@ class RelationService(
     }
 
     @Transactional
-    fun deleteRelation(tenantBpnL: BpnLString, externalId: String) {
-        val relations = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId) ?: throw BpdmMissingRelationException(externalId)
-        val relationStage = relationStageRepository.findByRelationAndStage(relations, stage = StageType.Input) ?: throw BpdmMissingRelationException(externalId)
-        relationStageRepository.delete(relationStage)
-        relationRepository.delete(relations)
-    }
-
-
-    @Transactional
     override fun upsertOutputRelations(relations: List<IRelationService.RelationUpsertRequest>): List<RelationDb> {
         val writes = relations.map { upsertOutput(
             it.relation,

@@ -55,6 +55,12 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
+    @ExceptionHandler(BpdmRelationInputDeleteException::class)
+    fun handleRelationInputDeleteException(ex: BpdmRelationInputDeleteException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.messages, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
     @ExceptionHandler(BpdmRelationAlreadyExistsException::class)
     fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
         val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.CONFLICT)
@@ -73,7 +79,6 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         BpdmRelationSourceNotFoundException::class,
         BpdmMissingSharingStateException::class,
         BpdmTenantResolutionException::class,
-        BpdmMissingRelationException::class,
         BpdmInvalidTenantBpnlException::class
     )
     fun handleGenericBadRequestException(ex: RuntimeException, request: WebRequest): ResponseEntity<GateErrorResponse>{
