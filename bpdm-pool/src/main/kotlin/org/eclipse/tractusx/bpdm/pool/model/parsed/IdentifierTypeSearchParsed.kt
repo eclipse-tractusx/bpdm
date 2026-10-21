@@ -19,10 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 
 data class IdentifierTypeSearchParsed(
     val businessPartnerType: IdentifierBusinessPartnerType,
-    val country: CountryCode?
+    val country: CountryDb?
 )

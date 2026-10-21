@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.model.error
 
 sealed interface LegalFormCreateParseError {
+    data class CountryNotFound(val country: String) : LegalFormCreateParseError
+    data class InvalidLanguage(val language: String) : LegalFormCreateParseError
     data class TechnicalKeyAlreadyTaken(val technicalKey: String) : LegalFormCreateParseError
     data class UnresolvableAdministrativeArea(val regionCode: String) : LegalFormCreateParseError
 }

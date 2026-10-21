@@ -47,7 +47,7 @@ class LegalFormCreateService(
             transliteratedName = legalForm.transliteratedName,
             abbreviation = legalForm.abbreviations,
             transliteratedAbbreviations = legalForm.transliteratedAbbreviations,
-            countryCode = legalForm.country,
+            country = legalForm.country,
             languageCode = legalForm.language,
             administrativeArea = legalForm.administrativeArea,
             isActive = legalForm.isActive

@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeDetailParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 
 /**
@@ -34,7 +35,8 @@ import org.springframework.stereotype.Service
  */
 @Service
 class IdentifierTypeCreateParser(
-    private val identifierTypeRepository: IdentifierTypeRepository
+    private val identifierTypeRepository: IdentifierTypeRepository,
+    private val countryRepository: CountryRepository
 ) {
 
     /**
@@ -46,6 +48,11 @@ class IdentifierTypeCreateParser(
         if (existing != null)
             return ParseResult.ofSingleFailure(TechnicalKeyAlreadyTaken(request.technicalKey, request.businessPartnerType))
 
+        val codes = request.details.mapNotNull { it.country }.toSet()
+        val countries = countryRepository.findByCountryCodeIn(codes).associateBy { it.countryCode }
+        val errors = (codes - countries.keys).map { IdentifierTypeCreateParseError.CountryNotFound(it) }
+        if (errors.isNotEmpty()) return ParseResult.Failure(errors)
+
         return ParseResult.Success(
             IdentifierTypeCreateParsed(
                 technicalKey = request.technicalKey,
@@ -56,7 +63,7 @@ class IdentifierTypeCreateParser(
                 transliteratedAbbreviation = request.transliteratedAbbreviation,
                 format = request.format,
                 categories = request.categories.ifEmpty { setOf(IdentifierTypeCategory.OTH) },
-                details = request.details.map { IdentifierTypeDetailParsed(it.country, it.mandatory) }
+                details = request.details.map { IdentifierTypeDetailParsed(it.country?.let(countries::getValue), it.mandatory) }
             )
         )
     }

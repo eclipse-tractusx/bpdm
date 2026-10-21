@@ -19,7 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
 
@@ -36,6 +37,6 @@ data class IdentifierTypeCreateParsed(
 )
 
 data class IdentifierTypeDetailParsed(
-    val country: CountryCode?,
+    val country: CountryDb?,
     val mandatory: Boolean
 )

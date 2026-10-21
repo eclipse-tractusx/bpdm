@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 
 data class LegalFormCreateRequest(
     val technicalKey: String,
@@ -28,8 +26,8 @@ data class LegalFormCreateRequest(
     val transliteratedName: String?,
     val abbreviations: String?,
     val transliteratedAbbreviations: String?,
-    val country: CountryCode?,
-    val language: LanguageCode?,
+    val country: String?,
+    val language: String?,
     val administrativeAreaLevel1: String?,
     val isActive: Boolean
 )

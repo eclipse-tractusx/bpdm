@@ -5,6 +5,7 @@
   * [7.5.x to 7.6.x](#75x-to-76x)
     * [Country Catalogue](#country-catalogue)
     * [Region and Field Quality Rule Countries](#region-and-field-quality-rule-countries)
+    * [Legal Form and Identifier Type Countries](#legal-form-and-identifier-type-countries)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
@@ -49,6 +50,11 @@ Before upgrading, ensure every region's `country_code` and every non-null `count
 The migration resolves these codes to `countries.id`, replaces the stored `country_code` columns with `country_id` foreign keys, and preserves the country codes returned by the API.
 If a code cannot be resolved, the upgrade fails with an error naming the unresolved codes; add the intended countries or correct the metadata before retrying.
 Null-country field quality rules remain valid as country-independent defaults.
+
+### Legal Form and Identifier Type Countries
+
+Before upgrading, correct or clear every non-null `country_code` in `legal_forms` and `identifier_type_details` that is absent from the `countries` catalogue.
+The migration fails and names any unresolved codes, so add intended countries to the catalogue or correct the affected metadata before upgrading.
 
 ## 7.4.x to 7.5.x
 
