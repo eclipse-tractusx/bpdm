@@ -19,20 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingRelationSharingStateException
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -40,35 +32,6 @@ import java.time.Instant
 class RelationSharingStateService(
     private val relationRepository: RelationRepository
 ) {
-
-    fun findSharingStates(
-        tenantBpnL: BpnLString,
-        externalIds: Collection<String> = emptyList(),
-        sharingStateTypes: Collection<RelationSharingStateType> = emptyList(),
-        updatedAfter: Instant? = null,
-        paginationRequest: PaginationRequest
-    ): PageDto<RelationSharingStateDto>{
-        val specs = Specification.allOf(
-            RelationRepository.Specs.bySharingStateNotNull(),
-            RelationRepository.Specs.byTenantBpnL(tenantBpnL.value),
-            RelationRepository.Specs.byExternalIds(externalIds),
-            RelationRepository.Specs.bySharingStateTypes(sharingStateTypes),
-            RelationRepository.Specs.bySharingStateUpdatedAfter(updatedAfter)
-        )
-
-        val relationPage = relationRepository.findAll(specs, PageRequest.of(paginationRequest.page, paginationRequest.size))
-        return relationPage.toPageDto{ it.toSharingStateDto() }
-    }
-
-    private fun RelationDb.toSharingStateDto(): RelationSharingStateDto{
-        return sharingState?.toDto(externalId) ?: throw BpdmMissingRelationSharingStateException(externalId, tenantBpnL)
-    }
-
-    private fun RelationSharingStateDb.toDto(externalId: String): RelationSharingStateDto{
-        return RelationSharingStateDto(
-            externalId, sharingStateType, sharingErrorCode, sharingErrorMessage, taskId, updatedAt
-        )
-    }
 
     fun setInitial(relation: RelationDb, relationType: RelationType){
         relation.sharingState = RelationSharingStateDb(

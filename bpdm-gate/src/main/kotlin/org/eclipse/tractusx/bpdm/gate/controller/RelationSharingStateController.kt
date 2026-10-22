@@ -21,11 +21,15 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationSharingStateDtoMapper
+import org.eclipse.tractusx.bpdm.gate.model.search.RelationSharingStateSearchRequest
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationSharingStateSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -33,8 +37,9 @@ import java.time.Instant
 
 @RestController
 class RelationSharingStateController(
-    private val relationSharingStateService: RelationSharingStateService,
-    private val principalUtil: PrincipalUtil
+    private val principalUtil: PrincipalUtil,
+    private val searchApplicationService: RelationSharingStateSearchApplicationService,
+    private val dtoMapper: RelationSharingStateDtoMapper
 ): GateRelationSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -44,14 +49,8 @@ class RelationSharingStateController(
         updatedAfter: Instant?,
         paginationRequest: PaginationRequest
     ): PageDto<RelationSharingStateDto> {
-        return relationSharingStateService.findSharingStates(
-            principalUtil.resolveTenantBpnl(),
-            externalIds ?: emptyList(),
-            sharingStateTypes ?: emptyList(),
-            updatedAfter,
-            paginationRequest
-        )
+        val request = RelationSharingStateSearchRequest(externalIds, sharingStateTypes, updatedAfter)
+        return searchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+            .toPageDto(dtoMapper::toDto)
     }
-
-
 }
