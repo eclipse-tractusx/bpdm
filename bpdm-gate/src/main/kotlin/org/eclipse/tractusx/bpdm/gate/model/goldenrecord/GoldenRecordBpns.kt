@@ -18,3 +18,13 @@ data class GoldenRecordBpns(
     val sites: Set<String>,
     val addresses: Set<String>
 )
+
+/**
+ * Returns every BPN of these collections, by business partner type.
+ */
+fun Iterable<GoldenRecordBpns>.union(): GoldenRecordBpns =
+    GoldenRecordBpns(
+        legalEntities = flatMap { it.legalEntities }.toSet(),
+        sites = flatMap { it.sites }.toSet(),
+        addresses = flatMap { it.addresses }.toSet()
+    )

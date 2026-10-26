@@ -21,19 +21,11 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.common.util.parenthesizeIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
-import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.PageRequest
@@ -46,32 +38,6 @@ class TaskResolutionBatchService(
     private val entityManager: EntityManager
 ){
     private val logger = KotlinLogging.logger { }
-
-    fun resolveTasks(){
-        logger.debug { "Start batch process for resolving pending tasks..." }
-
-        val totalSuccesses = mutableListOf<String>()
-        val totalErrors = mutableListOf<String>()
-        var totalUnresolved = 0
-        do{
-
-            val results = taskResolutionService.resolveTasks()
-
-            totalSuccesses.addAll(results.resolvedAsSuccess)
-            totalErrors.addAll(results.resolvedAsError)
-            totalUnresolved += results.unresolved
-
-            entityManager.clear()
-        }while (results.hasNextPage)
-
-        if (totalSuccesses.isNotEmpty() || totalErrors.isNotEmpty())
-            logger.info {
-                "Resolved ${totalSuccesses.size} tasks as successful${totalSuccesses.parenthesizeIdentifiersForLog()}, " +
-                        "${totalErrors.size} as errors${totalErrors.parenthesizeIdentifiersForLog()} and $totalUnresolved still unresolved"
-            }
-        else
-            logger.debug { "Resolved no tasks, $totalUnresolved still unresolved" }
-    }
 
     fun healthCheck(){
         logger.debug { "Start process Task Health Check..." }
@@ -101,17 +67,9 @@ class TaskResolutionBatchService(
 class TaskResolutionChunkService(
     private val sharingStateRepository: SharingStateRepository,
     private val sharingStateService: SharingStateService,
-    private val businessPartnerRepository: BusinessPartnerRepository,
     private val taskProperties: GoldenRecordTaskConfigProperties,
-    private val orchestrationApiClient: OrchestrationApiClient,
-    private val businessPartnerService: BusinessPartnerService,
-    private val orchestratorMappings: OrchestratorMappings,
-    private val synchRecordService: SyncRecordService,
-    private val goldenRecordUpdateService: GoldenRecordUpdateChunkService,
-    private val goldenRecordCountedService: GoldenRecordCountedService
+    private val orchestrationApiClient: OrchestrationApiClient
 ) {
-
-    private val logger = KotlinLogging.logger { }
 
     @Transactional
     fun healthCheck(pageToQuery: Int): HealthCheckResult{
@@ -130,170 +88,6 @@ class TaskResolutionChunkService(
         return HealthCheckResult(pendingSharingStates.size, sharingStatesMissingTask.map { it.externalId }, pendingSharingStatePage.hasNext())
     }
 
-
-    @Transactional
-    fun resolveTasks(): ResolutionStats {
-
-        val syncRecord = synchRecordService.getOrCreateRecord(SyncTypeDb.ORCHESTRATOR_FINISHED_TASKS)
-
-        val events = orchestrationApiClient.finishedTaskEvents.getEvents(syncRecord.fromTime, PaginationRequest(0, 1000))
-        val finishedTaskIds = events.content.map { it.taskId }.toSet()
-
-        val foundSharingStates = sharingStateRepository.findByTaskIdIn(finishedTaskIds)
-        val pendingSharingStates = foundSharingStates.filter { it.sharingStateType == SharingStateType.Pending }
-
-        val tasks = foundSharingStates.chunked(taskProperties.check.batchSize){ chunkedSharingStates ->
-            orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(chunkedSharingStates.map { TaskStateRequest.Entry(taskId = it.taskId.toString(), recordId = it.orchestratorRecordId.toString()) })).tasks
-        }.flatten()
-
-        val tasksById = tasks.associateBy { it.taskId }
-
-        val inputs = businessPartnerRepository.findBySharingStateInAndStage(pendingSharingStates, StageType.Input)
-        val inputsByExternalId = inputs.associateBy { it.sharingState.externalId }
-
-        val mappingResults = pendingSharingStates.map { sharingState ->
-            tryCreateUpsertRequest(sharingState, tasksById[sharingState.taskId], inputsByExternalId[sharingState.externalId])
-        }
-
-        val successes = mappingResults.filter { it.businessPartnerResult != null }
-        val errors = mappingResults.filter { it.errorType != null }
-        val unresolved = mappingResults.filter { it.businessPartnerResult == null && it.errorType == null }
-
-        resolveAsUpserts(successes)
-        resolveAsErrors(errors)
-
-        synchRecordService.updateRecord(syncRecord, events.content.lastOrNull()?.timestamp)
-
-        logger.debug { "Resolved ${successes.size} tasks as successful, ${errors.size} as errors and ${unresolved.size} still unresolved" }
-
-        return ResolutionStats(
-            successes.map { it.sharingState.externalId },
-            errors.map { it.sharingState.externalId },
-            unresolved.size,
-            events.totalPages > 1
-        )
-    }
-
-    private fun tryCreateUpsertRequest(sharingState: SharingStateDb, task: TaskClientStateDto?, input: BusinessPartnerDb?): RequestCreationResult {
-        if (task == null) {
-            return RequestCreationResult.error(sharingState, BusinessPartnerSharingError.MissingTaskID, "Missing Task in Orchestrator")
-        }
-
-        return when (task.processingState.resultState) {
-            ResultState.Pending -> RequestCreationResult(sharingState, null, null, null)
-            ResultState.Success -> createUpsertRequestForSuccessfulTask(sharingState, task, input)
-            ResultState.Error -> handleTaskErrorResult(sharingState, task)
-        }
-    }
-
-    private fun handleTaskErrorResult( sharingState: SharingStateDb, task: TaskClientStateDto): RequestCreationResult {
-        val errorDescription = task.processingState.errors.joinToString(" // ") { it.description }.take(255).ifEmpty { null }
-
-        return when (task.processingState.errors.firstOrNull()?.type) {
-            TaskErrorType.Timeout -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.SharingTimeout, errorDescription)
-            TaskErrorType.NaturalPersonError -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.NaturalPersonError, errorDescription)
-            TaskErrorType.BpnErrorNotFound -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.BpnErrorNotFound, errorDescription)
-            TaskErrorType.BpnErrorTooManyOptions -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.BpnErrorTooManyOptions, errorDescription)
-            TaskErrorType.MandatoryFieldValidationFailed -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.MandatoryFieldValidationFailed, errorDescription)
-            TaskErrorType.BlacklistCountryPresent -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.BlacklistCountryPresent, errorDescription)
-            TaskErrorType.UnknownSpecialCharacters -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.UnknownSpecialCharacters, errorDescription)
-            else -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.SharingProcessError, errorDescription )
-        }
-    }
-
-    private fun createUpsertRequestForSuccessfulTask(sharingState: SharingStateDb, task: TaskClientStateDto, input: BusinessPartnerDb?): RequestCreationResult {
-        if (input == null) {
-            return RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.SharingProcessError,
-                "No input data found for the references business partner"
-            )
-        }
-
-        val upsertRequest = try {
-            orchestratorMappings.toOutputUpsertData(task.businessPartnerResult, input.roles.toList(), sharingState.tenantBpnl)
-        } catch (ex: Throwable) {
-            return RequestCreationResult.error(sharingState, BusinessPartnerSharingError.SharingProcessError, ex.message?.take(255))
-        }
-
-        return RequestCreationResult.success(sharingState, upsertRequest)
-    }
-
-    private fun resolveAsUpserts(requests: List<RequestCreationResult>) {
-        val existingOutputsBySharingStateId = businessPartnerRepository
-            .findBySharingStateInAndStage(requests.map { it.sharingState }, StageType.Output)
-            .associateBy { it.sharingState.id }
-
-        val upsertRequests = requests.filter {
-            shouldWriteOutputByGoldenRecordTimestamp(
-                incoming = it.businessPartnerResult!!,
-                stored = existingOutputsBySharingStateId[it.sharingState.id]
-            )
-        }
-
-        val upsertResults = businessPartnerService.upsertBusinessPartnersOutput(upsertRequests.map {
-            BusinessPartnerService.OutputUpsertRequest(
-                it.sharingState,
-                it.businessPartnerResult!!
-            )
-        })
-        // check against the Pool again in case the business partner data is already outdated
-        goldenRecordUpdateService.updateAgainstPool(upsertResults.map { it.businessPartner })
-        requests.forEach { sharingStateService.setSuccess(it.sharingState) }
-
-        goldenRecordCountedService.setIsGoldenRecordCounted(upsertResults.map { it.businessPartner })
-    }
-
-    private fun shouldWriteOutputByGoldenRecordTimestamp(incoming: OutputUpsertData, stored: BusinessPartnerDb?): Boolean {
-        val incomingComponentTimestamps = listOf(incoming.legalEntityUpdatedAt, incoming.siteUpdatedAt, incoming.addressUpdatedAt)
-        if (incomingComponentTimestamps.all { it == null }) return true
-        if (stored == null) return true
-
-        val storedComponentTimestamps = listOf(stored.legalEntityUpdatedAt, stored.siteUpdatedAt, stored.addressUpdatedAt)
-        if (storedComponentTimestamps.all { it == null }) return true
-
-        val timestampPairs = listOf(
-            incoming.legalEntityUpdatedAt to stored.legalEntityUpdatedAt,
-            incoming.siteUpdatedAt to stored.siteUpdatedAt,
-            incoming.addressUpdatedAt to stored.addressUpdatedAt
-        )
-
-        val shouldSkip = timestampPairs
-            .filter { (incomingTimestamp, _) -> incomingTimestamp != null }
-            .all { (incomingTimestamp, storedTimestamp) ->
-                storedTimestamp != null && !incomingTimestamp!!.isAfter(storedTimestamp)
-            }
-
-        return !shouldSkip
-    }
-
-    private fun resolveAsErrors(errors: List<RequestCreationResult>) {
-        errors.forEach {
-            sharingStateService.setError(it.sharingState, it.errorType!!, it.errorMessage)
-        }
-    }
-
-    private data class RequestCreationResult(
-        val sharingState: SharingStateDb,
-        val businessPartnerResult: OutputUpsertData?,
-        val errorType: BusinessPartnerSharingError?,
-        val errorMessage: String?
-    ) {
-        companion object {
-            fun error(sharingState: SharingStateDb, errorType: BusinessPartnerSharingError, errorMessage: String?) =
-                RequestCreationResult(sharingState, null, errorType, errorMessage)
-
-            fun success(sharingState: SharingStateDb, request: OutputUpsertData) =
-                RequestCreationResult(sharingState, request, null, null)
-        }
-    }
-
-    data class ResolutionStats(
-        val resolvedAsSuccess: List<String>,
-        val resolvedAsError: List<String>,
-        val unresolved: Int,
-        val hasNextPage: Boolean
-    )
 
     data class HealthCheckResult(
         val processed: Int,

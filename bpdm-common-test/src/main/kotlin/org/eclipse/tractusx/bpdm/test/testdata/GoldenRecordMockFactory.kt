@@ -44,6 +44,18 @@ class GoldenRecordMockFactory(
         return poolMockResult
     }
 
+    fun mockLegalEntityRefinementChangedInPool(seed: String, owningCompany: String?, nameParts: List<String>): LegalEntityWithLegalAddressVerboseDto {
+        val taskGoldenRecord = mockLegalEntityRefinement(seed, owningCompany, nameParts)
+        val changedGoldenRecord = taskGoldenRecord.copy(
+            header = taskGoldenRecord.header.copy(
+                legalName = "Changed ${taskGoldenRecord.header.legalName}",
+                updatedAt = taskGoldenRecord.header.updatedAt.plusSeconds(1)
+            )
+        )
+        poolMockDataFactory.mockLegalEntitySearchResult(changedGoldenRecord)
+        return changedGoldenRecord
+    }
+
     fun mockLegalEntityOnSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>): PoolMockDataFactory.SiteWithLegalEntityParent {
         val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToLegalEntityOnSite(seed, poolMockResult.legalEntityParent, poolMockResult.site.site, owningCompany, nameParts)

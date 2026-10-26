@@ -16,6 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
@@ -33,19 +35,24 @@ class BusinessPartnerOutputOperationService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Updates the stored output of each of [outputs] to its new data, leaving those whose data is unchanged untouched.
+     * Creates or updates the output of each of [outputs] and returns every output in the same order, leaving those whose
+     * data is unchanged untouched.
      */
     @Transactional
-    fun write(outputs: List<BusinessPartnerOutputParsed>) {
-        outputs.forEach { parsed ->
-            val result = businessPartnerService.updateBusinessPartnerOutput(parsed.output, parsed.data)
-            val sharingState = result.businessPartner.sharingState
-            if (result.hadChanges && result.shouldUpdate) {
-                changeLogger.log(
-                    BusinessPartnerChange(PersistedChangeType.Updated, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.Output)
-                )
-                logger.debug { "Updated business partner output ${sharingState.externalId} from its golden records" }
-            }
+    fun write(outputs: List<BusinessPartnerOutputParsed>): List<BusinessPartnerDb> =
+        outputs.map { parsed ->
+            val result = businessPartnerService.upsertBusinessPartnerOutput(parsed.storedOutput, parsed.sharingState, parsed.data)
+            if (result.hadChanges && result.shouldUpdate) logChange(result)
+            result.businessPartner
         }
+
+    private fun logChange(result: BusinessPartnerService.UpsertResult) {
+        val sharingState = result.businessPartner.sharingState
+        val changeType = when (result.type) {
+            ChangelogType.CREATE -> PersistedChangeType.Created
+            ChangelogType.UPDATE -> PersistedChangeType.Updated
+        }
+        changeLogger.log(BusinessPartnerChange(changeType, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.Output))
+        logger.debug { "Wrote business partner output ${sharingState.externalId} as ${result.type}" }
     }
 }

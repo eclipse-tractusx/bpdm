@@ -187,4 +187,32 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }
+
+    /**
+     * GIVEN business partner whose finished task the Orchestrator no longer knows
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees that sharing state failed with a missing task
+     */
+    @Test
+    fun `find sharing state of missing task`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val missingTask = testDataClient.businessPartner.setStateToTaskMissing(input.externalId)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
+
+        //THEN
+        val expectedSharingState = SharingStateDto(
+            externalId = input.externalId,
+            sharingStateType = SharingStateType.Error,
+            sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
+            sharingErrorMessage = "Missing Task in Orchestrator",
+            taskId = missingTask.taskId,
+            updatedAt = Instant.MIN
+        )
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
 }

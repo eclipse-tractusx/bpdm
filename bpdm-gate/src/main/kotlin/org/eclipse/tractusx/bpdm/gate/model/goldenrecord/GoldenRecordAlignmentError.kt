@@ -13,17 +13,15 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 
 /**
  * Reason a business partner output cannot be aligned with the golden records it references.
  */
 sealed interface GoldenRecordAlignmentError {
-    val output: BusinessPartnerDb
+    val sharingState: SharingStateDb
 
-    data class GoldenRecordMissing(override val output: BusinessPartnerDb, val bpn: String) : GoldenRecordAlignmentError
+    data class GoldenRecordMissing(override val sharingState: SharingStateDb, val bpn: String) : GoldenRecordAlignmentError
 
-    data class AdoptedSiteMissing(override val output: BusinessPartnerDb, val siteBpn: String) : GoldenRecordAlignmentError
-
-    data class AddressTypeMissing(override val output: BusinessPartnerDb, val addressBpn: String) : GoldenRecordAlignmentError
+    data class AdoptedSiteMissing(override val sharingState: SharingStateDb, val siteBpn: String) : GoldenRecordAlignmentError
 }

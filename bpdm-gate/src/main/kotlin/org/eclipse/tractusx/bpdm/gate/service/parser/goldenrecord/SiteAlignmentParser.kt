@@ -14,10 +14,11 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRequest
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
 /**
@@ -27,14 +28,18 @@ import org.springframework.stereotype.Service
 class SiteAlignmentParser {
 
     /**
-     * Returns the golden record of the site [output] tracks among [goldenRecords], or null when it was not requested or
-     * is older than the stored one.
+     * Returns the golden record of the site [base] tracks among [goldenRecords], or null when it was not requested or
+     * is older than the one [base] holds.
      */
-    fun parse(output: BusinessPartnerDb, goldenRecords: PoolGoldenRecordsRequest): ParseResult<SiteGoldenRecordRequest?, GoldenRecordAlignmentError> {
-        val bpn = output.bpnS?.takeIf { it in goldenRecords.requested.sites } ?: return ParseResult.Success(null)
+    fun parse(
+        sharingState: SharingStateDb,
+        base: OutputUpsertData,
+        goldenRecords: PoolGoldenRecordsRequest
+    ): ParseResult<SiteGoldenRecordRequest?, GoldenRecordAlignmentError> {
+        val bpn = base.siteBpn?.takeIf { it in goldenRecords.requested.sites } ?: return ParseResult.Success(null)
         val site = goldenRecords.sites[bpn]
-            ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(output, bpn))
-        val isOutdated = output.siteUpdatedAt?.let { site.updatedAt.isBefore(it) } == true
+            ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(sharingState, bpn))
+        val isOutdated = base.siteUpdatedAt?.let { site.updatedAt.isBefore(it) } == true
 
         return ParseResult.Success(site.takeUnless { isOutdated }?.let(::normalize))
     }

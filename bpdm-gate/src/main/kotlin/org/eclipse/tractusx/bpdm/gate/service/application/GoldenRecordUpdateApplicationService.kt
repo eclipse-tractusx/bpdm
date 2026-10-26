@@ -76,14 +76,12 @@ class GoldenRecordUpdateApplicationService(
     }
 
     private fun log(error: GoldenRecordAlignmentError) {
-        val externalId = error.output.sharingState.externalId
+        val externalId = error.sharingState.externalId
         when (error) {
             is GoldenRecordAlignmentError.GoldenRecordMissing ->
                 logger.debug { "Skipped the update of business partner output '$externalId': the Pool does not return golden record '${error.bpn}'" }
             is GoldenRecordAlignmentError.AdoptedSiteMissing ->
                 logger.warn { "Skipped the update of business partner output '$externalId': its address belongs to site '${error.siteBpn}' which the Pool does not return" }
-            is GoldenRecordAlignmentError.AddressTypeMissing ->
-                logger.warn { "Skipped the update of business partner output '$externalId': neither the Pool nor the output holds an address type for address '${error.addressBpn}'" }
         }
     }
 }

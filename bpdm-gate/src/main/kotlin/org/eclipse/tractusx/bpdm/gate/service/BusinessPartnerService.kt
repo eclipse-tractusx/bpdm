@@ -47,25 +47,6 @@ class BusinessPartnerService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun upsertBusinessPartnersOutput(requests: List<OutputUpsertRequest>): List<UpsertResult> {
-        logger.debug { "Executing upsertBusinessPartnersOutput() with parameters $requests" }
-
-        val existingOutputs = businessPartnerRepository.findBySharingStateInAndStage(requests.map { it.sharingState }, StageType.Output)
-        val existingOutputsBySharingStateId = existingOutputs.associateBy { it.sharingState.id }
-
-        val updatedEntities = requests.map { request ->
-            val existingOutput = existingOutputsBySharingStateId[request.sharingState.id]
-            val updatedData = outputUpsertMappings.toEntity(request.upsertData, request.sharingState)
-
-            upsertFromEntity(existingOutput, updatedData)
-        }
-
-        reportWrites(updatedEntities, StageType.Output)
-
-        return updatedEntities
-    }
-
-    @Transactional
     fun updateBusinessPartnerOutput(businessPartner: BusinessPartnerDb, upsertData: OutputUpsertData): UpsertResult {
         logger.debug { "Executing updateBusinessPartnerOutput() with parameters $businessPartner and $upsertData" }
 
@@ -76,6 +57,13 @@ class BusinessPartnerService(
         return upsertFromEntity(businessPartner, updatedData)
     }
 
+
+    /**
+     * Creates the output of [sharingState] with [upsertData], or updates [storedOutput] to it when one exists.
+     */
+    @Transactional
+    fun upsertBusinessPartnerOutput(storedOutput: BusinessPartnerDb?, sharingState: SharingStateDb, upsertData: OutputUpsertData): UpsertResult =
+        upsertFromEntity(storedOutput, outputUpsertMappings.toEntity(upsertData, sharingState))
 
     private fun upsertFromEntity(existingPartner: BusinessPartnerDb?, upsertData: BusinessPartnerDb): UpsertResult {
         val sharingState = upsertData.sharingState
@@ -136,10 +124,5 @@ class BusinessPartnerService(
         val shouldUpdate: Boolean,
         val type: ChangelogType,
         val businessPartner: BusinessPartnerDb
-    )
-
-    data class OutputUpsertRequest(
-        val sharingState: SharingStateDb,
-        val upsertData: OutputUpsertData
     )
 }

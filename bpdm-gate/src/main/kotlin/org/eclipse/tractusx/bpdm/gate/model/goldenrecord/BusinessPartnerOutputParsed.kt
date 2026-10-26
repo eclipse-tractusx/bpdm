@@ -13,10 +13,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 
 data class BusinessPartnerOutputParsed(
-    val output: BusinessPartnerDb,
+    val sharingState: SharingStateDb,
+    val storedOutput: BusinessPartnerDb?,
     val data: OutputUpsertData
 )

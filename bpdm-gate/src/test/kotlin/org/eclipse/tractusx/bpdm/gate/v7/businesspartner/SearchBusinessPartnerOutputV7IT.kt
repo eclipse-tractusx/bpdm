@@ -50,6 +50,28 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     }
 
     /**
+     * GIVEN business partner output based on legal entity whose golden record the Pool changed while its task was pending
+     * WHEN output consumer searches for output with that external-ID
+     * THEN output consumer sees the changed golden record instead of the task result
+     *
+     */
+    @Test
+    fun `search legal entity business partner output changed while task was pending`(){
+        //GIVEN
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val changedGoldenRecord = testDataClient.businessPartner.refineToLegalEntityChangedInPool(createdInput)
+
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
+
+        //THEN
+        val expectedOutput =  testData.businessPartner.output.fromLegalEntity(createdInput, changedGoldenRecord)
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+    }
+
+    /**
      * GIVEN business partner output based on legal entity that is also a site main address
      * WHEN output consumer searches for output with that external-ID
      * THEN output consumer sees golden record result with both legal entity and site references

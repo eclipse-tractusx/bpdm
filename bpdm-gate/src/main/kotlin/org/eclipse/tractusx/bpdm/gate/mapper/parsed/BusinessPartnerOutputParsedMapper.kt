@@ -21,8 +21,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetScriptVariantDto
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.mapper.record.OutputUpsertDataMapper
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressAlignmentParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
@@ -32,29 +32,28 @@ import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.springframework.stereotype.Component
 
 /**
- * Maps a stored business partner output and the golden records it aligns with onto the output data it is rewritten to.
+ * Maps business partner output data and the golden records it aligns with onto the output data it is written as.
  */
 @Component
-class BusinessPartnerOutputParsedMapper(
-    private val upsertDataMapper: OutputUpsertDataMapper
-) {
+class BusinessPartnerOutputParsedMapper {
 
     /**
-     * Returns [output] with the golden records of [legalEntity], [site] and [address] laid over its stored data, leaving
-     * a component that is null as stored.
+     * Returns the output of [sharingState] with the golden records of [legalEntity], [site] and [address] laid over
+     * [base], leaving a component that is null as [base] holds it.
      */
     fun toParsed(
-        output: BusinessPartnerDb,
+        sharingState: SharingStateDb,
+        storedOutput: BusinessPartnerDb?,
+        base: OutputUpsertData,
         legalEntity: LegalEntityGoldenRecordRequest?,
         site: SiteGoldenRecordRequest?,
         address: AddressAlignmentParsed?
     ): BusinessPartnerOutputParsed {
-        val stored = upsertDataMapper.toUpsertData(output)
-        val aligned = stored
+        val aligned = base
             .let { data -> legalEntity?.let { withLegalEntity(data, it) } ?: data }
             .let { data -> site?.let { withSite(data, it) } ?: data }
             .let { data -> address?.let { withAddress(data, it) } ?: data }
-        return BusinessPartnerOutputParsed(output, aligned)
+        return BusinessPartnerOutputParsed(sharingState, storedOutput, aligned)
     }
 
     private fun withLegalEntity(data: OutputUpsertData, legalEntity: LegalEntityGoldenRecordRequest): OutputUpsertData =

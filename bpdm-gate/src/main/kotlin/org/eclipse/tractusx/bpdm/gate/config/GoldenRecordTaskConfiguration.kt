@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.config
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.service.*
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
@@ -32,7 +33,8 @@ class GoldenRecordTaskConfiguration(
     private val configProperties: GoldenRecordTaskConfigProperties,
     private val taskScheduler: TaskScheduler,
     private val taskCreationService: TaskCreationBatchService,
-    private val taskResolutionService: TaskResolutionBatchService,
+    private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
+    private val taskHealthCheckService: TaskResolutionBatchService,
     private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
     private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
     private val relationTaskCreationService: RelationTaskCreationService,
@@ -58,13 +60,13 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             "golden record task resolution",
-            { taskResolutionService.resolveTasks() },
+            { taskResolutionService.resolveFinishedTasks() },
             configProperties.check.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record task health check",
-            { taskResolutionService.healthCheck() },
+            { taskHealthCheckService.healthCheck() },
             configProperties.healthCheck.cron
         )
 

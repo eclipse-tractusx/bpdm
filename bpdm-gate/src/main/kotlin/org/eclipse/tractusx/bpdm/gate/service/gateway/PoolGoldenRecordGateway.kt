@@ -57,7 +57,10 @@ class PoolGoldenRecordGateway(
         )
     }
 
-    private fun fetchGoldenRecords(bpns: GoldenRecordBpns): PoolGoldenRecordsRequest {
+    /**
+     * Returns the current golden records of [bpns] together with every site their addresses belong to.
+     */
+    fun fetchGoldenRecords(bpns: GoldenRecordBpns): PoolGoldenRecordsRequest {
         val legalEntities = fetchLegalEntities(bpns.legalEntities)
         val addresses = fetchAddresses(bpns.addresses)
         val sitesOfAddresses = addresses.flatMap { listOfNotNull(it.siteBpn) + it.additionalSiteBpns }

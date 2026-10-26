@@ -228,6 +228,26 @@ class OrchestratorMockDataFactory(
         return mockedErrorTasks.tasks.single()
     }
 
+    fun mockMissingTask(seed: String): TaskClientStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(
+                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, mockedCreatedTask.taskId)
+                ))
+            )
+        )))
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(TaskStateResponse(emptyList()))
+        )))
+
+        return mockedCreatedTask
+    }
+
     fun mockRelationSharingError(seed: String, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 

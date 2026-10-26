@@ -14,12 +14,13 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressAlignmentParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
 /**
@@ -32,32 +33,30 @@ class AddressAlignmentParser(
 ) {
 
     /**
-     * Returns how the address of [output] among [goldenRecords] aligns the output, or null when it was not requested or
-     * is older than the stored one.
+     * Returns how the address of [base] among [goldenRecords] aligns the output, or null when it was not requested or
+     * is older than the one [base] holds.
      */
-    fun parse(output: BusinessPartnerDb, goldenRecords: PoolGoldenRecordsRequest): ParseResult<AddressAlignmentParsed?, GoldenRecordAlignmentError> {
-        val bpn = output.bpnA?.takeIf { it in goldenRecords.requested.addresses } ?: return ParseResult.Success(null)
+    fun parse(
+        sharingState: SharingStateDb,
+        base: OutputUpsertData,
+        goldenRecords: PoolGoldenRecordsRequest
+    ): ParseResult<AddressAlignmentParsed?, GoldenRecordAlignmentError> {
+        val bpn = base.addressBpn.takeIf { it in goldenRecords.requested.addresses } ?: return ParseResult.Success(null)
         val address = goldenRecords.addresses[bpn]
-            ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(output, bpn))
-        val isOutdated = output.addressUpdatedAt?.let { address.updatedAt.isBefore(it) } == true
+            ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(sharingState, bpn))
+        val isOutdated = base.addressUpdatedAt?.let { address.updatedAt.isBefore(it) } == true
         if (isOutdated) return ParseResult.Success(null)
 
-        val siteBpnToAdopt = address.siteBpn?.takeIf { output.bpnS == null }
+        val siteBpnToAdopt = address.siteBpn?.takeIf { base.siteBpn == null }
         val adoptedSite = siteBpnToAdopt?.let { goldenRecords.sites[it] }
-        val addressType = address.addressType ?: output.postalAddress.addressType
-        if (addressType == null || (siteBpnToAdopt != null && adoptedSite == null))
-            return ParseResult.Failure(
-                listOfNotNull(
-                    siteBpnToAdopt?.takeIf { adoptedSite == null }?.let { GoldenRecordAlignmentError.AdoptedSiteMissing(output, it) },
-                    GoldenRecordAlignmentError.AddressTypeMissing(output, bpn).takeIf { addressType == null }
-                )
-            )
+        if (siteBpnToAdopt != null && adoptedSite == null)
+            return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.AdoptedSiteMissing(sharingState, siteBpnToAdopt))
 
         return ParseResult.Success(
             AddressAlignmentParsed(
                 address = address.copy(scriptVariants = address.scriptVariants.distinctBy { it.scriptCode }),
-                addressType = addressType,
-                additionalSites = additionalSitesOf(address, output.bpnS ?: siteBpnToAdopt, goldenRecords),
+                addressType = address.addressType ?: base.addressType,
+                additionalSites = additionalSitesOf(address, base.siteBpn ?: siteBpnToAdopt, goldenRecords),
                 adoptedSite = adoptedSite?.let(siteParser::normalize)
             )
         )

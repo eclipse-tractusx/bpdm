@@ -15,11 +15,13 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.mapper.parsed.BusinessPartnerOutputParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
 /**
@@ -34,18 +36,20 @@ class GoldenRecordAlignmentParser(
 ) {
 
     /**
-     * Returns the output data each of [outputs] takes on from the golden records in [goldenRecords] it references,
-     * keeping what the stored output holds more recently.
+     * Returns the output data of [sharingState] that [base] takes on from the golden records in [goldenRecords] it
+     * references, keeping each component [base] holds more recently.
      */
-    fun parse(outputs: List<BusinessPartnerDb>, goldenRecords: PoolGoldenRecordsRequest): List<ParseResult<BusinessPartnerOutputParsed, GoldenRecordAlignmentError>> =
-        outputs.map { parse(it, goldenRecords) }
-
-    private fun parse(output: BusinessPartnerDb, goldenRecords: PoolGoldenRecordsRequest): ParseResult<BusinessPartnerOutputParsed, GoldenRecordAlignmentError> =
+    fun parse(
+        sharingState: SharingStateDb,
+        storedOutput: BusinessPartnerDb?,
+        base: OutputUpsertData,
+        goldenRecords: PoolGoldenRecordsRequest
+    ): ParseResult<BusinessPartnerOutputParsed, GoldenRecordAlignmentError> =
         zipParseResults(
-            legalEntityParser.parse(output, goldenRecords),
-            siteParser.parse(output, goldenRecords),
-            addressParser.parse(output, goldenRecords)
+            legalEntityParser.parse(sharingState, base, goldenRecords),
+            siteParser.parse(sharingState, base, goldenRecords),
+            addressParser.parse(sharingState, base, goldenRecords)
         ) { legalEntity, site, address ->
-            parsedMapper.toParsed(output, legalEntity, site ?: address?.adoptedSite, address)
+            parsedMapper.toParsed(sharingState, storedOutput, base, legalEntity, site ?: address?.adoptedSite, address)
         }
 }

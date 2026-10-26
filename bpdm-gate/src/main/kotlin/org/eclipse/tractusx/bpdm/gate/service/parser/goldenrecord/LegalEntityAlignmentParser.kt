@@ -14,10 +14,11 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
 /**
@@ -27,14 +28,18 @@ import org.springframework.stereotype.Service
 class LegalEntityAlignmentParser {
 
     /**
-     * Returns the golden record of the legal entity of [output] among [goldenRecords], or null when it was not requested
-     * or is older than the stored one.
+     * Returns the golden record of the legal entity of [base] among [goldenRecords], or null when it was not requested
+     * or is older than the one [base] holds.
      */
-    fun parse(output: BusinessPartnerDb, goldenRecords: PoolGoldenRecordsRequest): ParseResult<LegalEntityGoldenRecordRequest?, GoldenRecordAlignmentError> {
-        val bpn = output.bpnL?.takeIf { it in goldenRecords.requested.legalEntities } ?: return ParseResult.Success(null)
+    fun parse(
+        sharingState: SharingStateDb,
+        base: OutputUpsertData,
+        goldenRecords: PoolGoldenRecordsRequest
+    ): ParseResult<LegalEntityGoldenRecordRequest?, GoldenRecordAlignmentError> {
+        val bpn = base.legalEntityBpn.takeIf { it in goldenRecords.requested.legalEntities } ?: return ParseResult.Success(null)
         val legalEntity = goldenRecords.legalEntities[bpn]
-            ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(output, bpn))
-        val isOutdated = output.legalEntityUpdatedAt?.let { legalEntity.updatedAt.isBefore(it) } == true
+            ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(sharingState, bpn))
+        val isOutdated = base.legalEntityUpdatedAt?.let { legalEntity.updatedAt.isBefore(it) } == true
 
         return ParseResult.Success(
             legalEntity.takeUnless { isOutdated }?.copy(scriptVariants = legalEntity.scriptVariants.distinctBy { it.scriptCode })

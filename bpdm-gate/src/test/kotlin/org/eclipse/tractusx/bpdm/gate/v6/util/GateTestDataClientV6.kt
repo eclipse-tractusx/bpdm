@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
@@ -48,7 +48,7 @@ class GateTestDataClientV6 (
     val operatorClient: GateClientV6,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
-    private val taskResolutionBatchService: TaskResolutionBatchService,
+    private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val tenantBpnL: String,
     private val poolMockDataFactory: PoolMockDataFactory
 ){
@@ -186,7 +186,7 @@ class GateTestDataClientV6 (
 
         setStateToReady(externalId)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
+        taskResolutionService.resolveFinishedTasks()
 
         return mockedRefinedTask
     }
@@ -201,7 +201,7 @@ class GateTestDataClientV6 (
 
         setStateToReady(externalId)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
+        taskResolutionService.resolveFinishedTasks()
 
         return errorTask
     }
@@ -209,6 +209,6 @@ class GateTestDataClientV6 (
     private fun shareBusinessPartnerAndResolve(externalId: String){
         operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
         taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
+        taskResolutionService.resolveFinishedTasks()
     }
 }
