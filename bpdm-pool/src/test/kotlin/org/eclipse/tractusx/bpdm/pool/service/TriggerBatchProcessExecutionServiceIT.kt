@@ -94,6 +94,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     @Test
     fun `event trigger invokes headquarter relocation`(){
         //GIVEN
+        val creationStartTime = Instant.now()
         val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
@@ -106,15 +107,24 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
 
         //WHEN
-        val updateStartTime = Instant.now()
-        executeAtDate(LocalDate.now().plusDays(1)){ triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
-        val updateEndTime = Instant.now()
+        val creationEndTime = Instant.now()
+        lateinit var updateTimeframe: Timeframe
+        executeAtDate(LocalDate.now().plusDays(1)) {
+            val updateStartTime = Instant.now()
+            triggerBatchProcessExecutionService.executeUnprocessedTriggers()
+            updateTimeframe = Timeframe(updateStartTime.minusSeconds(2), Instant.now().plusSeconds(2))
+        }
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(2), updateEndTime.plusSeconds(2)))
+        poolAssertHelper.assertLegalEntityResponse(
+            listOf(actualLegalEntity),
+            listOf(expectedLegalEntity),
+            Timeframe(creationStartTime.minusSeconds(2), creationEndTime.plusSeconds(2)),
+            updateTimeframe
+        )
     }
 
 

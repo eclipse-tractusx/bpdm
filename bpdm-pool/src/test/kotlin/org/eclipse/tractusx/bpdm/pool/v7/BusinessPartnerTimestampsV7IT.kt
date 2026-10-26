@@ -21,6 +21,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class BusinessPartnerTimestampsV7IT : UnscheduledPoolTestBaseV7() {
     @Test
@@ -90,7 +91,37 @@ class BusinessPartnerTimestampsV7IT : UnscheduledPoolTestBaseV7() {
 
     @Test
     fun `changing only legal entity identifiers updates parent timestamp and no-op preserves it`() {
-        val request = requestFactory.buildLegalEntity(testName)
+        val original = requestFactory.buildLegalEntity(testName)
+        val request = original.copy(
+            header = original.header.copy(
+                states = original.header.states.map {
+                    it.copy(
+                        validFrom = it.validFrom?.truncatedTo(ChronoUnit.MICROS),
+                        validTo = it.validTo?.truncatedTo(ChronoUnit.MICROS)
+                    )
+                },
+                confidenceCriteria = original.header.confidenceCriteria.let {
+                    it.copy(
+                        lastConfidenceCheckAt = it.lastConfidenceCheckAt.truncatedTo(ChronoUnit.MICROS),
+                        nextConfidenceCheckAt = it.nextConfidenceCheckAt.truncatedTo(ChronoUnit.MICROS)
+                    )
+                }
+            ),
+            legalAddress = original.legalAddress.copy(
+                states = original.legalAddress.states.map {
+                    it.copy(
+                        validFrom = it.validFrom?.truncatedTo(ChronoUnit.MICROS),
+                        validTo = it.validTo?.truncatedTo(ChronoUnit.MICROS)
+                    )
+                },
+                confidenceCriteria = original.legalAddress.confidenceCriteria.let {
+                    it.copy(
+                        lastConfidenceCheckAt = it.lastConfidenceCheckAt.truncatedTo(ChronoUnit.MICROS),
+                        nextConfidenceCheckAt = it.nextConfidenceCheckAt.truncatedTo(ChronoUnit.MICROS)
+                    )
+                }
+            )
+        )
         val created = testDataClient.createLegalEntity(request)
         val content = request.copy(
             header = request.header.copy(
