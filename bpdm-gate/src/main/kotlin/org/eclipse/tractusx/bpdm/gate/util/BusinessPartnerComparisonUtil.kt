@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
 import org.springframework.stereotype.Component
 
@@ -49,6 +50,9 @@ class BusinessPartnerComparisonUtil {
                 entity.siteGoldenRecordRelations != persistedBP.siteGoldenRecordRelations ||
                 entity.addressGoldenRecordRelations != persistedBP.addressGoldenRecordRelations ||
                 entity.additionalSites != persistedBP.additionalSites ||
+                confidenceHasChanges(entity.legalEntityConfidence, persistedBP.legalEntityConfidence) ||
+                confidenceHasChanges(entity.siteConfidence, persistedBP.siteConfidence) ||
+                confidenceHasChanges(entity.addressConfidence, persistedBP.addressConfidence) ||
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress) ||
                 scriptVariantsHaveChanges(entity.scriptVariants, persistedBP.scriptVariants)
     }
@@ -57,6 +61,16 @@ class BusinessPartnerComparisonUtil {
         return (entityPostalAddress.addressType != persistedPostalAddress.addressType) ||
                 (entityPostalAddress.alternativePostalAddress != persistedPostalAddress.alternativePostalAddress) ||
                 (entityPostalAddress.physicalPostalAddress != persistedPostalAddress.physicalPostalAddress)
+    }
+
+    private fun confidenceHasChanges(entityConfidence: ConfidenceCriteriaDb?, persistedConfidence: ConfidenceCriteriaDb?): Boolean {
+        if (entityConfidence == null || persistedConfidence == null) return entityConfidence !== persistedConfidence
+        return entityConfidence.sharedByOwner != persistedConfidence.sharedByOwner ||
+                entityConfidence.checkedByExternalDataSource != persistedConfidence.checkedByExternalDataSource ||
+                entityConfidence.numberOfBusinessPartners != persistedConfidence.numberOfBusinessPartners ||
+                entityConfidence.lastConfidenceCheckAt != persistedConfidence.lastConfidenceCheckAt ||
+                entityConfidence.nextConfidenceCheckAt != persistedConfidence.nextConfidenceCheckAt ||
+                entityConfidence.confidenceLevel != persistedConfidence.confidenceLevel
     }
 
     private fun scriptVariantsHaveChanges(entities: List<BusinessPartnerScriptVariantDb>, persistedEntities: List<BusinessPartnerScriptVariantDb>): Boolean{

@@ -26,8 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
@@ -37,54 +35,21 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
-import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import kotlin.reflect.KProperty
 
 @Service
-class GoldenRecordUpdateBatchService(
-    private val goldenRecordUpdateService: GoldenRecordUpdateChunkService
-){
-    private val logger = KotlinLogging.logger { }
-
-    fun updateOutputOnGoldenRecordChange(){
-        logger.debug { "Update Business Partner Output based on Golden Record Updates from the Pool..." }
-
-        var totalLegalEntitiesUpdated = 0
-        var totalSitesUpdated = 0
-        var totalAddressesUpdated = 0
-        do {
-            val stats = goldenRecordUpdateService.updateFromNextChunk()
-
-            totalLegalEntitiesUpdated += stats.updatedLegalEntities
-            totalSitesUpdated += stats.updatedSites
-            totalAddressesUpdated += stats.updatedAddresses
-        }while (stats.foundChangelogEntries != 0)
-
-        if (totalLegalEntitiesUpdated > 0 || totalSitesUpdated > 0 || totalAddressesUpdated > 0)
-            logger.info { "Updated business partner output of $totalLegalEntitiesUpdated legal entities, $totalSitesUpdated sites and $totalAddressesUpdated addresses" }
-        else
-            logger.debug { "No golden record updates from the Pool to apply to business partner output" }
-    }
-}
-
-@Service
 class GoldenRecordUpdateChunkService(
     private val poolClient: PoolApiClient,
-    private val syncRecordService: SyncRecordService,
-    private val taskConfigProperties: GoldenRecordTaskConfigProperties,
-    private val businessPartnerRepository: BusinessPartnerRepository,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val businessPartnerService: BusinessPartnerService,
     private val businessPartnerMappings: BusinessPartnerMappings
@@ -92,48 +57,12 @@ class GoldenRecordUpdateChunkService(
 
     private val logger = KotlinLogging.logger { }
 
-    @Transactional
-    fun updateFromNextChunk(): UpdateStats{
-        logger.debug { "Update next chunk of Business Partner Output based on Golden Record Updates from the Pool..." }
-
-        val syncRecord = syncRecordService.getOrCreateRecord(SyncTypeDb.POOL_TO_GATE_OUTPUT)
-
-        val changelogSearchRequest = ChangelogSearchRequest(timestampAfter = syncRecord.fromTime)
-        val pageRequest = PaginationRequest(0, taskConfigProperties.creation.fromPool.batchSize)
-        val poolChangelogEntries = poolClient.changelogs.getChangelogEntries(changelogSearchRequest, pageRequest)
-
-        val changelogByType = poolChangelogEntries.content.groupBy { it.businessPartnerType }
-        val changedBpnAs = changelogByType[BusinessPartnerType.ADDRESS]?.map { it.bpn } ?: emptyList()
-        val changedBpnSs = changelogByType[BusinessPartnerType.SITE]?.map { it.bpn } ?: emptyList()
-        val changedBpnLs = changelogByType[BusinessPartnerType.LEGAL_ENTITY]?.map { it.bpn } ?: emptyList()
-
-        logger.debug { "Found ${changedBpnLs.size} BPNL, ${changedBpnSs.size} BPNS and ${changedBpnAs.size} BPNA entries." }
-
-        val updatedLegalEntities = updateLegalEntities(changedBpnLs)
-        val updatedSites = updateSites(changedBpnSs)
-        val updatedAddresses = updateAddresses(changedBpnAs)
-
-        businessPartnerService.reportWrites(updatedLegalEntities + updatedSites + updatedAddresses, StageType.Output)
-
-        syncRecordService.updateRecord(syncRecord, poolChangelogEntries.content.lastOrNull()?.timestamp)
-
-        logger.debug { "Updated '${updatedLegalEntities.size}' legal entities, '${updatedSites.size}' sites and '${updatedAddresses.size}' addresses." }
-
-        return UpdateStats(poolChangelogEntries.content.size, updatedLegalEntities.size, updatedSites.size, updatedAddresses.size)
-    }
-
     fun updateAgainstPool(businessPartners: List<BusinessPartnerDb>){
         val updatedLegalEntities = updateLegalEntitiesByReference(businessPartners)
         val updatedSites = updateSitesByReference(businessPartners.filter { it.bpnS != null })
         val updatedAddresses = updateAddressesByReference(businessPartners)
 
         businessPartnerService.reportWrites(updatedLegalEntities + updatedSites + updatedAddresses, StageType.Output)
-    }
-
-    private fun updateLegalEntities(changedBpnLs: Collection<String>): List<BusinessPartnerService.UpsertResult> {
-        val referencingBusinessPartners = businessPartnerRepository.findByStageAndBpnLIn(StageType.Output, changedBpnLs)
-        val businessPartnersToUpdate = referencingBusinessPartners.filter { it.sharingState.sharingStateType == SharingStateType.Success }
-        return updateLegalEntitiesByReference(businessPartnersToUpdate)
     }
 
     private fun updateLegalEntitiesByReference(businessPartnersToUpdate: Collection<BusinessPartnerDb>): List<BusinessPartnerService.UpsertResult> {
@@ -154,12 +83,6 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun updateSites(changedSiteBpns: Collection<String>): List<BusinessPartnerService.UpsertResult> {
-        val referencingBusinessPartners = businessPartnerRepository.findByStageAndBpnSIn(StageType.Output, changedSiteBpns)
-        val businessPartnersToUpdate = referencingBusinessPartners.filter { it.sharingState.sharingStateType == SharingStateType.Success }
-        return updateSitesByReference(businessPartnersToUpdate)
-    }
-
     private fun updateSitesByReference(businessPartnersToUpdate: Collection<BusinessPartnerDb>): List<BusinessPartnerService.UpsertResult> {
         logger.debug { "Found ${businessPartnersToUpdate.size} business partners with matching BPNS to update." }
 
@@ -178,12 +101,6 @@ class GoldenRecordUpdateChunkService(
             val upsertData = site.toUpsertData(output)
             businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
-    }
-
-    private fun updateAddresses(changedAddressBpns: Collection<String>): List<BusinessPartnerService.UpsertResult> {
-        val referencingBusinessPartners = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, changedAddressBpns)
-        val businessPartnersToUpdate = referencingBusinessPartners.filter { it.sharingState.sharingStateType == SharingStateType.Success }
-        return updateAddressesByReference(businessPartnersToUpdate)
     }
 
     private fun updateAddressesByReference(businessPartnersToUpdate: Collection<BusinessPartnerDb>): List<BusinessPartnerService.UpsertResult> {
@@ -615,11 +532,4 @@ class GoldenRecordUpdateChunkService(
     private fun createMappingException(property: KProperty<*>, entityId: Long? = null): BpdmNullMappingException {
         return BpdmNullMappingException(BusinessPartnerDb::class, OutputUpsertData::class, property, entityId.toString())
     }
-
-    data class UpdateStats(
-        val foundChangelogEntries: Int,
-        val updatedLegalEntities: Int,
-        val updatedSites: Int,
-        val updatedAddresses: Int
-    )
 }

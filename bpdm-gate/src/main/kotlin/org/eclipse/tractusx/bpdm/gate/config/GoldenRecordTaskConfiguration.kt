@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.config
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.service.*
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
@@ -32,7 +33,7 @@ class GoldenRecordTaskConfiguration(
     private val taskScheduler: TaskScheduler,
     private val taskCreationService: TaskCreationBatchService,
     private val taskResolutionService: TaskResolutionBatchService,
-    private val updateService: GoldenRecordUpdateBatchService,
+    private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
     private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
     private val relationTaskCreationService: RelationTaskCreationService,
     private val relationTaskResolutionService: RelationTaskResolutionService,
@@ -51,7 +52,7 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             "business partner output update from pool changes",
-            { updateService.updateOutputOnGoldenRecordChange() },
+            { goldenRecordUpdateService.updateFromPoolChanges() },
             configProperties.creation.fromPool.cron
         )
 

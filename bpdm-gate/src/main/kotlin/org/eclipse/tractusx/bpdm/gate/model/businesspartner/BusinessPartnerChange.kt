@@ -32,6 +32,7 @@ data class BusinessPartnerChange(
 
     enum class Aspect(val logName: String) {
         Input("input"),
+        Output("output"),
         SharingState("sharing state")
     }
 
