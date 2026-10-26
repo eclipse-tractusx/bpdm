@@ -52,8 +52,8 @@ class SiteResponseMapper(
                 confidenceCriteria = confidenceCriteriaResponseMapper.toConfidenceCriteria(confidenceCriteria),
                 isParticipantData = legalEntity.isDataSpaceParticipant,
                 scriptVariants = toScriptVariants(site),
-                createdAt = createdAt,
-                updatedAt = updatedAt,
+                createdAt = createdAt.instant,
+                updatedAt = updatedAt.instant,
                 relations = startSiteRelations.plus(endSiteRelations).map { relationResponseMapper.toSiteRelation(it) }
             )
         }

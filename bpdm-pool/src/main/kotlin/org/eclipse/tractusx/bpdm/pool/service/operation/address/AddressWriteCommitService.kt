@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
@@ -52,6 +53,7 @@ class AddressWriteCommitService(
      */
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> {
+        staged.filter { it.upsertType == UpsertType.Updated }.forEach { it.address.updatedAt = DbTimestamp.now() }
         logisticAddressRepository.saveAll(staged.filter { it.upsertType != UpsertType.NoChange }.map { it.address })
 
         changelogCreateService.record(staged.mapNotNull {

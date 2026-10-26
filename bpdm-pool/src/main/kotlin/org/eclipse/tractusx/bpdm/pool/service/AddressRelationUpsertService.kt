@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
@@ -56,7 +57,14 @@ class AddressRelationUpsertService(
      */
     @Transactional
     override fun upsertRelation(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): UpsertResult<AddressRelationDb> =
-        upsert(upsertRequest).also { logOutcome(it.upsertType, upsertRequest) }
+        upsert(upsertRequest).also {
+            if (it.upsertType != UpsertType.NoChange) {
+                val updatedAt = DbTimestamp.now()
+                upsertRequest.source.updatedAt = updatedAt
+                upsertRequest.target.updatedAt = updatedAt
+            }
+            logOutcome(it.upsertType, upsertRequest)
+        }
 
     private fun upsert(upsertRequest: IAddressRelationUpsertStratergyService.UpsertRequest): UpsertResult<AddressRelationDb> {
         validateNoSelfReference(upsertRequest)
@@ -80,6 +88,7 @@ class AddressRelationUpsertService(
 
         existingRelation.validityPeriods.clear()
         existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
+        existingRelation.updatedAt = DbTimestamp.now()
         addressRelationRepository.saveAndFlush(existingRelation)
 
         handleHeadquarterSynchronization(existingRelation)

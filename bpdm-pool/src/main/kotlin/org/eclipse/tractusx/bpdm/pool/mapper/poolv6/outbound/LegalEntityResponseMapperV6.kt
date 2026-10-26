@@ -61,8 +61,8 @@ class LegalEntityResponseMapperV6(
                 currentness = currentness,
                 confidenceCriteria = confidenceCriteriaResponseMapperV6.toConfidenceCriteria(confidenceCriteria),
                 isCatenaXMemberData = isDataSpaceParticipant,
-                createdAt = createdAt,
-                updatedAt = updatedAt,
+                createdAt = createdAt.instant,
+                updatedAt = updatedAt.instant,
             )
         }
 

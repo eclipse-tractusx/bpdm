@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(name = "configuration_entries")
@@ -31,4 +31,4 @@ class ConfigurationEntryDb(
     var key: String,
     @Column(name = "`value`", nullable = false)
     var value: String
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()
