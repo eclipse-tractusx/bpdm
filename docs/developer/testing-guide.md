@@ -689,8 +689,13 @@ fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputDto>, ex
 
 ### Ignored fields
 
-Fields that are genuinely non-deterministic — `createdAt`, `updatedAt`, `sharingProcessStarted`, changelog `timestamp` — are ignored in the comparison.
-These fields cannot be meaningfully predicted in a test, and asserting on them would make tests fragile without adding value.
+Ignore fields only when their expected values cannot be determined before the operation, such as creation timestamps
+in request-derived create expectations, `sharingProcessStarted`, or changelog timestamps.
+Read-after-write expectations built from an earlier response must compare `createdAt` and `updatedAt` exactly,
+without the seconds-precision comparator. Pool V7 read expectations currently all take their timestamps from responses;
+request-derived create expectations retain timestamp placeholders and must not use the read comparison.
+For updates, the result factory carries the previous response's creation and update timestamps into the expected value.
+The assertion repository checks that `createdAt` is unchanged and `updatedAt` advances, rather than predicting the new time.
 
 The set of ignored fields is decided once, in the assertion repository, and applied consistently.
 Test cases never ignore fields themselves.
