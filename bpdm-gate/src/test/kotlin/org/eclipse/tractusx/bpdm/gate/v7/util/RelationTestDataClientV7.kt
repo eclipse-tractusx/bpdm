@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
@@ -38,7 +38,7 @@ class RelationTestDataClientV7(
     private val gateClient: GateClient,
     private val testDataFactory: TestDataFactoryGateV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    private val relationTaskCreationService: RelationTaskCreationService,
+    private val relationTaskCreationService: RelationTaskCreationApplicationService,
     private val relationTaskResolutionService: RelationTaskResolutionService,
     private val businessPartner: BusinessPartnerTestDataClientV7,
 ) {
@@ -69,20 +69,20 @@ class RelationTestDataClientV7(
 
     fun setRelationStateToPending(externalId: String, seed: String = externalId): TaskClientRelationsStateDto {
         val createdTask = orchestratorMockDataFactory.mockCreateRelationTask(seed)
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
         return createdTask
     }
 
     fun setRelationStateToSuccess(externalId: String, seed: String = externalId): TaskClientRelationsStateDto {
         val refinedTask = orchestratorMockDataFactory.mockRefineRelation(seed)
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
         relationTaskResolutionService.checkResolveTasks()
         return refinedTask
     }
 
     fun setRelationStateToError(externalId: String, seed: String = externalId, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto {
         val errorTask = orchestratorMockDataFactory.mockRelationSharingError(seed, errorType)
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
         relationTaskResolutionService.checkResolveTasks()
         return errorTask
     }
@@ -149,7 +149,7 @@ class RelationTestDataClientV7(
 
     fun refineRelationToSuccess(input: RelationDto, seed: String = input.externalId): BusinessPartnerRelations {
         val refinementResult = orchestratorMockDataFactory.mockRefineRelation(seed).businessPartnerRelationsResult
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
         relationTaskResolutionService.checkResolveTasks()
         return refinementResult
     }

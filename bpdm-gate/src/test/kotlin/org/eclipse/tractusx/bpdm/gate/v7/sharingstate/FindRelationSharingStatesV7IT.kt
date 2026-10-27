@@ -313,7 +313,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
             { testDataClient.businessPartner.refineToLegalEntity(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
@@ -336,7 +336,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
@@ -359,7 +359,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
             { testDataClient.businessPartner.refineToLegalEntity(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
@@ -382,7 +382,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
             { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
@@ -405,7 +405,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
@@ -428,7 +428,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
-        relationTaskCreationService.sendTasks()
+        relationTaskCreationService.createTasksForReadyRelations()
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))

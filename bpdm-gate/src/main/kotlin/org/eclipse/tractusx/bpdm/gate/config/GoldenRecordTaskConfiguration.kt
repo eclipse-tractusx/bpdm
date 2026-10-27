@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.service.*
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
@@ -38,7 +39,7 @@ class GoldenRecordTaskConfiguration(
     private val taskHealthCheckService: TaskResolutionBatchService,
     private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
     private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
-    private val relationTaskCreationService: RelationTaskCreationService,
+    private val relationTaskCreationService: RelationTaskCreationApplicationService,
     private val relationTaskResolutionService: RelationTaskResolutionService,
     private val sharingMemberRecordCountedService: GoldenRecordCountedService
 ) {
@@ -79,7 +80,7 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             "golden record relation task creation",
-            { relationTaskCreationService.sendTasks() },
+            { relationTaskCreationService.createTasksForReadyRelations() },
             configProperties.relationCreation.cron
         )
 

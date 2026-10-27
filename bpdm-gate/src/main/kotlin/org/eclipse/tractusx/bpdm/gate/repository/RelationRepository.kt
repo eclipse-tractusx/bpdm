@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.time.Instant
 
@@ -136,6 +137,10 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
 
     @Query("SELECT r FROM RelationDb r WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = :isStaged")
     fun findBySharingStateAndStaged(sharingStateType: RelationSharingStateType, isStaged: Boolean, pageable: Pageable): Page<RelationDb>
+
+    @Modifying
+    @Query("UPDATE RelationDb r SET r.sharingState.isStaged = true WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = false")
+    fun stageBySharingStateType(sharingStateType: RelationSharingStateType): Int
 
     fun findBySharingStateTaskIdIn(taskIds: Set<String>): Set<RelationDb>
 }
