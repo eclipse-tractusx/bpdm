@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
@@ -39,7 +39,7 @@ class BusinessPartnerTestDataClientV7(
     private val gateClient: GateClient,
     private val testDataFactory: TestDataFactoryGateV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    private val taskCreationBatchService: TaskCreationBatchService,
+    private val taskCreationService: GoldenRecordTaskCreationApplicationService,
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val goldenRecordMockFactory: GoldenRecordMockFactory,
     private val tenantBpnL: String,
@@ -61,7 +61,7 @@ class BusinessPartnerTestDataClientV7(
     fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto {
         setStateToReady(externalId)
         val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
         return createdTask
     }
 
@@ -75,7 +75,7 @@ class BusinessPartnerTestDataClientV7(
     fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {
         val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList())
         setStateToReady(externalId)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return refinement.taskState
     }
@@ -83,7 +83,7 @@ class BusinessPartnerTestDataClientV7(
     fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {
         val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
         setStateToReady(externalId)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return errorTask
     }
@@ -91,7 +91,7 @@ class BusinessPartnerTestDataClientV7(
     fun setStateToTaskMissing(externalId: String, seed: String = externalId): TaskClientStateDto {
         val createdTask = orchestratorMockDataFactory.mockMissingTask(seed)
         setStateToReady(externalId)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return createdTask
     }
@@ -161,7 +161,7 @@ class BusinessPartnerTestDataClientV7(
 
     private fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputDto {
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
     }

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
@@ -59,7 +59,7 @@ class GateTestDataV6Config {
         testDataFactory: GateTestDataFactoryV6,
         operatorClient: GateClientV6,
         orchestratorMockDataFactory: OrchestratorMockDataFactory,
-        taskCreationBatchService: TaskCreationBatchService,
+        taskCreationService: GoldenRecordTaskCreationApplicationService,
         taskResolutionService: GoldenRecordTaskResolutionApplicationService,
         poolMockDataFactory: PoolMockDataFactory
     ): GateTestDataClientV6 {
@@ -67,7 +67,7 @@ class GateTestDataV6Config {
             testDataFactory,
             operatorClient,
             orchestratorMockDataFactory,
-            taskCreationBatchService,
+            taskCreationService,
             taskResolutionService,
             KeyCloakInitializer.TENANT_BPNL,
             poolMockDataFactory

@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
@@ -49,7 +49,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
 
     //gate services
     @Autowired
-    lateinit var taskCreationBatchService: TaskCreationBatchService
+    lateinit var taskCreationService: GoldenRecordTaskCreationApplicationService
     @Autowired
     lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
     @Autowired
@@ -77,7 +77,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
             gateClient,
             testData,
             orchestratorMockDataFactory,
-            taskCreationBatchService,
+            taskCreationService,
             taskResolutionService,
             relationTaskResolutionService,
             relationTaskCreationService,

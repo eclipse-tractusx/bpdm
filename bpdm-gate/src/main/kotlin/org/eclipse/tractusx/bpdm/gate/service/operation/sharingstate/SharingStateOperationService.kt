@@ -20,6 +20,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
+import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
@@ -45,6 +46,29 @@ class SharingStateOperationService(
         sharingStateRepository.findByTaskIdIn(taskIds.toSet())
             .filter { it.sharingStateType == SharingStateType.Pending }
             .map { TaskReference(taskId = it.taskId.toString(), recordId = it.orchestratorRecordId.toString()) }
+
+    /**
+     * Sets the sharing state of each started creation in [creations] pending on its new task, and assigns every sharing
+     * state in [creations] the Orchestrator record it is still missing.
+     */
+    @Transactional
+    fun start(creations: List<GoldenRecordTaskCreationParsed>) {
+        creations.forEach { creation ->
+            val sharingState = creation.sharingState
+            creation.recordIdToAssign?.let { sharingState.orchestratorRecordId = it }
+            when (creation) {
+                is GoldenRecordTaskCreationParsed.Started -> {
+                    sharingStateService.setPending(sharingState, creation.taskId)
+                    logChange(sharingState)
+                    logger.debug { "Started golden record task ${creation.taskId} of business partner ${sharingState.externalId}" }
+                }
+                is GoldenRecordTaskCreationParsed.Stale -> if (creation.recordIdToAssign != null) {
+                    sharingStateRepository.save(sharingState)
+                    logChange(sharingState)
+                }
+            }
+        }
+    }
 
     /**
      * Marks each of [sharingStates] as successfully shared.

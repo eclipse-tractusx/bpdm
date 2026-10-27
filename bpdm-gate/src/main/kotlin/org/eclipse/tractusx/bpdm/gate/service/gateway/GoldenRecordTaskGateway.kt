@@ -16,16 +16,21 @@ package org.eclipse.tractusx.bpdm.gate.service.gateway
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.GoldenRecordTaskResultRequestMapper
+import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.FinishedGoldenRecordTaskPage
+import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.stereotype.Component
 import java.time.Instant
 
 /**
- * Fetches the golden record tasks of business partners from the Orchestrator.
+ * Exchanges the golden record tasks of business partners with the Orchestrator.
  */
 @Component
 class GoldenRecordTaskGateway(
@@ -33,6 +38,16 @@ class GoldenRecordTaskGateway(
     private val requestMapper: GoldenRecordTaskResultRequestMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties
 ) {
+
+    /**
+     * Creates a golden record task for each of [candidates] and returns the created tasks in the order of [candidates].
+     */
+    fun createTasks(candidates: List<GoldenRecordTaskCandidate>): List<CreatedGoldenRecordTaskRequest> {
+        val entries = candidates.map { TaskCreateRequestEntry(recordId = it.recordId, businessPartner = it.businessPartner) }
+        val createdTasks = orchestrationApiClient.goldenRecordTasks.createTasks(TaskCreateRequest(TaskMode.UpdateFromSharingMember, entries)).createdTasks
+        check(createdTasks.size == candidates.size) { "The Orchestrator created ${createdTasks.size} golden record tasks for ${candidates.size} requested" }
+        return createdTasks.map { CreatedGoldenRecordTaskRequest(taskId = it.taskId, recordId = it.recordId) }
+    }
 
     /**
      * Returns the oldest page of tasks the Orchestrator reports as finished since [since].

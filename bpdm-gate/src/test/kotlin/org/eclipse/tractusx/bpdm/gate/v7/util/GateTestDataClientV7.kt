@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.util
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
@@ -32,7 +32,7 @@ class GateTestDataClientV7(
     gateClient: GateClient,
     testDataFactory: TestDataFactoryGateV7,
     orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    taskCreationBatchService: TaskCreationBatchService,
+    taskCreationService: GoldenRecordTaskCreationApplicationService,
     taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     relationTaskResolutionService: RelationTaskResolutionService,
     relationTaskCreationService: RelationTaskCreationService,
@@ -43,7 +43,7 @@ class GateTestDataClientV7(
         gateClient,
         testDataFactory,
         orchestratorMockDataFactory,
-        taskCreationBatchService,
+        taskCreationService,
         taskResolutionService,
         goldenRecordMockFactory,
         tenantBpnL,
