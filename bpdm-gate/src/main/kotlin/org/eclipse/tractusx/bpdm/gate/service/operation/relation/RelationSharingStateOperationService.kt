@@ -16,11 +16,13 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
+import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
 import org.springframework.data.domain.Pageable
@@ -91,6 +93,40 @@ class RelationSharingStateOperationService(
             logChange(relation)
             logger.debug { "Started golden record task ${creation.taskId} of relation ${relation.externalId}" }
         }
+    }
+
+    /**
+     * Returns a reference to the task of each relation still pending on any of [taskIds].
+     */
+    @Transactional(readOnly = true)
+    fun findPendingTasks(taskIds: Collection<String>): List<TaskReference> =
+        relationRepository.findBySharingStateTaskIdIn(taskIds.toSet())
+            .mapNotNull { it.sharingState }
+            .filter { it.sharingStateType == RelationSharingStateType.Pending }
+            .map { TaskReference(taskId = checkNotNull(it.taskId), recordId = checkNotNull(it.recordId)) }
+
+    /**
+     * Marks each of [relations] as successfully shared.
+     */
+    @Transactional
+    fun succeed(relations: List<RelationDb>) {
+        relations.forEach { relation ->
+            relationSharingStateService.setSuccess(relation)
+            relationRepository.save(relation)
+            logChange(relation)
+            logger.debug { "Resolved golden record task ${relation.sharingState?.taskId} of relation ${relation.externalId} as success" }
+        }
+    }
+
+    /**
+     * Marks [relation] as failed with [errorCode].
+     */
+    @Transactional
+    fun fail(relation: RelationDb, errorCode: RelationSharingStateErrorCode, errorMessage: String) {
+        relationSharingStateService.setError(relation, errorCode, errorMessage)
+        relationRepository.save(relation)
+        logChange(relation)
+        logger.debug { "Resolved golden record task ${relation.sharingState?.taskId} of relation ${relation.externalId} as error $errorCode" }
     }
 
     private fun logChange(relation: RelationDb) {

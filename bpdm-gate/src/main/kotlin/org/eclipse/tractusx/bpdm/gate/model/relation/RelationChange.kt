@@ -33,6 +33,7 @@ data class RelationChange(
 
     enum class Aspect(val logName: String) {
         Input("input"),
+        Output("output"),
         SharingState("sharing state")
     }
 

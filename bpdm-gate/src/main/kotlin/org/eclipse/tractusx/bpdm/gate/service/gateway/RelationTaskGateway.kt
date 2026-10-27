@@ -13,20 +13,30 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.gateway
 
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.RelationTaskResultRequestMapper
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedRelationTaskRequest
+import org.eclipse.tractusx.bpdm.gate.model.task.FinishedGoldenRecordTaskPage
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
+import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResultRequest
+import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequestEntry
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.stereotype.Component
+import java.time.Instant
 
 /**
  * Exchanges the golden record tasks of relations with the Orchestrator.
  */
 @Component
 class RelationTaskGateway(
-    private val orchestrationApiClient: OrchestrationApiClient
+    private val orchestrationApiClient: OrchestrationApiClient,
+    private val requestMapper: RelationTaskResultRequestMapper,
+    private val taskProperties: GoldenRecordTaskConfigProperties
 ) {
 
     /**
@@ -37,5 +47,30 @@ class RelationTaskGateway(
         val createdTasks = orchestrationApiClient.relationsGoldenRecordTasks.createTasks(TaskCreateRelationsRequest(TaskMode.UpdateFromSharingMember, entries)).createdTasks
         check(createdTasks.size == candidates.size) { "The Orchestrator created ${createdTasks.size} relation tasks for ${candidates.size} requested" }
         return createdTasks.map { CreatedRelationTaskRequest(taskId = it.taskId, recordId = it.recordId) }
+    }
+
+    /**
+     * Returns the oldest page of relation tasks the Orchestrator reports as finished since [since].
+     */
+    fun fetchFinishedTasks(since: Instant): FinishedGoldenRecordTaskPage {
+        val events = orchestrationApiClient.relationsFinishedTaskEvents.getRelationsEvents(since, PaginationRequest(0, EVENT_PAGE_SIZE))
+        return FinishedGoldenRecordTaskPage(
+            taskIds = events.content.map { it.taskId },
+            lastFinishedAt = events.content.lastOrNull()?.timestamp,
+            hasMore = events.totalPages > 1
+        )
+    }
+
+    /**
+     * Returns the current result of each task in [tasks], leaving out tasks the Orchestrator does not know.
+     */
+    fun fetchResults(tasks: List<TaskReference>): List<RelationTaskResultRequest> =
+        tasks.chunked(taskProperties.relationCheck.batchSize) { chunk ->
+            val entries = chunk.map { TaskStateRequest.Entry(taskId = it.taskId, recordId = it.recordId) }
+            orchestrationApiClient.relationsGoldenRecordTasks.searchTaskStates(TaskStateRequest(entries)).tasks
+        }.flatten().map(requestMapper::toRequest)
+
+    companion object {
+        private const val EVENT_PAGE_SIZE = 1000
     }
 }

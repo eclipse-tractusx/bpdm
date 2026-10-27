@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.v7
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestDataClientV7
@@ -53,7 +53,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
     @Autowired
-    lateinit var relationTaskResolutionService: RelationTaskResolutionService
+    lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
     @Autowired
     lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
 
