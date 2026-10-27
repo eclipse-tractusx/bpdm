@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 
 @Entity
@@ -57,7 +57,7 @@ class BusinessPartnerScriptVariantDb(
     @Embedded
     var alternativeAddress: AlternativePostalAddressScriptVariantDb? = null
 
-): BaseEntity(){
+): BaseEntityWithExplicitTimestamps(){
     companion object{
         const val COLUMN_SCRIPT_CODE = "script_code"
         const val COLUMN_BUSINESS_PARTNER_ID = "business_partner_id"

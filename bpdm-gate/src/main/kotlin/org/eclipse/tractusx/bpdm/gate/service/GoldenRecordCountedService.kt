@@ -23,6 +23,7 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
@@ -62,6 +63,7 @@ class GoldenRecordCountedService(
                     }
 
                     sharingState.syncedIsGoldenRecordCounted = isGoldenRecordCounted
+                    sharingState.updatedAt = DbTimestamp.now()
                     sharingStateRepository.save(sharingState)
                 }
 
@@ -98,6 +100,8 @@ class GoldenRecordCountedService(
     }
 
     private fun setIsGoldenRecordCounted(sharingState: SharingStateDb, isGoldenRecordCounted: Boolean){
+        if (sharingState.isGoldenRecordCounted != isGoldenRecordCounted)
+            sharingState.updatedAt = DbTimestamp.now()
         sharingState.isGoldenRecordCounted = isGoldenRecordCounted
         sharingStateRepository.save(sharingState)
     }

@@ -20,9 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import java.time.Instant
+import org.hibernate.annotations.Type
 
 @Entity
 @Table(name = "relation_outputs")
@@ -35,7 +37,8 @@ class RelationOutputDb(
     @Column(name = "target_bpn", nullable = false)
     var targetBpn: String,
     @Column(name = "result_updated_at", nullable = false)
-    var resultUpdatedAt: Instant,
+    @Type(DbTimestampConverter::class)
+    var resultUpdatedAt: DbTimestamp,
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
         name = "relation_output_validity_periods",
@@ -45,4 +48,4 @@ class RelationOutputDb(
     var validityPeriods: MutableList<RelationValidityPeriodDb>,
     @Column(name = "reason_code")
     var reasonCode: String?
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()
