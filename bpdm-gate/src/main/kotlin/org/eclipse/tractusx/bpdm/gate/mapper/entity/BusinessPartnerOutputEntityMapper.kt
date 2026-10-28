@@ -17,12 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.service
+package org.eclipse.tractusx.bpdm.gate.mapper.entity
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
-import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
@@ -31,13 +30,19 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
 import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
-class OutputUpsertMappings(
+/**
+ * Maps business partner output data to the output entity that stores it.
+ */
+@Component
+class BusinessPartnerOutputEntityMapper(
     private val inputEntityMapper: BusinessPartnerInputEntityMapper
 ) {
 
+    /**
+     * Returns the output entity of [sharingState] holding [upsertData].
+     */
     fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb): BusinessPartnerDb {
         val businessPartner =  with(upsertData) {
             BusinessPartnerDb(
