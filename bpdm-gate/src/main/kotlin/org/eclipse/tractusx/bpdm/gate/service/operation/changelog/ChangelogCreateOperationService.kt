@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.service
+package org.eclipse.tractusx.bpdm.gate.service.operation.changelog
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
  * The single authority for writing changelog entries of business partners and relations.
  */
 @Service
-class ChangelogCreateService(
+class ChangelogCreateOperationService(
     private val changelogRepository: ChangelogRepository
 ) {
     private val logger = KotlinLogging.logger { }

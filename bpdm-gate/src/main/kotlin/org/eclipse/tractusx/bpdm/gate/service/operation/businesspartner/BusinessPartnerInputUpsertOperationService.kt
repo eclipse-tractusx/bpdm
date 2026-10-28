@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUps
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
+import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerInputUpsertOperationService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val sharingStateService: SharingStateService,
-    private val changelogCreateService: ChangelogCreateService,
+    private val changelogCreateOperation: ChangelogCreateOperationService,
     private val contentMapper: BusinessPartnerInputContentMapper,
     private val entityMapper: BusinessPartnerInputEntityMapper,
     private val changeLogger: PersistedChangeLogger
@@ -113,7 +113,7 @@ class BusinessPartnerInputUpsertOperationService(
     private fun persist(input: BusinessPartnerDb, changeType: ChangelogType) {
         val sharingState = input.sharingState
         businessPartnerRepository.save(input)
-        changelogCreateService.record(
+        changelogCreateOperation.record(
             ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, StageType.Input, GoldenRecordType.BusinessPartner)
         )
         sharingStateService.setInitial(sharingState)

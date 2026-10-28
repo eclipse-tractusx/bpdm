@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertEntryRes
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
-import org.eclipse.tractusx.bpdm.gate.service.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
+import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -43,7 +43,7 @@ import java.util.*
 class RelationInputUpsertOperationService(
     private val relationStageRepository: RelationStageRepository,
     private val relationSharingStateService: RelationSharingStateService,
-    private val changelogCreateService: ChangelogCreateService,
+    private val changelogCreateOperation: ChangelogCreateOperationService,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
@@ -117,7 +117,7 @@ class RelationInputUpsertOperationService(
     private fun persist(input: RelationStageDb, changeType: ChangelogType) {
         val relation = input.relation
         relationStageRepository.save(input)
-        changelogCreateService.record(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changeType, StageType.Input, GoldenRecordType.Relation))
+        changelogCreateOperation.record(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changeType, StageType.Input, GoldenRecordType.Relation))
     }
 
     private fun logChange(relation: RelationDb, type: PersistedChangeType, vararg aspects: RelationChange.Aspect) =

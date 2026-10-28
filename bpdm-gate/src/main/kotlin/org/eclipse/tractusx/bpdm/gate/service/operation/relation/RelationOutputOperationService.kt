@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationOutputParsed
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.gate.service.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -36,7 +36,7 @@ import java.time.Instant
 @Service
 class RelationOutputOperationService(
     private val relationRepository: RelationRepository,
-    private val changelogCreateService: ChangelogCreateService,
+    private val changelogCreateOperation: ChangelogCreateOperationService,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
@@ -62,7 +62,7 @@ class RelationOutputOperationService(
             reasonCode = output.reasonCode
         )
         relationRepository.save(relation)
-        changelogCreateService.record(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changelogType, StageType.Output, GoldenRecordType.Relation))
+        changelogCreateOperation.record(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changelogType, StageType.Output, GoldenRecordType.Relation))
 
         val changeType = when (changelogType) {
             ChangelogType.CREATE -> PersistedChangeType.Created

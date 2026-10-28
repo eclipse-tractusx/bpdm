@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.springframework.stereotype.Service
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class BusinessPartnerService(
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val changelogCreateService: ChangelogCreateService,
+    private val changelogCreateOperation: ChangelogCreateOperationService,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val compareUtil: BusinessPartnerComparisonUtil,
     private val outputUpsertMappings: OutputUpsertMappings
@@ -61,7 +62,7 @@ class BusinessPartnerService(
         }
 
         if (hasChanges && shouldUpdate) {
-                changelogCreateService.record(
+                changelogCreateOperation.record(
                     ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner)
                 )
 

@@ -101,7 +101,7 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 - Application services MUST NOT log at INFO. They are per API version, so a line there is duplicated across v6 and v7, and they are bypassed entirely by the golden record task path — a line there would miss most production writes.
 - Parsers MUST NOT log at INFO. They decide; they never persist.
 - Every subject MUST log its own persisted-change line, whether or not that write also emits a changelog entry. Business partners, relations, metadata and tasks then all read the same way.
-- A changelog write MUST NOT stand in for that line, and `ChangelogCreateService` MUST report the entries it writes at DEBUG only. The changelog dedupes per subject and covers only some of them, so reporting through it would let a business decision change the logs.
+- A changelog write MUST NOT stand in for that line, and `ChangelogCreateService` (Pool) and `ChangelogCreateOperationService` (Gate) MUST report the entries it writes at DEBUG only. The changelog dedupes per subject and covers only some of them, so reporting through it would let a business decision change the logs.
 - A line MUST name its subject by the identifier its readers search on — the BPN for a business partner, the external ID for a Gate record, the task ID for a task — and MUST name all of them where a subject carries several.
 
 ## 2.5 Schedules
