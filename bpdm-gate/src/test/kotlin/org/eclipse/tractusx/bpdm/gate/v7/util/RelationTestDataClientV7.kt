@@ -47,14 +47,6 @@ class RelationTestDataClientV7(
         return gateClient.relation.put(createIfNotExist, RelationPutRequest(listOf(entry))).upsertedRelations.single()
     }
 
-    fun upsertRelationInput(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto, seed: String = externalId): RelationDto {
-        val request = testDataFactory.relation.input.request.fromSeed(seed).copy(
-            businessPartnerSourceExternalId = source.externalId,
-            businessPartnerTargetExternalId = target.externalId
-        )
-        return gateClient.relation.put(true, RelationPutRequest(listOf(request))).upsertedRelations.single()
-    }
-
     fun upsertRelationInputWithBusinessPartners(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto {
         businessPartner.upsertInput(entry.businessPartnerSourceExternalId)
         businessPartner.upsertInput(entry.businessPartnerTargetExternalId)

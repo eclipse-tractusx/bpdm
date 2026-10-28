@@ -19,16 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.common.util.countForLog
-import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
@@ -44,19 +39,6 @@ class BusinessPartnerService(
     private val compareUtil: BusinessPartnerComparisonUtil,
     private val outputUpsertMappings: OutputUpsertMappings
 ) {
-    private val logger = KotlinLogging.logger { }
-
-    @Transactional
-    fun updateBusinessPartnerOutput(businessPartner: BusinessPartnerDb, upsertData: OutputUpsertData): UpsertResult {
-        logger.debug { "Executing updateBusinessPartnerOutput() with parameters $businessPartner and $upsertData" }
-
-        if (businessPartner.stage != StageType.Output)
-            throw BpdmInvalidPartnerException(businessPartner.id.toString(), "Needs to be in Output stage")
-
-        val updatedData = outputUpsertMappings.toEntity(upsertData, businessPartner.sharingState)
-        return upsertFromEntity(businessPartner, updatedData)
-    }
-
 
     /**
      * Creates the output of [sharingState] with [upsertData], or updates [storedOutput] to it when one exists.
@@ -88,35 +70,6 @@ class BusinessPartnerService(
         }
 
         return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)
-    }
-
-    /**
-     * Reports the business partners the given results actually wrote, as one line per change type.
-     */
-    fun reportWrites(results: List<UpsertResult>, stage: StageType) {
-        val stageName = when (stage) {
-            StageType.Input -> "business partner input"
-            StageType.Output -> "business partner output"
-        }
-
-        results.filter { it.hadChanges && it.shouldUpdate }
-            .groupBy { it.type }
-            .forEach { (changeType, written) ->
-                val verb = when (changeType) {
-                    ChangelogType.CREATE -> "Created"
-                    ChangelogType.UPDATE -> "Updated"
-                }
-
-                logger.info {
-                    "$verb ${countForLog(written.size, stageName, "${stageName}s")}: " +
-                            written.map { it.businessPartner.toLogIdentifier() }.joinIdentifiersForLog()
-                }
-            }
-    }
-
-    private fun BusinessPartnerDb.toLogIdentifier(): String {
-        val bpns = listOfNotNull(bpnL, bpnS, bpnA)
-        return if (bpns.isEmpty()) sharingState.externalId else "${sharingState.externalId} (${bpns.joinToString("/")})"
     }
 
     data class UpsertResult(
