@@ -13,11 +13,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 
 data class GoldenRecordTaskCandidate(
     val sharingStateId: Long,
     val externalId: String,
     val recordId: String?,
-    val businessPartner: BusinessPartner
+    val input: BusinessPartnerInputContent,
+    val owningCompanyBpnl: String?
 )

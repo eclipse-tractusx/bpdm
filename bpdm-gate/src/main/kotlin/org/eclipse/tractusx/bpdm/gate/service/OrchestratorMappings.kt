@@ -19,17 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
@@ -44,167 +39,7 @@ import java.time.ZoneOffset
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite as OutputAdditionalSite
 
 @Service
-class OrchestratorMappings(
-    private val bpnConfigProperties: BpnConfigProperties
-) {
-    private val logger = KotlinLogging.logger { }
-
-    fun toOrchestratorDto(entity: BusinessPartnerDb): BusinessPartner {
-        val postalAddress = toPostalAddress(entity)
-        val postalAddressScriptVariants = entity.scriptVariants.map { toPostalAddressScriptVariantWithScriptCode(it) }
-
-        val isLegalAddress = entity.postalAddress.addressType == AddressType.LegalAddress || entity.postalAddress.addressType == AddressType.LegalAndSiteMainAddress
-        val isMainAddress = entity.postalAddress.addressType == AddressType.SiteMainAddress
-
-        return BusinessPartner(
-            nameParts = emptyList(),
-            uncategorized = UncategorizedProperties(
-                nameParts = entity.nameParts,
-                identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.GENERIC }.map { Identifier(it.value, it.type, it.issuingBody) },
-                states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }.map { toState(it) },
-                address = postalAddress.takeIf { entity.postalAddress.addressType == null }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants)  }
-            ),
-            owningCompany = getOwnerBpnL(entity),
-            legalEntity = LegalEntity(
-                bpnReference = toBpnReference(entity.bpnL),
-                legalName = entity.legalName,
-                legalForm = entity.legalForm,
-                legalShortName = entity.shortName,
-                identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }.map { Identifier(it.value, it.type, it.issuingBody) },
-                states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }.map { toState(it) },
-                confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
-                isParticipantData = null,
-                hasChanged = true,
-                ownershipUltimate = entity.ownershipUltimate,
-                ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
-                legalAddress = postalAddress.takeIf { isLegalAddress} ?: PostalAddress.empty,
-                scriptVariants = entity.scriptVariants.takeIf { isLegalAddress }?.map { toLegalEntityScriptVariant(it) } ?:emptyList()
-            ),
-            site = Site(
-                bpnReference = toBpnReference(entity.bpnS),
-                siteName = entity.siteName,
-                states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.SITE }.map { toState(it) },
-                confidenceCriteria = toConfidenceCriteria(entity.siteConfidence),
-                hasChanged = true,
-                siteMainAddress = postalAddress.takeIf { isMainAddress },
-                scriptVariants = entity.scriptVariants.takeIf { isMainAddress }?.map { toSiteScriptVariant(it) } ?:emptyList()
-            ).takeIf { entity.bpnS != null || entity.siteName != null },
-            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants) },
-            additionalSites = entity.additionalSites.map { AdditionalSite(bpnReference = toBpnReference(it.bpn), siteName = it.name) }
-        )
-    }
-
-    private fun toPostalAddress(entity: BusinessPartnerDb): PostalAddress {
-        return PostalAddress(
-            bpnReference = toBpnReference(entity.bpnA),
-            addressName = entity.addressName,
-            identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }.map { Identifier(it.value, it.type, it.issuingBody) },
-            states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }.map { toState(it) },
-            confidenceCriteria = toConfidenceCriteria(entity.addressConfidence),
-            physicalAddress = entity.postalAddress.physicalPostalAddress?.let {
-                with(it) {
-                    PhysicalAddress(
-                        geographicCoordinates = toGeographicCoordinates(geographicCoordinates),
-                        country = country,
-                        administrativeAreaLevel1 = administrativeAreaLevel1,
-                        administrativeAreaLevel2 = administrativeAreaLevel2,
-                        administrativeAreaLevel3 = administrativeAreaLevel3,
-                        postalCode = postalCode,
-                        city = city,
-                        district = district,
-                        street = toStreet(street),
-                        companyPostalCode = companyPostalCode,
-                        industrialZone = industrialZone,
-                        building = building,
-                        floor = floor,
-                        door = door,
-                        taxJurisdictionCode = taxJurisdictionCode
-                    )
-                }
-            } ?: PhysicalAddress.empty,
-            alternativeAddress = entity.postalAddress.alternativePostalAddress?.let {
-                with(it) {
-                    AlternativeAddress(
-                        geographicCoordinates = toGeographicCoordinates(geographicCoordinates),
-                        country = country,
-                        administrativeAreaLevel1,
-                        postalCode,
-                        city,
-                        deliveryServiceType,
-                        deliveryServiceQualifier,
-                        deliveryServiceNumber
-                    )
-                }
-            },
-            hasChanged = null
-        )
-    }
-
-    private fun toStreet(street: StreetDb?) =
-        street?.let {
-            with(it) {
-                Street(
-                    name = name,
-                    houseNumber = houseNumber,
-                    houseNumberSupplement = houseNumberSupplement,
-                    milestone = milestone,
-                    direction = direction,
-                    namePrefix = namePrefix,
-                    additionalNamePrefix = additionalNamePrefix,
-                    nameSuffix = nameSuffix,
-                    additionalNameSuffix = additionalNameSuffix
-                )
-            }
-        } ?: Street.empty
-
-    private fun toGeographicCoordinates(geoCoordinate: GeographicCoordinateDb?): GeoCoordinate {
-        return geoCoordinate?.let { with(it) {
-                GeoCoordinate(longitude, latitude, altitude)
-            }
-        } ?: GeoCoordinate.empty
-    }
-
-
-    private fun toConfidenceCriteria(confidenceCriteria: ConfidenceCriteriaDb?): ConfidenceCriteria {
-        return confidenceCriteria?.let {
-            with(it){
-                ConfidenceCriteria(
-                    sharedByOwner,
-                    checkedByExternalDataSource,
-                    numberOfBusinessPartners,
-                    lastConfidenceCheckAt.toInstant(ZoneOffset.UTC),
-                    nextConfidenceCheckAt.toInstant(ZoneOffset.UTC),
-                    confidenceLevel
-                )
-            }
-        } ?: ConfidenceCriteria.empty
-    }
-
-    private fun toState(state: StateDb): BusinessState {
-        return  BusinessState(state.validFrom?.toInstant(ZoneOffset.UTC), state.validTo?.toInstant(ZoneOffset.UTC), state.type)
-    }
-
-    private fun toBpnReference(value: String?) =
-        value?.let {
-            BpnReference(
-                referenceValue = value,
-                desiredBpn = null,
-                referenceType = BpnReferenceType.Bpn
-            )
-        } ?: BpnReference.empty
-
-    private fun getOwnerBpnL(entity: BusinessPartnerDb): String? {
-        //only determine owner BPNL if it is own company data
-        if(!entity.isOwnCompanyData) return null
-
-        return entity.sharingState.tenantBpnl
-                ?: bpnConfigProperties.ownerBpnL.takeIf { it.isNotBlank() }
-                ?: run {
-                    logger.warn { "Owner BPNL can't be determined for owned company data" }
-                    null
-                }
-    }
-
+class OrchestratorMappings {
 
     fun toOutputUpsertData(dto: BusinessPartner, roles: List<BusinessPartnerRole>, tenantBpnl: String?): OutputUpsertData {
         val addressType = when(dto.type){
@@ -338,7 +173,6 @@ class OrchestratorMappings(
         }
         }
 
-
     private fun toIdentifier(dto: Identifier, businessPartnerType: BusinessPartnerType) =
         dto.type?.let { type ->
             dto.value?.let { value ->
@@ -360,7 +194,6 @@ class OrchestratorMappings(
                 businessPartnerType = businessPartnerType
             )
         }
-
 
     private fun toPhysicalPostalAddress(dto: PhysicalAddress) =
         PhysicalPostalAddress(
@@ -432,20 +265,6 @@ class OrchestratorMappings(
             additionalNameSuffix = dto.additionalNameSuffix
         )
 
-    private fun toScriptVariantStreet(street: StreetScriptVariantDb?) =
-        street?.let {
-            with(it){
-                StreetScriptVariant(
-                    name = name,
-                    direction = direction,
-                    namePrefix = namePrefix,
-                    additionalNamePrefix = additionalNamePrefix,
-                    nameSuffix = nameSuffix,
-                    additionalNameSuffix = additionalNameSuffix
-                )
-            }
-        } ?: StreetScriptVariant.empty
-
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
             dto.longitude?.let {  lon ->
@@ -462,44 +281,4 @@ class OrchestratorMappings(
             nextConfidenceCheckAt = dto.nextConfidenceCheckAt!!.atZone(ZoneOffset.UTC).toLocalDateTime(),
             confidenceLevel = dto.confidenceLevel!!
         )
-
-    private fun toPostalAddressScriptVariantWithScriptCode(scriptVariant: BusinessPartnerScriptVariantDb) =
-        PostalAddressScriptVariantWithScriptCode(scriptVariant.scriptCode, toPostalAddressScriptVariant(scriptVariant))
-
-    private fun toPostalAddressScriptVariant(scriptVariant: BusinessPartnerScriptVariantDb) =
-        PostalAddressScriptVariant(
-            addressName = scriptVariant.addressName,
-            physicalAddress = toPhysicalAddressScriptVariant(scriptVariant.physicalAddress),
-            alternativeAddress = toAlternativeAddressScriptVariant(scriptVariant.alternativeAddress)
-        )
-
-    private fun toPhysicalAddressScriptVariant(scriptVariant: PhysicalPostalAddressScriptVariantDb?) =
-        scriptVariant?.let {
-            with(it){
-                PhysicalAddressScriptVariant(
-                    city = city,
-                    district = district,
-                    street = toScriptVariantStreet(street),
-                    industrialZone = industrialZone,
-                    building = building,
-                    floor = floor,
-                    door = door)
-            }
-        } ?: PhysicalAddressScriptVariant.empty
-
-
-    private fun toAlternativeAddressScriptVariant(scriptVariant: AlternativePostalAddressScriptVariantDb?) =
-        scriptVariant?.let {
-            with(it){
-                AlternativeAddressScriptVariant(
-                    city = city
-                )
-            }
-        }
-
-    private fun toLegalEntityScriptVariant(scriptVariantDb: BusinessPartnerScriptVariantDb) =
-        LegalEntityScriptVariant(scriptVariantDb.scriptCode, scriptVariantDb.legalName, scriptVariantDb.shortName, toPostalAddressScriptVariant(scriptVariantDb))
-
-    private fun toSiteScriptVariant(scriptVariantDb: BusinessPartnerScriptVariantDb) =
-        SiteScriptVariant(scriptVariantDb.scriptCode, scriptVariantDb.siteName ?: "", toPostalAddressScriptVariant(scriptVariantDb))
 }

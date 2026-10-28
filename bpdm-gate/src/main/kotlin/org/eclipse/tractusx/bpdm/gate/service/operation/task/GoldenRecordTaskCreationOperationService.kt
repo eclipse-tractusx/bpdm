@@ -16,10 +16,12 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.task
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.OrchestratorMappings
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,12 +33,13 @@ import org.springframework.transaction.annotation.Transactional
 class GoldenRecordTaskCreationOperationService(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val orchestratorMappings: OrchestratorMappings
+    private val contentMapper: BusinessPartnerInputContentMapper,
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Returns up to [limit] business partners ready to be shared, each with its input as the Orchestrator receives it,
+     * Returns up to [limit] business partners ready to be shared, each with its input and the company owning it,
      * leaving out those without input.
      */
     @Transactional(readOnly = true)
@@ -50,8 +53,20 @@ class GoldenRecordTaskCreationOperationService(
                 sharingStateId = input.sharingState.id,
                 externalId = input.sharingState.externalId,
                 recordId = input.sharingState.orchestratorRecordId?.toString(),
-                businessPartner = orchestratorMappings.toOrchestratorDto(input)
+                input = contentMapper.toContent(input),
+                owningCompanyBpnl = findOwningCompanyBpnl(input)
             )
         }
+    }
+
+    private fun findOwningCompanyBpnl(input: BusinessPartnerDb): String? {
+        if (!input.isOwnCompanyData) return null
+
+        return input.sharingState.tenantBpnl
+            ?: bpnConfigProperties.ownerBpnL.takeIf { it.isNotBlank() }
+            ?: run {
+                logger.warn { "Business partner '${input.sharingState.externalId}' is own company data, but neither its tenant nor the configuration states an owner BPNL" }
+                null
+            }
     }
 }

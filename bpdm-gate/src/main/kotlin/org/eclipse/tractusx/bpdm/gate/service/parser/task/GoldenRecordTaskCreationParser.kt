@@ -18,6 +18,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationError
@@ -25,7 +26,6 @@ import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationPageReq
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.OrchestratorMappings
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -37,7 +37,7 @@ import java.util.UUID
 class GoldenRecordTaskCreationParser(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val orchestratorMappings: OrchestratorMappings
+    private val contentMapper: BusinessPartnerInputContentMapper
 ) {
 
     /**
@@ -81,5 +81,5 @@ class GoldenRecordTaskCreationParser(
         sharingState.sharingStateType == SharingStateType.Ready
                 && sharingState.orchestratorRecordId?.toString() == candidate.recordId
                 && input != null
-                && orchestratorMappings.toOrchestratorDto(input) == candidate.businessPartner
+                && contentMapper.toContent(input) == candidate.input
 }
