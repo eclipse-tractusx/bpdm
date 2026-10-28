@@ -15,9 +15,10 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import java.time.Instant
 
 data class BusinessPartnerOutputRecord(
@@ -68,11 +69,5 @@ data class BusinessPartnerOutputRecord(
         val states: List<State>,
         val goldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
         val updatedAt: Instant?
-    )
-
-    data class GoldenRecordRelation<T>(
-        val type: T,
-        val sourceBpn: String,
-        val targetBpn: String
     )
 }

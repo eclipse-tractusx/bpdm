@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.record
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
@@ -26,9 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerMappings
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty
 
@@ -72,9 +70,9 @@ class OutputUpsertDataMapper(
                 siteUpdatedAt = siteUpdatedAt,
                 addressUpdatedAt = addressUpdatedAt,
                 scriptVariants = scriptVariants.map(businessPartnerMappings::toScriptVariantDto),
-                legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
-                siteGoldenRecordRelations = siteGoldenRecordRelations.map { SiteGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
-                addressGoldenRecordRelations = addressGoldenRecordRelations.map { AddressGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
+                legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
+                siteGoldenRecordRelations = siteGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
+                addressGoldenRecordRelations = addressGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
                 ownershipUltimate = ownershipUltimate,
                 ultimateOwnerBpnl = ultimateOwnerBpnl,
                 additionalSites = additionalSites.map { AdditionalSite(it.bpn ?: throw missing(AdditionalSiteDb::bpn, id), it.name) }

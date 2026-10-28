@@ -20,7 +20,6 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
 import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
 import java.time.Instant
 
 data class AddressGoldenRecordRequest(
@@ -32,7 +31,7 @@ data class AddressGoldenRecordRequest(
     val physicalPostalAddress: PhysicalPostalAddress,
     val alternativePostalAddress: AlternativeAddress?,
     val confidence: ConfidenceCriteria,
-    val relations: List<AddressGoldenRecordRelation>,
+    val relations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
     val siteBpn: String?,
     val additionalSiteBpns: List<String>,
     val scriptVariants: List<ScriptVariant>,

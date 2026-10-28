@@ -20,6 +20,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
@@ -61,7 +62,7 @@ class BusinessPartnerOutputRecordMapper(
                 ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
                 states = statesOf(entity, BusinessPartnerType.LEGAL_ENTITY),
                 goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map {
-                    BusinessPartnerOutputRecord.GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn)
+                    GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn)
                 },
                 updatedAt = entity.legalEntityUpdatedAt
             ),
@@ -72,7 +73,7 @@ class BusinessPartnerOutputRecordMapper(
                     confidence = toRecord(entity.siteConfidence ?: throw BpdmInvalidPartnerException(externalId, "Missing site confidence criteria")),
                     states = statesOf(entity, BusinessPartnerType.SITE),
                     goldenRecordRelations = entity.siteGoldenRecordRelations.map {
-                        BusinessPartnerOutputRecord.GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn)
+                        GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn)
                     },
                     updatedAt = entity.siteUpdatedAt
                 )
@@ -86,7 +87,7 @@ class BusinessPartnerOutputRecordMapper(
                 confidence = toRecord(entity.addressConfidence ?: throw BpdmInvalidPartnerException(externalId, "Missing address confidence criteria")),
                 states = statesOf(entity, BusinessPartnerType.ADDRESS),
                 goldenRecordRelations = entity.addressGoldenRecordRelations.map {
-                    BusinessPartnerOutputRecord.GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn)
+                    GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn)
                 },
                 updatedAt = entity.addressUpdatedAt
             ),

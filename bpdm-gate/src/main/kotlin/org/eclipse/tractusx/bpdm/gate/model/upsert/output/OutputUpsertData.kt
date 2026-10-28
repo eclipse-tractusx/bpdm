@@ -22,9 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import java.time.Instant
 
 data class OutputUpsertData(
@@ -51,9 +52,9 @@ data class OutputUpsertData(
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
     val scriptVariants: List<BusinessPartnerScriptVariantDto>,
-    val legalEntityGoldenRecordRelations: List<LegalEntityGoldenRecordRelation>,
-    val siteGoldenRecordRelations: List<SiteGoldenRecordRelation>,
-    val addressGoldenRecordRelations: List<AddressGoldenRecordRelation>,
+    val legalEntityGoldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
+    val siteGoldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
+    val addressGoldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean? = null,
     val ultimateOwnerBpnl: String? = null,
     val additionalSites: List<AdditionalSite> = emptyList()

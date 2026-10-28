@@ -29,9 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
 import org.springframework.stereotype.Service
 import java.time.Instant
 

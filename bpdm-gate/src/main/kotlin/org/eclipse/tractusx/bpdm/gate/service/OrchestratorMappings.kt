@@ -30,6 +30,10 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
@@ -247,9 +251,9 @@ class OrchestratorMappings(
                 addressUpdatedAt = postalAddress.updatedAt,
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
                 scriptVariants = toScriptVariants(addressType, dto),
-                legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
-                siteGoldenRecordRelations = site?.goldenRecordRelations.orEmpty(),
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto),
+                legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations.map(::toRelation),
+                siteGoldenRecordRelations = site?.goldenRecordRelations.orEmpty().map(::toRelation),
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto).map(::toRelation),
                 ownershipUltimate = legalEntity.ownershipUltimate,
                 ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
                 additionalSites = toOutputAdditionalSites(dto)
@@ -261,6 +265,15 @@ class OrchestratorMappings(
         dto.additionalSites.mapNotNull { additionalSite ->
             additionalSite.bpnReference.referenceValue?.let { OutputAdditionalSite(siteBpn = it, name = additionalSite.siteName) }
         }
+
+    private fun toRelation(relation: LegalEntityGoldenRecordRelation) =
+        GoldenRecordRelation(LegalEntityGoldenRecordRelationType.valueOf(relation.relationType.name), relation.sourceBpn, relation.targetBpn)
+
+    private fun toRelation(relation: SiteGoldenRecordRelation) =
+        GoldenRecordRelation(SiteGoldenRecordRelationType.valueOf(relation.relationType.name), relation.sourceBpn, relation.targetBpn)
+
+    private fun toRelation(relation: AddressGoldenRecordRelation) =
+        GoldenRecordRelation(AddressGoldenRecordRelationType.valueOf(relation.relationType.name), relation.sourceBpn, relation.targetBpn)
 
     private fun toAddressGoldenRecordRelations(addressType: AddressType, dto: BusinessPartner): List<AddressGoldenRecordRelation> =
         when (addressType) {

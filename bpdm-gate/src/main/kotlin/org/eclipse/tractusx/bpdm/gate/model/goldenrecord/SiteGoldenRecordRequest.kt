@@ -15,7 +15,6 @@ package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation
 import java.time.Instant
 
 data class SiteGoldenRecordRequest(
@@ -23,7 +22,7 @@ data class SiteGoldenRecordRequest(
     val name: String,
     val states: List<State>,
     val confidence: ConfidenceCriteria,
-    val relations: List<SiteGoldenRecordRelation>,
+    val relations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
     val scriptVariants: List<ScriptVariant>,
     val updatedAt: Instant
 ) {

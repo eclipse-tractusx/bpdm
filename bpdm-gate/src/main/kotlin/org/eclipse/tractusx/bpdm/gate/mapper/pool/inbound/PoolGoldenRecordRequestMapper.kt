@@ -16,8 +16,12 @@ package org.eclipse.tractusx.bpdm.gate.mapper.pool.inbound
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRequest
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
@@ -43,12 +47,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.model.StreetScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
 import org.springframework.stereotype.Component
 
 /**
@@ -128,8 +126,8 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toRelation(dto: RelationVerboseDto) =
-        LegalEntityGoldenRecordRelation(
-            relationType = when (dto.type) {
+        GoldenRecordRelation(
+            type = when (dto.type) {
                 LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
                 LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
                 LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
@@ -140,8 +138,8 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toRelation(dto: SiteRelationVerboseDto) =
-        SiteGoldenRecordRelation(
-            relationType = when (dto.type) {
+        GoldenRecordRelation(
+            type = when (dto.type) {
                 SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = dto.businessPartnerSourceBpns,
@@ -149,8 +147,8 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toRelation(dto: AddressRelationVerboseDto) =
-        AddressGoldenRecordRelation(
-            relationType = when (dto.type) {
+        GoldenRecordRelation(
+            type = when (dto.type) {
                 AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = dto.businessPartnerSourceBpna,
