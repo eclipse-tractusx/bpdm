@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
@@ -278,5 +280,4 @@ class GoldenRecordTaskDb(
         Aborted
     }
 }
-
 

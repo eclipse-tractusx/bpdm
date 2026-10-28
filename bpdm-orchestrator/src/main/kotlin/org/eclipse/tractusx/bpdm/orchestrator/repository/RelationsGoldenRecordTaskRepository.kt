@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.repository
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
