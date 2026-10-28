@@ -13,11 +13,17 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+
 data class GoldenRecordBpns(
     val legalEntities: Set<String>,
     val sites: Set<String>,
     val addresses: Set<String>
-)
+) {
+    companion object {
+        val NONE = GoldenRecordBpns(emptySet(), emptySet(), emptySet())
+    }
+}
 
 /**
  * Returns every BPN of these collections, by business partner type.
@@ -27,4 +33,14 @@ fun Iterable<GoldenRecordBpns>.union(): GoldenRecordBpns =
         legalEntities = flatMap { it.legalEntities }.toSet(),
         sites = flatMap { it.sites }.toSet(),
         addresses = flatMap { it.addresses }.toSet()
+    )
+
+/**
+ * Returns the BPNs of the golden records this business partner references.
+ */
+fun BusinessPartnerDb.referencedBpns(): GoldenRecordBpns =
+    GoldenRecordBpns(
+        legalEntities = setOfNotNull(bpnL),
+        sites = setOfNotNull(bpnS),
+        addresses = setOfNotNull(bpnA)
     )

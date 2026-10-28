@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.config
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.service.*
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
@@ -40,7 +41,7 @@ class GoldenRecordTaskConfiguration(
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
     private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
-    private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
+    private val consistencyCheckService: GoldenRecordConsistencyCheckApplicationService,
     private val relationTaskCreationService: RelationTaskCreationApplicationService,
     private val relationTaskResolutionService: RelationTaskResolutionApplicationService,
     private val sharingMemberRecordCountedService: GoldenRecordCountedService
@@ -76,7 +77,7 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             "golden record consistency check",
-            { goldenRecordConsistencyService.check() },
+            { consistencyCheckService.checkSharedBusinessPartners() },
             configProperties.consistencyCheck.cron
         )
 

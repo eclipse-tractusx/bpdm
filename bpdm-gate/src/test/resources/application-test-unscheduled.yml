@@ -13,6 +13,9 @@ bpdm:
     healthCheck:
       batchSize: 1
       cron: '-'
+    consistencyCheck:
+      batchSize: 1
+      cron: '-'
     relationCreation:
       cron: '-'
     relationCheck:

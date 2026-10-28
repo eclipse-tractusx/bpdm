@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -292,4 +293,75 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }
+
+    /**
+     * GIVEN shared business partner whose golden records the Pool deleted
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees that sharing state failed with the golden records missing in the Pool
+     */
+    @Test
+    fun `find sharing state of golden record lost by Pool`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val goldenRecord = testDataClient.businessPartner.setStateToGoldenRecordLost(input)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
+
+        //THEN
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(goldenRecordLostSharingState(input.externalId, goldenRecord)))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN shared business partners whose golden records the Pool deleted, more than the consistency check covers in one page
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees all of those sharing states failed with the golden records missing in the Pool
+     */
+    @Test
+    fun `find sharing states of golden records lost by Pool across pages`() {
+        //GIVEN
+        val inputs = listOf("1 $testName", "2 $testName", "3 $testName").map { testDataClient.businessPartner.upsertInput(it) }
+        val goldenRecords = testDataClient.businessPartner.setStatesToGoldenRecordLost(inputs)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), inputs.map { it.externalId })
+
+        //THEN
+        val expectedSharingStates = inputs.zip(goldenRecords) { input, goldenRecord -> goldenRecordLostSharingState(input.externalId, goldenRecord) }
+        val expectedResponse = PageDto(3, 1, 0, 3, expectedSharingStates)
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN shared business partner whose golden records the Pool still knows
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees that sharing state still successful
+     */
+    @Test
+    fun `find successful sharing state after consistency check`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        testDataClient.businessPartner.setStateToSuccessAfterConsistencyCheck(input)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
+
+        //THEN
+        val expectedSharingState = SharingStateDto(externalId = input.externalId, sharingStateType = SharingStateType.Success, updatedAt = Instant.MIN)
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    private fun goldenRecordLostSharingState(externalId: String, goldenRecord: LegalEntityWithLegalAddressVerboseDto) =
+        SharingStateDto(
+            externalId = externalId,
+            sharingStateType = SharingStateType.Error,
+            sharingErrorCode = BusinessPartnerSharingError.BpnNotInPool,
+            sharingErrorMessage = "Business partner with external-ID $externalId references not existing golden record '${goldenRecord.header.bpnl}, ${goldenRecord.legalAddress.bpna}'",
+            updatedAt = Instant.MIN
+        )
 }

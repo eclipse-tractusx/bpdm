@@ -56,6 +56,10 @@ class GoldenRecordMockFactory(
         return changedGoldenRecord
     }
 
+    fun mockGoldenRecordsDeletedInPool() {
+        poolMockDataFactory.mockNoGoldenRecordSearchResults()
+    }
+
     fun mockLegalEntityOnSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>): PoolMockDataFactory.SiteWithLegalEntityParent {
         val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToLegalEntityOnSite(seed, poolMockResult.legalEntityParent, poolMockResult.site.site, owningCompany, nameParts)

@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
@@ -43,6 +44,7 @@ class BusinessPartnerTestDataClientV7(
     private val taskCreationService: GoldenRecordTaskCreationApplicationService,
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
+    private val consistencyCheckService: GoldenRecordConsistencyCheckApplicationService,
     private val goldenRecordMockFactory: GoldenRecordMockFactory,
     private val tenantBpnL: String,
 ) {
@@ -113,6 +115,22 @@ class BusinessPartnerTestDataClientV7(
         orchestratorMockDataFactory.mockTasksLost()
         taskHealthCheckService.checkPendingTasks()
         return createdTasks
+    }
+
+    fun setStateToSuccessAfterConsistencyCheck(input: BusinessPartnerInputDto): LegalEntityWithLegalAddressVerboseDto {
+        val goldenRecord = refineToLegalEntity(input)
+        consistencyCheckService.checkSharedBusinessPartners()
+        return goldenRecord
+    }
+
+    fun setStateToGoldenRecordLost(input: BusinessPartnerInputDto): LegalEntityWithLegalAddressVerboseDto =
+        setStatesToGoldenRecordLost(listOf(input)).single()
+
+    fun setStatesToGoldenRecordLost(inputs: List<BusinessPartnerInputDto>): List<LegalEntityWithLegalAddressVerboseDto> {
+        val goldenRecords = inputs.map { refineToLegalEntity(it) }
+        goldenRecordMockFactory.mockGoldenRecordsDeletedInPool()
+        consistencyCheckService.checkSharedBusinessPartners()
+        return goldenRecords
     }
 
     fun createOutput(seed: String): BusinessPartnerOutputDto {

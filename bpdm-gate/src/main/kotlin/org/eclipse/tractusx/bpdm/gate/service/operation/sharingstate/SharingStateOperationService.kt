@@ -16,14 +16,19 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SharedBusinessPartner
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.referencedBpns
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -35,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SharingStateOperationService(
     private val sharingStateRepository: SharingStateRepository,
+    private val businessPartnerRepository: BusinessPartnerRepository,
     private val sharingStateService: SharingStateService,
     private val changeLogger: PersistedChangeLogger
 ) {
@@ -56,6 +62,17 @@ class SharingStateOperationService(
     fun findPendingTasksAfter(sharingStateId: Long, limit: Int): List<PendingGoldenRecordTask> =
         sharingStateRepository.findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(SharingStateType.Pending, sharingStateId, Pageable.ofSize(limit))
             .map { PendingGoldenRecordTask(sharingStateId = it.id, taskId = it.taskId) }
+
+    /**
+     * Returns up to [limit] successfully shared business partners with the golden records their output references, in
+     * the order of their sharing state id and starting after [sharingStateId].
+     */
+    @Transactional(readOnly = true)
+    fun findSharedAfter(sharingStateId: Long, limit: Int): List<SharedBusinessPartner> {
+        val sharingStates = sharingStateRepository.findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(SharingStateType.Success, sharingStateId, Pageable.ofSize(limit))
+        val outputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Output).associateBy { it.sharingState.id }
+        return sharingStates.map { SharedBusinessPartner(it.id, outputsBySharingStateId[it.id]?.referencedBpns() ?: GoldenRecordBpns.NONE) }
+    }
 
     /**
      * Sets the sharing state of each started creation in [creations] pending on its new task, and assigns every sharing

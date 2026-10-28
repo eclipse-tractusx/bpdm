@@ -74,6 +74,16 @@ class PoolGoldenRecordGateway(
         )
     }
 
+    /**
+     * Returns those of [bpns] the Pool knows.
+     */
+    fun fetchExistingBpns(bpns: GoldenRecordBpns): GoldenRecordBpns =
+        GoldenRecordBpns(
+            legalEntities = fetchLegalEntities(bpns.legalEntities).map { it.bpn }.toSet(),
+            sites = fetchSites(bpns.sites).map { it.bpn }.toSet(),
+            addresses = fetchAddresses(bpns.addresses).map { it.bpn }.toSet()
+        )
+
     private fun fetchLegalEntities(bpns: Set<String>): List<LegalEntityGoldenRecordRequest> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
             poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(bpnLs = chunk), PaginationRequest(0, chunk.size)).content

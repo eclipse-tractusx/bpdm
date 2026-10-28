@@ -234,6 +234,7 @@ abstract class GateTestBaseV7 : GateTestBase() {
     @Autowired lateinit var taskCreationService: GoldenRecordTaskCreationApplicationService
     @Autowired lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
     @Autowired lateinit var taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService
+    @Autowired lateinit var consistencyCheckService: GoldenRecordConsistencyCheckApplicationService
     @Autowired lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
     @Autowired lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
 
@@ -251,7 +252,7 @@ abstract class GateTestBaseV7 : GateTestBase() {
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
         testDataClient = GateTestDataClientV7(
             gateClient, testData, orchestratorMockDataFactory,
-            taskCreationService, taskResolutionService, taskHealthCheckService,
+            taskCreationService, taskResolutionService, taskHealthCheckService, consistencyCheckService,
             relationTaskResolutionService, relationTaskCreationService,
             goldenRecordMockFactory, tenantBPNL
         )
