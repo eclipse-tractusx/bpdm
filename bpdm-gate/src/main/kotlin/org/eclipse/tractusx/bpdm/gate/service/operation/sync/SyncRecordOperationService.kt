@@ -13,35 +13,46 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.operation.sync
 
-import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.gate.entity.SyncRecordDb
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.repository.SyncRecordRepository
-import org.eclipse.tractusx.bpdm.gate.service.SyncRecordService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
  * Tracks up to which time each synchronisation with another service has been processed.
  */
 @Service
 class SyncRecordOperationService(
-    private val syncRecordRepository: SyncRecordRepository,
-    private val syncRecordService: SyncRecordService
+    private val syncRecordRepository: SyncRecordRepository
 ) {
+    companion object {
+        private val INITIAL_FROM_TIME: Instant = LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC)
+    }
+
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Returns the time up to which [type] has been synchronised, or the initial time if it never was.
      */
     @Transactional(readOnly = true)
     fun getSyncedUntil(type: SyncTypeDb): Instant =
-        syncRecordRepository.findByType(type)?.fromTime ?: BaseSyncRecordService.INITIAL_FROM_TIME
+        syncRecordRepository.findByType(type)?.fromTime ?: INITIAL_FROM_TIME
 
     /**
      * Records that [type] is synchronised up to [until], keeping the previous time if it is null.
      */
     @Transactional
     fun advance(type: SyncTypeDb, until: Instant?) {
-        syncRecordService.updateRecord(syncRecordService.getOrCreateRecord(type), until)
+        if (until == null) return
+        val record = syncRecordRepository.findByType(type) ?: SyncRecordDb(type = type, fromTime = INITIAL_FROM_TIME)
+        if (record.fromTime == until) return
+        record.fromTime = until
+        syncRecordRepository.save(record)
+        logger.debug { "Advanced sync record $type to $until" }
     }
 }
