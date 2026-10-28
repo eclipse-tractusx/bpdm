@@ -215,4 +215,81 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }
+
+    /**
+     * GIVEN business partner whose pending task the Orchestrator lost
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees that sharing state failed with a missing task
+     */
+    @Test
+    fun `find sharing state of task lost by Orchestrator`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        testDataClient.businessPartner.setStateToTaskLost(input.externalId)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
+
+        //THEN
+        val expectedSharingState = SharingStateDto(
+            externalId = input.externalId,
+            sharingStateType = SharingStateType.Error,
+            sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
+            sharingErrorMessage = "Missing Task in Orchestrator",
+            updatedAt = Instant.MIN
+        )
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN business partners whose pending tasks the Orchestrator lost, more than the health check covers in one page
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees all of those sharing states failed with a missing task
+     */
+    @Test
+    fun `find sharing states of tasks lost by Orchestrator across health check pages`() {
+        //GIVEN
+        val inputs = listOf("1 $testName", "2 $testName", "3 $testName").map { testDataClient.businessPartner.upsertInput(it) }
+        testDataClient.businessPartner.setStatesToTaskLost(inputs.map { it.externalId })
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), inputs.map { it.externalId })
+
+        //THEN
+        val expectedSharingStates = inputs.map {
+            SharingStateDto(
+                externalId = it.externalId,
+                sharingStateType = SharingStateType.Error,
+                sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
+                sharingErrorMessage = "Missing Task in Orchestrator",
+                updatedAt = Instant.MIN
+            )
+        }
+        val expectedResponse = PageDto(3, 1, 0, 3, expectedSharingStates)
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN business partner whose pending task the Orchestrator still knows
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees that sharing state still pending
+     */
+    @Test
+    fun `find pending sharing state after health check`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        testDataClient.businessPartner.setStateToPendingAfterHealthCheck(input.externalId)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
+
+        //THEN
+        val expectedSharingState = SharingStateDto(externalId = input.externalId, sharingStateType = SharingStateType.Pending, updatedAt = Instant.MIN)
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
 }

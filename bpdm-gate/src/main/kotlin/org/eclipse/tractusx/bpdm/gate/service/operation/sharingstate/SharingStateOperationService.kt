@@ -21,9 +21,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -46,6 +48,14 @@ class SharingStateOperationService(
         sharingStateRepository.findByTaskIdIn(taskIds.toSet())
             .filter { it.sharingStateType == SharingStateType.Pending }
             .map { TaskReference(taskId = it.taskId.toString(), recordId = it.orchestratorRecordId.toString()) }
+
+    /**
+     * Returns up to [limit] sharing states pending on a task, in the order of their id and starting after [sharingStateId].
+     */
+    @Transactional(readOnly = true)
+    fun findPendingTasksAfter(sharingStateId: Long, limit: Int): List<PendingGoldenRecordTask> =
+        sharingStateRepository.findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(SharingStateType.Pending, sharingStateId, Pageable.ofSize(limit))
+            .map { PendingGoldenRecordTask(sharingStateId = it.id, taskId = it.taskId) }
 
     /**
      * Sets the sharing state of each started creation in [creations] pending on its new task, and assigns every sharing

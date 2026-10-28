@@ -231,10 +231,11 @@ abstract class GateTestBaseV7 : GateTestBase() {
     @Autowired lateinit var testData: TestDataFactoryGateV7
 
     // Gate internal services — triggered directly in TestDataClient to drive the sharing pipeline
-    @Autowired lateinit var taskCreationBatchService: TaskCreationBatchService
-    @Autowired lateinit var taskResolutionBatchService: TaskResolutionBatchService
-    @Autowired lateinit var relationTaskCreationService: RelationTaskCreationService
-    @Autowired lateinit var relationTaskResolutionService: RelationTaskResolutionService
+    @Autowired lateinit var taskCreationService: GoldenRecordTaskCreationApplicationService
+    @Autowired lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
+    @Autowired lateinit var taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService
+    @Autowired lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
+    @Autowired lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
 
     // Mock factories for simulating Pool and Orchestrator APIs
     @Autowired lateinit var orchestratorMockDataFactory: OrchestratorMockDataFactory
@@ -250,7 +251,7 @@ abstract class GateTestBaseV7 : GateTestBase() {
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
         testDataClient = GateTestDataClientV7(
             gateClient, testData, orchestratorMockDataFactory,
-            taskCreationBatchService, taskResolutionBatchService,
+            taskCreationService, taskResolutionService, taskHealthCheckService,
             relationTaskResolutionService, relationTaskCreationService,
             goldenRecordMockFactory, tenantBPNL
         )
@@ -333,7 +334,7 @@ val goldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInp
 val request = testData.businessPartner.input.request.fromSeed(testName)
 gateClient.businessParters.upsertBusinessPartnersInput(listOf(request))
 gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
-taskCreationBatchService.createTasksForReadyBusinessPartners()
+taskCreationService.createTasksForReadyBusinessPartners()
 // ... more steps
 ```
 
@@ -840,8 +841,8 @@ If a utility is missing from the base class, add it there — not in the concret
 val request = testData.businessPartner.input.request.fromSeed(testName)
 gateClient.businessParters.upsertBusinessPartnersInput(listOf(request))
 gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
-taskCreationBatchService.createTasksForReadyBusinessPartners()
-taskResolutionBatchService.resolveTasks()
+taskCreationService.createTasksForReadyBusinessPartners()
+taskResolutionService.resolveFinishedTasks()
 
 // Good — test communicates what state it needs
 //GIVEN

@@ -76,6 +76,8 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
 
     fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
 
+    fun findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(sharingStateType: SharingStateType, id: Long, pageable: Pageable): List<SharingStateDb>
+
     @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s GROUP BY s.sharingStateType")
     fun countSharingStateTypes(): List<SharingStateTypeCount>
 

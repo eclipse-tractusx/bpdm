@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyReq
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
@@ -41,6 +42,7 @@ class BusinessPartnerTestDataClientV7(
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationService: GoldenRecordTaskCreationApplicationService,
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
+    private val taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
     private val goldenRecordMockFactory: GoldenRecordMockFactory,
     private val tenantBpnL: String,
 ) {
@@ -94,6 +96,23 @@ class BusinessPartnerTestDataClientV7(
         taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return createdTask
+    }
+
+    fun setStateToPendingAfterHealthCheck(externalId: String, seed: String = externalId): TaskClientStateDto {
+        val createdTask = setStateToPending(externalId, seed)
+        orchestratorMockDataFactory.mockTasksPending()
+        taskHealthCheckService.checkPendingTasks()
+        return createdTask
+    }
+
+    fun setStateToTaskLost(externalId: String, seed: String = externalId): TaskClientStateDto =
+        setStatesToTaskLost(listOf(externalId)).single()
+
+    fun setStatesToTaskLost(externalIds: List<String>): List<TaskClientStateDto> {
+        val createdTasks = externalIds.map { setStateToPending(it) }
+        orchestratorMockDataFactory.mockTasksLost()
+        taskHealthCheckService.checkPendingTasks()
+        return createdTasks
     }
 
     fun createOutput(seed: String): BusinessPartnerOutputDto {

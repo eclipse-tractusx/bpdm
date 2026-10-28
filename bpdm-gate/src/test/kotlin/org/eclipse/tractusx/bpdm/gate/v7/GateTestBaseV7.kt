@@ -23,6 +23,7 @@ import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
@@ -53,6 +54,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
     @Autowired
+    lateinit var taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService
+    @Autowired
     lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
     @Autowired
     lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
@@ -79,6 +82,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
             orchestratorMockDataFactory,
             taskCreationService,
             taskResolutionService,
+            taskHealthCheckService,
             relationTaskResolutionService,
             relationTaskCreationService,
             goldenRecordMockFactory,

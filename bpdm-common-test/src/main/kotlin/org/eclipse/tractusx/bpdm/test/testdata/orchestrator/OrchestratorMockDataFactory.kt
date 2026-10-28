@@ -248,6 +248,22 @@ class OrchestratorMockDataFactory(
         return mockedCreatedTask
     }
 
+    fun mockTasksLost(){
+        mockTaskResultStates(null)
+    }
+
+    fun mockTasksPending(){
+        mockTaskResultStates(ResultState.Pending)
+    }
+
+    private fun mockTaskResultStates(resultState: ResultState?){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(TaskResultStateSearchResponse(listOf(resultState)))
+        )))
+    }
+
     fun mockRelationSharingError(seed: String, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 

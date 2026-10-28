@@ -23,6 +23,7 @@ import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.service.*
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
@@ -37,7 +38,7 @@ class GoldenRecordTaskConfiguration(
     private val taskScheduler: TaskScheduler,
     private val taskCreationService: GoldenRecordTaskCreationApplicationService,
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
-    private val taskHealthCheckService: TaskResolutionBatchService,
+    private val taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
     private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
     private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
     private val relationTaskCreationService: RelationTaskCreationApplicationService,
@@ -69,7 +70,7 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             "golden record task health check",
-            { taskHealthCheckService.healthCheck() },
+            { taskHealthCheckService.checkPendingTasks() },
             configProperties.healthCheck.cron
         )
 

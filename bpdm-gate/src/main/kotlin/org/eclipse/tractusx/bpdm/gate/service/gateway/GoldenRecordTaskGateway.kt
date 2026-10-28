@@ -25,6 +25,7 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -69,6 +70,16 @@ class GoldenRecordTaskGateway(
             val entries = chunk.map { TaskStateRequest.Entry(taskId = it.taskId, recordId = it.recordId) }
             orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(entries)).tasks
         }.flatten().map(requestMapper::toRequest)
+
+    /**
+     * Returns those of [taskIds] the Orchestrator knows.
+     */
+    fun fetchKnownTaskIds(taskIds: Collection<String>): Set<String> =
+        taskIds.distinct().chunked(taskProperties.healthCheck.batchSize) { chunk ->
+            val resultStates = orchestrationApiClient.goldenRecordTasks.searchTaskResultStates(TaskResultStateSearchRequest(chunk)).resultStates
+            check(resultStates.size == chunk.size) { "The Orchestrator returned ${resultStates.size} task result states for ${chunk.size} requested" }
+            chunk.zip(resultStates).filter { (_, resultState) -> resultState != null }.map { (taskId, _) -> taskId }
+        }.flatten().toSet()
 
     companion object {
         private const val EVENT_PAGE_SIZE = 1000
