@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
-import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerMappings
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty
 
@@ -38,7 +37,7 @@ import kotlin.reflect.KProperty
  */
 @Component
 class OutputUpsertDataMapper(
-    private val businessPartnerMappings: BusinessPartnerMappings
+    private val valueMapper: BusinessPartnerValueMapper
 ) {
 
     /**
@@ -69,7 +68,7 @@ class OutputUpsertDataMapper(
                 legalEntityUpdatedAt = legalEntityUpdatedAt,
                 siteUpdatedAt = siteUpdatedAt,
                 addressUpdatedAt = addressUpdatedAt,
-                scriptVariants = scriptVariants.map(businessPartnerMappings::toScriptVariantDto),
+                scriptVariants = scriptVariants.map(valueMapper::toValue),
                 legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
                 siteGoldenRecordRelations = siteGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
                 addressGoldenRecordRelations = addressGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },

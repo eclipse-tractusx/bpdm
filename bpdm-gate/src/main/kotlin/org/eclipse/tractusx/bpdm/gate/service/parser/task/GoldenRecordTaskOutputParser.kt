@@ -16,13 +16,6 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativeAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
@@ -91,7 +84,7 @@ class GoldenRecordTaskOutputParser {
                 legalEntityUpdatedAt = request.legalEntityUpdatedAt,
                 siteUpdatedAt = request.siteUpdatedAt,
                 addressUpdatedAt = request.addressUpdatedAt,
-                scriptVariants = request.scriptVariants.map(::toScriptVariantDto),
+                scriptVariants = request.scriptVariants,
                 legalEntityGoldenRecordRelations = request.legalEntityGoldenRecordRelations,
                 siteGoldenRecordRelations = request.siteGoldenRecordRelations,
                 addressGoldenRecordRelations = request.addressGoldenRecordRelations,
@@ -197,37 +190,6 @@ class GoldenRecordTaskOutputParser {
 
     private fun toState(state: GoldenRecordTaskOutputRequest.State): State? =
         state.type?.let { State(validFrom = state.validFrom, validTo = state.validTo, type = it, businessPartnerType = state.businessPartnerType) }
-
-    private fun toScriptVariantDto(scriptVariant: BusinessPartnerValues.ScriptVariant): BusinessPartnerScriptVariantDto {
-        val physicalAddress = scriptVariant.physicalAddress
-        val street = physicalAddress.street
-        return BusinessPartnerScriptVariantDto(
-            scriptCode = scriptVariant.scriptCode,
-            nameParts = scriptVariant.nameParts,
-            legalEntity = LegalEntityScriptVariantDto(legalName = scriptVariant.legalName, shortName = scriptVariant.shortName),
-            site = SiteScriptVariantDto(name = scriptVariant.siteName),
-            address = AddressScriptVariantDto(
-                name = scriptVariant.addressName,
-                physicalAddress = PhysicalAddressScriptVariantDto(
-                    city = physicalAddress.city,
-                    district = physicalAddress.district,
-                    street = StreetScriptVariantDto(
-                        name = street.name,
-                        direction = street.direction,
-                        namePrefix = street.namePrefix,
-                        additionalNamePrefix = street.additionalNamePrefix,
-                        nameSuffix = street.nameSuffix,
-                        additionalNameSuffix = street.additionalNameSuffix
-                    ),
-                    industrialZone = physicalAddress.industrialZone,
-                    building = physicalAddress.building,
-                    floor = physicalAddress.floor,
-                    door = physicalAddress.door
-                ),
-                alternativeAddress = scriptVariant.alternativeAddressCity?.let { AlternativeAddressScriptVariantDto(city = it) }
-            )
-        )
-    }
 
     private fun <T : Any> required(value: T?, property: String): ParseResult<T, GoldenRecordTaskOutputError> =
         value?.let { ParseResult.Success(it) } ?: missing(property)

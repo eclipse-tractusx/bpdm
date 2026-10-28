@@ -14,13 +14,6 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.parsed
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativeAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressAlignmentParsed
@@ -69,7 +62,7 @@ class BusinessPartnerOutputParsedMapper {
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
             legalEntityUpdatedAt = legalEntity.updatedAt,
             scriptVariants = mergeScriptVariants(data.scriptVariants, legalEntity.scriptVariants, { it.scriptCode }) { variant, goldenRecord ->
-                variant.copy(legalEntity = LegalEntityScriptVariantDto(goldenRecord.legalName, goldenRecord.shortName))
+                variant.copy(legalName = goldenRecord.legalName, shortName = goldenRecord.shortName)
             }
         )
 
@@ -82,7 +75,7 @@ class BusinessPartnerOutputParsedMapper {
             siteGoldenRecordRelations = site.relations,
             siteUpdatedAt = site.updatedAt,
             scriptVariants = mergeScriptVariants(data.scriptVariants, site.scriptVariants, { it.scriptCode }) { variant, goldenRecord ->
-                variant.copy(site = SiteScriptVariantDto(goldenRecord.name))
+                variant.copy(siteName = goldenRecord.name)
             }
         )
 
@@ -101,40 +94,45 @@ class BusinessPartnerOutputParsedMapper {
             addressUpdatedAt = address.updatedAt,
             scriptVariants = mergeScriptVariants(data.scriptVariants, address.scriptVariants, { it.scriptCode }) { variant, goldenRecord ->
                 variant.copy(
-                    address = AddressScriptVariantDto(
-                        name = goldenRecord.name,
-                        physicalAddress = toScriptVariantDto(goldenRecord.physicalAddress),
-                        alternativeAddress = goldenRecord.alternativeAddressCity?.let { AlternativeAddressScriptVariantDto(it) }
-                    )
+                    addressName = goldenRecord.name,
+                    physicalAddress = goldenRecord.physicalAddress,
+                    alternativeAddressCity = goldenRecord.alternativeAddressCity
                 )
             }
         )
     }
 
     private fun <G> mergeScriptVariants(
-        variants: List<BusinessPartnerScriptVariantDto>,
+        variants: List<BusinessPartnerValues.ScriptVariant>,
         goldenRecordVariants: List<G>,
         scriptCodeOf: (G) -> String,
-        apply: (BusinessPartnerScriptVariantDto, G) -> BusinessPartnerScriptVariantDto
-    ): List<BusinessPartnerScriptVariantDto> {
+        apply: (BusinessPartnerValues.ScriptVariant, G) -> BusinessPartnerValues.ScriptVariant
+    ): List<BusinessPartnerValues.ScriptVariant> {
         val goldenRecordVariantByCode = goldenRecordVariants.associateBy(scriptCodeOf)
         val storedCodes = variants.map { it.scriptCode }.toSet()
         val updated = variants.map { variant -> goldenRecordVariantByCode[variant.scriptCode]?.let { apply(variant, it) } ?: variant }
         val added = goldenRecordVariantByCode.filterKeys { it !in storedCodes }
-            .map { (scriptCode, goldenRecordVariant) -> apply(BusinessPartnerScriptVariantDto(scriptCode), goldenRecordVariant) }
+            .map { (scriptCode, goldenRecordVariant) -> apply(emptyScriptVariant(scriptCode), goldenRecordVariant) }
         return updated + added
     }
 
-    private fun toScriptVariantDto(physicalAddress: BusinessPartnerValues.PhysicalAddressScriptVariant) =
-        with(physicalAddress) {
-            PhysicalAddressScriptVariantDto(
-                city = city,
-                district = district,
-                street = with(street) { StreetScriptVariantDto(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix) },
-                industrialZone = industrialZone,
-                building = building,
-                floor = floor,
-                door = door
-            )
-        }
+    private fun emptyScriptVariant(scriptCode: String) =
+        BusinessPartnerValues.ScriptVariant(
+            scriptCode = scriptCode,
+            nameParts = emptyList(),
+            legalName = null,
+            shortName = null,
+            siteName = null,
+            addressName = null,
+            physicalAddress = BusinessPartnerValues.PhysicalAddressScriptVariant(
+                city = null,
+                district = null,
+                street = BusinessPartnerValues.StreetScriptVariant(null, null, null, null, null, null),
+                industrialZone = null,
+                building = null,
+                floor = null,
+                door = null
+            ),
+            alternativeAddressCity = null
+        )
 }

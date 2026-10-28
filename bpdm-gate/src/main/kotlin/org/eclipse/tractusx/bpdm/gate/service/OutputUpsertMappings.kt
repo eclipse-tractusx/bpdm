@@ -22,18 +22,20 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Service
 
 @Service
 class OutputUpsertMappings(
-    private val businessPartnerMappings: BusinessPartnerMappings
+    private val inputEntityMapper: BusinessPartnerInputEntityMapper
 ) {
 
     fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb): BusinessPartnerDb {
@@ -66,8 +68,8 @@ class OutputUpsertMappings(
             )
         }
 
-        val scriptVariants = upsertData.scriptVariants.map { variant ->  businessPartnerMappings.toScriptVariantDb(businessPartner, variant) }
-        scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
+        upsertData.scriptVariants.map { toScriptVariant(businessPartner, it) }
+            .forEach { businessPartner.scriptVariants.add(it) }
 
         upsertData.legalEntityGoldenRecordRelations.map { toLegalEntityGoldenRecordRelation(it) }
             .forEach { businessPartner.legalEntityGoldenRecordRelations.add(it) }
@@ -80,6 +82,19 @@ class OutputUpsertMappings(
 
         return businessPartner
     }
+
+    private fun toScriptVariant(businessPartner: BusinessPartnerDb, scriptVariant: BusinessPartnerValues.ScriptVariant) =
+        BusinessPartnerScriptVariantDb(
+            scriptCode = scriptVariant.scriptCode,
+            businessPartner = businessPartner,
+            nameParts = scriptVariant.nameParts.toMutableList(),
+            shortName = scriptVariant.shortName,
+            legalName = scriptVariant.legalName,
+            siteName = scriptVariant.siteName,
+            addressName = scriptVariant.addressName,
+            physicalAddress = inputEntityMapper.toEntity(scriptVariant.physicalAddress),
+            alternativeAddress = scriptVariant.alternativeAddressCity?.let(inputEntityMapper::toAlternativeAddressScriptVariant)
+        )
 
     private fun toLegalEntityGoldenRecordRelation(relation: GoldenRecordRelation<LegalEntityGoldenRecordRelationType>) =
         LegalEntityGoldenRecordRelationDb(

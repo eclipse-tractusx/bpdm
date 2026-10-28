@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import java.time.Instant
 
 data class OutputUpsertData(
@@ -51,7 +51,7 @@ data class OutputUpsertData(
     val legalEntityUpdatedAt: Instant?,
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
-    val scriptVariants: List<BusinessPartnerScriptVariantDto>,
+    val scriptVariants: List<BusinessPartnerValues.ScriptVariant>,
     val legalEntityGoldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
     val siteGoldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
     val addressGoldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
