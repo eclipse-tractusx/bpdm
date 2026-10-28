@@ -102,6 +102,21 @@ class BusinessPartnerTestDataClientV7(
         return errorTask
     }
 
+    fun setStateToResultWithoutCountry(externalId: String, seed: String = externalId): TaskClientStateDto {
+        val refinedTask = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList()).taskState
+        val refinedResult = refinedTask.businessPartnerResult
+        val additionalAddress = refinedResult.additionalAddress!!
+        val physicalAddressWithoutCountry = additionalAddress.postalProperties.physicalAddress.copy(country = null)
+        val resultWithoutCountry = refinedResult.copy(
+            additionalAddress = additionalAddress.copy(postalProperties = additionalAddress.postalProperties.copy(physicalAddress = physicalAddressWithoutCountry))
+        )
+        val incompleteTask = orchestratorMockDataFactory.mockTaskRefinedSuccessfully(refinedTask.taskId, resultWithoutCountry, seed)
+        setStateToReady(externalId)
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
+        return incompleteTask
+    }
+
     fun setStateToTaskMissing(externalId: String, seed: String = externalId): TaskClientStateDto {
         val createdTask = orchestratorMockDataFactory.mockMissingTask(seed)
         setStateToReady(externalId)

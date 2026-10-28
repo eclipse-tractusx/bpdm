@@ -218,6 +218,34 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     }
 
     /**
+     * GIVEN business partner whose task result lacks the country of its address
+     * WHEN input consumer searches sharing states
+     * THEN input consumer sees that sharing state failed naming the missing value
+     */
+    @Test
+    fun `find sharing state of task result without country`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val incompleteTask = testDataClient.businessPartner.setStateToResultWithoutCountry(input.externalId)
+
+        //WHEN
+        val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
+
+        //THEN
+        val expectedSharingState = SharingStateDto(
+            externalId = input.externalId,
+            sharingStateType = SharingStateType.Error,
+            sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
+            sharingErrorMessage = "Task result lacks mandatory values: physicalPostalAddress.country",
+            taskId = incompleteTask.taskId,
+            updatedAt = Instant.MIN
+        )
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+
+        assertRepo.assertSharingStates(actualResponse, expectedResponse)
+    }
+
+    /**
      * GIVEN business partner whose pending task the Orchestrator lost
      * WHEN input consumer searches sharing states
      * THEN input consumer sees that sharing state failed with a missing task

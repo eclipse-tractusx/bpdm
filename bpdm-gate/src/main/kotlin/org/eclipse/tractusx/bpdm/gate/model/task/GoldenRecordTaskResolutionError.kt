@@ -30,5 +30,7 @@ sealed interface GoldenRecordTaskResolutionError {
         override val message = "No input data found for the references business partner"
     }
 
-    data class ResultUnusable(override val sharingState: SharingStateDb, override val message: String?) : GoldenRecordTaskResolutionError
+    data class ResultIncomplete(override val sharingState: SharingStateDb, val missingValues: List<String>) : GoldenRecordTaskResolutionError {
+        override val message = "Task result lacks mandatory values: ${missingValues.joinToString()}".take(255)
+    }
 }

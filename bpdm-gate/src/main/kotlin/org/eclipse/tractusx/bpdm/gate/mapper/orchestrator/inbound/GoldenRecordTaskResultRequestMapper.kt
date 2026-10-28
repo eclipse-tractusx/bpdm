@@ -26,7 +26,9 @@ import org.springframework.stereotype.Component
  * Maps the golden record task states the Orchestrator reports onto the task results the Gate resolves.
  */
 @Component
-class GoldenRecordTaskResultRequestMapper {
+class GoldenRecordTaskResultRequestMapper(
+    private val outputMapper: GoldenRecordTaskOutputRequestMapper
+) {
 
     /**
      * Maps [task] onto its result, translating the error type the task failed with first into a sharing error code.
@@ -34,7 +36,7 @@ class GoldenRecordTaskResultRequestMapper {
     fun toRequest(task: TaskClientStateDto): GoldenRecordTaskResultRequest =
         when (task.processingState.resultState) {
             ResultState.Pending -> GoldenRecordTaskResultRequest.Pending(task.taskId)
-            ResultState.Success -> GoldenRecordTaskResultRequest.Succeeded(task.taskId, task.businessPartnerResult, toBpns(task.businessPartnerResult))
+            ResultState.Success -> GoldenRecordTaskResultRequest.Succeeded(task.taskId, outputMapper.toRequest(task.businessPartnerResult), toBpns(task.businessPartnerResult))
             ResultState.Error -> toFailed(task)
         }
 

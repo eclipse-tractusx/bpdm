@@ -15,7 +15,6 @@ package org.eclipse.tractusx.bpdm.gate.model.task
 
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
 sealed interface GoldenRecordTaskResultRequest {
     val taskId: String
@@ -24,7 +23,7 @@ sealed interface GoldenRecordTaskResultRequest {
 
     data class Succeeded(
         override val taskId: String,
-        val businessPartner: BusinessPartner,
+        val output: GoldenRecordTaskOutputRequest,
         val bpns: GoldenRecordBpns
     ) : GoldenRecordTaskResultRequest
 

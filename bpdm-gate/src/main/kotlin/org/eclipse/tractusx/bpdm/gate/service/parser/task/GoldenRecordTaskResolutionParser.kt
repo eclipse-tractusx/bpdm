@@ -20,6 +20,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
+import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionPageRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionParsed
@@ -27,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.OrchestratorMappings
 import org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord.GoldenRecordAlignmentParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional
 class GoldenRecordTaskResolutionParser(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val orchestratorMappings: OrchestratorMappings,
+    private val outputParser: GoldenRecordTaskOutputParser,
     private val alignmentParser: GoldenRecordAlignmentParser
 ) {
 
@@ -82,10 +82,11 @@ class GoldenRecordTaskResolutionParser(
     ): ParseResult<GoldenRecordTaskResolutionParsed, GoldenRecordTaskResolutionError> {
         if (input == null) return ParseResult.ofSingleFailure(GoldenRecordTaskResolutionError.InputMissing(sharingState))
 
-        val taskOutput = try {
-            orchestratorMappings.toOutputUpsertData(result.businessPartner, input.roles.toList(), sharingState.tenantBpnl)
-        } catch (ex: Exception) {
-            return ParseResult.ofSingleFailure(GoldenRecordTaskResolutionError.ResultUnusable(sharingState, ex.message?.take(255)))
+        val taskOutput = when (val parsedOutput = outputParser.parse(result.output, input.roles, sharingState.tenantBpnl)) {
+            is ParseResult.Success -> parsedOutput.parsed
+            is ParseResult.Failure -> return ParseResult.ofSingleFailure(
+                GoldenRecordTaskResolutionError.ResultIncomplete(sharingState, parsedOutput.errors.map(::toMissingValue))
+            )
         }
 
         if (!isNewerThanStored(taskOutput, storedOutput))
@@ -117,4 +118,9 @@ class GoldenRecordTaskResolutionParser(
             .filter { (incomingTimestamp, _) -> incomingTimestamp != null }
             .any { (incomingTimestamp, storedTimestamp) -> storedTimestamp == null || incomingTimestamp!!.isAfter(storedTimestamp) }
     }
+
+    private fun toMissingValue(error: GoldenRecordTaskOutputError): String =
+        when (error) {
+            is GoldenRecordTaskOutputError.ValueMissing -> error.property
+        }
 }

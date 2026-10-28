@@ -91,7 +91,7 @@ class GoldenRecordTaskResolutionApplicationService(
         val errorCode = when (error) {
             is GoldenRecordTaskResolutionError.TaskMissing -> BusinessPartnerSharingError.MissingTaskID
             is GoldenRecordTaskResolutionError.InputMissing -> BusinessPartnerSharingError.SharingProcessError
-            is GoldenRecordTaskResolutionError.ResultUnusable -> BusinessPartnerSharingError.SharingProcessError
+            is GoldenRecordTaskResolutionError.ResultIncomplete -> BusinessPartnerSharingError.SharingProcessError
         }
         return GoldenRecordTaskResolutionParsed.Failed(error.sharingState, errorCode, error.message)
     }
