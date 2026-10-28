@@ -15,18 +15,16 @@ package org.eclipse.tractusx.bpdm.gate.service.gateway
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.FinishedGoldenRecordTaskPageMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.GoldenRecordTaskResultRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.GoldenRecordTaskRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.TaskStateRequestMapper
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.FinishedGoldenRecordTaskPage
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -36,7 +34,10 @@ import java.time.Instant
 @Component
 class GoldenRecordTaskGateway(
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val requestMapper: GoldenRecordTaskResultRequestMapper,
+    private val createRequestMapper: GoldenRecordTaskRequestMapper,
+    private val stateRequestMapper: TaskStateRequestMapper,
+    private val resultRequestMapper: GoldenRecordTaskResultRequestMapper,
+    private val finishedPageMapper: FinishedGoldenRecordTaskPageMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties
 ) {
 
@@ -44,8 +45,7 @@ class GoldenRecordTaskGateway(
      * Creates a golden record task for each of [candidates] and returns the created tasks in the order of [candidates].
      */
     fun createTasks(candidates: List<GoldenRecordTaskCandidate>): List<CreatedGoldenRecordTaskRequest> {
-        val entries = candidates.map { TaskCreateRequestEntry(recordId = it.recordId, businessPartner = it.businessPartner) }
-        val createdTasks = orchestrationApiClient.goldenRecordTasks.createTasks(TaskCreateRequest(TaskMode.UpdateFromSharingMember, entries)).createdTasks
+        val createdTasks = orchestrationApiClient.goldenRecordTasks.createTasks(createRequestMapper.toCreateRequest(candidates)).createdTasks
         check(createdTasks.size == candidates.size) { "The Orchestrator created ${createdTasks.size} golden record tasks for ${candidates.size} requested" }
         return createdTasks.map { CreatedGoldenRecordTaskRequest(taskId = it.taskId, recordId = it.recordId) }
     }
@@ -55,11 +55,7 @@ class GoldenRecordTaskGateway(
      */
     fun fetchFinishedTasks(since: Instant): FinishedGoldenRecordTaskPage {
         val events = orchestrationApiClient.finishedTaskEvents.getEvents(since, PaginationRequest(0, EVENT_PAGE_SIZE))
-        return FinishedGoldenRecordTaskPage(
-            taskIds = events.content.map { it.taskId },
-            lastFinishedAt = events.content.lastOrNull()?.timestamp,
-            hasMore = events.totalPages > 1
-        )
+        return finishedPageMapper.toPage(events)
     }
 
     /**
@@ -67,16 +63,15 @@ class GoldenRecordTaskGateway(
      */
     fun fetchResults(tasks: List<TaskReference>): List<GoldenRecordTaskResultRequest> =
         tasks.chunked(taskProperties.check.batchSize) { chunk ->
-            val entries = chunk.map { TaskStateRequest.Entry(taskId = it.taskId, recordId = it.recordId) }
-            orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(entries)).tasks
-        }.flatten().map(requestMapper::toRequest)
+            orchestrationApiClient.goldenRecordTasks.searchTaskStates(stateRequestMapper.toRequest(chunk)).tasks
+        }.flatten().map(resultRequestMapper::toRequest)
 
     /**
      * Returns those of [taskIds] the Orchestrator knows.
      */
     fun fetchKnownTaskIds(taskIds: Collection<String>): Set<String> =
         taskIds.distinct().chunked(taskProperties.healthCheck.batchSize) { chunk ->
-            val resultStates = orchestrationApiClient.goldenRecordTasks.searchTaskResultStates(TaskResultStateSearchRequest(chunk)).resultStates
+            val resultStates = orchestrationApiClient.goldenRecordTasks.searchTaskResultStates(createRequestMapper.toResultStateSearchRequest(chunk)).resultStates
             check(resultStates.size == chunk.size) { "The Orchestrator returned ${resultStates.size} task result states for ${chunk.size} requested" }
             chunk.zip(resultStates).filter { (_, resultState) -> resultState != null }.map { (taskId, _) -> taskId }
         }.flatten().toSet()

@@ -15,17 +15,16 @@ package org.eclipse.tractusx.bpdm.gate.service.gateway
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.FinishedGoldenRecordTaskPageMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.RelationTaskResultRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.RelationTaskRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.TaskStateRequestMapper
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedRelationTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.FinishedGoldenRecordTaskPage
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResultRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequestEntry
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -35,7 +34,10 @@ import java.time.Instant
 @Component
 class RelationTaskGateway(
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val requestMapper: RelationTaskResultRequestMapper,
+    private val createRequestMapper: RelationTaskRequestMapper,
+    private val stateRequestMapper: TaskStateRequestMapper,
+    private val resultRequestMapper: RelationTaskResultRequestMapper,
+    private val finishedPageMapper: FinishedGoldenRecordTaskPageMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties
 ) {
 
@@ -43,8 +45,7 @@ class RelationTaskGateway(
      * Creates a golden record task for each of [candidates] and returns the created tasks in the order of [candidates].
      */
     fun createTasks(candidates: List<RelationTaskCandidate>): List<CreatedRelationTaskRequest> {
-        val entries = candidates.map { TaskCreateRelationsRequestEntry(recordId = it.recordId, businessPartnerRelations = it.businessPartnerRelations) }
-        val createdTasks = orchestrationApiClient.relationsGoldenRecordTasks.createTasks(TaskCreateRelationsRequest(TaskMode.UpdateFromSharingMember, entries)).createdTasks
+        val createdTasks = orchestrationApiClient.relationsGoldenRecordTasks.createTasks(createRequestMapper.toCreateRequest(candidates)).createdTasks
         check(createdTasks.size == candidates.size) { "The Orchestrator created ${createdTasks.size} relation tasks for ${candidates.size} requested" }
         return createdTasks.map { CreatedRelationTaskRequest(taskId = it.taskId, recordId = it.recordId) }
     }
@@ -54,11 +55,7 @@ class RelationTaskGateway(
      */
     fun fetchFinishedTasks(since: Instant): FinishedGoldenRecordTaskPage {
         val events = orchestrationApiClient.relationsFinishedTaskEvents.getRelationsEvents(since, PaginationRequest(0, EVENT_PAGE_SIZE))
-        return FinishedGoldenRecordTaskPage(
-            taskIds = events.content.map { it.taskId },
-            lastFinishedAt = events.content.lastOrNull()?.timestamp,
-            hasMore = events.totalPages > 1
-        )
+        return finishedPageMapper.toPage(events)
     }
 
     /**
@@ -66,9 +63,8 @@ class RelationTaskGateway(
      */
     fun fetchResults(tasks: List<TaskReference>): List<RelationTaskResultRequest> =
         tasks.chunked(taskProperties.relationCheck.batchSize) { chunk ->
-            val entries = chunk.map { TaskStateRequest.Entry(taskId = it.taskId, recordId = it.recordId) }
-            orchestrationApiClient.relationsGoldenRecordTasks.searchTaskStates(TaskStateRequest(entries)).tasks
-        }.flatten().map(requestMapper::toRequest)
+            orchestrationApiClient.relationsGoldenRecordTasks.searchTaskStates(stateRequestMapper.toRequest(chunk)).tasks
+        }.flatten().map(resultRequestMapper::toRequest)
 
     companion object {
         private const val EVENT_PAGE_SIZE = 1000

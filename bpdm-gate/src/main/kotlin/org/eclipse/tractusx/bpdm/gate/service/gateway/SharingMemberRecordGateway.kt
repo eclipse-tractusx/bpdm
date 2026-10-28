@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.gateway
 
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.SharingMemberRecordRequestMapper
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedUpdate
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.springframework.stereotype.Component
 
 /**
@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class SharingMemberRecordGateway(
-    private val orchestrationApiClient: OrchestrationApiClient
+    private val orchestrationApiClient: OrchestrationApiClient,
+    private val requestMapper: SharingMemberRecordRequestMapper
 ) {
 
     /**
@@ -31,7 +32,7 @@ class SharingMemberRecordGateway(
      */
     fun updateGoldenRecordCounted(updates: List<GoldenRecordCountedUpdate>) {
         updates.forEach { update ->
-            orchestrationApiClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(update.recordId, update.isGoldenRecordCounted))
+            orchestrationApiClient.sharingMemberRecords.update(requestMapper.toRequest(update))
         }
     }
 }

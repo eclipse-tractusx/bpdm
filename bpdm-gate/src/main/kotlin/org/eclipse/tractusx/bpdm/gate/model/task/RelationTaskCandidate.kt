@@ -13,7 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
 import java.time.Instant
 
 data class RelationTaskCandidate(
@@ -21,5 +22,9 @@ data class RelationTaskCandidate(
     val externalId: String,
     val sharingStateUpdatedAt: Instant,
     val recordId: String?,
-    val businessPartnerRelations: BusinessPartnerRelations
+    val relationType: RelationType,
+    val sourceBpn: String,
+    val targetBpn: String,
+    val validityPeriods: List<RelationValidityPeriod>,
+    val reasonCode: String?
 )

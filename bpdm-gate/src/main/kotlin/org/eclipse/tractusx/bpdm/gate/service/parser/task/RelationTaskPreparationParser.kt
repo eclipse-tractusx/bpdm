@@ -20,16 +20,14 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationError
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 /**
  * Decides which relations staged for sharing are sent to the Orchestrator as golden record tasks.
@@ -85,13 +83,11 @@ class RelationTaskPreparationParser(
             externalId = relation.externalId,
             sharingStateUpdatedAt = sharingState.updatedAt,
             recordId = sharingState.recordId,
-            businessPartnerRelations = BusinessPartnerRelations(
-                relationType = toOrchestratorType(input.relationType),
-                businessPartnerSourceBpn = sourceBpn,
-                businessPartnerTargetBpn = targetBpn,
-                validityPeriods = input.validityPeriods.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) },
-                reasonCode = input.reasonCode
-            )
+            relationType = input.relationType,
+            sourceBpn = sourceBpn,
+            targetBpn = targetBpn,
+            validityPeriods = input.validityPeriods.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) },
+            reasonCode = input.reasonCode
         )
         return ParseResult.Success(RelationTaskPreparationParsed.Sendable(relation, candidate))
     }
@@ -123,14 +119,6 @@ class RelationTaskPreparationParser(
     // LegalAndSiteMainAddress is a legal entity too, and IsReplacedBy between two of those already means the legal
     // entities succeed each other. A site sharing its legal entity's address can therefore not be replaced.
     private fun isSiteMainOnly(addressType: AddressType) = addressType == AddressType.SiteMainAddress
-
-    private fun toOrchestratorType(relationType: RelationType) =
-        when (relationType) {
-            RelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
-            RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
-            RelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
-            RelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
-        }
 
     private enum class RelationTaskKind(val bpnType: String, val bpnOf: (BusinessPartnerDb) -> String?) {
         LegalEntity("BPNL", { it.bpnL }),
