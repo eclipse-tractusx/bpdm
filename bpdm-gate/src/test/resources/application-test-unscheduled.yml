@@ -21,6 +21,7 @@ bpdm:
     relationCheck:
       cron: '-'
     recordSync:
+      batchSize: 1
       cron: '-'
 spring:
   datasource:

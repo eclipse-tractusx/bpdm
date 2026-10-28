@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyReq
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
@@ -34,6 +35,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 
@@ -45,6 +47,7 @@ class BusinessPartnerTestDataClientV7(
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
     private val consistencyCheckService: GoldenRecordConsistencyCheckApplicationService,
+    private val goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService,
     private val goldenRecordMockFactory: GoldenRecordMockFactory,
     private val tenantBpnL: String,
 ) {
@@ -74,6 +77,13 @@ class BusinessPartnerTestDataClientV7(
         orchestratorMockDataFactory.resetRecordedRequests()
         setStateToPending(externalId, seed)
         return orchestratorMockDataFactory.getCreatedTaskBusinessPartners().single()
+    }
+
+    fun goldenRecordCountedSyncedToOrchestrator(): List<SharingMemberRecordUpdateRequest> {
+        orchestratorMockDataFactory.mockSharingMemberRecordUpdates()
+        orchestratorMockDataFactory.resetRecordedRequests()
+        goldenRecordCountedSyncService.synchronizeGoldenRecordCounted()
+        return orchestratorMockDataFactory.getSharingMemberRecordUpdates()
     }
 
     fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {

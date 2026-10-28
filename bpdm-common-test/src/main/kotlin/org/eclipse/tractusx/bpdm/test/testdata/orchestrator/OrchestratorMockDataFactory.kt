@@ -27,6 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
+import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS
+import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
@@ -167,6 +169,23 @@ class OrchestratorMockDataFactory(
         return loggedRequests
             .map { jsonMapper.readValue(it.body, TaskCreateRequest::class.java) }
             .flatMap { createRequest -> createRequest.requests.map { it.businessPartner } }
+    }
+
+    fun mockSharingMemberRecordUpdates(){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(
+            WireMock
+                .put(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(SharingMemberRecord("", null, Instant.now(), Instant.now()))))
+        )
+    }
+
+    fun getSharingMemberRecordUpdates(): List<SharingMemberRecordUpdateRequest>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.putRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS)))
+            .map { jsonMapper.readValue(it.body, SharingMemberRecordUpdateRequest::class.java) }
     }
 
     fun mockTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{

@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.task
 
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionParsed
-import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordCountedService
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerOutputOperationService
+import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.GoldenRecordCountedOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional
 class GoldenRecordTaskResolutionOperationService(
     private val outputOperation: BusinessPartnerOutputOperationService,
     private val sharingStateOperation: SharingStateOperationService,
-    private val goldenRecordCountedService: GoldenRecordCountedService
+    private val goldenRecordCountedOperation: GoldenRecordCountedOperationService
 ) {
 
     /**
@@ -41,6 +41,6 @@ class GoldenRecordTaskResolutionOperationService(
         sharingStateOperation.succeed(succeeded.map { it.sharingState })
         resolutions.filterIsInstance<GoldenRecordTaskResolutionParsed.Failed>()
             .forEach { sharingStateOperation.fail(it.sharingState, it.errorCode, it.errorMessage) }
-        goldenRecordCountedService.setIsGoldenRecordCounted(written)
+        goldenRecordCountedOperation.recalculate(written)
     }
 }

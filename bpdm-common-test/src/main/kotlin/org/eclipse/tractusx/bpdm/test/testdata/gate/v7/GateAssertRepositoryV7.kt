@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -226,6 +227,12 @@ class GateAssertRepositoryV7(
                 SharingStateDto::taskId.name
             )
             .isEqualTo(expected)
+    }
+
+    fun assertSharingMemberRecordUpdates(actual: Collection<SharingMemberRecordUpdateRequest>, expected: Collection<SharingMemberRecordUpdateRequest>) {
+        Assertions.assertThat(actual.sortedBy { it.recordId })
+            .usingRecursiveComparison()
+            .isEqualTo(expected.sortedBy { it.recordId })
     }
 
     fun assertErrorPerExternalId(actual: GateErrorResponse, externalIds: Collection<String>) {

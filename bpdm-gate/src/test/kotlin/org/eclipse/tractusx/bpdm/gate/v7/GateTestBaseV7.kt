@@ -23,6 +23,7 @@ import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
@@ -59,6 +60,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var consistencyCheckService: GoldenRecordConsistencyCheckApplicationService
     @Autowired
+    lateinit var goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService
+    @Autowired
     lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
     @Autowired
     lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
@@ -87,6 +90,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
             taskResolutionService,
             taskHealthCheckService,
             consistencyCheckService,
+            goldenRecordCountedSyncService,
             relationTaskResolutionService,
             relationTaskCreationService,
             goldenRecordMockFactory,
