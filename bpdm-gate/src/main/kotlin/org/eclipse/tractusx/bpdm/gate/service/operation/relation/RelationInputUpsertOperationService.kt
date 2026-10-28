@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertEntryRes
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
-import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,7 +41,7 @@ import java.util.*
 @Service
 class RelationInputUpsertOperationService(
     private val relationStageRepository: RelationStageRepository,
-    private val relationSharingStateService: RelationSharingStateService,
+    private val sharingStateOperation: RelationSharingStateOperationService,
     private val changelogCreateOperation: ChangelogCreateOperationService,
     private val changeLogger: PersistedChangeLogger
 ) {
@@ -70,7 +69,7 @@ class RelationInputUpsertOperationService(
 
     private fun create(request: RelationInputUpsertParsed, tenantBpnl: String): Created {
         val relation = RelationDb(externalId = request.externalId ?: UUID.randomUUID().toString(), tenantBpnL = tenantBpnl, sharingState = null, output = null)
-        relationSharingStateService.setInitial(relation, request.relationType)
+        sharingStateOperation.reset(relation)
 
         val input = RelationStageDb(
             relation = relation,
@@ -95,13 +94,13 @@ class RelationInputUpsertOperationService(
         input.updatedAt = Instant.now()
         persist(input, ChangelogType.UPDATE)
 
-        relationSharingStateService.setInitial(input.relation, request.relationType)
+        sharingStateOperation.reset(input.relation)
         logChange(input.relation, PersistedChangeType.Updated, RelationChange.Aspect.Input, RelationChange.Aspect.SharingState)
         return Updated(input)
     }
 
     private fun resubmit(input: RelationStageDb): Resubmitted {
-        relationSharingStateService.setInitial(input.relation, input.relationType)
+        sharingStateOperation.reset(input.relation)
         logChange(input.relation, PersistedChangeType.Updated, RelationChange.Aspect.SharingState)
         return Resubmitted(input)
     }

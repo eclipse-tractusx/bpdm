@@ -19,6 +19,7 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
@@ -29,10 +30,10 @@ import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 /**
  * Moves the sharing states of business partners through their lifecycle.
@@ -41,10 +42,34 @@ import org.springframework.transaction.annotation.Transactional
 class SharingStateOperationService(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val sharingStateService: SharingStateService,
+    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
+
+    /**
+     * Returns the sharing states of [externalIds] for [tenantBpnl] in the same order, creating each missing one in its
+     * initial state.
+     */
+    @Transactional
+    fun getOrCreate(externalIds: List<String>, tenantBpnl: String?): List<SharingStateDb> {
+        val sharingStatesByExternalId = sharingStateRepository.findByExternalIdInAndTenantBpnl(externalIds, tenantBpnl).associateBy { it.externalId }
+        return externalIds.map { externalId -> sharingStatesByExternalId[externalId] ?: create(externalId, tenantBpnl) }
+    }
+
+    /**
+     * Resets [sharingState] to its initial state for a new sharing attempt, clearing any error and task of a previous one.
+     */
+    @Transactional
+    fun reset(sharingState: SharingStateDb) {
+        sharingState.sharingStateType = initialType()
+        sharingState.sharingErrorCode = null
+        sharingState.sharingErrorMessage = null
+        sharingState.sharingProcessStarted = null
+        sharingState.taskId = null
+        sharingStateRepository.save(sharingState)
+        logChange(sharingState)
+    }
 
     /**
      * Returns a reference to the task of each sharing state still pending on any of [taskIds].
@@ -85,7 +110,12 @@ class SharingStateOperationService(
             creation.recordIdToAssign?.let { sharingState.orchestratorRecordId = it }
             when (creation) {
                 is GoldenRecordTaskCreationParsed.Started -> {
-                    sharingStateService.setPending(sharingState, creation.taskId)
+                    sharingState.sharingStateType = SharingStateType.Pending
+                    sharingState.sharingErrorCode = null
+                    sharingState.sharingErrorMessage = null
+                    sharingState.sharingProcessStarted = sharingState.sharingProcessStarted ?: LocalDateTime.now()
+                    sharingState.taskId = creation.taskId
+                    sharingStateRepository.save(sharingState)
                     logChange(sharingState)
                     logger.debug { "Started golden record task ${creation.taskId} of business partner ${sharingState.externalId}" }
                 }
@@ -103,7 +133,11 @@ class SharingStateOperationService(
     @Transactional
     fun succeed(sharingStates: List<SharingStateDb>) {
         sharingStates.forEach { sharingState ->
-            sharingStateService.setSuccess(sharingState)
+            sharingState.sharingStateType = SharingStateType.Success
+            sharingState.sharingErrorCode = null
+            sharingState.sharingErrorMessage = null
+            sharingState.sharingProcessStarted = sharingState.sharingProcessStarted ?: LocalDateTime.now()
+            sharingStateRepository.save(sharingState)
             logChange(sharingState)
             logger.debug { "Resolved golden record task ${sharingState.taskId} of business partner ${sharingState.externalId} as success" }
         }
@@ -114,14 +148,37 @@ class SharingStateOperationService(
      */
     @Transactional
     fun fail(sharingState: SharingStateDb, errorCode: BusinessPartnerSharingError, errorMessage: String?) {
-        sharingStateService.setError(sharingState, errorCode, errorMessage)
+        sharingState.sharingStateType = SharingStateType.Error
+        sharingState.sharingErrorCode = errorCode
+        sharingState.sharingErrorMessage = errorMessage
+        sharingState.sharingProcessStarted = sharingState.sharingProcessStarted ?: LocalDateTime.now()
+        sharingStateRepository.save(sharingState)
         logChange(sharingState)
         logger.debug { "Resolved golden record task ${sharingState.taskId} of business partner ${sharingState.externalId} as error $errorCode" }
     }
 
-    private fun logChange(sharingState: SharingStateDb) {
+    private fun create(externalId: String, tenantBpnl: String?): SharingStateDb {
+        val sharingState = SharingStateDb(
+            externalId,
+            sharingStateType = initialType(),
+            orchestratorRecordId = null,
+            sharingErrorCode = null,
+            sharingErrorMessage = null,
+            sharingProcessStarted = null,
+            tenantBpnl = tenantBpnl,
+            isGoldenRecordCounted = null,
+            syncedIsGoldenRecordCounted = null
+        )
+        return sharingStateRepository.save(sharingState)
+            .also { logChange(it, PersistedChangeType.Created) }
+    }
+
+    private fun initialType() =
+        if (goldenRecordTaskConfigProperties.creation.fromSharingMember.startsAsReady) SharingStateType.Ready else SharingStateType.Initial
+
+    private fun logChange(sharingState: SharingStateDb, type: PersistedChangeType = PersistedChangeType.Updated) {
         changeLogger.log(
-            BusinessPartnerChange(PersistedChangeType.Updated, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.SharingState)
+            BusinessPartnerChange(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.SharingState)
         )
     }
 }

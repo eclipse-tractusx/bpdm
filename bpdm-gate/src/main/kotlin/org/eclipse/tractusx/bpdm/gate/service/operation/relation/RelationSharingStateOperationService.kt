@@ -19,15 +19,16 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 /**
  * Moves the sharing states of relations through their lifecycle.
@@ -35,10 +36,26 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class RelationSharingStateOperationService(
     private val relationRepository: RelationRepository,
-    private val relationSharingStateService: RelationSharingStateService,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
+
+    /**
+     * Resets the sharing state of [relation] to ready for a new sharing attempt, keeping only its Orchestrator record.
+     */
+    @Transactional
+    fun reset(relation: RelationDb) {
+        relation.sharingState = RelationSharingStateDb(
+            sharingStateType = RelationSharingStateType.Ready,
+            sharingErrorCode = null,
+            sharingErrorMessage = null,
+            recordId = relation.sharingState?.recordId,
+            taskId = null,
+            updatedAt = Instant.now(),
+            isStaged = false
+        )
+        relationRepository.save(relation)
+    }
 
     /**
      * Stages every relation ready to be shared for the golden record task creation, so that a creation run covers the
@@ -73,9 +90,7 @@ class RelationSharingStateOperationService(
                     logger.debug { "Deferred the golden record task of relation ${relation.externalId}: its endpoints are not yet shared" }
                 }
                 is RelationTaskPreparationParsed.Failed -> {
-                    relationSharingStateService.setError(relation, preparation.errorCode, preparation.errorMessage)
-                    relationRepository.save(relation)
-                    logChange(relation)
+                    markError(relation, preparation.errorCode, preparation.errorMessage)
                     logger.debug { "Failed to prepare a golden record task for relation ${relation.externalId}: ${preparation.errorMessage}" }
                 }
             }
@@ -89,7 +104,16 @@ class RelationSharingStateOperationService(
     fun start(creations: List<RelationTaskCreationParsed>) {
         creations.forEach { creation ->
             val relation = creation.relation
-            relationSharingStateService.setPending(relation, creation.taskId, creation.recordId)
+            relation.sharingState = RelationSharingStateDb(
+                sharingStateType = RelationSharingStateType.Pending,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                recordId = creation.recordId,
+                taskId = creation.taskId,
+                updatedAt = Instant.now(),
+                isStaged = false
+            )
+            relationRepository.save(relation)
             logChange(relation)
             logger.debug { "Started golden record task ${creation.taskId} of relation ${relation.externalId}" }
         }
@@ -111,7 +135,15 @@ class RelationSharingStateOperationService(
     @Transactional
     fun succeed(relations: List<RelationDb>) {
         relations.forEach { relation ->
-            relationSharingStateService.setSuccess(relation)
+            relation.sharingState = RelationSharingStateDb(
+                sharingStateType = RelationSharingStateType.Success,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                recordId = relation.sharingState?.recordId,
+                taskId = relation.sharingState?.taskId,
+                updatedAt = Instant.now(),
+                isStaged = false
+            )
             relationRepository.save(relation)
             logChange(relation)
             logger.debug { "Resolved golden record task ${relation.sharingState?.taskId} of relation ${relation.externalId} as success" }
@@ -123,10 +155,22 @@ class RelationSharingStateOperationService(
      */
     @Transactional
     fun fail(relation: RelationDb, errorCode: RelationSharingStateErrorCode, errorMessage: String) {
-        relationSharingStateService.setError(relation, errorCode, errorMessage)
+        markError(relation, errorCode, errorMessage)
+        logger.debug { "Resolved golden record task ${relation.sharingState?.taskId} of relation ${relation.externalId} as error $errorCode" }
+    }
+
+    private fun markError(relation: RelationDb, errorCode: RelationSharingStateErrorCode, errorMessage: String) {
+        relation.sharingState = RelationSharingStateDb(
+            sharingStateType = RelationSharingStateType.Error,
+            sharingErrorCode = errorCode,
+            sharingErrorMessage = errorMessage,
+            recordId = relation.sharingState?.recordId,
+            taskId = relation.sharingState?.taskId,
+            updatedAt = Instant.now(),
+            isStaged = false
+        )
         relationRepository.save(relation)
         logChange(relation)
-        logger.debug { "Resolved golden record task ${relation.sharingState?.taskId} of relation ${relation.externalId} as error $errorCode" }
     }
 
     private fun logChange(relation: RelationDb) {

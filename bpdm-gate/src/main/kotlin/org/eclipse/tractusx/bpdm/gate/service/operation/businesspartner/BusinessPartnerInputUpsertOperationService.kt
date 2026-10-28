@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUps
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
+import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class BusinessPartnerInputUpsertOperationService(
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val sharingStateService: SharingStateService,
+    private val sharingStateOperation: SharingStateOperationService,
     private val changelogCreateOperation: ChangelogCreateOperationService,
     private val contentMapper: BusinessPartnerInputContentMapper,
     private val entityMapper: BusinessPartnerInputEntityMapper,
@@ -56,7 +56,7 @@ class BusinessPartnerInputUpsertOperationService(
      */
     @Transactional
     fun upsert(requests: List<BusinessPartnerInputUpsertParsed>, tenantBpnl: String?): List<BusinessPartnerInputUpsertEntryResult> {
-        val sharingStates = sharingStateService.getOrCreateStates(requests.map { it.externalId }, tenantBpnl)
+        val sharingStates = sharingStateOperation.getOrCreate(requests.map { it.externalId }, tenantBpnl)
         val existingByExternalId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
             .associateBy { it.sharingState.externalId }
 
@@ -97,7 +97,7 @@ class BusinessPartnerInputUpsertOperationService(
     }
 
     private fun resubmit(input: BusinessPartnerDb): Resubmitted {
-        sharingStateService.setInitial(input.sharingState)
+        sharingStateOperation.reset(input.sharingState)
         return Resubmitted(input)
     }
 
@@ -116,7 +116,7 @@ class BusinessPartnerInputUpsertOperationService(
         changelogCreateOperation.record(
             ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, StageType.Input, GoldenRecordType.BusinessPartner)
         )
-        sharingStateService.setInitial(sharingState)
+        sharingStateOperation.reset(sharingState)
     }
 
     private fun logChange(input: BusinessPartnerDb, type: PersistedChangeType) {
