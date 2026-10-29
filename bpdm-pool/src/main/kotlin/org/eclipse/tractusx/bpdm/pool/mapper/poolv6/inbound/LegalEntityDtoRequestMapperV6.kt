@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateDtoV6
@@ -74,7 +75,7 @@ class LegalEntityDtoRequestMapperV6(
         )
 
     private fun toStateRequest(state: LegalEntityStateDtoV6): LegalEntityState =
-        LegalEntityState(state.validFrom?.toUtcInstant(), state.validTo?.toUtcInstant(), state.type)
+        LegalEntityState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
     private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
@@ -85,4 +86,8 @@ class LegalEntityDtoRequestMapperV6(
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

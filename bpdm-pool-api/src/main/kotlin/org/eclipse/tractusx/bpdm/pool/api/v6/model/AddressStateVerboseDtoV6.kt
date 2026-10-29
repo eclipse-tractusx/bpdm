@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescr
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(description = AddressStateDescription.header, deprecated = true)
+@Schema(description = AddressStateDescription.header, deprecated = true, requiredProperties = ["validFrom", "validTo"])
 data class AddressStateVerboseDtoV6(
-    override val validFrom: LocalDateTime?,
-    override val validTo: LocalDateTime?,
+    override val validFrom: LocalDateTime,
+    override val validTo: LocalDateTime,
 
     @field:JsonProperty("type")
     @get:Schema(description = AddressStateDescription.type)

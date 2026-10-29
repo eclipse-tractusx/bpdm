@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerStateResponseDto
 import java.time.Instant
 
 @Schema(
@@ -34,7 +35,7 @@ data class BusinessPartnerOutputDto(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
     override val legalEntity: LegalEntityRepresentationOutputDto,
@@ -60,7 +61,7 @@ data class LegalEntityRepresentationOutputDto(
     override val shortName: String? = null,
     override val legalForm: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList()
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
@@ -70,7 +71,7 @@ data class SiteRepresentationOutputDto(
     override val siteBpn: String,
     override val name: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList()
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -84,5 +85,5 @@ data class AddressComponentOutputDto(
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
     override val alternativePostalAddress: AlternativePostalAddressDto? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList()
 ) : IBaseAddressRepresentation

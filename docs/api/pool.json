@@ -3989,12 +3989,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -4011,12 +4011,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -4030,20 +4030,21 @@
         "description" : "An address state indicates if the address is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the business partner is still operating at that address.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "AddressStateVerboseDtoV6" : {
         "type" : "object",
@@ -4051,20 +4052,21 @@
         "description" : "An address state indicates if the address is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the business partner is still operating at that address.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "AlternativeAddressScriptVariantDto" : {
         "type" : "object",
@@ -4500,18 +4502,19 @@
         "type" : "object",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time"
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time"
           },
           "type" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "ChangelogEntryVerboseDto" : {
         "type" : "object",
@@ -5860,12 +5863,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -5882,12 +5885,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -5901,20 +5904,21 @@
         "description" : "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "LegalEntityStateVerboseDtoV6" : {
         "type" : "object",
@@ -5922,20 +5926,21 @@
         "description" : "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "LegalEntityWithLegalAddressVerboseDto" : {
         "type" : "object",
@@ -8243,12 +8248,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -8265,12 +8270,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -8284,20 +8289,21 @@
         "description" : "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "SiteStateVerboseDtoV6" : {
         "type" : "object",
@@ -8305,20 +8311,21 @@
         "description" : "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "SiteVerboseDto" : {
         "type" : "object",

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateVerboseDto
@@ -78,7 +79,11 @@ class SiteResponseMapper(
         )
 
     private fun toState(state: SiteStateDb): SiteStateVerboseDto =
-        SiteStateVerboseDto(state.validFrom, state.validTo, state.type.toDto())
+        SiteStateVerboseDto(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 
     // The main address covers every script its site is named in: the parsers reject a variant it does not cover and
     // ScriptVariantCoverageService prunes any the main address stops covering.

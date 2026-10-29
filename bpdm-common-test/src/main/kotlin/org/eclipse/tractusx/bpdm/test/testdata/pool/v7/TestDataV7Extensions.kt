@@ -75,6 +75,9 @@ fun LegalEntityDto.withAlternativeAdminArea(code: String?) =
 fun LegalEntityPartnerCreateRequest.withParticipantData(isParticipantData: Boolean) =
     copy(legalEntity = legalEntity.withParticipantData(isParticipantData))
 
+fun LegalEntityPartnerCreateRequest.withStates(vararg states: LegalEntityStateDto) =
+    copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states.toList())))
+
 fun LegalEntityPartnerUpdateRequest.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierDto>) =
     copy(legalEntity = legalEntity.withLegalIdentifiers(identifiers))
 
@@ -110,6 +113,9 @@ fun LegalEntityPartnerCreateVerboseDto.withUltimateOwner(ownershipUltimate: Bool
 
 fun LegalEntityWithLegalAddressVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
     copy(header = header.copy(ownershipUltimate = ownershipUltimate, ultimateOwnerBpnl = ultimateOwnerBpnl))
+
+fun LegalEntityPartnerCreateVerboseDto.withStates(vararg states: LegalEntityStateVerboseDto) =
+    copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states.toList())))
 
 fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
     copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL))

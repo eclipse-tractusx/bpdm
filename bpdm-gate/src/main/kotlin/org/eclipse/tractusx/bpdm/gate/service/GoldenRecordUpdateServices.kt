@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
@@ -537,8 +538,8 @@ class GoldenRecordUpdateChunkService(
 
     fun toEntity(poolDto: IBaseStateDto, businessPartnerType: BusinessPartnerType) =
         StateDb(
-            validFrom = poolDto.validFrom,
-            validTo = poolDto.validTo,
+            validFrom = BusinessStateDates.receiveValidFrom(poolDto.validFrom),
+            validTo = BusinessStateDates.receiveValidTo(poolDto.validTo),
             type = poolDto.type!!,
             businessPartnerTyp = businessPartnerType
         )
