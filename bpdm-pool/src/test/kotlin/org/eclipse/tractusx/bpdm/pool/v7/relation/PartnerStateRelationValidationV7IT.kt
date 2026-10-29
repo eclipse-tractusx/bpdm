@@ -99,11 +99,11 @@ class PartnerStateRelationValidationV7IT : UnscheduledPoolTestBaseV7() {
     /**
      * GIVEN a legal entity governing another over a validity period
      * WHEN a sharing member records the governing legal entity as inactive from the day that period ends on
-     * THEN the update is accepted, because a period no longer holds on its end date
+     * THEN the update is rejected, because a period still holds on its end date
      */
     @ParameterizedTest
     @EnumSource(value = RelationType::class, names = ["IsOwnedBy", "IsManagedBy"])
-    fun `accept deactivating a governing partner once its relation has ended`(relationType: RelationType) {
+    fun `reject deactivating a governing partner on the day its relation ends`(relationType: RelationType) {
         //GIVEN
         val governedBpn = createLegalEntity("$testName governed")
         val governingBpn = createLegalEntity("$testName governing")
@@ -112,6 +112,27 @@ class PartnerStateRelationValidationV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val errors = updateLegalEntityStatesToErrors(governingBpn, active(stateStart, periodEnd), inactive(periodEnd, null))
+
+        //THEN
+        assertThat(errors).singleElement().satisfies({ assertThat(it.entityKey).isEqualTo(governingBpn) })
+    }
+
+    /**
+     * GIVEN a legal entity governing another over a validity period
+     * WHEN a sharing member records the governing legal entity as inactive from the day after that period ends on
+     * THEN the update is accepted
+     */
+    @ParameterizedTest
+    @EnumSource(value = RelationType::class, names = ["IsOwnedBy", "IsManagedBy"])
+    fun `accept deactivating a governing partner once its relation has ended`(relationType: RelationType) {
+        //GIVEN
+        val governedBpn = createLegalEntity("$testName governed")
+        val governingBpn = createLegalEntity("$testName governing")
+        relate(relationType, governedBpn, governingBpn, relationPeriod)
+        val dayAfterPeriod = relationPeriod.validTo!!.plusDays(1).atStartOfDay()
+
+        //WHEN
+        val errors = updateLegalEntityStatesToErrors(governingBpn, active(stateStart, dayAfterPeriod), inactive(dayAfterPeriod, null))
 
         //THEN
         assertThat(errors).isEmpty()

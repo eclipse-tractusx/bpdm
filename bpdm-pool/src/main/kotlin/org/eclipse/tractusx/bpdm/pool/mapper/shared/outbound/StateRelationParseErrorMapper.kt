@@ -85,7 +85,7 @@ class StateRelationParseErrorMapper {
         "Replacing '$predecessorBpn' from '$validFrom': $partnerKind '$bpn' cannot be recorded as inactive on that date"
 
     private fun toGoverningDescription(role: String, validFrom: LocalDate, validTo: LocalDate?, bpn: String): String {
-        val period = if (validTo == null) "from '$validFrom' on" else "from '$validFrom' until '$validTo'"
+        val period = if (validTo == null) "from '$validFrom' on" else "from '$validFrom' through '$validTo'"
         return "$role $period: $LEGAL_ENTITY '$bpn' cannot be recorded as inactive during that period"
     }
 

@@ -13284,7 +13284,7 @@ components:
             - string
             - "null"
           format: date
-          description: "The date up to, but not including, which the relation is valid."
+          description: "The last date on which the relation is valid, included in the period."
     RelationVerboseDto:
       type: object
       description: Directed relation between two business partners

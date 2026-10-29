@@ -3,7 +3,6 @@
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [7.5.x to 7.6.x](#75x-to-76x)
-    * [Ultimate owners can change](#ultimate-owners-can-change)
     * [Data that was valid can now be inconsistent](#data-that-was-valid-can-now-be-inconsistent)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
@@ -32,19 +31,11 @@
 
 ## 7.5.x to 7.6.x
 
-### Ultimate owners can change
-
-A relation is no longer valid on its end date. An `ultimateOwnerBpnl` derived from an ownership relation that ends today therefore shifts by a day.
-
-The upgrade does **not** recalculate stored ultimate owners. A value comes in line when the relation behind it is next written, or on the day the relation's validity boundary trigger fires.
-
-Decide whether your consumers can live with that transitional state. If they cannot, trigger the recalculation yourself by writing the affected relations again.
-
 ### Data that was valid can now be inconsistent
 
 The Pool now judges data by rules it did not apply when your sharing members shared it, so records it accepted at the time can be contradictory today:
 
-- A relation's `validTo` is now read strictly as non-inclusive everywhere, as it should be: a relation valid from 2026-01-01 to 2026-03-10 holds on 2026-03-09 and no longer holds on 2026-03-10. Previously one part of the Pool read the end date as inclusive and another as exclusive, so relations that contradict each other on the day two periods meet were accepted.
+- A relation's `validTo` is now inclusive: a relation valid from 2026-01-01 to 2026-03-10 still holds on 2026-03-10. Validity periods that meet on one date, of the same relation or of competing relations such as two owners of one legal entity, therefore overlap on that date.
 - A succession is rejected when its predecessor is still recorded as active on or after its start date, when its successor is recorded as inactive on that date, or when it carries an end date or more than one validity period.
 - An ownership or data management relation is rejected when its owner or manager is recorded as inactive during any of its validity periods.
 - An alternative headquarter relation is rejected when either of its two legal entities is recorded as inactive during any of its validity periods.

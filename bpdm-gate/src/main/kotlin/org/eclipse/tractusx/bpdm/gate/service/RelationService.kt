@@ -426,9 +426,9 @@ class RelationService(
         validityPeriods.forEach { state ->
             val isAfter = if(state.validTo != null) state.validFrom.isAfter(state.validTo) else false
 
-            if (state.validFrom == state.validTo || isAfter) {
+            if (isAfter) {
                 throw BpdmInvalidRelationException(
-                    "validFrom '${state.validFrom}' cannot be same or after validTo '${state.validTo}'."
+                    "validFrom '${state.validFrom}' cannot be after validTo '${state.validTo}'."
                 )
             }
         }

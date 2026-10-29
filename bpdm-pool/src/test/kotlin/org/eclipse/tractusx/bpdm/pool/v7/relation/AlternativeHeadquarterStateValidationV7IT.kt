@@ -120,8 +120,8 @@ class AlternativeHeadquarterStateValidationV7IT : UnscheduledPoolTestBaseV7() {
         //GIVEN
         val judgedBpn = createLegalEntity(
             "$testName judged",
-            active(stateStart, firstPeriod.validTo!!.atStartOfDay()),
-            inactive(firstPeriod.validTo!!.atStartOfDay(), secondPeriod.validFrom.atStartOfDay()),
+            active(stateStart, dayAfterFirstPeriod),
+            inactive(dayAfterFirstPeriod, secondPeriod.validFrom.atStartOfDay()),
             active(secondPeriod.validFrom.atStartOfDay(), null)
         )
         val otherBpn = createLegalEntity("$testName other")
@@ -131,6 +131,30 @@ class AlternativeHeadquarterStateValidationV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         assertThat(errors).isEmpty()
+    }
+
+    /**
+     * GIVEN a legal entity recorded as inactive from midnight of the day the designation's validity period ends on
+     * WHEN a sharing member designates it over that period
+     * THEN the designation is rejected, because the period includes its end date
+     */
+    @ParameterizedTest
+    @EnumSource(DesignatedRole::class)
+    fun `reject designation ending on the day the partner's inactive state starts`(role: DesignatedRole) {
+        //GIVEN
+        val judgedBpn = createLegalEntity(
+            "$testName judged",
+            active(stateStart, firstPeriod.validTo!!.atStartOfDay()),
+            inactive(firstPeriod.validTo!!.atStartOfDay(), null)
+        )
+        val otherBpn = createLegalEntity("$testName other")
+
+        //WHEN
+        val errors = designate(role, judgedBpn, otherBpn, listOf(firstPeriod))
+
+        //THEN
+        assertThat(errors.map { it.description }).singleElement().asString()
+            .contains(judgedBpn).contains("recorded as inactive")
     }
 
     /**
@@ -183,6 +207,8 @@ class AlternativeHeadquarterStateValidationV7IT : UnscheduledPoolTestBaseV7() {
     private val firstPeriod = RelationValidityPeriod(relationStart, relationStart.plusYears(1))
 
     private val secondPeriod = RelationValidityPeriod(relationStart.plusYears(2), relationStart.plusYears(3))
+
+    private val dayAfterFirstPeriod: LocalDateTime = firstPeriod.validTo!!.plusDays(1).atStartOfDay()
 
     private fun active(validFrom: LocalDateTime?, validTo: LocalDateTime?) = LegalEntityStateDto(validFrom, validTo, BusinessStateType.ACTIVE)
 

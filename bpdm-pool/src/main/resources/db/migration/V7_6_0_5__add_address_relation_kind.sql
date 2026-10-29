@@ -9,7 +9,7 @@ WITH RECURSIVE started_relations AS (
     SELECT DISTINCT relation.id, relation.start_address_id, relation.end_address_id
     FROM address_relations relation
     JOIN address_relation_validity_periods period ON period.relation_id = relation.id
-    WHERE period.valid_from <= CURRENT_DATE AND (period.valid_to IS NULL OR period.valid_to > CURRENT_DATE)
+    WHERE period.valid_from <= CURRENT_DATE AND (period.valid_to IS NULL OR period.valid_to >= CURRENT_DATE)
 ),
 applied_relocations AS (
     SELECT started.id, started.start_address_id

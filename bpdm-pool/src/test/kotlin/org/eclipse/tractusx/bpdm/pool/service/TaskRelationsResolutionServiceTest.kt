@@ -269,14 +269,14 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(resultAC_conflict[0].errors).hasSize(1)
 
         /**
-         * Scenario 3: A→C exists, new A→C with overlapping validity → overwrite existing validity
+         * Scenario 3: A→C starts the day after A→B ends, new A→C with overlapping validity → overwrite existing validity
          */
         val relationAC_nonOverlap = buildRelationRequest(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
-                validFrom = nowDate.plusYears(2),
+                validFrom = nowDate.plusYears(2).plusDays(1),
                 validTo = nowDate.plusYears(3)
             ))
         )
@@ -288,7 +288,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
-                validFrom = nowDate.plusYears(2),
+                validFrom = nowDate.plusYears(2).plusDays(1),
                 validTo = nowDate.plusYears(3).plusMonths(6)
             ))
         )
@@ -300,7 +300,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             .header.relations.first { it.businessPartnerTargetBpnl == savedC.legalEntity.header.bpnl }
         assertThat(updatedRelationAC.validityPeriods).hasSize(1)
         val stateAC = updatedRelationAC.validityPeriods.first()
-        assertThat(stateAC.validFrom).isEqualTo(nowDate.plusYears(2))
+        assertThat(stateAC.validFrom).isEqualTo(nowDate.plusYears(2).plusDays(1))
         assertThat(stateAC.validTo).isEqualTo(nowDate.plusYears(3).plusMonths(6))
     }
 

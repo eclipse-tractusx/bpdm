@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.covers
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.ScriptVariantCoverageService
@@ -66,7 +67,7 @@ class HeadquarterSyncService(
                 .filterNot{ visitedValidityPeriods.contains(it) }
 
             val activeValidities = notVisitiedValidities
-                .filter {  it.validityPeriod.validFrom <= today && (it.validityPeriod.validTo?: LocalDate.MAX) > today }
+                .filter { it.validityPeriod.covers(today) }
 
             activeValidities.forEach { visitedValidityPeriods.add(it) }
 

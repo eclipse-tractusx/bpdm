@@ -496,7 +496,8 @@ A relation names the two records it relates by their `externalId`, not by BPN, a
 * the relation's own `externalId` - unknown creates, known replaces
 * its `relationType`
 * `businessPartnerSourceExternalId` and `businessPartnerTargetExternalId`
-* `validityPeriods`, at least one, each with a `validFrom` and an open or closed `validTo`
+* `validityPeriods`, at least one, each with a `validFrom` and an open or closed `validTo`; the
+  relation is valid on both dates, so a period that follows another starts the day after it ends
 * optionally a `reasonCode`, a technical key from the reason codes the Pool publishes at
   `GET /v7/reason-codes`
 

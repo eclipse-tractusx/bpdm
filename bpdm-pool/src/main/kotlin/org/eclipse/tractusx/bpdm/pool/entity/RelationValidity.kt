@@ -22,15 +22,20 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import java.time.LocalDate
 
 /**
- * Whether this relation counts on [date]: one of its validity periods must cover the date, from its start on and up to
- * but not including its end, so a relation without any period never counts and one ending on [date] no longer counts.
- * Shared by everything that walks the ownership graph, so they all agree on which edges exist.
+ * Whether this relation counts on [date]: one of its validity periods must cover the date, so a relation without any
+ * period never counts. Shared by everything that walks the ownership graph, so they all agree on which edges exist.
  */
 fun RelationDb.isValidOn(date: LocalDate): Boolean =
-    validityPeriods.any { period -> date >= period.validFrom && (period.validTo == null || date < period.validTo) }
+    validityPeriods.any { it.covers(date) }
 
 /**
- * Whether this period and any of [others] intersect, where periods meeting on a single shared date do not.
+ * Whether this period covers [date], from its start up to and including its end.
+ */
+fun RelationValidityPeriodDb.covers(date: LocalDate): Boolean =
+    date >= validFrom && (validTo == null || date <= validTo)
+
+/**
+ * Whether this period and any of [others] share a date, so periods meeting on a single shared date overlap.
  */
 fun RelationValidityPeriodDb.hasOverlap(others: Collection<RelationValidityPeriodDb>): Boolean =
     others.any { other -> asTimePeriod().hasOverlap(other.asTimePeriod()) }

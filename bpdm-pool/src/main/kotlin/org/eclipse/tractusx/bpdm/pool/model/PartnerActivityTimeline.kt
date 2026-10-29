@@ -52,18 +52,18 @@ data class PartnerActivityTimeline(
      * Whether the partner is recorded as inactive on [validFrom], which contradicts it replacing another from that date.
      */
     fun isRecordedInactiveWhenReplacingFrom(validFrom: LocalDate): Boolean =
-        isRecordedWithin(BusinessStateType.INACTIVE, RelationTimePeriod(validFrom, validFrom.plusDays(1)))
+        isRecordedWithin(BusinessStateType.INACTIVE, RelationTimePeriod(validFrom, validFrom))
 
     /**
-     * Whether the partner is recorded as inactive on any day of [validityPeriod], which contradicts it governing another
-     * or being designated as a headquarter during that period.
+     * Whether the partner is recorded as inactive on any day of [validityPeriod], its end date included, which
+     * contradicts it governing another or being designated as a headquarter during that period.
      */
     fun isRecordedInactiveDuring(validityPeriod: RelationValidityPeriodDb): Boolean =
         isRecordedWithin(BusinessStateType.INACTIVE, RelationTimePeriod.fromUnlimited(validityPeriod.validFrom, validityPeriod.validTo))
 
     private fun isRecordedWithin(type: BusinessStateType, span: RelationTimePeriod): Boolean {
         val spanStart = span.validFrom.atStartOfDay()
-        val spanEnd = span.validTo.atStartOfDay()
+        val spanEnd = span.validTo.plusDays(1).atStartOfDay()
 
         return recordedStates.any { state ->
             state.type == type &&

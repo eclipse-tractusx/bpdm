@@ -198,11 +198,11 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
-                    validFrom = futureDate.plusYears(1),
+                    validFrom = futureDate.plusYears(1).plusDays(1),
                     validTo = futureDate.plusYears(2)
                 ),
                 RelationValidityPeriod(
-                    validFrom = futureDate.plusYears(2),
+                    validFrom = futureDate.plusYears(2).plusDays(1),
                     validTo = futureDate.plusYears(3)
                 ),
                 RelationValidityPeriod(
@@ -292,6 +292,54 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
         //Then
         assertError(createdRelation)
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = LegalEntityRelationType::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
+    fun `try create legal entity relation with validity periods meeting on one date`(relationType: LegalEntityRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
+            listOf(
+                RelationValidityPeriod(validFrom = futureDate, validTo = futureDate.plusYears(1)),
+                RelationValidityPeriod(validFrom = futureDate.plusYears(1), validTo = null)
+            ),
+            getAnyReasonCode()
+        )
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = LegalEntityRelationType::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
+    fun `create legal entity relation with validity periods on consecutive days`(relationType: LegalEntityRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
+            listOf(
+                RelationValidityPeriod(validFrom = futureDate, validTo = futureDate.plusYears(1)),
+                RelationValidityPeriod(validFrom = futureDate.plusYears(1).plusDays(1), validTo = null)
+            ),
+            getAnyReasonCode()
+        )
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertSuccess(createdRelation, relationToCreate)
     }
 
     @Test
@@ -418,6 +466,72 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
         //Then
         assertSuccess(updatedRelation, relationToUpdate)
+    }
+
+    @Test
+    fun `update relation with moving ongoing validity end to today`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val today = LocalDate.now()
+
+        executeInPast {
+            val relationToCreate = BusinessPartnerRelations(
+                RelationType.IsManagedBy,
+                legalEntity2.legalEntity.header.bpnl,
+                legalEntity1.legalEntity.header.bpnl,
+                listOf(RelationValidityPeriod(validFrom = pastDate, validTo = futureDate)),
+                reasonCode =  getAnyReasonCode()
+            )
+            createRelation(relationToCreate)
+        }
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
+            listOf(RelationValidityPeriod(validFrom = pastDate, validTo = today)),
+            reasonCode =  getAnyReasonCode()
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+        //Then
+        assertSuccess(updatedRelation, relationToUpdate)
+    }
+
+    @Test
+    fun `try update relation with moving ongoing validity end to yesterday`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val yesterday = LocalDate.now().minusDays(1)
+
+        executeInPast {
+            val relationToCreate = BusinessPartnerRelations(
+                RelationType.IsManagedBy,
+                legalEntity2.legalEntity.header.bpnl,
+                legalEntity1.legalEntity.header.bpnl,
+                listOf(RelationValidityPeriod(validFrom = pastDate, validTo = futureDate)),
+                reasonCode =  getAnyReasonCode()
+            )
+            createRelation(relationToCreate)
+        }
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
+            listOf(RelationValidityPeriod(validFrom = pastDate, validTo = yesterday)),
+            reasonCode =  getAnyReasonCode()
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+        //Then
+        assertError(updatedRelation)
     }
 
     @ParameterizedTest

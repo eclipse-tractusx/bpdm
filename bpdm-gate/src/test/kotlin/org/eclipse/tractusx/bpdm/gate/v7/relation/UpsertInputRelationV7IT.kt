@@ -261,21 +261,18 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
     /**
      * GIVEN two business partner inputs
      * WHEN input manager upserts a relation with a validity period where validFrom equals validTo
-     * THEN a bad request error is returned
+     * THEN the relation is returned with that single-day validity period preserved
      */
     @Test
-    fun `upsert relation with validity period where validFrom equals validTo fails`() {
-        //GIVEN
+    fun `upsert relation with single-day validity period`() {
+        //GIVEN + WHEN
         val sameDate = LocalDate.of(2024, 6, 15)
         val request = testData.relation.input.request.fromSeed(testName)
             .withValidityPeriods(listOf(RelationValidityPeriodDto(validFrom = sameDate, validTo = sameDate)))
-        testDataClient.businessPartner.upsertInput(request.businessPartnerSourceExternalId)
-        testDataClient.businessPartner.upsertInput(request.businessPartnerTargetExternalId)
+        val response = testDataClient.relation.upsertRelationInputWithBusinessPartners(request)
 
-        //WHEN + THEN
-        assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            testDataClient.relation.upsertRelationInput(request)
-        }
+        //THEN
+        assertRepo.assertRelation(response, testData.relation.input.response.fromRequest(request))
     }
 
     /**

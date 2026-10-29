@@ -182,7 +182,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     }
 
     @Test
-    fun `ownership validity trigger clears ultimate owner on end date`() {
+    fun `ownership validity trigger clears ultimate owner on the day after its end date`() {
         val owned = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Owned", true))).entities.single()
         val owner = poolApiClient.legalEntities.createBusinessPartners(listOf(requestFactory.createLegalEntityRequest("$testName Owner", true))).entities.single()
 
@@ -190,12 +190,12 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         ownerDb.ownershipUltimate = true
         legalEntityRepository.save(ownerDb)
 
-        val endingTomorrow = listOf(RelationValidityPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
+        val endingToday = listOf(RelationValidityPeriod(LocalDate.now(), LocalDate.now()))
         val ownershipRelation = BusinessPartnerRelations(
             RelationType.IsOwnedBy,
             owned.legalEntity.header.bpnl,
             owner.legalEntity.header.bpnl,
-            endingTomorrow,
+            endingToday,
             anyReasonCode()
         )
 
