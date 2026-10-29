@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
@@ -42,13 +40,12 @@ class LegalFormDb(
     @Column(name = "transliterated_abbreviations")
     val transliteratedAbbreviations: String?,
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "country_code")
-    val countryCode: CountryCode?,
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    val country: CountryDb?,
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "language_code")
-    val languageCode: LanguageCode?,
+    val languageCode: String?,
 
     @ManyToOne
     @JoinColumn(name = "region_id")

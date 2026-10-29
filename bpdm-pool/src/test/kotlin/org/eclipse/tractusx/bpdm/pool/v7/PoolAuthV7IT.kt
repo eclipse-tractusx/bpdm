@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -300,7 +299,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Authorized
         ){
-            poolClient.metadata.getFieldQualityRules(CountryCode.DE.alpha2)
+            poolClient.metadata.getFieldQualityRules("DE")
         }
     }
 

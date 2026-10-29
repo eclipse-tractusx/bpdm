@@ -46,7 +46,20 @@ class LegalFormParseErrorMapperV6 {
         val alreadyTaken = errors.filterIsInstance<TechnicalKeyAlreadyTaken>().firstOrNull()
         if (alreadyTaken != null)
             return BpdmAlreadyExists(LegalFormDb::class.simpleName!!, alreadyTaken.technicalKey)
-        return BpdmValidationErrorException(errors.filterIsInstance<UnresolvableAdministrativeArea>().map { toValidationError(it) })
+        return BpdmValidationErrorException(errors.map { error ->
+            when (error) {
+                is UnresolvableAdministrativeArea -> toValidationError(error)
+                is LegalFormCreateParseError.CountryNotFound -> ValidationError(
+                    "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
+                    ValidationContext.fromRoot(LegalFormRequestV6::class, "request", LegalFormRequestV6::country)
+                )
+                is LegalFormCreateParseError.InvalidLanguage -> ValidationError(
+                    "InvalidLanguage", "Language '${error.language}' is not an accepted ISO 639-1 code.", error.language,
+                    ValidationContext.fromRoot(LegalFormRequestV6::class, "request", LegalFormRequestV6::language)
+                )
+                is TechnicalKeyAlreadyTaken -> error("Technical key conflict must be handled first")
+            }
+        })
     }
 
     private fun toValidationError(error: UnresolvableAdministrativeArea): ValidationError =

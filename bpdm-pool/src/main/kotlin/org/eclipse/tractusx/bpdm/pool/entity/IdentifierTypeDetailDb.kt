@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
@@ -30,8 +29,8 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 @Table(
     name = "identifier_type_details",
     uniqueConstraints = [UniqueConstraint(
-        name = "uc_identifier_type_details_country_code_identifier_type_id",
-        columnNames = ["country_code", "identifier_type_id"]
+        name = "uc_identifier_type_details_country_identifier_type",
+        columnNames = ["country_id", "identifier_type_id"]
     )]
 )
 class IdentifierTypeDetailDb(
@@ -40,9 +39,9 @@ class IdentifierTypeDetailDb(
     var identifierType: IdentifierTypeDb,
 
     // null for universal identifiers
-    @Column(name = "country_code", nullable = true)
-    @Enumerated(EnumType.STRING)
-    var countryCode: CountryCode?,
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    var country: CountryDb?,
 
     @Column(name = "mandatory", nullable = false)
     var mandatory: Boolean

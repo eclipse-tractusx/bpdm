@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalFormCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalFormCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,8 +38,19 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalFormCreateParser(
     private val legalFormRepository: LegalFormRepository,
-    private val regionRepository: RegionRepository
+    private val regionRepository: RegionRepository,
+    private val countryRepository: CountryRepository
 ) {
+    private companion object {
+        val LANGUAGE_CODES: Set<String> = (
+            "aa ab ae af ak am an ar as av ay az ba be bg bh bi bm bn bo br bs ca ce ch co cr cs cu cv cy " +
+                "da de dv dz ee el en eo es et eu fa ff fi fj fo fr fy ga gd gl gn gu gv ha he hi ho hr ht hu hy hz " +
+                "ia id ie ig ii ik io is it iu ja jv ka kg ki kj kk kl km kn ko kr ks ku kv kw ky la lb lg li ln lo lt lu lv " +
+                "mg mh mi mk ml mn mr ms mt my na nb nd ne ng nl nn no nr nv ny oc oj om or os pa pi pl ps pt " +
+                "qu rm rn ro ru rw sa sc sd se sg si sk sl sm sn so sq sr ss st su sv sw ta te tg th ti tk tl tn to tr " +
+                "ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zu"
+            ).split(" ").toSet()
+    }
 
     /**
      * Validates the request and reports either the validated legal form or every problem found: a technical key that is
@@ -52,6 +64,12 @@ class LegalFormCreateParser(
             errors.add(TechnicalKeyAlreadyTaken(request.technicalKey))
 
         val administrativeArea = parseAdministrativeArea(request.administrativeAreaLevel1, errors)
+        val country = request.country?.let { code ->
+            countryRepository.findByCountryCode(code)
+                ?: run { errors.add(LegalFormCreateParseError.CountryNotFound(code)); null }
+        }
+        if (request.language != null && request.language !in LANGUAGE_CODES)
+            errors.add(LegalFormCreateParseError.InvalidLanguage(request.language))
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
@@ -62,7 +80,7 @@ class LegalFormCreateParser(
                 transliteratedName = request.transliteratedName,
                 abbreviations = request.abbreviations,
                 transliteratedAbbreviations = request.transliteratedAbbreviations,
-                country = request.country,
+                country = country,
                 language = request.language,
                 administrativeArea = administrativeArea,
                 isActive = request.isActive

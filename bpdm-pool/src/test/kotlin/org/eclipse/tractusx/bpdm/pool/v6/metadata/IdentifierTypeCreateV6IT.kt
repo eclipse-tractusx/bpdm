@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
@@ -101,7 +100,7 @@ class IdentifierTypeCreateV6IT: UnscheduledPoolTestBaseV6() {
             transliteratedName = "$seed ${IdentifierTypeDtoV6::transliteratedName.name}",
             transliteratedAbbreviation = "$seed ${IdentifierTypeDtoV6::transliteratedAbbreviation.name}",
             details = (1..random.nextInt(3, 10))
-                .map { CountryCode.entries.random(random) }
+                .map { listOf("DE", "US", "FR", "CN", "PL").random(random) }
                 .toSet()
                 .map { IdentifierTypeDetailDtoV6(it, random.nextBoolean()) }
         )

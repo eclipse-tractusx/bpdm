@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -1156,7 +1155,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             copy(
                 confidenceCriteria = fullConfidenceCriteria(),
                 physicalAddress = physicalAddress.copy(
-                    country = CountryCode.DE.alpha2,
+                    country = "DE",
                     city = "Stuttgart"
                 )
             )

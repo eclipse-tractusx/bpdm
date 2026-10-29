@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.common
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -139,7 +138,7 @@ abstract class BusinessPartnerCommonRequestFactory(
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -166,7 +165,7 @@ abstract class BusinessPartnerCommonRequestFactory(
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.filter { it != CountryCode.UNDEFINED }.random(random).alpha2,
+                country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 postalCode = "Postal Code $seed",
                 city = "City $seed",

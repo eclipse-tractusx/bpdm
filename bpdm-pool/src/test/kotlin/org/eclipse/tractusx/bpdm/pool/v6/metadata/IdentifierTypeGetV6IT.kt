@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
@@ -66,7 +65,7 @@ class IdentifierTypeGetV6IT: UnscheduledPoolTestBaseV6() {
     @Test
     fun `find mandatory identifier types for country`(){
         //GIVEN
-        val countryX = CountryCode.DE
+        val countryX = "DE"
         val identifierType = IdentifierTypeDtoV6(
             testName, IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, testName, testName, testName, testName,
             listOf(IdentifierTypeDetailDtoV6(countryX, true))
@@ -88,7 +87,7 @@ class IdentifierTypeGetV6IT: UnscheduledPoolTestBaseV6() {
     @Test
     fun `find optional identifier types for country`(){
         //GIVEN
-        val countryX = CountryCode.US
+        val countryX = "US"
         val identifierType = IdentifierTypeDtoV6(
             testName, IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, testName, testName, testName, testName,
             listOf(IdentifierTypeDetailDtoV6(countryX, false))
