@@ -23,7 +23,9 @@ import org.springframework.stereotype.Component
  * Maps the relation input entry of the API to the unparsed upsert model, without judging its content.
  */
 @Component
-class RelationInputRequestMapper {
+class RelationInputRequestMapper(
+    private val enumRequestMapper: EnumRequestMapper
+) {
 
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [entry].
@@ -31,7 +33,7 @@ class RelationInputRequestMapper {
     fun toUpsertRequest(entry: RelationPutEntry): RelationInputUpsertRequest =
         RelationInputUpsertRequest(
             externalId = entry.externalId,
-            relationType = entry.relationType,
+            relationType = enumRequestMapper.toModel(entry.relationType),
             sourceExternalId = entry.businessPartnerSourceExternalId,
             targetExternalId = entry.businessPartnerTargetExternalId,
             validityPeriods = entry.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },

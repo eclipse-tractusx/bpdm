@@ -13,10 +13,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 
 sealed interface GoldenRecordTaskResolutionParsed {
     val sharingState: SharingStateDb

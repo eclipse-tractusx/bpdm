@@ -13,7 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.relation
 
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 
 data class RelationOutputParsed(

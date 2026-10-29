@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationSharingStateDtoMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.RelationSharingStateSearchRequest
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationSharingStateSearchApplicationService
@@ -39,7 +40,8 @@ import java.time.Instant
 class RelationSharingStateController(
     private val principalUtil: PrincipalUtil,
     private val searchApplicationService: RelationSharingStateSearchApplicationService,
-    private val dtoMapper: RelationSharingStateDtoMapper
+    private val dtoMapper: RelationSharingStateDtoMapper,
+    private val enumRequestMapper: EnumRequestMapper
 ): GateRelationSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -49,7 +51,7 @@ class RelationSharingStateController(
         updatedAfter: Instant?,
         paginationRequest: PaginationRequest
     ): PageDto<RelationSharingStateDto> {
-        val request = RelationSharingStateSearchRequest(externalIds, sharingStateTypes, updatedAfter)
+        val request = RelationSharingStateSearchRequest(externalIds, sharingStateTypes?.map(enumRequestMapper::toModel), updatedAfter)
         return searchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(dtoMapper::toDto)
     }

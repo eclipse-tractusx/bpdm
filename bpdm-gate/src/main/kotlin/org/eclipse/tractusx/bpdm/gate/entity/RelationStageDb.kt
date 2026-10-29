@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.gate.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb.Companion.COLUMN_RELATION
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb.Companion.COLUMN_STAGE
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
 
 @Entity
 @Table(name = "business_partner_relation_stages",

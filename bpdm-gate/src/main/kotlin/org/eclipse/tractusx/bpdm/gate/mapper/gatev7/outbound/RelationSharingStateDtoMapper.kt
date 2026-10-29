@@ -21,7 +21,9 @@ import org.springframework.stereotype.Component
  * Maps a relation sharing state record to the relation sharing state the API returns.
  */
 @Component
-class RelationSharingStateDtoMapper {
+class RelationSharingStateDtoMapper(
+    private val enumDtoMapper: EnumDtoMapper
+) {
 
     /**
      * Returns the API relation sharing state for [record].
@@ -29,8 +31,8 @@ class RelationSharingStateDtoMapper {
     fun toDto(record: RelationSharingStateRecord): RelationSharingStateDto =
         RelationSharingStateDto(
             externalId = record.externalId,
-            sharingStateType = record.sharingStateType,
-            sharingErrorCode = record.sharingErrorCode,
+            sharingStateType = enumDtoMapper.toDto(record.sharingStateType),
+            sharingErrorCode = record.sharingErrorCode?.let(enumDtoMapper::toDto),
             sharingErrorMessage = record.sharingErrorMessage,
             taskId = record.taskId,
             updatedAt = record.updatedAt

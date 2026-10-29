@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.search
 
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import java.time.Instant
 
 data class SharingStateSearchParsed(

@@ -14,7 +14,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.relation
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import java.time.Instant
 
 data class RelationInputRecord(

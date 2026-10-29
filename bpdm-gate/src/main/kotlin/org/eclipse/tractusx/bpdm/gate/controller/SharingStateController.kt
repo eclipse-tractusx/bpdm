@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyReq
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateReadyErrorMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.SharingStateSearchRequest
@@ -46,7 +47,8 @@ class SharingStateController(
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
     private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
     private val sharingStateDtoMapper: SharingStateDtoMapper,
-    private val sharingStateReadyErrorMapper: SharingStateReadyErrorMapper
+    private val sharingStateReadyErrorMapper: SharingStateReadyErrorMapper,
+    private val enumRequestMapper: EnumRequestMapper
 ): GateSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -56,7 +58,7 @@ class SharingStateController(
         sharingStateTypes: Collection<SharingStateType>?,
         updatedAfter: Instant?,
     ): PageDto<SharingStateDto> {
-        val request = SharingStateSearchRequest(externalIds, sharingStateTypes, updatedAfter)
+        val request = SharingStateSearchRequest(externalIds, sharingStateTypes?.map(enumRequestMapper::toModel), updatedAfter)
         return sharingStateSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(sharingStateDtoMapper::toDto)
     }

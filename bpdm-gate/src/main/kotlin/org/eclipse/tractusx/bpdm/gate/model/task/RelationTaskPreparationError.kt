@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.model.task
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
 
 /**
  * Reason a relation staged for sharing cannot become a golden record task.

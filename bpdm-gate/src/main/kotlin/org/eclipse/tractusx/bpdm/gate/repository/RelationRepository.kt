@@ -19,13 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification

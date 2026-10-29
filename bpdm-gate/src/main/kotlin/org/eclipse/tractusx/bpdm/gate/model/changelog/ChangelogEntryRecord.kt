@@ -12,7 +12,6 @@
  */
 package org.eclipse.tractusx.bpdm.gate.model.changelog
 
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import java.time.Instant
 
 data class ChangelogEntryRecord(

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationOutputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationOutputSearchApplicationService
@@ -38,7 +39,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequ
 class RelationOutputController(
     private val principalUtil: PrincipalUtil,
     private val outputSearchApplicationService: RelationOutputSearchApplicationService,
-    private val outputDtoMapper: RelationOutputDtoMapper
+    private val outputDtoMapper: RelationOutputDtoMapper,
+    private val enumRequestMapper: EnumRequestMapper
 ): GateRelationOutputApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
@@ -48,7 +50,7 @@ class RelationOutputController(
     ): PageDto<RelationOutputDto> {
         val request = RelationOutputSearchRequest(
             externalIds = searchRequest.externalIds,
-            relationType = searchRequest.relationType,
+            relationType = searchRequest.relationType?.let(enumRequestMapper::toModel),
             sourceBpns = searchRequest.sourceBpns,
             targetBpns = searchRequest.targetBpns,
             updatedAfter = searchRequest.updatedAtFrom

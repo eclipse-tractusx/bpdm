@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.union

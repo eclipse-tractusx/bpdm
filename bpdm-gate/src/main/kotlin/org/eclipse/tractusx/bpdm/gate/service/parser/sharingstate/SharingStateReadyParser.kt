@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyError
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyParsed
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyRequest

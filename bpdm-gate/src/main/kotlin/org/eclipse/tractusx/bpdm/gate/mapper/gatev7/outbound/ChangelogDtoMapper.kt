@@ -22,7 +22,9 @@ import org.springframework.stereotype.Component
  * Maps a page of changelog entry records to the changelog response of the API.
  */
 @Component
-class ChangelogDtoMapper {
+class ChangelogDtoMapper(
+    private val enumDtoMapper: EnumDtoMapper
+) {
 
     /**
      * Returns the API response for [page], which never reports invalid entries.
@@ -33,7 +35,7 @@ class ChangelogDtoMapper {
             totalPages = page.totalPages,
             page = page.number,
             contentSize = page.numberOfElements,
-            content = page.content.map { ChangelogGateDto(externalId = it.externalId, timestamp = it.createdAt, changelogType = it.changelogType) },
+            content = page.content.map { ChangelogGateDto(externalId = it.externalId, timestamp = it.createdAt, changelogType = enumDtoMapper.toDto(it.changelogType)) },
             invalidEntries = 0,
             errors = emptyList()
         )

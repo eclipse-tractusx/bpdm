@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.RelationInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputUpsertErrorMapper
@@ -49,7 +50,8 @@ class RelationController(
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val inputRequestMapper: RelationInputRequestMapper,
     private val inputDtoMapper: RelationInputDtoMapper,
-    private val inputErrorMapper: RelationInputUpsertErrorMapper
+    private val inputErrorMapper: RelationInputUpsertErrorMapper,
+    private val enumRequestMapper: EnumRequestMapper
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
@@ -59,7 +61,7 @@ class RelationController(
     ): PageDto<RelationDto> {
         val request = RelationInputSearchRequest(
             externalIds = searchRequest.externalIds,
-            relationType = searchRequest.relationType,
+            relationType = searchRequest.relationType?.let(enumRequestMapper::toModel),
             sourceExternalIds = searchRequest.businessPartnerSourceExternalIds,
             targetExternalIds = searchRequest.businessPartnerTargetExternalIds,
             updatedAfter = searchRequest.updatedAtFrom

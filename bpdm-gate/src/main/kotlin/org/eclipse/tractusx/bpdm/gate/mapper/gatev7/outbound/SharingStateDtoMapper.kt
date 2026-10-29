@@ -21,7 +21,9 @@ import org.springframework.stereotype.Component
  * Maps a sharing state record to the sharing state response of the API.
  */
 @Component
-class SharingStateDtoMapper {
+class SharingStateDtoMapper(
+    private val enumDtoMapper: EnumDtoMapper
+) {
 
     /**
      * Returns the API response for [record].
@@ -29,8 +31,8 @@ class SharingStateDtoMapper {
     fun toDto(record: SharingStateRecord): SharingStateDto =
         SharingStateDto(
             externalId = record.externalId,
-            sharingStateType = record.sharingStateType,
-            sharingErrorCode = record.sharingErrorCode,
+            sharingStateType = enumDtoMapper.toDto(record.sharingStateType),
+            sharingErrorCode = record.sharingErrorCode?.let(enumDtoMapper::toDto),
             sharingErrorMessage = record.sharingErrorMessage,
             sharingProcessStarted = record.sharingProcessStarted,
             taskId = record.taskId,

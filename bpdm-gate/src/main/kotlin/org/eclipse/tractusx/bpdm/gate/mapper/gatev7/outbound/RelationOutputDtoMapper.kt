@@ -22,7 +22,9 @@ import org.springframework.stereotype.Component
  * Maps a relation output record to the relation output the API returns.
  */
 @Component
-class RelationOutputDtoMapper {
+class RelationOutputDtoMapper(
+    private val enumDtoMapper: EnumDtoMapper
+) {
 
     /**
      * Returns the API relation output for [record].
@@ -30,7 +32,7 @@ class RelationOutputDtoMapper {
     fun toDto(record: RelationOutputRecord): RelationOutputDto =
         RelationOutputDto(
             externalId = record.externalId,
-            relationType = record.relationType,
+            relationType = enumDtoMapper.toDto(record.relationType),
             sourceBpn = record.sourceBpn,
             targetBpn = record.targetBpn,
             validityPeriods = record.validityPeriods.map { RelationValidityPeriodDto(validFrom = it.validFrom, validTo = it.validTo) },

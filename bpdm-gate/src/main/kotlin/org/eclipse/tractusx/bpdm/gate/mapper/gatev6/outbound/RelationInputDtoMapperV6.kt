@@ -15,6 +15,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.EnumDtoMapper
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputRecord
 import org.springframework.stereotype.Component
 
@@ -22,7 +23,9 @@ import org.springframework.stereotype.Component
  * Maps a relation input record to the relation the v6 API returns.
  */
 @Component
-class RelationInputDtoMapperV6 {
+class RelationInputDtoMapperV6(
+    private val enumDtoMapper: EnumDtoMapper
+) {
 
     /**
      * Returns the v6 API relation for [record].
@@ -30,7 +33,7 @@ class RelationInputDtoMapperV6 {
     fun toDto(record: RelationInputRecord): RelationDto =
         RelationDto(
             externalId = record.externalId,
-            relationType = record.relationType,
+            relationType = enumDtoMapper.toDto(record.relationType),
             businessPartnerSourceExternalId = record.sourceExternalId,
             businessPartnerTargetExternalId = record.targetExternalId,
             updatedAt = record.updatedAt,

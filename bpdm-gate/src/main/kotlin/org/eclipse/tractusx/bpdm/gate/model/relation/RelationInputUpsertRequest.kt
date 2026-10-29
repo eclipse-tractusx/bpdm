@@ -14,8 +14,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.relation
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-
 data class RelationInputUpsertRequest(
     val externalId: String?,
     val relationType: RelationType,

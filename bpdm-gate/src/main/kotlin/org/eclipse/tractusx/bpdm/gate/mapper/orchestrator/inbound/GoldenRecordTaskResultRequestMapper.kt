@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner

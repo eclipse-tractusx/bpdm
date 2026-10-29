@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod

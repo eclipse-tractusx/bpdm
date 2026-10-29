@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 
 sealed interface GoldenRecordTaskResultRequest {
     val taskId: String

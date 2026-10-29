@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
 import java.time.Instant
 
 @Entity

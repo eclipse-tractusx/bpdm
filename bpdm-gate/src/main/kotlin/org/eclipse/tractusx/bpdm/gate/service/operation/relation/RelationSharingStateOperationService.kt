@@ -16,8 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange

@@ -14,6 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.EnumDtoMapper
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateRecord
 import org.springframework.stereotype.Component
 
@@ -21,7 +22,9 @@ import org.springframework.stereotype.Component
  * Maps a sharing state record to the sharing state response of the v6 API.
  */
 @Component
-class SharingStateDtoMapperV6 {
+class SharingStateDtoMapperV6(
+    private val enumDtoMapper: EnumDtoMapper
+) {
 
     /**
      * Returns the v6 API response for [record].
@@ -29,8 +32,8 @@ class SharingStateDtoMapperV6 {
     fun toDto(record: SharingStateRecord): SharingStateDto =
         SharingStateDto(
             externalId = record.externalId,
-            sharingStateType = record.sharingStateType,
-            sharingErrorCode = record.sharingErrorCode,
+            sharingStateType = enumDtoMapper.toDto(record.sharingStateType),
+            sharingErrorCode = record.sharingErrorCode?.let(enumDtoMapper::toDto),
             sharingErrorMessage = record.sharingErrorMessage,
             sharingProcessStarted = record.sharingProcessStarted,
             taskId = record.taskId

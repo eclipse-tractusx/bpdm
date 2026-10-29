@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationError
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationResult

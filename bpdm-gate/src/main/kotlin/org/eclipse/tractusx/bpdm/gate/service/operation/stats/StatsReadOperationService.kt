@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.stats
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.stats.AddressTypeStats
 import org.eclipse.tractusx.bpdm.gate.model.stats.ConfidenceCriteriaStats
 import org.eclipse.tractusx.bpdm.gate.model.stats.SharingStateStats

@@ -13,8 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.sharingstate
 
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import java.time.Instant
 import java.time.LocalDateTime
 

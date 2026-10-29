@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
 import java.time.Instant
 

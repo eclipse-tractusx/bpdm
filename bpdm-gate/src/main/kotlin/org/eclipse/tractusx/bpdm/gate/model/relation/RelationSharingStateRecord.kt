@@ -13,8 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.relation
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import java.time.Instant
 
 data class RelationSharingStateRecord(

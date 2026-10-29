@@ -13,7 +13,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.relation
 
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import java.time.Instant
 
 data class RelationOutputRecord(

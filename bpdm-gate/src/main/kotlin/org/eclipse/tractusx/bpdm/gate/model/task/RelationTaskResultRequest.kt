@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
 
 sealed interface RelationTaskResultRequest {
     val taskId: String

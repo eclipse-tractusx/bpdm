@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.search
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
 import java.time.Instant
 
 data class RelationInputSearchRequest(
