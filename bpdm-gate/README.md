@@ -4,6 +4,10 @@ The BPDM Gate is a core service with a standardized API used within data spaces 
 
 The BPDM Gate offers an [API](../bpdm-gate-api) to query and share business partners.
 
+Gate-managed creation and update timestamps use microsecond precision and are set explicitly before responses are mapped.
+Business partner updates include child-record changes; unchanged input payloads preserve the business partner's update timestamp.
+API timestamp fields remain `Instant` values, and no database migration is required.
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).

@@ -19,10 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
@@ -45,9 +47,9 @@ class BusinessPartnerCopyUtil {
             bpnA = fromPartner.bpnA
             ownershipUltimate = fromPartner.ownershipUltimate
             ultimateOwnerBpnl = fromPartner.ultimateOwnerBpnl
-            legalEntityConfidence = fromPartner.legalEntityConfidence
-            siteConfidence = fromPartner.siteConfidence
-            addressConfidence = fromPartner.addressConfidence
+            legalEntityConfidence = fromPartner.legalEntityConfidence?.copyValues()
+            siteConfidence = fromPartner.siteConfidence?.copyValues()
+            addressConfidence = fromPartner.addressConfidence?.copyValues()
             externalSequenceTimestamp = fromPartner.externalSequenceTimestamp
             legalEntityUpdatedAt = fromPartner.legalEntityUpdatedAt
             siteUpdatedAt = fromPartner.siteUpdatedAt
@@ -69,6 +71,15 @@ class BusinessPartnerCopyUtil {
         }
     }
 
+    private fun ConfidenceCriteriaDb.copyValues() = ConfidenceCriteriaDb(
+        sharedByOwner = sharedByOwner,
+        checkedByExternalDataSource = checkedByExternalDataSource,
+        numberOfBusinessPartners = numberOfBusinessPartners,
+        lastConfidenceCheckAt = lastConfidenceCheckAt,
+        nextConfidenceCheckAt = nextConfidenceCheckAt,
+        confidenceLevel = confidenceLevel
+    )
+
     private fun copyValues(fromState: StateDb, toState: StateDb) =
         toState.apply {
             validFrom = fromState.validFrom
@@ -87,6 +98,10 @@ class BusinessPartnerCopyUtil {
 
     private fun copyValues(fromPostalAddress: PostalAddressDb, toPostalAddress: PostalAddressDb) =
         toPostalAddress.apply {
+            if (addressType != fromPostalAddress.addressType ||
+                physicalPostalAddress != fromPostalAddress.physicalPostalAddress ||
+                alternativePostalAddress != fromPostalAddress.alternativePostalAddress
+            ) updatedAt = DbTimestamp.now()
             addressType = fromPostalAddress.addressType
             physicalPostalAddress = fromPostalAddress.physicalPostalAddress
             alternativePostalAddress = fromPostalAddress.alternativePostalAddress
@@ -94,6 +109,15 @@ class BusinessPartnerCopyUtil {
 
     private fun copyValues(fromScriptVariant: BusinessPartnerScriptVariantDb, toScriptVariantDb: BusinessPartnerScriptVariantDb) =
         toScriptVariantDb.apply {
+            if (scriptCode != fromScriptVariant.scriptCode ||
+                nameParts != fromScriptVariant.nameParts ||
+                legalName != fromScriptVariant.legalName ||
+                shortName != fromScriptVariant.shortName ||
+                siteName != fromScriptVariant.siteName ||
+                addressName != fromScriptVariant.addressName ||
+                physicalAddress != fromScriptVariant.physicalAddress ||
+                alternativeAddress != fromScriptVariant.alternativeAddress
+            ) updatedAt = DbTimestamp.now()
             scriptCode = fromScriptVariant.scriptCode
             nameParts.replace( fromScriptVariant.nameParts)
             legalName = fromScriptVariant.legalName

@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
 import org.eclipse.tractusx.bpdm.gate.entity.SyncRecordDb
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
@@ -41,7 +42,7 @@ class SyncRecordService(
         )
 
     override fun save(record: SyncRecordDb) =
-        syncRecordRepository.save(record)
+        syncRecordRepository.save(record.apply { updatedAt = DbTimestamp.now() })
 
     override fun findByType(type: SyncTypeDb) =
         syncRecordRepository.findByType(type)

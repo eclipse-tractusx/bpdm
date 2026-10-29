@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordIdNotValid
@@ -32,7 +34,6 @@ import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequ
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import java.time.Instant
 import java.util.*
 
 @Service
@@ -48,7 +49,7 @@ class SharingMemberRecordOperation(
      */
     fun queryRecords(request: SharingMemberRecordQueryRequest, paginationRequest: PaginationRequest): PageDto<SharingMemberRecord> {
         val pageable = PageRequest.of(paginationRequest.page, paginationRequest.size, Sort.Direction.ASC, "updatedAt")
-        val recordPage = sharingMemberRecordRepository.findByUpdatedAtAfter(request.timestampAfter, pageable)
+        val recordPage = sharingMemberRecordRepository.findByUpdatedAtAfter(request.timestampAfter.toTimestamp(), pageable)
 
         return recordPage.toPageDto { toPublicDto(it) }
     }
@@ -61,7 +62,7 @@ class SharingMemberRecordOperation(
         val hasChanges = sharingMemberRecord.isGoldenRecordCounted != request.isGoldenRecordCounted
         if (hasChanges) {
             sharingMemberRecord.isGoldenRecordCounted = request.isGoldenRecordCounted
-            sharingMemberRecord.updatedAt = Instant.now()
+            sharingMemberRecord.updatedAt = DbTimestamp.now()
             sharingMemberRecordRepository.save(sharingMemberRecord)
         }
 
@@ -87,8 +88,8 @@ class SharingMemberRecordOperation(
         return SharingMemberRecord(
             recordId,
             entity.isGoldenRecordCounted,
-            entity.createdAt,
-            entity.updatedAt
+            entity.createdAt.instant,
+            entity.updatedAt.instant
         )
     }
 }

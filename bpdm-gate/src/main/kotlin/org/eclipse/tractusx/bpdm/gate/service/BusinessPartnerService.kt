@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
@@ -159,6 +160,7 @@ class BusinessPartnerService(
                 )
 
                 copyUtil.copyValues(upsertData, partnerToUpsert)
+                if (existingPartner != null) partnerToUpsert.updatedAt = DbTimestamp.now()
                 businessPartnerRepository.save(partnerToUpsert)
         }
 

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -77,7 +78,7 @@ class SharingStateService(
                 sharingErrorMessage = it.sharingErrorMessage,
                 sharingProcessStarted = it.sharingProcessStarted,
                 taskId = it.taskId,
-                updatedAt = it.updatedAt
+                updatedAt = it.updatedAt.instant
             )
         }
     }
@@ -118,6 +119,7 @@ class SharingStateService(
         sharingState.sharingProcessStarted = null
         sharingState.taskId = null
 
+        sharingState.updatedAt = DbTimestamp.now()
         return stateRepository.save(sharingState)
     }
 
@@ -128,6 +130,7 @@ class SharingStateService(
         sharingState.sharingErrorMessage = null
         sharingState.sharingProcessStarted = startTimeOverwrite ?: sharingState.sharingProcessStarted ?: LocalDateTime.now()
 
+        sharingState.updatedAt = DbTimestamp.now()
         return stateRepository.save(sharingState)
     }
 
@@ -138,6 +141,7 @@ class SharingStateService(
         sharingState.sharingProcessStarted = startTimeOverwrite ?: sharingState.sharingProcessStarted ?: LocalDateTime.now()
         sharingState.taskId = taskId
 
+        sharingState.updatedAt = DbTimestamp.now()
         return stateRepository.save(sharingState)
     }
 
@@ -152,6 +156,7 @@ class SharingStateService(
         sharingState.sharingErrorMessage = sharingErrorMessage
         sharingState.sharingProcessStarted = startTimeOverwrite ?: sharingState.sharingProcessStarted ?: LocalDateTime.now()
 
+        sharingState.updatedAt = DbTimestamp.now()
         return stateRepository.save(sharingState)
     }
 
@@ -164,6 +169,7 @@ class SharingStateService(
         sharingState.sharingProcessStarted = null
         sharingState.taskId = null
 
+        sharingState.updatedAt = DbTimestamp.now()
         return stateRepository.save(sharingState)
     }
 

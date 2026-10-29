@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.hibernate.annotations.Formula
 import org.hibernate.annotations.Type

@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.springframework.data.jpa.domain.Specification
@@ -51,7 +53,10 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
         fun byCreatedAtGreaterThan(createdAt: Instant?) =
             Specification<ChangelogEntryDb> { root, _, builder ->
                 createdAt?.let {
-                    builder.greaterThanOrEqualTo(root.get(ChangelogEntryDb::createdAt.name), createdAt)
+                    val lowerBound = createdAt.toTimestamp()
+                    val path = root.get<DbTimestamp>(ChangelogEntryDb::createdAt.name)
+                    if (lowerBound.instant == createdAt) builder.greaterThanOrEqualTo(path, lowerBound)
+                    else builder.greaterThan(path, lowerBound)
                 }
             }
 
