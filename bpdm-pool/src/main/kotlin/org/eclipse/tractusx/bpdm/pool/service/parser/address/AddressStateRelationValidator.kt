@@ -19,6 +19,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationKind
 import org.eclipse.tractusx.bpdm.pool.model.PartnerActivityTimeline
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressStateRelationParseError
 import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
@@ -59,7 +60,7 @@ class AddressStateRelationValidator(
         relation.validityPeriods.sortedBy { it.validFrom }.flatMap { validityPeriod ->
             val validFrom = validityPeriod.validFrom
             listOfNotNull(
-                if (relation.startAddress.bpn == bpn && activity.isRecordedActiveOnceReplacedFrom(validFrom))
+                if (relation.kind == AddressRelationKind.Succession && relation.startAddress.bpn == bpn && activity.isRecordedActiveOnceReplacedFrom(validFrom))
                     AddressStateRelationParseError.ReplacedAddressRecordedActive(bpn, relation.endAddress.bpn, validFrom) else null,
                 if (relation.endAddress.bpn == bpn && activity.isRecordedInactiveWhenReplacingFrom(validFrom))
                     AddressStateRelationParseError.ReplacingAddressRecordedInactive(bpn, relation.startAddress.bpn, validFrom) else null

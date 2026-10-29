@@ -597,6 +597,31 @@ are before you do:
 A headquarter that simply moves to a new postal address is therefore no relation at all.
 The legal entity keeps its identity and only its address changes, which is an update of the record.
 
+### A Headquarter Relocates
+
+The company's headquarter moves to another of its addresses, one that already has a business partner
+record of its own - an existing plant or office becomes the registered seat.
+Report one `IsReplacedBy` relation from the legal address record to the record of the address that
+takes over, with one validity period that starts on the date of the move and stays open.
+
+This is not a succession, although it is reported like one: it moves the role of legal address,
+not the company's activity.
+The former legal address usually stays in use as one of the company's other addresses, so leave its
+`address.states` as they are - it may stay active before and after the move.
+The address that takes over has to be in use from the start date, and the Pool rejects the relation
+when that address is recorded as inactive on that date.
+Once the start date is reached, the Pool reports the new address as the legal entity's legal address.
+
+Only a relation starting at the legal address relocates the headquarter.
+An `IsReplacedBy` from one of the company's other addresses to its legal address is an ordinary
+address succession, and its predecessor has to go out of use as described above.
+
+Whether a relation relocates the headquarter is decided when you first share it and does not change
+afterwards. When the new legal address is itself replaced later on, the legal address follows that
+replacement once it has started.
+Once the headquarter has moved on, the former legal address is an ordinary address again and can be
+replaced like any other.
+
 ### An Owner Or Data Manager Is Established
 
 A legal entity becomes the owner of another, or takes over maintaining another partner's data - a

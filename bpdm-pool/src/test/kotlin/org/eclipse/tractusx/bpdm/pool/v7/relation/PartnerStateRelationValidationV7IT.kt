@@ -43,7 +43,8 @@ import java.time.ZoneOffset
 
 /**
  * Whether a business partner update is accepted depends on whether the states it states contradict the relations the
- * partner already takes part in, so a relation that was valid when shared cannot be made contradictory afterwards.
+ * partner already takes part in, so a relation that was valid when shared cannot be made contradictory afterwards; a
+ * headquarter relocation never requires its former legal address to go out of use.
  */
 class PartnerStateRelationValidationV7IT : UnscheduledPoolTestBaseV7() {
 
@@ -257,6 +258,52 @@ class PartnerStateRelationValidationV7IT : UnscheduledPoolTestBaseV7() {
             assertThat(it.errorCode).isEqualTo(LegalEntityUpdateError.LegalAddressStatesContradictSuccession)
             assertThat(it.message).contains(predecessorBpn).contains(legalAddressBpn)
         })
+    }
+
+    /**
+     * GIVEN a headquarter relocation that has taken effect, so its former legal address is an additional address
+     * WHEN a sharing member records the former legal address as active without end
+     * THEN the update is accepted, because a relocation leaves its former legal address free to stay in use
+     */
+    @Test
+    fun `accept keeping a former legal address active after the headquarter relocated`() {
+        //GIVEN
+        val legalEntity = testDataClient.createLegalEntity(testName)
+        val formerLegalAddressBpn = legalEntity.legalAddress.bpna
+        val newLegalAddressBpn = testDataClient.createAdditionalAddress(legalEntity, "$testName new legal address").address.bpna
+        replace(formerLegalAddressBpn, newLegalAddressBpn)
+
+        //WHEN
+        val errors = updateStatesToErrors(PartnerLevel.ADDRESS, formerLegalAddressBpn, active(stateStart, null))
+
+        //THEN
+        assertThat(errors).isEmpty()
+    }
+
+    /**
+     * GIVEN a headquarter relocation that starts in the future, so the legal address is still the legal address
+     * WHEN a sharing member records the legal address as active without end in a legal entity update
+     * THEN the update is accepted
+     */
+    @Test
+    fun `accept keeping a legal address active ahead of its headquarter relocation`() {
+        //GIVEN
+        val legalEntity = testDataClient.createLegalEntity(testName)
+        val newLegalAddressBpn = testDataClient.createAdditionalAddress(legalEntity, "$testName new legal address").address.bpna
+        val relocationErrors = testDataClient.createSuccessionToErrors(legalEntity.legalAddress.bpna, newLegalAddressBpn, LocalDate.now().plusYears(1))
+        check(relocationErrors.isEmpty()) { "Could not relocate the headquarter: $relocationErrors" }
+
+        //WHEN
+        val request = requestFactory.buildLegalEntityUpdateRequest("$testName update", legalEntity.header.bpnl)
+        val keepingActive = request.copy(
+            legalEntity = request.legalEntity.copy(
+                legalAddress = request.legalEntity.legalAddress.copy(states = listOf(AddressStateDto(stateStart, null, BusinessStateType.ACTIVE)))
+            )
+        )
+        val errors = poolClient.legalEntities.updateBusinessPartners(listOf(keepingActive)).errors
+
+        //THEN
+        assertThat(errors).isEmpty()
     }
 
     /**

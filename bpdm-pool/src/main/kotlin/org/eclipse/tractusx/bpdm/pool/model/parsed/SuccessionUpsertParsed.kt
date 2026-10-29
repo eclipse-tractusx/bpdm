@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationKind
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
@@ -49,6 +50,7 @@ data class SiteSuccessionParsed(
 data class AddressSuccessionParsed(
     val predecessor: LogisticAddressDb,
     val successor: LogisticAddressDb,
+    val kind: AddressRelationKind,
     val validityPeriod: RelationValidityPeriodDb,
     val reasonCode: ReasonCodeDb?,
     val existingRelation: AddressRelationDb?

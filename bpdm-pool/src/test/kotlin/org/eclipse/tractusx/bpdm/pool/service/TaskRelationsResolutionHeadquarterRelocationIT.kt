@@ -121,6 +121,35 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     }
 
     /**
+     * GIVEN a legal entity whose legal address is recorded as active without end, and an additional address
+     * WHEN additional address replaces legal address effective immediately
+     * THEN user sees legal entity has the former additional address as new legal address
+     */
+    @Test
+    fun `replaced legal address changes headquarter while the former legal address stays active`(){
+        //GIVEN
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
+
+        //WHEN
+        val updateStartTime = Instant.now()
+        val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
+        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeNow, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        val updateEndTime = Instant.now()
+
+        //THEN
+        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
+        val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
+
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(5), updateEndTime.plusSeconds(5)))
+    }
+
+    /**
      * GIVEN a legal entity and a site whose main address is its own
      * WHEN the site main address replaces the legal address effective immediately
      * THEN user sees the site main address as new legal address, now serving both roles

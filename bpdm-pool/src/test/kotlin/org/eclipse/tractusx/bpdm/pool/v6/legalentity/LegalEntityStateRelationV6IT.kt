@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.legalentity
 
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressStateDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapperV6
@@ -27,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityUpdateErr
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6AndV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 /**
  * A state change over the v6 API is judged against the partner's relations exactly as over v7.
@@ -58,5 +61,31 @@ class LegalEntityStateRelationV6IT : UnscheduledPoolTestBaseV6AndV7() {
         val expectedError = ErrorInfoV6(LegalEntityUpdateErrorV6.StatesContradictOwnership, "IGNORED", ownerBpn)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
         assertRepository.assertLegalEntityUpdate(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN a legal entity whose headquarter relocates to an additional address in the future
+     * WHEN operator records the legal address as active without end over the v6 API
+     * THEN the update is accepted
+     */
+    @Test
+    fun `update legal address to active ahead of its headquarter relocation`() {
+        //GIVEN
+        val legalEntity = testDataClientV7.createLegalEntity(testName)
+        val newLegalAddressBpn = testDataClientV7.createAdditionalAddress(legalEntity, "$testName new legal address").address.bpna
+        val relocationErrors = testDataClientV7.createSuccessionToErrors(legalEntity.legalAddress.bpna, newLegalAddressBpn, LocalDate.now().plusYears(1))
+        check(relocationErrors.isEmpty()) { "Could not relocate the headquarter: $relocationErrors" }
+
+        //WHEN
+        val request = testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntity.header.bpnl)
+        val activeRequest = request.copy(
+            legalAddress = request.legalAddress.copy(
+                states = listOf(AddressStateDtoV6(TestDataV7.currentStateValidFrom, null, BusinessStateType.ACTIVE))
+            )
+        )
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(activeRequest))
+
+        //THEN
+        assertThat(response.errors).isEmpty()
     }
 }

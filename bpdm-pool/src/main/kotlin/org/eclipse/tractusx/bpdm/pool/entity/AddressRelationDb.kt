@@ -36,6 +36,10 @@ class AddressRelationDb(
     @Enumerated(EnumType.STRING)
     val type: AddressRelationType = AddressRelationType.IsReplacedBy, //Only allowed type for address relations
 
+    @Column(name = "kind", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val kind: AddressRelationKind,
+
     @ManyToOne
     @JoinColumn(name = "start_address_id", nullable = false)
     val startAddress: LogisticAddressDb,

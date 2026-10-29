@@ -36,7 +36,8 @@ import java.time.LocalDateTime
 
 /**
  * Whether a succession is accepted depends on what its two partners record about being in use, and the rule reads the
- * same at legal entity, site and address level.
+ * same at legal entity, site and address level; a headquarter relocation leaves its former legal address free to stay
+ * in use.
  */
 class SuccessionStateValidationV7IT : UnscheduledPoolTestBaseV7() {
 
@@ -226,6 +227,84 @@ class SuccessionStateValidationV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         assertThat(errors.map { it.description }).singleElement().asString().contains("states one validity period")
+    }
+
+    /**
+     * GIVEN a legal address recorded as active without end
+     * WHEN a sharing member relocates the headquarter from it to an additional address
+     * THEN the relocation is accepted, because the former legal address may stay in use
+     */
+    @Test
+    fun `accept headquarter relocation whose former legal address stays active`() {
+        //GIVEN
+        val legalEntity = testDataClient.createLegalEntity(testName)
+        val newLegalAddressBpn = testDataClient.createAdditionalAddress(legalEntity, "$testName new legal address").address.bpna
+
+        //WHEN
+        val errors = testDataClient.createSuccessionToErrors(legalEntity.legalAddress.bpna, newLegalAddressBpn, successionStart)
+
+        //THEN
+        assertThat(errors).isEmpty()
+    }
+
+    /**
+     * GIVEN an additional address recorded as inactive from a date on
+     * WHEN a sharing member relocates the headquarter to it from that date
+     * THEN the relocation is rejected, naming the new legal address
+     */
+    @Test
+    fun `reject headquarter relocation whose new legal address is recorded as inactive on the start date`() {
+        //GIVEN
+        val legalEntity = testDataClient.createLegalEntity(testName)
+        val newLegalAddressBpn = testDataClient.createAdditionalAddress(legalEntity, "$testName new legal address").address.bpna
+        recordStates(SuccessionLevel.ADDRESS, newLegalAddressBpn, inactive(successionStart.atStartOfDay(), null))
+
+        //WHEN
+        val errors = testDataClient.createSuccessionToErrors(legalEntity.legalAddress.bpna, newLegalAddressBpn, successionStart)
+
+        //THEN
+        assertThat(errors.map { it.description }).singleElement().asString()
+            .contains(newLegalAddressBpn).contains("recorded as inactive")
+    }
+
+    /**
+     * GIVEN an additional address recorded as active without end
+     * WHEN a sharing member replaces it by the legal address
+     * THEN the succession is rejected, because only a replacement starting at the legal address relocates the headquarter
+     */
+    @Test
+    fun `reject succession onto the legal address whose predecessor stays active`() {
+        //GIVEN
+        val legalEntity = testDataClient.createLegalEntity(testName)
+        val predecessorBpn = testDataClient.createAdditionalAddress(legalEntity, "$testName predecessor").address.bpna
+
+        //WHEN
+        val errors = testDataClient.createSuccessionToErrors(predecessorBpn, legalEntity.legalAddress.bpna, successionStart)
+
+        //THEN
+        assertThat(errors.map { it.description }).singleElement().asString()
+            .contains(predecessorBpn).contains("still recorded as active")
+    }
+
+    /**
+     * GIVEN a headquarter relocation that has taken effect, so its former legal address is an additional address
+     * WHEN a sharing member shares the relocation again
+     * THEN the relocation is accepted, although the former legal address stays active
+     */
+    @Test
+    fun `accept sharing a headquarter relocation again after it took effect`() {
+        //GIVEN
+        val legalEntity = testDataClient.createLegalEntity(testName)
+        val formerLegalAddressBpn = legalEntity.legalAddress.bpna
+        val newLegalAddressBpn = testDataClient.createAdditionalAddress(legalEntity, "$testName new legal address").address.bpna
+        val relocationErrors = testDataClient.createSuccessionToErrors(formerLegalAddressBpn, newLegalAddressBpn, successionStart)
+        check(relocationErrors.isEmpty()) { "Could not relocate the headquarter: $relocationErrors" }
+
+        //WHEN
+        val errors = testDataClient.createSuccessionToErrors(formerLegalAddressBpn, newLegalAddressBpn, successionStart)
+
+        //THEN
+        assertThat(errors).isEmpty()
     }
 
     enum class SuccessionLevel { LEGAL_ENTITY, SITE, ADDRESS }

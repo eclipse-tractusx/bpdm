@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationEventTriggerDb
+import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationKind
 import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSuccessionParsed
@@ -39,10 +40,10 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 /**
- * The single authority for writing a succession between two addresses of one legal entity.
+ * The single authority for writing a succession or headquarter relocation between two addresses of one legal entity.
  *
- * A succession that has already started relocates its legal entity's headquarters at once; one that starts later
- * leaves a trigger behind that does so on the day it starts.
+ * A relation that has already started moves its legal entity's legal address at once; one that starts later leaves a
+ * trigger behind that does so on the day it starts.
  */
 @Service
 class AddressSuccessionUpsertService(
@@ -55,8 +56,8 @@ class AddressSuccessionUpsertService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Persists the succession, relocates the headquarters it moves, and reports whether it was created, whether its
-     * validity changed, or whether it already stood as stated.
+     * Persists the succession or relocation, moves the legal address along it once it has started, and reports whether
+     * it was created, whether its validity changed, or whether it already stood as stated.
      */
     @Transactional
     fun upsert(parsed: AddressSuccessionParsed): UpsertResult<AddressRelationDb> =
@@ -87,6 +88,7 @@ class AddressSuccessionUpsertService(
     private fun create(parsed: AddressSuccessionParsed): AddressRelationDb {
         val newRelation = AddressRelationDb(
             type = AddressRelationType.IsReplacedBy,
+            kind = parsed.kind,
             startAddress = parsed.predecessor,
             endAddress = parsed.successor,
             validityPeriods = mutableListOf(parsed.validityPeriod),
@@ -101,9 +103,9 @@ class AddressSuccessionUpsertService(
         return newRelation
     }
 
-    // Every succession is synchronized and triggered, not only one starting at a legal address: the synchronization walks
-    // forward from the legal entity's legal address, so a succession off that chain reaches nothing. Which future-dated
-    // succession will be on the chain once it becomes active is not known when it is written.
+    // Every relation is synchronized and triggered, not only a relocation: the synchronization walks forward from the legal
+    // entity's legal address, so a relation off that chain reaches nothing, while a succession of an address a pending
+    // relocation makes the legal address carries the legal address on once both have started.
     private fun synchronizeHeadquarter(relation: AddressRelationDb) {
         val today = LocalDate.now()
 
@@ -124,11 +126,15 @@ class AddressSuccessionUpsertService(
     }
 
     private fun logOutcome(upsertType: UpsertType, parsed: AddressSuccessionParsed) {
-        val succession = "address succession from '${parsed.predecessor.bpn}' to '${parsed.successor.bpn}'"
+        val kindName = when (parsed.kind) {
+            AddressRelationKind.Succession -> "address succession"
+            AddressRelationKind.HeadquarterRelocation -> "headquarter relocation"
+        }
+        val relation = "$kindName from '${parsed.predecessor.bpn}' to '${parsed.successor.bpn}'"
         when (upsertType) {
-            UpsertType.Created -> logger.info { "Created $succession" }
-            UpsertType.Updated -> logger.info { "Updated validity of $succession" }
-            UpsertType.NoChange -> logger.debug { "Left $succession unchanged" }
+            UpsertType.Created -> logger.info { "Created $relation" }
+            UpsertType.Updated -> logger.info { "Updated validity of $relation" }
+            UpsertType.NoChange -> logger.debug { "Left $relation unchanged" }
         }
     }
 }
