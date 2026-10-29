@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationEventTriggerRepository
@@ -50,6 +51,7 @@ class AddressRelationTriggerExecutionService(
         }
 
         nextUnprocessedTrigger.isProcessed = true
+        nextUnprocessedTrigger.updatedAt = DbTimestamp.now()
         addressRelationEventTriggerRepository.save(nextUnprocessedTrigger)
 
         return true

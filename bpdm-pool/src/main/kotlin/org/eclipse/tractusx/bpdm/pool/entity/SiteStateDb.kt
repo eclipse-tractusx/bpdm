@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
@@ -46,4 +46,4 @@ class SiteStateDb(
     @JoinColumn(name = "site_id", nullable = false)
     var site: SiteDb
 
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()

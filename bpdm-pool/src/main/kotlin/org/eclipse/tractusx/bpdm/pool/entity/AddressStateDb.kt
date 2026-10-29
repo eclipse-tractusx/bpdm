@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
@@ -42,7 +42,7 @@ class AddressStateDb(
     @Enumerated(EnumType.STRING)
     val type: BusinessStateType
 
-) : BaseEntity() {
+) : BaseEntityWithExplicitTimestamps() {
     // Owned by its address; the back-reference is wired by the aggregate (create mapper / address mutator) right after
     // construction, not passed in — this keeps the entity mapper a pure translation.
     @ManyToOne

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(name = "script_codes")
@@ -32,4 +32,4 @@ class ScriptCodeDb(
 
     @Column(name = "description")
     var description: String?
-): BaseEntity()
+): BaseEntityWithExplicitTimestamps()

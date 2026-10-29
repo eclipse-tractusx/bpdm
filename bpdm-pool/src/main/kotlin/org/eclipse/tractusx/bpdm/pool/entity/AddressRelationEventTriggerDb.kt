@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationEventTriggerDb.Companion.EVENT_TYPE_COLUMN
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationEventTriggerDb.Companion.IS_PROCESSED_COLUMN
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationEventTriggerDb.Companion.RELATION_ID_COLUMN
@@ -49,7 +49,7 @@ class AddressRelationEventTriggerDb(
     @ManyToOne
     @JoinColumn(name = "relation_id", nullable = false)
     var relation: AddressRelationDb
-): BaseEntity(){
+): BaseEntityWithExplicitTimestamps(){
     companion object{
         const val TRIGGER_DATE_COLUMN = "trigger_date"
         const val EVENT_TYPE_COLUMN = "event_type"
