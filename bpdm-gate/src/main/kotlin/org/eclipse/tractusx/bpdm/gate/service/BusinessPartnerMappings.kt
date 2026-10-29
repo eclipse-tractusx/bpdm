@@ -54,8 +54,8 @@ class BusinessPartnerMappings {
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
             additionalSites = entity.additionalSites.map { AdditionalSiteInputDto(siteBpn = it.bpn, name = it.name) },
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt
+            createdAt = entity.createdAt.instant,
+            updatedAt = entity.updatedAt.instant
         )
     }
 
@@ -89,8 +89,8 @@ class BusinessPartnerMappings {
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
             additionalSites = entity.additionalSites.map { toAdditionalSiteOutputDto(it, entity) },
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt
+            createdAt = entity.createdAt.instant,
+            updatedAt = entity.updatedAt.instant
         )
     }
 

@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.common.util.countForLog
@@ -249,7 +250,7 @@ class RelationService(
             relationType = relationType,
             sourceBpn = sourceBpnL,
             targetBpn = targetBpnL,
-            resultUpdatedAt = Instant.now(),
+            resultUpdatedAt = DbTimestamp.now(),
             validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList(),
             reasonCode =  reasonCode
         )
@@ -358,7 +359,7 @@ class RelationService(
             existingStage.target = target
             existingStage.validityPeriods = proposedValidityPeriods
             existingStage.reasonCode = reasonCode
-            existingStage.updatedAt = Instant.now()
+            existingStage.updatedAt = DbTimestamp.now()
 
 
             relationStageRepository.save(existingStage)
@@ -380,8 +381,8 @@ class RelationService(
             businessPartnerSourceExternalId = entity.source.externalId,
             businessPartnerTargetExternalId = entity.target.externalId,
             validityPeriods = entity.validityPeriods.map { it.toDto() },
-            updatedAt = entity.updatedAt,
-            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt.instant,
+            createdAt = entity.createdAt.instant,
             reasonCode = entity.reasonCode
         )
     }
@@ -400,7 +401,7 @@ class RelationService(
             sourceBpn = entity.output!!.sourceBpn,
             targetBpn = entity.output!!.targetBpn,
             validityPeriods = entity.output!!.validityPeriods.map { it.toDto() },
-            updatedAt = entity.output!!.resultUpdatedAt,
+            updatedAt = entity.output!!.resultUpdatedAt.instant,
             reasonCode = entity.output!!.reasonCode
         )
     }

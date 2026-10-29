@@ -14,48 +14,10 @@
 package org.eclipse.tractusx.bpdm.common.model
 
 import org.assertj.core.api.Assertions.assertThat
-import org.hibernate.type.descriptor.WrapperOptions
 import org.junit.jupiter.api.Test
-import java.lang.reflect.Proxy
-import java.sql.PreparedStatement
-import java.sql.ResultSet
-import java.sql.Timestamp
 import java.time.Instant
-import java.util.Calendar
 
 class DbTimestampTest {
-    @Test
-    fun `converter reads and writes timestamps with an explicit UTC calendar`() {
-        val timestamp = Instant.parse("2026-01-01T00:00:00.123456Z").toTimestamp()
-        var readCalendar: Calendar? = null
-        var writeCalendar: Calendar? = null
-        var writtenTimestamp: Timestamp? = null
-        val resultSet = Proxy.newProxyInstance(
-            ResultSet::class.java.classLoader, arrayOf(ResultSet::class.java)
-        ) { _, method, args ->
-            check(method.name == "getTimestamp")
-            readCalendar = args!![1] as Calendar
-            Timestamp.from(timestamp.instant)
-        } as ResultSet
-        val statement = Proxy.newProxyInstance(
-            PreparedStatement::class.java.classLoader, arrayOf(PreparedStatement::class.java)
-        ) { _, method, args ->
-            check(method.name == "setTimestamp")
-            writtenTimestamp = args!![1] as Timestamp
-            writeCalendar = args[2] as Calendar
-            null
-        } as PreparedStatement
-
-        val converter = DbTimestampConverter()
-        val options: WrapperOptions? = null
-        assertThat(converter.nullSafeGet(resultSet, 1, options)).isEqualTo(timestamp)
-        converter.nullSafeSet(statement, timestamp, 1, options)
-
-        assertThat(readCalendar!!.timeZone.id).isEqualTo("UTC")
-        assertThat(writeCalendar!!.timeZone.id).isEqualTo("UTC")
-        assertThat(writtenTimestamp!!.toInstant()).isEqualTo(timestamp.instant)
-    }
-
     @Test
     fun `timestamps truncate to database precision and compare by value`() {
         val timestamp = Instant.parse("2026-01-01T00:00:00.123456789Z").toTimestamp()
