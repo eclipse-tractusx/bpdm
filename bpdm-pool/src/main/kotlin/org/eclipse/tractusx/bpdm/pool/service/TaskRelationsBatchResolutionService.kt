@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import jakarta.annotation.PostConstruct
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -117,6 +118,7 @@ class TaskRelationsBatchResolutionService(
                 }
 
                 task.lastChecked = scheduleTime
+                task.updatedAt = DbTimestamp.now()
                 goldenRecordTaskRepository.save(task)
                 entityManager.clear()
 

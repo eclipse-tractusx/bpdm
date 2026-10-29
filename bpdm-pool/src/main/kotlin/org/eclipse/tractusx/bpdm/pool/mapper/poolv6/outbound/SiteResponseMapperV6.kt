@@ -49,8 +49,8 @@ class SiteResponseMapperV6(
                 bpnLegalEntity = legalEntity.bpn,
                 confidenceCriteria = confidenceCriteriaResponseMapperV6.toConfidenceCriteria(confidenceCriteria),
                 isCatenaXMemberData = legalEntity.isDataSpaceParticipant,
-                createdAt = createdAt,
-                updatedAt = updatedAt,
+                createdAt = createdAt.instant,
+                updatedAt = updatedAt.instant,
             )
         }
 

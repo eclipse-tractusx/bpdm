@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 /**
  * Represents identifier type validity details specific to a country
@@ -46,4 +46,4 @@ class IdentifierTypeDetailDb(
     @Column(name = "mandatory", nullable = false)
     var mandatory: Boolean
 
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()

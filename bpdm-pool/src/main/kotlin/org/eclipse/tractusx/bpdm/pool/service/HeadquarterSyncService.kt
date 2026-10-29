@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
@@ -84,6 +85,10 @@ class HeadquarterSyncService(
         if(newLegalAddress != null){
             val currentLegalAddress = legalEntityDb.legalAddress
             legalEntityDb.legalAddress = newLegalAddress
+            val updatedAt = DbTimestamp.now()
+            legalEntityDb.updatedAt = updatedAt
+            currentLegalAddress.updatedAt = updatedAt
+            newLegalAddress.updatedAt = updatedAt
 
             legalEntityRepository.save(legalEntityDb)
             logger.info { "Updated legal address of legal entity '${legalEntityDb.bpn}': From '${currentLegalAddress.bpn}' to '${newLegalAddress.bpn}'" }

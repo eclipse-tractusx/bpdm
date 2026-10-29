@@ -33,5 +33,5 @@ class ChangelogResponseMapper {
      * Returns the given changelog entry as the API reports it.
      */
     fun toChangelogEntry(changelogEntry: PartnerChangelogEntryDb): ChangelogEntryVerboseDto =
-        with(changelogEntry) { ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt, changelogType) }
+        with(changelogEntry) { ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt.instant, changelogType) }
 }

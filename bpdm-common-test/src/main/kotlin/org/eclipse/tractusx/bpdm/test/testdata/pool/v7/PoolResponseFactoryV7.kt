@@ -51,7 +51,11 @@ class PoolResponseFactoryV7(
     }
 
     fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateRequest, bpnAFrom: LegalEntityWithLegalAddressVerboseDto): LegalEntityPartnerCreateVerboseDto{
-        return buildLegalEntityUpdate(withValuesFrom, bpnAFrom.legalAddress.bpna)
+        val expected = buildLegalEntityUpdate(withValuesFrom, bpnAFrom.legalAddress.bpna)
+        return expected.copy(legalEntity = expected.legalEntity.copy(
+            header = expected.legalEntity.header.copy(createdAt = bpnAFrom.header.createdAt, updatedAt = bpnAFrom.header.updatedAt),
+            legalAddress = expected.legalEntity.legalAddress.copy(createdAt = bpnAFrom.legalAddress.createdAt, updatedAt = bpnAFrom.legalAddress.updatedAt)
+        ))
     }
 
     fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateRequest, bpnA: String = anyStringValue): LegalEntityPartnerCreateVerboseDto{
@@ -116,7 +120,9 @@ class PoolResponseFactoryV7(
             site = buildSite(
                 withValuesFrom = withValuesFrom.site,
                 bpnS = existingSite.site.bpns,
-                bpnLegalEntity = existingSite.site.bpnLegalEntity
+                bpnLegalEntity = existingSite.site.bpnLegalEntity,
+                createdAt = existingSite.site.createdAt,
+                updatedAt = existingSite.site.updatedAt
             ),
             mainAddress = buildInvariantAddress(
                 withValuesFrom = withValuesFrom.site.mainAddress,
@@ -124,7 +130,9 @@ class PoolResponseFactoryV7(
                 isParticipantData = true,
                 givenBpnA = existingSite.mainAddress.bpna,
                 bpnLegalEntity = existingSite.site.bpnLegalEntity,
-                bpnSite = existingSite.site.bpns
+                bpnSite = existingSite.site.bpns,
+                createdAt = existingSite.mainAddress.createdAt,
+                updatedAt = existingSite.mainAddress.updatedAt
             ).withConfidence(TestDataV7.SharedByOwnerConfidence),
             index = withValuesFrom.bpns
         )
@@ -281,7 +289,9 @@ class PoolResponseFactoryV7(
             isParticipantData = legalEntity.header.isParticipantData,
             givenBpnA = legalEntity.legalAddress.bpna,
             bpnLegalEntity = legalEntity.header.bpnl,
-            bpnSite = null
+            bpnSite = null,
+            createdAt = legalEntity.legalAddress.createdAt,
+            updatedAt = legalEntity.legalAddress.updatedAt
         )
         return AddressPartnerUpdateVerboseDto(
             address = invariantAddress,
@@ -299,7 +309,9 @@ class PoolResponseFactoryV7(
             isParticipantData = true,
             givenBpnA = site.mainAddress.bpna,
             bpnLegalEntity = site.site.bpnLegalEntity,
-            bpnSite = site.site.bpns
+            bpnSite = site.site.bpns,
+            createdAt = site.mainAddress.createdAt,
+            updatedAt = site.mainAddress.updatedAt
         ).withConfidence(TestDataV7.SharedByOwnerConfidence)
         return AddressPartnerUpdateVerboseDto(
             address = invariantAddress,
@@ -318,7 +330,9 @@ class PoolResponseFactoryV7(
             isParticipantData = isParticipantData,
             givenBpnA = existingAddress.address.bpna,
             bpnLegalEntity = existingAddress.address.bpnLegalEntity,
-            bpnSite = existingAddress.address.bpnSite
+            bpnSite = existingAddress.address.bpnSite,
+            createdAt = existingAddress.address.createdAt,
+            updatedAt = existingAddress.address.updatedAt
         )
         return AddressPartnerUpdateVerboseDto(
             address = invariantAddress,

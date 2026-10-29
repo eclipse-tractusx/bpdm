@@ -59,8 +59,8 @@ class LegalEntityResponseMapper(
                 currentness = currentness,
                 confidenceCriteria = confidenceCriteriaResponseMapper.toConfidenceCriteria(confidenceCriteria),
                 isParticipantData = isDataSpaceParticipant,
-                createdAt = createdAt,
-                updatedAt = updatedAt,
+                createdAt = createdAt.instant,
+                updatedAt = updatedAt.instant,
                 ownershipUltimate = ownershipUltimate,
                 ultimateOwnerBpnl = ultimateOwnerBpnl
             )

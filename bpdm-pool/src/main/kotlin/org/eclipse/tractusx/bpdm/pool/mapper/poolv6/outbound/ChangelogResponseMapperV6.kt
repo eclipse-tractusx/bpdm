@@ -35,6 +35,6 @@ class ChangelogResponseMapperV6 {
      */
     fun toChangelogEntry(changelogEntry: PartnerChangelogEntryDb): ChangelogEntryVerboseDtoV6 =
         with(changelogEntry) {
-            ChangelogEntryVerboseDtoV6(bpn, businessPartnerType, updatedAt, ChangelogTypeV6.valueOf(changelogType.name))
+            ChangelogEntryVerboseDtoV6(bpn, businessPartnerType, updatedAt.instant, ChangelogTypeV6.valueOf(changelogType.name))
         }
 }

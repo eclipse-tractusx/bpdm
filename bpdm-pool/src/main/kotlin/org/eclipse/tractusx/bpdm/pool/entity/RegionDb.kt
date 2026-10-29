@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(
@@ -37,4 +37,4 @@ class RegionDb(
     @Column(name = "region_name")
     val regionName: String
 )
-: BaseEntity()
+: BaseEntityWithExplicitTimestamps()

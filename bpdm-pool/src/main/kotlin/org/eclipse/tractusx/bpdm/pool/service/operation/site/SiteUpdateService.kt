@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
@@ -74,6 +75,7 @@ class SiteUpdateService(
 
         val updatedSites = siteChangeResults.filter { it.upsertType == UpsertType.Updated }
 
+        updatedSites.forEach { it.value.updatedAt = DbTimestamp.now() }
         siteRepository.saveAll(updatedSites.map { it.value })
         changelogCreateService.record(updatedSites.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
 
