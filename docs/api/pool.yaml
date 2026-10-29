@@ -3238,13 +3238,17 @@ components:
             - string
             - "null"
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
           type:
             - string
             - "null"
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           type: string
           description: "One of the state types: active, inactive."
@@ -3264,13 +3268,17 @@ components:
             - string
             - "null"
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
           type:
             - string
             - "null"
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           type: string
           description: "One of the state types: active, inactive."
@@ -3285,20 +3293,23 @@ components:
         \ the business partner is still operating at that address."
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+      required:
+        - validFrom
+        - validTo
     AddressStateVerboseDtoV6:
       type: object
       deprecated: true
@@ -3308,20 +3319,23 @@ components:
         \ the business partner is still operating at that address."
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+      required:
+        - validFrom
+        - validTo
     AlternativeAddressScriptVariantDto:
       type: object
       properties:
@@ -3739,14 +3753,10 @@ components:
       type: object
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
         type:
           type:
@@ -3755,6 +3765,9 @@ components:
           enum:
             - ACTIVE
             - INACTIVE
+      required:
+        - validFrom
+        - validTo
     ChangelogEntryVerboseDto:
       type: object
       description: "An entry of the changelog, which is created each time a business\
@@ -5191,13 +5204,17 @@ components:
             - string
             - "null"
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
           type:
             - string
             - "null"
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           type: string
           description: "One of the state types: active, inactive."
@@ -5217,13 +5234,17 @@ components:
             - string
             - "null"
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
           type:
             - string
             - "null"
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           type: string
           description: "One of the state types: active, inactive."
@@ -5238,20 +5259,23 @@ components:
         \ whether the legal entity is still operating."
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+      required:
+        - validFrom
+        - validTo
     LegalEntityStateVerboseDtoV6:
       type: object
       deprecated: true
@@ -5261,20 +5285,23 @@ components:
         \ whether the legal entity is still operating."
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+      required:
+        - validFrom
+        - validTo
     LegalEntityWithLegalAddressVerboseDto:
       type: object
       description: "In general, a legal entity is a juridical person that has legal\
@@ -7454,13 +7481,17 @@ components:
             - string
             - "null"
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
           type:
             - string
             - "null"
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           type: string
           description: "One of the state types: active, inactive."
@@ -7480,13 +7511,17 @@ components:
             - string
             - "null"
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
           type:
             - string
             - "null"
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           type: string
           description: "One of the state types: active, inactive."
@@ -7501,20 +7536,23 @@ components:
         \ is still operating."
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+      required:
+        - validFrom
+        - validTo
     SiteStateVerboseDtoV6:
       type: object
       deprecated: true
@@ -7524,20 +7562,23 @@ components:
         \ is still operating."
       properties:
         validFrom:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date from which the state is valid.
+          description: The date from which the state is valid. The earliest date 1900-01-01T00:00:00
+            (UTC) stands for a state without start; an earlier date counts as the
+            earliest date.
         validTo:
-          type:
-            - string
-            - "null"
+          type: string
           format: date-time
-          description: The date until the state is valid.
+          description: The date until the state is valid. The latest date 9999-12-31T23:59:59
+            (UTC) stands for a state without end; a later date counts as the latest
+            date.
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+      required:
+        - validFrom
+        - validTo
     SiteVerboseDto:
       type: object
       description: "In general, a site is a delimited geographical area in which an\

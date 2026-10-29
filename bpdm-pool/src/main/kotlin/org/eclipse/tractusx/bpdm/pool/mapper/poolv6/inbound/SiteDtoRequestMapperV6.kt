@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateDtoV6
@@ -81,7 +82,7 @@ class SiteDtoRequestMapperV6(
         )
 
     private fun toStateRequest(state: SiteStateDtoV6): SiteState =
-        SiteState(state.validFrom?.toUtcInstant(), state.validTo?.toUtcInstant(), state.type)
+        SiteState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
     private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
@@ -92,4 +93,8 @@ class SiteDtoRequestMapperV6(
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

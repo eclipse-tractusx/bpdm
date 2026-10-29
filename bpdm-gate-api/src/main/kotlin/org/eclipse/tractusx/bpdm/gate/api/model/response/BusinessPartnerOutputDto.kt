@@ -34,7 +34,7 @@ data class BusinessPartnerOutputDto(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
     override val legalEntity: LegalEntityRepresentationOutputDto,
@@ -68,7 +68,7 @@ data class LegalEntityRepresentationOutputDto(
     val ownershipUltimate: Boolean? = null,
     @get:Schema(description = "The BPNL of the designated ultimate owner up in the ownership chain.")
     val ultimateOwnerBpnl: String? = null,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList(),
     val goldenRecordRelations: List<LegalEntityGoldenRecordRelationDto> = emptyList(),
 
     @get:Schema(description = "Timestamp when the associated legal entity golden record was last updated")
@@ -82,7 +82,7 @@ data class SiteRepresentationOutputDto(
     override val siteBpn: String,
     override val name: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList(),
     val goldenRecordRelations: List<SiteGoldenRecordRelationDto> = emptyList(),
 
     @get:Schema(description = "Timestamp when the associated site golden record was last updated")
@@ -111,7 +111,7 @@ data class AddressComponentOutputDto(
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
     override val alternativePostalAddress: AlternativePostalAddressDto? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val states: Collection<BusinessPartnerStateResponseDto> = emptyList(),
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
     val goldenRecordRelations: List<AddressGoldenRecordRelationDto> = emptyList(),
 

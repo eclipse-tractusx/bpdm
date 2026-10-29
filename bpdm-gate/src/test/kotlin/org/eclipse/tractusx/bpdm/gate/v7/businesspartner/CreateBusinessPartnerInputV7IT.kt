@@ -20,8 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withLegalEntityStates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withoutAlternativeAddressScriptVariants
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -55,6 +59,23 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = testData.businessPartner.input.response.fromRequest(request)
+        assertRepo.assertBusinessPartnerInput(response, listOf(expected))
+    }
+
+    /**
+     * WHEN input manager creates a record with a state from the earliest to the latest date
+     * THEN that record returned with the state having neither start nor end date
+     */
+    @Test
+    fun `create business partner input with state from the earliest to the latest date`(){
+        //WHEN
+        val boundedState = BusinessPartnerStateDto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE)
+        val request = testData.businessPartner.input.request.fromSeed(testName).withLegalEntityStates(boundedState)
+        val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!
+
+        //THEN
+        val openState = BusinessPartnerStateDto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE)
+        val expected = testData.businessPartner.input.response.fromRequest(request.withLegalEntityStates(openState))
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }
 

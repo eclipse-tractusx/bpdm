@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteStateDescript
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(description = SiteStateDescription.header, deprecated = true)
+@Schema(description = SiteStateDescription.header, deprecated = true, requiredProperties = ["validFrom", "validTo"])
 data class SiteStateVerboseDtoV6(
-    override val validFrom: LocalDateTime?,
-    override val validTo: LocalDateTime?,
+    override val validFrom: LocalDateTime,
+    override val validTo: LocalDateTime,
 
     @field:JsonProperty("type")
     @get:Schema(description = SiteStateDescription.type)

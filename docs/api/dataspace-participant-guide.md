@@ -245,8 +245,10 @@ provider adds it, and nothing announces it.
 Two things on a golden record say this, and they answer different questions.
 
 The `states` say whether it is in use.
-A state is a period with a `validFrom` and an open or closed `validTo` and a type of `ACTIVE` or
-`INACTIVE`, and the levels state it separately: a legal entity that stopped trading, a site that
+A state is a period with a `validFrom`, a `validTo` and a type of `ACTIVE` or `INACTIVE`.
+Both dates are always present: `1900-01-01T00:00:00` stands for a state without start and
+`9999-12-31T23:59:59` for a state without end.
+The levels state it separately: a legal entity that stopped trading, a site that
 closed and an address that is no longer used are three different statements.
 Read the state that covers today, not the last one in the list.
 

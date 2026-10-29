@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.test.testdata.pool.common.latestSeededStateSecond
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
@@ -66,7 +67,7 @@ class BusinessPartnerV6RequestFactory(
     }
 
     fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong())): LegalEntityDtoV6 {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return LegalEntityDtoV6(
             legalName = "Legal Name $seed",
@@ -121,7 +122,7 @@ class BusinessPartnerV6RequestFactory(
     }
 
     fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDtoV6 {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteDtoV6(
             name = "Site Name $seed",
@@ -146,7 +147,7 @@ class BusinessPartnerV6RequestFactory(
     }
 
     fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMainV6{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteCreateRequestWithLegalAddressAsMainV6(
             name = "Site Name $seed",
@@ -194,7 +195,7 @@ class BusinessPartnerV6RequestFactory(
     }
 
     fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDtoV6 {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
         return LogisticAddressDtoV6(
             name = "Address Name $seed",
             states = listOf(

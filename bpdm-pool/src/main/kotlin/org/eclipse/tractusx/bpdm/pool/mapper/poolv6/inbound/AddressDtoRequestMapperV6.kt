@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
@@ -105,7 +106,7 @@ class AddressDtoRequestMapperV6 {
         )
 
     private fun toStateRequest(state: AddressStateDtoV6): AddressStateRequest =
-        AddressStateRequest(validFrom = state.validFrom?.toUtcInstant(), validTo = state.validTo?.toUtcInstant(), type = state.type)
+        AddressStateRequest(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
 
     private fun toIdentifierRequest(identifier: AddressIdentifierDtoV6): AddressIdentifierRequest =
         AddressIdentifierRequest(value = identifier.value, type = identifier.type)
@@ -127,4 +128,8 @@ class AddressDtoRequestMapperV6 {
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }
