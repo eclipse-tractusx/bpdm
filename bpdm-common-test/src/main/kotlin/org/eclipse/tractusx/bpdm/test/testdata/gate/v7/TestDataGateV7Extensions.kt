@@ -19,8 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 
 
 fun BusinessPartnerInputRequest.withoutAlternativeAddressScriptVariants() =
     copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.copy(alternativeAddress = null)) })
+
+fun BusinessPartnerInputRequest.withLegalEntityStates(vararg states: BusinessPartnerStateDto) =
+    copy(legalEntity = legalEntity.copy(states = states.toList()))

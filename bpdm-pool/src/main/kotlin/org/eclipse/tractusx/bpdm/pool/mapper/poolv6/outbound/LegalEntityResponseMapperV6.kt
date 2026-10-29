@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseDtoV6
@@ -94,7 +95,11 @@ class LegalEntityResponseMapperV6(
         )
 
     private fun toState(state: LegalEntityStateDb): LegalEntityStateVerboseDtoV6 =
-        LegalEntityStateVerboseDtoV6(state.validFrom, state.validTo, state.type.toDto())
+        LegalEntityStateVerboseDtoV6(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 
     // Relation types introduced after v6 was frozen are omitted from v6 responses rather than added to its enum,
     // which would change a deprecated contract. Mapping them exhaustively keeps a later type from silently reaching here.

@@ -20,6 +20,9 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
+import java.time.ZoneOffset
+import java.util.Calendar
+import java.util.TimeZone
 
 class DbTimestampConverter : UserType<DbTimestamp> {
     override fun equals(x: DbTimestamp?, y: DbTimestamp?): Boolean = x == y
@@ -31,12 +34,14 @@ class DbTimestampConverter : UserType<DbTimestamp> {
     override fun returnedClass(): Class<DbTimestamp> = DbTimestamp::class.java
 
     override fun nullSafeGet(rs: ResultSet, position: Int, options: WrapperOptions?): DbTimestamp? =
-        rs.getTimestamp(position)?.toInstant()?.toTimestamp()
+        rs.getTimestamp(position, utcCalendar())?.toInstant()?.toTimestamp()
 
     override fun nullSafeSet(st: PreparedStatement, value: DbTimestamp?, position: Int, options: WrapperOptions?) {
         if (value == null) st.setNull(position, Types.TIMESTAMP)
-        else st.setTimestamp(position, Timestamp.from(value.instant))
+        else st.setTimestamp(position, Timestamp.from(value.instant), utcCalendar())
     }
+
+    private fun utcCalendar(): Calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC))
 
     override fun isMutable(): Boolean = false
 

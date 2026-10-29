@@ -42,7 +42,7 @@ class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = PageDto(1, 1, 0, 1, listOf(created))
-        assertRepo.assertBusinessPartnerInput(response, expected)
+        assertRepo.assertBusinessPartnerInputRead(response, expected)
     }
 
     /**
@@ -62,7 +62,7 @@ class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = PageDto(1, 1, 0, 1, listOf(created))
-        assertRepo.assertBusinessPartnerInput(response, expected)
+        assertRepo.assertBusinessPartnerInputRead(response, expected)
     }
 
     /**
@@ -80,6 +80,6 @@ class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = PageDto<BusinessPartnerInputDto>(0, 0, 0, 0, emptyList())
-        assertRepo.assertBusinessPartnerInput(response, expected)
+        assertRepo.assertBusinessPartnerInputRead(response, expected)
     }
 }

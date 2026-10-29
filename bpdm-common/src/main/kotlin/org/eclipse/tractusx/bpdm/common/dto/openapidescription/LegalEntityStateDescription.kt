@@ -25,7 +25,7 @@ object LegalEntityStateDescription {
             "business, but it describes whether the legal entity is still operating."
 
     const val description = "The description from the original source indicating the state of the legal entity, such as from the German Handelsregister."
-    const val validFrom = "The date from which the state is valid."
-    const val validTo = "The date until the state is valid."
+    const val validFrom = BusinessStateDescription.validFrom
+    const val validTo = BusinessStateDescription.validTo
     const val type = "One of the state types: active, inactive."
 }

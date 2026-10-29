@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -102,7 +103,11 @@ class AddressResponseMapper(
         scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode.technicalKey, toPostalAddressScriptVariant(it)) }
 
     private fun toState(state: AddressStateDb): AddressStateVerboseDto =
-        AddressStateVerboseDto(state.validFrom, state.validTo, state.type.toDto())
+        AddressStateVerboseDto(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 
     private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseDto =
         AddressIdentifierVerboseDto(identifier.value, identifierTypeResponseMapper.toTypeKeyName(identifier.type))

@@ -24,12 +24,25 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.Instant
 
 class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
+
+    @Autowired
+    lateinit var sharingStateService: SharingStateService
+
+    @Autowired
+    lateinit var sharingStateRepository: SharingStateRepository
+
+    @Autowired
+    lateinit var transactionTemplate: TransactionTemplate
 
     /**
      * GIVEN business partner with external-ID
@@ -106,7 +119,10 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     fun `find ready sharing state`() {
         //GIVEN
         val input = testDataClient.businessPartner.upsertInput(testName)
-        testDataClient.businessPartner.setStateToReady(input.externalId)
+        val stamped = transactionTemplate.execute {
+            val state = sharingStateRepository.findByExternalIdAndTenantBpnl(input.externalId, tenantBPNL).single()
+            sharingStateService.setReady(state).updatedAt.instant
+        }!!
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
@@ -116,6 +132,11 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
+        assertRepo.assertSharingStateTimestamp(actualResponse.content.single(), stamped)
+        assertRepo.assertSharingStates(
+            gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(input.externalId), updatedAfter = stamped),
+            PageDto(0, 0, 0, 0, emptyList())
+        )
     }
 
     /**

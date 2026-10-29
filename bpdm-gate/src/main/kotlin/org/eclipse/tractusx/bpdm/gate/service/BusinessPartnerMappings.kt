@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -79,7 +80,7 @@ class BusinessPartnerMappings {
                         AddressType.AdditionalAddress -> BusinessPartnerType.ADDRESS
                         AddressType.SiteMainAddress -> BusinessPartnerType.SITE
                     } }
-                    .map(::toStateDto)
+                    .map(::toStateResponseDto)
             }?: emptyList(),
             roles = entity.roles,
             isOwnCompanyData = entity.isOwnCompanyData,
@@ -190,7 +191,7 @@ class BusinessPartnerMappings {
             ),
             ownershipUltimate = entity.ownershipUltimate,
             ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
-            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
+            states = toStateResponseDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
             goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
             updatedAt = entity.legalEntityUpdatedAt ?: Instant.EPOCH
         )
@@ -207,7 +208,7 @@ class BusinessPartnerMappings {
                         entity.sharingState.externalId,
                         "Missing site confidence criteria"
                     ),
-                    states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    states = toStateResponseDtos(entity.states, BusinessPartnerType.SITE),
                     goldenRecordRelations = entity.siteGoldenRecordRelations.map { relation ->
                         SiteGoldenRecordRelationDto(toSiteRelationType(relation.relationType), relation.sourceBpn, relation.targetBpn)
                     },
@@ -232,7 +233,7 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing legal entity confidence criteria"
             ),
-            states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
+            states = toStateResponseDtos(entity.states, BusinessPartnerType.ADDRESS),
             goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
             updatedAt = entity.addressUpdatedAt ?: Instant.EPOCH
         )
@@ -430,8 +431,25 @@ class BusinessPartnerMappings {
     private fun toStateDto(entity: StateDb) =
         BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
 
+    private fun toStateResponseDtos(entities: Collection<StateDb>, businessPartnerType: BusinessPartnerType) =
+        entities.filter { it.businessPartnerTyp == businessPartnerType }.map(::toStateResponseDto)
+
+    private fun toStateResponseDto(entity: StateDb) =
+        BusinessPartnerStateResponseDto(
+            type = entity.type,
+            validFrom = BusinessStateDates.reportValidFrom(entity.validFrom),
+            validTo = BusinessStateDates.reportValidTo(entity.validTo)
+        )
+
     private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
-        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp = businessPartnerType) }
+        dto.type?.let {
+            StateDb(
+                type = it,
+                validFrom = BusinessStateDates.receiveValidFrom(dto.validFrom),
+                validTo = BusinessStateDates.receiveValidTo(dto.validTo),
+                businessPartnerTyp = businessPartnerType
+            )
+        }
 
     private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
         GeographicCoordinateDb(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)

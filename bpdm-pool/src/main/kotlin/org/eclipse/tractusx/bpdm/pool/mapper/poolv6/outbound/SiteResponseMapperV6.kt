@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
@@ -75,5 +76,9 @@ class SiteResponseMapperV6(
         )
 
     private fun toState(state: SiteStateDb): SiteStateVerboseDtoV6 =
-        SiteStateVerboseDtoV6(state.validFrom, state.validTo, state.type.toDto())
+        SiteStateVerboseDtoV6(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 }
