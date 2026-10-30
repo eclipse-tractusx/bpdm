@@ -21,6 +21,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertEntryResult.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertBatchParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
@@ -48,12 +49,12 @@ class RelationInputUpsertOperationService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Creates or updates the input of each of [requests] for [tenantBpnl] and resets its sharing state, resubmits an
+     * Creates or updates the input of each entry of [batch] for its tenant and resets its sharing state, resubmits an
      * unchanged input whose sharing failed, or leaves an unchanged input as it is.
      */
     @Transactional
-    fun upsert(requests: List<RelationInputUpsertParsed>, tenantBpnl: String): List<RelationInputUpsertEntryResult> =
-        requests.map { upsert(it, tenantBpnl) }
+    fun upsert(batch: RelationInputUpsertBatchParsed): List<RelationInputUpsertEntryResult> =
+        batch.entries.map { upsert(it, batch.tenantBpnl) }
 
     private fun upsert(request: RelationInputUpsertParsed, tenantBpnl: String): RelationInputUpsertEntryResult {
         val existing = request.existing

@@ -22,6 +22,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertBatchParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
@@ -52,12 +53,12 @@ class RelationInputUpsertParser(
         requests: List<RelationInputUpsertRaw>,
         tenantBpnl: String,
         mode: RelationInputUpsertMode
-    ): ParseResult<List<RelationInputUpsertParsed>, RelationInputUpsertError> {
+    ): ParseResult<RelationInputUpsertBatchParsed, RelationInputUpsertError> {
         val limit = apiConfigProperties.upsertLimit
         if (requests.size > limit) return ParseResult.ofSingleFailure(UpsertLimitExceeded(limit, requests.size))
         val duplicates = requests.mapNotNull { it.externalId }.groupingBy { it }.eachCount().filterValues { it > 1 }.keys
         if (duplicates.isNotEmpty()) return ParseResult.ofSingleFailure(DuplicateExternalIds(duplicates))
-        if (requests.isEmpty()) return ParseResult.Success(emptyList())
+        if (requests.isEmpty()) return ParseResult.Success(RelationInputUpsertBatchParsed(tenantBpnl, emptyList()))
 
         val existingByExternalId = findExistingInputs(requests, tenantBpnl)
         val businessPartnersByExternalId = findBusinessPartners(requests, tenantBpnl)
@@ -82,7 +83,7 @@ class RelationInputUpsertParser(
 
         val errors = results.filterIsInstance<ParseResult.Failure<RelationInputUpsertError>>().flatMap { it.errors }
         return if (errors.isEmpty())
-            ParseResult.Success(results.map { (it as ParseResult.Success).parsed })
+            ParseResult.Success(RelationInputUpsertBatchParsed(tenantBpnl, results.map { (it as ParseResult.Success).parsed }))
         else
             ParseResult.Failure(errors)
     }

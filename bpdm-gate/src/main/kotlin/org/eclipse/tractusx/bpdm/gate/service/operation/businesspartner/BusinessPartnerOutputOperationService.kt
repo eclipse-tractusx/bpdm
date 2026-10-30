@@ -49,7 +49,7 @@ class BusinessPartnerOutputOperationService(
 
     /**
      * Creates or updates the output of each of [outputs] and returns every output in the same order, leaving those whose
-     * data is unchanged untouched.
+     * data is unchanged untouched; the caller ensures that no two of [outputs] share a sharing state.
      */
     @Transactional
     fun write(outputs: List<BusinessPartnerOutputParsed>): List<BusinessPartnerDb> =

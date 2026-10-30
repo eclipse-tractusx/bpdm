@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertBatchParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
@@ -50,11 +51,12 @@ class BusinessPartnerInputUpsertOperationService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Creates or updates the input of each of [requests] for [tenantBpnl] and resets its sharing state, resubmits an
+     * Creates or updates the input of each entry of [batch] for [tenantBpnl] and resets its sharing state, resubmits an
      * unchanged input whose sharing failed, or skips a request that is outdated or changes nothing.
      */
     @Transactional
-    fun upsert(requests: List<BusinessPartnerInputUpsertParsed>, tenantBpnl: String?): List<BusinessPartnerInputUpsertEntryResult> {
+    fun upsert(batch: BusinessPartnerInputUpsertBatchParsed, tenantBpnl: String?): List<BusinessPartnerInputUpsertEntryResult> {
+        val requests = batch.entries
         val sharingStates = sharingStateOperation.getOrCreate(requests.map { it.externalId }, tenantBpnl)
         val existingByExternalId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
             .associateBy { it.sharingState.externalId }

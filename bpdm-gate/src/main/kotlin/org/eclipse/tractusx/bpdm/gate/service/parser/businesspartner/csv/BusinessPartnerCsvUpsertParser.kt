@@ -17,7 +17,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvTenantParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertBatchParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.BusinessPartnerInputUpsertParser
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -39,7 +39,7 @@ class BusinessPartnerCsvUpsertParser(
      * Parses [rows] for [tenantBpnl] as a whole, succeeding only if the tenant is a legal entity known to the Pool and
      * every row is valid, and failing with every violation otherwise.
      */
-    fun parse(rows: List<BusinessPartnerCsvRowRaw>, tenantBpnl: String?): ParseResult<List<BusinessPartnerInputUpsertParsed>, BusinessPartnerCsvUpsertError> {
+    fun parse(rows: List<BusinessPartnerCsvRowRaw>, tenantBpnl: String?): ParseResult<BusinessPartnerInputUpsertBatchParsed, BusinessPartnerCsvUpsertError> {
         val tenant = when (val tenantResult = resolveTenant(tenantBpnl)) {
             is ParseResult.Failure -> return tenantResult
             is ParseResult.Success -> tenantResult.parsed

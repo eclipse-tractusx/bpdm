@@ -43,7 +43,7 @@ class RelationInputUpsertApplicationService(
         when (val parseResult = parser.parse(requests, tenantBpnl, mode)) {
             is ParseResult.Failure -> RelationInputUpsertResult.Rejected(parseResult.errors)
             is ParseResult.Success -> RelationInputUpsertResult.Written(
-                operationService.upsert(parseResult.parsed, tenantBpnl).map { dbToOutputMapper.toRecord(it.input) }
+                operationService.upsert(parseResult.parsed).map { dbToOutputMapper.toRecord(it.input) }
             )
         }
 }

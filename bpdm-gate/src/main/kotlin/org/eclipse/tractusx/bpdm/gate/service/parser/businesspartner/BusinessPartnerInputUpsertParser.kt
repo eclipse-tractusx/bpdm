@@ -16,7 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.mapper.RawToParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertBatchParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator.BusinessPartnerInputUpsertBatchValidator
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator.BusinessPartnerInputUpsertValidator
@@ -37,7 +37,7 @@ class BusinessPartnerInputUpsertParser(
      * Parses [requests] as a whole, succeeding only if every entry is valid and failing with the violations of every
      * entry otherwise.
      */
-    fun parse(requests: List<BusinessPartnerInputUpsertRaw>): ParseResult<List<BusinessPartnerInputUpsertParsed>, BusinessPartnerInputUpsertError> {
+    fun parse(requests: List<BusinessPartnerInputUpsertRaw>): ParseResult<BusinessPartnerInputUpsertBatchParsed, BusinessPartnerInputUpsertError> {
         val batchErrors = batchValidators.flatMap { it.validate(requests) }
         if (batchErrors.isNotEmpty()) return ParseResult.Failure(batchErrors)
 
@@ -45,7 +45,7 @@ class BusinessPartnerInputUpsertParser(
         val errors = normalized.flatMap { request -> validators.flatMap { it.validate(request) } }
 
         return if (errors.isEmpty())
-            ParseResult.Success(normalized.map(rawToParsedMapper::toParsed))
+            ParseResult.Success(BusinessPartnerInputUpsertBatchParsed(normalized.map(rawToParsedMapper::toParsed)))
         else
             ParseResult.Failure(errors)
     }
