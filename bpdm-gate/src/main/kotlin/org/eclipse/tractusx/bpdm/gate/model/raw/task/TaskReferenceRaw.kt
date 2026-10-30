@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
-data class CreatedGoldenRecordTaskRequest(
+data class TaskReferenceRaw(
     val taskId: String,
     val recordId: String
 )

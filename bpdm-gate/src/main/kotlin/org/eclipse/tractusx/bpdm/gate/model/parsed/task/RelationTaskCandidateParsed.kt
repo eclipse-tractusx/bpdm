@@ -11,13 +11,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import java.time.Instant
 
-data class RelationTaskCandidate(
+data class RelationTaskCandidateParsed(
     val relationId: Long,
     val externalId: String,
     val sharingStateUpdatedAt: Instant,

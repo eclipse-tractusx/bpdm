@@ -15,8 +15,8 @@ package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
@@ -59,7 +59,7 @@ class GoldenRecordTaskRequestMapper {
     /**
      * Maps [candidates] onto one request creating a golden record task from the sharing member side for each of them.
      */
-    fun toCreateRequest(candidates: List<GoldenRecordTaskCandidate>): TaskCreateRequest =
+    fun toCreateRequest(candidates: List<GoldenRecordTaskCandidateParsed>): TaskCreateRequest =
         TaskCreateRequest(
             mode = TaskMode.UpdateFromSharingMember,
             requests = candidates.map { TaskCreateRequestEntry(recordId = it.recordId, businessPartner = toBusinessPartner(it)) }
@@ -71,7 +71,7 @@ class GoldenRecordTaskRequestMapper {
     fun toResultStateSearchRequest(taskIds: List<String>): TaskResultStateSearchRequest =
         TaskResultStateSearchRequest(taskIds)
 
-    private fun toBusinessPartner(candidate: GoldenRecordTaskCandidate): BusinessPartner {
+    private fun toBusinessPartner(candidate: GoldenRecordTaskCandidateParsed): BusinessPartner {
         val input = candidate.input
         val addressType = input.address.addressType
         val postalAddress = toPostalAddress(input)

@@ -11,14 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
-/**
- * Reason a business partner whose task was checked cannot be resolved for the health check.
- */
-sealed interface GoldenRecordTaskHealthCheckError {
-    val sharingStateId: Long
-    val taskId: String?
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
 
-    data class SharingStateMissing(override val sharingStateId: Long, override val taskId: String?) : GoldenRecordTaskHealthCheckError
-}
+data class GoldenRecordTaskResolutionPageRaw(
+    val finishedTasks: FinishedGoldenRecordTaskPageRaw,
+    val results: List<GoldenRecordTaskResultRaw>,
+    val goldenRecords: PoolGoldenRecordsRequest
+)

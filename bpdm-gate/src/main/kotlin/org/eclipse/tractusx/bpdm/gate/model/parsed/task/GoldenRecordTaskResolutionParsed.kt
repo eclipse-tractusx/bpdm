@@ -11,25 +11,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 
-sealed interface GoldenRecordTaskResultRequest {
-    val taskId: String
-
-    data class Pending(override val taskId: String) : GoldenRecordTaskResultRequest
+sealed interface GoldenRecordTaskResolutionParsed {
+    val sharingState: SharingStateDb
 
     data class Succeeded(
-        override val taskId: String,
-        val output: GoldenRecordTaskOutputRequest,
-        val bpns: GoldenRecordBpns
-    ) : GoldenRecordTaskResultRequest
+        override val sharingState: SharingStateDb,
+        val output: BusinessPartnerOutputParsed?
+    ) : GoldenRecordTaskResolutionParsed
 
     data class Failed(
-        override val taskId: String,
+        override val sharingState: SharingStateDb,
         val errorCode: BusinessPartnerSharingErrorCode,
         val errorMessage: String?
-    ) : GoldenRecordTaskResultRequest
+    ) : GoldenRecordTaskResolutionParsed
 }

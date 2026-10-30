@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskHealthCheckError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskHealthCheckParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskHealthCheckPageRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.stereotype.Service
 
@@ -31,7 +31,7 @@ class GoldenRecordTaskHealthCheckParser(
     /**
      * Resolves the sharing state of each checked task in [page], failing those whose sharing state no longer exists.
      */
-    fun parse(page: GoldenRecordTaskHealthCheckPageRequest): List<ParseResult<GoldenRecordTaskHealthCheckParsed, GoldenRecordTaskHealthCheckError>> {
+    fun parse(page: GoldenRecordTaskHealthCheckPageRaw): List<ParseResult<GoldenRecordTaskHealthCheckParsed, GoldenRecordTaskHealthCheckError>> {
         val sharingStatesById = sharingStateRepository.findAllById(page.pendingTasks.map { it.sharingStateId }).associateBy { it.id }
         return page.pendingTasks.map { pendingTask ->
             val sharingState = sharingStatesById[pendingTask.sharingStateId]

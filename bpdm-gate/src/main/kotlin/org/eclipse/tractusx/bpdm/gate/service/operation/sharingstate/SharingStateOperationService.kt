@@ -22,11 +22,11 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SharedBusinessPartner
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
-import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.PendingGoldenRecordTaskRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.TaskReferenceRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Pageable
@@ -74,18 +74,18 @@ class SharingStateOperationService(
      * Returns a reference to the task of each sharing state still pending on any of [taskIds].
      */
     @Transactional(readOnly = true)
-    fun findPendingTasks(taskIds: Collection<String>): List<TaskReference> =
+    fun findPendingTasks(taskIds: Collection<String>): List<TaskReferenceRaw> =
         sharingStateRepository.findByTaskIdIn(taskIds.toSet())
             .filter { it.sharingStateType == SharingStateType.Pending }
-            .map { TaskReference(taskId = it.taskId.toString(), recordId = it.orchestratorRecordId.toString()) }
+            .map { TaskReferenceRaw(taskId = it.taskId.toString(), recordId = it.orchestratorRecordId.toString()) }
 
     /**
      * Returns up to [limit] sharing states pending on a task, in the order of their id and starting after [sharingStateId].
      */
     @Transactional(readOnly = true)
-    fun findPendingTasksAfter(sharingStateId: Long, limit: Int): List<PendingGoldenRecordTask> =
+    fun findPendingTasksAfter(sharingStateId: Long, limit: Int): List<PendingGoldenRecordTaskRaw> =
         sharingStateRepository.findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(SharingStateType.Pending, sharingStateId, Pageable.ofSize(limit))
-            .map { PendingGoldenRecordTask(sharingStateId = it.id, taskId = it.taskId) }
+            .map { PendingGoldenRecordTaskRaw(sharingStateId = it.id, taskId = it.taskId) }
 
     /**
      * Returns up to [limit] successfully shared business partners with the golden records their output references, in

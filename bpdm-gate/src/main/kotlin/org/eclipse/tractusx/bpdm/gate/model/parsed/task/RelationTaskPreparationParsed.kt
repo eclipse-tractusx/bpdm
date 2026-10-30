@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
@@ -19,7 +19,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErr
 sealed interface RelationTaskPreparationParsed {
     val relation: RelationDb
 
-    data class Sendable(override val relation: RelationDb, val candidate: RelationTaskCandidate) : RelationTaskPreparationParsed
+    data class Sendable(override val relation: RelationDb, val candidate: RelationTaskCandidateParsed) : RelationTaskPreparationParsed
 
     data class Deferred(override val relation: RelationDb) : RelationTaskPreparationParsed
 

@@ -19,11 +19,11 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCandidateParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskPreparationError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationError
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.stereotype.Service
@@ -78,7 +78,7 @@ class RelationTaskPreparationParser(
             return ParseResult.ofSingleFailure(RelationTaskPreparationError.BpnMissing(relation, kind.bpnType, sourceBpn, targetBpn))
 
         val sharingState = checkNotNull(relation.sharingState)
-        val candidate = RelationTaskCandidate(
+        val candidate = RelationTaskCandidateParsed(
             relationId = relation.id,
             externalId = relation.externalId,
             sharingStateUpdatedAt = sharingState.updatedAt,

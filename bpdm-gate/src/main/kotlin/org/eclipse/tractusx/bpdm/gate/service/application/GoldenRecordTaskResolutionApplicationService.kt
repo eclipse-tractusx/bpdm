@@ -16,11 +16,11 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.union
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResolutionPageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.gate.service.gateway.PoolGoldenRecordGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
@@ -61,14 +61,14 @@ class GoldenRecordTaskResolutionApplicationService(
         } while (page.finishedTasks.hasMore)
     }
 
-    private fun fetchNextPage(): GoldenRecordTaskResolutionPageRequest {
+    private fun fetchNextPage(): GoldenRecordTaskResolutionPageRaw {
         val finishedTasks = taskGateway.fetchFinishedTasks(syncRecordOperation.getSyncedUntil(SyncTypeDb.ORCHESTRATOR_FINISHED_TASKS))
         val results = taskGateway.fetchResults(sharingStateOperation.findPendingTasks(finishedTasks.taskIds))
-        val succeededBpns = results.filterIsInstance<GoldenRecordTaskResultRequest.Succeeded>().map { it.bpns }
-        return GoldenRecordTaskResolutionPageRequest(finishedTasks, results, poolGateway.fetchGoldenRecords(succeededBpns.union()))
+        val succeededBpns = results.filterIsInstance<GoldenRecordTaskResultRaw.Succeeded>().map { it.bpns }
+        return GoldenRecordTaskResolutionPageRaw(finishedTasks, results, poolGateway.fetchGoldenRecords(succeededBpns.union()))
     }
 
-    private fun resolve(page: GoldenRecordTaskResolutionPageRequest) {
+    private fun resolve(page: GoldenRecordTaskResolutionPageRaw) {
         pageTransaction.executeWithoutResult {
             val resolutions = resolutionParser.parse(page).flatMap { result ->
                 when (result) {

@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.operation.task
 
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionParsed
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerOutputOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.GoldenRecordCountedOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService

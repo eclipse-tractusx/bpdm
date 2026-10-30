@@ -16,9 +16,9 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.CreatedRelationTaskRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCandidateParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCreationError
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedRelationTaskRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.RelationTaskGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationSharingStateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.task.RelationTaskCreationParser
@@ -58,7 +58,7 @@ class RelationTaskCreationApplicationService(
         } while (preparation.preparedCount > 0)
     }
 
-    private fun start(candidates: List<RelationTaskCandidate>, createdTasks: List<CreatedRelationTaskRequest>) {
+    private fun start(candidates: List<RelationTaskCandidateParsed>, createdTasks: List<CreatedRelationTaskRaw>) {
         pageTransaction.executeWithoutResult {
             val creations = creationParser.parse(candidates, createdTasks).mapNotNull { result ->
                 when (result) {

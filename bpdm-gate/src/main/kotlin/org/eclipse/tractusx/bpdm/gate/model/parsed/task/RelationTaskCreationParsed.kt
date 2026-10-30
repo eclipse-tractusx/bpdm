@@ -11,8 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
-sealed interface GoldenRecordTaskOutputError {
-    data class ValueMissing(val property: String) : GoldenRecordTaskOutputError
-}
+import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+
+data class RelationTaskCreationParsed(
+    val relation: RelationDb,
+    val taskId: String,
+    val recordId: String
+)

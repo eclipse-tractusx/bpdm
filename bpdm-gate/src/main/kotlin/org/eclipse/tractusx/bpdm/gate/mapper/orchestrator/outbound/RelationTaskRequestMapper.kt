@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound
 
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCandidateParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
@@ -33,13 +33,13 @@ class RelationTaskRequestMapper {
      * Maps [candidates] onto one request creating a relation golden record task from the sharing member side for each
      * of them.
      */
-    fun toCreateRequest(candidates: List<RelationTaskCandidate>): TaskCreateRelationsRequest =
+    fun toCreateRequest(candidates: List<RelationTaskCandidateParsed>): TaskCreateRelationsRequest =
         TaskCreateRelationsRequest(
             mode = TaskMode.UpdateFromSharingMember,
             requests = candidates.map { TaskCreateRelationsRequestEntry(recordId = it.recordId, businessPartnerRelations = toRelations(it)) }
         )
 
-    private fun toRelations(candidate: RelationTaskCandidate): BusinessPartnerRelations =
+    private fun toRelations(candidate: RelationTaskCandidateParsed): BusinessPartnerRelations =
         BusinessPartnerRelations(
             relationType = toOrchestratorType(candidate.relationType),
             businessPartnerSourceBpn = candidate.sourceBpn,

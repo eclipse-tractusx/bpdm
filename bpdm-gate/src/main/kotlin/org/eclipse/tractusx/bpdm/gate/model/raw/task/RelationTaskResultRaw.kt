@@ -11,16 +11,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
 
-sealed interface RelationTaskResultRequest {
+sealed interface RelationTaskResultRaw {
     val taskId: String
 
-    data class Pending(override val taskId: String) : RelationTaskResultRequest
+    data class Pending(override val taskId: String) : RelationTaskResultRaw
 
     data class Succeeded(
         override val taskId: String,
@@ -29,11 +29,11 @@ sealed interface RelationTaskResultRequest {
         val targetBpn: String,
         val validityPeriods: List<RelationValidityPeriodRaw>,
         val reasonCode: String?
-    ) : RelationTaskResultRequest
+    ) : RelationTaskResultRaw
 
     data class Failed(
         override val taskId: String,
         val errorCode: RelationSharingStateErrorCode,
         val errorMessage: String
-    ) : RelationTaskResultRequest
+    ) : RelationTaskResultRaw
 }

@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
@@ -33,10 +33,10 @@ class GoldenRecordTaskResultRequestMapper(
     /**
      * Maps [task] onto its result, translating the error type the task failed with first into a sharing error code.
      */
-    fun toRequest(task: TaskClientStateDto): GoldenRecordTaskResultRequest =
+    fun toRequest(task: TaskClientStateDto): GoldenRecordTaskResultRaw =
         when (task.processingState.resultState) {
-            ResultState.Pending -> GoldenRecordTaskResultRequest.Pending(task.taskId)
-            ResultState.Success -> GoldenRecordTaskResultRequest.Succeeded(task.taskId, outputMapper.toRequest(task.businessPartnerResult), toBpns(task.businessPartnerResult))
+            ResultState.Pending -> GoldenRecordTaskResultRaw.Pending(task.taskId)
+            ResultState.Success -> GoldenRecordTaskResultRaw.Succeeded(task.taskId, outputMapper.toRequest(task.businessPartnerResult), toBpns(task.businessPartnerResult))
             ResultState.Error -> toFailed(task)
         }
 
@@ -53,9 +53,9 @@ class GoldenRecordTaskResultRequestMapper(
             )
         }
 
-    private fun toFailed(task: TaskClientStateDto): GoldenRecordTaskResultRequest.Failed {
+    private fun toFailed(task: TaskClientStateDto): GoldenRecordTaskResultRaw.Failed {
         val errors = task.processingState.errors
-        return GoldenRecordTaskResultRequest.Failed(
+        return GoldenRecordTaskResultRaw.Failed(
             taskId = task.taskId,
             errorCode = toErrorCode(errors.firstOrNull()?.type),
             errorMessage = errors.joinToString(" // ") { it.description }.take(255).ifEmpty { null }

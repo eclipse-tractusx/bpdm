@@ -11,12 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
-
-data class GoldenRecordTaskResolutionPageRequest(
-    val finishedTasks: FinishedGoldenRecordTaskPage,
-    val results: List<GoldenRecordTaskResultRequest>,
-    val goldenRecords: PoolGoldenRecordsRequest
+data class CreatedGoldenRecordTaskRaw(
+    val taskId: String,
+    val recordId: String
 )

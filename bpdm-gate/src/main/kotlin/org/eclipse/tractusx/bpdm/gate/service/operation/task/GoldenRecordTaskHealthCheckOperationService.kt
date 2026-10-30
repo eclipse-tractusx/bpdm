@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.task
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskHealthCheckParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckParsed
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

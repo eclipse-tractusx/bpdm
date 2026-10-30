@@ -18,12 +18,12 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.TaskReferenceRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -123,11 +123,11 @@ class RelationSharingStateOperationService(
      * Returns a reference to the task of each relation still pending on any of [taskIds].
      */
     @Transactional(readOnly = true)
-    fun findPendingTasks(taskIds: Collection<String>): List<TaskReference> =
+    fun findPendingTasks(taskIds: Collection<String>): List<TaskReferenceRaw> =
         relationRepository.findBySharingStateTaskIdIn(taskIds.toSet())
             .mapNotNull { it.sharingState }
             .filter { it.sharingStateType == RelationSharingStateType.Pending }
-            .map { TaskReference(taskId = checkNotNull(it.taskId), recordId = checkNotNull(it.recordId)) }
+            .map { TaskReferenceRaw(taskId = checkNotNull(it.taskId), recordId = checkNotNull(it.recordId)) }
 
     /**
      * Marks each of [relations] as successfully shared.

@@ -16,11 +16,11 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskResolutionError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskResolutionParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionError
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResultRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResolutionPageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -38,7 +38,7 @@ class RelationTaskResolutionParser(
      * or task result is unusable and leaving out those whose task is still pending.
      */
     @Transactional(readOnly = true)
-    fun parse(page: RelationTaskResolutionPageRequest): List<ParseResult<RelationTaskResolutionParsed, RelationTaskResolutionError>> {
+    fun parse(page: RelationTaskResolutionPageRaw): List<ParseResult<RelationTaskResolutionParsed, RelationTaskResolutionError>> {
         val pendingRelations = relationRepository.findBySharingStateTaskIdIn(page.finishedTasks.taskIds.toSet())
             .filter { it.sharingState?.sharingStateType == RelationSharingStateType.Pending }
         val resultsByTaskId = page.results.associateBy { it.taskId }
@@ -46,17 +46,17 @@ class RelationTaskResolutionParser(
         return pendingRelations.mapNotNull { relation ->
             when (val result = resultsByTaskId[checkNotNull(relation.sharingState).taskId]) {
                 null -> ParseResult.ofSingleFailure(RelationTaskResolutionError.TaskMissing(relation))
-                is RelationTaskResultRequest.Pending -> null
-                is RelationTaskResultRequest.Failed ->
+                is RelationTaskResultRaw.Pending -> null
+                is RelationTaskResultRaw.Failed ->
                     ParseResult.Success(RelationTaskResolutionParsed.Failed(relation, result.errorCode, result.errorMessage))
-                is RelationTaskResultRequest.Succeeded -> parseSucceeded(relation, result)
+                is RelationTaskResultRaw.Succeeded -> parseSucceeded(relation, result)
             }
         }
     }
 
     private fun parseSucceeded(
         relation: RelationDb,
-        result: RelationTaskResultRequest.Succeeded
+        result: RelationTaskResultRaw.Succeeded
     ): ParseResult<RelationTaskResolutionParsed, RelationTaskResolutionError> {
         val errors = listOfNotNull(validateEndpoints(relation, result)) + validateValidityPeriods(relation, result)
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
@@ -72,13 +72,13 @@ class RelationTaskResolutionParser(
         return ParseResult.Success(RelationTaskResolutionParsed.Succeeded(relation, output))
     }
 
-    private fun validateEndpoints(relation: RelationDb, result: RelationTaskResultRequest.Succeeded): RelationTaskResolutionError? =
+    private fun validateEndpoints(relation: RelationDb, result: RelationTaskResultRaw.Succeeded): RelationTaskResolutionError? =
         if (result.sourceBpn == result.targetBpn)
             RelationTaskResolutionError.ResultUnusable(relation, "Source and target should not be the same")
         else
             null
 
-    private fun validateValidityPeriods(relation: RelationDb, result: RelationTaskResultRequest.Succeeded): List<RelationTaskResolutionError> =
+    private fun validateValidityPeriods(relation: RelationDb, result: RelationTaskResultRaw.Succeeded): List<RelationTaskResolutionError> =
         result.validityPeriods.mapNotNull { period ->
             period.validTo
                 ?.takeIf { !period.validFrom.isBefore(it) }

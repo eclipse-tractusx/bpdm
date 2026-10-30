@@ -21,12 +21,12 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskOutputError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResolutionPageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -51,21 +51,21 @@ class GoldenRecordTaskResolutionParser(
      * task, input or task result is unusable and leaving out those whose task is still pending.
      */
     @Transactional(readOnly = true)
-    fun parse(page: GoldenRecordTaskResolutionPageRequest): List<ParseResult<GoldenRecordTaskResolutionParsed, GoldenRecordTaskResolutionError>> {
+    fun parse(page: GoldenRecordTaskResolutionPageRaw): List<ParseResult<GoldenRecordTaskResolutionParsed, GoldenRecordTaskResolutionError>> {
         val pendingSharingStates = sharingStateRepository.findByTaskIdIn(page.finishedTasks.taskIds.toSet())
             .filter { it.sharingStateType == SharingStateType.Pending }
         val resultsByTaskId = page.results.associateBy { it.taskId }
-        val succeededSharingStates = pendingSharingStates.filter { resultsByTaskId[it.taskId] is GoldenRecordTaskResultRequest.Succeeded }
+        val succeededSharingStates = pendingSharingStates.filter { resultsByTaskId[it.taskId] is GoldenRecordTaskResultRaw.Succeeded }
         val inputsBySharingStateId = findBySharingStates(succeededSharingStates, StageType.Input)
         val storedOutputsBySharingStateId = findBySharingStates(succeededSharingStates, StageType.Output)
 
         return pendingSharingStates.mapNotNull { sharingState ->
             when (val result = resultsByTaskId[sharingState.taskId]) {
                 null -> ParseResult.ofSingleFailure(GoldenRecordTaskResolutionError.TaskMissing(sharingState))
-                is GoldenRecordTaskResultRequest.Pending -> null
-                is GoldenRecordTaskResultRequest.Failed ->
+                is GoldenRecordTaskResultRaw.Pending -> null
+                is GoldenRecordTaskResultRaw.Failed ->
                     ParseResult.Success(GoldenRecordTaskResolutionParsed.Failed(sharingState, result.errorCode, result.errorMessage))
-                is GoldenRecordTaskResultRequest.Succeeded -> parseSucceeded(
+                is GoldenRecordTaskResultRaw.Succeeded -> parseSucceeded(
                     sharingState,
                     result,
                     inputsBySharingStateId[sharingState.id],
@@ -78,7 +78,7 @@ class GoldenRecordTaskResolutionParser(
 
     private fun parseSucceeded(
         sharingState: SharingStateDb,
-        result: GoldenRecordTaskResultRequest.Succeeded,
+        result: GoldenRecordTaskResultRaw.Succeeded,
         input: BusinessPartnerDb?,
         storedOutput: BusinessPartnerDb?,
         goldenRecords: PoolGoldenRecordsRequest

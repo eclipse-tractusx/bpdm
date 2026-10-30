@@ -15,11 +15,11 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCandidateParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCreationError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.CreatedRelationTaskRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedRelationTaskRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,7 +37,7 @@ class RelationTaskCreationParser(
      * is still staged for sharing as it was when the task was created.
      */
     @Transactional(readOnly = true)
-    fun parse(candidates: List<RelationTaskCandidate>, createdTasks: List<CreatedRelationTaskRequest>): List<ParseResult<RelationTaskCreationParsed, RelationTaskCreationError>> {
+    fun parse(candidates: List<RelationTaskCandidateParsed>, createdTasks: List<CreatedRelationTaskRaw>): List<ParseResult<RelationTaskCreationParsed, RelationTaskCreationError>> {
         val relationsById = relationRepository.findAllById(candidates.map { it.relationId }).associateBy { it.id }
 
         return candidates.zip(createdTasks) { candidate, createdTask ->
@@ -46,8 +46,8 @@ class RelationTaskCreationParser(
     }
 
     private fun parse(
-        candidate: RelationTaskCandidate,
-        createdTask: CreatedRelationTaskRequest,
+        candidate: RelationTaskCandidateParsed,
+        createdTask: CreatedRelationTaskRaw,
         relation: RelationDb?
     ): ParseResult<RelationTaskCreationParsed, RelationTaskCreationError> {
         if (relation == null)
@@ -58,7 +58,7 @@ class RelationTaskCreationParser(
         return ParseResult.Success(RelationTaskCreationParsed(relation, createdTask.taskId, createdTask.recordId))
     }
 
-    private fun isUnchangedSince(candidate: RelationTaskCandidate, relation: RelationDb): Boolean {
+    private fun isUnchangedSince(candidate: RelationTaskCandidateParsed, relation: RelationDb): Boolean {
         val sharingState = relation.sharingState ?: return false
         return sharingState.sharingStateType == RelationSharingStateType.Ready
                 && sharingState.isStaged

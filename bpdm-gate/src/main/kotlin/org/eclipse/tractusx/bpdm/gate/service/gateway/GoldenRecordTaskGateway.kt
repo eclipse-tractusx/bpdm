@@ -19,11 +19,11 @@ import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.FinishedGolden
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.GoldenRecordTaskResultRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.GoldenRecordTaskRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.TaskStateRequestMapper
-import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.FinishedGoldenRecordTaskPage
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedGoldenRecordTaskRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.TaskReferenceRaw
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -44,16 +44,16 @@ class GoldenRecordTaskGateway(
     /**
      * Creates a golden record task for each of [candidates] and returns the created tasks in the order of [candidates].
      */
-    fun createTasks(candidates: List<GoldenRecordTaskCandidate>): List<CreatedGoldenRecordTaskRequest> {
+    fun createTasks(candidates: List<GoldenRecordTaskCandidateParsed>): List<CreatedGoldenRecordTaskRaw> {
         val createdTasks = orchestrationApiClient.goldenRecordTasks.createTasks(createRequestMapper.toCreateRequest(candidates)).createdTasks
         check(createdTasks.size == candidates.size) { "The Orchestrator created ${createdTasks.size} golden record tasks for ${candidates.size} requested" }
-        return createdTasks.map { CreatedGoldenRecordTaskRequest(taskId = it.taskId, recordId = it.recordId) }
+        return createdTasks.map { CreatedGoldenRecordTaskRaw(taskId = it.taskId, recordId = it.recordId) }
     }
 
     /**
      * Returns the oldest page of tasks the Orchestrator reports as finished since [since].
      */
-    fun fetchFinishedTasks(since: Instant): FinishedGoldenRecordTaskPage {
+    fun fetchFinishedTasks(since: Instant): FinishedGoldenRecordTaskPageRaw {
         val events = orchestrationApiClient.finishedTaskEvents.getEvents(since, PaginationRequest(0, EVENT_PAGE_SIZE))
         return finishedPageMapper.toPage(events)
     }
@@ -61,7 +61,7 @@ class GoldenRecordTaskGateway(
     /**
      * Returns the current result of each task in [tasks], leaving out tasks the Orchestrator does not know.
      */
-    fun fetchResults(tasks: List<TaskReference>): List<GoldenRecordTaskResultRequest> =
+    fun fetchResults(tasks: List<TaskReferenceRaw>): List<GoldenRecordTaskResultRaw> =
         tasks.chunked(taskProperties.check.batchSize) { chunk ->
             orchestrationApiClient.goldenRecordTasks.searchTaskStates(stateRequestMapper.toRequest(chunk)).tasks
         }.flatten().map(resultRequestMapper::toRequest)

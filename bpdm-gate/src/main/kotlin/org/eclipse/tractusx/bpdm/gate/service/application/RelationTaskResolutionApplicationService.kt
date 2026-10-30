@@ -15,10 +15,10 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskResolutionError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskResolutionParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionError
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResolutionPageRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.RelationTaskGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationSharingStateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sync.SyncRecordOperationService
@@ -58,13 +58,13 @@ class RelationTaskResolutionApplicationService(
         } while (page.finishedTasks.hasMore)
     }
 
-    private fun fetchNextPage(): RelationTaskResolutionPageRequest {
+    private fun fetchNextPage(): RelationTaskResolutionPageRaw {
         val finishedTasks = taskGateway.fetchFinishedTasks(syncRecordOperation.getSyncedUntil(SyncTypeDb.ORCHESTRATOR_FINISHED_RELATION_TASKS))
         val results = taskGateway.fetchResults(sharingStateOperation.findPendingTasks(finishedTasks.taskIds))
-        return RelationTaskResolutionPageRequest(finishedTasks, results)
+        return RelationTaskResolutionPageRaw(finishedTasks, results)
     }
 
-    private fun resolve(page: RelationTaskResolutionPageRequest) {
+    private fun resolve(page: RelationTaskResolutionPageRaw) {
         pageTransaction.executeWithoutResult {
             val resolutions = resolutionParser.parse(page).map { result ->
                 when (result) {

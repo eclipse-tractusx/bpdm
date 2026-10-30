@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.operation.task
 
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResolutionParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskResolutionParsed
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationOutputOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationSharingStateOperationService
 import org.springframework.stereotype.Service

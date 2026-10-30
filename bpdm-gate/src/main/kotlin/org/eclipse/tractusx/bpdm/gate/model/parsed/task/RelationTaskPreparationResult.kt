@@ -11,12 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
-import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-
-data class GoldenRecordTaskHealthCheckParsed(
-    val sharingState: SharingStateDb,
-    val checkedTaskId: String?,
-    val isTaskKnown: Boolean
+data class RelationTaskPreparationResult(
+    val preparedCount: Int,
+    val candidates: List<RelationTaskCandidateParsed>
 )

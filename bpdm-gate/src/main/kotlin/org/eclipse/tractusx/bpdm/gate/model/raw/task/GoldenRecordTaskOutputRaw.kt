@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import java.time.Instant
 import java.time.LocalDateTime
 
-data class GoldenRecordTaskOutputRequest(
+data class GoldenRecordTaskOutputRaw(
     val addressType: AddressType?,
     val owningCompanyBpnl: String?,
     val nameParts: List<String>,

@@ -16,9 +16,9 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskHealthCheckError
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskHealthCheckPageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.PendingGoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.task.GoldenRecordTaskHealthCheckOperationService
@@ -52,15 +52,15 @@ class GoldenRecordTaskHealthCheckApplicationService(
     fun checkPendingTasks() {
         var pendingTasks = findPendingTasksAfter(Long.MIN_VALUE)
         while (pendingTasks.isNotEmpty()) {
-            checkPage(GoldenRecordTaskHealthCheckPageRequest(pendingTasks, taskGateway.fetchKnownTaskIds(pendingTasks.mapNotNull { it.taskId })))
+            checkPage(GoldenRecordTaskHealthCheckPageRaw(pendingTasks, taskGateway.fetchKnownTaskIds(pendingTasks.mapNotNull { it.taskId })))
             pendingTasks = findPendingTasksAfter(pendingTasks.last().sharingStateId)
         }
     }
 
-    private fun findPendingTasksAfter(sharingStateId: Long): List<PendingGoldenRecordTask> =
+    private fun findPendingTasksAfter(sharingStateId: Long): List<PendingGoldenRecordTaskRaw> =
         sharingStateOperation.findPendingTasksAfter(sharingStateId, taskProperties.healthCheck.batchSize)
 
-    private fun checkPage(page: GoldenRecordTaskHealthCheckPageRequest) {
+    private fun checkPage(page: GoldenRecordTaskHealthCheckPageRaw) {
         pageTransaction.executeWithoutResult {
             val checks = healthCheckParser.parse(page).mapNotNull { result ->
                 when (result) {

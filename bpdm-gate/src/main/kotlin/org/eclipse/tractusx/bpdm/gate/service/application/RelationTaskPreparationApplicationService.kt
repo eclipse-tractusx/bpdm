@@ -14,10 +14,10 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskPreparationError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskPreparationParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskPreparationResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationError
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationResult
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationSharingStateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.task.RelationTaskPreparationParser
 import org.springframework.stereotype.Service

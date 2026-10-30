@@ -11,23 +11,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
-import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import java.util.UUID
 
-sealed interface GoldenRecordTaskResolutionParsed {
+sealed interface GoldenRecordTaskCreationParsed {
     val sharingState: SharingStateDb
+    val recordIdToAssign: UUID?
 
-    data class Succeeded(
+    data class Started(
         override val sharingState: SharingStateDb,
-        val output: BusinessPartnerOutputParsed?
-    ) : GoldenRecordTaskResolutionParsed
+        val taskId: String,
+        override val recordIdToAssign: UUID?
+    ) : GoldenRecordTaskCreationParsed
 
-    data class Failed(
+    data class Stale(
         override val sharingState: SharingStateDb,
-        val errorCode: BusinessPartnerSharingErrorCode,
-        val errorMessage: String?
-    ) : GoldenRecordTaskResolutionParsed
+        override val recordIdToAssign: UUID?
+    ) : GoldenRecordTaskCreationParsed
 }

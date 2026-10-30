@@ -16,7 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResultRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResultRaw
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientRelationsStateDto
@@ -32,16 +32,16 @@ class RelationTaskResultRequestMapper {
     /**
      * Maps [task] onto its result, translating the error type the task failed with first into a sharing error code.
      */
-    fun toRequest(task: TaskClientRelationsStateDto): RelationTaskResultRequest =
+    fun toRequest(task: TaskClientRelationsStateDto): RelationTaskResultRaw =
         when (task.processingState.resultState) {
-            ResultState.Pending -> RelationTaskResultRequest.Pending(task.taskId)
+            ResultState.Pending -> RelationTaskResultRaw.Pending(task.taskId)
             ResultState.Success -> toSucceeded(task)
             ResultState.Error -> toFailed(task)
         }
 
-    private fun toSucceeded(task: TaskClientRelationsStateDto): RelationTaskResultRequest.Succeeded =
+    private fun toSucceeded(task: TaskClientRelationsStateDto): RelationTaskResultRaw.Succeeded =
         with(task.businessPartnerRelationsResult) {
-            RelationTaskResultRequest.Succeeded(
+            RelationTaskResultRaw.Succeeded(
                 taskId = task.taskId,
                 relationType = toRelationType(relationType),
                 sourceBpn = businessPartnerSourceBpn,
@@ -51,9 +51,9 @@ class RelationTaskResultRequestMapper {
             )
         }
 
-    private fun toFailed(task: TaskClientRelationsStateDto): RelationTaskResultRequest.Failed {
+    private fun toFailed(task: TaskClientRelationsStateDto): RelationTaskResultRaw.Failed {
         val errors = task.processingState.errors
-        return RelationTaskResultRequest.Failed(
+        return RelationTaskResultRaw.Failed(
             taskId = task.taskId,
             errorCode = toErrorCode(errors.firstOrNull()?.type),
             errorMessage = errors.joinToString { it.description }.take(250)

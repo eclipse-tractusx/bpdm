@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound
 
-import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.TaskReferenceRaw
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.stereotype.Component
 
@@ -26,6 +26,6 @@ class TaskStateRequestMapper {
     /**
      * Maps [tasks] onto a request asking for the current state of each of these tasks.
      */
-    fun toRequest(tasks: List<TaskReference>): TaskStateRequest =
+    fun toRequest(tasks: List<TaskReferenceRaw>): TaskStateRequest =
         TaskStateRequest(tasks.map { TaskStateRequest.Entry(taskId = it.taskId, recordId = it.recordId) })
 }

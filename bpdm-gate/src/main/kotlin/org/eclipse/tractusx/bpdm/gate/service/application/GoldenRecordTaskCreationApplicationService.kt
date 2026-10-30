@@ -16,10 +16,10 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedGoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.task.GoldenRecordTaskCreationOperationService
@@ -64,7 +64,7 @@ class GoldenRecordTaskCreationApplicationService(
         return start(candidates, taskGateway.createTasks(candidates))
     }
 
-    private fun start(candidates: List<GoldenRecordTaskCandidate>, createdTasks: List<CreatedGoldenRecordTaskRequest>): Int =
+    private fun start(candidates: List<GoldenRecordTaskCandidateParsed>, createdTasks: List<CreatedGoldenRecordTaskRaw>): Int =
         pageTransaction.execute {
             val creations = creationParser.parse(candidates, createdTasks).mapNotNull { result ->
                 when (result) {

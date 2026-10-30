@@ -11,12 +11,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 
-data class FinishedGoldenRecordTaskPage(
-    val taskIds: List<String>,
-    val lastFinishedAt: Instant?,
-    val hasMore: Boolean
+data class GoldenRecordTaskCandidateParsed(
+    val sharingStateId: Long,
+    val externalId: String,
+    val recordId: String?,
+    val input: BusinessPartnerInputContent,
+    val owningCompanyBpnl: String?
 )

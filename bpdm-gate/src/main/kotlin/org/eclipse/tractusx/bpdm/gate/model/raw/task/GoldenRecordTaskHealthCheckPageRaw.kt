@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.task
+package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
-data class PendingGoldenRecordTask(
-    val sharingStateId: Long,
-    val taskId: String?
+data class GoldenRecordTaskHealthCheckPageRaw(
+    val pendingTasks: List<PendingGoldenRecordTaskRaw>,
+    val knownTaskIds: Set<String>
 )

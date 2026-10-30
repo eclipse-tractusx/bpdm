@@ -16,6 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskOutputError
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskOutputRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
@@ -23,8 +25,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputRequest
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
@@ -39,7 +39,7 @@ class GoldenRecordTaskOutputParser {
      * it with every mandatory value it lacks and dropping identifiers, states and additional sites without their key.
      */
     fun parse(
-        request: GoldenRecordTaskOutputRequest,
+        request: GoldenRecordTaskOutputRaw,
         roles: Collection<BusinessPartnerRole>,
         tenantBpnl: String?
     ): ParseResult<OutputUpsertData, GoldenRecordTaskOutputError> {
@@ -150,7 +150,7 @@ class GoldenRecordTaskOutputParser {
         }
 
     private fun parseConfidence(
-        confidence: GoldenRecordTaskOutputRequest.Confidence?,
+        confidence: GoldenRecordTaskOutputRaw.Confidence?,
         property: String
     ): ParseResult<ConfidenceCriteriaRaw, GoldenRecordTaskOutputError> {
         if (confidence == null) return missing(property)
@@ -182,13 +182,13 @@ class GoldenRecordTaskOutputParser {
         }
     }
 
-    private fun toIdentifier(identifier: GoldenRecordTaskOutputRequest.Identifier): IdentifierRaw? {
+    private fun toIdentifier(identifier: GoldenRecordTaskOutputRaw.Identifier): IdentifierRaw? {
         val type = identifier.type ?: return null
         val value = identifier.value ?: return null
         return IdentifierRaw(type = type, value = value, issuingBody = identifier.issuingBody, businessPartnerType = identifier.businessPartnerType)
     }
 
-    private fun toState(state: GoldenRecordTaskOutputRequest.State): StateRaw? =
+    private fun toState(state: GoldenRecordTaskOutputRaw.State): StateRaw? =
         state.type?.let { StateRaw(validFrom = state.validFrom, validTo = state.validTo, type = it, businessPartnerType = state.businessPartnerType) }
 
     private fun <T : Any> required(value: T?, property: String): ParseResult<T, GoldenRecordTaskOutputError> =

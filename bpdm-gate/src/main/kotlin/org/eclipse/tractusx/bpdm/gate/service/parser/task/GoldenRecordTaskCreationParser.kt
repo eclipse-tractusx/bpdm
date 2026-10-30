@@ -18,11 +18,11 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedGoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.stereotype.Service
@@ -45,8 +45,8 @@ class GoldenRecordTaskCreationParser(
      */
     @Transactional(readOnly = true)
     fun parse(
-        candidates: List<GoldenRecordTaskCandidate>,
-        createdTasks: List<CreatedGoldenRecordTaskRequest>
+        candidates: List<GoldenRecordTaskCandidateParsed>,
+        createdTasks: List<CreatedGoldenRecordTaskRaw>
     ): List<ParseResult<GoldenRecordTaskCreationParsed, GoldenRecordTaskCreationError>> {
         val sharingStatesById = sharingStateRepository.findAllById(candidates.map { it.sharingStateId }).associateBy { it.id }
         val inputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStatesById.values, StageType.Input)
@@ -58,8 +58,8 @@ class GoldenRecordTaskCreationParser(
     }
 
     private fun parse(
-        candidate: GoldenRecordTaskCandidate,
-        createdTask: CreatedGoldenRecordTaskRequest,
+        candidate: GoldenRecordTaskCandidateParsed,
+        createdTask: CreatedGoldenRecordTaskRaw,
         sharingState: SharingStateDb?,
         input: BusinessPartnerDb?
     ): ParseResult<GoldenRecordTaskCreationParsed, GoldenRecordTaskCreationError> {
@@ -79,7 +79,7 @@ class GoldenRecordTaskCreationParser(
         return ParseResult.Success(parsed)
     }
 
-    private fun isUnchangedSince(candidate: GoldenRecordTaskCandidate, sharingState: SharingStateDb, input: BusinessPartnerDb?): Boolean =
+    private fun isUnchangedSince(candidate: GoldenRecordTaskCandidateParsed, sharingState: SharingStateDb, input: BusinessPartnerDb?): Boolean =
         sharingState.sharingStateType == SharingStateType.Ready
                 && sharingState.orchestratorRecordId?.toString() == candidate.recordId
                 && input != null

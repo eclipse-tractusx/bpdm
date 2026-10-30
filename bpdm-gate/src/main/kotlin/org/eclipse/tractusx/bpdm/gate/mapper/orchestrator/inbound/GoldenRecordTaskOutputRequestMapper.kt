@@ -19,10 +19,10 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRela
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskOutputRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputRequest
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
@@ -54,13 +54,13 @@ class GoldenRecordTaskOutputRequestMapper {
      * Maps [businessPartner] onto its output request, taking the address the golden record type points to as the
      * business partner's address and leaving every value the result lacks empty.
      */
-    fun toRequest(businessPartner: BusinessPartner): GoldenRecordTaskOutputRequest {
+    fun toRequest(businessPartner: BusinessPartner): GoldenRecordTaskOutputRaw {
         val addressType = toAddressType(businessPartner)
         val address = addressType?.let { addressOf(it, businessPartner) }
         val legalEntity = businessPartner.legalEntity
         val site = businessPartner.site
 
-        return GoldenRecordTaskOutputRequest(
+        return GoldenRecordTaskOutputRaw(
             addressType = addressType,
             owningCompanyBpnl = businessPartner.owningCompany,
             nameParts = businessPartner.uncategorized.nameParts,
@@ -113,14 +113,14 @@ class GoldenRecordTaskOutputRequestMapper {
         }
 
     private fun toIdentifiers(identifiers: List<Identifier>, businessPartnerType: BusinessPartnerType) =
-        identifiers.map { GoldenRecordTaskOutputRequest.Identifier(it.type, it.value, it.issuingBody, businessPartnerType) }
+        identifiers.map { GoldenRecordTaskOutputRaw.Identifier(it.type, it.value, it.issuingBody, businessPartnerType) }
 
     private fun toStates(states: List<BusinessState>, businessPartnerType: BusinessPartnerType) =
-        states.map { GoldenRecordTaskOutputRequest.State(it.type, toLocalDateTime(it.validFrom), toLocalDateTime(it.validTo), businessPartnerType) }
+        states.map { GoldenRecordTaskOutputRaw.State(it.type, toLocalDateTime(it.validFrom), toLocalDateTime(it.validTo), businessPartnerType) }
 
     private fun toConfidence(confidence: ConfidenceCriteria) =
         with(confidence) {
-            GoldenRecordTaskOutputRequest.Confidence(
+            GoldenRecordTaskOutputRaw.Confidence(
                 sharedByOwner = sharedByOwner,
                 checkedByExternalDataSource = checkedByExternalDataSource,
                 numberOfSharingMembers = numberOfSharingMembers,

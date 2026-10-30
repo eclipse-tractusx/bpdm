@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.gate.model.task.FinishedGoldenRecordTaskPage
+import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPageRaw
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.stereotype.Component
 
@@ -27,8 +27,8 @@ class FinishedGoldenRecordTaskPageMapper {
      * Maps the first page of [events] onto its finished tasks, the finish time of its last event and whether more
      * pages follow.
      */
-    fun toPage(events: FinishedTaskEventsResponse): FinishedGoldenRecordTaskPage =
-        FinishedGoldenRecordTaskPage(
+    fun toPage(events: FinishedTaskEventsResponse): FinishedGoldenRecordTaskPageRaw =
+        FinishedGoldenRecordTaskPageRaw(
             taskIds = events.content.map { it.taskId },
             lastFinishedAt = events.content.lastOrNull()?.timestamp,
             hasMore = events.totalPages > 1
