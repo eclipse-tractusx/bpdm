@@ -29,10 +29,9 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.BusinessPartnerOutputDtoMapperV6
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6OutboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7BusinessPartnerMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputUpsertApplicationService
@@ -45,19 +44,18 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("businessPartnerControllerLegacy")
 class BusinessPartnerController(
     val inputUpsertApplicationService: BusinessPartnerInputUpsertApplicationService,
-    val inputRequestMapper: BusinessPartnerInputRequestMapper,
-    val inputDtoMapper: BusinessPartnerInputDtoMapper,
-    val inputErrorMapper: BusinessPartnerInputUpsertErrorMapper,
+    val apiV7InboundMapper: ApiV7InboundMapper,
+    val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
     val outputSearchApplicationService: BusinessPartnerOutputSearchApplicationService,
-    val outputDtoMapper: BusinessPartnerOutputDtoMapperV6
+    val apiV6OutboundMapper: ApiV6OutboundMapper
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
     override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
-        val requests = businessPartners.map(inputRequestMapper::toUpsertIn)
+        val requests = businessPartners.map(apiV7InboundMapper::toUpsertIn)
         return when (val result = inputUpsertApplicationService.upsert(requests, getCurrentUserBpn())) {
-            is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
-            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmBusinessPartnerInputUpsertException(result.errors.map(inputErrorMapper::toMessage))
+            is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(apiV7BusinessPartnerMapper::toDto))
+            is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmBusinessPartnerInputUpsertException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
         }
     }
 
@@ -68,6 +66,6 @@ class BusinessPartnerController(
     ): PageDto<BusinessPartnerOutputDto> {
         val request = BusinessPartnerSearchRaw(externalIds)
         return outputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
-            .toPageDto(outputDtoMapper::toDto)
+            .toPageDto(apiV6OutboundMapper::toDto)
     }
 }

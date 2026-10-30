@@ -18,8 +18,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
-import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerOutputRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputDesignationParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
@@ -33,8 +32,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class BusinessPartnerOutputSearchOperationService(
-    private val businessPartnerRepository: BusinessPartnerRepository,
-    private val recordMapper: BusinessPartnerOutputRecordMapper
+    private val businessPartnerRepository: BusinessPartnerRepository
 ) {
 
     /**
@@ -42,14 +40,14 @@ class BusinessPartnerOutputSearchOperationService(
      * and states of the business partner its address type designates as its own.
      */
     @Transactional(readOnly = true)
-    fun search(criteria: BusinessPartnerSearchParsed, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerOutputRecord> {
+    fun search(criteria: BusinessPartnerSearchParsed, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerOutputDesignationParsed> {
         val spec = Specification.allOf(
             BusinessPartnerRepository.Specs.byExternalIdsIn(criteria.externalIds),
             BusinessPartnerRepository.Specs.byTenantBpnl(tenantBpnl),
             BusinessPartnerRepository.Specs.byStage(StageType.Output)
         )
         return businessPartnerRepository.findAll(spec, pageable)
-            .map { recordMapper.toRecord(it, designatedIdentifiers(it), designatedStates(it)) }
+            .map { BusinessPartnerOutputDesignationParsed(it, designatedIdentifiers(it), designatedStates(it)) }
     }
 
     private fun designatedIdentifiers(output: BusinessPartnerDb): List<IdentifierDb> =

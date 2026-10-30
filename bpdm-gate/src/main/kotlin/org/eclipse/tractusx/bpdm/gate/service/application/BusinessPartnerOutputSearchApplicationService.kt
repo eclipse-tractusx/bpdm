@@ -12,6 +12,7 @@
  */
 package org.eclipse.tractusx.bpdm.gate.service.application
 
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerOutputSearchOperationService
@@ -27,7 +28,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class BusinessPartnerOutputSearchApplicationService(
     private val parser: BusinessPartnerSearchParser,
-    private val operationService: BusinessPartnerOutputSearchOperationService
+    private val operationService: BusinessPartnerOutputSearchOperationService,
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
@@ -36,4 +38,5 @@ class BusinessPartnerOutputSearchApplicationService(
     @Transactional(readOnly = true)
     fun search(request: BusinessPartnerSearchRaw, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerOutputRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
+            .map(dbToOutputMapper::toRecord)
 }

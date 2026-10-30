@@ -30,10 +30,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.RelationInputRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputDtoMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputUpsertErrorMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
@@ -48,10 +46,8 @@ class RelationController(
     private val principalUtil: PrincipalUtil,
     private val inputSearchApplicationService: RelationInputSearchApplicationService,
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
-    private val inputRequestMapper: RelationInputRequestMapper,
-    private val inputDtoMapper: RelationInputDtoMapper,
-    private val inputErrorMapper: RelationInputUpsertErrorMapper,
-    private val enumRequestMapper: EnumRequestMapper
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7RelationMapper: ApiV7RelationMapper,
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
@@ -61,13 +57,13 @@ class RelationController(
     ): PageDto<RelationDto> {
         val request = RelationInputSearchRaw(
             externalIds = searchRequest.externalIds,
-            relationType = searchRequest.relationType?.let(enumRequestMapper::toModel),
+            relationType = searchRequest.relationType?.let(apiV7InboundMapper::toModel),
             sourceExternalIds = searchRequest.businessPartnerSourceExternalIds,
             targetExternalIds = searchRequest.businessPartnerTargetExternalIds,
             updatedAfter = searchRequest.updatedAtFrom
         )
         return inputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
-            .toPageDto(inputDtoMapper::toDto)
+            .toPageDto(apiV7RelationMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
@@ -75,11 +71,11 @@ class RelationController(
         createIfNotExist: Boolean,
         requestBody: RelationPutRequest
     ): RelationPutResponse {
-        val requests = requestBody.relations.map(inputRequestMapper::toUpsertRequest)
+        val requests = requestBody.relations.map(apiV7InboundMapper::toUpsertRequest)
         val mode = if (createIfNotExist) RelationInputUpsertMode.CreateOrUpdate else RelationInputUpsertMode.UpdateOnly
         return when (val result = inputUpsertApplicationService.upsert(requests, principalUtil.resolveTenantBpnl().value, mode)) {
-            is RelationInputUpsertResult.Written -> RelationPutResponse(result.relations.map(inputDtoMapper::toDto))
-            is RelationInputUpsertResult.Rejected -> throw BpdmRelationInputUpsertException(result.errors.map(inputErrorMapper::toMessage))
+            is RelationInputUpsertResult.Written -> RelationPutResponse(result.relations.map(apiV7RelationMapper::toDto))
+            is RelationInputUpsertResult.Rejected -> throw BpdmRelationInputUpsertException(result.errors.map(apiV7RelationMapper::toMessage))
         }
     }
 }

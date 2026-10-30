@@ -25,22 +25,22 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest as RelationOutputSearchRequestDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationOutputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationOutputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest as RelationOutputSearchRequestDto
 
 @RestController
 class RelationOutputController(
     private val principalUtil: PrincipalUtil,
     private val outputSearchApplicationService: RelationOutputSearchApplicationService,
-    private val outputDtoMapper: RelationOutputDtoMapper,
-    private val enumRequestMapper: EnumRequestMapper
+    private val apiV7RelationMapper: ApiV7RelationMapper,
+    private val apiV7InboundMapper: ApiV7InboundMapper
 ): GateRelationOutputApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
@@ -50,12 +50,12 @@ class RelationOutputController(
     ): PageDto<RelationOutputDto> {
         val request = RelationOutputSearchRaw(
             externalIds = searchRequest.externalIds,
-            relationType = searchRequest.relationType?.let(enumRequestMapper::toModel),
+            relationType = searchRequest.relationType?.let(apiV7InboundMapper::toModel),
             sourceBpns = searchRequest.sourceBpns,
             targetBpns = searchRequest.targetBpns,
             updatedAfter = searchRequest.updatedAtFrom
         )
         return outputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
-            .toPageDto(outputDtoMapper::toDto)
+            .toPageDto(apiV7RelationMapper::toDto)
     }
 }

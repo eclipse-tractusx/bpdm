@@ -17,7 +17,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional
 class GoldenRecordTaskCreationOperationService(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val contentMapper: BusinessPartnerInputContentMapper,
+    private val dbToParsedMapper: DbToParsedMapper,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
@@ -53,7 +53,7 @@ class GoldenRecordTaskCreationOperationService(
                 sharingStateId = input.sharingState.id,
                 externalId = input.sharingState.externalId,
                 recordId = input.sharingState.orchestratorRecordId?.toString(),
-                input = contentMapper.toContent(input),
+                input = dbToParsedMapper.toContent(input),
                 owningCompanyBpnl = findOwningCompanyBpnl(input)
             )
         }

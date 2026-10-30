@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationSharingStateDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationSharingStateSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
@@ -40,8 +40,8 @@ import java.time.Instant
 class RelationSharingStateController(
     private val principalUtil: PrincipalUtil,
     private val searchApplicationService: RelationSharingStateSearchApplicationService,
-    private val dtoMapper: RelationSharingStateDtoMapper,
-    private val enumRequestMapper: EnumRequestMapper
+    private val apiV7RelationMapper: ApiV7RelationMapper,
+    private val apiV7InboundMapper: ApiV7InboundMapper
 ): GateRelationSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -51,8 +51,8 @@ class RelationSharingStateController(
         updatedAfter: Instant?,
         paginationRequest: PaginationRequest
     ): PageDto<RelationSharingStateDto> {
-        val request = RelationSharingStateSearchRaw(externalIds, sharingStateTypes?.map(enumRequestMapper::toModel), updatedAfter)
+        val request = RelationSharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
         return searchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
-            .toPageDto(dtoMapper::toDto)
+            .toPageDto(apiV7RelationMapper::toDto)
     }
 }

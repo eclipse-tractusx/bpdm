@@ -23,22 +23,22 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationChangelogApi
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest as ChangelogSearchRequestDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.ChangelogDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7ChangelogMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.ChangelogSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest as ChangelogSearchRequestDto
 
 @RestController
 class RelationChangelogController(
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
-    private val changelogDtoMapper: ChangelogDtoMapper,
+    private val apiV7ChangelogMapper: ApiV7ChangelogMapper,
     private val principalUtil: PrincipalUtil
 ): GateRelationChangelogApi {
 
@@ -49,7 +49,7 @@ class RelationChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter)
         val page = changelogSearchApplicationService.search(request, StageType.Input, GoldenRecordType.Relation, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
-        return changelogDtoMapper.toPageDto(page)
+        return apiV7ChangelogMapper.toPageDto(page)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_CHANGELOG})")
@@ -59,6 +59,6 @@ class RelationChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter)
         val page = changelogSearchApplicationService.search(request, StageType.Output, GoldenRecordType.Relation, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
-        return changelogDtoMapper.toPageDto(page)
+        return apiV7ChangelogMapper.toPageDto(page)
     }
 }

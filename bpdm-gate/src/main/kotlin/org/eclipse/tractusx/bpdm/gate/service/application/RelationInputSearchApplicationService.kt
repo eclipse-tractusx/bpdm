@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.application
 
-import org.eclipse.tractusx.bpdm.gate.mapper.record.RelationInputRecordMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputRecord
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationInputSearchOperationService
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 class RelationInputSearchApplicationService(
     private val parser: RelationInputSearchParser,
     private val operationService: RelationInputSearchOperationService,
-    private val recordMapper: RelationInputRecordMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
@@ -39,5 +39,5 @@ class RelationInputSearchApplicationService(
     @Transactional(readOnly = true)
     fun search(request: RelationInputSearchRaw, tenantBpnl: String, pageable: Pageable): Page<RelationInputRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
-            .map(recordMapper::toRecord)
+            .map(dbToOutputMapper::toRecord)
 }

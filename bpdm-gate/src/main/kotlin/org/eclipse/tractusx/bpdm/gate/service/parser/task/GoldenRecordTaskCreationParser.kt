@@ -17,7 +17,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
@@ -36,7 +36,7 @@ import java.util.UUID
 class GoldenRecordTaskCreationParser(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val contentMapper: BusinessPartnerInputContentMapper
+    private val dbToParsedMapper: DbToParsedMapper
 ) {
 
     /**
@@ -83,5 +83,5 @@ class GoldenRecordTaskCreationParser(
         sharingState.sharingStateType == SharingStateType.Ready
                 && sharingState.orchestratorRecordId?.toString() == candidate.recordId
                 && input != null
-                && contentMapper.toContent(input) == candidate.input
+                && dbToParsedMapper.toContent(input) == candidate.input
 }

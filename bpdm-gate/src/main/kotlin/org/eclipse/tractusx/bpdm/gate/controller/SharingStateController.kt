@@ -29,9 +29,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyReq
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateDtoMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateReadyErrorMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7SharingStateMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
@@ -46,9 +45,8 @@ import java.time.Instant
 class SharingStateController(
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
     private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
-    private val sharingStateDtoMapper: SharingStateDtoMapper,
-    private val sharingStateReadyErrorMapper: SharingStateReadyErrorMapper,
-    private val enumRequestMapper: EnumRequestMapper
+    private val apiV7SharingStateMapper: ApiV7SharingStateMapper,
+    private val apiV7InboundMapper: ApiV7InboundMapper
 ): GateSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -58,9 +56,9 @@ class SharingStateController(
         sharingStateTypes: Collection<SharingStateType>?,
         updatedAfter: Instant?,
     ): PageDto<SharingStateDto> {
-        val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(enumRequestMapper::toModel), updatedAfter)
+        val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
         return sharingStateSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
-            .toPageDto(sharingStateDtoMapper::toDto)
+            .toPageDto(apiV7SharingStateMapper::toDto)
     }
 
 
@@ -69,7 +67,7 @@ class SharingStateController(
         val readyRequest = SharingStateReadyRaw(request.externalIds)
         when (val result = sharingStateReadyApplicationService.setReady(readyRequest, getCurrentUserBpn())) {
             is SharingStateReadyResult.Readied -> Unit
-            is SharingStateReadyResult.Rejected -> throw BpdmSharingStateReadyException(result.errors.map(sharingStateReadyErrorMapper::toMessage))
+            is SharingStateReadyResult.Rejected -> throw BpdmSharingStateReadyException(result.errors.map(apiV7SharingStateMapper::toMessage))
         }
     }
 }

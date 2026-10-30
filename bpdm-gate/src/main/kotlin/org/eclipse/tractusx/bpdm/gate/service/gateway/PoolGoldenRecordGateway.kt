@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.gateway
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.mapper.pool.inbound.PoolGoldenRecordRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.pool.PoolInboundMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordChangePageRaw
@@ -37,7 +37,7 @@ import java.time.Instant
 @Component
 class PoolGoldenRecordGateway(
     private val poolClient: PoolApiClient,
-    private val requestMapper: PoolGoldenRecordRequestMapper
+    private val poolInboundMapper: PoolInboundMapper
 ) {
 
     /**
@@ -93,17 +93,17 @@ class PoolGoldenRecordGateway(
     private fun fetchLegalEntities(bpns: Set<String>): List<LegalEntityGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
             poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(bpnLs = chunk), PaginationRequest(0, chunk.size)).content
-        }.flatten().map(requestMapper::toRequest)
+        }.flatten().map(poolInboundMapper::toRequest)
 
     private fun fetchSites(bpns: Set<String>): List<SiteGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
             poolClient.sites.getSites(SiteSearchRequest(siteBpns = chunk), PaginationRequest(0, chunk.size)).content
-        }.flatten().map { requestMapper.toRequest(it.site) }
+        }.flatten().map { poolInboundMapper.toRequest(it.site) }
 
     private fun fetchAddresses(bpns: Set<String>): List<AddressGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
             poolClient.addresses.getAddresses(AddressSearchRequest(addressBpns = chunk), PaginationRequest(0, chunk.size)).content
-        }.flatten().map(requestMapper::toRequest)
+        }.flatten().map(poolInboundMapper::toRequest)
 
     companion object {
         private const val MAX_PAGE_SIZE = 100

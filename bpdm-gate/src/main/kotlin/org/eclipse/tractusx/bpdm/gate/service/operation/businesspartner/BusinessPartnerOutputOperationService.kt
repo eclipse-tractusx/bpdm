@@ -21,7 +21,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerOutputEntityMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerOutputOperationService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val changelogCreateOperation: ChangelogCreateOperationService,
-    private val entityMapper: BusinessPartnerOutputEntityMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val compareUtil: BusinessPartnerComparisonUtil,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val changeLogger: PersistedChangeLogger
@@ -57,7 +57,7 @@ class BusinessPartnerOutputOperationService(
     private fun write(parsed: BusinessPartnerOutputParsed): BusinessPartnerDb {
         val sharingState = parsed.sharingState
         val storedOutput = parsed.storedOutput
-        val incoming = entityMapper.toEntity(parsed.data, sharingState)
+        val incoming = parsedToDbMapper.toEntity(parsed.data, sharingState)
         if (storedOutput != null && !compareUtil.hasChanges(incoming, storedOutput)) return storedOutput
 
         val changeType = if (storedOutput == null) ChangelogType.CREATE else ChangelogType.UPDATE

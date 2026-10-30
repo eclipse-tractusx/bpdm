@@ -15,7 +15,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.mapper.record.RelationInputRecordMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional
 class RelationInputUpsertApplicationService(
     private val parser: RelationInputUpsertParser,
     private val operationService: RelationInputUpsertOperationService,
-    private val recordMapper: RelationInputRecordMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
@@ -43,7 +43,7 @@ class RelationInputUpsertApplicationService(
         when (val parseResult = parser.parse(requests, tenantBpnl, mode)) {
             is ParseResult.Failure -> RelationInputUpsertResult.Rejected(parseResult.errors)
             is ParseResult.Success -> RelationInputUpsertResult.Written(
-                operationService.upsert(parseResult.parsed, tenantBpnl).map { recordMapper.toRecord(it.input) }
+                operationService.upsert(parseResult.parsed, tenantBpnl).map { dbToOutputMapper.toRecord(it.input) }
             )
         }
 }

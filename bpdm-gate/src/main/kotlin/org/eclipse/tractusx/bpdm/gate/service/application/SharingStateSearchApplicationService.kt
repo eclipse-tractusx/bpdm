@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.application
 
-import org.eclipse.tractusx.bpdm.gate.mapper.record.SharingStateRecordMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateRecord
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateSearchOperationService
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 class SharingStateSearchApplicationService(
     private val parser: SharingStateSearchParser,
     private val operationService: SharingStateSearchOperationService,
-    private val recordMapper: SharingStateRecordMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
@@ -39,5 +39,5 @@ class SharingStateSearchApplicationService(
     @Transactional(readOnly = true)
     fun search(request: SharingStateSearchRaw, tenantBpnl: String?, pageable: Pageable): Page<SharingStateRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
-            .map(recordMapper::toRecord)
+            .map(dbToOutputMapper::toRecord)
 }

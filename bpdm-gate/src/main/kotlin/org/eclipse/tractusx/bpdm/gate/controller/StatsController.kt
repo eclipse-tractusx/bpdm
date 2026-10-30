@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteria
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.StatsDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7StatsMapper
 import org.eclipse.tractusx.bpdm.gate.service.application.StatsReadApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -34,26 +34,26 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class StatsController(
     private val statsReadApplicationService: StatsReadApplicationService,
-    private val statsDtoMapper: StatsDtoMapper
+    private val apiV7StatsMapper: ApiV7StatsMapper
 ) : StatsApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun countPartnersBySharingState(): StatsSharingStatesResponse {
-        return statsDtoMapper.toDto(statsReadApplicationService.countSharingStates())
+        return apiV7StatsMapper.toDto(statsReadApplicationService.countSharingStates())
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun countPartnersPerStage(): StatsStagesResponse {
-        return statsDtoMapper.toDto(statsReadApplicationService.countStages())
+        return apiV7StatsMapper.toDto(statsReadApplicationService.countStages())
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
-        return statsDtoMapper.toDto(statsReadApplicationService.countAddressTypes(stage))
+        return apiV7StatsMapper.toDto(statsReadApplicationService.countAddressTypes(stage))
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse {
-        return statsDtoMapper.toDto(statsReadApplicationService.summarizeConfidenceCriteria())
+        return apiV7StatsMapper.toDto(statsReadApplicationService.summarizeConfidenceCriteria())
     }
 }

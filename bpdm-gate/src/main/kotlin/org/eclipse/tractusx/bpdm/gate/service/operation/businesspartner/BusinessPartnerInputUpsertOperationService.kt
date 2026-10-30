@@ -20,8 +20,8 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
-import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToParsedMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult.*
@@ -44,8 +44,8 @@ class BusinessPartnerInputUpsertOperationService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val sharingStateOperation: SharingStateOperationService,
     private val changelogCreateOperation: ChangelogCreateOperationService,
-    private val contentMapper: BusinessPartnerInputContentMapper,
-    private val entityMapper: BusinessPartnerInputEntityMapper,
+    private val dbToParsedMapper: DbToParsedMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
@@ -108,7 +108,7 @@ class BusinessPartnerInputUpsertOperationService(
     }
 
     private fun hasChanged(request: BusinessPartnerInputUpsertParsed, existing: BusinessPartnerDb) =
-        contentMapper.toContent(existing) != request.content
+        dbToParsedMapper.toContent(existing) != request.content
 
     private fun persist(input: BusinessPartnerDb, changeType: ChangelogType) {
         val sharingState = input.sharingState
@@ -139,8 +139,8 @@ class BusinessPartnerInputUpsertOperationService(
         input.externalSequenceTimestamp = request.externalSequenceTimestamp
         input.nameParts.replace(content.nameParts)
         input.roles.replace(content.roles)
-        input.identifiers.replace(content.identifiers.map(entityMapper::toEntity))
-        input.states.replace(content.states.map(entityMapper::toEntity))
+        input.identifiers.replace(content.identifiers.map(parsedToDbMapper::toEntity))
+        input.states.replace(content.states.map(parsedToDbMapper::toEntity))
         input.isOwnCompanyData = content.isOwnCompanyData
 
         input.bpnL = content.legalEntity.bpn
@@ -152,7 +152,7 @@ class BusinessPartnerInputUpsertOperationService(
 
         input.bpnS = content.site.bpn
         input.siteName = content.site.name
-        input.additionalSites.replace(content.additionalSites.map(entityMapper::toEntity))
+        input.additionalSites.replace(content.additionalSites.map(parsedToDbMapper::toEntity))
 
         input.bpnA = content.address.bpn
         input.addressName = content.address.name
@@ -163,8 +163,8 @@ class BusinessPartnerInputUpsertOperationService(
 
     private fun writeAddress(address: BusinessPartnerInputContentParsed.Address, postalAddress: PostalAddressDb) {
         postalAddress.addressType = address.addressType
-        postalAddress.physicalPostalAddress = address.physicalPostalAddress?.let(entityMapper::toEntity)
-        postalAddress.alternativePostalAddress = address.alternativePostalAddress?.let(entityMapper::toEntity)
+        postalAddress.physicalPostalAddress = address.physicalPostalAddress?.let(parsedToDbMapper::toEntity)
+        postalAddress.alternativePostalAddress = address.alternativePostalAddress?.let(parsedToDbMapper::toEntity)
     }
 
     // Updated in place by script code: replacing the list would insert before the orphans are deleted and break the
@@ -186,8 +186,8 @@ class BusinessPartnerInputUpsertOperationService(
         target.shortName = scriptVariant.shortName
         target.siteName = scriptVariant.siteName
         target.addressName = scriptVariant.addressName
-        target.physicalAddress = entityMapper.toEntity(scriptVariant.physicalAddress)
-        target.alternativeAddress = scriptVariant.alternativeAddressCity?.let(entityMapper::toAlternativeAddressScriptVariant)
+        target.physicalAddress = parsedToDbMapper.toEntity(scriptVariant.physicalAddress)
+        target.alternativeAddress = scriptVariant.alternativeAddressCity?.let(parsedToDbMapper::toAlternativeAddressScriptVariant)
     }
 }
 

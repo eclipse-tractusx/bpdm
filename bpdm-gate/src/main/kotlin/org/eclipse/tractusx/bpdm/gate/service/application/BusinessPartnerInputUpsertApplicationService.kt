@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputRecordMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerInputUpsertApplicationService(
     private val parser: BusinessPartnerInputUpsertParser,
     private val operationService: BusinessPartnerInputUpsertOperationService,
-    private val recordMapper: BusinessPartnerInputRecordMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
     /**
      * Upserts [requests] for [tenantBpnl] and returns the inputs that were written, or writes nothing and returns the
@@ -43,7 +43,7 @@ class BusinessPartnerInputUpsertApplicationService(
             is ParseResult.Success -> {
                 val applied = operationService.upsert(parseResult.parsed, tenantBpnl)
                     .filterIsInstance<BusinessPartnerInputUpsertEntryResult.Applied>()
-                BusinessPartnerInputUpsertResult.Written(applied.map { recordMapper.toRecord(it.input) })
+                BusinessPartnerInputUpsertResult.Written(applied.map { dbToOutputMapper.toRecord(it.input) })
             }
         }
 }

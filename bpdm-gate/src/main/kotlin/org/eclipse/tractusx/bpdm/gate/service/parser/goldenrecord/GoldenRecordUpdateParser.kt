@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.mapper.record.OutputUpsertDataMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordUpdatePageRaw
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GoldenRecordUpdateParser(
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val upsertDataMapper: OutputUpsertDataMapper,
+    private val dbToParsedMapper: DbToParsedMapper,
     private val alignmentParser: GoldenRecordAlignmentParser
 ) {
 
@@ -48,7 +48,7 @@ class GoldenRecordUpdateParser(
             .distinctBy { it.id }
 
         return sharedOutputs.map { output ->
-            alignmentParser.parse(output.sharingState, output, upsertDataMapper.toUpsertData(output), page.goldenRecords)
+            alignmentParser.parse(output.sharingState, output, dbToParsedMapper.toUpsertData(output), page.goldenRecords)
         }
     }
 }

@@ -15,10 +15,8 @@ package org.eclipse.tractusx.bpdm.gate.service.gateway
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.FinishedGoldenRecordTaskPageMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound.GoldenRecordTaskResultRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.GoldenRecordTaskRequestMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound.TaskStateRequestMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.OrchestratorInboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.OrchestratorOutboundMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedGoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPageRaw
@@ -34,10 +32,8 @@ import java.time.Instant
 @Component
 class GoldenRecordTaskGateway(
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val createRequestMapper: GoldenRecordTaskRequestMapper,
-    private val stateRequestMapper: TaskStateRequestMapper,
-    private val resultRequestMapper: GoldenRecordTaskResultRequestMapper,
-    private val finishedPageMapper: FinishedGoldenRecordTaskPageMapper,
+    private val orchestratorOutboundMapper: OrchestratorOutboundMapper,
+    private val orchestratorInboundMapper: OrchestratorInboundMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties
 ) {
 
@@ -45,7 +41,7 @@ class GoldenRecordTaskGateway(
      * Creates a golden record task for each of [candidates] and returns the created tasks in the order of [candidates].
      */
     fun createTasks(candidates: List<GoldenRecordTaskCandidateParsed>): List<CreatedGoldenRecordTaskRaw> {
-        val createdTasks = orchestrationApiClient.goldenRecordTasks.createTasks(createRequestMapper.toCreateRequest(candidates)).createdTasks
+        val createdTasks = orchestrationApiClient.goldenRecordTasks.createTasks(orchestratorOutboundMapper.toCreateRequest(candidates)).createdTasks
         check(createdTasks.size == candidates.size) { "The Orchestrator created ${createdTasks.size} golden record tasks for ${candidates.size} requested" }
         return createdTasks.map { CreatedGoldenRecordTaskRaw(taskId = it.taskId, recordId = it.recordId) }
     }
@@ -55,7 +51,7 @@ class GoldenRecordTaskGateway(
      */
     fun fetchFinishedTasks(since: Instant): FinishedGoldenRecordTaskPageRaw {
         val events = orchestrationApiClient.finishedTaskEvents.getEvents(since, PaginationRequest(0, EVENT_PAGE_SIZE))
-        return finishedPageMapper.toPage(events)
+        return orchestratorInboundMapper.toPage(events)
     }
 
     /**
@@ -63,15 +59,15 @@ class GoldenRecordTaskGateway(
      */
     fun fetchResults(tasks: List<TaskReferenceRaw>): List<GoldenRecordTaskResultRaw> =
         tasks.chunked(taskProperties.check.batchSize) { chunk ->
-            orchestrationApiClient.goldenRecordTasks.searchTaskStates(stateRequestMapper.toRequest(chunk)).tasks
-        }.flatten().map(resultRequestMapper::toRequest)
+            orchestrationApiClient.goldenRecordTasks.searchTaskStates(orchestratorOutboundMapper.toRequest(chunk)).tasks
+        }.flatten().map(orchestratorInboundMapper::toRequest)
 
     /**
      * Returns those of [taskIds] the Orchestrator knows.
      */
     fun fetchKnownTaskIds(taskIds: Collection<String>): Set<String> =
         taskIds.distinct().chunked(taskProperties.healthCheck.batchSize) { chunk ->
-            val resultStates = orchestrationApiClient.goldenRecordTasks.searchTaskResultStates(createRequestMapper.toResultStateSearchRequest(chunk)).resultStates
+            val resultStates = orchestrationApiClient.goldenRecordTasks.searchTaskResultStates(orchestratorOutboundMapper.toResultStateSearchRequest(chunk)).resultStates
             check(resultStates.size == chunk.size) { "The Orchestrator returned ${resultStates.size} task result states for ${chunk.size} requested" }
             chunk.zip(resultStates).filter { (_, resultState) -> resultState != null }.map { (taskId, _) -> taskId }
         }.flatten().toSet()

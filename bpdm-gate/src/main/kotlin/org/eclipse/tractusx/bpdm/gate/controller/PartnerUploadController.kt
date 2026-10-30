@@ -23,10 +23,9 @@ import org.eclipse.tractusx.bpdm.gate.api.GatePartnerUploadApi
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerUploadException
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerCsvReader
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerCsvTemplateWriter
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerCsvUpsertErrorMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7BusinessPartnerMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.BusinessPartnerCsvReader
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.BusinessPartnerCsvTemplateWriter
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerCsvUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerCsvUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
@@ -44,8 +43,7 @@ class PartnerUploadController(
     val csvUpsertApplicationService: BusinessPartnerCsvUpsertApplicationService,
     val csvReader: BusinessPartnerCsvReader,
     val csvTemplateWriter: BusinessPartnerCsvTemplateWriter,
-    val inputDtoMapper: BusinessPartnerInputDtoMapper,
-    val csvErrorMapper: BusinessPartnerCsvUpsertErrorMapper
+    val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
 ) : GatePartnerUploadApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.UPLOAD_INPUT_PARTNER})")
@@ -56,8 +54,8 @@ class PartnerUploadController(
             return ResponseEntity(HttpStatus.BAD_REQUEST)
 
         return when (val result = csvUpsertApplicationService.upload(csvReader.read(file), getCurrentUserBpn())) {
-            is BusinessPartnerCsvUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(inputDtoMapper::toDto))
-            is BusinessPartnerCsvUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map(csvErrorMapper::toMessage))
+            is BusinessPartnerCsvUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(apiV7BusinessPartnerMapper::toDto))
+            is BusinessPartnerCsvUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
         }
     }
 
