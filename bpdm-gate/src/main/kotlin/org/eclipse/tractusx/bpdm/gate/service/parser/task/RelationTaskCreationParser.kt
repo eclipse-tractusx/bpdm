@@ -19,7 +19,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedRelationTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationPageRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.springframework.stereotype.Service
@@ -34,14 +33,14 @@ class RelationTaskCreationParser(
 ) {
 
     /**
-     * Starts the created task of each candidate in [page] that is still staged for sharing as it was when the task was
-     * created.
+     * Starts the task in [createdTasks] created for the candidate at the same position in [candidates] if that candidate
+     * is still staged for sharing as it was when the task was created.
      */
     @Transactional(readOnly = true)
-    fun parse(page: RelationTaskCreationPageRequest): List<ParseResult<RelationTaskCreationParsed, RelationTaskCreationError>> {
-        val relationsById = relationRepository.findAllById(page.candidates.map { it.relationId }).associateBy { it.id }
+    fun parse(candidates: List<RelationTaskCandidate>, createdTasks: List<CreatedRelationTaskRequest>): List<ParseResult<RelationTaskCreationParsed, RelationTaskCreationError>> {
+        val relationsById = relationRepository.findAllById(candidates.map { it.relationId }).associateBy { it.id }
 
-        return page.candidates.zip(page.createdTasks) { candidate, createdTask ->
+        return candidates.zip(createdTasks) { candidate, createdTask ->
             parse(candidate, createdTask, relationsById[candidate.relationId])
         }
     }

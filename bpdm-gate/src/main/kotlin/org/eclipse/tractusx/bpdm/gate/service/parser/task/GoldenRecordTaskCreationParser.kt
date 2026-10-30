@@ -22,7 +22,6 @@ import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentM
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationPageRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -41,16 +40,19 @@ class GoldenRecordTaskCreationParser(
 ) {
 
     /**
-     * Starts the created task of each candidate in [page] that is still ready to be shared with the input the task was
-     * created from, and marks every other candidate as stale.
+     * Starts the task in [createdTasks] created for the candidate at the same position in [candidates] if that candidate
+     * is still ready to be shared with the input the task was created from, and marks every other candidate as stale.
      */
     @Transactional(readOnly = true)
-    fun parse(page: GoldenRecordTaskCreationPageRequest): List<ParseResult<GoldenRecordTaskCreationParsed, GoldenRecordTaskCreationError>> {
-        val sharingStatesById = sharingStateRepository.findAllById(page.candidates.map { it.sharingStateId }).associateBy { it.id }
+    fun parse(
+        candidates: List<GoldenRecordTaskCandidate>,
+        createdTasks: List<CreatedGoldenRecordTaskRequest>
+    ): List<ParseResult<GoldenRecordTaskCreationParsed, GoldenRecordTaskCreationError>> {
+        val sharingStatesById = sharingStateRepository.findAllById(candidates.map { it.sharingStateId }).associateBy { it.id }
         val inputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStatesById.values, StageType.Input)
             .associateBy { it.sharingState.id }
 
-        return page.candidates.zip(page.createdTasks) { candidate, createdTask ->
+        return candidates.zip(createdTasks) { candidate, createdTask ->
             parse(candidate, createdTask, sharingStatesById[candidate.sharingStateId], inputsBySharingStateId[candidate.sharingStateId])
         }
     }

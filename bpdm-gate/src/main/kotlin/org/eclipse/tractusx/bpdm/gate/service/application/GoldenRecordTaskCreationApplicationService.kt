@@ -17,7 +17,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationError
-import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationPageRequest
+import org.eclipse.tractusx.bpdm.gate.model.task.CreatedGoldenRecordTaskRequest
+import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
@@ -60,12 +61,12 @@ class GoldenRecordTaskCreationApplicationService(
         val candidates = creationOperation.findCandidates(taskProperties.creation.fromSharingMember.batchSize)
         if (candidates.isEmpty()) return 0
 
-        return start(GoldenRecordTaskCreationPageRequest(candidates, taskGateway.createTasks(candidates)))
+        return start(candidates, taskGateway.createTasks(candidates))
     }
 
-    private fun start(page: GoldenRecordTaskCreationPageRequest): Int =
+    private fun start(candidates: List<GoldenRecordTaskCandidate>, createdTasks: List<CreatedGoldenRecordTaskRequest>): Int =
         pageTransaction.execute {
-            val creations = creationParser.parse(page).mapNotNull { result ->
+            val creations = creationParser.parse(candidates, createdTasks).mapNotNull { result ->
                 when (result) {
                     is ParseResult.Success -> result.parsed
                     is ParseResult.Failure -> {
