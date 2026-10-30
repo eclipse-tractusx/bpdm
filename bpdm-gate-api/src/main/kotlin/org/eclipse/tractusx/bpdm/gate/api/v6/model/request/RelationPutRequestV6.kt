@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.v6.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntry
 
 @Schema(description = "A request to upsert the contents of the given relations")
 data class RelationPutRequest(

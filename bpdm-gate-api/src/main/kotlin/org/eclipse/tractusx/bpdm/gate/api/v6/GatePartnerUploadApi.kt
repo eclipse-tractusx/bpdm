@@ -1,0 +1,76 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.gate.api.v6
+
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.GateErrorResponse
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.multipart.MultipartFile
+
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
+interface GatePartnerUploadApi {
+
+    @Operation(
+        summary = "Create or update business partners from uploaded CSV file",
+        description = "Create or update generic business partners. " +
+                "Updates instead of creating a new business partner if an already existing external ID is used. " +
+                "The same external ID may not occur more than once in a requested file. "
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Business partners were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed Business partner upload request",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = GateErrorResponse::class)
+                )]),
+        ]
+    )
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/partner-upload-process"], consumes = ["multipart/form-data"])
+    fun uploadPartnerCsvFile(
+        @RequestPart("file") file: MultipartFile
+    ): ResponseEntity<Collection<BusinessPartnerInputDto>>
+
+    @Operation(
+        summary = "Get CSV template with headers in file",
+        description = "Create empty CSV file template including headers." +
+                "Generated CSV file can later be used for uploading business partner data."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "CSV file template generated successfully")
+        ]
+    )
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/partner-upload-template"])
+    fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
+
+}

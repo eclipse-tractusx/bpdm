@@ -66,6 +66,6 @@ interface GateSharingStateApi {
             ApiResponse(responseCode = "400", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
         ]
     )
-    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V6}/ready", "${ApiCommons.SHARING_STATE_PATH_V7}/ready"])
+    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V7}/ready"])
     fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 }

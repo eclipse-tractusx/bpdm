@@ -13,10 +13,22 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerScriptVariantDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType as RelationTypeDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
-import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.springframework.stereotype.Component
 
@@ -24,9 +36,127 @@ import org.springframework.stereotype.Component
  * Maps API v6 requests to their raw model.
  */
 @Component
-class ApiV6InboundMapper(
-    private val apiV7InboundMapper: ApiV7InboundMapper
-) {
+class ApiV6InboundMapper {
+
+    /**
+     * Returns the unparsed upsert entry carrying exactly the content of [request].
+     */
+    fun toUpsertIn(request: BusinessPartnerInputRequest): BusinessPartnerInputUpsertRaw =
+        BusinessPartnerInputUpsertRaw(
+            externalId = request.externalId,
+            nameParts = request.nameParts,
+            identifiers = request.identifiers.map { BusinessPartnerInputUpsertRaw.Identifier(it.type, it.value, it.issuingBody) },
+            states = toStates(request.states),
+            roles = request.roles.toList(),
+            isOwnCompanyData = request.isOwnCompanyData,
+            legalEntity = with(request.legalEntity) {
+                BusinessPartnerInputUpsertRaw.LegalEntity(
+                    bpn = legalEntityBpn,
+                    legalName = legalName,
+                    shortName = shortName,
+                    legalForm = legalForm,
+                    ownershipUltimate = ownershipUltimate,
+                    ultimateOwnerBpnl = ultimateOwnerBpnl,
+                    states = toStates(states)
+                )
+            },
+            site = BusinessPartnerInputUpsertRaw.Site(bpn = request.site.siteBpn, name = request.site.name, states = toStates(request.site.states)),
+            address = with(request.address) {
+                BusinessPartnerInputUpsertRaw.Address(
+                    bpn = addressBpn,
+                    name = name,
+                    addressType = addressType,
+                    physicalPostalAddress = toValue(physicalPostalAddress),
+                    alternativePostalAddress = alternativePostalAddress?.let(::toValue),
+                    states = toStates(states)
+                )
+            },
+            externalSequenceTimestamp = request.externalSequenceTimestamp,
+            scriptVariants = request.scriptVariants.map(::toValue),
+            additionalSites = request.additionalSites.map { BusinessPartnerValuesRaw.AdditionalSite(bpn = it.siteBpn, name = it.name) }
+        )
+
+    private fun toStates(states: Collection<BusinessPartnerStateDto>) =
+        states.map { BusinessPartnerInputUpsertRaw.State(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
+
+    private fun toValue(address: PhysicalPostalAddressDto) =
+        with(address) {
+            BusinessPartnerValuesRaw.PhysicalPostalAddress(
+                geographicCoordinates = geographicCoordinates?.let(::toValue),
+                country = country,
+                administrativeAreaLevel1 = administrativeAreaLevel1,
+                administrativeAreaLevel2 = administrativeAreaLevel2,
+                administrativeAreaLevel3 = administrativeAreaLevel3,
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = street?.let(::toValue),
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode
+            )
+        }
+
+    private fun toValue(address: AlternativePostalAddressDto) =
+        with(address) {
+            BusinessPartnerValuesRaw.AlternativePostalAddress(
+                geographicCoordinates = geographicCoordinates?.let(::toValue),
+                country = country,
+                administrativeAreaLevel1 = administrativeAreaLevel1,
+                postalCode = postalCode,
+                city = city,
+                deliveryServiceType = deliveryServiceType,
+                deliveryServiceQualifier = deliveryServiceQualifier,
+                deliveryServiceNumber = deliveryServiceNumber
+            )
+        }
+
+    private fun toValue(street: StreetDto) =
+        with(street) {
+            StreetRaw(
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                name = name,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix,
+                houseNumber = houseNumber,
+                houseNumberSupplement = houseNumberSupplement,
+                milestone = milestone,
+                direction = direction
+            )
+        }
+
+    private fun toValue(coordinate: GeoCoordinateDto) =
+        GeoCoordinateRaw(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
+
+    private fun toValue(scriptVariant: BusinessPartnerScriptVariantDto) =
+        with(scriptVariant) {
+            BusinessPartnerValuesRaw.ScriptVariant(
+                scriptCode = scriptCode,
+                nameParts = nameParts,
+                legalName = legalEntity.legalName,
+                shortName = legalEntity.shortName,
+                siteName = site.name,
+                addressName = address.name,
+                physicalAddress = with(address.physicalAddress) {
+                    BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
+                        city = city,
+                        district = district,
+                        street = with(street) {
+                            BusinessPartnerValuesRaw.StreetScriptVariant(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
+                        },
+                        industrialZone = industrialZone,
+                        building = building,
+                        floor = floor,
+                        door = door
+                    )
+                },
+                alternativeAddressCity = address.alternativeAddress?.city
+            )
+        }
 
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [entry].
@@ -34,7 +164,7 @@ class ApiV6InboundMapper(
     fun toUpsertRequest(entry: RelationPutEntryV6): RelationInputUpsertRaw =
         RelationInputUpsertRaw(
             externalId = entry.externalId,
-            relationType = apiV7InboundMapper.toModel(entry.relationType),
+            relationType = toModel(entry.relationType),
             sourceExternalId = entry.businessPartnerSourceExternalId,
             targetExternalId = entry.businessPartnerTargetExternalId,
             validityPeriods = entry.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
@@ -47,10 +177,21 @@ class ApiV6InboundMapper(
     fun toUpsertRequest(request: RelationPostRequest): RelationInputUpsertRaw =
         RelationInputUpsertRaw(
             externalId = request.externalId,
-            relationType = apiV7InboundMapper.toModel(request.relationType),
+            relationType = toModel(request.relationType),
             sourceExternalId = request.businessPartnerSourceExternalId,
             targetExternalId = request.businessPartnerTargetExternalId,
             validityPeriods = emptyList(),
             reasonCode = null
         )
+
+    /**
+     * Returns the Gate's relation input type for [relationType].
+     */
+    fun toModel(relationType: RelationTypeDto): RelationType =
+        when (relationType) {
+            RelationTypeDto.IsManagedBy -> RelationType.IsManagedBy
+            RelationTypeDto.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            RelationTypeDto.IsOwnedBy -> RelationType.IsOwnedBy
+            RelationTypeDto.IsReplacedBy -> RelationType.IsReplacedBy
+        }
 }

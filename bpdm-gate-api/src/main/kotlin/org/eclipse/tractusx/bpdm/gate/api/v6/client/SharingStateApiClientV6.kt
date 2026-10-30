@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.v6.client
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
@@ -34,7 +34,7 @@ import org.springframework.web.service.annotation.PostExchange
 interface SharingStateApiClientV6: GateSharingStateApi {
 
     @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V6}/ready")
-    fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
+    override fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 
     @GetExchange(value = ApiCommons.SHARING_STATE_PATH_V6)
     override fun getSharingStates(

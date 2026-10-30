@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.IRelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
 import java.time.Instant
 
 @Schema(name = "RelationV6Dto", description = "A relation from one business partner (the source) to another business partner (the target). ")

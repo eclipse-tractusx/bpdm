@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.api.v6.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
-import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.IRelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationValidityPeriodDto
 
 @Schema(description = "A request to update the content of the given business partner relation")
 data class RelationPutEntryV6(

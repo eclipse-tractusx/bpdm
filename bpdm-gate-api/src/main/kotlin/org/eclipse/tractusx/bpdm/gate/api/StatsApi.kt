@@ -41,7 +41,7 @@ interface StatsApi {
             ApiResponse(responseCode = "200")
         ]
     )
-    @GetMapping(value = ["${ApiCommons.STATS_PATH_V6}/sharing-states", "${ApiCommons.STATS_PATH_V7}/sharing-states"])
+    @GetMapping(value = ["${ApiCommons.STATS_PATH_V7}/sharing-states"])
     fun countPartnersBySharingState(): StatsSharingStatesResponse
 
     @Operation
@@ -50,7 +50,7 @@ interface StatsApi {
             ApiResponse(responseCode = "200")
         ]
     )
-    @GetMapping(value = ["${ApiCommons.STATS_PATH_V6}/stages", "${ApiCommons.STATS_PATH_V7}/stages"])
+    @GetMapping(value = ["${ApiCommons.STATS_PATH_V7}/stages"])
     fun countPartnersPerStage(): StatsStagesResponse
 
     @Operation
@@ -59,7 +59,7 @@ interface StatsApi {
             ApiResponse(responseCode = "200")
         ]
     )
-    @GetMapping(value = ["${ApiCommons.STATS_PATH_V6}/{stage}/address-types", "${ApiCommons.STATS_PATH_V7}/{stage}/address-types"])
+    @GetMapping(value = ["${ApiCommons.STATS_PATH_V7}/{stage}/address-types"])
     fun countAddressTypes(@PathVariable("stage") stage: StageType): StatsAddressTypesResponse
 
     @Operation
@@ -68,7 +68,7 @@ interface StatsApi {
             ApiResponse(responseCode = "200")
         ]
     )
-    @GetMapping(value = ["${ApiCommons.STATS_PATH_V6}/confidence-criteria", "${ApiCommons.STATS_PATH_V7}/confidence-criteria"])
+    @GetMapping(value = ["${ApiCommons.STATS_PATH_V7}/confidence-criteria"])
     fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse
 
 

@@ -27,8 +27,8 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -56,6 +56,22 @@ interface GateBusinessPartnerApi {
     )
     @PutMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners"])
     fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
+
+    @Operation(
+        summary = "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
+        description = "Get page of business partners filtered by a collection of external IDs."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of busines partners"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners/search"])
+    fun getBusinessPartnersInput(
+        @RequestBody externalIds: Collection<String>? = null,
+        @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
+    ): PageDto<BusinessPartnerInputDto>
 
     @Operation(
         summary = "Search business partners by an array of external IDs from the output stage",

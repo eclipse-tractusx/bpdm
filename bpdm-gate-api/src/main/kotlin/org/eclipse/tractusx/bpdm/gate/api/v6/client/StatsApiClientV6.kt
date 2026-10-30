@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.gate.api.v6.client
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
-import org.eclipse.tractusx.bpdm.gate.api.StatsApi
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.StatsApi
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsStagesResponse
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.service.annotation.GetExchange
 

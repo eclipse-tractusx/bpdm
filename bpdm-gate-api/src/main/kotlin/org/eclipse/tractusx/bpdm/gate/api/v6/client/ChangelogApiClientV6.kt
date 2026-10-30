@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.api.v6.client
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
-import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateChangelogApi
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.PostExchange

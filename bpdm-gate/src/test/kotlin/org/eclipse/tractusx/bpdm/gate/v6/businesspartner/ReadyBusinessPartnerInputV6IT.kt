@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test

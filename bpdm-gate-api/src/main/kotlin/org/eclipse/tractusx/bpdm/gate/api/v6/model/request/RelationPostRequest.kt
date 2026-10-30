@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.api.v6.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.IRelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
 
 @Schema(description = "A request to create a new relation between two business partners")
 data class RelationPostRequest(

@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreati
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.ExpectedGateResultV6Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateInputFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
@@ -40,7 +40,7 @@ class GateTestDataV6Config {
     @Bean
     fun testDataFactoryV6(testMetadataV7: TestMetadataV7): GateTestDataFactoryV6 {
         return GateTestDataFactoryV6(
-            GateInputFactory(
+            GateInputFactoryV6(
                 testMetadata = TestMetadata(
                     identifierTypes = testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
                     legalForms = testMetadataV7.legalForms.map { it.technicalKey },

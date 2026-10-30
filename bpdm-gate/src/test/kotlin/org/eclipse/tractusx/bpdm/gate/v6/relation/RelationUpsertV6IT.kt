@@ -22,11 +22,13 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto as RelationValidityPeriodDtoV7
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
@@ -191,7 +193,7 @@ class RelationUpsertV6IT: UnscheduledGateV6TestBase() {
         val gateClientV7 = testClientProviderV7.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
         val sourceInput = testDataClient.createBusinessPartnerInput("$testName 1")
         val targetInput = testDataClient.createBusinessPartnerInput("$testName 2")
-        val givenRelation = RelationPutEntry(testName, RelationType.IsManagedBy, sourceInput.externalId, targetInput.externalId, reasonCode = "$testName reason")
+        val givenRelation = RelationPutEntry(testName, RelationTypeV7.IsManagedBy, sourceInput.externalId, targetInput.externalId, reasonCode = "$testName reason")
         gateClientV7.relation.put(true, RelationPutRequest(listOf(givenRelation)))
 
         //WHEN
@@ -200,7 +202,8 @@ class RelationUpsertV6IT: UnscheduledGateV6TestBase() {
 
         //THEN
         val actual = gateClientV7.relation.postSearch(RelationSearchRequest(externalIds = listOf(testName))).content.single()
-        val expected = RelationDto(testName, RelationType.IsManagedBy, sourceInput.externalId, targetInput.externalId, validityPeriods, null, Instant.now(), Instant.now())
+        val expectedValidityPeriods = listOf(RelationValidityPeriodDtoV7(validFrom = LocalDate.of(2024, 1, 1), validTo = null))
+        val expected = RelationDto(testName, RelationTypeV7.IsManagedBy, sourceInput.externalId, targetInput.externalId, expectedValidityPeriods, null, Instant.now(), Instant.now())
 
         assertRepoV7.assertRelation(actual, expected)
     }

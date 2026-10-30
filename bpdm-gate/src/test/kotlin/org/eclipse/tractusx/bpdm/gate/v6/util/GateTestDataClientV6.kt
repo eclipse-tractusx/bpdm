@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto

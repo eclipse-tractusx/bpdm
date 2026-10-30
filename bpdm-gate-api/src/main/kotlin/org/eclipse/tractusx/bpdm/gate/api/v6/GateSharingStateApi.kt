@@ -27,10 +27,13 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -51,4 +54,17 @@ interface GateSharingStateApi {
         @Parameter(description = "External IDs")
         @RequestParam(required = false) externalIds: Collection<String>?
     ): PageDto<SharingStateDto>
+
+    @Operation(
+        summary = "Sets the given business partners into ready to be shared state",
+        description = "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach)."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "All business partners put in ready to be shared state"),
+            ApiResponse(responseCode = "400", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
+        ]
+    )
+    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V6}/ready"])
+    fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 }

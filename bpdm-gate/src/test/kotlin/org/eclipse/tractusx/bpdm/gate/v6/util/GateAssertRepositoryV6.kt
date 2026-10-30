@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.gate.v6.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto

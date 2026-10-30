@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.v6.model.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.*
 import java.time.Instant
 
 @Schema(

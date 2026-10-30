@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.v6.exception.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.SharingStateType
 import java.time.LocalDateTime
 
 data class SharingStateDto(

@@ -19,10 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v6
 
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 
 class GateTestDataFactoryV6(
-    val request: GateInputFactory,
+    val request: GateInputFactoryV6,
     val result: ExpectedGateResultV6Factory
 ) {
 }

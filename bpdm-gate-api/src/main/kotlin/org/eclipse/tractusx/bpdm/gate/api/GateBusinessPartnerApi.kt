@@ -66,7 +66,7 @@ interface GateBusinessPartnerApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners/search", "${ApiCommons.BASE_PATH_V7}/input/business-partners/search"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/input/business-partners/search"])
     fun getBusinessPartnersInput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()

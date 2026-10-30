@@ -23,15 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6InboundMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6OutboundMapper
-import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputDeleteResult
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputUpsertResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputDeleteRaw
@@ -52,9 +51,8 @@ class RelationController(
     private val inputSearchApplicationService: RelationInputSearchApplicationService,
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val apiV6InboundMapper: ApiV6InboundMapper,
-    private val apiV6OutboundMapper: ApiV6OutboundMapper,
-    private val inputDeleteApplicationService: RelationInputDeleteApplicationService,
-    private val apiV7InboundMapper: ApiV7InboundMapper
+    private val apiV6RelationMapper: ApiV6RelationMapper,
+    private val inputDeleteApplicationService: RelationInputDeleteApplicationService
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
@@ -68,13 +66,13 @@ class RelationController(
     ): PageDto<RelationDto> {
         val request = RelationInputSearchRaw(
             externalIds = externalIds,
-            relationType = relationType?.let(apiV7InboundMapper::toModel),
+            relationType = relationType?.let(apiV6InboundMapper::toModel),
             sourceExternalIds = businessPartnerSourceExternalIds,
             targetExternalIds = businessPartnerTargetExternalIds,
             updatedAfter = updatedAtFrom
         )
         return inputSearchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
-            .toPageDto(apiV6OutboundMapper::toDto)
+            .toPageDto(apiV6RelationMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
@@ -96,13 +94,13 @@ class RelationController(
     override fun delete(externalId: String) {
         when (val result = inputDeleteApplicationService.delete(RelationInputDeleteRaw(externalId), tenantResolver.resolveTenantBpnl().value)) {
             is RelationInputDeleteResult.Deleted -> Unit
-            is RelationInputDeleteResult.Rejected -> throw apiV6OutboundMapper.toDeleteException(result.errors)
+            is RelationInputDeleteResult.Rejected -> throw apiV6RelationMapper.toDeleteException(result.errors)
         }
     }
 
     private fun upsert(request: RelationInputUpsertRaw, mode: RelationInputUpsertMode): RelationDto =
         when (val result = inputUpsertApplicationService.upsert(listOf(request), tenantResolver.resolveTenantBpnl().value, mode)) {
-            is RelationInputUpsertResult.Written -> apiV6OutboundMapper.toDto(result.relations.single())
-            is RelationInputUpsertResult.Rejected -> throw apiV6OutboundMapper.toUpsertException(result.errors)
+            is RelationInputUpsertResult.Written -> apiV6RelationMapper.toDto(result.relations.single())
+            is RelationInputUpsertResult.Rejected -> throw apiV6RelationMapper.toUpsertException(result.errors)
         }
 }

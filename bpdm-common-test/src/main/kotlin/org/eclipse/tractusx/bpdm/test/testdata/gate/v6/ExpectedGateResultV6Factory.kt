@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.*

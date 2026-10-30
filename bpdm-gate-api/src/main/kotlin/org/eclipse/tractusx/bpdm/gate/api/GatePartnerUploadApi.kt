@@ -54,7 +54,7 @@ interface GatePartnerUploadApi {
                 )]),
         ]
     )
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/partner-upload-process", "${ApiCommons.BASE_PATH_V7}/input/partner-upload-process"], consumes = ["multipart/form-data"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/input/partner-upload-process"], consumes = ["multipart/form-data"])
     fun uploadPartnerCsvFile(
         @RequestPart("file") file: MultipartFile
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
@@ -69,7 +69,7 @@ interface GatePartnerUploadApi {
             ApiResponse(responseCode = "200", description = "CSV file template generated successfully")
         ]
     )
-    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/partner-upload-template", "${ApiCommons.BASE_PATH_V7}/input/partner-upload-template"])
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/input/partner-upload-template"])
     fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
 
 }

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory

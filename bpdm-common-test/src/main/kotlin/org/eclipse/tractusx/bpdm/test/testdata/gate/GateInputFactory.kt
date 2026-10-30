@@ -40,10 +40,6 @@ class GateInputFactory(
         return InputTestData(seed, transform(SeededTestDataCreator(seed).createAllFieldsFilled()))
     }
 
-    fun createFullValid(seed: String, externalId: String = seed, withTestRunContext: Boolean = true): BusinessPartnerInputRequest {
-        return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData?.toExternalId(externalId)?.takeIf { withTestRunContext } ?: externalId)
-    }
-
     fun buildRelation(
         externalId: String,
         relationType: RelationType,
