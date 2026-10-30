@@ -24,15 +24,15 @@ import org.assertj.core.api.ObjectAssert
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
-import java.time.LocalDateTime
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.time.LocalDateTime
 
 /**
  * Offers util functionalities for comparing complex API V6 objects under test

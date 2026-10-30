@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.v7.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateErrorCodeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateErrorCodeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
 import org.junit.jupiter.api.Test

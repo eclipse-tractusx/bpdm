@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.stats
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsSharingStatesV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsSharingStatesV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 

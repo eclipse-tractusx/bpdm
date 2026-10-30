@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationV7Api
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.RelationPutV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException

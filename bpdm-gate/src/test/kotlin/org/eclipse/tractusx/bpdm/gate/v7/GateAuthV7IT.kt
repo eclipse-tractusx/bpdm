@@ -23,10 +23,10 @@ import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.PostSharingStateReadyV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateReadyV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType

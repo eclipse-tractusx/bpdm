@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.GateSharingStateV7Api
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.PostSharingStateReadyV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateReadyV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException

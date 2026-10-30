@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.other
 import org.junit.jupiter.api.Test

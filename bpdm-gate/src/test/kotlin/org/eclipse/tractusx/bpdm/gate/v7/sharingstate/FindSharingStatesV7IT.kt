@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.v7.sharingstate
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.exception.BusinessPartnerSharingErrorV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType

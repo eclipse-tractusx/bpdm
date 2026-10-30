@@ -14,15 +14,11 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerScriptVariantV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerStateV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw

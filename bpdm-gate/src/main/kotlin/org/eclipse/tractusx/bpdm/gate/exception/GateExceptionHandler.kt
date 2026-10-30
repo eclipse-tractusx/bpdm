@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.exception
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.error.GateErrorV7Response
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice

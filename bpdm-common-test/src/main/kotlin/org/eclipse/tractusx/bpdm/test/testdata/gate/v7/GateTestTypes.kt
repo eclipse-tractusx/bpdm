@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 
 object GateTestTypes {
     enum class LegalEntityRelationType(val gateRelationType: RelationTypeV7){

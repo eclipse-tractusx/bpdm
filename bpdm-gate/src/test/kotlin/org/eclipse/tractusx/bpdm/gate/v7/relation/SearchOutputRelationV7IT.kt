@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharableRelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestTypes
 import org.junit.jupiter.api.Test

@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Entry
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7

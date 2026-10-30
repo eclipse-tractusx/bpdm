@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v7.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.junit.jupiter.api.Test

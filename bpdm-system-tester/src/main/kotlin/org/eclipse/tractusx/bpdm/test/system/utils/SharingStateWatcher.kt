@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap

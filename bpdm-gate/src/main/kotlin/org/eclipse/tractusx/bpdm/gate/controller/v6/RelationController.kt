@@ -23,12 +23,13 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationV6Api
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputDeleteResult
@@ -40,7 +41,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputDeleteApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
-import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant

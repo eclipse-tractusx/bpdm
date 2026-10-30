@@ -22,9 +22,13 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationOutputSearchV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AddressGoldenRecordRelationTypeV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.LegalEntityGoldenRecordRelationTypeV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.SiteGoldenRecordRelationTypeV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
 
 /**
  * Asserts that a record's Gate output reflects an established golden record relation.

@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.gate.api.v7.exception.BusinessPartnerSharingErrorV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateRecord
 import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError.InvalidSharingState

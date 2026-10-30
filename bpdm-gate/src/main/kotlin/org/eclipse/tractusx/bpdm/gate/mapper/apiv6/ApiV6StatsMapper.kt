@@ -13,10 +13,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsAddressTypesV6Response
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaV6Response
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesV6Response
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsStagesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsAddressTypesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsConfidenceCriteriaV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsSharingStatesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsStagesV6Response
 import org.eclipse.tractusx.bpdm.gate.model.output.stats.AddressTypeStats
 import org.eclipse.tractusx.bpdm.gate.model.output.stats.ConfidenceCriteriaStats
 import org.eclipse.tractusx.bpdm.gate.model.output.stats.SharingStateStats

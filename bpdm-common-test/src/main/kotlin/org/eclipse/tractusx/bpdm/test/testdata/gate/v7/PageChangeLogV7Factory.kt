@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.PageChangeLogV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.PageChangeLogV7Dto
 
 class PageChangeLogV7Factory {
 

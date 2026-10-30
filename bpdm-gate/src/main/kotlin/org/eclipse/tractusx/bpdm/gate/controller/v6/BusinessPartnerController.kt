@@ -23,11 +23,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateBusinessPartnerV6Api
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6BusinessPartnerMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6InboundMapper
@@ -36,7 +37,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerS
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerOutputSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController

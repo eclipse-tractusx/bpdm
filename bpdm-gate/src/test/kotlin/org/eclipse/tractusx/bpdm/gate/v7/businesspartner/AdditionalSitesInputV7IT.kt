@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteInputV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.junit.jupiter.api.Test

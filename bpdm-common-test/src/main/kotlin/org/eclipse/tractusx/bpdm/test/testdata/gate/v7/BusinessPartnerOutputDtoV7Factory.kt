@@ -20,15 +20,9 @@
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.AlternativePostalAddressV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.ConfidenceCriteriaV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.PhysicalAddressScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.PhysicalPostalAddressV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SiteScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.StreetV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.StreetScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.*
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
@@ -302,8 +296,8 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildScriptVariantLegalEntityComponent(legalEntityScriptVariant: LegalEntityScriptVariantDto?): org.eclipse.tractusx.bpdm.gate.api.v7.model.LegalEntityScriptVariantV7Dto{
-        return org.eclipse.tractusx.bpdm.gate.api.v7.model.LegalEntityScriptVariantV7Dto(
+    private fun buildScriptVariantLegalEntityComponent(legalEntityScriptVariant: LegalEntityScriptVariantDto?): org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto{
+        return org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto(
             legalName = legalEntityScriptVariant?.legalName,
             shortName = legalEntityScriptVariant?.shortName
         )
@@ -328,7 +322,7 @@ class BusinessPartnerOutputDtoV7Factory {
                 )
             } ?: PhysicalAddressScriptVariantV7Dto(),
             alternativeAddress = addressScriptVariant?.alternativeAddress?.let { a ->
-                org.eclipse.tractusx.bpdm.gate.api.v7.model.AlternativeAddressScriptVariantV7Dto(
+                org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto(
                     city = a.city
                 )
             }

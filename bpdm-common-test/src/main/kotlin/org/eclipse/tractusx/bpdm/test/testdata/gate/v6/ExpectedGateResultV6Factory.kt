@@ -20,17 +20,16 @@
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.*
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.ConfidenceCriteriaV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.AddressComponentOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.LegalEntityRepresentationOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.SiteRepresentationOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto

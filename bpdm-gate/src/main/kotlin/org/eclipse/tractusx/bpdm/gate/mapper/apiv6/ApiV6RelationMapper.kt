@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationAlreadyExistsException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputDeleteException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException

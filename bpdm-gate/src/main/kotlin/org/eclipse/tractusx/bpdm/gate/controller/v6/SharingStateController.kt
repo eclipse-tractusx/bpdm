@@ -24,9 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateV6Api
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6SharingStateMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
@@ -34,7 +35,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRa
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateReadyApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 

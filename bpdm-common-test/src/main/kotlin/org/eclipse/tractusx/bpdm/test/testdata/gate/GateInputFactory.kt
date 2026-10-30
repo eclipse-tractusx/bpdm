@@ -23,12 +23,16 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Entry
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AddressRepresentationInputV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.LegalEntityRepresentationInputV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.StreetV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
 import java.time.LocalDate
 import kotlin.random.Random
 

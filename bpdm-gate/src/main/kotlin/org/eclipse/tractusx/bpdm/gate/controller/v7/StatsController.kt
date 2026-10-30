@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.controller.v7
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.v7.StatsV7Api
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsAddressTypesV7Response
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsConfidenceCriteriaV7Response
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsSharingStatesV7Response
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsStagesV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsAddressTypesV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsConfidenceCriteriaV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsSharingStatesV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsStagesV7Response
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7StatsMapper
 import org.eclipse.tractusx.bpdm.gate.service.application.StatsReadApplicationService

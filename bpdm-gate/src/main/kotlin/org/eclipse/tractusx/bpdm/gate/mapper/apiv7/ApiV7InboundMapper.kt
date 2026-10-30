@@ -14,13 +14,13 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharableRelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw

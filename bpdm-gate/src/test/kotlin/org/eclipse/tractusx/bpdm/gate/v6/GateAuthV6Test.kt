@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.gate.v6
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyV6Request
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper

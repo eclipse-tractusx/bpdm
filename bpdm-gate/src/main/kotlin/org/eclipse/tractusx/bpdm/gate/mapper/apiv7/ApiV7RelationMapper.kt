@@ -13,14 +13,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateErrorCodeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharableRelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateErrorCodeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputRecord
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationOutputRecord
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationSharingStateRecord

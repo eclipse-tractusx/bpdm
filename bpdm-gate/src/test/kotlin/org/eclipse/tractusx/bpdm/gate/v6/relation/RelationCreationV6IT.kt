@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.controller.v7
 
 import org.eclipse.tractusx.bpdm.gate.api.v7.GatePartnerUploadV7Api
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerUploadException

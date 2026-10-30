@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v6.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.ChangelogTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.PageChangeLogV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import java.time.Instant

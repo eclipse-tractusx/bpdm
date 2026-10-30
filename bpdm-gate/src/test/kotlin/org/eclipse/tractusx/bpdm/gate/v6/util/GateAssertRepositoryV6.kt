@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.gate.v6.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.GateErrorV6Response
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesV6Response
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.PageChangeLogV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.error.GateErrorV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsSharingStatesV6Response
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.stereotype.Component

@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationOutputV7Api
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange

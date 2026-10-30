@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.stats
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsStagesV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsStagesV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 

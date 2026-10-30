@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateChangelogV6Api
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.PageChangeLogV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType

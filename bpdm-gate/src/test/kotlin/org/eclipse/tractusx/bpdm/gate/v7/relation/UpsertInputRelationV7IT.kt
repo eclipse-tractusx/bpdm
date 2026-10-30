@@ -20,12 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodV7Dto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.error.GateErrorV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
@@ -35,7 +36,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException.BadRequest
 import java.time.LocalDate

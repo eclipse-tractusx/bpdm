@@ -23,9 +23,9 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateChangelogV6Api
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchV6Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.PageChangeLogV6Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.PostExchange

@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.ChangelogTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateV6Dto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.PageChangeLogV6Dto
 import org.eclipse.tractusx.bpdm.gate.model.output.changelog.ChangelogEntryRecord
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.springframework.data.domain.Page

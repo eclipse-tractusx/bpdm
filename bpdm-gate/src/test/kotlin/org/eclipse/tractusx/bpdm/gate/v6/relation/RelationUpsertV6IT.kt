@@ -21,26 +21,26 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodV7Dto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Entry
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationValidityPeriodV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationValidityPeriodV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import java.time.Instant
-import java.time.LocalDate
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.time.Instant
+import java.time.LocalDate
 
 class RelationUpsertV6IT: UnscheduledGateV6TestBase() {
 
