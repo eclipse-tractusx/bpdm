@@ -11,7 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
+
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
 
 data class SharedBusinessPartnerRaw(
     val sharingStateId: Long,

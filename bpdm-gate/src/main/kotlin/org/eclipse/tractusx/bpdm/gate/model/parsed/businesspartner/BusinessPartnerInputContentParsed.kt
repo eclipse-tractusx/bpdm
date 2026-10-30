@@ -17,7 +17,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
 import java.time.LocalDateTime
 
 /**

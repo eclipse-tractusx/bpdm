@@ -13,10 +13,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordsRaw
 
 data class GoldenRecordTaskResolutionPageRaw(
     val finishedTasks: FinishedGoldenRecordTaskPageRaw,
     val results: List<GoldenRecordTaskResultRaw>,
-    val goldenRecords: PoolGoldenRecordsRaw
+    val goldenRecords: GoldenRecordsRaw
 )

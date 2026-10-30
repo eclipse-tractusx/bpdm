@@ -18,10 +18,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.mapper.pool.inbound.PoolGoldenRecordRequestMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordChangePageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordUpdatePageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolChangePageRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
@@ -49,10 +49,10 @@ class PoolGoldenRecordGateway(
         return GoldenRecordUpdatePageRaw(changes, fetchGoldenRecords(changes.changed))
     }
 
-    private fun fetchChanges(after: Instant, pageSize: Int): PoolChangePageRaw {
+    private fun fetchChanges(after: Instant, pageSize: Int): GoldenRecordChangePageRaw {
         val entries = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(timestampAfter = after), PaginationRequest(0, pageSize))
         val changedBpnsByType = entries.content.groupBy({ it.businessPartnerType }, { it.bpn })
-        return PoolChangePageRaw(
+        return GoldenRecordChangePageRaw(
             changed = GoldenRecordBpnsRaw(
                 legalEntities = changedBpnsByType[BusinessPartnerType.LEGAL_ENTITY].orEmpty().toSet(),
                 sites = changedBpnsByType[BusinessPartnerType.SITE].orEmpty().toSet(),
@@ -66,13 +66,13 @@ class PoolGoldenRecordGateway(
     /**
      * Returns the current golden records of [bpns] together with every site their addresses belong to.
      */
-    fun fetchGoldenRecords(bpns: GoldenRecordBpnsRaw): PoolGoldenRecordsRaw {
+    fun fetchGoldenRecords(bpns: GoldenRecordBpnsRaw): GoldenRecordsRaw {
         val legalEntities = fetchLegalEntities(bpns.legalEntities)
         val addresses = fetchAddresses(bpns.addresses)
         val sitesOfAddresses = addresses.flatMap { listOfNotNull(it.siteBpn) + it.additionalSiteBpns }
         val sites = fetchSites(bpns.sites + sitesOfAddresses)
 
-        return PoolGoldenRecordsRaw(
+        return GoldenRecordsRaw(
             requested = bpns,
             legalEntities = legalEntities.associateBy { it.bpn },
             sites = sites.associateBy { it.bpn },

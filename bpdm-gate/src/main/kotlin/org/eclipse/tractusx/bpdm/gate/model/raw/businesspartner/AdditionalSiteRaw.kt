@@ -17,15 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.raw.value
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
-import java.time.LocalDateTime
-
-data class ConfidenceCriteriaRaw(
-    val sharedByOwner: Boolean,
-    val checkedByExternalDataSource: Boolean,
-    val numberOfSharingMembers: Int,
-    val lastConfidenceCheckAt: LocalDateTime,
-    val nextConfidenceCheckAt: LocalDateTime,
-    val confidenceLevel: Int
+data class AdditionalSiteRaw(
+    val siteBpn: String,
+    val name: String?
 )

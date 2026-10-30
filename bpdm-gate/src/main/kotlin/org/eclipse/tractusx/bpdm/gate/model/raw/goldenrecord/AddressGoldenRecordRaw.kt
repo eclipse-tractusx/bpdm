@@ -14,12 +14,12 @@
 package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StateRaw
 import java.time.Instant
 
 data class AddressGoldenRecordRaw(

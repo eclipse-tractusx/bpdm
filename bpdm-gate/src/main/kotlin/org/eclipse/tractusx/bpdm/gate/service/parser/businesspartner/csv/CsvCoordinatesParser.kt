@@ -16,7 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw
 import org.springframework.stereotype.Service
 
 /**

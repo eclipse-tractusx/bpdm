@@ -17,9 +17,9 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StreetRaw
 import org.springframework.stereotype.Component
 
 /**

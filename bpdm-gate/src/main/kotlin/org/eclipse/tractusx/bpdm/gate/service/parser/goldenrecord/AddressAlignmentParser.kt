@@ -18,9 +18,9 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.AddressAlignmentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordsRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -39,7 +39,7 @@ class AddressAlignmentParser(
     fun parse(
         sharingState: SharingStateDb,
         base: BusinessPartnerOutputContentParsed,
-        goldenRecords: PoolGoldenRecordsRaw
+        goldenRecords: GoldenRecordsRaw
     ): ParseResult<AddressAlignmentParsed?, GoldenRecordAlignmentError> {
         val bpn = base.addressBpn.takeIf { it in goldenRecords.requested.addresses } ?: return ParseResult.Success(null)
         val address = goldenRecords.addresses[bpn]
@@ -64,7 +64,7 @@ class AddressAlignmentParser(
 
     // Which of the address's sites is additional is relative to the site this output tracks, which may be any member,
     // not to the Pool's `bpnSite`, which is only its oldest member.
-    private fun additionalSitesOf(address: AddressGoldenRecordRaw, trackedSiteBpn: String?, goldenRecords: PoolGoldenRecordsRaw): List<AdditionalSiteRaw> =
+    private fun additionalSitesOf(address: AddressGoldenRecordRaw, trackedSiteBpn: String?, goldenRecords: GoldenRecordsRaw): List<AdditionalSiteRaw> =
         (listOfNotNull(address.siteBpn) + address.additionalSiteBpns)
             .distinct()
             .filterNot { it == trackedSiteBpn }

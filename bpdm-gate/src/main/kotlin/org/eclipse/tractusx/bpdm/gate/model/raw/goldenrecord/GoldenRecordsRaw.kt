@@ -13,10 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-import java.time.Instant
-
-data class PoolChangePageRaw(
-    val changed: GoldenRecordBpnsRaw,
-    val changedUntil: Instant?,
-    val hasMore: Boolean
+data class GoldenRecordsRaw(
+    val requested: GoldenRecordBpnsRaw,
+    val legalEntities: Map<String, LegalEntityGoldenRecordRaw>,
+    val sites: Map<String, SiteGoldenRecordRaw>,
+    val addresses: Map<String, AddressGoldenRecordRaw>
 )

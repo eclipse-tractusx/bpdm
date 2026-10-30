@@ -17,8 +17,8 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -34,7 +34,7 @@ class LegalEntityAlignmentParser {
     fun parse(
         sharingState: SharingStateDb,
         base: BusinessPartnerOutputContentParsed,
-        goldenRecords: PoolGoldenRecordsRaw
+        goldenRecords: GoldenRecordsRaw
     ): ParseResult<LegalEntityGoldenRecordRaw?, GoldenRecordAlignmentError> {
         val bpn = base.legalEntityBpn.takeIf { it in goldenRecords.requested.legalEntities } ?: return ParseResult.Success(null)
         val legalEntity = goldenRecords.legalEntities[bpn]

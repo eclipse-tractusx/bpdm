@@ -15,12 +15,12 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StreetRaw
 import org.springframework.stereotype.Component
 
 /**

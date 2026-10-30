@@ -13,6 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.SharedBusinessPartnerRaw
+
 data class GoldenRecordConsistencyCheckPageRaw(
     val sharedBusinessPartners: List<SharedBusinessPartnerRaw>,
     val existingBpns: GoldenRecordBpnsRaw

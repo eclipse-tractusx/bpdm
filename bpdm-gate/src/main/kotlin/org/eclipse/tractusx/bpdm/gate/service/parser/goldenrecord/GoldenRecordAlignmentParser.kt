@@ -19,9 +19,9 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.mapper.parsed.BusinessPartnerOutputParsedMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
-import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordsRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -43,7 +43,7 @@ class GoldenRecordAlignmentParser(
         sharingState: SharingStateDb,
         storedOutput: BusinessPartnerDb?,
         base: BusinessPartnerOutputContentParsed,
-        goldenRecords: PoolGoldenRecordsRaw
+        goldenRecords: GoldenRecordsRaw
     ): ParseResult<BusinessPartnerOutputParsed, GoldenRecordAlignmentError> =
         zipParseResults(
             legalEntityParser.parse(sharingState, base, goldenRecords),

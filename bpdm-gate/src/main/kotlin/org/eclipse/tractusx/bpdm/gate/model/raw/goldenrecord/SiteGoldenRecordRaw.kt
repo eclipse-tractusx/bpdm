@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StateRaw
 import java.time.Instant
 
 data class SiteGoldenRecordRaw(

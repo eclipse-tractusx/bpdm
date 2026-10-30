@@ -17,7 +17,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant
@@ -47,8 +47,8 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
 import org.springframework.stereotype.Component
 import java.time.ZoneOffset
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw as GateGeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw as GateStreet
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw as GateGeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StreetRaw as GateStreet
 
 /**
  * Maps business partner golden record task requests onto the requests the Orchestrator receives.

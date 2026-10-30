@@ -14,6 +14,6 @@
 package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
 data class GoldenRecordUpdatePageRaw(
-    val changes: PoolChangePageRaw,
-    val goldenRecords: PoolGoldenRecordsRaw
+    val changes: GoldenRecordChangePageRaw,
+    val goldenRecords: GoldenRecordsRaw
 )

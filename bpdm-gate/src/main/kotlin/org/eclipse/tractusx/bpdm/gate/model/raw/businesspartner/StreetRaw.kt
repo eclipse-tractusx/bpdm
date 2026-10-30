@@ -11,11 +11,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
-data class PoolGoldenRecordsRaw(
-    val requested: GoldenRecordBpnsRaw,
-    val legalEntities: Map<String, LegalEntityGoldenRecordRaw>,
-    val sites: Map<String, SiteGoldenRecordRaw>,
-    val addresses: Map<String, AddressGoldenRecordRaw>
+data class StreetRaw(
+    val namePrefix: String?,
+    val additionalNamePrefix: String?,
+    val name: String?,
+    val nameSuffix: String?,
+    val additionalNameSuffix: String?,
+    val houseNumber: String?,
+    val houseNumberSupplement: String?,
+    val milestone: String?,
+    val direction: String?
 )

@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StreetRaw
 import org.springframework.stereotype.Component
 
 /**

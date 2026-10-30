@@ -17,8 +17,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordConsistencyCheckError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.SharedBusinessPartnerRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordConsistencyCheckPageRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SharedBusinessPartnerRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.union
 import org.eclipse.tractusx.bpdm.gate.service.gateway.PoolGoldenRecordGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.goldenrecord.GoldenRecordConsistencyCheckOperationService

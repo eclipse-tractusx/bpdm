@@ -17,15 +17,15 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty
 

@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 
 data class AddressAlignmentParsed(
     val address: AddressGoldenRecordRaw,

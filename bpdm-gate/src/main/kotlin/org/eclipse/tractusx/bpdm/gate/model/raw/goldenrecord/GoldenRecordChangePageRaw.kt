@@ -11,16 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.raw.value
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-data class StreetRaw(
-    val namePrefix: String?,
-    val additionalNamePrefix: String?,
-    val name: String?,
-    val nameSuffix: String?,
-    val additionalNameSuffix: String?,
-    val houseNumber: String?,
-    val houseNumberSupplement: String?,
-    val milestone: String?,
-    val direction: String?
+import java.time.Instant
+
+data class GoldenRecordChangePageRaw(
+    val changed: GoldenRecordBpnsRaw,
+    val changedUntil: Instant?,
+    val hasMore: Boolean
 )

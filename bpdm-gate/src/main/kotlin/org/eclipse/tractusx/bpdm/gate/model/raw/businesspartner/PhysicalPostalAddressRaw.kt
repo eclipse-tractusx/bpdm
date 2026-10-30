@@ -17,17 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.raw.value
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
-import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
-data class AlternativeAddressRaw(
+data class PhysicalPostalAddressRaw(
     val geographicCoordinates: GeoCoordinateRaw?,
     val country: String,
     val administrativeAreaLevel1: String?,
+    val administrativeAreaLevel2: String?,
+    val administrativeAreaLevel3: String?,
     val postalCode: String?,
     val city: String,
-    val deliveryServiceType: DeliveryServiceType,
-    val deliveryServiceQualifier: String?,
-    val deliveryServiceNumber: String
+    val district: String?,
+    val street: StreetRaw?,
+    val companyPostalCode: String?,
+    val industrialZone: String?,
+    val building: String?,
+    val floor: String?,
+    val door: String?,
+    val taxJurisdictionCode: String?
 )

@@ -14,15 +14,15 @@ package org.eclipse.tractusx.bpdm.gate.model.output.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.StateRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
 data class BusinessPartnerOutputRecord(

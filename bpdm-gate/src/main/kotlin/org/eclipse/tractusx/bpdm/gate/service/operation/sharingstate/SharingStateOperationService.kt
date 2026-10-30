@@ -21,8 +21,8 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.SharedBusinessPartnerRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SharedBusinessPartnerRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.PendingGoldenRecordTaskRaw
