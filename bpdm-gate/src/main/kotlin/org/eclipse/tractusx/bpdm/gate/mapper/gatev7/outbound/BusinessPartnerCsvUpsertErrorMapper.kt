@@ -15,7 +15,6 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
 import org.springframework.stereotype.Component
 
 /**
@@ -31,13 +30,13 @@ class BusinessPartnerCsvUpsertErrorMapper(
      */
     fun toMessage(error: BusinessPartnerCsvUpsertError): String =
         when (error) {
-            is BusinessPartnerInputUpsertError -> inputErrorMapper.toMessage(error)
             is BusinessPartnerCsvUpsertError.InvalidTenantBpnl ->
                 "The uploading tenant '${error.tenantBpnl.orEmpty()}' is not identified by a legal entity BPN"
             is BusinessPartnerCsvUpsertError.TenantLegalEntityNotFound ->
                 "No legal entity with BPN '${error.tenantBpnl}' of the uploading tenant found in the Pool"
             is BusinessPartnerCsvUpsertError.InvalidRow ->
                 "Row - ${error.rowNumber}${error.externalId?.let { ", External ID - $it" }.orEmpty()} has error: ${toProblem(error.error)}"
+            is BusinessPartnerCsvUpsertError.InputRejected -> inputErrorMapper.toMessage(error.error)
         }
 
     private fun toProblem(error: BusinessPartnerCsvRowError): String =

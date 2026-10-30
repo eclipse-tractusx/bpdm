@@ -48,7 +48,10 @@ class BusinessPartnerCsvUpsertParser(
         val rowErrors = rowResults.flatMap { (it as? ParseResult.Failure)?.errors.orEmpty() }
         if (rowErrors.isNotEmpty()) return ParseResult.Failure(rowErrors)
 
-        return inputUpsertParser.parse(rowResults.map { (it as ParseResult.Success).parsed })
+        return when (val inputResult = inputUpsertParser.parse(rowResults.map { (it as ParseResult.Success).parsed })) {
+            is ParseResult.Success -> inputResult
+            is ParseResult.Failure -> ParseResult.Failure(inputResult.errors.map { BusinessPartnerCsvUpsertError.InputRejected(it) })
+        }
     }
 
     private fun resolveTenant(tenantBpnl: String?): ParseResult<BusinessPartnerCsvTenant, BusinessPartnerCsvUpsertError> {

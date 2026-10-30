@@ -22,6 +22,7 @@ sealed interface BusinessPartnerCsvUpsertError {
     data class InvalidTenantBpnl(val tenantBpnl: String?) : BusinessPartnerCsvUpsertError
     data class TenantLegalEntityNotFound(val tenantBpnl: String) : BusinessPartnerCsvUpsertError
     data class InvalidRow(val rowNumber: Int, val externalId: String?, val error: BusinessPartnerCsvRowError) : BusinessPartnerCsvUpsertError
+    data class InputRejected(val error: BusinessPartnerInputUpsertError) : BusinessPartnerCsvUpsertError
 }
 
 /**
