@@ -15,6 +15,12 @@ package org.eclipse.tractusx.bpdm.gate.model.parsed.task
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 
+/**
+ * A relation starting the golden record task the Orchestrator created for it.
+ *
+ * Guarantees:
+ * - [relation] is still ready and staged for sharing, unchanged since the task was created.
+ */
 data class RelationTaskCreationParsed(
     val relation: RelationDb,
     val taskId: String,

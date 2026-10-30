@@ -17,6 +17,13 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import java.time.Instant
 
+/**
+ * A relation staged for sharing, as the golden record relation the Orchestrator receives for it.
+ *
+ * Guarantees:
+ * - Both endpoints are shared, and their address types and [relationType] form a relation the golden record supports.
+ * - [sourceBpn] and [targetBpn] are non-blank BPNs of the level that combination selects: BPNL, BPNS or BPNA.
+ */
 data class RelationTaskCandidateParsed(
     val relationId: Long,
     val externalId: String,

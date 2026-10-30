@@ -22,6 +22,9 @@ import java.time.LocalDateTime
 
 /**
  * Everything a business partner input stores about the partner, so two equal contents mean no change.
+ *
+ * Guarantees:
+ * - [additionalSites] is empty unless [site] states a BPN or a name.
  */
 data class BusinessPartnerInputContentParsed(
     val nameParts: List<String>,

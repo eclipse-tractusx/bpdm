@@ -15,6 +15,12 @@ package org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate
 
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 
+/**
+ * The sharing states to set ready to be shared.
+ *
+ * Guarantees:
+ * - Every sharing state belongs to the tenant the request was parsed for and is in an initial or error state.
+ */
 data class SharingStateReadyParsed(
     val sharingStates: List<SharingStateDb>
 )

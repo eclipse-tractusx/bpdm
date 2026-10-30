@@ -16,6 +16,12 @@ package org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 
+/**
+ * The output data a shared business partner takes on.
+ *
+ * Guarantees:
+ * - [storedOutput] is the output [sharingState] holds, or null if it holds none.
+ */
 data class BusinessPartnerOutputParsed(
     val sharingState: SharingStateDb,
     val storedOutput: BusinessPartnerDb?,

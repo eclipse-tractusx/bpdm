@@ -17,6 +17,13 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
 
+/**
+ * The golden record relation a relation output takes on.
+ *
+ * Guarantees:
+ * - [sourceBpn] and [targetBpn] differ.
+ * - Every validity period ending at a `validTo` starts before it.
+ */
 data class RelationOutputParsed(
     val relation: RelationDb,
     val relationType: SharableRelationType,

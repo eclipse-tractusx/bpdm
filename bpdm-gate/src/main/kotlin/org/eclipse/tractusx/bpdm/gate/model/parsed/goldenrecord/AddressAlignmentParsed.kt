@@ -18,6 +18,13 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AdditionalSiteRa
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
 
+/**
+ * The address golden record a business partner output takes on, with the site it brings along.
+ *
+ * Guarantees:
+ * - [address] is not older than the address golden record the output holds.
+ * - [adoptedSite] is set only when the output tracks no site, and then is the site [address] belongs to.
+ */
 data class AddressAlignmentParsed(
     val address: AddressGoldenRecordRaw,
     val addressType: AddressType,

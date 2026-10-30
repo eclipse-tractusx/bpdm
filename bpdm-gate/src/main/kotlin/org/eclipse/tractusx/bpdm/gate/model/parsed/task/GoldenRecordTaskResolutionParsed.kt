@@ -17,9 +17,21 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 
+/**
+ * The outcome a business partner takes on from its finished golden record task.
+ *
+ * Guarantees:
+ * - [sharingState] is pending on a task the Orchestrator reports as finished.
+ */
 sealed interface GoldenRecordTaskResolutionParsed {
     val sharingState: SharingStateDb
 
+    /**
+     * The task succeeded.
+     *
+     * Guarantees:
+     * - [output] is null when the task result carries nothing newer than the output [sharingState] already holds.
+     */
     data class Succeeded(
         override val sharingState: SharingStateDb,
         val output: BusinessPartnerOutputParsed?

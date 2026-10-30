@@ -13,6 +13,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner
 
+/**
+ * The tenant a business partner CSV upload is made for.
+ *
+ * Guarantees:
+ * - [bpnl] is the BPNL of a legal entity the Pool knows, and [legalName] is that legal entity's legal name.
+ */
 data class BusinessPartnerCsvTenantParsed(
     val bpnl: String,
     val legalName: String

@@ -15,6 +15,12 @@ package org.eclipse.tractusx.bpdm.gate.model.parsed.relation
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 
+/**
+ * A relation input to delete.
+ *
+ * Guarantees:
+ * - [input] is an input-stage relation of the tenant the request was parsed for.
+ */
 data class RelationInputDeleteParsed(
     val input: RelationStageDb
 )

@@ -17,6 +17,12 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
 
+/**
+ * The outcome a relation takes on from its finished golden record task.
+ *
+ * Guarantees:
+ * - [relation] is pending on a task the Orchestrator reports as finished.
+ */
 sealed interface RelationTaskResolutionParsed {
     val relation: RelationDb
 
