@@ -62,13 +62,13 @@ class GoldenRecordAlignmentParser(
 
     private fun withLegalEntity(data: BusinessPartnerOutputContentParsed, legalEntity: LegalEntityGoldenRecordRaw): BusinessPartnerOutputContentParsed =
         data.copy(
-            identifiers = data.identifiers.filterNot { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY } + legalEntity.identifiers,
-            states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY } + legalEntity.states,
+            identifiers = data.identifiers.filterNot { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }.toSet() + legalEntity.identifiers,
+            states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }.toSet() + legalEntity.states,
             legalName = legalEntity.legalName,
             legalForm = legalEntity.legalForm,
             shortName = legalEntity.shortName,
             legalEntityConfidence = legalEntity.confidence,
-            legalEntityGoldenRecordRelations = legalEntity.relations,
+            legalEntityGoldenRecordRelations = legalEntity.relations.toSet(),
             ownershipUltimate = legalEntity.ownershipUltimate,
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
             legalEntityUpdatedAt = legalEntity.updatedAt,
@@ -80,10 +80,10 @@ class GoldenRecordAlignmentParser(
     private fun withSite(data: BusinessPartnerOutputContentParsed, site: SiteGoldenRecordRaw): BusinessPartnerOutputContentParsed =
         data.copy(
             siteBpn = site.bpn,
-            states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.SITE } + site.states,
+            states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.SITE }.toSet() + site.states,
             siteName = site.name,
             siteConfidence = site.confidence,
-            siteGoldenRecordRelations = site.relations,
+            siteGoldenRecordRelations = site.relations.toSet(),
             siteUpdatedAt = site.updatedAt,
             scriptVariants = mergeScriptVariants(data.scriptVariants, site.scriptVariants, { it.scriptCode }) { variant, goldenRecord ->
                 variant.copy(siteName = goldenRecord.name)
@@ -93,15 +93,15 @@ class GoldenRecordAlignmentParser(
     private fun withAddress(data: BusinessPartnerOutputContentParsed, alignment: AddressAlignmentParsed): BusinessPartnerOutputContentParsed {
         val address = alignment.address
         return data.copy(
-            identifiers = data.identifiers.filterNot { it.businessPartnerType == BusinessPartnerType.ADDRESS } + address.identifiers,
-            states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.ADDRESS } + address.states,
+            identifiers = data.identifiers.filterNot { it.businessPartnerType == BusinessPartnerType.ADDRESS }.toSet() + address.identifiers,
+            states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.ADDRESS }.toSet() + address.states,
             addressName = address.name,
             addressType = alignment.addressType,
             physicalPostalAddress = address.physicalPostalAddress,
             alternativePostalAddress = address.alternativePostalAddress,
             addressConfidence = address.confidence,
-            addressGoldenRecordRelations = address.relations,
-            additionalSites = alignment.additionalSites,
+            addressGoldenRecordRelations = address.relations.toSet(),
+            additionalSites = alignment.additionalSites.toSet(),
             addressUpdatedAt = address.updatedAt,
             scriptVariants = mergeScriptVariants(data.scriptVariants, address.scriptVariants, { it.scriptCode }) { variant, goldenRecord ->
                 variant.copy(
@@ -114,17 +114,17 @@ class GoldenRecordAlignmentParser(
     }
 
     private fun <G> mergeScriptVariants(
-        variants: List<BusinessPartnerValuesRaw.ScriptVariant>,
+        variants: Set<BusinessPartnerValuesRaw.ScriptVariant>,
         goldenRecordVariants: List<G>,
         scriptCodeOf: (G) -> String,
         apply: (BusinessPartnerValuesRaw.ScriptVariant, G) -> BusinessPartnerValuesRaw.ScriptVariant
-    ): List<BusinessPartnerValuesRaw.ScriptVariant> {
+    ): Set<BusinessPartnerValuesRaw.ScriptVariant> {
         val goldenRecordVariantByCode = goldenRecordVariants.associateBy(scriptCodeOf)
         val storedCodes = variants.map { it.scriptCode }.toSet()
         val updated = variants.map { variant -> goldenRecordVariantByCode[variant.scriptCode]?.let { apply(variant, it) } ?: variant }
         val added = goldenRecordVariantByCode.filterKeys { it !in storedCodes }
             .map { (scriptCode, goldenRecordVariant) -> apply(emptyScriptVariant(scriptCode), goldenRecordVariant) }
-        return updated + added
+        return (updated + added).toSet()
     }
 
     private fun emptyScriptVariant(scriptCode: String) =

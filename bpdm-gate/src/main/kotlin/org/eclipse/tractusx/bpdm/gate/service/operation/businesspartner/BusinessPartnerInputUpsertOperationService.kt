@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartn
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult.*
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
-import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -158,36 +157,13 @@ class BusinessPartnerInputUpsertOperationService(
         input.addressName = content.address.name
         writeAddress(content.address, input.postalAddress)
 
-        syncScriptVariants(content.scriptVariants, input)
+        parsedToDbMapper.writeScriptVariants(content.scriptVariants, input)
     }
 
     private fun writeAddress(address: BusinessPartnerInputContentParsed.Address, postalAddress: PostalAddressDb) {
         postalAddress.addressType = address.addressType
         postalAddress.physicalPostalAddress = address.physicalPostalAddress?.let(parsedToDbMapper::toEntity)
         postalAddress.alternativePostalAddress = address.alternativePostalAddress?.let(parsedToDbMapper::toEntity)
-    }
-
-    // Updated in place by script code: replacing the list would insert before the orphans are deleted and break the
-    // unique (script_code, business_partner_id) constraint.
-    private fun syncScriptVariants(scriptVariants: Collection<BusinessPartnerValuesRaw.ScriptVariant>, input: BusinessPartnerDb) {
-        val existingByCode = input.scriptVariants.associateBy { it.scriptCode }
-        input.scriptVariants.removeIf { existing -> scriptVariants.none { it.scriptCode == existing.scriptCode } }
-
-        scriptVariants.forEach { scriptVariant ->
-            val target = existingByCode[scriptVariant.scriptCode]
-                ?: BusinessPartnerScriptVariantDb(scriptVariant.scriptCode, input).also { input.scriptVariants.add(it) }
-            writeScriptVariant(scriptVariant, target)
-        }
-    }
-
-    private fun writeScriptVariant(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant, target: BusinessPartnerScriptVariantDb) {
-        target.nameParts.replace(scriptVariant.nameParts)
-        target.legalName = scriptVariant.legalName
-        target.shortName = scriptVariant.shortName
-        target.siteName = scriptVariant.siteName
-        target.addressName = scriptVariant.addressName
-        target.physicalAddress = parsedToDbMapper.toEntity(scriptVariant.physicalAddress)
-        target.alternativeAddress = scriptVariant.alternativeAddressCity?.let(parsedToDbMapper::toAlternativeAddressScriptVariant)
     }
 }
 

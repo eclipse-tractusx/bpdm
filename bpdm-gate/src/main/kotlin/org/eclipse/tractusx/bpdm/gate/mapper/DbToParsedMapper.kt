@@ -79,9 +79,9 @@ class DbToParsedMapper {
         with(output) {
             BusinessPartnerOutputContentParsed(
                 nameParts = nameParts,
-                identifiers = identifiers.map { IdentifierRaw(it.type, it.value, it.issuingBody, it.businessPartnerType) },
-                states = states.map { StateRaw(it.validFrom, it.validTo, it.type, it.businessPartnerTyp) },
-                roles = roles.toList(),
+                identifiers = identifiers.mapTo(linkedSetOf()) { IdentifierRaw(it.type, it.value, it.issuingBody, it.businessPartnerType) },
+                states = states.mapTo(linkedSetOf()) { StateRaw(it.validFrom, it.validTo, it.type, it.businessPartnerTyp) },
+                roles = roles.toSet(),
                 isOwnCompanyData = isOwnCompanyData,
                 legalEntityBpn = bpnL ?: throw missing(BusinessPartnerDb::bpnL, id),
                 siteBpn = bpnS,
@@ -100,13 +100,13 @@ class DbToParsedMapper {
                 legalEntityUpdatedAt = legalEntityUpdatedAt,
                 siteUpdatedAt = siteUpdatedAt,
                 addressUpdatedAt = addressUpdatedAt,
-                scriptVariants = scriptVariants.map(::toValue),
-                legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
-                siteGoldenRecordRelations = siteGoldenRecordRelations.map { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
-                addressGoldenRecordRelations = addressGoldenRecordRelations.map { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
+                scriptVariants = scriptVariants.mapTo(linkedSetOf(), ::toValue),
+                legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.mapTo(linkedSetOf()) { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
+                siteGoldenRecordRelations = siteGoldenRecordRelations.mapTo(linkedSetOf()) { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
+                addressGoldenRecordRelations = addressGoldenRecordRelations.mapTo(linkedSetOf()) { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
                 ownershipUltimate = ownershipUltimate,
                 ultimateOwnerBpnl = ultimateOwnerBpnl,
-                additionalSites = additionalSites.map { AdditionalSiteRaw(it.bpn ?: throw missing(AdditionalSiteDb::bpn, id), it.name) }
+                additionalSites = additionalSites.mapTo(linkedSetOf()) { AdditionalSiteRaw(it.bpn ?: throw missing(AdditionalSiteDb::bpn, id), it.name) }
             )
         }
 

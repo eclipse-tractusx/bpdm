@@ -34,11 +34,14 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRe
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import java.time.Instant
 
+/**
+ * Everything a business partner output stores about the partner, so two equal contents mean no change.
+ */
 data class BusinessPartnerOutputContentParsed(
     val nameParts: List<String>,
-    val identifiers: Collection<IdentifierRaw>,
-    val states: Collection<StateRaw>,
-    val roles: Collection<BusinessPartnerRole>,
+    val identifiers: Set<IdentifierRaw>,
+    val states: Set<StateRaw>,
+    val roles: Set<BusinessPartnerRole>,
     val isOwnCompanyData: Boolean,
     val legalEntityBpn: String,
     val legalName: String?,
@@ -57,11 +60,11 @@ data class BusinessPartnerOutputContentParsed(
     val legalEntityUpdatedAt: Instant?,
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
-    val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
-    val legalEntityGoldenRecordRelations: List<GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>>,
-    val siteGoldenRecordRelations: List<GoldenRecordRelationRaw<SiteGoldenRecordRelationType>>,
-    val addressGoldenRecordRelations: List<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,
+    val scriptVariants: Set<BusinessPartnerValuesRaw.ScriptVariant>,
+    val legalEntityGoldenRecordRelations: Set<GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>>,
+    val siteGoldenRecordRelations: Set<GoldenRecordRelationRaw<SiteGoldenRecordRelationType>>,
+    val addressGoldenRecordRelations: Set<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean? = null,
     val ultimateOwnerBpnl: String? = null,
-    val additionalSites: List<AdditionalSiteRaw> = emptyList()
+    val additionalSites: Set<AdditionalSiteRaw> = emptySet()
 )

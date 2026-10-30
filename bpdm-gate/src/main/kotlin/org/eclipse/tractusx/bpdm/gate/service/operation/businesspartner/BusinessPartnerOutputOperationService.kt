@@ -17,18 +17,20 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
+import org.eclipse.tractusx.bpdm.gate.mapper.DbToParsedMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.ParsedToDbMapper
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,9 +41,8 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerOutputOperationService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val changelogCreateOperation: ChangelogCreateOperationService,
+    private val dbToParsedMapper: DbToParsedMapper,
     private val parsedToDbMapper: ParsedToDbMapper,
-    private val compareUtil: BusinessPartnerComparisonUtil,
-    private val copyUtil: BusinessPartnerCopyUtil,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
@@ -55,20 +56,37 @@ class BusinessPartnerOutputOperationService(
         outputs.map(::write)
 
     private fun write(parsed: BusinessPartnerOutputParsed): BusinessPartnerDb {
-        val sharingState = parsed.sharingState
         val storedOutput = parsed.storedOutput
-        val incoming = parsedToDbMapper.toEntity(parsed.data, sharingState)
-        if (storedOutput != null && !compareUtil.hasChanges(incoming, storedOutput)) return storedOutput
+        return when {
+            storedOutput == null -> create(parsed.data, parsed.sharingState)
+            hasChanged(parsed.data, storedOutput) -> update(parsed.data, storedOutput)
+            else -> storedOutput
+        }
+    }
 
-        val changeType = if (storedOutput == null) ChangelogType.CREATE else ChangelogType.UPDATE
-        val output = storedOutput ?: BusinessPartnerDb.createEmpty(sharingState, StageType.Output)
+    private fun create(content: BusinessPartnerOutputContentParsed, sharingState: SharingStateDb): BusinessPartnerDb {
+        val output = BusinessPartnerDb.createEmpty(sharingState, StageType.Output)
+        write(content, output)
+        persist(output, ChangelogType.CREATE)
+        return output
+    }
+
+    private fun update(content: BusinessPartnerOutputContentParsed, output: BusinessPartnerDb): BusinessPartnerDb {
+        write(content, output)
+        persist(output, ChangelogType.UPDATE)
+        return output
+    }
+
+    private fun hasChanged(content: BusinessPartnerOutputContentParsed, storedOutput: BusinessPartnerDb) =
+        dbToParsedMapper.toUpsertData(storedOutput) != content
+
+    private fun persist(output: BusinessPartnerDb, changeType: ChangelogType) {
+        val sharingState = output.sharingState
+        businessPartnerRepository.save(output)
         changelogCreateOperation.record(
             ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, StageType.Output, GoldenRecordType.BusinessPartner)
         )
-        copyUtil.copyValues(incoming, output)
-        businessPartnerRepository.save(output)
         logChange(sharingState, changeType)
-        return output
     }
 
     private fun logChange(sharingState: SharingStateDb, changeType: ChangelogType) {
@@ -78,5 +96,45 @@ class BusinessPartnerOutputOperationService(
         }
         changeLogger.log(BusinessPartnerChangeRaw(persistedChangeType, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChangeRaw.Aspect.Output))
         logger.debug { "Wrote business partner output ${sharingState.externalId} as $changeType" }
+    }
+
+    private fun write(content: BusinessPartnerOutputContentParsed, output: BusinessPartnerDb) {
+        output.nameParts.replace(content.nameParts)
+        output.roles.replace(content.roles)
+        output.identifiers.replace(content.identifiers.map(parsedToDbMapper::toEntity))
+        output.states.replace(content.states.map(parsedToDbMapper::toEntity))
+        output.isOwnCompanyData = content.isOwnCompanyData
+
+        output.bpnL = content.legalEntityBpn
+        output.legalName = content.legalName
+        output.shortName = content.shortName
+        output.legalForm = content.legalForm
+        output.ownershipUltimate = content.ownershipUltimate
+        output.ultimateOwnerBpnl = content.ultimateOwnerBpnl
+        output.legalEntityConfidence = parsedToDbMapper.toEntity(content.legalEntityConfidence)
+        output.legalEntityUpdatedAt = content.legalEntityUpdatedAt
+        output.legalEntityGoldenRecordRelations.replace(content.legalEntityGoldenRecordRelations.map(parsedToDbMapper::toLegalEntityGoldenRecordRelation))
+
+        output.bpnS = content.siteBpn
+        output.siteName = content.siteName
+        output.siteConfidence = content.siteConfidence?.let(parsedToDbMapper::toEntity)
+        output.siteUpdatedAt = content.siteUpdatedAt
+        output.siteGoldenRecordRelations.replace(content.siteGoldenRecordRelations.map(parsedToDbMapper::toSiteGoldenRecordRelation))
+        output.additionalSites.replace(content.additionalSites.map(parsedToDbMapper::toEntity))
+
+        output.bpnA = content.addressBpn
+        output.addressName = content.addressName
+        output.addressConfidence = parsedToDbMapper.toEntity(content.addressConfidence)
+        output.addressUpdatedAt = content.addressUpdatedAt
+        output.addressGoldenRecordRelations.replace(content.addressGoldenRecordRelations.map(parsedToDbMapper::toAddressGoldenRecordRelation))
+        writeAddress(content, output.postalAddress)
+
+        parsedToDbMapper.writeScriptVariants(content.scriptVariants, output)
+    }
+
+    private fun writeAddress(content: BusinessPartnerOutputContentParsed, postalAddress: PostalAddressDb) {
+        postalAddress.addressType = content.addressType
+        postalAddress.physicalPostalAddress = parsedToDbMapper.toEntity(content.physicalPostalAddress)
+        postalAddress.alternativePostalAddress = content.alternativePostalAddress?.let(parsedToDbMapper::toEntity)
     }
 }

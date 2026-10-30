@@ -63,8 +63,8 @@ class GoldenRecordTaskOutputParser {
                                                                                 (legalEntityBpn, alternativePostalAddress) ->
             BusinessPartnerOutputContentParsed(
                 nameParts = request.nameParts,
-                identifiers = request.identifiers.mapNotNull(::toIdentifier),
-                states = request.states.mapNotNull(::toState),
+                identifiers = request.identifiers.mapNotNullTo(linkedSetOf(), ::toIdentifier),
+                states = request.states.mapNotNullTo(linkedSetOf(), ::toState),
                 roles = roles.toSortedSet(),
                 isOwnCompanyData = tenantBpnl != null && tenantBpnl == request.owningCompanyBpnl,
                 legalEntityBpn = legalEntityBpn,
@@ -84,13 +84,13 @@ class GoldenRecordTaskOutputParser {
                 legalEntityUpdatedAt = request.legalEntityUpdatedAt,
                 siteUpdatedAt = request.siteUpdatedAt,
                 addressUpdatedAt = request.addressUpdatedAt,
-                scriptVariants = request.scriptVariants,
-                legalEntityGoldenRecordRelations = request.legalEntityGoldenRecordRelations,
-                siteGoldenRecordRelations = request.siteGoldenRecordRelations,
-                addressGoldenRecordRelations = request.addressGoldenRecordRelations,
+                scriptVariants = request.scriptVariants.toSet(),
+                legalEntityGoldenRecordRelations = request.legalEntityGoldenRecordRelations.toSet(),
+                siteGoldenRecordRelations = request.siteGoldenRecordRelations.toSet(),
+                addressGoldenRecordRelations = request.addressGoldenRecordRelations.toSet(),
                 ownershipUltimate = request.ownershipUltimate,
                 ultimateOwnerBpnl = request.ultimateOwnerBpnl,
-                additionalSites = request.additionalSites.mapNotNull { site -> site.bpn?.let { AdditionalSiteRaw(siteBpn = it, name = site.name) } }
+                additionalSites = request.additionalSites.mapNotNullTo(linkedSetOf()) { site -> site.bpn?.let { AdditionalSiteRaw(siteBpn = it, name = site.name) } }
             )
         }
     }
