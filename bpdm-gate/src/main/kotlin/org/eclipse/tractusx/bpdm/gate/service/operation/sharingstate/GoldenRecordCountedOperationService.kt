@@ -20,8 +20,8 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedSyncParsed
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedUpdate
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.GoldenRecordCountedSyncParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.GoldenRecordCountedUpdateRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Pageable
@@ -60,9 +60,9 @@ class GoldenRecordCountedOperationService(
      * sharing state id and starting after [sharingStateId].
      */
     @Transactional(readOnly = true)
-    fun findUnsyncedAfter(sharingStateId: Long, limit: Int): List<GoldenRecordCountedUpdate> =
+    fun findUnsyncedAfter(sharingStateId: Long, limit: Int): List<GoldenRecordCountedUpdateRaw> =
         sharingStateRepository.findGoldenRecordCountedUnsyncedAfter(sharingStateId, Pageable.ofSize(limit))
-            .map { GoldenRecordCountedUpdate(it.id, checkNotNull(it.orchestratorRecordId).toString(), checkNotNull(it.isGoldenRecordCounted)) }
+            .map { GoldenRecordCountedUpdateRaw(it.id, checkNotNull(it.orchestratorRecordId).toString(), checkNotNull(it.isGoldenRecordCounted)) }
 
     /**
      * Records for each of [syncs] that the Orchestrator received the flag sent for it.

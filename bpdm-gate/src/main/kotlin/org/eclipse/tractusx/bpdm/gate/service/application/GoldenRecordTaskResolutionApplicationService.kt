@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.union
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionPageRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionParsed
@@ -83,9 +83,9 @@ class GoldenRecordTaskResolutionApplicationService(
 
     private fun toFailed(error: GoldenRecordTaskResolutionError): GoldenRecordTaskResolutionParsed.Failed {
         val errorCode = when (error) {
-            is GoldenRecordTaskResolutionError.TaskMissing -> BusinessPartnerSharingError.MissingTaskID
-            is GoldenRecordTaskResolutionError.InputMissing -> BusinessPartnerSharingError.SharingProcessError
-            is GoldenRecordTaskResolutionError.ResultIncomplete -> BusinessPartnerSharingError.SharingProcessError
+            is GoldenRecordTaskResolutionError.TaskMissing -> BusinessPartnerSharingErrorCode.MissingTaskID
+            is GoldenRecordTaskResolutionError.InputMissing -> BusinessPartnerSharingErrorCode.SharingProcessError
+            is GoldenRecordTaskResolutionError.ResultIncomplete -> BusinessPartnerSharingErrorCode.SharingProcessError
         }
         return GoldenRecordTaskResolutionParsed.Failed(error.sharingState, errorCode, error.message)
     }

@@ -11,11 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate
+package org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate
 
-import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import java.time.Instant
 
-data class GoldenRecordCountedSyncParsed(
-    val sharingState: SharingStateDb,
-    val sentIsGoldenRecordCounted: Boolean
+data class SharingStateSearchRaw(
+    val externalIds: Collection<String>?,
+    val sharingStateTypes: Collection<SharingStateType>?,
+    val updatedAfter: Instant?
 )

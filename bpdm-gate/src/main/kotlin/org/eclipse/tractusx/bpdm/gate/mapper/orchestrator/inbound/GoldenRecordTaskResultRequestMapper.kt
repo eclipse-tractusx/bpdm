@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
@@ -62,15 +62,15 @@ class GoldenRecordTaskResultRequestMapper(
         )
     }
 
-    private fun toErrorCode(errorType: TaskErrorType?): BusinessPartnerSharingError =
+    private fun toErrorCode(errorType: TaskErrorType?): BusinessPartnerSharingErrorCode =
         when (errorType) {
-            TaskErrorType.Timeout -> BusinessPartnerSharingError.SharingTimeout
-            TaskErrorType.NaturalPersonError -> BusinessPartnerSharingError.NaturalPersonError
-            TaskErrorType.BpnErrorNotFound -> BusinessPartnerSharingError.BpnErrorNotFound
-            TaskErrorType.BpnErrorTooManyOptions -> BusinessPartnerSharingError.BpnErrorTooManyOptions
-            TaskErrorType.MandatoryFieldValidationFailed -> BusinessPartnerSharingError.MandatoryFieldValidationFailed
-            TaskErrorType.BlacklistCountryPresent -> BusinessPartnerSharingError.BlacklistCountryPresent
-            TaskErrorType.UnknownSpecialCharacters -> BusinessPartnerSharingError.UnknownSpecialCharacters
-            else -> BusinessPartnerSharingError.SharingProcessError
+            TaskErrorType.Timeout -> BusinessPartnerSharingErrorCode.SharingTimeout
+            TaskErrorType.NaturalPersonError -> BusinessPartnerSharingErrorCode.NaturalPersonError
+            TaskErrorType.BpnErrorNotFound -> BusinessPartnerSharingErrorCode.BpnErrorNotFound
+            TaskErrorType.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorCode.BpnErrorTooManyOptions
+            TaskErrorType.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorCode.MandatoryFieldValidationFailed
+            TaskErrorType.BlacklistCountryPresent -> BusinessPartnerSharingErrorCode.BlacklistCountryPresent
+            TaskErrorType.UnknownSpecialCharacters -> BusinessPartnerSharingErrorCode.UnknownSpecialCharacters
+            else -> BusinessPartnerSharingErrorCode.SharingProcessError
         }
 }

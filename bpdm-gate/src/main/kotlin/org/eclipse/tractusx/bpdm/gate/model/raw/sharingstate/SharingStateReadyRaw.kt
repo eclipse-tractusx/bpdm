@@ -11,8 +11,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready
+package org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate
 
-data class SharingStateReadyRequest(
+data class SharingStateReadyRaw(
     val externalIds: List<String>
 )

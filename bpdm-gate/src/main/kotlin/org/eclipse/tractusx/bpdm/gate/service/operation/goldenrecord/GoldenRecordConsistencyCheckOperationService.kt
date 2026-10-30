@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.goldenrecord
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,7 +41,7 @@ class GoldenRecordConsistencyCheckOperationService(
 
         inconsistent.forEach { check ->
             val errorMessage = "Business partner with external-ID ${check.sharingState.externalId} references not existing golden record '${check.missingBpns.joinToString()}'"
-            sharingStateOperation.fail(check.sharingState, BusinessPartnerSharingError.BpnNotInPool, errorMessage)
+            sharingStateOperation.fail(check.sharingState, BusinessPartnerSharingErrorCode.BpnNotInPool, errorMessage)
         }
     }
 

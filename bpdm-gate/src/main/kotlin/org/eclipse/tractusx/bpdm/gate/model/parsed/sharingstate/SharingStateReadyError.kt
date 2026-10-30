@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready
+package org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate
 
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 
 /**
  * Reason a business partner cannot be set ready to be shared.

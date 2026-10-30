@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedSyncError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedSyncParsed
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedUpdate
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.GoldenRecordCountedSyncError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.GoldenRecordCountedSyncParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.GoldenRecordCountedUpdateRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.stereotype.Service
 
@@ -31,7 +31,7 @@ class GoldenRecordCountedSyncParser(
     /**
      * Resolves the sharing state of each sent update in [updates], failing those whose sharing state no longer exists.
      */
-    fun parse(updates: List<GoldenRecordCountedUpdate>): List<ParseResult<GoldenRecordCountedSyncParsed, GoldenRecordCountedSyncError>> {
+    fun parse(updates: List<GoldenRecordCountedUpdateRaw>): List<ParseResult<GoldenRecordCountedSyncParsed, GoldenRecordCountedSyncError>> {
         val sharingStatesById = sharingStateRepository.findAllById(updates.map { it.sharingStateId }).associateBy { it.id }
         return updates.map { update ->
             val sharingState = sharingStatesById[update.sharingStateId]

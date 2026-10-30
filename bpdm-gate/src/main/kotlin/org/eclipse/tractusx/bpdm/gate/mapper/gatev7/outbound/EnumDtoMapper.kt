@@ -17,8 +17,8 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErr
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError as BusinessPartnerSharingErrorDto
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType as ChangelogTypeDto
@@ -58,18 +58,18 @@ class EnumDtoMapper {
     /**
      * Returns the API sharing error code for [sharingError].
      */
-    fun toDto(sharingError: BusinessPartnerSharingError): BusinessPartnerSharingErrorDto =
+    fun toDto(sharingError: BusinessPartnerSharingErrorCode): BusinessPartnerSharingErrorDto =
         when (sharingError) {
-            BusinessPartnerSharingError.SharingProcessError -> BusinessPartnerSharingErrorDto.SharingProcessError
-            BusinessPartnerSharingError.SharingTimeout -> BusinessPartnerSharingErrorDto.SharingTimeout
-            BusinessPartnerSharingError.BpnNotInPool -> BusinessPartnerSharingErrorDto.BpnNotInPool
-            BusinessPartnerSharingError.MissingTaskID -> BusinessPartnerSharingErrorDto.MissingTaskID
-            BusinessPartnerSharingError.NaturalPersonError -> BusinessPartnerSharingErrorDto.NaturalPersonError
-            BusinessPartnerSharingError.BpnErrorNotFound -> BusinessPartnerSharingErrorDto.BpnErrorNotFound
-            BusinessPartnerSharingError.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorDto.BpnErrorTooManyOptions
-            BusinessPartnerSharingError.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorDto.MandatoryFieldValidationFailed
-            BusinessPartnerSharingError.BlacklistCountryPresent -> BusinessPartnerSharingErrorDto.BlacklistCountryPresent
-            BusinessPartnerSharingError.UnknownSpecialCharacters -> BusinessPartnerSharingErrorDto.UnknownSpecialCharacters
+            BusinessPartnerSharingErrorCode.SharingProcessError -> BusinessPartnerSharingErrorDto.SharingProcessError
+            BusinessPartnerSharingErrorCode.SharingTimeout -> BusinessPartnerSharingErrorDto.SharingTimeout
+            BusinessPartnerSharingErrorCode.BpnNotInPool -> BusinessPartnerSharingErrorDto.BpnNotInPool
+            BusinessPartnerSharingErrorCode.MissingTaskID -> BusinessPartnerSharingErrorDto.MissingTaskID
+            BusinessPartnerSharingErrorCode.NaturalPersonError -> BusinessPartnerSharingErrorDto.NaturalPersonError
+            BusinessPartnerSharingErrorCode.BpnErrorNotFound -> BusinessPartnerSharingErrorDto.BpnErrorNotFound
+            BusinessPartnerSharingErrorCode.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorDto.BpnErrorTooManyOptions
+            BusinessPartnerSharingErrorCode.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorDto.MandatoryFieldValidationFailed
+            BusinessPartnerSharingErrorCode.BlacklistCountryPresent -> BusinessPartnerSharingErrorDto.BlacklistCountryPresent
+            BusinessPartnerSharingErrorCode.UnknownSpecialCharacters -> BusinessPartnerSharingErrorDto.UnknownSpecialCharacters
         }
 
     /**

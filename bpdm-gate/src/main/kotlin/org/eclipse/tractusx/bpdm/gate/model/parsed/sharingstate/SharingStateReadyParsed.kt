@@ -11,13 +11,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.search
+package org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate
 
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 
-data class SharingStateSearchParsed(
-    val externalIds: Set<String>?,
-    val sharingStateTypes: Set<SharingStateType>?,
-    val updatedAfter: Instant?
+data class SharingStateReadyParsed(
+    val sharingStates: List<SharingStateDb>
 )

@@ -11,15 +11,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate
+package org.eclipse.tractusx.bpdm.gate.model.output.sharingstate
 
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import java.time.Instant
 import java.time.LocalDateTime
 
 data class SharingStateRecord(
     val externalId: String,
     val sharingStateType: SharingStateType,
-    val sharingErrorCode: BusinessPartnerSharingError?,
+    val sharingErrorCode: BusinessPartnerSharingErrorCode?,
     val sharingErrorMessage: String?,
     val sharingProcessStarted: LocalDateTime?,
     val taskId: String?,

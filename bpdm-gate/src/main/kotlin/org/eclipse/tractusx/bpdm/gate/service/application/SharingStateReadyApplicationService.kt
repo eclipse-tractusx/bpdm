@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyResult
+import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateReadyOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.sharingstate.SharingStateReadyParser
 import org.springframework.stereotype.Service
@@ -35,7 +35,7 @@ class SharingStateReadyApplicationService(
      * violation if any of them cannot be set ready.
      */
     @Transactional
-    fun setReady(request: SharingStateReadyRequest, tenantBpnl: String?): SharingStateReadyResult =
+    fun setReady(request: SharingStateReadyRaw, tenantBpnl: String?): SharingStateReadyResult =
         when (val parseResult = parser.parse(request, tenantBpnl)) {
             is ParseResult.Failure -> SharingStateReadyResult.Rejected(parseResult.errors)
             is ParseResult.Success -> {

@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyError.InvalidSharingState
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyError.NotFound
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError.InvalidSharingState
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError.NotFound
 import org.springframework.stereotype.Component
 
 /**

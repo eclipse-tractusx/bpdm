@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.model.task
 
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 
 sealed interface GoldenRecordTaskResolutionParsed {
     val sharingState: SharingStateDb
@@ -27,7 +27,7 @@ sealed interface GoldenRecordTaskResolutionParsed {
 
     data class Failed(
         override val sharingState: SharingStateDb,
-        val errorCode: BusinessPartnerSharingError,
+        val errorCode: BusinessPartnerSharingErrorCode,
         val errorMessage: String?
     ) : GoldenRecordTaskResolutionParsed
 }

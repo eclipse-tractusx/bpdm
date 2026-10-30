@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification

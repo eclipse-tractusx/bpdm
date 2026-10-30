@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate
 
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.search.SharingStateSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

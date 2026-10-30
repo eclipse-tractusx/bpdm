@@ -32,9 +32,9 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.SharingStateReadyErrorMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.SharingStateSearchRequest
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyResult
+import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateReadyApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
@@ -58,7 +58,7 @@ class SharingStateController(
         sharingStateTypes: Collection<SharingStateType>?,
         updatedAfter: Instant?,
     ): PageDto<SharingStateDto> {
-        val request = SharingStateSearchRequest(externalIds, sharingStateTypes?.map(enumRequestMapper::toModel), updatedAfter)
+        val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(enumRequestMapper::toModel), updatedAfter)
         return sharingStateSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(sharingStateDtoMapper::toDto)
     }
@@ -66,7 +66,7 @@ class SharingStateController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
-        val readyRequest = SharingStateReadyRequest(request.externalIds)
+        val readyRequest = SharingStateReadyRaw(request.externalIds)
         when (val result = sharingStateReadyApplicationService.setReady(readyRequest, getCurrentUserBpn())) {
             is SharingStateReadyResult.Readied -> Unit
             is SharingStateReadyResult.Rejected -> throw BpdmSharingStateReadyException(result.errors.map(sharingStateReadyErrorMapper::toMessage))

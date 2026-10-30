@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.task
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskHealthCheckParsed
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
 import org.springframework.stereotype.Service
@@ -39,7 +39,7 @@ class GoldenRecordTaskHealthCheckOperationService(
         val lost = checks.filter { !it.isTaskKnown && isStillPendingOnCheckedTask(it) }.map { it.sharingState }
         logger.debug { "Checked the tasks of ${checks.size} pending business partners, ${lost.size} of them lost by the Orchestrator" }
 
-        lost.forEach { sharingStateOperation.fail(it, BusinessPartnerSharingError.MissingTaskID, TASK_MISSING_MESSAGE) }
+        lost.forEach { sharingStateOperation.fail(it, BusinessPartnerSharingErrorCode.MissingTaskID, TASK_MISSING_MESSAGE) }
     }
 
     private fun isStillPendingOnCheckedTask(check: GoldenRecordTaskHealthCheckParsed): Boolean =

@@ -11,12 +11,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready
+package org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate
 
-/**
- * Result of setting a batch of business partners ready to be shared: either all of them or none, with every reason.
- */
-sealed interface SharingStateReadyResult {
-    data object Readied : SharingStateReadyResult
-    data class Rejected(val errors: List<SharingStateReadyError>) : SharingStateReadyResult
-}
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
+import java.time.Instant
+
+data class SharingStateSearchParsed(
+    val externalIds: Set<String>?,
+    val sharingStateTypes: Set<SharingStateType>?,
+    val updatedAfter: Instant?
+)

@@ -10,12 +10,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate
+package org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate
 
 /**
  * Why sharing a business partner input as a golden record failed.
  */
-enum class BusinessPartnerSharingError {
+enum class BusinessPartnerSharingErrorCode {
     SharingProcessError,
     SharingTimeout,
     BpnNotInPool,

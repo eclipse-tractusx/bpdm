@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.EnumDtoMapper
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateRecord
 import org.springframework.stereotype.Component
 
 /**

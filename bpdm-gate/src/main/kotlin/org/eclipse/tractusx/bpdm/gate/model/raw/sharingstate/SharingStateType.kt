@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.sharingstate
+package org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate
 
 /**
  * Where a business partner input stands in the golden record sharing process.

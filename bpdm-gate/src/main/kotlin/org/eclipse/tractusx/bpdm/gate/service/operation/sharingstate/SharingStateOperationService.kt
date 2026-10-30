@@ -17,13 +17,13 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SharedBusinessPartner
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
@@ -146,7 +146,7 @@ class SharingStateOperationService(
      * Marks [sharingState] as failed with [errorCode].
      */
     @Transactional
-    fun fail(sharingState: SharingStateDb, errorCode: BusinessPartnerSharingError, errorMessage: String?) {
+    fun fail(sharingState: SharingStateDb, errorCode: BusinessPartnerSharingErrorCode, errorMessage: String?) {
         sharingState.sharingStateType = SharingStateType.Error
         sharingState.sharingErrorCode = errorCode
         sharingState.sharingErrorMessage = errorMessage

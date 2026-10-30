@@ -15,10 +15,10 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

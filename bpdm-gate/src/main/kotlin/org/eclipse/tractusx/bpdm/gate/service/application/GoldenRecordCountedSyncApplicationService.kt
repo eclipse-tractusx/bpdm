@@ -16,8 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedSyncError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.GoldenRecordCountedUpdate
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.GoldenRecordCountedSyncError
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.GoldenRecordCountedUpdateRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.SharingMemberRecordGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.GoldenRecordCountedOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.sharingstate.GoldenRecordCountedSyncParser
@@ -55,10 +55,10 @@ class GoldenRecordCountedSyncApplicationService(
         }
     }
 
-    private fun findUnsyncedAfter(sharingStateId: Long): List<GoldenRecordCountedUpdate> =
+    private fun findUnsyncedAfter(sharingStateId: Long): List<GoldenRecordCountedUpdateRaw> =
         countedOperation.findUnsyncedAfter(sharingStateId, taskProperties.recordSync.batchSize)
 
-    private fun markSynced(updates: List<GoldenRecordCountedUpdate>) {
+    private fun markSynced(updates: List<GoldenRecordCountedUpdateRaw>) {
         pageTransaction.executeWithoutResult {
             val syncs = syncParser.parse(updates).mapNotNull { result ->
                 when (result) {

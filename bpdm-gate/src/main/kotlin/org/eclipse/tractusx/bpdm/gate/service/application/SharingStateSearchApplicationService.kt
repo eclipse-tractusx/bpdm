@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.gate.mapper.record.SharingStateRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.SharingStateSearchRequest
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateRecord
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateSearchOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.sharingstate.SharingStateSearchParser
 import org.springframework.data.domain.Page
@@ -37,7 +37,7 @@ class SharingStateSearchApplicationService(
      * Returns the page of [tenantBpnl]'s sharing states that match [request].
      */
     @Transactional(readOnly = true)
-    fun search(request: SharingStateSearchRequest, tenantBpnl: String?, pageable: Pageable): Page<SharingStateRecord> =
+    fun search(request: SharingStateSearchRaw, tenantBpnl: String?, pageable: Pageable): Page<SharingStateRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
             .map(recordMapper::toRecord)
 }

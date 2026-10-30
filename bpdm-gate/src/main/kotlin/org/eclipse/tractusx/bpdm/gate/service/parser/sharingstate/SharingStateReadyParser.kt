@@ -14,10 +14,10 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyError
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyParsed
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.ready.SharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.stereotype.Service
 
@@ -35,7 +35,7 @@ class SharingStateReadyParser(
      * Parses [request] for [tenantBpnl] as a whole, succeeding with the named sharing states only if every one of them
      * exists and is in an initial or error state, and failing with every violation otherwise.
      */
-    fun parse(request: SharingStateReadyRequest, tenantBpnl: String?): ParseResult<SharingStateReadyParsed, SharingStateReadyError> {
+    fun parse(request: SharingStateReadyRaw, tenantBpnl: String?): ParseResult<SharingStateReadyParsed, SharingStateReadyError> {
         val externalIds = request.externalIds.distinct()
         val sharingStatesByExternalId = sharingStateRepository.findByExternalIdInAndTenantBpnl(externalIds, tenantBpnl)
             .associateBy { it.externalId }
