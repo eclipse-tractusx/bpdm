@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
 import org.springframework.stereotype.Service
 
 /**

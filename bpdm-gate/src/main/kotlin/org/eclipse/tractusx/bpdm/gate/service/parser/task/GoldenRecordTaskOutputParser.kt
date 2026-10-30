@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskOutputError
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskOutputRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
@@ -25,7 +26,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
 /**
@@ -42,7 +42,7 @@ class GoldenRecordTaskOutputParser {
         request: GoldenRecordTaskOutputRaw,
         roles: Collection<BusinessPartnerRole>,
         tenantBpnl: String?
-    ): ParseResult<OutputUpsertData, GoldenRecordTaskOutputError> {
+    ): ParseResult<BusinessPartnerOutputContentParsed, GoldenRecordTaskOutputError> {
         val address = zipParseResults(
             required(request.addressType, "addressType"),
             required(request.addressBpn, "addressBpn"),
@@ -61,7 +61,7 @@ class GoldenRecordTaskOutputParser {
         return zipParseResults(address, confidences, legalEntityAndAlternative) { (addressType, addressBpn, physicalPostalAddress),
                                                                                 (legalEntityConfidence, siteConfidence, addressConfidence),
                                                                                 (legalEntityBpn, alternativePostalAddress) ->
-            OutputUpsertData(
+            BusinessPartnerOutputContentParsed(
                 nameParts = request.nameParts,
                 identifiers = request.identifiers.mapNotNull(::toIdentifier),
                 states = request.states.mapNotNull(::toState),

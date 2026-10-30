@@ -19,8 +19,8 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerOutputRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchParsed
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

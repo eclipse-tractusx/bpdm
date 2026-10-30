@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.record
 
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputRecord
 import org.springframework.stereotype.Component
 
 /**

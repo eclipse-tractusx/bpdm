@@ -22,14 +22,14 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
-import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult.*
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertParsed
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
@@ -121,7 +121,7 @@ class BusinessPartnerInputUpsertOperationService(
 
     private fun logChange(input: BusinessPartnerDb, type: PersistedChangeType) {
         val sharingState = input.sharingState
-        changeLogger.log(BusinessPartnerChange(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.Input))
+        changeLogger.log(BusinessPartnerChangeRaw(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChangeRaw.Aspect.Input))
     }
 
     private fun logDebug(result: BusinessPartnerInputUpsertEntryResult) =
@@ -161,7 +161,7 @@ class BusinessPartnerInputUpsertOperationService(
         syncScriptVariants(content.scriptVariants, input)
     }
 
-    private fun writeAddress(address: BusinessPartnerInputContent.Address, postalAddress: PostalAddressDb) {
+    private fun writeAddress(address: BusinessPartnerInputContentParsed.Address, postalAddress: PostalAddressDb) {
         postalAddress.addressType = address.addressType
         postalAddress.physicalPostalAddress = address.physicalPostalAddress?.let(entityMapper::toEntity)
         postalAddress.alternativePostalAddress = address.alternativePostalAddress?.let(entityMapper::toEntity)

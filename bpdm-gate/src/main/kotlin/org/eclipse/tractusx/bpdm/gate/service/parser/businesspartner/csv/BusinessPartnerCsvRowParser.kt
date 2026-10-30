@@ -16,11 +16,11 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvHeader
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRow
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvTenantParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -39,18 +39,18 @@ class BusinessPartnerCsvRowParser(
      * Returns the upsert entry [row] describes for [tenant], or fails with every invalid cell, each reported with
      * [rowNumber] and the row's external ID.
      */
-    fun parse(row: BusinessPartnerCsvRow, rowNumber: Int, tenant: BusinessPartnerCsvTenant): ParseResult<BusinessPartnerInputUpsertIn, BusinessPartnerCsvUpsertError> {
-        val externalId = CsvCell(BusinessPartnerCsvHeader.EXTERNAL_ID, row.externalId).value
+    fun parse(row: BusinessPartnerCsvRowRaw, rowNumber: Int, tenant: BusinessPartnerCsvTenantParsed): ParseResult<BusinessPartnerInputUpsertRaw, BusinessPartnerCsvUpsertError> {
+        val externalId = CsvCell(BusinessPartnerCsvRowRaw.Columns.EXTERNAL_ID, row.externalId).value
 
         val result = zipParseResults(parseExternalId(externalId), parseSite(row), addressParser.parse(row)) { parsedExternalId, site, address ->
-            BusinessPartnerInputUpsertIn(
+            BusinessPartnerInputUpsertRaw(
                 externalId = parsedExternalId,
                 nameParts = emptyList(),
                 identifiers = identifiers(row),
                 states = emptyList(),
                 roles = emptyList(),
                 isOwnCompanyData = true,
-                legalEntity = BusinessPartnerInputUpsertIn.LegalEntity(
+                legalEntity = BusinessPartnerInputUpsertRaw.LegalEntity(
                     bpn = tenant.bpnl,
                     legalName = tenant.legalName,
                     shortName = null,
@@ -78,18 +78,18 @@ class BusinessPartnerCsvRowParser(
             ?.let { ParseResult.Success(it) }
             ?: ParseResult.ofSingleFailure(BusinessPartnerCsvRowError.MissingExternalId)
 
-    private fun parseSite(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerInputUpsertIn.Site, BusinessPartnerCsvRowError> =
+    private fun parseSite(row: BusinessPartnerCsvRowRaw): ParseResult<BusinessPartnerInputUpsertRaw.Site, BusinessPartnerCsvRowError> =
         with(row) {
             stateParser.parse(
-                CsvCell(BusinessPartnerCsvHeader.SITE_STATES_TYPE, siteStatesType),
-                CsvCell(BusinessPartnerCsvHeader.SITE_STATES_VALID_FROM, siteStatesValidFrom),
-                CsvCell(BusinessPartnerCsvHeader.SITE_STATES_VALID_TO, siteStatesValidTo)
+                CsvCell(BusinessPartnerCsvRowRaw.Columns.SITE_STATES_TYPE, siteStatesType),
+                CsvCell(BusinessPartnerCsvRowRaw.Columns.SITE_STATES_VALID_FROM, siteStatesValidFrom),
+                CsvCell(BusinessPartnerCsvRowRaw.Columns.SITE_STATES_VALID_TO, siteStatesValidTo)
             ).combine(emptyList()) { state ->
-                BusinessPartnerInputUpsertIn.Site(bpn = cellText(siteBpn), name = cellText(siteName), states = listOf(state))
+                BusinessPartnerInputUpsertRaw.Site(bpn = cellText(siteBpn), name = cellText(siteName), states = listOf(state))
             }
         }
 
-    private fun identifiers(row: BusinessPartnerCsvRow) =
+    private fun identifiers(row: BusinessPartnerCsvRowRaw) =
         with(row) {
             listOf(
                 identifier(identifiersType1, identifiersValue1, identifiersIssuingBody1),
@@ -99,5 +99,5 @@ class BusinessPartnerCsvRowParser(
         }
 
     private fun identifier(type: String?, value: String?, issuingBody: String?) =
-        BusinessPartnerInputUpsertIn.Identifier(type = cellText(type), value = cellText(value), issuingBody = cellText(issuingBody))
+        BusinessPartnerInputUpsertRaw.Identifier(type = cellText(type), value = cellText(value), issuingBody = cellText(issuingBody))
 }

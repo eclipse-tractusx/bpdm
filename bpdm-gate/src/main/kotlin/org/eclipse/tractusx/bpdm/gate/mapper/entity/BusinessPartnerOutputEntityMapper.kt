@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.entity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
@@ -34,7 +35,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Component
 
 /**
@@ -48,7 +48,7 @@ class BusinessPartnerOutputEntityMapper(
     /**
      * Returns the output entity of [sharingState] holding [upsertData].
      */
-    fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb): BusinessPartnerDb {
+    fun toEntity(upsertData: BusinessPartnerOutputContentParsed, sharingState: SharingStateDb): BusinessPartnerDb {
         val businessPartner =  with(upsertData) {
             BusinessPartnerDb(
                 sharingState = sharingState,

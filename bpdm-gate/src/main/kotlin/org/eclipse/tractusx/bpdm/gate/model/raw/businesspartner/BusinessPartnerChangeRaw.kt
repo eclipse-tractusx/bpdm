@@ -11,13 +11,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.businesspartner
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChange
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeSubject
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 
-data class BusinessPartnerChange(
+data class BusinessPartnerChangeRaw(
     override val type: PersistedChangeType,
     val externalId: String,
     val tenantBpnl: String?,

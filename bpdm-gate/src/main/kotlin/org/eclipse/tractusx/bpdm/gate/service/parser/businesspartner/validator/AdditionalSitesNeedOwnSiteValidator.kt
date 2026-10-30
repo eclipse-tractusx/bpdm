@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component
 @Component
 class AdditionalSitesNeedOwnSiteValidator : BusinessPartnerInputUpsertValidator {
 
-    override fun validate(request: BusinessPartnerInputUpsertIn): List<BusinessPartnerInputUpsertError> {
+    override fun validate(request: BusinessPartnerInputUpsertRaw): List<BusinessPartnerInputUpsertError> {
         val statesSite = request.site.bpn != null || request.site.name != null
         return if (request.additionalSites.isNotEmpty() && !statesSite)
             listOf(BusinessPartnerInputUpsertError.AdditionalSitesWithoutOwnSite(request.externalId))

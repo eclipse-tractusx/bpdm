@@ -15,8 +15,8 @@ package org.eclipse.tractusx.bpdm.gate.mapper.record
 
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 import org.springframework.stereotype.Component
 
 /**
@@ -30,14 +30,14 @@ class BusinessPartnerInputContentMapper(
     /**
      * Returns the content of [entity].
      */
-    fun toContent(entity: BusinessPartnerDb): BusinessPartnerInputContent =
-        BusinessPartnerInputContent(
+    fun toContent(entity: BusinessPartnerDb): BusinessPartnerInputContentParsed =
+        BusinessPartnerInputContentParsed(
             nameParts = entity.nameParts.toList(),
-            identifiers = entity.identifiers.mapTo(linkedSetOf()) { BusinessPartnerInputContent.Identifier(it.type, it.value, it.issuingBody) },
+            identifiers = entity.identifiers.mapTo(linkedSetOf()) { BusinessPartnerInputContentParsed.Identifier(it.type, it.value, it.issuingBody) },
             states = entity.states.mapTo(linkedSetOf(), ::toContent),
             roles = entity.roles.toCollection(linkedSetOf()),
             isOwnCompanyData = entity.isOwnCompanyData,
-            legalEntity = BusinessPartnerInputContent.LegalEntity(
+            legalEntity = BusinessPartnerInputContentParsed.LegalEntity(
                 bpn = entity.bpnL,
                 legalName = entity.legalName,
                 shortName = entity.shortName,
@@ -45,8 +45,8 @@ class BusinessPartnerInputContentMapper(
                 ownershipUltimate = entity.ownershipUltimate,
                 ultimateOwnerBpnl = entity.ultimateOwnerBpnl
             ),
-            site = BusinessPartnerInputContent.Site(bpn = entity.bpnS, name = entity.siteName),
-            address = BusinessPartnerInputContent.Address(
+            site = BusinessPartnerInputContentParsed.Site(bpn = entity.bpnS, name = entity.siteName),
+            address = BusinessPartnerInputContentParsed.Address(
                 bpn = entity.bpnA,
                 name = entity.addressName,
                 addressType = entity.postalAddress.addressType,
@@ -58,5 +58,5 @@ class BusinessPartnerInputContentMapper(
         )
 
     private fun toContent(state: StateDb) =
-        BusinessPartnerInputContent.State(type = state.type, validFrom = state.validFrom, validTo = state.validTo, businessPartnerType = state.businessPartnerTyp)
+        BusinessPartnerInputContentParsed.State(type = state.type, validFrom = state.validFrom, validTo = state.validTo, businessPartnerType = state.businessPartnerTyp)
 }

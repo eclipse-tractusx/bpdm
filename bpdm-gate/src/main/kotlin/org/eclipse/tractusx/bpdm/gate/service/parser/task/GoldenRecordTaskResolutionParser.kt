@@ -18,6 +18,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskOutputError
@@ -27,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRa
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResolutionPageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord.GoldenRecordAlignmentParser
@@ -118,7 +118,7 @@ class GoldenRecordTaskResolutionParser(
     private fun findBySharingStates(sharingStates: List<SharingStateDb>, stage: StageType): Map<Long, BusinessPartnerDb> =
         businessPartnerRepository.findBySharingStateInAndStage(sharingStates, stage).associateBy { it.sharingState.id }
 
-    private fun isNewerThanStored(incoming: OutputUpsertData, stored: BusinessPartnerDb?): Boolean {
+    private fun isNewerThanStored(incoming: BusinessPartnerOutputContentParsed, stored: BusinessPartnerDb?): Boolean {
         val incomingComponentTimestamps = listOf(incoming.legalEntityUpdatedAt, incoming.siteUpdatedAt, incoming.addressUpdatedAt)
         if (incomingComponentTimestamps.all { it == null }) return true
         if (stored == null) return true

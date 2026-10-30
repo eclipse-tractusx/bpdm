@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.upsert.output
+package org.eclipse.tractusx.bpdm.gate.model.output.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole

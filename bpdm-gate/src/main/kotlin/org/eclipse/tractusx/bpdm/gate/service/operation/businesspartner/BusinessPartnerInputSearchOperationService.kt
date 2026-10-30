@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

@@ -19,8 +19,8 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.GoldenRecordCountedSyncParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.GoldenRecordCountedUpdateRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -89,7 +89,7 @@ class GoldenRecordCountedOperationService(
 
     private fun logChange(sharingState: SharingStateDb) {
         changeLogger.log(
-            BusinessPartnerChange(PersistedChangeType.Updated, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.SharingState)
+            BusinessPartnerChangeRaw(PersistedChangeType.Updated, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChangeRaw.Aspect.SharingState)
         )
     }
 }

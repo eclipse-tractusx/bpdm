@@ -12,8 +12,8 @@
  */
 package org.eclipse.tractusx.bpdm.gate.service.application
 
-import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerOutputSearchOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.BusinessPartnerSearchParser
 import org.springframework.data.domain.Page
@@ -34,6 +34,6 @@ class BusinessPartnerOutputSearchApplicationService(
      * Returns the page of [tenantBpnl]'s business partner outputs that match [request].
      */
     @Transactional(readOnly = true)
-    fun search(request: BusinessPartnerSearchRequest, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerOutputRecord> =
+    fun search(request: BusinessPartnerSearchRaw, tenantBpnl: String?, pageable: Pageable): Page<BusinessPartnerOutputRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
 }

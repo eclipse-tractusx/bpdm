@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerCsvRe
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerCsvTemplateWriter
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerCsvUpsertErrorMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerCsvUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerCsvUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.core.io.ByteArrayResource

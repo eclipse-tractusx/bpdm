@@ -18,10 +18,10 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.AdditionalSiteDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 import org.springframework.stereotype.Component
 
 /**
@@ -33,13 +33,13 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of [identifier].
      */
-    fun toEntity(identifier: BusinessPartnerInputContent.Identifier): IdentifierDb =
+    fun toEntity(identifier: BusinessPartnerInputContentParsed.Identifier): IdentifierDb =
         IdentifierDb(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody, BusinessPartnerType.GENERIC)
 
     /**
      * Returns the stored form of [state].
      */
-    fun toEntity(state: BusinessPartnerInputContent.State): StateDb =
+    fun toEntity(state: BusinessPartnerInputContentParsed.State): StateDb =
         StateDb(type = state.type, validFrom = state.validFrom, validTo = state.validTo, businessPartnerTyp = state.businessPartnerType)
 
     /**

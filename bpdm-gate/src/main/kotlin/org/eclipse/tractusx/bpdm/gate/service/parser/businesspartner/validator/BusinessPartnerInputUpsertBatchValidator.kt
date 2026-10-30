@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 
 /**
  * One validation rule over the shape of a whole business partner upsert batch, decidable without the database.
@@ -24,5 +24,5 @@ interface BusinessPartnerInputUpsertBatchValidator {
     /**
      * Returns the violations of this rule in [requests], or an empty list if it holds.
      */
-    fun validate(requests: List<BusinessPartnerInputUpsertIn>): List<BusinessPartnerInputUpsertError>
+    fun validate(requests: List<BusinessPartnerInputUpsertRaw>): List<BusinessPartnerInputUpsertError>
 }

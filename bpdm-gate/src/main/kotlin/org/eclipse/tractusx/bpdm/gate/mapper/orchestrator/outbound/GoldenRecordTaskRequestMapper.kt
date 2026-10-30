@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCandidateParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant
@@ -117,7 +117,7 @@ class GoldenRecordTaskRequestMapper {
         )
     }
 
-    private fun toPostalAddress(input: BusinessPartnerInputContent): PostalAddress =
+    private fun toPostalAddress(input: BusinessPartnerInputContentParsed): PostalAddress =
         PostalAddress(
             bpnReference = toBpnReference(input.address.bpn),
             addressName = input.address.name,
@@ -129,7 +129,7 @@ class GoldenRecordTaskRequestMapper {
             hasChanged = null
         )
 
-    private fun toWithScriptVariants(postalAddress: PostalAddress, input: BusinessPartnerInputContent) =
+    private fun toWithScriptVariants(postalAddress: PostalAddress, input: BusinessPartnerInputContentParsed) =
         PostalAddressWithScriptVariants(
             postalAddress,
             input.scriptVariants.map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it)) }
@@ -188,7 +188,7 @@ class GoldenRecordTaskRequestMapper {
     private fun toGeoCoordinate(coordinate: GateGeoCoordinate?) =
         coordinate?.let { GeoCoordinate(it.longitude, it.latitude, it.altitude) } ?: GeoCoordinate.empty
 
-    private fun toStates(input: BusinessPartnerInputContent, businessPartnerType: BusinessPartnerType) =
+    private fun toStates(input: BusinessPartnerInputContentParsed, businessPartnerType: BusinessPartnerType) =
         input.states.filter { it.businessPartnerType == businessPartnerType }.map {
             BusinessState(it.validFrom?.toInstant(ZoneOffset.UTC), it.validTo?.toInstant(ZoneOffset.UTC), it.type)
         }

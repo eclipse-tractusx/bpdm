@@ -13,10 +13,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError.AdditionalSitesWithoutOwnSite
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError.DuplicateExternalIds
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError.UpsertLimitExceeded
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.AdditionalSitesWithoutOwnSite
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.DuplicateExternalIds
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.UpsertLimitExceeded
 import org.springframework.stereotype.Component
 
 /**

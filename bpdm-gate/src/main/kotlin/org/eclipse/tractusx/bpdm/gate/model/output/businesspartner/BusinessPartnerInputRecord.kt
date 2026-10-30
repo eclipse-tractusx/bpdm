@@ -11,8 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.input
+package org.eclipse.tractusx.bpdm.gate.model.output.businesspartner
 
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import java.time.Instant
 
 /**
@@ -21,7 +22,7 @@ import java.time.Instant
 data class BusinessPartnerInputRecord(
     val externalId: String,
     val externalSequenceTimestamp: Instant?,
-    val content: BusinessPartnerInputContent,
+    val content: BusinessPartnerInputContentParsed,
     val createdAt: Instant,
     val updatedAt: Instant
 )

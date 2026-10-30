@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRow
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvUpsertResult
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerCsvUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertEntryResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerInputUpsertOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv.BusinessPartnerCsvUpsertParser
 import org.springframework.stereotype.Service
@@ -38,7 +38,7 @@ class BusinessPartnerCsvUpsertApplicationService(
      * writes nothing and returns every violation if the tenant or any row is invalid.
      */
     @Transactional
-    fun upload(rows: List<BusinessPartnerCsvRow>, tenantBpnl: String?): BusinessPartnerCsvUpsertResult =
+    fun upload(rows: List<BusinessPartnerCsvRowRaw>, tenantBpnl: String?): BusinessPartnerCsvUpsertResult =
         when (val parseResult = parser.parse(rows, tenantBpnl)) {
             is ParseResult.Failure -> BusinessPartnerCsvUpsertResult.Rejected(parseResult.errors)
             is ParseResult.Success -> {

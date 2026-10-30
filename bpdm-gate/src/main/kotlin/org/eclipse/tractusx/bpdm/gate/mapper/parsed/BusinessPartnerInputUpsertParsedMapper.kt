@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.parsed
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -28,16 +28,16 @@ class BusinessPartnerInputUpsertParsedMapper {
     /**
      * Returns the parsed form of the normalized, validated [request].
      */
-    fun toParsed(request: BusinessPartnerInputUpsertIn): BusinessPartnerInputUpsertParsed =
+    fun toParsed(request: BusinessPartnerInputUpsertRaw): BusinessPartnerInputUpsertParsed =
         BusinessPartnerInputUpsertParsed(
             externalId = request.externalId,
             externalSequenceTimestamp = request.externalSequenceTimestamp,
             content = toContent(request)
         )
 
-    private fun toContent(request: BusinessPartnerInputUpsertIn) =
+    private fun toContent(request: BusinessPartnerInputUpsertRaw) =
         with(request) {
-            BusinessPartnerInputContent(
+            BusinessPartnerInputContentParsed(
                 nameParts = nameParts,
                 identifiers = identifiers.mapTo(linkedSetOf(), ::toContent),
                 states = toContent(states, BusinessPartnerType.GENERIC) +
@@ -47,11 +47,11 @@ class BusinessPartnerInputUpsertParsedMapper {
                 roles = roles.toCollection(linkedSetOf()),
                 isOwnCompanyData = isOwnCompanyData,
                 legalEntity = with(legalEntity) {
-                    BusinessPartnerInputContent.LegalEntity(bpn, legalName, shortName, legalForm, ownershipUltimate, ultimateOwnerBpnl)
+                    BusinessPartnerInputContentParsed.LegalEntity(bpn, legalName, shortName, legalForm, ownershipUltimate, ultimateOwnerBpnl)
                 },
-                site = BusinessPartnerInputContent.Site(site.bpn, site.name),
+                site = BusinessPartnerInputContentParsed.Site(site.bpn, site.name),
                 address = with(address) {
-                    BusinessPartnerInputContent.Address(bpn, name, addressType, physicalPostalAddress, alternativePostalAddress)
+                    BusinessPartnerInputContentParsed.Address(bpn, name, addressType, physicalPostalAddress, alternativePostalAddress)
                 },
                 scriptVariants = scriptVariants.toCollection(linkedSetOf()),
                 additionalSites = additionalSites.toCollection(linkedSetOf())
@@ -59,11 +59,11 @@ class BusinessPartnerInputUpsertParsedMapper {
         }
 
     // The normalizer has dropped every identifier and state missing these fields.
-    private fun toContent(identifier: BusinessPartnerInputUpsertIn.Identifier) =
-        BusinessPartnerInputContent.Identifier(type = identifier.type!!, value = identifier.value!!, issuingBody = identifier.issuingBody)
+    private fun toContent(identifier: BusinessPartnerInputUpsertRaw.Identifier) =
+        BusinessPartnerInputContentParsed.Identifier(type = identifier.type!!, value = identifier.value!!, issuingBody = identifier.issuingBody)
 
-    private fun toContent(states: List<BusinessPartnerInputUpsertIn.State>, businessPartnerType: BusinessPartnerType) =
+    private fun toContent(states: List<BusinessPartnerInputUpsertRaw.State>, businessPartnerType: BusinessPartnerType) =
         states.mapTo(linkedSetOf()) {
-            BusinessPartnerInputContent.State(type = it.type!!, validFrom = it.validFrom, validTo = it.validTo, businessPartnerType = businessPartnerType)
+            BusinessPartnerInputContentParsed.State(type = it.type!!, validFrom = it.validFrom, validTo = it.validTo, businessPartnerType = businessPartnerType)
         }
 }

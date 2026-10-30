@@ -17,11 +17,10 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvHeader
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRow
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
 import org.springframework.stereotype.Service
 
 /**
@@ -36,12 +35,12 @@ class BusinessPartnerCsvPostalAddressParser(
     /**
      * Returns the physical postal address [row] describes, or fails with every cell that holds no valid value.
      */
-    fun parsePhysical(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerValuesRaw.PhysicalPostalAddress, BusinessPartnerCsvRowError> =
+    fun parsePhysical(row: BusinessPartnerCsvRowRaw): ParseResult<BusinessPartnerValuesRaw.PhysicalPostalAddress, BusinessPartnerCsvRowError> =
         with(row) {
             coordinatesParser.parse(
-                CsvCell(BusinessPartnerCsvHeader.PHYSICAL_POSTAL_ADDRESS_LONGITUDE, physicalPostalAddressLongitude),
-                CsvCell(BusinessPartnerCsvHeader.PHYSICAL_POSTAL_ADDRESS_LATITUDE, physicalPostalAddressLatitude),
-                CsvCell(BusinessPartnerCsvHeader.PHYSICAL_POSTAL_ADDRESS_ALTITUDE, physicalPostalAddressAltitude)
+                CsvCell(BusinessPartnerCsvRowRaw.Columns.PHYSICAL_POSTAL_ADDRESS_LONGITUDE, physicalPostalAddressLongitude),
+                CsvCell(BusinessPartnerCsvRowRaw.Columns.PHYSICAL_POSTAL_ADDRESS_LATITUDE, physicalPostalAddressLatitude),
+                CsvCell(BusinessPartnerCsvRowRaw.Columns.PHYSICAL_POSTAL_ADDRESS_ALTITUDE, physicalPostalAddressAltitude)
             ).combine(emptyList()) { coordinates ->
                 BusinessPartnerValuesRaw.PhysicalPostalAddress(
                     geographicCoordinates = coordinates,
@@ -76,16 +75,16 @@ class BusinessPartnerCsvPostalAddressParser(
     /**
      * Returns the alternative postal address [row] describes, or fails with every cell that holds no valid value.
      */
-    fun parseAlternative(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerValuesRaw.AlternativePostalAddress, BusinessPartnerCsvRowError> =
+    fun parseAlternative(row: BusinessPartnerCsvRowRaw): ParseResult<BusinessPartnerValuesRaw.AlternativePostalAddress, BusinessPartnerCsvRowError> =
         with(row) {
             zipParseResults(
                 coordinatesParser.parse(
-                    CsvCell(BusinessPartnerCsvHeader.ALTERNATIVE_POSTAL_ADDRESS_LONGITUDE, alternativePostalAddressLongitude),
-                    CsvCell(BusinessPartnerCsvHeader.ALTERNATIVE_POSTAL_ADDRESS_LATITUDE, alternativePostalAddressLatitude),
-                    CsvCell(BusinessPartnerCsvHeader.ALTERNATIVE_POSTAL_ADDRESS_ALTITUDE, alternativePostalAddressAltitude)
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ALTERNATIVE_POSTAL_ADDRESS_LONGITUDE, alternativePostalAddressLongitude),
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ALTERNATIVE_POSTAL_ADDRESS_LATITUDE, alternativePostalAddressLatitude),
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ALTERNATIVE_POSTAL_ADDRESS_ALTITUDE, alternativePostalAddressAltitude)
                 ),
                 enumParser.parse(
-                    CsvCell(BusinessPartnerCsvHeader.ALTERNATIVE_POSTAL_ADDRESS_DELIVERY_SERVICE_TYPE, alternativePostalAddressDeliveryServiceType),
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ALTERNATIVE_POSTAL_ADDRESS_DELIVERY_SERVICE_TYPE, alternativePostalAddressDeliveryServiceType),
                     DeliveryServiceType::valueOf
                 )
             ) { coordinates, deliveryServiceType ->

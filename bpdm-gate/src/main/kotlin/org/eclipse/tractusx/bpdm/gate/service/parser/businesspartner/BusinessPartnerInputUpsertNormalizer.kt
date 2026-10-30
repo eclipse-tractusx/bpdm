@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
 import org.springframework.stereotype.Component
 
 /**
@@ -30,7 +30,7 @@ class BusinessPartnerInputUpsertNormalizer {
     /**
      * Returns [request] in canonical form.
      */
-    fun normalize(request: BusinessPartnerInputUpsertIn): BusinessPartnerInputUpsertIn =
+    fun normalize(request: BusinessPartnerInputUpsertRaw): BusinessPartnerInputUpsertRaw =
         request.copy(
             identifiers = request.identifiers.filter { it.type != null && it.value != null },
             states = normalize(request.states),
@@ -40,10 +40,10 @@ class BusinessPartnerInputUpsertNormalizer {
             address = normalize(request.address)
         )
 
-    private fun normalize(states: List<BusinessPartnerInputUpsertIn.State>) =
+    private fun normalize(states: List<BusinessPartnerInputUpsertRaw.State>) =
         states.filter { it.type != null }
 
-    private fun normalize(address: BusinessPartnerInputUpsertIn.Address) =
+    private fun normalize(address: BusinessPartnerInputUpsertRaw.Address) =
         address.copy(
             physicalPostalAddress = address.physicalPostalAddress
                 ?.let { it.copy(street = it.street?.takeIf { street -> street != EMPTY_STREET }) }

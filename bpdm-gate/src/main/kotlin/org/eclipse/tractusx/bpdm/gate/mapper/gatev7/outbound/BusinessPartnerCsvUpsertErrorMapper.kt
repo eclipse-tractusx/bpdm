@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvUpsertError
 import org.springframework.stereotype.Component
 
 /**

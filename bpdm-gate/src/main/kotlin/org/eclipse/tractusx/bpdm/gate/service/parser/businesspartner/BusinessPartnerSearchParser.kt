@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 
-import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchParsed
-import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -29,7 +29,7 @@ class BusinessPartnerSearchParser {
     /**
      * Returns [request] normalized, with an absent or empty external ID filter meaning no filter.
      */
-    fun parse(request: BusinessPartnerSearchRequest): BusinessPartnerSearchParsed =
+    fun parse(request: BusinessPartnerSearchRaw): BusinessPartnerSearchParsed =
         BusinessPartnerSearchParsed(
             externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet()
         )

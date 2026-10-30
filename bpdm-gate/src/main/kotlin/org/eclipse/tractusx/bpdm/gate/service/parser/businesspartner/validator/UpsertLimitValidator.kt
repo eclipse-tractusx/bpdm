@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator
 
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -26,7 +26,7 @@ class UpsertLimitValidator(
     private val apiConfigProperties: ApiConfigProperties
 ) : BusinessPartnerInputUpsertBatchValidator {
 
-    override fun validate(requests: List<BusinessPartnerInputUpsertIn>): List<BusinessPartnerInputUpsertError> {
+    override fun validate(requests: List<BusinessPartnerInputUpsertRaw>): List<BusinessPartnerInputUpsertError> {
         val limit = apiConfigProperties.upsertLimit
         return if (requests.size > limit)
             listOf(BusinessPartnerInputUpsertError.UpsertLimitExceeded(limit, requests.size))

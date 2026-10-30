@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.record
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
@@ -25,7 +26,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty
 
@@ -43,9 +43,9 @@ class OutputUpsertDataMapper(
     /**
      * Returns the output data [output] holds.
      */
-    fun toUpsertData(output: BusinessPartnerDb): OutputUpsertData =
+    fun toUpsertData(output: BusinessPartnerDb): BusinessPartnerOutputContentParsed =
         with(output) {
-            OutputUpsertData(
+            BusinessPartnerOutputContentParsed(
                 nameParts = nameParts,
                 identifiers = identifiers.map { IdentifierRaw(it.type, it.value, it.issuingBody, it.businessPartnerType) },
                 states = states.map { StateRaw(it.validFrom, it.validTo, it.type, it.businessPartnerTyp) },
@@ -136,5 +136,5 @@ class OutputUpsertDataMapper(
         GeoCoordinateRaw(longitude = entity.longitude, latitude = entity.latitude, altitude = entity.altitude)
 
     private fun missing(property: KProperty<*>, entityId: Long? = null) =
-        BpdmNullMappingException(BusinessPartnerDb::class, OutputUpsertData::class, property, entityId.toString())
+        BpdmNullMappingException(BusinessPartnerDb::class, BusinessPartnerOutputContentParsed::class, property, entityId.toString())
 }

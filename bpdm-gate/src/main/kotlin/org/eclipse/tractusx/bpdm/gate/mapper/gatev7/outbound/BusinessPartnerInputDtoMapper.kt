@@ -16,8 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputRecord
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.springframework.stereotype.Component
 
 /**
@@ -74,7 +74,7 @@ class BusinessPartnerInputDtoMapper(
         )
     }
 
-    private fun toStateDtos(states: Collection<BusinessPartnerInputContent.State>, businessPartnerType: BusinessPartnerType) =
+    private fun toStateDtos(states: Collection<BusinessPartnerInputContentParsed.State>, businessPartnerType: BusinessPartnerType) =
         states.filter { it.businessPartnerType == businessPartnerType }
             .map { BusinessPartnerStateDto(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
 }

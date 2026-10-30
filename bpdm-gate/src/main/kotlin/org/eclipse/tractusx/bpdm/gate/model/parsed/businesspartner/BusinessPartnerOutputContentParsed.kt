@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.output
+package org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
-data class OutputUpsertData(
+data class BusinessPartnerOutputContentParsed(
     val nameParts: List<String>,
     val identifiers: Collection<IdentifierRaw>,
     val states: Collection<StateRaw>,

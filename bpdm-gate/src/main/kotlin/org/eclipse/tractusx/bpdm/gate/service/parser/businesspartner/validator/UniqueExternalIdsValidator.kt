@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component
 @Component
 class UniqueExternalIdsValidator : BusinessPartnerInputUpsertBatchValidator {
 
-    override fun validate(requests: List<BusinessPartnerInputUpsertIn>): List<BusinessPartnerInputUpsertError> {
+    override fun validate(requests: List<BusinessPartnerInputUpsertRaw>): List<BusinessPartnerInputUpsertError> {
         val duplicates = requests.groupingBy { it.externalId }.eachCount().filterValues { it > 1 }.keys
         return if (duplicates.isNotEmpty())
             listOf(BusinessPartnerInputUpsertError.DuplicateExternalIds(duplicates))

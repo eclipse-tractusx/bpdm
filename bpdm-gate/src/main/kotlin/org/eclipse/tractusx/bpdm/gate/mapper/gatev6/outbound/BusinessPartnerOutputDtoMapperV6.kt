@@ -19,7 +19,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutpu
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.LegalEntityRepresentationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SiteRepresentationOutputDto
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerValueDtoMapper
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
 import org.springframework.stereotype.Component
 
 /**

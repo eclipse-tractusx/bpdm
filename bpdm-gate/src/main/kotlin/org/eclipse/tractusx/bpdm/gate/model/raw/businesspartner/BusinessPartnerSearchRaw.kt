@@ -11,12 +11,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.input
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
-import java.time.Instant
-
-data class BusinessPartnerInputUpsertParsed(
-    val externalId: String,
-    val externalSequenceTimestamp: Instant?,
-    val content: BusinessPartnerInputContent
+data class BusinessPartnerSearchRaw(
+    val externalIds: Collection<String>?
 )

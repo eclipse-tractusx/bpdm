@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound
 
 import com.opencsv.bean.CsvToBeanBuilder
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRow
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import java.io.InputStreamReader
@@ -28,10 +28,10 @@ class BusinessPartnerCsvReader {
     /**
      * Returns the rows of [file] in file order, bound by their column headers.
      */
-    fun read(file: MultipartFile): List<BusinessPartnerCsvRow> =
+    fun read(file: MultipartFile): List<BusinessPartnerCsvRowRaw> =
         InputStreamReader(file.inputStream).use { reader ->
-            CsvToBeanBuilder<BusinessPartnerCsvRow>(reader)
-                .withType(BusinessPartnerCsvRow::class.java)
+            CsvToBeanBuilder<BusinessPartnerCsvRowRaw>(reader)
+                .withType(BusinessPartnerCsvRowRaw::class.java)
                 .withIgnoreLeadingWhiteSpace(true)
                 .build()
                 .parse()

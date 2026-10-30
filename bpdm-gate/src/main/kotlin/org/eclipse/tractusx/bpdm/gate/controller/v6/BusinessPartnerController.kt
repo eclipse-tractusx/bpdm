@@ -33,8 +33,8 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.BusinessPartnerOutp
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.BusinessPartnerInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.BusinessPartnerInputUpsertErrorMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
@@ -66,7 +66,7 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto> {
-        val request = BusinessPartnerSearchRequest(externalIds)
+        val request = BusinessPartnerSearchRaw(externalIds)
         return outputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(outputDtoMapper::toDto)
     }

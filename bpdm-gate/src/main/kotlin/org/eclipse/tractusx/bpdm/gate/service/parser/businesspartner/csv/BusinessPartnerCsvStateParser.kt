@@ -16,8 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -32,12 +32,12 @@ class BusinessPartnerCsvStateParser(
     /**
      * Returns the state the cells describe, or fails with every cell that holds no valid state type or date-time.
      */
-    fun parse(type: CsvCell, validFrom: CsvCell, validTo: CsvCell): ParseResult<BusinessPartnerInputUpsertIn.State, BusinessPartnerCsvRowError> =
+    fun parse(type: CsvCell, validFrom: CsvCell, validTo: CsvCell): ParseResult<BusinessPartnerInputUpsertRaw.State, BusinessPartnerCsvRowError> =
         zipParseResults(
             enumParser.parse(type, BusinessStateType::valueOf),
             dateTimeParser.parse(validFrom),
             dateTimeParser.parse(validTo)
         ) { parsedType, parsedValidFrom, parsedValidTo ->
-            BusinessPartnerInputUpsertIn.State(type = parsedType, validFrom = parsedValidFrom, validTo = parsedValidTo)
+            BusinessPartnerInputUpsertRaw.State(type = parsedType, validFrom = parsedValidFrom, validTo = parsedValidTo)
         }
 }

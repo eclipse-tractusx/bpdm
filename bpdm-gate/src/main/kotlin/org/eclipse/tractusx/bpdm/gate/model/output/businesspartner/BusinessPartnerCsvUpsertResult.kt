@@ -11,7 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.input
+package org.eclipse.tractusx.bpdm.gate.model.output.businesspartner
+
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvUpsertError
 
 /**
  * Result of uploading business partner inputs as CSV: either every row written or nothing, with every reason.

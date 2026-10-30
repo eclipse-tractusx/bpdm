@@ -19,8 +19,8 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SharedBusinessPartnerRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
@@ -177,7 +177,7 @@ class SharingStateOperationService(
 
     private fun logChange(sharingState: SharingStateDb, type: PersistedChangeType = PersistedChangeType.Updated) {
         changeLogger.log(
-            BusinessPartnerChange(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.SharingState)
+            BusinessPartnerChangeRaw(type, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChangeRaw.Aspect.SharingState)
         )
     }
 }

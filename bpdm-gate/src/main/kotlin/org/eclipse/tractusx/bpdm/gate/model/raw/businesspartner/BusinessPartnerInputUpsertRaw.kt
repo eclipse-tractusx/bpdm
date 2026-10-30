@@ -11,29 +11,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.input
+package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import java.time.Instant
 import java.time.LocalDateTime
 
-/**
- * Everything a business partner input stores about the partner, so two equal contents mean no change.
- */
-data class BusinessPartnerInputContent(
+data class BusinessPartnerInputUpsertRaw(
+    val externalId: String,
     val nameParts: List<String>,
-    val identifiers: Set<Identifier>,
-    val states: Set<State>,
-    val roles: Set<BusinessPartnerRole>,
+    val identifiers: List<Identifier>,
+    val states: List<State>,
+    val roles: List<BusinessPartnerRole>,
     val isOwnCompanyData: Boolean,
     val legalEntity: LegalEntity,
     val site: Site,
     val address: Address,
-    val scriptVariants: Set<BusinessPartnerValuesRaw.ScriptVariant>,
-    val additionalSites: Set<BusinessPartnerValuesRaw.AdditionalSite>
+    val externalSequenceTimestamp: Instant?,
+    val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
+    val additionalSites: List<BusinessPartnerValuesRaw.AdditionalSite>
 ) {
     data class LegalEntity(
         val bpn: String?,
@@ -41,12 +40,14 @@ data class BusinessPartnerInputContent(
         val shortName: String?,
         val legalForm: String?,
         val ownershipUltimate: Boolean?,
-        val ultimateOwnerBpnl: String?
+        val ultimateOwnerBpnl: String?,
+        val states: List<State>
     )
 
     data class Site(
         val bpn: String?,
-        val name: String?
+        val name: String?,
+        val states: List<State>
     )
 
     data class Address(
@@ -54,19 +55,19 @@ data class BusinessPartnerInputContent(
         val name: String?,
         val addressType: AddressType?,
         val physicalPostalAddress: BusinessPartnerValuesRaw.PhysicalPostalAddress?,
-        val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?
+        val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?,
+        val states: List<State>
     )
 
     data class Identifier(
-        val type: String,
-        val value: String,
+        val type: String?,
+        val value: String?,
         val issuingBody: String?
     )
 
     data class State(
-        val type: BusinessStateType,
+        val type: BusinessStateType?,
         val validFrom: LocalDateTime?,
-        val validTo: LocalDateTime?,
-        val businessPartnerType: BusinessPartnerType
+        val validTo: LocalDateTime?
     )
 }

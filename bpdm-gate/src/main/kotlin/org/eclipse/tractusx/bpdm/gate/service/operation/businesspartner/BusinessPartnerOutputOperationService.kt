@@ -22,8 +22,8 @@ import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerOutputEntityMapper
-import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
@@ -76,7 +76,7 @@ class BusinessPartnerOutputOperationService(
             ChangelogType.CREATE -> PersistedChangeType.Created
             ChangelogType.UPDATE -> PersistedChangeType.Updated
         }
-        changeLogger.log(BusinessPartnerChange(persistedChangeType, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChange.Aspect.Output))
+        changeLogger.log(BusinessPartnerChangeRaw(persistedChangeType, sharingState.externalId, sharingState.tenantBpnl, BusinessPartnerChangeRaw.Aspect.Output))
         logger.debug { "Wrote business partner output ${sharingState.externalId} as $changeType" }
     }
 }

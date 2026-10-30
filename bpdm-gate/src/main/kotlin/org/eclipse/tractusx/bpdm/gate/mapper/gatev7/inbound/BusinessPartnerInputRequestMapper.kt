@@ -16,10 +16,10 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
 import org.springframework.stereotype.Component
 
 /**
@@ -31,16 +31,16 @@ class BusinessPartnerInputRequestMapper {
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [request].
      */
-    fun toUpsertIn(request: BusinessPartnerInputRequest): BusinessPartnerInputUpsertIn =
-        BusinessPartnerInputUpsertIn(
+    fun toUpsertIn(request: BusinessPartnerInputRequest): BusinessPartnerInputUpsertRaw =
+        BusinessPartnerInputUpsertRaw(
             externalId = request.externalId,
             nameParts = request.nameParts,
-            identifiers = request.identifiers.map { BusinessPartnerInputUpsertIn.Identifier(it.type, it.value, it.issuingBody) },
+            identifiers = request.identifiers.map { BusinessPartnerInputUpsertRaw.Identifier(it.type, it.value, it.issuingBody) },
             states = toStates(request.states),
             roles = request.roles.toList(),
             isOwnCompanyData = request.isOwnCompanyData,
             legalEntity = with(request.legalEntity) {
-                BusinessPartnerInputUpsertIn.LegalEntity(
+                BusinessPartnerInputUpsertRaw.LegalEntity(
                     bpn = legalEntityBpn,
                     legalName = legalName,
                     shortName = shortName,
@@ -50,9 +50,9 @@ class BusinessPartnerInputRequestMapper {
                     states = toStates(states)
                 )
             },
-            site = BusinessPartnerInputUpsertIn.Site(bpn = request.site.siteBpn, name = request.site.name, states = toStates(request.site.states)),
+            site = BusinessPartnerInputUpsertRaw.Site(bpn = request.site.siteBpn, name = request.site.name, states = toStates(request.site.states)),
             address = with(request.address) {
-                BusinessPartnerInputUpsertIn.Address(
+                BusinessPartnerInputUpsertRaw.Address(
                     bpn = addressBpn,
                     name = name,
                     addressType = addressType,
@@ -67,7 +67,7 @@ class BusinessPartnerInputRequestMapper {
         )
 
     private fun toStates(states: Collection<BusinessPartnerStateDto>) =
-        states.map { BusinessPartnerInputUpsertIn.State(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
+        states.map { BusinessPartnerInputUpsertRaw.State(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
 
     private fun toValue(address: PhysicalPostalAddressDto) =
         with(address) {

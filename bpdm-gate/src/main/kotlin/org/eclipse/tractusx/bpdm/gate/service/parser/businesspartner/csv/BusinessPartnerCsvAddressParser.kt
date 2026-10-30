@@ -15,10 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvHeader
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRow
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -34,18 +33,18 @@ class BusinessPartnerCsvAddressParser(
     /**
      * Returns the address [row] describes, or fails with every cell that holds no valid value.
      */
-    fun parse(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerInputUpsertIn.Address, BusinessPartnerCsvRowError> =
+    fun parse(row: BusinessPartnerCsvRowRaw): ParseResult<BusinessPartnerInputUpsertRaw.Address, BusinessPartnerCsvRowError> =
         with(row) {
             zipParseResults(
-                addressTypeParser.parse(CsvCell(BusinessPartnerCsvHeader.ADDRESS_TYPE, addressType)),
+                addressTypeParser.parse(CsvCell(BusinessPartnerCsvRowRaw.Columns.ADDRESS_TYPE, addressType)),
                 zipParseResults(postalAddressParser.parsePhysical(row), postalAddressParser.parseAlternative(row), ::Pair),
                 stateParser.parse(
-                    CsvCell(BusinessPartnerCsvHeader.ADDRESS_STATES_TYPE, addressStatesType),
-                    CsvCell(BusinessPartnerCsvHeader.ADDRESS_STATES_VALID_FROM, addressStatesValidFrom),
-                    CsvCell(BusinessPartnerCsvHeader.ADDRESS_STATES_VALID_TO, addressStatesValidTo)
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ADDRESS_STATES_TYPE, addressStatesType),
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ADDRESS_STATES_VALID_FROM, addressStatesValidFrom),
+                    CsvCell(BusinessPartnerCsvRowRaw.Columns.ADDRESS_STATES_VALID_TO, addressStatesValidTo)
                 )
             ) { parsedAddressType, (physicalPostalAddress, alternativePostalAddress), state ->
-                BusinessPartnerInputUpsertIn.Address(
+                BusinessPartnerInputUpsertRaw.Address(
                     bpn = cellText(addressBpn),
                     name = cellText(addressName),
                     addressType = parsedAddressType,

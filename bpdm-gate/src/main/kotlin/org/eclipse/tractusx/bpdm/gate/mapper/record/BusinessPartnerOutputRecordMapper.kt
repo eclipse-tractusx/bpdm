@@ -20,12 +20,12 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
 import org.springframework.stereotype.Component
 
 /**

@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.input
+package org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner
 
 /**
  * Reason a business partner input upsert is rejected, either for the batch as a whole or for one of its entries.

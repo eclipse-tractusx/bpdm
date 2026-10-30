@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.validator
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 
 /**
  * One validation rule over a single normalized business partner upsert entry.
@@ -27,5 +27,5 @@ interface BusinessPartnerInputUpsertValidator {
     /**
      * Returns the violations of this rule in [request], or an empty list if it holds.
      */
-    fun validate(request: BusinessPartnerInputUpsertIn): List<BusinessPartnerInputUpsertError>
+    fun validate(request: BusinessPartnerInputUpsertRaw): List<BusinessPartnerInputUpsertError>
 }

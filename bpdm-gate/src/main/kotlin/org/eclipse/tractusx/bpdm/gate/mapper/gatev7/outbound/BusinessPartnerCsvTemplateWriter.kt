@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import com.opencsv.CSVWriter
-import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvHeader
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.stereotype.Component
 import java.io.ByteArrayOutputStream
@@ -31,7 +31,7 @@ class BusinessPartnerCsvTemplateWriter {
      */
     fun write(): ByteArrayResource {
         val outputStream = ByteArrayOutputStream()
-        CSVWriter(OutputStreamWriter(outputStream)).use { it.writeNext(BusinessPartnerCsvHeader.COLUMNS.toTypedArray()) }
+        CSVWriter(OutputStreamWriter(outputStream)).use { it.writeNext(BusinessPartnerCsvRowRaw.Columns.COLUMNS.toTypedArray()) }
         return ByteArrayResource(outputStream.toByteArray())
     }
 }

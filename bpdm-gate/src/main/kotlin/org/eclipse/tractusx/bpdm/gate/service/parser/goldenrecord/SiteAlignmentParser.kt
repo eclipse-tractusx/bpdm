@@ -15,10 +15,10 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
 /**
@@ -33,7 +33,7 @@ class SiteAlignmentParser {
      */
     fun parse(
         sharingState: SharingStateDb,
-        base: OutputUpsertData,
+        base: BusinessPartnerOutputContentParsed,
         goldenRecords: PoolGoldenRecordsRaw
     ): ParseResult<SiteGoldenRecordRaw?, GoldenRecordAlignmentError> {
         val bpn = base.siteBpn?.takeIf { it in goldenRecords.requested.sites } ?: return ParseResult.Success(null)
