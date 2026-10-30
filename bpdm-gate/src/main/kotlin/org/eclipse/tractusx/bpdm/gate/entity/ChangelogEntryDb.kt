@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 
 @Entity
 @Table(name = "changelog_entries")

@@ -14,10 +14,10 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.stats.AddressTypeStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.ConfidenceCriteriaStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.SharingStateStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.StageStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.AddressTypeStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.ConfidenceCriteriaStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.SharingStateStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.StageStats
 import org.eclipse.tractusx.bpdm.gate.service.operation.stats.StatsReadOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -17,10 +17,10 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesRespon
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
-import org.eclipse.tractusx.bpdm.gate.model.stats.AddressTypeStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.ConfidenceCriteriaStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.SharingStateStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.StageStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.AddressTypeStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.ConfidenceCriteriaStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.SharingStateStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.StageStats
 import org.springframework.stereotype.Component
 
 /**

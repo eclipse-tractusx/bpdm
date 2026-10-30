@@ -15,11 +15,11 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.stats
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.AddressTypeStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.ConfidenceCriteriaStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.SharingStateStats
+import org.eclipse.tractusx.bpdm.gate.model.output.stats.StageStats
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.stats.AddressTypeStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.ConfidenceCriteriaStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.SharingStateStats
-import org.eclipse.tractusx.bpdm.gate.model.stats.StageStats
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.ConfidenceCriteriaRepository

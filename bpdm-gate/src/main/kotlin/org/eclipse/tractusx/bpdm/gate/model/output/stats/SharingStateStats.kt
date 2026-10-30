@@ -10,11 +10,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.search
 
-import java.time.Instant
+package org.eclipse.tractusx.bpdm.gate.model.output.stats
 
-data class ChangelogSearchParsed(
-    val externalIds: Set<String>?,
-    val timestampAfter: Instant?
+data class SharingStateStats(
+    val initialTotal: Int,
+    val readyTotal: Int,
+    val pendingTotal: Int,
+    val successTotal: Int,
+    val errorTotal: Int
 )

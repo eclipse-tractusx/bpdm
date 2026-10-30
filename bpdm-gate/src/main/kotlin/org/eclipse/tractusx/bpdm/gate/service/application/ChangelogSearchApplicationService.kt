@@ -14,8 +14,8 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogEntryRecord
-import org.eclipse.tractusx.bpdm.gate.model.search.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.output.changelog.ChangelogEntryRecord
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogSearchOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.changelog.ChangelogSearchParser
 import org.springframework.data.domain.Page
@@ -37,7 +37,7 @@ class ChangelogSearchApplicationService(
      */
     @Transactional(readOnly = true)
     fun search(
-        request: ChangelogSearchRequest,
+        request: ChangelogSearchRaw,
         stage: StageType,
         goldenRecordType: GoldenRecordType,
         tenantBpnl: String?,

@@ -19,10 +19,10 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertEntryResult.*
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw

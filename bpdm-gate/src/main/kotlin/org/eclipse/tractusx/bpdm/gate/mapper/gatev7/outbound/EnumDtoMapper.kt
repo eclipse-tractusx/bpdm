@@ -12,7 +12,7 @@
  */
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType

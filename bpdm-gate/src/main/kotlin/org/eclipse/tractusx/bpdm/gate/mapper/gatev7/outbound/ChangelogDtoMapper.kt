@@ -14,7 +14,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogEntryRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.changelog.ChangelogEntryRecord
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 

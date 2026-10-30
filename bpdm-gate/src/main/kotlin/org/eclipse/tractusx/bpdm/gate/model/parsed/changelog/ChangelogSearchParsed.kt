@@ -10,12 +10,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+package org.eclipse.tractusx.bpdm.gate.model.parsed.changelog
 
-package org.eclipse.tractusx.bpdm.gate.model.stats
+import java.time.Instant
 
-data class AddressTypeStats(
-    val legalAndSiteTotal: Int,
-    val legalTotal: Int,
-    val siteTotal: Int,
-    val additionalTotal: Int
+data class ChangelogSearchParsed(
+    val externalIds: Set<String>?,
+    val timestampAfter: Instant?
 )

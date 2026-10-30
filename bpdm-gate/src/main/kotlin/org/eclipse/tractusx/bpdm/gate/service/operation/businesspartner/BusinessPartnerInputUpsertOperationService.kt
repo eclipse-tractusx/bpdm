@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent

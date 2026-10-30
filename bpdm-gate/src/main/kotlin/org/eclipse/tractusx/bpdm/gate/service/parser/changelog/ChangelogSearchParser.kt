@@ -12,8 +12,8 @@
  */
 package org.eclipse.tractusx.bpdm.gate.service.parser.changelog
 
-import org.eclipse.tractusx.bpdm.gate.model.search.ChangelogSearchParsed
-import org.eclipse.tractusx.bpdm.gate.model.search.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.changelog.ChangelogSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogSearchRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -28,7 +28,7 @@ class ChangelogSearchParser {
     /**
      * Returns [request] normalized, with an absent or empty external ID filter meaning no filter.
      */
-    fun parse(request: ChangelogSearchRequest): ChangelogSearchParsed =
+    fun parse(request: ChangelogSearchRaw): ChangelogSearchParsed =
         ChangelogSearchParsed(
             externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet(),
             timestampAfter = request.timestampAfter

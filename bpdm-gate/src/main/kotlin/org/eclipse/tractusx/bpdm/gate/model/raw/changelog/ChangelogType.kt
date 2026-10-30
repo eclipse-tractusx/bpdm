@@ -10,11 +10,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.search
+package org.eclipse.tractusx.bpdm.gate.model.raw.changelog
 
-import java.time.Instant
-
-data class ChangelogSearchRequest(
-    val externalIds: Collection<String>?,
-    val timestampAfter: Instant?
-)
+/**
+ * Whether a changelog entry records the creation or the update of a business partner or relation.
+ */
+enum class ChangelogType {
+    CREATE,
+    UPDATE
+}

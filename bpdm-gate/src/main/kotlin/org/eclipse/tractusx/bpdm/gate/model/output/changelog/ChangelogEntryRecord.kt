@@ -10,8 +10,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.changelog
+package org.eclipse.tractusx.bpdm.gate.model.output.changelog
 
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import java.time.Instant
 
 data class ChangelogEntryRecord(

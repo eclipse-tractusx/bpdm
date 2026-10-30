@@ -21,8 +21,8 @@ import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationValidityPeriodDb
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService

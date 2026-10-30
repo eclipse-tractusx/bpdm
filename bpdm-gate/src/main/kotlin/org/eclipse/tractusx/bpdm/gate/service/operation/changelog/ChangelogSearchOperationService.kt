@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.changelog
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
-import org.eclipse.tractusx.bpdm.gate.model.search.ChangelogSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.changelog.ChangelogSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest

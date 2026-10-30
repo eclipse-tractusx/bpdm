@@ -17,7 +17,6 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
@@ -25,6 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerOutputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil

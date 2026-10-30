@@ -10,12 +10,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.changelog
 
-/**
- * Whether a changelog entry records the creation or the update of a business partner or relation.
- */
-enum class ChangelogType {
-    CREATE,
-    UPDATE
-}
+package org.eclipse.tractusx.bpdm.gate.model.output.stats
+
+data class StageStats(
+    val inputTotal: Int,
+    val outputTotal: Int
+)

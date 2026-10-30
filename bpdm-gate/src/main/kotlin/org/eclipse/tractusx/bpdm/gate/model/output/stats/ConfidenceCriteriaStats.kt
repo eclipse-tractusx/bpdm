@@ -11,9 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.stats
+package org.eclipse.tractusx.bpdm.gate.model.output.stats
 
-data class StageStats(
-    val inputTotal: Int,
-    val outputTotal: Int
+data class ConfidenceCriteriaStats(
+    val numberOfBusinessPartnersAverage: Float,
+    val uniqueTotal: Long,
+    val sharedByOwnerTotal: Long,
+    val checkedByExternalDataSourceTotal: Long,
+    val confidenceLevelAverage: Float
 )
