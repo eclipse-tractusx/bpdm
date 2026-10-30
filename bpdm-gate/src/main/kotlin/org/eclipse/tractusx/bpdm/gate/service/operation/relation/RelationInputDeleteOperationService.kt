@@ -16,8 +16,8 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputDeleteParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.springframework.stereotype.Service
@@ -43,7 +43,7 @@ class RelationInputDeleteOperationService(
         relationStageRepository.delete(parsed.input)
         relationRepository.delete(relation)
 
-        changeLogger.log(RelationChange(PersistedChangeType.Deleted, relation.externalId, relation.tenantBpnL, aspect = null))
+        changeLogger.log(RelationChangeRaw(PersistedChangeType.Deleted, relation.externalId, relation.tenantBpnL, aspect = null))
         logger.debug { "Deleted relation ${relation.externalId}" }
     }
 }

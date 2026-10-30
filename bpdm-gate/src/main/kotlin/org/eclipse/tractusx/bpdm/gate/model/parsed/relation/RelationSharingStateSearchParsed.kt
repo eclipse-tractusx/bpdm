@@ -11,15 +11,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.search
+package org.eclipse.tractusx.bpdm.gate.model.parsed.relation
 
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import java.time.Instant
 
-data class RelationInputSearchRequest(
-    val externalIds: Collection<String>?,
-    val relationType: RelationType?,
-    val sourceExternalIds: Collection<String>?,
-    val targetExternalIds: Collection<String>?,
+data class RelationSharingStateSearchParsed(
+    val externalIds: Set<String>?,
+    val sharingStateTypes: Set<RelationSharingStateType>?,
     val updatedAfter: Instant?
 )

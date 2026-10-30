@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.task
 
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import java.time.Instant
 
 data class RelationTaskCandidate(
@@ -25,6 +25,6 @@ data class RelationTaskCandidate(
     val relationType: RelationType,
     val sourceBpn: String,
     val targetBpn: String,
-    val validityPeriods: List<RelationValidityPeriod>,
+    val validityPeriods: List<RelationValidityPeriodRaw>,
     val reasonCode: String?
 )

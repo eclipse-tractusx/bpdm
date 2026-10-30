@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.task.CreatedRelationTaskRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationError

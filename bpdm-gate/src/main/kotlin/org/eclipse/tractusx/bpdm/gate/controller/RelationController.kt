@@ -34,9 +34,9 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.RelationInputRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputDtoMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationInputUpsertErrorMapper
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationInputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputSearchRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
@@ -59,7 +59,7 @@ class RelationController(
         searchRequest: RelationSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
-        val request = RelationInputSearchRequest(
+        val request = RelationInputSearchRaw(
             externalIds = searchRequest.externalIds,
             relationType = searchRequest.relationType?.let(enumRequestMapper::toModel),
             sourceExternalIds = searchRequest.businessPartnerSourceExternalIds,

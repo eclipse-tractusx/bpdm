@@ -10,16 +10,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
-
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
-
-data class RelationOutputParsed(
-    val relation: RelationDb,
-    val relationType: SharableRelationType,
-    val sourceBpn: String,
-    val targetBpn: String,
-    val validityPeriods: List<RelationValidityPeriod>,
-    val reasonCode: String?
-)
+/**
+ * Where a relation input stands in the golden record sharing process.
+ */
+enum class RelationSharingStateType {
+    Ready,
+    Pending,
+    Error,
+    Success
+}

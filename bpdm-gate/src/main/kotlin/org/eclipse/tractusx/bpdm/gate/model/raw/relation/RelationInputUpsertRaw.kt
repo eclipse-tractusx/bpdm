@@ -11,8 +11,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
 
-data class RelationInputDeleteRequest(
-    val externalId: String
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
+
+data class RelationInputUpsertRaw(
+    val externalId: String?,
+    val relationType: RelationType,
+    val sourceExternalId: String,
+    val targetExternalId: String,
+    val validityPeriods: List<RelationValidityPeriodRaw>,
+    val reasonCode: String?
 )

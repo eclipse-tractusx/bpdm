@@ -10,12 +10,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.relation
 
-/**
- * Why sharing a relation input as a golden record relation failed.
- */
-enum class RelationSharingStateErrorCode {
-    SharingProcessError,
-    SharingTimeout
-}
+
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
+
+import java.time.LocalDate
+
+data class RelationValidityPeriodRaw(
+    val validFrom: LocalDate,
+    val validTo: LocalDate?
+)

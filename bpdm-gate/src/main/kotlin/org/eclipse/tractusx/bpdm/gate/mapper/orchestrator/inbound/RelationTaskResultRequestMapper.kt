@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
@@ -46,7 +46,7 @@ class RelationTaskResultRequestMapper {
                 relationType = toRelationType(relationType),
                 sourceBpn = businessPartnerSourceBpn,
                 targetBpn = businessPartnerTargetBpn,
-                validityPeriods = validityPeriods.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) },
+                validityPeriods = validityPeriods.map { RelationValidityPeriodRaw(validFrom = it.validFrom, validTo = it.validTo) },
                 reasonCode = reasonCode
             )
         }

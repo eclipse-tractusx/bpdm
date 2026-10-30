@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

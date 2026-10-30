@@ -15,8 +15,8 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.record
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputRecord
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputRecord
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -34,7 +34,7 @@ class RelationInputRecordMapper {
             relationType = input.relationType,
             sourceExternalId = input.source.externalId,
             targetExternalId = input.target.externalId,
-            validityPeriods = input.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+            validityPeriods = input.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
             reasonCode = input.reasonCode,
             createdAt = input.createdAt,
             updatedAt = input.updatedAt

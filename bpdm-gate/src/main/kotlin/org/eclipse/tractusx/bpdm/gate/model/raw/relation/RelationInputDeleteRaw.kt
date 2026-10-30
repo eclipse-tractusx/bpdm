@@ -10,14 +10,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.relation
 
-/**
- * The kind of relation the golden record process returns as relation output.
- */
-enum class SharableRelationType {
-    IsAlternativeHeadquarterFor,
-    IsManagedBy,
-    IsOwnedBy,
-    IsReplacedBy
-}
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
+
+data class RelationInputDeleteRaw(
+    val externalId: String
+)

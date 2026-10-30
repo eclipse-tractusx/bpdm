@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound.RelationOutputDtoMapper
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationOutputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationOutputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
@@ -48,7 +48,7 @@ class RelationOutputController(
         searchRequest: RelationOutputSearchRequestDto,
         paginationRequest: PaginationRequest
     ): PageDto<RelationOutputDto> {
-        val request = RelationOutputSearchRequest(
+        val request = RelationOutputSearchRaw(
             externalIds = searchRequest.externalIds,
             relationType = searchRequest.relationType?.let(enumRequestMapper::toModel),
             sourceBpns = searchRequest.sourceBpns,

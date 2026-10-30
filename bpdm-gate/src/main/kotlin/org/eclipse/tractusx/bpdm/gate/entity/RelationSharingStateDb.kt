@@ -23,8 +23,8 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import java.time.Instant
 
 @Embeddable

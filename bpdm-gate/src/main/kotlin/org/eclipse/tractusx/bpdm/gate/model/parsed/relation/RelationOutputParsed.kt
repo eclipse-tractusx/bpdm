@@ -11,16 +11,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.parsed.relation
 
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
 
-data class RelationOutputRecord(
-    val externalId: String,
+data class RelationOutputParsed(
+    val relation: RelationDb,
     val relationType: SharableRelationType,
     val sourceBpn: String,
     val targetBpn: String,
-    val validityPeriods: List<RelationValidityPeriod>,
-    val reasonCode: String?,
-    val updatedAt: Instant
+    val validityPeriods: List<RelationValidityPeriodRaw>,
+    val reasonCode: String?
 )

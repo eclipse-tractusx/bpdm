@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.relation
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteError
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteParsed
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputDeleteError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputDeleteParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputDeleteRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -34,7 +34,7 @@ class RelationInputDeleteParser(
      * Parses [request] for [tenantBpnl], succeeding with the named relation input if the tenant has it and failing
      * otherwise.
      */
-    fun parse(request: RelationInputDeleteRequest, tenantBpnl: String): ParseResult<RelationInputDeleteParsed, RelationInputDeleteError> {
+    fun parse(request: RelationInputDeleteRaw, tenantBpnl: String): ParseResult<RelationInputDeleteParsed, RelationInputDeleteError> {
         val input = relationStageRepository.findOne(
             Specification.allOf(
                 RelationStageRepository.Specs.byTenantBpnL(tenantBpnl),

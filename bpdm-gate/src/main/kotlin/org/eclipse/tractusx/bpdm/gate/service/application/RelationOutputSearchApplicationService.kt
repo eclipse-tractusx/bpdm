@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.gate.mapper.record.RelationOutputRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationOutputRecord
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationOutputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationOutputSearchOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.relation.RelationOutputSearchParser
 import org.springframework.data.domain.Page
@@ -37,7 +37,7 @@ class RelationOutputSearchApplicationService(
      * Returns the page of [tenantBpnl]'s relation outputs that match [request].
      */
     @Transactional(readOnly = true)
-    fun search(request: RelationOutputSearchRequest, tenantBpnl: String, pageable: Pageable): Page<RelationOutputRecord> =
+    fun search(request: RelationOutputSearchRaw, tenantBpnl: String, pageable: Pageable): Page<RelationOutputRecord> =
         operationService.search(parser.parse(request), tenantBpnl, pageable)
             .map(recordMapper::toRecord)
 }

@@ -17,8 +17,8 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev6.inbound
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -32,21 +32,21 @@ class RelationInputRequestMapperV6(
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [entry].
      */
-    fun toUpsertRequest(entry: RelationPutEntryV6): RelationInputUpsertRequest =
-        RelationInputUpsertRequest(
+    fun toUpsertRequest(entry: RelationPutEntryV6): RelationInputUpsertRaw =
+        RelationInputUpsertRaw(
             externalId = entry.externalId,
             relationType = enumRequestMapper.toModel(entry.relationType),
             sourceExternalId = entry.businessPartnerSourceExternalId,
             targetExternalId = entry.businessPartnerTargetExternalId,
-            validityPeriods = entry.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+            validityPeriods = entry.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
             reasonCode = null
         )
 
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [request].
      */
-    fun toUpsertRequest(request: RelationPostRequest): RelationInputUpsertRequest =
-        RelationInputUpsertRequest(
+    fun toUpsertRequest(request: RelationPostRequest): RelationInputUpsertRaw =
+        RelationInputUpsertRaw(
             externalId = request.externalId,
             relationType = enumRequestMapper.toModel(request.relationType),
             sourceExternalId = request.businessPartnerSourceExternalId,

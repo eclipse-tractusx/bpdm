@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationInputSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

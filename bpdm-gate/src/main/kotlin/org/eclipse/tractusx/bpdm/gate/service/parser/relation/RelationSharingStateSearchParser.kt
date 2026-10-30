@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.relation
 
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationSharingStateSearchParsed
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationSharingStateSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationSharingStateSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateSearchRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -26,7 +26,7 @@ class RelationSharingStateSearchParser {
     /**
      * Returns [request] normalized, with an absent or empty external ID or sharing state type filter meaning no filter.
      */
-    fun parse(request: RelationSharingStateSearchRequest): RelationSharingStateSearchParsed =
+    fun parse(request: RelationSharingStateSearchRaw): RelationSharingStateSearchParsed =
         RelationSharingStateSearchParsed(
             externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet(),
             sharingStateTypes = request.sharingStateTypes?.takeIf { it.isNotEmpty() }?.toSet(),

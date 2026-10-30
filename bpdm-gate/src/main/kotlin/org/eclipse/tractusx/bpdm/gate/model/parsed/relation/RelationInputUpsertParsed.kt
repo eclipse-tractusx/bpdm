@@ -12,10 +12,12 @@
  */
 
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.parsed.relation
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 
 data class RelationInputUpsertParsed(
     val externalId: String?,
@@ -23,6 +25,6 @@ data class RelationInputUpsertParsed(
     val relationType: RelationType,
     val source: SharingStateDb,
     val target: SharingStateDb,
-    val validityPeriods: List<RelationValidityPeriod>,
+    val validityPeriods: List<RelationValidityPeriodRaw>,
     val reasonCode: String?
 )

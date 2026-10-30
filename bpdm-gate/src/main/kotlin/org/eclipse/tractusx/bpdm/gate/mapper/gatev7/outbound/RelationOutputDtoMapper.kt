@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationOutputRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationOutputRecord
 import org.springframework.stereotype.Component
 
 /**

@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteResult
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputDeleteResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputDeleteRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationInputDeleteOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.relation.RelationInputDeleteParser
 import org.springframework.stereotype.Service
@@ -35,7 +35,7 @@ class RelationInputDeleteApplicationService(
      * cannot be deleted.
      */
     @Transactional
-    fun delete(request: RelationInputDeleteRequest, tenantBpnl: String): RelationInputDeleteResult =
+    fun delete(request: RelationInputDeleteRaw, tenantBpnl: String): RelationInputDeleteResult =
         when (val parseResult = parser.parse(request, tenantBpnl)) {
             is ParseResult.Failure -> RelationInputDeleteResult.Rejected(parseResult.errors)
             is ParseResult.Success -> {

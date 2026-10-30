@@ -16,11 +16,11 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationError
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
@@ -86,7 +86,7 @@ class RelationTaskPreparationParser(
             relationType = input.relationType,
             sourceBpn = sourceBpn,
             targetBpn = targetBpn,
-            validityPeriods = input.validityPeriods.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) },
+            validityPeriods = input.validityPeriods.map { RelationValidityPeriodRaw(validFrom = it.validFrom, validTo = it.validTo) },
             reasonCode = input.reasonCode
         )
         return ParseResult.Success(RelationTaskPreparationParsed.Sendable(relation, candidate))

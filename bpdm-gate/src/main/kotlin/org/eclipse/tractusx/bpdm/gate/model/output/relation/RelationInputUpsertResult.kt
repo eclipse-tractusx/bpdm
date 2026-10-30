@@ -12,7 +12,9 @@
  */
 
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.output.relation
+
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError
 
 /**
  * Result of upserting a batch of relation inputs: either everything written or nothing, with every reason.

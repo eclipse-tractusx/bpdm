@@ -16,11 +16,11 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.RelationTaskPreparationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
@@ -174,6 +174,6 @@ class RelationSharingStateOperationService(
     }
 
     private fun logChange(relation: RelationDb) {
-        changeLogger.log(RelationChange(PersistedChangeType.Updated, relation.externalId, relation.tenantBpnL, RelationChange.Aspect.SharingState))
+        changeLogger.log(RelationChangeRaw(PersistedChangeType.Updated, relation.externalId, relation.tenantBpnL, RelationChangeRaw.Aspect.SharingState))
     }
 }

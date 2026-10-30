@@ -16,9 +16,9 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.mapper.record.RelationInputRecordMapper
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertMode
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.relation.RelationInputUpsertOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.relation.RelationInputUpsertParser
 import org.springframework.stereotype.Service
@@ -39,7 +39,7 @@ class RelationInputUpsertApplicationService(
      * nothing and returns the violations of every entry if any entry is invalid.
      */
     @Transactional
-    fun upsert(requests: List<RelationInputUpsertRequest>, tenantBpnl: String, mode: RelationInputUpsertMode): RelationInputUpsertResult =
+    fun upsert(requests: List<RelationInputUpsertRaw>, tenantBpnl: String, mode: RelationInputUpsertMode): RelationInputUpsertResult =
         when (val parseResult = parser.parse(requests, tenantBpnl, mode)) {
             is ParseResult.Failure -> RelationInputUpsertResult.Rejected(parseResult.errors)
             is ParseResult.Success -> RelationInputUpsertResult.Written(

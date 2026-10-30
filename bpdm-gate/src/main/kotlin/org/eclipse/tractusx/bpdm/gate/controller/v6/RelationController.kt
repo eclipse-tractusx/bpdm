@@ -34,8 +34,12 @@ import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDelete
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputDtoMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound.RelationInputUpsertErrorMapperV6
 import org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound.EnumRequestMapper
-import org.eclipse.tractusx.bpdm.gate.model.relation.*
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationInputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputDeleteResult
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputUpsertResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputDeleteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputSearchRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputDeleteApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
@@ -66,7 +70,7 @@ class RelationController(
         updatedAtFrom: Instant?,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
-        val request = RelationInputSearchRequest(
+        val request = RelationInputSearchRaw(
             externalIds = externalIds,
             relationType = relationType?.let(enumRequestMapper::toModel),
             sourceExternalIds = businessPartnerSourceExternalIds,
@@ -94,13 +98,13 @@ class RelationController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun delete(externalId: String) {
-        when (val result = inputDeleteApplicationService.delete(RelationInputDeleteRequest(externalId), principalUtil.resolveTenantBpnl().value)) {
+        when (val result = inputDeleteApplicationService.delete(RelationInputDeleteRaw(externalId), principalUtil.resolveTenantBpnl().value)) {
             is RelationInputDeleteResult.Deleted -> Unit
             is RelationInputDeleteResult.Rejected -> throw inputDeleteErrorMapper.toException(result.errors)
         }
     }
 
-    private fun upsert(request: RelationInputUpsertRequest, mode: RelationInputUpsertMode): RelationDto =
+    private fun upsert(request: RelationInputUpsertRaw, mode: RelationInputUpsertMode): RelationDto =
         when (val result = inputUpsertApplicationService.upsert(listOf(request), principalUtil.resolveTenantBpnl().value, mode)) {
             is RelationInputUpsertResult.Written -> inputDtoMapper.toDto(result.relations.single())
             is RelationInputUpsertResult.Rejected -> throw inputErrorMapper.toException(result.errors)

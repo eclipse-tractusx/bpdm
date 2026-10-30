@@ -12,13 +12,13 @@
  */
 
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChange
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeSubject
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 
-data class RelationChange(
+data class RelationChangeRaw(
     override val type: PersistedChangeType,
     val externalId: String,
     val tenantBpnl: String,

@@ -14,8 +14,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertError
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertError.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError.*
 import org.springframework.stereotype.Component
 
 /**

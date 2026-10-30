@@ -12,7 +12,7 @@
  */
 
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.parsed.relation
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 

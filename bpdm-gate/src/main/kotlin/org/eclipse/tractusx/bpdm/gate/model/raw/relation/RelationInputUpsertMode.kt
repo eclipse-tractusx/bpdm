@@ -12,7 +12,7 @@
  */
 
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
 /**
  * Which of the requested relations an input upsert may create and which it may update.

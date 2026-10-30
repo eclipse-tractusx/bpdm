@@ -11,10 +11,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
-import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
+import java.time.Instant
 
-data class RelationInputDeleteParsed(
-    val input: RelationStageDb
+data class RelationOutputSearchRaw(
+    val externalIds: Collection<String>?,
+    val relationType: SharableRelationType?,
+    val sourceBpns: Collection<String>?,
+    val targetBpns: Collection<String>?,
+    val updatedAfter: Instant?
 )

@@ -15,8 +15,8 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound
 
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertRequest
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -30,13 +30,13 @@ class RelationInputRequestMapper(
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [entry].
      */
-    fun toUpsertRequest(entry: RelationPutEntry): RelationInputUpsertRequest =
-        RelationInputUpsertRequest(
+    fun toUpsertRequest(entry: RelationPutEntry): RelationInputUpsertRaw =
+        RelationInputUpsertRaw(
             externalId = entry.externalId,
             relationType = enumRequestMapper.toModel(entry.relationType),
             sourceExternalId = entry.businessPartnerSourceExternalId,
             targetExternalId = entry.businessPartnerTargetExternalId,
-            validityPeriods = entry.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+            validityPeriods = entry.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
             reasonCode = entry.reasonCode
         )
 }

@@ -13,10 +13,10 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.springframework.stereotype.Component

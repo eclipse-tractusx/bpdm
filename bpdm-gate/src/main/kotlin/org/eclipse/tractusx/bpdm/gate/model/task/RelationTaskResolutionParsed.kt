@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.model.task
 
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationOutputParsed
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode
 
 sealed interface RelationTaskResolutionParsed {
     val relation: RelationDb

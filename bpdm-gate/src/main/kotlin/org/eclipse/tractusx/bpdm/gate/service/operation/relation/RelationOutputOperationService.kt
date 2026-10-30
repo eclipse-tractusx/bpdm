@@ -17,13 +17,13 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationValidityPeriodDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationChange
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationChangeRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
@@ -68,7 +68,7 @@ class RelationOutputOperationService(
             ChangelogType.CREATE -> PersistedChangeType.Created
             ChangelogType.UPDATE -> PersistedChangeType.Updated
         }
-        changeLogger.log(RelationChange(changeType, relation.externalId, relation.tenantBpnL, RelationChange.Aspect.Output))
+        changeLogger.log(RelationChangeRaw(changeType, relation.externalId, relation.tenantBpnL, RelationChangeRaw.Aspect.Output))
         logger.debug { "Wrote relation output ${relation.externalId} (${output.sourceBpn} -> ${output.targetBpn}) as $changelogType" }
     }
 }

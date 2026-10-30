@@ -14,8 +14,8 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev6.outbound
 
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputDeleteException
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteError
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputDeleteError.NotFound
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputDeleteError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputDeleteError.NotFound
 import org.springframework.stereotype.Component
 
 /**

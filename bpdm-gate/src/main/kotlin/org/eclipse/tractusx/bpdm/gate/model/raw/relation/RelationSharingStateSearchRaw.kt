@@ -11,12 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
-/**
- * Result of deleting a relation input: either the relation is gone, or nothing changed and every reason is given.
- */
-sealed interface RelationInputDeleteResult {
-    data object Deleted : RelationInputDeleteResult
-    data class Rejected(val errors: List<RelationInputDeleteError>) : RelationInputDeleteResult
-}
+import java.time.Instant
+
+data class RelationSharingStateSearchRaw(
+    val externalIds: Collection<String>?,
+    val sharingStateTypes: Collection<RelationSharingStateType>?,
+    val updatedAfter: Instant?
+)

@@ -10,14 +10,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.relation
+
+package org.eclipse.tractusx.bpdm.gate.model.parsed.relation
 
 /**
- * The kind of relation a sharing member declares between two business partner inputs.
+ * Reason a relation input delete is rejected.
  */
-enum class RelationType {
-    IsManagedBy,
-    IsAlternativeHeadquarterFor,
-    IsOwnedBy,
-    IsReplacedBy
+sealed interface RelationInputDeleteError {
+    data class NotFound(val externalId: String) : RelationInputDeleteError
 }

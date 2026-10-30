@@ -12,9 +12,9 @@
  */
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound
 
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType as RelationSharingStateTypeDto

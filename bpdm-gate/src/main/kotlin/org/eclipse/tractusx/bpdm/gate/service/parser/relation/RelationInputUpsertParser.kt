@@ -20,8 +20,12 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.relation.*
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationInputUpsertError.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertError.*
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.springframework.data.jpa.domain.Specification
@@ -45,7 +49,7 @@ class RelationInputUpsertParser(
      */
     @Transactional(readOnly = true)
     fun parse(
-        requests: List<RelationInputUpsertRequest>,
+        requests: List<RelationInputUpsertRaw>,
         tenantBpnl: String,
         mode: RelationInputUpsertMode
     ): ParseResult<List<RelationInputUpsertParsed>, RelationInputUpsertError> {
@@ -83,7 +87,7 @@ class RelationInputUpsertParser(
             ParseResult.Failure(errors)
     }
 
-    private fun findExistingInputs(requests: List<RelationInputUpsertRequest>, tenantBpnl: String): Map<String, RelationStageDb> =
+    private fun findExistingInputs(requests: List<RelationInputUpsertRaw>, tenantBpnl: String): Map<String, RelationStageDb> =
         relationStageRepository.findAll(
             Specification.allOf(
                 RelationStageRepository.Specs.byTenantBpnL(tenantBpnl),
@@ -92,13 +96,13 @@ class RelationInputUpsertParser(
             )
         ).associateBy { it.relation.externalId }
 
-    private fun findBusinessPartners(requests: List<RelationInputUpsertRequest>, tenantBpnl: String): Map<String, SharingStateDb> {
+    private fun findBusinessPartners(requests: List<RelationInputUpsertRaw>, tenantBpnl: String): Map<String, SharingStateDb> {
         val externalIds = requests.flatMap { listOf(it.sourceExternalId, it.targetExternalId) }.toSet()
         return sharingStateRepository.findByExternalIdInAndTenantBpnl(externalIds, tenantBpnl).associateBy { it.externalId }
     }
 
     private fun resolveExisting(
-        request: RelationInputUpsertRequest,
+        request: RelationInputUpsertRaw,
         existing: RelationStageDb?,
         mode: RelationInputUpsertMode
     ): ParseResult<RelationStageDb?, RelationInputUpsertError> =
@@ -109,7 +113,7 @@ class RelationInputUpsertParser(
         }
 
     private fun resolveEndpoints(
-        request: RelationInputUpsertRequest,
+        request: RelationInputUpsertRaw,
         businessPartnersByExternalId: Map<String, SharingStateDb>
     ): ParseResult<Pair<SharingStateDb, SharingStateDb>, RelationInputUpsertError> {
         val source = businessPartnersByExternalId[request.sourceExternalId]
@@ -125,7 +129,7 @@ class RelationInputUpsertParser(
             ParseResult.Failure(errors)
     }
 
-    private fun validateValidityPeriods(request: RelationInputUpsertRequest): ParseResult<List<RelationValidityPeriod>, RelationInputUpsertError> {
+    private fun validateValidityPeriods(request: RelationInputUpsertRaw): ParseResult<List<RelationValidityPeriodRaw>, RelationInputUpsertError> {
         val errors = request.validityPeriods.mapNotNull { period ->
             period.validTo
                 ?.takeIf { !period.validFrom.isBefore(it) }

@@ -10,14 +10,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.bpdm.gate.model.relation
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
 /**
- * Where a relation input stands in the golden record sharing process.
+ * The kind of relation the golden record process returns as relation output.
  */
-enum class RelationSharingStateType {
-    Ready,
-    Pending,
-    Error,
-    Success
+enum class SharableRelationType {
+    IsAlternativeHeadquarterFor,
+    IsManagedBy,
+    IsOwnedBy,
+    IsReplacedBy
 }

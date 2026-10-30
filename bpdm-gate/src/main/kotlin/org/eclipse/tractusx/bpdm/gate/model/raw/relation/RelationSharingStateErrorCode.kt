@@ -10,16 +10,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+package org.eclipse.tractusx.bpdm.gate.model.raw.relation
 
-package org.eclipse.tractusx.bpdm.gate.model.search
-
-import org.eclipse.tractusx.bpdm.gate.model.relation.SharableRelationType
-import java.time.Instant
-
-data class RelationOutputSearchParsed(
-    val externalIds: Set<String>?,
-    val relationType: SharableRelationType?,
-    val sourceBpns: Set<String>?,
-    val targetBpns: Set<String>?,
-    val updatedAfter: Instant?
-)
+/**
+ * Why sharing a relation input as a golden record relation failed.
+ */
+enum class RelationSharingStateErrorCode {
+    SharingProcessError,
+    SharingTimeout
+}

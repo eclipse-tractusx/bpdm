@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.relation
 
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchParsed
-import org.eclipse.tractusx.bpdm.gate.model.search.RelationOutputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationOutputSearchParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationOutputSearchRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -27,7 +27,7 @@ class RelationOutputSearchParser {
      * Returns [request] normalized, with an absent or empty external ID, source BPN or target BPN filter meaning no
      * filter.
      */
-    fun parse(request: RelationOutputSearchRequest): RelationOutputSearchParsed =
+    fun parse(request: RelationOutputSearchRaw): RelationOutputSearchParsed =
         RelationOutputSearchParsed(
             externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet(),
             relationType = request.relationType,

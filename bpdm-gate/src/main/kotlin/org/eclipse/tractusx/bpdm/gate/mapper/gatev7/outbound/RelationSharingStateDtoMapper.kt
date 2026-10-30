@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.model.relation.RelationSharingStateRecord
+import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationSharingStateRecord
 import org.springframework.stereotype.Component
 
 /**
