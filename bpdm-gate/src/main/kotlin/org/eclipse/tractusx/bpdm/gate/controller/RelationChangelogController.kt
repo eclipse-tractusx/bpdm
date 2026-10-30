@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7ChangelogMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.ChangelogSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -39,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController
 class RelationChangelogController(
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
     private val apiV7ChangelogMapper: ApiV7ChangelogMapper,
-    private val principalUtil: PrincipalUtil
+    private val tenantResolver: TenantResolver
 ): GateRelationChangelogApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_CHANGELOG})")
@@ -48,7 +47,7 @@ class RelationChangelogController(
         searchRequest: ChangelogSearchRequestDto
     ): PageChangeLogDto<ChangelogGateDto> {
         val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter)
-        val page = changelogSearchApplicationService.search(request, StageType.Input, GoldenRecordType.Relation, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+        val page = changelogSearchApplicationService.search(request, StageType.Input, GoldenRecordType.Relation, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
         return apiV7ChangelogMapper.toPageDto(page)
     }
 
@@ -58,7 +57,7 @@ class RelationChangelogController(
         searchRequest: ChangelogSearchRequestDto
     ): PageChangeLogDto<ChangelogGateDto> {
         val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter)
-        val page = changelogSearchApplicationService.search(request, StageType.Output, GoldenRecordType.Relation, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+        val page = changelogSearchApplicationService.search(request, StageType.Output, GoldenRecordType.Relation, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
         return apiV7ChangelogMapper.toPageDto(page)
     }
 }

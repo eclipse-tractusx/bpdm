@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.BusinessPartnerCsvReader
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.BusinessPartnerCsvTemplateWriter
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerCsvUpsertResult
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerCsvUpsertApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -44,6 +43,7 @@ class PartnerUploadController(
     val csvReader: BusinessPartnerCsvReader,
     val csvTemplateWriter: BusinessPartnerCsvTemplateWriter,
     val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
+    val tenantResolver: TenantResolver,
 ) : GatePartnerUploadApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.UPLOAD_INPUT_PARTNER})")
@@ -53,7 +53,7 @@ class PartnerUploadController(
         if (file.isEmpty || !file.contentType.equals("text/csv", ignoreCase = true))
             return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        return when (val result = csvUpsertApplicationService.upload(csvReader.read(file), getCurrentUserBpn())) {
+        return when (val result = csvUpsertApplicationService.upload(csvReader.read(file), tenantResolver.currentUserBpn())) {
             is BusinessPartnerCsvUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(apiV7BusinessPartnerMapper::toDto))
             is BusinessPartnerCsvUpsertResult.Rejected -> throw BpdmInvalidPartnerUploadException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
         }

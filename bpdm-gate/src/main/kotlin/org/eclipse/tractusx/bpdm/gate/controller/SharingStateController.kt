@@ -36,7 +36,6 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRa
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateReadyApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
@@ -46,7 +45,8 @@ class SharingStateController(
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
     private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
     private val apiV7SharingStateMapper: ApiV7SharingStateMapper,
-    private val apiV7InboundMapper: ApiV7InboundMapper
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val tenantResolver: TenantResolver
 ): GateSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -57,7 +57,7 @@ class SharingStateController(
         updatedAfter: Instant?,
     ): PageDto<SharingStateDto> {
         val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
-        return sharingStateSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
+        return sharingStateSearchApplicationService.search(request, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(apiV7SharingStateMapper::toDto)
     }
 
@@ -65,7 +65,7 @@ class SharingStateController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
         val readyRequest = SharingStateReadyRaw(request.externalIds)
-        when (val result = sharingStateReadyApplicationService.setReady(readyRequest, getCurrentUserBpn())) {
+        when (val result = sharingStateReadyApplicationService.setReady(readyRequest, tenantResolver.currentUserBpn())) {
             is SharingStateReadyResult.Readied -> Unit
             is SharingStateReadyResult.Rejected -> throw BpdmSharingStateReadyException(result.errors.map(apiV7SharingStateMapper::toMessage))
         }

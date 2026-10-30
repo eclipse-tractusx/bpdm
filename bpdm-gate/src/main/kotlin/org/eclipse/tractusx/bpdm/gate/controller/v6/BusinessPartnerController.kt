@@ -36,7 +36,7 @@ import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartn
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerInputUpsertApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerOutputSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
+import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -47,13 +47,14 @@ class BusinessPartnerController(
     val apiV7InboundMapper: ApiV7InboundMapper,
     val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
     val outputSearchApplicationService: BusinessPartnerOutputSearchApplicationService,
-    val apiV6OutboundMapper: ApiV6OutboundMapper
+    val apiV6OutboundMapper: ApiV6OutboundMapper,
+    val tenantResolver: TenantResolver
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
     override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
         val requests = businessPartners.map(apiV7InboundMapper::toUpsertIn)
-        return when (val result = inputUpsertApplicationService.upsert(requests, getCurrentUserBpn())) {
+        return when (val result = inputUpsertApplicationService.upsert(requests, tenantResolver.currentUserBpn())) {
             is BusinessPartnerInputUpsertResult.Written -> ResponseEntity.ok(result.inputs.map(apiV7BusinessPartnerMapper::toDto))
             is BusinessPartnerInputUpsertResult.Rejected -> throw BpdmBusinessPartnerInputUpsertException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
         }
@@ -65,7 +66,7 @@ class BusinessPartnerController(
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto> {
         val request = BusinessPartnerSearchRaw(externalIds)
-        return outputSearchApplicationService.search(request, getCurrentUserBpn(), paginationRequest.toPageRequest())
+        return outputSearchApplicationService.search(request, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(apiV6OutboundMapper::toDto)
     }
 }

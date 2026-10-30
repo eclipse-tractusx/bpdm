@@ -37,13 +37,12 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationInputUpsertMode
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputSearchApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationInputUpsertApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class RelationController(
-    private val principalUtil: PrincipalUtil,
+    private val tenantResolver: TenantResolver,
     private val inputSearchApplicationService: RelationInputSearchApplicationService,
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
@@ -62,7 +61,7 @@ class RelationController(
             targetExternalIds = searchRequest.businessPartnerTargetExternalIds,
             updatedAfter = searchRequest.updatedAtFrom
         )
-        return inputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+        return inputSearchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(apiV7RelationMapper::toDto)
     }
 
@@ -73,7 +72,7 @@ class RelationController(
     ): RelationPutResponse {
         val requests = requestBody.relations.map(apiV7InboundMapper::toUpsertRequest)
         val mode = if (createIfNotExist) RelationInputUpsertMode.CreateOrUpdate else RelationInputUpsertMode.UpdateOnly
-        return when (val result = inputUpsertApplicationService.upsert(requests, principalUtil.resolveTenantBpnl().value, mode)) {
+        return when (val result = inputUpsertApplicationService.upsert(requests, tenantResolver.resolveTenantBpnl().value, mode)) {
             is RelationInputUpsertResult.Written -> RelationPutResponse(result.relations.map(apiV7RelationMapper::toDto))
             is RelationInputUpsertResult.Rejected -> throw BpdmRelationInputUpsertException(result.errors.map(apiV7RelationMapper::toMessage))
         }

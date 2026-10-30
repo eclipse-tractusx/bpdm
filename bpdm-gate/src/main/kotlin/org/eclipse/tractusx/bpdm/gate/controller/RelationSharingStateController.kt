@@ -31,14 +31,13 @@ import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationSharingStateSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
 @RestController
 class RelationSharingStateController(
-    private val principalUtil: PrincipalUtil,
+    private val tenantResolver: TenantResolver,
     private val searchApplicationService: RelationSharingStateSearchApplicationService,
     private val apiV7RelationMapper: ApiV7RelationMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper
@@ -52,7 +51,7 @@ class RelationSharingStateController(
         paginationRequest: PaginationRequest
     ): PageDto<RelationSharingStateDto> {
         val request = RelationSharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
-        return searchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+        return searchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(apiV7RelationMapper::toDto)
     }
 }

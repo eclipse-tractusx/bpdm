@@ -17,25 +17,38 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.util
+package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidTenantBpnlException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmTenantResolutionException
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
 
+/**
+ * Determines the tenant a request acts for from the authenticated caller.
+ */
 @Component
-class PrincipalUtil(
-    private val  bpnConfigProperties: BpnConfigProperties
+class TenantResolver(
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
-    fun resolveTenantBpnl(): BpnLString {
-        val tenantBpnlString =  getTenantBnlFromContext() ?: throw BpdmTenantResolutionException()
-        return BpnLString.map(tenantBpnlString).successfulResultOrNull  ?: throw BpdmInvalidTenantBpnlException(tenantBpnlString)
+
+    /**
+     * Returns the BPN claimed by the caller's token, or null when the caller presents none.
+     */
+    fun currentUserBpn(): String? {
+        val authentication = SecurityContextHolder.getContext().authentication
+        return (authentication as? JwtAuthenticationToken)?.tokenAttributes?.get("bpn") as String?
     }
 
-    fun getTenantBnlFromContext(): String? {
-        return getCurrentUserBpn() ?: bpnConfigProperties.ownerBpnL.takeIf { it.isNotBlank() }
+    /**
+     * Returns the caller's tenant BPNL, falling back to the configured owner BPNL, and fails when neither is present or
+     * the value is not a valid BPNL.
+     */
+    fun resolveTenantBpnl(): BpnLString {
+        val tenantBpnl = currentUserBpn() ?: bpnConfigProperties.ownerBpnL.takeIf { it.isNotBlank() } ?: throw BpdmTenantResolutionException()
+        return BpnLString.map(tenantBpnl).successfulResultOrNull ?: throw BpdmInvalidTenantBpnlException(tenantBpnl)
     }
 }
-

@@ -31,13 +31,12 @@ import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7RelationMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationOutputSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationOutputSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class RelationOutputController(
-    private val principalUtil: PrincipalUtil,
+    private val tenantResolver: TenantResolver,
     private val outputSearchApplicationService: RelationOutputSearchApplicationService,
     private val apiV7RelationMapper: ApiV7RelationMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper
@@ -55,7 +54,7 @@ class RelationOutputController(
             targetBpns = searchRequest.targetBpns,
             updatedAfter = searchRequest.updatedAtFrom
         )
-        return outputSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+        return outputSearchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(apiV7RelationMapper::toDto)
     }
 }

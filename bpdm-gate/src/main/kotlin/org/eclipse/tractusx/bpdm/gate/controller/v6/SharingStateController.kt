@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6OutboundMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
 import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
-import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
+import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 class SharingStateController(
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
     private val apiV6OutboundMapper: ApiV6OutboundMapper,
-    private val principalUtil: PrincipalUtil
+    private val tenantResolver: TenantResolver
 ): GateSharingStateApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -46,7 +46,7 @@ class SharingStateController(
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
         val request = SharingStateSearchRaw(externalIds, sharingStateTypes = null, updatedAfter = null)
-        return sharingStateSearchApplicationService.search(request, principalUtil.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+        return sharingStateSearchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(apiV6OutboundMapper::toDto)
     }
 }
