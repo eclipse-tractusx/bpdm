@@ -17,36 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.util
+package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.stereotype.Component
+import java.time.Instant
 
-@Component("poolHealth")
-class PoolHealthIndicator(
-    private val poolClient: PoolApiClient,
+@Component("orchestratorHealth")
+class OrchestratorHealthIndicator(
+    private val orchestrationClient: OrchestrationApiClient
 ) : HealthIndicator {
 
     override fun health(): Health {
 
         return try {
             /*
-            We can directly use actuator heath response from Pool service but that will not be an authenticated way.
-            So, included changelog request to achieve the same for now and in future we can create separate REST api endpoint which will provide
+            We can directly use actuator heath response from Orchestrator service but that will not be an authenticated way.
+            So, included get finished task events request to achieve the same for now and in future we can create separate REST api endpoint which will provide
             health of the service with readiness in authenticated way.
             */
-            val response = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(), PaginationRequest(page = 0, size = 1))
+            val response = orchestrationClient.finishedTaskEvents.getEvents(Instant.now(), PaginationRequest(page = 0, size = 1))
             if (response.contentSize >= 0) {
-                Health.up().withDetail("Pool Service", "Available").build()
+                Health.up().withDetail("Orchestrator Service", "Available").build()
             } else {
-                Health.down().withDetail("Pool Service", "Unreachable").build()
+                Health.down().withDetail("Orchestrator Service", "Unreachable").build()
             }
         } catch (e: Exception) {
-            Health.down().withDetail("Pool Service", "Error: ${e.message}").build()
+            Health.down().withDetail("Orchestrator Service", "Error: ${e.message}").build()
         }
     }
 }

@@ -13,11 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.application
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.union
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionPageRequest
@@ -47,7 +45,6 @@ class GoldenRecordTaskResolutionApplicationService(
     private val syncRecordOperation: SyncRecordOperationService,
     transactionManager: PlatformTransactionManager
 ) {
-    private val logger = KotlinLogging.logger { }
 
     // The remote reads stay outside the transaction, so each page commits through a template rather than @Transactional.
     private val pageTransaction = TransactionTemplate(transactionManager).apply {
@@ -79,9 +76,6 @@ class GoldenRecordTaskResolutionApplicationService(
                     is ParseResult.Failure -> result.errors.map(::toFailed)
                 }
             }
-            resolutions.filterIsInstance<GoldenRecordTaskResolutionParsed.Succeeded>()
-                .forEach { it.alignmentErrors.forEach(::log) }
-
             resolutionOperation.resolve(resolutions)
             syncRecordOperation.advance(SyncTypeDb.ORCHESTRATOR_FINISHED_TASKS, page.finishedTasks.lastFinishedAt)
         }
@@ -94,15 +88,5 @@ class GoldenRecordTaskResolutionApplicationService(
             is GoldenRecordTaskResolutionError.ResultIncomplete -> BusinessPartnerSharingError.SharingProcessError
         }
         return GoldenRecordTaskResolutionParsed.Failed(error.sharingState, errorCode, error.message)
-    }
-
-    private fun log(error: GoldenRecordAlignmentError) {
-        val externalId = error.sharingState.externalId
-        when (error) {
-            is GoldenRecordAlignmentError.GoldenRecordMissing ->
-                logger.debug { "Kept the task result of business partner output '$externalId' unaligned: the Pool does not return golden record '${error.bpn}'" }
-            is GoldenRecordAlignmentError.AdoptedSiteMissing ->
-                logger.warn { "Kept the task result of business partner output '$externalId' unaligned: its address belongs to site '${error.siteBpn}' which the Pool does not return" }
-        }
     }
 }

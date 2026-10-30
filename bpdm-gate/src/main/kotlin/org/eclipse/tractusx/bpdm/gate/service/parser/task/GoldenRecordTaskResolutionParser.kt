@@ -13,12 +13,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.task
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskResolutionError
@@ -42,6 +44,7 @@ class GoldenRecordTaskResolutionParser(
     private val outputParser: GoldenRecordTaskOutputParser,
     private val alignmentParser: GoldenRecordAlignmentParser
 ) {
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Resolves each sharing state still pending on a task in [page] into the outcome of its task, failing those whose
@@ -90,17 +93,26 @@ class GoldenRecordTaskResolutionParser(
         }
 
         if (!isNewerThanStored(taskOutput, storedOutput))
-            return ParseResult.Success(GoldenRecordTaskResolutionParsed.Succeeded(sharingState, null, emptyList()))
+            return ParseResult.Success(GoldenRecordTaskResolutionParsed.Succeeded(sharingState, null))
 
-        val succeeded = when (val aligned = alignmentParser.parse(sharingState, storedOutput, taskOutput, goldenRecords)) {
-            is ParseResult.Success -> GoldenRecordTaskResolutionParsed.Succeeded(sharingState, aligned.parsed, emptyList())
-            is ParseResult.Failure -> GoldenRecordTaskResolutionParsed.Succeeded(
-                sharingState,
-                BusinessPartnerOutputParsed(sharingState, storedOutput, taskOutput),
-                aligned.errors
-            )
+        val output = when (val aligned = alignmentParser.parse(sharingState, storedOutput, taskOutput, goldenRecords)) {
+            is ParseResult.Success -> aligned.parsed
+            is ParseResult.Failure -> {
+                aligned.errors.forEach(::logKeptUnaligned)
+                BusinessPartnerOutputParsed(sharingState, storedOutput, taskOutput)
+            }
         }
-        return ParseResult.Success(succeeded)
+        return ParseResult.Success(GoldenRecordTaskResolutionParsed.Succeeded(sharingState, output))
+    }
+
+    private fun logKeptUnaligned(error: GoldenRecordAlignmentError) {
+        val externalId = error.sharingState.externalId
+        when (error) {
+            is GoldenRecordAlignmentError.GoldenRecordMissing ->
+                logger.debug { "Kept the task result of business partner output '$externalId' unaligned: the Pool does not return golden record '${error.bpn}'" }
+            is GoldenRecordAlignmentError.AdoptedSiteMissing ->
+                logger.warn { "Kept the task result of business partner output '$externalId' unaligned: its address belongs to site '${error.siteBpn}' which the Pool does not return" }
+        }
     }
 
     private fun findBySharingStates(sharingStates: List<SharingStateDb>, stage: StageType): Map<Long, BusinessPartnerDb> =
