@@ -15,8 +15,8 @@ package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.*
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputRecord
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvRowError

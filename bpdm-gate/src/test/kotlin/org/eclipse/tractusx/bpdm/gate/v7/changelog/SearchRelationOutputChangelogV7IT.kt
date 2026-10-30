@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.v7.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.exception.ChangeLogOutputError
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 import java.time.Instant

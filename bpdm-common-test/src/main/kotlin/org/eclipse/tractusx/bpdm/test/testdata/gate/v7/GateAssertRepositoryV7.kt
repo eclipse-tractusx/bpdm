@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest

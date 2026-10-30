@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.v7
 
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService

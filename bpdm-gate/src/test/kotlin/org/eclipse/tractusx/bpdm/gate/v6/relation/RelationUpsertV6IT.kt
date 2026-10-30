@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as RelationTypeV7
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto as RelationValidityPeriodDtoV7
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType as RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodDto as RelationValidityPeriodDtoV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase

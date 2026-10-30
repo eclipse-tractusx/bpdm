@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutEntry
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import java.time.Instant
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType as GateRelationType
 
 class RelationOutputDtoV7Factory {
 

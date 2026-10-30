@@ -25,15 +25,15 @@ import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDate
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType as GateRelationType
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 /**

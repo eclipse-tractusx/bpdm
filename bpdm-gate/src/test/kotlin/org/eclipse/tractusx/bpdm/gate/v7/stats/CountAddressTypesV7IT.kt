@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.stats
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsAddressTypesResponse
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 

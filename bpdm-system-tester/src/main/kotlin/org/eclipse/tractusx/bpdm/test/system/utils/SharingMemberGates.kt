@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
 
 /** One of the sharing members a scenario can share business partner data as. */
 enum class SharingMember { FIRST, SECOND, THIRD }

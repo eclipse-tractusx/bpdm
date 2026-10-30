@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorResponse
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource

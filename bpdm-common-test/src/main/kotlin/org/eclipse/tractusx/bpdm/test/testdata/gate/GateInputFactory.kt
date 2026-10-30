@@ -23,12 +23,12 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AddressRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.LegalEntityRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputDto
 import java.time.LocalDate
 import kotlin.random.Random
 

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClientImpl
 import org.springframework.boot.web.server.WebServer
 
 class GateTestClientProviderV7(

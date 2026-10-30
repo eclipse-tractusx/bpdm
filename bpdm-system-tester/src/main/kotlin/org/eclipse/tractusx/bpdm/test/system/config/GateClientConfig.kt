@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcClientProperties
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClientImpl
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGate
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates

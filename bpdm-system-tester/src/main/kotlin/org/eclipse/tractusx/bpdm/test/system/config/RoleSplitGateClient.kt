@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.test.system.config
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.BusinessPartnerApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.ChangelogApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.client.PartnerUploadApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.RelationApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.RelationChangelogApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.RelationOutputApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.RelationSharingStateApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.SharingStateApiClient
-import org.eclipse.tractusx.bpdm.gate.api.client.StatsApiClient
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.BusinessPartnerApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.ChangelogApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.PartnerUploadApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationChangelogApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationOutputApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationSharingStateApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.SharingStateApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.StatsApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchRequest
 
 /**
  * Sends every Gate call with whichever of two configured credentials is permitted to make it.

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 
 import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputDto
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
