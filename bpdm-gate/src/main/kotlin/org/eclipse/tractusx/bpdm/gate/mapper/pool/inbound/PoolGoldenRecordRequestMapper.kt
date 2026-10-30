@@ -23,14 +23,14 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecord
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRequest
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressVerboseDto
@@ -65,7 +65,7 @@ class PoolGoldenRecordRequestMapper {
             legalName = header.legalName,
             shortName = header.legalShortName,
             legalForm = header.legalForm,
-            identifiers = header.identifiers.map { Identifier(it.type, it.value, it.issuingBody, BusinessPartnerType.LEGAL_ENTITY) },
+            identifiers = header.identifiers.map { IdentifierRaw(it.type, it.value, it.issuingBody, BusinessPartnerType.LEGAL_ENTITY) },
             states = header.states.map { toState(it, BusinessPartnerType.LEGAL_ENTITY) },
             confidence = toConfidence(header.confidenceCriteria),
             relations = header.relations.map(::toRelation),
@@ -99,7 +99,7 @@ class PoolGoldenRecordRequestMapper {
             bpn = address.bpna,
             name = address.name,
             addressType = address.addressType,
-            identifiers = address.identifiers.map { Identifier(it.type, it.value, null, BusinessPartnerType.ADDRESS) },
+            identifiers = address.identifiers.map { IdentifierRaw(it.type, it.value, null, BusinessPartnerType.ADDRESS) },
             states = address.states.map { toState(it, BusinessPartnerType.ADDRESS) },
             physicalPostalAddress = toPhysicalPostalAddress(address.physicalPostalAddress),
             alternativePostalAddress = address.alternativePostalAddress?.let(::toAlternativeAddress),
@@ -113,10 +113,10 @@ class PoolGoldenRecordRequestMapper {
     }
 
     private fun toState(dto: IBaseStateDto, businessPartnerType: BusinessPartnerType) =
-        State(validFrom = dto.validFrom, validTo = dto.validTo, type = dto.type!!, businessPartnerType = businessPartnerType)
+        StateRaw(validFrom = dto.validFrom, validTo = dto.validTo, type = dto.type!!, businessPartnerType = businessPartnerType)
 
     private fun toConfidence(dto: ConfidenceCriteriaDto) =
-        ConfidenceCriteria(
+        ConfidenceCriteriaRaw(
             sharedByOwner = dto.sharedByOwner,
             checkedByExternalDataSource = dto.checkedByExternalDataSource,
             numberOfSharingMembers = dto.numberOfSharingMembers,
@@ -156,7 +156,7 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressVerboseDto) =
-        PhysicalPostalAddress(
+        PhysicalPostalAddressRaw(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeoCoordinate),
             country = dto.country,
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
@@ -175,7 +175,7 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toAlternativeAddress(dto: AlternativePostalAddressVerboseDto) =
-        AlternativeAddress(
+        AlternativeAddressRaw(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeoCoordinate),
             country = dto.country,
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
@@ -187,10 +187,10 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toGeoCoordinate(dto: GeoCoordinateDto) =
-        GeoCoordinate(longitude = dto.longitude, latitude = dto.latitude, altitude = dto.altitude)
+        GeoCoordinateRaw(longitude = dto.longitude, latitude = dto.latitude, altitude = dto.altitude)
 
     private fun toStreet(dto: StreetDto) =
-        Street(
+        StreetRaw(
             namePrefix = dto.namePrefix,
             additionalNamePrefix = dto.additionalNamePrefix,
             name = dto.name,
@@ -211,7 +211,7 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariantDto) =
-        BusinessPartnerValues.PhysicalAddressScriptVariant(
+        BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
             city = dto.city,
             district = dto.district,
             street = toStreetScriptVariant(dto.street ?: StreetScriptVariantDto()),
@@ -222,7 +222,7 @@ class PoolGoldenRecordRequestMapper {
         )
 
     private fun toStreetScriptVariant(dto: StreetScriptVariantDto) =
-        BusinessPartnerValues.StreetScriptVariant(
+        BusinessPartnerValuesRaw.StreetScriptVariant(
             name = dto.name,
             direction = dto.direction,
             namePrefix = dto.namePrefix,

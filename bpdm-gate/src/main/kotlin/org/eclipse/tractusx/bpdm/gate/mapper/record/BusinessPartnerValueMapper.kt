@@ -14,9 +14,9 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.record
 
 import org.eclipse.tractusx.bpdm.gate.entity.*
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -29,7 +29,7 @@ class BusinessPartnerValueMapper {
      * Returns the value of a stored physical postal address.
      */
     fun toValue(address: PhysicalPostalAddressDb) =
-        BusinessPartnerValues.PhysicalPostalAddress(
+        BusinessPartnerValuesRaw.PhysicalPostalAddress(
             geographicCoordinates = address.geographicCoordinates?.let(::toValue),
             country = address.country,
             administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -51,7 +51,7 @@ class BusinessPartnerValueMapper {
      * Returns the value of a stored alternative postal address.
      */
     fun toValue(address: AlternativePostalAddressDb) =
-        BusinessPartnerValues.AlternativePostalAddress(
+        BusinessPartnerValuesRaw.AlternativePostalAddress(
             geographicCoordinates = address.geographicCoordinates?.let(::toValue),
             country = address.country,
             administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -63,7 +63,7 @@ class BusinessPartnerValueMapper {
         )
 
     private fun toValue(street: StreetDb) =
-        Street(
+        StreetRaw(
             namePrefix = street.namePrefix,
             additionalNamePrefix = street.additionalNamePrefix,
             name = street.name,
@@ -76,13 +76,13 @@ class BusinessPartnerValueMapper {
         )
 
     private fun toValue(coordinate: GeographicCoordinateDb) =
-        GeoCoordinate(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
+        GeoCoordinateRaw(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
 
     /**
      * Returns the value of a stored script variant.
      */
     fun toValue(scriptVariant: BusinessPartnerScriptVariantDb) =
-        BusinessPartnerValues.ScriptVariant(
+        BusinessPartnerValuesRaw.ScriptVariant(
             scriptCode = scriptVariant.scriptCode,
             nameParts = scriptVariant.nameParts.toList(),
             legalName = scriptVariant.legalName,
@@ -95,7 +95,7 @@ class BusinessPartnerValueMapper {
 
     // An all-empty embeddable is read back as null, while a request always states the physical script variant address.
     private fun toValue(address: PhysicalPostalAddressScriptVariantDb?) =
-        BusinessPartnerValues.PhysicalAddressScriptVariant(
+        BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
             city = address?.city,
             district = address?.district,
             street = toValue(address?.street),
@@ -106,7 +106,7 @@ class BusinessPartnerValueMapper {
         )
 
     private fun toValue(street: StreetScriptVariantDb?) =
-        BusinessPartnerValues.StreetScriptVariant(
+        BusinessPartnerValuesRaw.StreetScriptVariant(
             name = street?.name,
             direction = street?.direction,
             namePrefix = street?.namePrefix,

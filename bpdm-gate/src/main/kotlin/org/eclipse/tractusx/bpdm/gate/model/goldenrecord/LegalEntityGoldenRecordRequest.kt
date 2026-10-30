@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
 data class LegalEntityGoldenRecordRequest(
@@ -23,9 +23,9 @@ data class LegalEntityGoldenRecordRequest(
     val legalName: String,
     val shortName: String?,
     val legalForm: String?,
-    val identifiers: List<Identifier>,
-    val states: List<State>,
-    val confidence: ConfidenceCriteria,
+    val identifiers: List<IdentifierRaw>,
+    val states: List<StateRaw>,
+    val confidence: ConfidenceCriteriaRaw,
     val relations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean?,
     val ultimateOwnerBpnl: String?,

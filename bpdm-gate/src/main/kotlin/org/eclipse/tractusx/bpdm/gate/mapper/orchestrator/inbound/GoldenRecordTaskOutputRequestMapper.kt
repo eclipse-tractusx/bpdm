@@ -19,10 +19,10 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRela
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputRequest
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
@@ -93,7 +93,7 @@ class GoldenRecordTaskOutputRequestMapper {
             addressGoldenRecordRelations = address?.goldenRecordRelations.orEmpty().map(::toRelation),
             ownershipUltimate = legalEntity.ownershipUltimate,
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
-            additionalSites = businessPartner.additionalSites.map { BusinessPartnerValues.AdditionalSite(bpn = it.bpnReference.referenceValue, name = it.siteName) }
+            additionalSites = businessPartner.additionalSites.map { BusinessPartnerValuesRaw.AdditionalSite(bpn = it.bpnReference.referenceValue, name = it.siteName) }
         )
     }
 
@@ -132,7 +132,7 @@ class GoldenRecordTaskOutputRequestMapper {
 
     private fun toPhysicalPostalAddress(address: PhysicalAddress) =
         with(address) {
-            BusinessPartnerValues.PhysicalPostalAddress(
+            BusinessPartnerValuesRaw.PhysicalPostalAddress(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -153,7 +153,7 @@ class GoldenRecordTaskOutputRequestMapper {
 
     private fun toAlternativePostalAddress(address: AlternativeAddress) =
         with(address) {
-            BusinessPartnerValues.AlternativePostalAddress(
+            BusinessPartnerValuesRaw.AlternativePostalAddress(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -167,7 +167,7 @@ class GoldenRecordTaskOutputRequestMapper {
 
     private fun toStreet(street: OrchestratorStreet) =
         with(street) {
-            Street(
+            StreetRaw(
                 namePrefix = namePrefix,
                 additionalNamePrefix = additionalNamePrefix,
                 name = name,
@@ -180,13 +180,13 @@ class GoldenRecordTaskOutputRequestMapper {
             )
         }
 
-    private fun toGeoCoordinate(coordinate: OrchestratorGeoCoordinate): GeoCoordinate? {
+    private fun toGeoCoordinate(coordinate: OrchestratorGeoCoordinate): GeoCoordinateRaw? {
         val latitude = coordinate.latitude ?: return null
         val longitude = coordinate.longitude ?: return null
-        return GeoCoordinate(longitude = longitude, latitude = latitude, altitude = coordinate.altitude)
+        return GeoCoordinateRaw(longitude = longitude, latitude = latitude, altitude = coordinate.altitude)
     }
 
-    private fun toScriptVariants(addressType: AddressType, businessPartner: BusinessPartner): List<BusinessPartnerValues.ScriptVariant> {
+    private fun toScriptVariants(addressType: AddressType, businessPartner: BusinessPartner): List<BusinessPartnerValuesRaw.ScriptVariant> {
         val legalEntityVariantsByCode = businessPartner.legalEntity.scriptVariants.associateBy { it.scriptCode }
         val siteVariantsByCode = businessPartner.site?.scriptVariants.orEmpty().associateBy { it.scriptCode }
         val addressVariantsByCode = when (addressType) {
@@ -198,7 +198,7 @@ class GoldenRecordTaskOutputRequestMapper {
         val scriptCodes = addressVariantsByCode.keys + legalEntityVariantsByCode.keys + siteVariantsByCode.keys
         return scriptCodes.map { scriptCode ->
             val addressVariant = addressVariantsByCode[scriptCode]
-            BusinessPartnerValues.ScriptVariant(
+            BusinessPartnerValuesRaw.ScriptVariant(
                 scriptCode = scriptCode,
                 nameParts = emptyList(),
                 legalName = legalEntityVariantsByCode[scriptCode]?.legalName,
@@ -211,13 +211,13 @@ class GoldenRecordTaskOutputRequestMapper {
         }
     }
 
-    private fun toPhysicalAddressScriptVariant(addressVariant: PostalAddressScriptVariant?): BusinessPartnerValues.PhysicalAddressScriptVariant {
+    private fun toPhysicalAddressScriptVariant(addressVariant: PostalAddressScriptVariant?): BusinessPartnerValuesRaw.PhysicalAddressScriptVariant {
         val physicalAddress = addressVariant?.physicalAddress
         val street = physicalAddress?.street
-        return BusinessPartnerValues.PhysicalAddressScriptVariant(
+        return BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
             city = physicalAddress?.city,
             district = physicalAddress?.district,
-            street = BusinessPartnerValues.StreetScriptVariant(
+            street = BusinessPartnerValuesRaw.StreetScriptVariant(
                 name = street?.name,
                 direction = street?.direction,
                 namePrefix = street?.namePrefix,

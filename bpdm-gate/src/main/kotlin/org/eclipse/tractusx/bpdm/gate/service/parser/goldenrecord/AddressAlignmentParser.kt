@@ -19,7 +19,7 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressAlignmentParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
@@ -64,9 +64,9 @@ class AddressAlignmentParser(
 
     // Which of the address's sites is additional is relative to the site this output tracks, which may be any member,
     // not to the Pool's `bpnSite`, which is only its oldest member.
-    private fun additionalSitesOf(address: AddressGoldenRecordRequest, trackedSiteBpn: String?, goldenRecords: PoolGoldenRecordsRequest): List<AdditionalSite> =
+    private fun additionalSitesOf(address: AddressGoldenRecordRequest, trackedSiteBpn: String?, goldenRecords: PoolGoldenRecordsRequest): List<AdditionalSiteRaw> =
         (listOfNotNull(address.siteBpn) + address.additionalSiteBpns)
             .distinct()
             .filterNot { it == trackedSiteBpn }
-            .map { AdditionalSite(it, goldenRecords.sites[it]?.name) }
+            .map { AdditionalSiteRaw(it, goldenRecords.sites[it]?.name) }
 }

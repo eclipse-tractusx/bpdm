@@ -16,10 +16,10 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.inbound
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertIn
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Component
 
 /**
@@ -63,7 +63,7 @@ class BusinessPartnerInputRequestMapper {
             },
             externalSequenceTimestamp = request.externalSequenceTimestamp,
             scriptVariants = request.scriptVariants.map(::toValue),
-            additionalSites = request.additionalSites.map { BusinessPartnerValues.AdditionalSite(bpn = it.siteBpn, name = it.name) }
+            additionalSites = request.additionalSites.map { BusinessPartnerValuesRaw.AdditionalSite(bpn = it.siteBpn, name = it.name) }
         )
 
     private fun toStates(states: Collection<BusinessPartnerStateDto>) =
@@ -71,7 +71,7 @@ class BusinessPartnerInputRequestMapper {
 
     private fun toValue(address: PhysicalPostalAddressDto) =
         with(address) {
-            BusinessPartnerValues.PhysicalPostalAddress(
+            BusinessPartnerValuesRaw.PhysicalPostalAddress(
                 geographicCoordinates = geographicCoordinates?.let(::toValue),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -92,7 +92,7 @@ class BusinessPartnerInputRequestMapper {
 
     private fun toValue(address: AlternativePostalAddressDto) =
         with(address) {
-            BusinessPartnerValues.AlternativePostalAddress(
+            BusinessPartnerValuesRaw.AlternativePostalAddress(
                 geographicCoordinates = geographicCoordinates?.let(::toValue),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -106,7 +106,7 @@ class BusinessPartnerInputRequestMapper {
 
     private fun toValue(street: StreetDto) =
         with(street) {
-            Street(
+            StreetRaw(
                 namePrefix = namePrefix,
                 additionalNamePrefix = additionalNamePrefix,
                 name = name,
@@ -120,11 +120,11 @@ class BusinessPartnerInputRequestMapper {
         }
 
     private fun toValue(coordinate: GeoCoordinateDto) =
-        GeoCoordinate(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
+        GeoCoordinateRaw(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
 
     private fun toValue(scriptVariant: BusinessPartnerScriptVariantDto) =
         with(scriptVariant) {
-            BusinessPartnerValues.ScriptVariant(
+            BusinessPartnerValuesRaw.ScriptVariant(
                 scriptCode = scriptCode,
                 nameParts = nameParts,
                 legalName = legalEntity.legalName,
@@ -132,11 +132,11 @@ class BusinessPartnerInputRequestMapper {
                 siteName = site.name,
                 addressName = address.name,
                 physicalAddress = with(address.physicalAddress) {
-                    BusinessPartnerValues.PhysicalAddressScriptVariant(
+                    BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
                         city = city,
                         district = district,
                         street = with(street) {
-                            BusinessPartnerValues.StreetScriptVariant(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
+                            BusinessPartnerValuesRaw.StreetScriptVariant(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
                         },
                         industrialZone = industrialZone,
                         building = building,

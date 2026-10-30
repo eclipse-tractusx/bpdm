@@ -25,13 +25,19 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRela
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
 data class OutputUpsertData(
     val nameParts: List<String>,
-    val identifiers: Collection<Identifier>,
-    val states: Collection<State>,
+    val identifiers: Collection<IdentifierRaw>,
+    val states: Collection<StateRaw>,
     val roles: Collection<BusinessPartnerRole>,
     val isOwnCompanyData: Boolean,
     val legalEntityBpn: String,
@@ -43,19 +49,19 @@ data class OutputUpsertData(
     val addressBpn: String,
     val addressName: String?,
     val addressType: AddressType,
-    val physicalPostalAddress: PhysicalPostalAddress,
-    val alternativePostalAddress: AlternativeAddress?,
-    val legalEntityConfidence: ConfidenceCriteria,
-    val siteConfidence: ConfidenceCriteria?,
-    val addressConfidence: ConfidenceCriteria,
+    val physicalPostalAddress: PhysicalPostalAddressRaw,
+    val alternativePostalAddress: AlternativeAddressRaw?,
+    val legalEntityConfidence: ConfidenceCriteriaRaw,
+    val siteConfidence: ConfidenceCriteriaRaw?,
+    val addressConfidence: ConfidenceCriteriaRaw,
     val legalEntityUpdatedAt: Instant?,
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
-    val scriptVariants: List<BusinessPartnerValues.ScriptVariant>,
+    val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
     val legalEntityGoldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
     val siteGoldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
     val addressGoldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean? = null,
     val ultimateOwnerBpnl: String? = null,
-    val additionalSites: List<AdditionalSite> = emptyList()
+    val additionalSites: List<AdditionalSiteRaw> = emptyList()
 )

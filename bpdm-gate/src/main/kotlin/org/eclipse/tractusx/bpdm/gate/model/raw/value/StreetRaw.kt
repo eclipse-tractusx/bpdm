@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.value
+package org.eclipse.tractusx.bpdm.gate.model.raw.value
 
-data class Street(
+data class StreetRaw(
     val namePrefix: String?,
     val additionalNamePrefix: String?,
     val name: String?,

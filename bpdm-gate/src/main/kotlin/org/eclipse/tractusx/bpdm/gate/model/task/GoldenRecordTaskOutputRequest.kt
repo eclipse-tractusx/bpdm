@@ -20,7 +20,7 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRela
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -38,21 +38,21 @@ data class GoldenRecordTaskOutputRequest(
     val siteName: String?,
     val addressBpn: String?,
     val addressName: String?,
-    val physicalPostalAddress: BusinessPartnerValues.PhysicalPostalAddress?,
-    val alternativePostalAddress: BusinessPartnerValues.AlternativePostalAddress?,
+    val physicalPostalAddress: BusinessPartnerValuesRaw.PhysicalPostalAddress?,
+    val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?,
     val legalEntityConfidence: Confidence?,
     val siteConfidence: Confidence?,
     val addressConfidence: Confidence?,
     val legalEntityUpdatedAt: Instant?,
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
-    val scriptVariants: List<BusinessPartnerValues.ScriptVariant>,
+    val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
     val legalEntityGoldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
     val siteGoldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
     val addressGoldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean?,
     val ultimateOwnerBpnl: String?,
-    val additionalSites: List<BusinessPartnerValues.AdditionalSite>
+    val additionalSites: List<BusinessPartnerValuesRaw.AdditionalSite>
 ) {
     data class Identifier(
         val type: String?,

@@ -17,15 +17,15 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty
 
@@ -47,8 +47,8 @@ class OutputUpsertDataMapper(
         with(output) {
             OutputUpsertData(
                 nameParts = nameParts,
-                identifiers = identifiers.map { Identifier(it.type, it.value, it.issuingBody, it.businessPartnerType) },
-                states = states.map { State(it.validFrom, it.validTo, it.type, it.businessPartnerTyp) },
+                identifiers = identifiers.map { IdentifierRaw(it.type, it.value, it.issuingBody, it.businessPartnerType) },
+                states = states.map { StateRaw(it.validFrom, it.validTo, it.type, it.businessPartnerTyp) },
                 roles = roles.toList(),
                 isOwnCompanyData = isOwnCompanyData,
                 legalEntityBpn = bpnL ?: throw missing(BusinessPartnerDb::bpnL, id),
@@ -74,12 +74,12 @@ class OutputUpsertDataMapper(
                 addressGoldenRecordRelations = addressGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
                 ownershipUltimate = ownershipUltimate,
                 ultimateOwnerBpnl = ultimateOwnerBpnl,
-                additionalSites = additionalSites.map { AdditionalSite(it.bpn ?: throw missing(AdditionalSiteDb::bpn, id), it.name) }
+                additionalSites = additionalSites.map { AdditionalSiteRaw(it.bpn ?: throw missing(AdditionalSiteDb::bpn, id), it.name) }
             )
         }
 
     private fun toPhysicalPostalAddress(entity: PhysicalPostalAddressDb) =
-        PhysicalPostalAddress(
+        PhysicalPostalAddressRaw(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinate),
             country = entity.country ?: throw missing(PhysicalPostalAddressDb::country),
             administrativeAreaLevel1 = entity.administrativeAreaLevel1,
@@ -98,7 +98,7 @@ class OutputUpsertDataMapper(
         )
 
     private fun toAlternativeAddress(entity: AlternativePostalAddressDb) =
-        AlternativeAddress(
+        AlternativeAddressRaw(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinate),
             country = entity.country ?: throw missing(AlternativePostalAddressDb::country),
             administrativeAreaLevel1 = entity.administrativeAreaLevel1,
@@ -110,7 +110,7 @@ class OutputUpsertDataMapper(
         )
 
     private fun toStreet(entity: StreetDb) =
-        Street(
+        StreetRaw(
             namePrefix = entity.namePrefix,
             additionalNamePrefix = entity.additionalNamePrefix,
             name = entity.name,
@@ -123,7 +123,7 @@ class OutputUpsertDataMapper(
         )
 
     private fun toConfidence(entity: ConfidenceCriteriaDb) =
-        ConfidenceCriteria(
+        ConfidenceCriteriaRaw(
             sharedByOwner = entity.sharedByOwner,
             checkedByExternalDataSource = entity.checkedByExternalDataSource,
             numberOfSharingMembers = entity.numberOfBusinessPartners,
@@ -133,7 +133,7 @@ class OutputUpsertDataMapper(
         )
 
     private fun toGeoCoordinate(entity: GeographicCoordinateDb) =
-        GeoCoordinate(longitude = entity.longitude, latitude = entity.latitude, altitude = entity.altitude)
+        GeoCoordinateRaw(longitude = entity.longitude, latitude = entity.latitude, altitude = entity.altitude)
 
     private fun missing(property: KProperty<*>, entityId: Long? = null) =
         BpdmNullMappingException(BusinessPartnerDb::class, OutputUpsertData::class, property, entityId.toString())

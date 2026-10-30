@@ -20,8 +20,8 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressAlignmentParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRequest
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.springframework.stereotype.Component
 
 /**
@@ -103,11 +103,11 @@ class BusinessPartnerOutputParsedMapper {
     }
 
     private fun <G> mergeScriptVariants(
-        variants: List<BusinessPartnerValues.ScriptVariant>,
+        variants: List<BusinessPartnerValuesRaw.ScriptVariant>,
         goldenRecordVariants: List<G>,
         scriptCodeOf: (G) -> String,
-        apply: (BusinessPartnerValues.ScriptVariant, G) -> BusinessPartnerValues.ScriptVariant
-    ): List<BusinessPartnerValues.ScriptVariant> {
+        apply: (BusinessPartnerValuesRaw.ScriptVariant, G) -> BusinessPartnerValuesRaw.ScriptVariant
+    ): List<BusinessPartnerValuesRaw.ScriptVariant> {
         val goldenRecordVariantByCode = goldenRecordVariants.associateBy(scriptCodeOf)
         val storedCodes = variants.map { it.scriptCode }.toSet()
         val updated = variants.map { variant -> goldenRecordVariantByCode[variant.scriptCode]?.let { apply(variant, it) } ?: variant }
@@ -117,17 +117,17 @@ class BusinessPartnerOutputParsedMapper {
     }
 
     private fun emptyScriptVariant(scriptCode: String) =
-        BusinessPartnerValues.ScriptVariant(
+        BusinessPartnerValuesRaw.ScriptVariant(
             scriptCode = scriptCode,
             nameParts = emptyList(),
             legalName = null,
             shortName = null,
             siteName = null,
             addressName = null,
-            physicalAddress = BusinessPartnerValues.PhysicalAddressScriptVariant(
+            physicalAddress = BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
                 city = null,
                 district = null,
-                street = BusinessPartnerValues.StreetScriptVariant(null, null, null, null, null, null),
+                street = BusinessPartnerValuesRaw.StreetScriptVariant(null, null, null, null, null, null),
                 industrialZone = null,
                 building = null,
                 floor = null,

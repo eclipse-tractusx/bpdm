@@ -17,26 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.output
+package org.eclipse.tractusx.bpdm.gate.model.raw.value
 
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
-
-data class PhysicalPostalAddress(
-    val geographicCoordinates: GeoCoordinate?,
+data class AlternativeAddressRaw(
+    val geographicCoordinates: GeoCoordinateRaw?,
     val country: String,
     val administrativeAreaLevel1: String?,
-    val administrativeAreaLevel2: String?,
-    val administrativeAreaLevel3: String?,
     val postalCode: String?,
     val city: String,
-    val district: String?,
-    val street: Street?,
-    val companyPostalCode: String?,
-    val industrialZone: String?,
-    val building: String?,
-    val floor: String?,
-    val door: String?,
-    val taxJurisdictionCode: String?
+    val deliveryServiceType: DeliveryServiceType,
+    val deliveryServiceQualifier: String?,
+    val deliveryServiceNumber: String
 )

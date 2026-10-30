@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCandidate
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant
@@ -47,8 +47,8 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
 import org.springframework.stereotype.Component
 import java.time.ZoneOffset
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate as GateGeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street as GateStreet
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw as GateGeoCoordinate
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw as GateStreet
 
 /**
  * Maps business partner golden record task requests onto the requests the Orchestrator receives.
@@ -135,7 +135,7 @@ class GoldenRecordTaskRequestMapper {
             input.scriptVariants.map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it)) }
         )
 
-    private fun toPhysicalAddress(address: BusinessPartnerValues.PhysicalPostalAddress) =
+    private fun toPhysicalAddress(address: BusinessPartnerValuesRaw.PhysicalPostalAddress) =
         with(address) {
             PhysicalAddress(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
@@ -156,7 +156,7 @@ class GoldenRecordTaskRequestMapper {
             )
         }
 
-    private fun toAlternativeAddress(address: BusinessPartnerValues.AlternativePostalAddress) =
+    private fun toAlternativeAddress(address: BusinessPartnerValuesRaw.AlternativePostalAddress) =
         with(address) {
             AlternativeAddress(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
@@ -196,20 +196,20 @@ class GoldenRecordTaskRequestMapper {
     private fun toBpnReference(bpn: String?) =
         bpn?.let { BpnReference(referenceValue = it, desiredBpn = null, referenceType = BpnReferenceType.Bpn) } ?: BpnReference.empty
 
-    private fun toLegalEntityScriptVariant(scriptVariant: BusinessPartnerValues.ScriptVariant) =
+    private fun toLegalEntityScriptVariant(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
         LegalEntityScriptVariant(scriptVariant.scriptCode, scriptVariant.legalName, scriptVariant.shortName, toPostalAddressScriptVariant(scriptVariant))
 
-    private fun toSiteScriptVariant(scriptVariant: BusinessPartnerValues.ScriptVariant) =
+    private fun toSiteScriptVariant(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
         SiteScriptVariant(scriptVariant.scriptCode, scriptVariant.siteName ?: "", toPostalAddressScriptVariant(scriptVariant))
 
-    private fun toPostalAddressScriptVariant(scriptVariant: BusinessPartnerValues.ScriptVariant) =
+    private fun toPostalAddressScriptVariant(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
         PostalAddressScriptVariant(
             addressName = scriptVariant.addressName,
             physicalAddress = toPhysicalAddressScriptVariant(scriptVariant.physicalAddress),
             alternativeAddress = scriptVariant.alternativeAddressCity?.let { AlternativeAddressScriptVariant(city = it) }
         )
 
-    private fun toPhysicalAddressScriptVariant(address: BusinessPartnerValues.PhysicalAddressScriptVariant) =
+    private fun toPhysicalAddressScriptVariant(address: BusinessPartnerValuesRaw.PhysicalAddressScriptVariant) =
         with(address) {
             PhysicalAddressScriptVariant(
                 city = city,

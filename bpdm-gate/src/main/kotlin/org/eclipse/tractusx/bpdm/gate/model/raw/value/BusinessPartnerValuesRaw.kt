@@ -11,16 +11,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.value
+package org.eclipse.tractusx.bpdm.gate.model.raw.value
 
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
 /**
  * Value types a business partner carries unchanged through every stage and representation.
  */
-object BusinessPartnerValues {
+object BusinessPartnerValuesRaw {
     data class PhysicalPostalAddress(
-        val geographicCoordinates: GeoCoordinate?,
+        val geographicCoordinates: GeoCoordinateRaw?,
         val country: String?,
         val administrativeAreaLevel1: String?,
         val administrativeAreaLevel2: String?,
@@ -28,7 +28,7 @@ object BusinessPartnerValues {
         val postalCode: String?,
         val city: String?,
         val district: String?,
-        val street: Street?,
+        val street: StreetRaw?,
         val companyPostalCode: String?,
         val industrialZone: String?,
         val building: String?,
@@ -38,7 +38,7 @@ object BusinessPartnerValues {
     )
 
     data class AlternativePostalAddress(
-        val geographicCoordinates: GeoCoordinate?,
+        val geographicCoordinates: GeoCoordinateRaw?,
         val country: String?,
         val administrativeAreaLevel1: String?,
         val postalCode: String?,

@@ -17,11 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.output
+package org.eclipse.tractusx.bpdm.gate.model.raw.value
 
 import java.time.LocalDateTime
 
-data class ConfidenceCriteria(
+data class ConfidenceCriteriaRaw(
     val sharedByOwner: Boolean,
     val checkedByExternalDataSource: Boolean,
     val numberOfSharingMembers: Int,

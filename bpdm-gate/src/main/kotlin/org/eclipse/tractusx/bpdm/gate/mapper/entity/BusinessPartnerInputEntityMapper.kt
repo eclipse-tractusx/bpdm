@@ -18,10 +18,10 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.AdditionalSiteDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Component
 
 /**
@@ -45,13 +45,13 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of [additionalSite].
      */
-    fun toEntity(additionalSite: BusinessPartnerValues.AdditionalSite): AdditionalSiteDb =
+    fun toEntity(additionalSite: BusinessPartnerValuesRaw.AdditionalSite): AdditionalSiteDb =
         AdditionalSiteDb(bpn = additionalSite.bpn, name = additionalSite.name)
 
     /**
      * Returns the stored form of the physical postal [address].
      */
-    fun toEntity(address: BusinessPartnerValues.PhysicalPostalAddress): PhysicalPostalAddressDb =
+    fun toEntity(address: BusinessPartnerValuesRaw.PhysicalPostalAddress): PhysicalPostalAddressDb =
         PhysicalPostalAddressDb(
             geographicCoordinates = address.geographicCoordinates?.let(::toEntity),
             country = address.country,
@@ -73,7 +73,7 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of the alternative postal [address].
      */
-    fun toEntity(address: BusinessPartnerValues.AlternativePostalAddress): AlternativePostalAddressDb =
+    fun toEntity(address: BusinessPartnerValuesRaw.AlternativePostalAddress): AlternativePostalAddressDb =
         AlternativePostalAddressDb(
             geographicCoordinates = address.geographicCoordinates?.let(::toEntity),
             country = address.country,
@@ -88,7 +88,7 @@ class BusinessPartnerInputEntityMapper {
     /**
      * Returns the stored form of a script variant's physical [address].
      */
-    fun toEntity(address: BusinessPartnerValues.PhysicalAddressScriptVariant): PhysicalPostalAddressScriptVariantDb =
+    fun toEntity(address: BusinessPartnerValuesRaw.PhysicalAddressScriptVariant): PhysicalPostalAddressScriptVariantDb =
         PhysicalPostalAddressScriptVariantDb(
             city = address.city,
             district = address.district,
@@ -114,7 +114,7 @@ class BusinessPartnerInputEntityMapper {
     fun toAlternativeAddressScriptVariant(city: String): AlternativePostalAddressScriptVariantDb =
         AlternativePostalAddressScriptVariantDb(city = city)
 
-    private fun toEntity(street: Street) =
+    private fun toEntity(street: StreetRaw) =
         StreetDb(
             name = street.name,
             houseNumber = street.houseNumber,
@@ -127,6 +127,6 @@ class BusinessPartnerInputEntityMapper {
             additionalNameSuffix = street.additionalNameSuffix
         )
 
-    private fun toEntity(coordinate: GeoCoordinate) =
+    private fun toEntity(coordinate: GeoCoordinateRaw) =
         GeographicCoordinateDb(latitude = coordinate.latitude, longitude = coordinate.longitude, altitude = coordinate.altitude)
 }

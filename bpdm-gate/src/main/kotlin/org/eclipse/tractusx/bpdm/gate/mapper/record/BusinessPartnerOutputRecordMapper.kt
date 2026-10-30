@@ -21,11 +21,11 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
 import org.springframework.stereotype.Component
 
 /**
@@ -93,7 +93,7 @@ class BusinessPartnerOutputRecordMapper(
             ),
             scriptVariants = entity.scriptVariants.map(valueMapper::toValue),
             additionalSites = entity.additionalSites.map {
-                AdditionalSite(
+                AdditionalSiteRaw(
                     siteBpn = it.bpn ?: throw BpdmNullMappingException(AdditionalSiteDb::class, BusinessPartnerOutputRecord::class, AdditionalSiteDb::bpn, externalId),
                     name = it.name
                 )
@@ -107,13 +107,13 @@ class BusinessPartnerOutputRecordMapper(
         entity.states.filter { it.businessPartnerTyp == businessPartnerType }.map(::toRecord)
 
     private fun toRecord(identifier: IdentifierDb) =
-        Identifier(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody, businessPartnerType = identifier.businessPartnerType)
+        IdentifierRaw(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody, businessPartnerType = identifier.businessPartnerType)
 
     private fun toRecord(state: StateDb) =
-        State(validFrom = state.validFrom, validTo = state.validTo, type = state.type, businessPartnerType = state.businessPartnerTyp)
+        StateRaw(validFrom = state.validFrom, validTo = state.validTo, type = state.type, businessPartnerType = state.businessPartnerTyp)
 
     private fun toRecord(confidence: ConfidenceCriteriaDb) =
-        ConfidenceCriteria(
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             numberOfSharingMembers = confidence.numberOfBusinessPartners,

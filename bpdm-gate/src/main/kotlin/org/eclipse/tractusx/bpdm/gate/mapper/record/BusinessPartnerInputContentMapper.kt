@@ -15,8 +15,8 @@ package org.eclipse.tractusx.bpdm.gate.mapper.record
 
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.springframework.stereotype.Component
 
 /**
@@ -54,7 +54,7 @@ class BusinessPartnerInputContentMapper(
                 alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(valueMapper::toValue)
             ),
             scriptVariants = entity.scriptVariants.mapTo(linkedSetOf(), valueMapper::toValue),
-            additionalSites = entity.additionalSites.mapTo(linkedSetOf()) { BusinessPartnerValues.AdditionalSite(bpn = it.bpn, name = it.name) }
+            additionalSites = entity.additionalSites.mapTo(linkedSetOf()) { BusinessPartnerValuesRaw.AdditionalSite(bpn = it.bpn, name = it.name) }
         )
 
     private fun toContent(state: StateDb) =

@@ -14,26 +14,30 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
 data class BusinessPartnerOutputRecord(
     val externalId: String,
     val externalSequenceTimestamp: Instant?,
     val nameParts: List<String>,
-    val identifiers: List<Identifier>,
-    val states: List<State>,
+    val identifiers: List<IdentifierRaw>,
+    val states: List<StateRaw>,
     val roles: List<BusinessPartnerRole>,
     val isOwnCompanyData: Boolean,
     val legalEntity: LegalEntity,
     val site: Site?,
     val address: Address,
-    val scriptVariants: List<BusinessPartnerValues.ScriptVariant>,
-    val additionalSites: List<AdditionalSite>,
+    val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
+    val additionalSites: List<AdditionalSiteRaw>,
     val createdAt: Instant,
     val updatedAt: Instant
 ) {
@@ -42,10 +46,10 @@ data class BusinessPartnerOutputRecord(
         val legalName: String?,
         val shortName: String?,
         val legalForm: String?,
-        val confidence: ConfidenceCriteria,
+        val confidence: ConfidenceCriteriaRaw,
         val ownershipUltimate: Boolean?,
         val ultimateOwnerBpnl: String?,
-        val states: List<State>,
+        val states: List<StateRaw>,
         val goldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )
@@ -53,8 +57,8 @@ data class BusinessPartnerOutputRecord(
     data class Site(
         val bpn: String,
         val name: String?,
-        val confidence: ConfidenceCriteria,
-        val states: List<State>,
+        val confidence: ConfidenceCriteriaRaw,
+        val states: List<StateRaw>,
         val goldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )
@@ -63,10 +67,10 @@ data class BusinessPartnerOutputRecord(
         val bpn: String,
         val name: String?,
         val addressType: AddressType?,
-        val physicalPostalAddress: BusinessPartnerValues.PhysicalPostalAddress?,
-        val alternativePostalAddress: BusinessPartnerValues.AlternativePostalAddress?,
-        val confidence: ConfidenceCriteria,
-        val states: List<State>,
+        val physicalPostalAddress: BusinessPartnerValuesRaw.PhysicalPostalAddress?,
+        val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?,
+        val confidence: ConfidenceCriteriaRaw,
+        val states: List<StateRaw>,
         val goldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )

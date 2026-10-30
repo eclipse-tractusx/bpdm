@@ -17,18 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.output
+package org.eclipse.tractusx.bpdm.gate.model.raw.value
 
-import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-
-data class AlternativeAddress(
-    val geographicCoordinates: GeoCoordinate?,
-    val country: String,
-    val administrativeAreaLevel1: String?,
-    val postalCode: String?,
-    val city: String,
-    val deliveryServiceType: DeliveryServiceType,
-    val deliveryServiceQualifier: String?,
-    val deliveryServiceNumber: String
+data class AdditionalSiteRaw(
+    val siteBpn: String,
+    val name: String?
 )

@@ -18,18 +18,18 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.mapper.entity.BusinessPartnerInputEntityMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.record.BusinessPartnerInputContentMapper
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
+import org.eclipse.tractusx.bpdm.gate.model.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputContent
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertEntryResult.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerInputUpsertParsed
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
@@ -169,7 +169,7 @@ class BusinessPartnerInputUpsertOperationService(
 
     // Updated in place by script code: replacing the list would insert before the orphans are deleted and break the
     // unique (script_code, business_partner_id) constraint.
-    private fun syncScriptVariants(scriptVariants: Collection<BusinessPartnerValues.ScriptVariant>, input: BusinessPartnerDb) {
+    private fun syncScriptVariants(scriptVariants: Collection<BusinessPartnerValuesRaw.ScriptVariant>, input: BusinessPartnerDb) {
         val existingByCode = input.scriptVariants.associateBy { it.scriptCode }
         input.scriptVariants.removeIf { existing -> scriptVariants.none { it.scriptCode == existing.scriptCode } }
 
@@ -180,7 +180,7 @@ class BusinessPartnerInputUpsertOperationService(
         }
     }
 
-    private fun writeScriptVariant(scriptVariant: BusinessPartnerValues.ScriptVariant, target: BusinessPartnerScriptVariantDb) {
+    private fun writeScriptVariant(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant, target: BusinessPartnerScriptVariantDb) {
         target.nameParts.replace(scriptVariant.nameParts)
         target.legalName = scriptVariant.legalName
         target.shortName = scriptVariant.shortName

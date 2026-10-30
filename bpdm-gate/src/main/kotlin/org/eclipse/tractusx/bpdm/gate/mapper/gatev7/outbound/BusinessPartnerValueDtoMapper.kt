@@ -15,12 +15,12 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -32,19 +32,19 @@ class BusinessPartnerValueDtoMapper {
     /**
      * Returns the API form of an identifier.
      */
-    fun toDto(identifier: Identifier) =
+    fun toDto(identifier: IdentifierRaw) =
         BusinessPartnerIdentifierDto(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody)
 
     /**
      * Returns the API form of a business state.
      */
-    fun toDto(state: State) =
+    fun toDto(state: StateRaw) =
         BusinessPartnerStateDto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
 
     /**
      * Returns the API form of confidence criteria.
      */
-    fun toDto(confidence: ConfidenceCriteria) =
+    fun toDto(confidence: ConfidenceCriteriaRaw) =
         ConfidenceCriteriaDto(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
@@ -57,7 +57,7 @@ class BusinessPartnerValueDtoMapper {
     /**
      * Returns the API form of a physical postal address.
      */
-    fun toDto(address: BusinessPartnerValues.PhysicalPostalAddress) =
+    fun toDto(address: BusinessPartnerValuesRaw.PhysicalPostalAddress) =
         PhysicalPostalAddressDto(
             geographicCoordinates = address.geographicCoordinates?.let(::toDto),
             country = address.country,
@@ -79,7 +79,7 @@ class BusinessPartnerValueDtoMapper {
     /**
      * Returns the API form of an alternative postal address.
      */
-    fun toDto(address: BusinessPartnerValues.AlternativePostalAddress) =
+    fun toDto(address: BusinessPartnerValuesRaw.AlternativePostalAddress) =
         AlternativePostalAddressDto(
             geographicCoordinates = address.geographicCoordinates?.let(::toDto),
             country = address.country,
@@ -91,7 +91,7 @@ class BusinessPartnerValueDtoMapper {
             deliveryServiceNumber = address.deliveryServiceNumber
         )
 
-    private fun toDto(street: Street) =
+    private fun toDto(street: StreetRaw) =
         StreetDto(
             namePrefix = street.namePrefix,
             additionalNamePrefix = street.additionalNamePrefix,
@@ -104,13 +104,13 @@ class BusinessPartnerValueDtoMapper {
             direction = street.direction
         )
 
-    private fun toDto(coordinate: GeoCoordinate) =
+    private fun toDto(coordinate: GeoCoordinateRaw) =
         GeoCoordinateDto(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
 
     /**
      * Returns the API form of a script variant.
      */
-    fun toDto(scriptVariant: BusinessPartnerValues.ScriptVariant) =
+    fun toDto(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
         BusinessPartnerScriptVariantDto(
             scriptCode = scriptVariant.scriptCode,
             nameParts = scriptVariant.nameParts,

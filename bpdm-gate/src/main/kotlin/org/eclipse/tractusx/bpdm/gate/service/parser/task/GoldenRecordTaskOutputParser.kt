@@ -16,16 +16,16 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.task
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputError
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskOutputRequest
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
 import org.springframework.stereotype.Service
 
 /**
@@ -90,21 +90,21 @@ class GoldenRecordTaskOutputParser {
                 addressGoldenRecordRelations = request.addressGoldenRecordRelations,
                 ownershipUltimate = request.ownershipUltimate,
                 ultimateOwnerBpnl = request.ultimateOwnerBpnl,
-                additionalSites = request.additionalSites.mapNotNull { site -> site.bpn?.let { AdditionalSite(siteBpn = it, name = site.name) } }
+                additionalSites = request.additionalSites.mapNotNull { site -> site.bpn?.let { AdditionalSiteRaw(siteBpn = it, name = site.name) } }
             )
         }
     }
 
     private fun parsePhysicalPostalAddress(
-        address: BusinessPartnerValues.PhysicalPostalAddress?
-    ): ParseResult<PhysicalPostalAddress, GoldenRecordTaskOutputError> {
+        address: BusinessPartnerValuesRaw.PhysicalPostalAddress?
+    ): ParseResult<PhysicalPostalAddressRaw, GoldenRecordTaskOutputError> {
         if (address == null) return missing("physicalPostalAddress")
 
         return zipParseResults(
             required(address.country, "physicalPostalAddress.country"),
             required(address.city, "physicalPostalAddress.city")
         ) { country, city ->
-            PhysicalPostalAddress(
+            PhysicalPostalAddressRaw(
                 geographicCoordinates = address.geographicCoordinates,
                 country = country,
                 administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -125,8 +125,8 @@ class GoldenRecordTaskOutputParser {
     }
 
     private fun parseAlternativePostalAddress(
-        address: BusinessPartnerValues.AlternativePostalAddress
-    ): ParseResult<AlternativeAddress, GoldenRecordTaskOutputError> =
+        address: BusinessPartnerValuesRaw.AlternativePostalAddress
+    ): ParseResult<AlternativeAddressRaw, GoldenRecordTaskOutputError> =
         zipParseResults(
             zipParseResults(
                 required(address.country, "alternativePostalAddress.country"),
@@ -137,7 +137,7 @@ class GoldenRecordTaskOutputParser {
                 required(address.deliveryServiceNumber, "alternativePostalAddress.deliveryServiceNumber")
             ) { type, number -> type to number }
         ) { (country, city), (deliveryServiceType, deliveryServiceNumber) ->
-            AlternativeAddress(
+            AlternativeAddressRaw(
                 geographicCoordinates = address.geographicCoordinates,
                 country = country,
                 administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -152,7 +152,7 @@ class GoldenRecordTaskOutputParser {
     private fun parseConfidence(
         confidence: GoldenRecordTaskOutputRequest.Confidence?,
         property: String
-    ): ParseResult<ConfidenceCriteria, GoldenRecordTaskOutputError> {
+    ): ParseResult<ConfidenceCriteriaRaw, GoldenRecordTaskOutputError> {
         if (confidence == null) return missing(property)
 
         return zipParseResults(
@@ -171,7 +171,7 @@ class GoldenRecordTaskOutputParser {
                 Triple(lastConfidenceCheckAt, nextConfidenceCheckAt, confidenceLevel)
             }
         ) { (sharedByOwner, checkedByExternalDataSource, numberOfSharingMembers), (lastConfidenceCheckAt, nextConfidenceCheckAt, confidenceLevel) ->
-            ConfidenceCriteria(
+            ConfidenceCriteriaRaw(
                 sharedByOwner = sharedByOwner,
                 checkedByExternalDataSource = checkedByExternalDataSource,
                 numberOfSharingMembers = numberOfSharingMembers,
@@ -182,14 +182,14 @@ class GoldenRecordTaskOutputParser {
         }
     }
 
-    private fun toIdentifier(identifier: GoldenRecordTaskOutputRequest.Identifier): Identifier? {
+    private fun toIdentifier(identifier: GoldenRecordTaskOutputRequest.Identifier): IdentifierRaw? {
         val type = identifier.type ?: return null
         val value = identifier.value ?: return null
-        return Identifier(type = type, value = value, issuingBody = identifier.issuingBody, businessPartnerType = identifier.businessPartnerType)
+        return IdentifierRaw(type = type, value = value, issuingBody = identifier.issuingBody, businessPartnerType = identifier.businessPartnerType)
     }
 
-    private fun toState(state: GoldenRecordTaskOutputRequest.State): State? =
-        state.type?.let { State(validFrom = state.validFrom, validTo = state.validTo, type = it, businessPartnerType = state.businessPartnerType) }
+    private fun toState(state: GoldenRecordTaskOutputRequest.State): StateRaw? =
+        state.type?.let { StateRaw(validFrom = state.validFrom, validTo = state.validTo, type = it, businessPartnerType = state.businessPartnerType) }
 
     private fun <T : Any> required(value: T?, property: String): ParseResult<T, GoldenRecordTaskOutputError> =
         value?.let { ParseResult.Success(it) } ?: missing(property)

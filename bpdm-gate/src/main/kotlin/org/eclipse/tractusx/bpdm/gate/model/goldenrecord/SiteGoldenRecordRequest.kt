@@ -13,15 +13,15 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
 data class SiteGoldenRecordRequest(
     val bpn: String,
     val name: String,
-    val states: List<State>,
-    val confidence: ConfidenceCriteria,
+    val states: List<StateRaw>,
+    val confidence: ConfidenceCriteriaRaw,
     val relations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
     val scriptVariants: List<ScriptVariant>,
     val updatedAt: Instant

@@ -14,23 +14,23 @@
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
 data class AddressGoldenRecordRequest(
     val bpn: String,
     val name: String?,
     val addressType: AddressType?,
-    val identifiers: List<Identifier>,
-    val states: List<State>,
-    val physicalPostalAddress: PhysicalPostalAddress,
-    val alternativePostalAddress: AlternativeAddress?,
-    val confidence: ConfidenceCriteria,
+    val identifiers: List<IdentifierRaw>,
+    val states: List<StateRaw>,
+    val physicalPostalAddress: PhysicalPostalAddressRaw,
+    val alternativePostalAddress: AlternativeAddressRaw?,
+    val confidence: ConfidenceCriteriaRaw,
     val relations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
     val siteBpn: String?,
     val additionalSiteBpns: List<String>,
@@ -40,7 +40,7 @@ data class AddressGoldenRecordRequest(
     data class ScriptVariant(
         val scriptCode: String,
         val name: String?,
-        val physicalAddress: BusinessPartnerValues.PhysicalAddressScriptVariant,
+        val physicalAddress: BusinessPartnerValuesRaw.PhysicalAddressScriptVariant,
         val alternativeAddressCity: String?
     )
 }

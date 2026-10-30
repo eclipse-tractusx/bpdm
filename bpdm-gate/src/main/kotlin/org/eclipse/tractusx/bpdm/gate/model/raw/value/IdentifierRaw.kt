@@ -17,15 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model.upsert.output
+package org.eclipse.tractusx.bpdm.gate.model.raw.value
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
 
-data class State(
-    val validFrom: LocalDateTime?,
-    val validTo: LocalDateTime?,
-    val type: BusinessStateType,
+data class IdentifierRaw(
+    val type: String,
+    val value: String,
+    val issuingBody: String?,
     val businessPartnerType: BusinessPartnerType
 )

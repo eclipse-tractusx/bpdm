@@ -14,11 +14,11 @@
 package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.AdditionalSite
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 
 data class AddressAlignmentParsed(
     val address: AddressGoldenRecordRequest,
     val addressType: AddressType,
-    val additionalSites: List<AdditionalSite>,
+    val additionalSites: List<AdditionalSiteRaw>,
     val adoptedSite: SiteGoldenRecordRequest?
 )

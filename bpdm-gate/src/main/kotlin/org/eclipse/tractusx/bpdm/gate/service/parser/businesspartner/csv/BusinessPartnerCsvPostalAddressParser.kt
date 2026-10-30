@@ -17,11 +17,11 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvHeader
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRow
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
 import org.springframework.stereotype.Service
 
 /**
@@ -36,14 +36,14 @@ class BusinessPartnerCsvPostalAddressParser(
     /**
      * Returns the physical postal address [row] describes, or fails with every cell that holds no valid value.
      */
-    fun parsePhysical(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerValues.PhysicalPostalAddress, BusinessPartnerCsvRowError> =
+    fun parsePhysical(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerValuesRaw.PhysicalPostalAddress, BusinessPartnerCsvRowError> =
         with(row) {
             coordinatesParser.parse(
                 CsvCell(BusinessPartnerCsvHeader.PHYSICAL_POSTAL_ADDRESS_LONGITUDE, physicalPostalAddressLongitude),
                 CsvCell(BusinessPartnerCsvHeader.PHYSICAL_POSTAL_ADDRESS_LATITUDE, physicalPostalAddressLatitude),
                 CsvCell(BusinessPartnerCsvHeader.PHYSICAL_POSTAL_ADDRESS_ALTITUDE, physicalPostalAddressAltitude)
             ).combine(emptyList()) { coordinates ->
-                BusinessPartnerValues.PhysicalPostalAddress(
+                BusinessPartnerValuesRaw.PhysicalPostalAddress(
                     geographicCoordinates = coordinates,
                     country = cellText(physicalPostalAddressCountry),
                     administrativeAreaLevel1 = cellText(physicalPostalAddressAdminArea1),
@@ -52,7 +52,7 @@ class BusinessPartnerCsvPostalAddressParser(
                     postalCode = cellText(physicalPostalAddressPostalCode),
                     city = cellText(physicalPostalAddressCity),
                     district = cellText(physicalPostalAddressDistrict),
-                    street = Street(
+                    street = StreetRaw(
                         namePrefix = cellText(physicalPostalAddressStreetNamePrefix),
                         additionalNamePrefix = cellText(physicalPostalAddressStreetAdditionalNamePrefix),
                         name = cellText(physicalPostalAddressStreetName),
@@ -76,7 +76,7 @@ class BusinessPartnerCsvPostalAddressParser(
     /**
      * Returns the alternative postal address [row] describes, or fails with every cell that holds no valid value.
      */
-    fun parseAlternative(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerValues.AlternativePostalAddress, BusinessPartnerCsvRowError> =
+    fun parseAlternative(row: BusinessPartnerCsvRow): ParseResult<BusinessPartnerValuesRaw.AlternativePostalAddress, BusinessPartnerCsvRowError> =
         with(row) {
             zipParseResults(
                 coordinatesParser.parse(
@@ -89,7 +89,7 @@ class BusinessPartnerCsvPostalAddressParser(
                     DeliveryServiceType::valueOf
                 )
             ) { coordinates, deliveryServiceType ->
-                BusinessPartnerValues.AlternativePostalAddress(
+                BusinessPartnerValuesRaw.AlternativePostalAddress(
                     geographicCoordinates = coordinates,
                     country = cellText(alternativePostalAddressCountry),
                     administrativeAreaLevel1 = cellText(alternativePostalAddressAdminArea1),

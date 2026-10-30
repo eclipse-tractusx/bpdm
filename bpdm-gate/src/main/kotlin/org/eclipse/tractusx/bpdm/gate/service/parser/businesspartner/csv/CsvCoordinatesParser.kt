@@ -15,8 +15,8 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.input.BusinessPartnerCsvRowError
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
 import org.springframework.stereotype.Service
 
 /**
@@ -32,11 +32,11 @@ class CsvCoordinatesParser(
      * Returns the coordinates the cells hold, absent if all three are empty, or fails with every cell that is not a
      * number or is missing although required.
      */
-    fun parse(longitude: CsvCell, latitude: CsvCell, altitude: CsvCell): ParseResult<GeoCoordinate?, BusinessPartnerCsvRowError> {
+    fun parse(longitude: CsvCell, latitude: CsvCell, altitude: CsvCell): ParseResult<GeoCoordinateRaw?, BusinessPartnerCsvRowError> {
         if (longitude.value == null && latitude.value == null && altitude.value == null) return ParseResult.Success(null)
 
         return zipParseResults(parseRequired(longitude), parseRequired(latitude), numberParser.parse(altitude)) { parsedLongitude, parsedLatitude, parsedAltitude ->
-            GeoCoordinate(parsedLongitude, parsedLatitude, parsedAltitude)
+            GeoCoordinateRaw(parsedLongitude, parsedLatitude, parsedAltitude)
         }
     }
 

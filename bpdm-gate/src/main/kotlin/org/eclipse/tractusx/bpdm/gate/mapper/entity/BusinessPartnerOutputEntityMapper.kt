@@ -26,10 +26,15 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRela
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
-import org.eclipse.tractusx.bpdm.gate.model.value.BusinessPartnerValues
-import org.eclipse.tractusx.bpdm.gate.model.value.GeoCoordinate
-import org.eclipse.tractusx.bpdm.gate.model.value.Street
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.StreetRaw
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Component
 
 /**
@@ -88,7 +93,7 @@ class BusinessPartnerOutputEntityMapper(
         return businessPartner
     }
 
-    private fun toScriptVariant(businessPartner: BusinessPartnerDb, scriptVariant: BusinessPartnerValues.ScriptVariant) =
+    private fun toScriptVariant(businessPartner: BusinessPartnerDb, scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
         BusinessPartnerScriptVariantDb(
             scriptCode = scriptVariant.scriptCode,
             businessPartner = businessPartner,
@@ -122,17 +127,17 @@ class BusinessPartnerOutputEntityMapper(
             targetBpn = relation.targetBpn
         )
 
-    private fun Identifier.toEntity() =
+    private fun IdentifierRaw.toEntity() =
         IdentifierDb(type = type, value = value, issuingBody = issuingBody, businessPartnerType = businessPartnerType)
 
-    private fun State.toEntity() =
+    private fun StateRaw.toEntity() =
         StateDb(type = type, validFrom = validFrom, validTo = validTo, businessPartnerTyp = businessPartnerType)
 
-    private fun ConfidenceCriteria.toEntity() =
+    private fun ConfidenceCriteriaRaw.toEntity() =
         ConfidenceCriteriaDb(sharedByOwner, checkedByExternalDataSource, numberOfSharingMembers, lastConfidenceCheckAt, nextConfidenceCheckAt, confidenceLevel)
 
 
-    private fun PhysicalPostalAddress.toEntity() =
+    private fun PhysicalPostalAddressRaw.toEntity() =
         PhysicalPostalAddressDb(
             geographicCoordinates = geographicCoordinates?.toEntity(),
             country = country,
@@ -151,7 +156,7 @@ class BusinessPartnerOutputEntityMapper(
             taxJurisdictionCode = taxJurisdictionCode
         )
 
-    private fun AlternativeAddress.toEntity() =
+    private fun AlternativeAddressRaw.toEntity() =
         AlternativePostalAddressDb(
             geographicCoordinates = geographicCoordinates?.toEntity(),
             country = country,
@@ -163,7 +168,7 @@ class BusinessPartnerOutputEntityMapper(
             deliveryServiceNumber = deliveryServiceNumber
         )
 
-    private fun Street.toEntity() =
+    private fun StreetRaw.toEntity() =
         StreetDb(
             name = name,
             houseNumber = houseNumber,
@@ -176,6 +181,6 @@ class BusinessPartnerOutputEntityMapper(
             additionalNameSuffix = additionalNameSuffix
         )
 
-    private fun GeoCoordinate.toEntity() = GeographicCoordinateDb(latitude = latitude, longitude = longitude, altitude = altitude)
+    private fun GeoCoordinateRaw.toEntity() = GeographicCoordinateDb(latitude = latitude, longitude = longitude, altitude = altitude)
 
 }
