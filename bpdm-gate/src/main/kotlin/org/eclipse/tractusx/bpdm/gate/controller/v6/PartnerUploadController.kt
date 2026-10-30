@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller.v6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.GatePartnerUploadApi
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.GatePartnerUploadV6Api
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerUploadException
@@ -45,12 +45,12 @@ class PartnerUploadController(
     val csvTemplateWriter: BusinessPartnerCsvTemplateWriter,
     val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
     val tenantResolver: TenantResolver,
-) : GatePartnerUploadApi {
+) : GatePartnerUploadV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.UPLOAD_INPUT_PARTNER})")
     override fun uploadPartnerCsvFile(
         file: MultipartFile
-    ): ResponseEntity<Collection<BusinessPartnerInputDto>> {
+    ): ResponseEntity<Collection<BusinessPartnerInputV6Dto>> {
         if (file.isEmpty || !file.contentType.equals("text/csv", ignoreCase = true))
             return ResponseEntity(HttpStatus.BAD_REQUEST)
 

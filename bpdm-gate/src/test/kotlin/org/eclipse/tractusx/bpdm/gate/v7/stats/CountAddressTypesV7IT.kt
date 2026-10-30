@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.stats
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsAddressTypesV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -39,7 +39,7 @@ class CountAddressTypesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countAddressTypes(StageType.Input)
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsAddressTypesResponse(0, 0, 0, 0))
+        Assertions.assertThat(response).isEqualTo(StatsAddressTypesV7Response(0, 0, 0, 0))
     }
 
     /**
@@ -58,7 +58,7 @@ class CountAddressTypesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countAddressTypes(StageType.Input)
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsAddressTypesResponse(3, 0, 0, 0))
+        Assertions.assertThat(response).isEqualTo(StatsAddressTypesV7Response(3, 0, 0, 0))
     }
 
     /**
@@ -77,7 +77,7 @@ class CountAddressTypesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countAddressTypes(StageType.Input)
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsAddressTypesResponse(0, 3, 0, 0))
+        Assertions.assertThat(response).isEqualTo(StatsAddressTypesV7Response(0, 3, 0, 0))
     }
 
     /**
@@ -96,7 +96,7 @@ class CountAddressTypesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countAddressTypes(StageType.Input)
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsAddressTypesResponse(0, 0, 3, 0))
+        Assertions.assertThat(response).isEqualTo(StatsAddressTypesV7Response(0, 0, 3, 0))
     }
 
     /**
@@ -115,7 +115,7 @@ class CountAddressTypesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countAddressTypes(StageType.Input)
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsAddressTypesResponse(0, 0, 0, 3))
+        Assertions.assertThat(response).isEqualTo(StatsAddressTypesV7Response(0, 0, 0, 3))
     }
 
     private fun createInputOfType(seed: String, addressType: AddressType) {

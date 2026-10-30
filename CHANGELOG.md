@@ -11,6 +11,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Breaking
 
 - BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
+- BPDM Gate: The `bpdm-gate-api` module keeps its V6 and V7 types in separate `v6` and `v7` packages, and every type carries its API version in its name (e.g. `BusinessPartnerInputV7Request`, `GateV7Client`, `DefaultGateV7Client`). Code built against the module must update its imports and type names. The HTTP contract is unchanged; only the schema names in the OpenAPI documents change.
 
 ### Added
 

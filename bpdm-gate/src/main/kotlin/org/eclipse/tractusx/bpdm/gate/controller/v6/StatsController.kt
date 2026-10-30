@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.v6.StatsApi
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsAddressTypesResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsStagesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.StatsV6Api
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsAddressTypesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsStagesV6Response
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6StatsMapper
 import org.eclipse.tractusx.bpdm.gate.service.application.StatsReadApplicationService
@@ -35,25 +35,25 @@ import org.springframework.web.bind.annotation.RestController
 class StatsController(
     private val statsReadApplicationService: StatsReadApplicationService,
     private val apiV6StatsMapper: ApiV6StatsMapper
-) : StatsApi {
+) : StatsV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
-    override fun countPartnersBySharingState(): StatsSharingStatesResponse {
+    override fun countPartnersBySharingState(): StatsSharingStatesV6Response {
         return apiV6StatsMapper.toDto(statsReadApplicationService.countSharingStates())
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
-    override fun countPartnersPerStage(): StatsStagesResponse {
+    override fun countPartnersPerStage(): StatsStagesV6Response {
         return apiV6StatsMapper.toDto(statsReadApplicationService.countStages())
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
-    override fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
+    override fun countAddressTypes(stage: StageType): StatsAddressTypesV6Response {
         return apiV6StatsMapper.toDto(statsReadApplicationService.countAddressTypes(stage))
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
-    override fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse {
+    override fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaV6Response {
         return apiV6StatsMapper.toDto(statsReadApplicationService.summarizeConfidenceCriteria())
     }
 }

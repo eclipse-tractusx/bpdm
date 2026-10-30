@@ -47,17 +47,17 @@ class ApiV7BusinessPartnerMapper {
     /**
      * Returns the API response for [record].
      */
-    fun toDto(record: BusinessPartnerInputRecord): BusinessPartnerInputDto {
+    fun toDto(record: BusinessPartnerInputRecord): BusinessPartnerInputV7Dto {
         val content = record.content
-        return BusinessPartnerInputDto(
+        return BusinessPartnerInputV7Dto(
             externalId = record.externalId,
             nameParts = content.nameParts,
-            identifiers = content.identifiers.map { BusinessPartnerIdentifierDto(type = it.type, value = it.value, issuingBody = it.issuingBody) },
+            identifiers = content.identifiers.map { BusinessPartnerIdentifierV7Dto(type = it.type, value = it.value, issuingBody = it.issuingBody) },
             states = toStateDtos(content.states, BusinessPartnerType.GENERIC),
             roles = content.roles,
             isOwnCompanyData = content.isOwnCompanyData,
             legalEntity = with(content.legalEntity) {
-                LegalEntityRepresentationInputDto(
+                LegalEntityRepresentationInputV7Dto(
                     legalEntityBpn = bpn,
                     legalName = legalName,
                     shortName = shortName,
@@ -67,24 +67,24 @@ class ApiV7BusinessPartnerMapper {
                     states = toStateDtos(content.states, BusinessPartnerType.LEGAL_ENTITY)
                 )
             },
-            site = SiteRepresentationInputDto(
+            site = SiteRepresentationInputV7Dto(
                 siteBpn = content.site.bpn,
                 name = content.site.name,
                 states = toStateDtos(content.states, BusinessPartnerType.SITE)
             ),
             address = with(content.address) {
-                AddressRepresentationInputDto(
+                AddressRepresentationInputV7Dto(
                     addressBpn = bpn,
                     name = name,
                     addressType = addressType,
-                    physicalPostalAddress = physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressDto(),
+                    physicalPostalAddress = physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV7Dto(),
                     alternativePostalAddress = alternativePostalAddress?.let(::toDto),
                     states = toStateDtos(content.states, BusinessPartnerType.ADDRESS)
                 )
             },
             externalSequenceTimestamp = record.externalSequenceTimestamp,
             scriptVariants = content.scriptVariants.map(::toDto),
-            additionalSites = content.additionalSites.map { AdditionalSiteInputDto(siteBpn = it.bpn, name = it.name) },
+            additionalSites = content.additionalSites.map { AdditionalSiteInputV7Dto(siteBpn = it.bpn, name = it.name) },
             createdAt = record.createdAt,
             updatedAt = record.updatedAt
         )
@@ -92,13 +92,13 @@ class ApiV7BusinessPartnerMapper {
 
     private fun toStateDtos(states: Collection<BusinessPartnerInputContentParsed.State>, businessPartnerType: BusinessPartnerType) =
         states.filter { it.businessPartnerType == businessPartnerType }
-            .map { BusinessPartnerStateDto(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
+            .map { BusinessPartnerStateV7Dto(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
 
     /**
      * Returns the API response for [record].
      */
-    fun toDto(record: BusinessPartnerOutputRecord): BusinessPartnerOutputDto =
-        BusinessPartnerOutputDto(
+    fun toDto(record: BusinessPartnerOutputRecord): BusinessPartnerOutputV7Dto =
+        BusinessPartnerOutputV7Dto(
             externalId = record.externalId,
             nameParts = record.nameParts,
             identifiers = record.identifiers.map(::toDto),
@@ -110,13 +110,13 @@ class ApiV7BusinessPartnerMapper {
             address = toDto(record.address),
             externalSequenceTimestamp = record.externalSequenceTimestamp,
             scriptVariants = record.scriptVariants.map(::toDto),
-            additionalSites = record.additionalSites.map { AdditionalSiteOutputDto(siteBpn = it.siteBpn, name = it.name) },
+            additionalSites = record.additionalSites.map { AdditionalSiteOutputV7Dto(siteBpn = it.siteBpn, name = it.name) },
             createdAt = record.createdAt,
             updatedAt = record.updatedAt
         )
 
     private fun toDto(legalEntity: BusinessPartnerOutputRecord.LegalEntity) =
-        LegalEntityRepresentationOutputDto(
+        LegalEntityRepresentationOutputV7Dto(
             legalEntityBpn = legalEntity.bpn,
             legalName = legalEntity.legalName,
             shortName = legalEntity.shortName,
@@ -125,68 +125,68 @@ class ApiV7BusinessPartnerMapper {
             ownershipUltimate = legalEntity.ownershipUltimate,
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
             states = legalEntity.states.map(::toDto),
-            goldenRecordRelations = legalEntity.goldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toDto(it.type), it.sourceBpn, it.targetBpn) },
+            goldenRecordRelations = legalEntity.goldenRecordRelations.map { LegalEntityGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = legalEntity.updatedAt ?: Instant.EPOCH
         )
 
     private fun toDto(site: BusinessPartnerOutputRecord.Site) =
-        SiteRepresentationOutputDto(
+        SiteRepresentationOutputV7Dto(
             siteBpn = site.bpn,
             name = site.name,
             confidenceCriteria = toDto(site.confidence),
             states = site.states.map(::toDto),
-            goldenRecordRelations = site.goldenRecordRelations.map { SiteGoldenRecordRelationDto(toDto(it.type), it.sourceBpn, it.targetBpn) },
+            goldenRecordRelations = site.goldenRecordRelations.map { SiteGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = site.updatedAt ?: Instant.EPOCH
         )
 
     private fun toDto(address: BusinessPartnerOutputRecord.Address) =
-        AddressComponentOutputDto(
+        AddressComponentOutputV7Dto(
             addressBpn = address.bpn,
             name = address.name,
             addressType = address.addressType,
-            physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressDto(),
+            physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV7Dto(),
+            alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressV7Dto(),
             confidenceCriteria = toDto(address.confidence),
             states = address.states.map(::toDto),
-            goldenRecordRelations = address.goldenRecordRelations.map { AddressGoldenRecordRelationDto(toDto(it.type), it.sourceBpn, it.targetBpn) },
+            goldenRecordRelations = address.goldenRecordRelations.map { AddressGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = address.updatedAt ?: Instant.EPOCH
         )
 
     private fun toDto(type: LegalEntityGoldenRecordRelationType) =
         when (type) {
-            LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeDto.IsAlternativeHeadquarterFor
-            LegalEntityGoldenRecordRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeDto.IsManagedBy
-            LegalEntityGoldenRecordRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeDto.IsOwnedBy
-            LegalEntityGoldenRecordRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationTypeDto.IsReplacedBy
+            LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeV7Dto.IsAlternativeHeadquarterFor
+            LegalEntityGoldenRecordRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeV7Dto.IsManagedBy
+            LegalEntityGoldenRecordRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeV7Dto.IsOwnedBy
+            LegalEntityGoldenRecordRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationTypeV7Dto.IsReplacedBy
         }
 
     private fun toDto(type: SiteGoldenRecordRelationType) =
         when (type) {
-            SiteGoldenRecordRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeDto.IsReplacedBy
+            SiteGoldenRecordRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeV7Dto.IsReplacedBy
         }
 
     private fun toDto(type: AddressGoldenRecordRelationType) =
         when (type) {
-            AddressGoldenRecordRelationType.IsReplacedBy -> AddressGoldenRecordRelationTypeDto.IsReplacedBy
+            AddressGoldenRecordRelationType.IsReplacedBy -> AddressGoldenRecordRelationTypeV7Dto.IsReplacedBy
         }
 
     /**
      * Returns the API form of an identifier.
      */
     fun toDto(identifier: IdentifierRaw) =
-        BusinessPartnerIdentifierDto(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody)
+        BusinessPartnerIdentifierV7Dto(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody)
 
     /**
      * Returns the API form of a business state.
      */
     fun toDto(state: StateRaw) =
-        BusinessPartnerStateDto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
+        BusinessPartnerStateV7Dto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
 
     /**
      * Returns the API form of confidence criteria.
      */
     fun toDto(confidence: ConfidenceCriteriaRaw) =
-        ConfidenceCriteriaDto(
+        ConfidenceCriteriaV7Dto(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             numberOfSharingMembers = confidence.numberOfSharingMembers,
@@ -199,7 +199,7 @@ class ApiV7BusinessPartnerMapper {
      * Returns the API form of a physical postal address.
      */
     fun toDto(address: BusinessPartnerValuesRaw.PhysicalPostalAddress) =
-        PhysicalPostalAddressDto(
+        PhysicalPostalAddressV7Dto(
             geographicCoordinates = address.geographicCoordinates?.let(::toDto),
             country = address.country,
             administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -221,7 +221,7 @@ class ApiV7BusinessPartnerMapper {
      * Returns the API form of an alternative postal address.
      */
     fun toDto(address: BusinessPartnerValuesRaw.AlternativePostalAddress) =
-        AlternativePostalAddressDto(
+        AlternativePostalAddressV7Dto(
             geographicCoordinates = address.geographicCoordinates?.let(::toDto),
             country = address.country,
             administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -233,7 +233,7 @@ class ApiV7BusinessPartnerMapper {
         )
 
     private fun toDto(street: StreetRaw) =
-        StreetDto(
+        StreetV7Dto(
             namePrefix = street.namePrefix,
             additionalNamePrefix = street.additionalNamePrefix,
             name = street.name,
@@ -252,19 +252,19 @@ class ApiV7BusinessPartnerMapper {
      * Returns the API form of a script variant.
      */
     fun toDto(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
-        BusinessPartnerScriptVariantDto(
+        BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptVariant.scriptCode,
             nameParts = scriptVariant.nameParts,
-            legalEntity = LegalEntityScriptVariantDto(legalName = scriptVariant.legalName, shortName = scriptVariant.shortName),
-            site = SiteScriptVariantDto(name = scriptVariant.siteName),
-            address = AddressScriptVariantDto(
+            legalEntity = LegalEntityScriptVariantV7Dto(legalName = scriptVariant.legalName, shortName = scriptVariant.shortName),
+            site = SiteScriptVariantV7Dto(name = scriptVariant.siteName),
+            address = AddressScriptVariantV7Dto(
                 name = scriptVariant.addressName,
                 physicalAddress = with(scriptVariant.physicalAddress) {
-                    PhysicalAddressScriptVariantDto(
+                    PhysicalAddressScriptVariantV7Dto(
                         city = city,
                         district = district,
                         street = with(street) {
-                            StreetScriptVariantDto(
+                            StreetScriptVariantV7Dto(
                                 name = name,
                                 direction = direction,
                                 namePrefix = namePrefix,
@@ -279,7 +279,7 @@ class ApiV7BusinessPartnerMapper {
                         door = door
                     )
                 },
-                alternativeAddress = scriptVariant.alternativeAddressCity?.let { AlternativeAddressScriptVariantDto(city = it) }
+                alternativeAddress = scriptVariant.alternativeAddressCity?.let { AlternativeAddressScriptVariantV7Dto(city = it) }
             )
         )
 

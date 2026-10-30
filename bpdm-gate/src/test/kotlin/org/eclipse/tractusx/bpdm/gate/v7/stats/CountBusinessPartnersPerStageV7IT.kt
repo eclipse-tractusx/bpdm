@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.stats
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsStagesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.StatsStagesV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -37,7 +37,7 @@ class CountBusinessPartnersPerStageV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countPartnersPerStage()
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsStagesResponse(0, 0))
+        Assertions.assertThat(response).isEqualTo(StatsStagesV7Response(0, 0))
     }
 
     /**
@@ -56,6 +56,6 @@ class CountBusinessPartnersPerStageV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countPartnersPerStage()
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsStagesResponse(3, 0))
+        Assertions.assertThat(response).isEqualTo(StatsStagesV7Response(3, 0))
     }
 }

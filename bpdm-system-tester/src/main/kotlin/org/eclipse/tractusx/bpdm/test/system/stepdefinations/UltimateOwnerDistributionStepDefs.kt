@@ -23,7 +23,7 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
@@ -114,7 +114,7 @@ class UltimateOwnerDistributionStepDefs(
             .isEqualTo(expectedBpnl)
     }
 
-    private fun outputOf(recordId: String): BusinessPartnerOutputDto {
+    private fun outputOf(recordId: String): BusinessPartnerOutputV7Dto {
         val runId = context.runId(recordId)
         val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)

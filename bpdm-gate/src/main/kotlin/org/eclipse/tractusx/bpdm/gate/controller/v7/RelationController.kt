@@ -23,11 +23,11 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationApi
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.RelationPutResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationV7Api
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.RelationPutV7Response
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException
@@ -48,13 +48,13 @@ class RelationController(
     private val inputUpsertApplicationService: RelationInputUpsertApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7RelationMapper: ApiV7RelationMapper,
-): GateRelationApi {
+): GateRelationV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
     override fun postSearch(
-        searchRequest: RelationSearchRequest,
+        searchRequest: RelationSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<RelationDto> {
+    ): PageDto<RelationV7Dto> {
         val request = RelationInputSearchRaw(
             externalIds = searchRequest.externalIds,
             relationType = searchRequest.relationType?.let(apiV7InboundMapper::toModel),
@@ -69,12 +69,12 @@ class RelationController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun put(
         createIfNotExist: Boolean,
-        requestBody: RelationPutRequest
-    ): RelationPutResponse {
+        requestBody: RelationPutV7Request
+    ): RelationPutV7Response {
         val requests = requestBody.relations.map(apiV7InboundMapper::toUpsertRequest)
         val mode = if (createIfNotExist) RelationInputUpsertMode.CreateOrUpdate else RelationInputUpsertMode.UpdateOnly
         return when (val result = inputUpsertApplicationService.upsert(requests, tenantResolver.resolveTenantBpnl().value, mode)) {
-            is RelationInputUpsertResult.Written -> RelationPutResponse(result.relations.map(apiV7RelationMapper::toDto))
+            is RelationInputUpsertResult.Written -> RelationPutV7Response(result.relations.map(apiV7RelationMapper::toDto))
             is RelationInputUpsertResult.Rejected -> throw BpdmRelationInputUpsertException(result.errors.map(apiV7RelationMapper::toMessage))
         }
     }

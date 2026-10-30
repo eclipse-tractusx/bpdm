@@ -14,15 +14,15 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType as RelationTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerScriptVariantV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.BusinessPartnerStateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerInputUpsertRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.GeoCoordinateRaw
@@ -41,7 +41,7 @@ class ApiV6InboundMapper {
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [request].
      */
-    fun toUpsertIn(request: BusinessPartnerInputRequest): BusinessPartnerInputUpsertRaw =
+    fun toUpsertIn(request: BusinessPartnerInputV6Request): BusinessPartnerInputUpsertRaw =
         BusinessPartnerInputUpsertRaw(
             externalId = request.externalId,
             nameParts = request.nameParts,
@@ -76,10 +76,10 @@ class ApiV6InboundMapper {
             additionalSites = request.additionalSites.map { BusinessPartnerValuesRaw.AdditionalSite(bpn = it.siteBpn, name = it.name) }
         )
 
-    private fun toStates(states: Collection<BusinessPartnerStateDto>) =
+    private fun toStates(states: Collection<BusinessPartnerStateV6Dto>) =
         states.map { BusinessPartnerInputUpsertRaw.State(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
 
-    private fun toValue(address: PhysicalPostalAddressDto) =
+    private fun toValue(address: PhysicalPostalAddressV6Dto) =
         with(address) {
             BusinessPartnerValuesRaw.PhysicalPostalAddress(
                 geographicCoordinates = geographicCoordinates?.let(::toValue),
@@ -100,7 +100,7 @@ class ApiV6InboundMapper {
             )
         }
 
-    private fun toValue(address: AlternativePostalAddressDto) =
+    private fun toValue(address: AlternativePostalAddressV6Dto) =
         with(address) {
             BusinessPartnerValuesRaw.AlternativePostalAddress(
                 geographicCoordinates = geographicCoordinates?.let(::toValue),
@@ -114,7 +114,7 @@ class ApiV6InboundMapper {
             )
         }
 
-    private fun toValue(street: StreetDto) =
+    private fun toValue(street: StreetV6Dto) =
         with(street) {
             StreetRaw(
                 namePrefix = namePrefix,
@@ -132,7 +132,7 @@ class ApiV6InboundMapper {
     private fun toValue(coordinate: GeoCoordinateDto) =
         GeoCoordinateRaw(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
 
-    private fun toValue(scriptVariant: BusinessPartnerScriptVariantDto) =
+    private fun toValue(scriptVariant: BusinessPartnerScriptVariantV6Dto) =
         with(scriptVariant) {
             BusinessPartnerValuesRaw.ScriptVariant(
                 scriptCode = scriptCode,
@@ -161,7 +161,7 @@ class ApiV6InboundMapper {
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [entry].
      */
-    fun toUpsertRequest(entry: RelationPutEntryV6): RelationInputUpsertRaw =
+    fun toUpsertRequest(entry: RelationPutV6Entry): RelationInputUpsertRaw =
         RelationInputUpsertRaw(
             externalId = entry.externalId,
             relationType = toModel(entry.relationType),
@@ -174,7 +174,7 @@ class ApiV6InboundMapper {
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [request].
      */
-    fun toUpsertRequest(request: RelationPostRequest): RelationInputUpsertRaw =
+    fun toUpsertRequest(request: RelationPostV6Request): RelationInputUpsertRaw =
         RelationInputUpsertRaw(
             externalId = request.externalId,
             relationType = toModel(request.relationType),
@@ -187,11 +187,11 @@ class ApiV6InboundMapper {
     /**
      * Returns the Gate's relation input type for [relationType].
      */
-    fun toModel(relationType: RelationTypeDto): RelationType =
+    fun toModel(relationType: RelationTypeV6): RelationType =
         when (relationType) {
-            RelationTypeDto.IsManagedBy -> RelationType.IsManagedBy
-            RelationTypeDto.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            RelationTypeDto.IsOwnedBy -> RelationType.IsOwnedBy
-            RelationTypeDto.IsReplacedBy -> RelationType.IsReplacedBy
+            RelationTypeV6.IsManagedBy -> RelationType.IsManagedBy
+            RelationTypeV6.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            RelationTypeV6.IsOwnedBy -> RelationType.IsOwnedBy
+            RelationTypeV6.IsReplacedBy -> RelationType.IsReplacedBy
         }
 }

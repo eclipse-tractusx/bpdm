@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.test.system.config
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.BusinessPartnerApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.ChangelogApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.PartnerUploadApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationChangelogApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationOutputApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationSharingStateApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.SharingStateApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.StatsApiClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.BusinessPartnerV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.ChangelogV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.PartnerUploadV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationChangelogV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationOutputV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationSharingStateV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.SharingStateV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.StatsV7ApiClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchV7Request
 
 /**
  * Sends every Gate call with whichever of two configured credentials is permitted to make it.
@@ -41,36 +41,36 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchReques
  * company, as the Gate scopes what a read returns by the BPNL of the token that made it.
  */
 class RoleSplitGateClient(
-    private val inputCredential: GateClient,
-    private val outputCredential: GateClient
-) : GateClient {
+    private val inputCredential: GateV7Client,
+    private val outputCredential: GateV7Client
+) : GateV7Client {
 
-    override val businessParters: BusinessPartnerApiClient = SplitBusinessPartnerApiClient(inputCredential, outputCredential)
+    override val businessParters: BusinessPartnerV7ApiClient = SplitBusinessPartnerApiClient(inputCredential, outputCredential)
 
-    override val changelog: ChangelogApiClient = SplitChangelogApiClient(inputCredential, outputCredential)
+    override val changelog: ChangelogV7ApiClient = SplitChangelogApiClient(inputCredential, outputCredential)
 
-    override val relationChangelog: RelationChangelogApiClient = SplitRelationChangelogApiClient(inputCredential, outputCredential)
+    override val relationChangelog: RelationChangelogV7ApiClient = SplitRelationChangelogApiClient(inputCredential, outputCredential)
 
-    override val sharingState: SharingStateApiClient get() = inputCredential.sharingState
+    override val sharingState: SharingStateV7ApiClient get() = inputCredential.sharingState
 
-    override val stats: StatsApiClient get() = inputCredential.stats
+    override val stats: StatsV7ApiClient get() = inputCredential.stats
 
-    override val partnerUpload: PartnerUploadApiClient get() = inputCredential.partnerUpload
+    override val partnerUpload: PartnerUploadV7ApiClient get() = inputCredential.partnerUpload
 
-    override val relation: RelationApiClient get() = inputCredential.relation
+    override val relation: RelationV7ApiClient get() = inputCredential.relation
 
-    override val relationSharingState: RelationSharingStateApiClient get() = inputCredential.relationSharingState
+    override val relationSharingState: RelationSharingStateV7ApiClient get() = inputCredential.relationSharingState
 
-    override val relationOutput: RelationOutputApiClient get() = outputCredential.relationOutput
+    override val relationOutput: RelationOutputV7ApiClient get() = outputCredential.relationOutput
 }
 
 /** Splits the business partner API, whose input and output endpoints fall to different credentials. */
 private class SplitBusinessPartnerApiClient(
-    private val inputCredential: GateClient,
-    private val outputCredential: GateClient
-) : BusinessPartnerApiClient {
+    private val inputCredential: GateV7Client,
+    private val outputCredential: GateV7Client
+) : BusinessPartnerV7ApiClient {
 
-    override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>) =
+    override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputV7Request>) =
         inputCredential.businessParters.upsertBusinessPartnersInput(businessPartners)
 
     override fun getBusinessPartnersInput(externalIds: Collection<String>?, paginationRequest: PaginationRequest) =
@@ -82,26 +82,26 @@ private class SplitBusinessPartnerApiClient(
 
 /** Splits the business partner changelog API, whose input and output searches fall to different credentials. */
 private class SplitChangelogApiClient(
-    private val inputCredential: GateClient,
-    private val outputCredential: GateClient
-) : ChangelogApiClient {
+    private val inputCredential: GateV7Client,
+    private val outputCredential: GateV7Client
+) : ChangelogV7ApiClient {
 
-    override fun getInputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest) =
+    override fun getInputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
         inputCredential.changelog.getInputChangelog(paginationRequest, searchRequest)
 
-    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest) =
+    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
         outputCredential.changelog.getOutputChangelog(paginationRequest, searchRequest)
 }
 
 /** Splits the relation changelog API, whose input and output searches fall to different credentials. */
 private class SplitRelationChangelogApiClient(
-    private val inputCredential: GateClient,
-    private val outputCredential: GateClient
-) : RelationChangelogApiClient {
+    private val inputCredential: GateV7Client,
+    private val outputCredential: GateV7Client
+) : RelationChangelogV7ApiClient {
 
-    override fun getInputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest) =
+    override fun getInputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
         inputCredential.relationChangelog.getInputChangelog(paginationRequest, searchRequest)
 
-    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest) =
+    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
         outputCredential.relationChangelog.getOutputChangelog(paginationRequest, searchRequest)
 }

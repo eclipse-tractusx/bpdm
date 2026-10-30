@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 
@@ -76,7 +76,7 @@ class FindBusinessPartnerInputV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.businessPartners.getBusinessPartnersInput(listOf("NOT_EXISTS"))
 
         //THEN
-        val expected = PageDto<BusinessPartnerInputDto>(0, 0, 0, 0, emptyList())
+        val expected = PageDto<BusinessPartnerInputV6Dto>(0, 0, 0, 0, emptyList())
         assertRepo.assertBusinessPartnerInput(response, expected)
     }
 

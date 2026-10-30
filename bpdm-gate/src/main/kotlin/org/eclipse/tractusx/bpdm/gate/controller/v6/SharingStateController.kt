@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateV6Api
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6SharingStateMapper
@@ -44,20 +44,20 @@ class SharingStateController(
     private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
     private val apiV6SharingStateMapper: ApiV6SharingStateMapper,
     private val tenantResolver: TenantResolver
-): GateSharingStateApi {
+): GateSharingStateV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageDto<SharingStateDto> {
+    ): PageDto<SharingStateV6Dto> {
         val request = SharingStateSearchRaw(externalIds, sharingStateTypes = null, updatedAfter = null)
         return sharingStateSearchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(apiV6SharingStateMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
-    override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
+    override fun postSharingStateReady(request: PostSharingStateReadyV6Request) {
         val readyRequest = SharingStateReadyRaw(request.externalIds)
         when (val result = sharingStateReadyApplicationService.setReady(readyRequest, tenantResolver.currentUserBpn())) {
             is SharingStateReadyResult.Readied -> Unit

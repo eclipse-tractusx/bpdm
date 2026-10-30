@@ -26,16 +26,16 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.util.OpenApiSchemaExample
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.*
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputV7Dto
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 object BusinessPartnerInputRequestValues {
     private val now = LocalDateTime.now()
-    private val state = BusinessPartnerStateDto(
+    private val state = BusinessPartnerStateV7Dto(
         validFrom = now,
         validTo = now,
         type = BusinessStateType.ACTIVE
@@ -47,7 +47,7 @@ object BusinessPartnerInputRequestValues {
         altitude = 0.1
     )
 
-    private val street = StreetDto(
+    private val street = StreetV7Dto(
         namePrefix = "string",
         additionalNamePrefix = "string",
         name = "string",
@@ -59,7 +59,7 @@ object BusinessPartnerInputRequestValues {
         direction = "string"
     )
 
-    private val scriptVariantStreet = StreetScriptVariantDto(
+    private val scriptVariantStreet = StreetScriptVariantV7Dto(
         namePrefix = "string",
         additionalNamePrefix = "string",
         name = "string",
@@ -68,11 +68,11 @@ object BusinessPartnerInputRequestValues {
         direction = "string"
     )
 
-    val businessPartnerInputRequest = BusinessPartnerInputRequest(
+    val businessPartnerInputRequest = BusinessPartnerInputV7Request(
         externalId = "MB01",
         nameParts = listOf(""),
         identifiers = listOf(
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifierV7Dto(
                 type = "EU_VAT_ID_DE",
                 value = "LEGAL_ENTITY",
                 issuingBody = "string"
@@ -81,19 +81,19 @@ object BusinessPartnerInputRequestValues {
         states = listOf(state),
         roles = listOf(BusinessPartnerRole.SUPPLIER),
         isOwnCompanyData = true,
-        legalEntity = LegalEntityRepresentationInputDto(
+        legalEntity = LegalEntityRepresentationInputV7Dto(
             legalEntityBpn = null,
             legalName = "MBRDI",
             shortName = "",
             legalForm = "1EQC",
             states = listOf(state)
         ),
-        site = SiteRepresentationInputDto(),
-        address = AddressRepresentationInputDto(
+        site = SiteRepresentationInputV7Dto(),
+        address = AddressRepresentationInputV7Dto(
             addressBpn = null,
             name = "string",
             addressType = null,
-            physicalPostalAddress = PhysicalPostalAddressDto(
+            physicalPostalAddress = PhysicalPostalAddressV7Dto(
                 geographicCoordinates = geoCoordinate,
                 country = CountryCode.UNDEFINED.alpha2,
                 administrativeAreaLevel1 = "AD-02",
@@ -110,7 +110,7 @@ object BusinessPartnerInputRequestValues {
                 door = "string",
                 taxJurisdictionCode = "string"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
+            alternativePostalAddress = AlternativePostalAddressV7Dto(
                 geographicCoordinates = geoCoordinate,
                 country = CountryCode.UNDEFINED.alpha2,
                 administrativeAreaLevel1 = "AD-02",
@@ -124,17 +124,17 @@ object BusinessPartnerInputRequestValues {
         ),
         externalSequenceTimestamp = now.toInstant(ZoneOffset.UTC),
         scriptVariants = listOf(
-            BusinessPartnerScriptVariantDto(
+            BusinessPartnerScriptVariantV7Dto(
                 scriptCode = "string",
                 nameParts = listOf("string"),
-                legalEntity = LegalEntityScriptVariantDto(
+                legalEntity = LegalEntityScriptVariantV7Dto(
                     legalName = "string",
                     shortName = "string"
                 ),
-                site = SiteScriptVariantDto(name = "string"),
-                address = AddressScriptVariantDto(
+                site = SiteScriptVariantV7Dto(name = "string"),
+                address = AddressScriptVariantV7Dto(
                     name = "string",
-                    physicalAddress = PhysicalAddressScriptVariantDto(
+                    physicalAddress = PhysicalAddressScriptVariantV7Dto(
                         city = "string",
                         district = "string",
                         street = scriptVariantStreet,
@@ -143,7 +143,7 @@ object BusinessPartnerInputRequestValues {
                         floor = "string",
                         door = "string"
                     ),
-                    alternativeAddress = AlternativeAddressScriptVariantDto(
+                    alternativeAddress = AlternativeAddressScriptVariantV7Dto(
                         city = "string"
                     )
                 )
@@ -152,7 +152,7 @@ object BusinessPartnerInputRequestValues {
     )
 
     val businessPartnerInputRequestExample = OpenApiSchemaExample(
-        schemaName = "BusinessPartnerInputRequest",
+        schemaName = "BusinessPartnerInputV7Request",
         example = businessPartnerInputRequest
     )
 }

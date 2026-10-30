@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorResponse
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.PostSharingStateReadyV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -45,12 +45,12 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
         testDataClient.businessPartner.upsertInput(testName)
 
         //WHEN
-        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(testName)))
 
         //THEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(testName))
 
-        val expectedState = SharingStateDto(externalId = testName, sharingStateType = SharingStateType.Ready, updatedAt = Instant.MIN)
+        val expectedState = SharingStateV7Dto(externalId = testName, sharingStateType = SharingStateTypeV7.Ready, updatedAt = Instant.MIN)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedState))
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }
@@ -64,11 +64,11 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     fun `try ready already ready business partner`() {
         //GIVEN
         testDataClient.businessPartner.upsertInput(testName)
-        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(testName)))
 
         //WHEN THEN
         Assertions.assertThatThrownBy {
-            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
+            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(testName)))
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
@@ -81,7 +81,7 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     fun `try ready unknown business partner`() {
         //WHEN THEN
         Assertions.assertThatThrownBy {
-            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
+            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(testName)))
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
@@ -99,11 +99,11 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = assertThrows<WebClientResponseException.BadRequest> {
-            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(readyExternalId, unknownExternalId)))
+            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(readyExternalId, unknownExternalId)))
         }
 
         //THEN
-        assertRepo.assertErrorPerExternalId(response.getResponseBodyAs(GateErrorResponse::class.java)!!, listOf(readyExternalId, unknownExternalId))
+        assertRepo.assertErrorPerExternalId(response.getResponseBodyAs(GateErrorV7Response::class.java)!!, listOf(readyExternalId, unknownExternalId))
     }
 
     /**
@@ -118,13 +118,13 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         assertThrows<WebClientResponseException.BadRequest> {
-            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName, "$testName unknown")))
+            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(testName, "$testName unknown")))
         }
 
         //THEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(testName))
 
-        val expectedState = SharingStateDto(externalId = testName, sharingStateType = SharingStateType.Initial, updatedAt = Instant.MIN)
+        val expectedState = SharingStateV7Dto(externalId = testName, sharingStateType = SharingStateTypeV7.Initial, updatedAt = Instant.MIN)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedState))
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }

@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
 
 
-fun BusinessPartnerInputRequest.withoutAlternativeAddressScriptVariants() =
+fun BusinessPartnerInputV7Request.withoutAlternativeAddressScriptVariants() =
     copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.copy(alternativeAddress = null)) })

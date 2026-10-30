@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
@@ -57,7 +57,7 @@ class GateTestDataV6Config {
     @Bean
     fun gateTestDataClientV6(
         testDataFactory: GateTestDataFactoryV6,
-        operatorClient: GateClientV6,
+        operatorClient: GateV6Client,
         orchestratorMockDataFactory: OrchestratorMockDataFactory,
         taskCreationService: GoldenRecordTaskCreationApplicationService,
         taskResolutionService: GoldenRecordTaskResolutionApplicationService,

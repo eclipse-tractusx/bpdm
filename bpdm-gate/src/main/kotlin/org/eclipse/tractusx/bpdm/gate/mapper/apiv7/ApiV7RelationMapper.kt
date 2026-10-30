@@ -13,14 +13,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateErrorCode as RelationSharingStateErrorCodeDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateType as RelationSharingStateTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType as RelationTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharableRelationType as SharableRelationTypeDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateErrorCodeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharableRelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationInputRecord
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationOutputRecord
 import org.eclipse.tractusx.bpdm.gate.model.output.relation.RelationSharingStateRecord
@@ -41,13 +41,13 @@ class ApiV7RelationMapper {
     /**
      * Returns the API relation for [record].
      */
-    fun toDto(record: RelationInputRecord): RelationDto =
-        RelationDto(
+    fun toDto(record: RelationInputRecord): RelationV7Dto =
+        RelationV7Dto(
             externalId = record.externalId,
             relationType = toDto(record.relationType),
             businessPartnerSourceExternalId = record.sourceExternalId,
             businessPartnerTargetExternalId = record.targetExternalId,
-            validityPeriods = record.validityPeriods.map { RelationValidityPeriodDto(validFrom = it.validFrom, validTo = it.validTo) },
+            validityPeriods = record.validityPeriods.map { RelationValidityPeriodV7Dto(validFrom = it.validFrom, validTo = it.validTo) },
             reasonCode = record.reasonCode,
             updatedAt = record.updatedAt,
             createdAt = record.createdAt
@@ -56,13 +56,13 @@ class ApiV7RelationMapper {
     /**
      * Returns the API relation output for [record].
      */
-    fun toDto(record: RelationOutputRecord): RelationOutputDto =
-        RelationOutputDto(
+    fun toDto(record: RelationOutputRecord): RelationOutputV7Dto =
+        RelationOutputV7Dto(
             externalId = record.externalId,
             relationType = toDto(record.relationType),
             sourceBpn = record.sourceBpn,
             targetBpn = record.targetBpn,
-            validityPeriods = record.validityPeriods.map { RelationValidityPeriodDto(validFrom = it.validFrom, validTo = it.validTo) },
+            validityPeriods = record.validityPeriods.map { RelationValidityPeriodV7Dto(validFrom = it.validFrom, validTo = it.validTo) },
             reasonCode = record.reasonCode,
             updatedAt = record.updatedAt
         )
@@ -70,8 +70,8 @@ class ApiV7RelationMapper {
     /**
      * Returns the API relation sharing state for [record].
      */
-    fun toDto(record: RelationSharingStateRecord): RelationSharingStateDto =
-        RelationSharingStateDto(
+    fun toDto(record: RelationSharingStateRecord): RelationSharingStateV7Dto =
+        RelationSharingStateV7Dto(
             externalId = record.externalId,
             sharingStateType = toDto(record.sharingStateType),
             sharingErrorCode = record.sharingErrorCode?.let(::toDto),
@@ -109,42 +109,42 @@ class ApiV7RelationMapper {
     /**
      * Returns the API relation type for the relation input type [relationType].
      */
-    fun toDto(relationType: RelationType): RelationTypeDto =
+    fun toDto(relationType: RelationType): RelationTypeV7 =
         when (relationType) {
-            RelationType.IsManagedBy -> RelationTypeDto.IsManagedBy
-            RelationType.IsAlternativeHeadquarterFor -> RelationTypeDto.IsAlternativeHeadquarterFor
-            RelationType.IsOwnedBy -> RelationTypeDto.IsOwnedBy
-            RelationType.IsReplacedBy -> RelationTypeDto.IsReplacedBy
+            RelationType.IsManagedBy -> RelationTypeV7.IsManagedBy
+            RelationType.IsAlternativeHeadquarterFor -> RelationTypeV7.IsAlternativeHeadquarterFor
+            RelationType.IsOwnedBy -> RelationTypeV7.IsOwnedBy
+            RelationType.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
 
     /**
      * Returns the API relation type for the relation output type [relationType].
      */
-    fun toDto(relationType: SharableRelationType): SharableRelationTypeDto =
+    fun toDto(relationType: SharableRelationType): SharableRelationTypeV7 =
         when (relationType) {
-            SharableRelationType.IsAlternativeHeadquarterFor -> SharableRelationTypeDto.IsAlternativeHeadquarterFor
-            SharableRelationType.IsManagedBy -> SharableRelationTypeDto.IsManagedBy
-            SharableRelationType.IsOwnedBy -> SharableRelationTypeDto.IsOwnedBy
-            SharableRelationType.IsReplacedBy -> SharableRelationTypeDto.IsReplacedBy
+            SharableRelationType.IsAlternativeHeadquarterFor -> SharableRelationTypeV7.IsAlternativeHeadquarterFor
+            SharableRelationType.IsManagedBy -> SharableRelationTypeV7.IsManagedBy
+            SharableRelationType.IsOwnedBy -> SharableRelationTypeV7.IsOwnedBy
+            SharableRelationType.IsReplacedBy -> SharableRelationTypeV7.IsReplacedBy
         }
 
     /**
      * Returns the API relation sharing state type for [sharingStateType].
      */
-    fun toDto(sharingStateType: RelationSharingStateType): RelationSharingStateTypeDto =
+    fun toDto(sharingStateType: RelationSharingStateType): RelationSharingStateTypeV7 =
         when (sharingStateType) {
-            RelationSharingStateType.Ready -> RelationSharingStateTypeDto.Ready
-            RelationSharingStateType.Pending -> RelationSharingStateTypeDto.Pending
-            RelationSharingStateType.Error -> RelationSharingStateTypeDto.Error
-            RelationSharingStateType.Success -> RelationSharingStateTypeDto.Success
+            RelationSharingStateType.Ready -> RelationSharingStateTypeV7.Ready
+            RelationSharingStateType.Pending -> RelationSharingStateTypeV7.Pending
+            RelationSharingStateType.Error -> RelationSharingStateTypeV7.Error
+            RelationSharingStateType.Success -> RelationSharingStateTypeV7.Success
         }
 
     /**
      * Returns the API relation sharing error code for [errorCode].
      */
-    fun toDto(errorCode: RelationSharingStateErrorCode): RelationSharingStateErrorCodeDto =
+    fun toDto(errorCode: RelationSharingStateErrorCode): RelationSharingStateErrorCodeV7 =
         when (errorCode) {
-            RelationSharingStateErrorCode.SharingProcessError -> RelationSharingStateErrorCodeDto.SharingProcessError
-            RelationSharingStateErrorCode.SharingTimeout -> RelationSharingStateErrorCodeDto.SharingTimeout
+            RelationSharingStateErrorCode.SharingProcessError -> RelationSharingStateErrorCodeV7.SharingProcessError
+            RelationSharingStateErrorCode.SharingTimeout -> RelationSharingStateErrorCodeV7.SharingTimeout
         }
 }

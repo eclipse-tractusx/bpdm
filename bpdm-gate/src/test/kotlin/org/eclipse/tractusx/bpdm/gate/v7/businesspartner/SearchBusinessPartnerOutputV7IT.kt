@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -153,7 +153,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
         //THEN
-        val expectedAdditionalSites = goldenRecord.additionalSites.map { AdditionalSiteOutputDto(it.site.bpns, it.site.name) }
+        val expectedAdditionalSites = goldenRecord.additionalSites.map { AdditionalSiteOutputV7Dto(it.site.bpns, it.site.name) }
         val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(
             createdInput, goldenRecord.legalEntityParent, goldenRecord.siteParent, goldenRecord.additionalAddress, expectedAdditionalSites
         )
@@ -174,7 +174,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf("non-existing-external-id"))
 
         //THEN
-        val expectedResponse = PageDto(0, 0, 0, 0, emptyList<BusinessPartnerOutputDto>())
+        val expectedResponse = PageDto(0, 0, 0, 0, emptyList<BusinessPartnerOutputV7Dto>())
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
     }

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteInputV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -51,7 +51,7 @@ class BusinessPartnerShareActions(
         recordId: String,
         isOwnCompanyData: Boolean,
         contentSeed: String = recordId,
-        additionalSites: List<AdditionalSiteInputDto> = emptyList(),
+        additionalSites: List<AdditionalSiteInputV7Dto> = emptyList(),
         member: SharingMember = SharingMember.FIRST
     ) {
         val existingState = context.records[recordId]

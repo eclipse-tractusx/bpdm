@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.PageChangeLogV7Dto
 
 class PageChangeLogV7Factory {
 
-    fun ofOnePageWithoutInvalids(vararg entries: ChangelogGateDto): PageChangeLogDto<ChangelogGateDto>{
-        return PageChangeLogDto(entries.size.toLong(), 1, 0, entries.size, entries.toList(), 0, emptyList())
+    fun ofOnePageWithoutInvalids(vararg entries: ChangelogGateV7Dto): PageChangeLogV7Dto<ChangelogGateV7Dto>{
+        return PageChangeLogV7Dto(entries.size.toLong(), 1, 0, entries.size, entries.toList(), 0, emptyList())
     }
 }

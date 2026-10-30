@@ -43,17 +43,17 @@ class ApiV6BusinessPartnerMapper {
     /**
      * Returns the API response for [record].
      */
-    fun toDto(record: BusinessPartnerInputRecord): BusinessPartnerInputDto {
+    fun toDto(record: BusinessPartnerInputRecord): BusinessPartnerInputV6Dto {
         val content = record.content
-        return BusinessPartnerInputDto(
+        return BusinessPartnerInputV6Dto(
             externalId = record.externalId,
             nameParts = content.nameParts,
-            identifiers = content.identifiers.map { BusinessPartnerIdentifierDto(type = it.type, value = it.value, issuingBody = it.issuingBody) },
+            identifiers = content.identifiers.map { BusinessPartnerIdentifierV6Dto(type = it.type, value = it.value, issuingBody = it.issuingBody) },
             states = toStateDtos(content.states, BusinessPartnerType.GENERIC),
             roles = content.roles,
             isOwnCompanyData = content.isOwnCompanyData,
             legalEntity = with(content.legalEntity) {
-                LegalEntityRepresentationInputDto(
+                LegalEntityRepresentationInputV6Dto(
                     legalEntityBpn = bpn,
                     legalName = legalName,
                     shortName = shortName,
@@ -63,24 +63,24 @@ class ApiV6BusinessPartnerMapper {
                     states = toStateDtos(content.states, BusinessPartnerType.LEGAL_ENTITY)
                 )
             },
-            site = SiteRepresentationInputDto(
+            site = SiteRepresentationInputV6Dto(
                 siteBpn = content.site.bpn,
                 name = content.site.name,
                 states = toStateDtos(content.states, BusinessPartnerType.SITE)
             ),
             address = with(content.address) {
-                AddressRepresentationInputDto(
+                AddressRepresentationInputV6Dto(
                     addressBpn = bpn,
                     name = name,
                     addressType = addressType,
-                    physicalPostalAddress = physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressDto(),
+                    physicalPostalAddress = physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV6Dto(),
                     alternativePostalAddress = alternativePostalAddress?.let(::toDto),
                     states = toStateDtos(content.states, BusinessPartnerType.ADDRESS)
                 )
             },
             externalSequenceTimestamp = record.externalSequenceTimestamp,
             scriptVariants = content.scriptVariants.map(::toDto),
-            additionalSites = content.additionalSites.map { AdditionalSiteInputDto(siteBpn = it.bpn, name = it.name) },
+            additionalSites = content.additionalSites.map { AdditionalSiteInputV6Dto(siteBpn = it.bpn, name = it.name) },
             createdAt = record.createdAt,
             updatedAt = record.updatedAt
         )
@@ -88,13 +88,13 @@ class ApiV6BusinessPartnerMapper {
 
     private fun toStateDtos(states: Collection<BusinessPartnerInputContentParsed.State>, businessPartnerType: BusinessPartnerType) =
         states.filter { it.businessPartnerType == businessPartnerType }
-            .map { BusinessPartnerStateDto(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
+            .map { BusinessPartnerStateV6Dto(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
 
     /**
      * Returns the API response for [record].
      */
-    fun toDto(record: BusinessPartnerOutputRecord): BusinessPartnerOutputDto =
-        BusinessPartnerOutputDto(
+    fun toDto(record: BusinessPartnerOutputRecord): BusinessPartnerOutputV6Dto =
+        BusinessPartnerOutputV6Dto(
             externalId = record.externalId,
             nameParts = record.nameParts,
             identifiers = record.identifiers.map(::toDto),
@@ -110,7 +110,7 @@ class ApiV6BusinessPartnerMapper {
         )
 
     private fun toDto(legalEntity: BusinessPartnerOutputRecord.LegalEntity) =
-        LegalEntityRepresentationOutputDto(
+        LegalEntityRepresentationOutputV6Dto(
             legalEntityBpn = legalEntity.bpn,
             legalName = legalEntity.legalName,
             shortName = legalEntity.shortName,
@@ -120,7 +120,7 @@ class ApiV6BusinessPartnerMapper {
         )
 
     private fun toDto(site: BusinessPartnerOutputRecord.Site) =
-        SiteRepresentationOutputDto(
+        SiteRepresentationOutputV6Dto(
             siteBpn = site.bpn,
             name = site.name,
             confidenceCriteria = toDto(site.confidence),
@@ -128,24 +128,24 @@ class ApiV6BusinessPartnerMapper {
         )
 
     private fun toDto(address: BusinessPartnerOutputRecord.Address) =
-        AddressComponentOutputDto(
+        AddressComponentOutputV6Dto(
             addressBpn = address.bpn,
             name = address.name,
             addressType = address.addressType,
-            physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressDto(),
+            physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV6Dto(),
+            alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressV6Dto(),
             confidenceCriteria = toDto(address.confidence),
             states = address.states.map(::toDto)
         )
 
     private fun toDto(identifier: IdentifierRaw) =
-        BusinessPartnerIdentifierDto(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody)
+        BusinessPartnerIdentifierV6Dto(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody)
 
     private fun toDto(state: StateRaw) =
-        BusinessPartnerStateDto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
+        BusinessPartnerStateV6Dto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
 
     private fun toDto(confidence: ConfidenceCriteriaRaw) =
-        ConfidenceCriteriaDto(
+        ConfidenceCriteriaV6Dto(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             numberOfSharingMembers = confidence.numberOfSharingMembers,
@@ -155,7 +155,7 @@ class ApiV6BusinessPartnerMapper {
         )
 
     private fun toDto(address: BusinessPartnerValuesRaw.PhysicalPostalAddress) =
-        PhysicalPostalAddressDto(
+        PhysicalPostalAddressV6Dto(
             geographicCoordinates = address.geographicCoordinates?.let(::toDto),
             country = address.country,
             administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -174,7 +174,7 @@ class ApiV6BusinessPartnerMapper {
         )
 
     private fun toDto(address: BusinessPartnerValuesRaw.AlternativePostalAddress) =
-        AlternativePostalAddressDto(
+        AlternativePostalAddressV6Dto(
             geographicCoordinates = address.geographicCoordinates?.let(::toDto),
             country = address.country,
             administrativeAreaLevel1 = address.administrativeAreaLevel1,
@@ -186,7 +186,7 @@ class ApiV6BusinessPartnerMapper {
         )
 
     private fun toDto(street: StreetRaw) =
-        StreetDto(
+        StreetV6Dto(
             namePrefix = street.namePrefix,
             additionalNamePrefix = street.additionalNamePrefix,
             name = street.name,
@@ -202,19 +202,19 @@ class ApiV6BusinessPartnerMapper {
         GeoCoordinateDto(longitude = coordinate.longitude, latitude = coordinate.latitude, altitude = coordinate.altitude)
 
     private fun toDto(scriptVariant: BusinessPartnerValuesRaw.ScriptVariant) =
-        BusinessPartnerScriptVariantDto(
+        BusinessPartnerScriptVariantV6Dto(
             scriptCode = scriptVariant.scriptCode,
             nameParts = scriptVariant.nameParts,
-            legalEntity = LegalEntityScriptVariantDto(legalName = scriptVariant.legalName, shortName = scriptVariant.shortName),
-            site = SiteScriptVariantDto(name = scriptVariant.siteName),
-            address = AddressScriptVariantDto(
+            legalEntity = LegalEntityScriptVariantV6Dto(legalName = scriptVariant.legalName, shortName = scriptVariant.shortName),
+            site = SiteScriptVariantV6Dto(name = scriptVariant.siteName),
+            address = AddressScriptVariantV6Dto(
                 name = scriptVariant.addressName,
                 physicalAddress = with(scriptVariant.physicalAddress) {
-                    PhysicalAddressScriptVariantDto(
+                    PhysicalAddressScriptVariantV6Dto(
                         city = city,
                         district = district,
                         street = with(street) {
-                            StreetScriptVariantDto(
+                            StreetScriptVariantV6Dto(
                                 name = name,
                                 direction = direction,
                                 namePrefix = namePrefix,
@@ -229,7 +229,7 @@ class ApiV6BusinessPartnerMapper {
                         door = door
                     )
                 },
-                alternativeAddress = scriptVariant.alternativeAddressCity?.let { AlternativeAddressScriptVariantDto(city = it) }
+                alternativeAddress = scriptVariant.alternativeAddressCity?.let { AlternativeAddressScriptVariantV6Dto(city = it) }
             )
         )
 

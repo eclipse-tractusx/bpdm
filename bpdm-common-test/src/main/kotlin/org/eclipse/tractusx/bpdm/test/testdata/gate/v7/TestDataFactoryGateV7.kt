@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AdditionalSiteOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -70,44 +70,44 @@ class TestDataFactoryGateV7(
             val response = ResponseFactory()
 
             inner class RequestFactory {
-                fun fromSeed(seed: String): BusinessPartnerInputRequest =
+                fun fromSeed(seed: String): BusinessPartnerInputV7Request =
                     bpInputRequestFactory.fromSeed(seed)
             }
 
             inner class ResponseFactory {
-                fun fromRequest(request: BusinessPartnerInputRequest): BusinessPartnerInputDto =
+                fun fromRequest(request: BusinessPartnerInputV7Request): BusinessPartnerInputV7Dto =
                     bpInputDtoFactory.fromRequest(request)
             }
         }
 
         inner class OutputFactory {
             fun fromLegalEntity(
-                input: BusinessPartnerInputDto,
+                input: BusinessPartnerInputV7Dto,
                 legalEntity: LegalEntityWithLegalAddressVerboseDto
             ) = bpOutputDtoFactory.fromLegalEntity(input, legalEntity)
 
             fun fromLegalEntityOnSite(
-                input: BusinessPartnerInputDto,
+                input: BusinessPartnerInputV7Dto,
                 legalEntity: LegalEntityWithLegalAddressVerboseDto,
                 site: SiteWithMainAddressVerboseDto
             ) = bpOutputDtoFactory.fromLegalEntityOnSite(input, legalEntity, site)
 
             fun fromSite(
-                input: BusinessPartnerInputDto,
+                input: BusinessPartnerInputV7Dto,
                 legalEntity: LegalEntityWithLegalAddressVerboseDto,
                 site: SiteWithMainAddressVerboseDto
             ) = bpOutputDtoFactory.fromSite(input, legalEntity, site)
 
             fun fromAdditionalAddressOnSite(
-                input: BusinessPartnerInputDto,
+                input: BusinessPartnerInputV7Dto,
                 legalEntity: LegalEntityWithLegalAddressVerboseDto,
                 site: SiteWithMainAddressVerboseDto,
                 additionalAddress: LogisticAddressVerboseDto,
-                additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
+                additionalSites: Collection<AdditionalSiteOutputV7Dto> = emptyList()
             ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress, additionalSites)
 
             fun fromAdditionalAddressOnLegalEntity(
-                input: BusinessPartnerInputDto,
+                input: BusinessPartnerInputV7Dto,
                 legalEntity: LegalEntityWithLegalAddressVerboseDto,
                 additionalAddress: LogisticAddressVerboseDto
             ) = bpOutputDtoFactory.fromAdditionalAddressOnLegalEntity(input, legalEntity, additionalAddress)
@@ -123,12 +123,12 @@ class TestDataFactoryGateV7(
             val response = ResponseFactory()
 
             inner class RequestFactory {
-                fun fromSeed(seed: String): RelationPutEntry =
+                fun fromSeed(seed: String): RelationPutV7Entry =
                     relationInputRequestFactory.fromSeed(seed)
             }
 
             inner class ResponseFactory {
-                fun fromRequest(entry: RelationPutEntry) =
+                fun fromRequest(entry: RelationPutV7Entry) =
                     relationInputRequestFactory.toExpectedResponse(entry)
             }
         }
@@ -137,13 +137,13 @@ class TestDataFactoryGateV7(
             fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations) =
                 relationOutputDtoFactory.fromGoldenRecord(externalId, goldenRecordRelation)
 
-            fun fromInput(entry: RelationPutEntry) =
+            fun fromInput(entry: RelationPutV7Entry) =
                 relationOutputDtoFactory.fromInput(entry)
         }
     }
 
     inner class ChangelogFactory {
-        fun ofOnePage(vararg entries: ChangelogGateDto) =
+        fun ofOnePage(vararg entries: ChangelogGateV7Dto) =
             pageChangeLogFactory.ofOnePageWithoutInvalids(*entries)
     }
 }

@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.SharingStateTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -61,13 +61,13 @@ class ReadyBusinessPartnerInputV6IT: UnscheduledGateV6TestBase() {
         testDataClient.createBusinessPartnerInput(testName)
 
         //WHEN
-        val request = PostSharingStateReadyRequest(listOf(testName))
+        val request = PostSharingStateReadyV6Request(listOf(testName))
         gateClient.sharingStates.postSharingStateReady(request)
 
         //THEN
         val actualSharingStateResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), listOf(testName))
 
-        val expectedSharingState = SharingStateDto(testName, SharingStateType.Ready, null, null, null, null)
+        val expectedSharingState = SharingStateV6Dto(testName, SharingStateTypeV6.Ready, null, null, null, null)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualSharingStateResponse, expectedResponse)
@@ -82,10 +82,10 @@ class ReadyBusinessPartnerInputV6IT: UnscheduledGateV6TestBase() {
     fun `try ready already business partner`(){
         //GIVEN
         testDataClient.createBusinessPartnerInput(testName)
-        gateClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
+        gateClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(testName)))
 
         //WHEN THEN
-        val request = PostSharingStateReadyRequest(listOf(testName))
+        val request = PostSharingStateReadyV6Request(listOf(testName))
         Assertions.assertThatThrownBy { gateClient.sharingStates.postSharingStateReady(request) }
             .isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }

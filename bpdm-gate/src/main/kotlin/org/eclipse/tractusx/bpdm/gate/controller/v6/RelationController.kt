@@ -23,11 +23,11 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationApi
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationV6Api
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6RelationMapper
@@ -53,17 +53,17 @@ class RelationController(
     private val apiV6InboundMapper: ApiV6InboundMapper,
     private val apiV6RelationMapper: ApiV6RelationMapper,
     private val inputDeleteApplicationService: RelationInputDeleteApplicationService
-): GateRelationApi {
+): GateRelationV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
     override fun get(
         externalIds: List<String>?,
-        relationType: RelationType?,
+        relationType: RelationTypeV6?,
         businessPartnerSourceExternalIds: List<String>?,
         businessPartnerTargetExternalIds: List<String>?,
         updatedAtFrom: Instant?,
         paginationRequest: PaginationRequest
-    ): PageDto<RelationDto> {
+    ): PageDto<RelationV6Dto> {
         val request = RelationInputSearchRaw(
             externalIds = externalIds,
             relationType = relationType?.let(apiV6InboundMapper::toModel),
@@ -77,15 +77,15 @@ class RelationController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun post(
-        requestBody: RelationPostRequest
-    ): RelationDto =
+        requestBody: RelationPostV6Request
+    ): RelationV6Dto =
         upsert(apiV6InboundMapper.toUpsertRequest(requestBody), RelationInputUpsertMode.CreateOnly)
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
     override fun put(
         createIfNotExist: Boolean,
-        requestBody: RelationPutEntryV6
-    ): RelationDto {
+        requestBody: RelationPutV6Entry
+    ): RelationV6Dto {
         val mode = if (createIfNotExist) RelationInputUpsertMode.CreateOrUpdate else RelationInputUpsertMode.UpdateOnly
         return upsert(apiV6InboundMapper.toUpsertRequest(requestBody), mode)
     }
@@ -98,7 +98,7 @@ class RelationController(
         }
     }
 
-    private fun upsert(request: RelationInputUpsertRaw, mode: RelationInputUpsertMode): RelationDto =
+    private fun upsert(request: RelationInputUpsertRaw, mode: RelationInputUpsertMode): RelationV6Dto =
         when (val result = inputUpsertApplicationService.upsert(listOf(request), tenantResolver.resolveTenantBpnl().value, mode)) {
             is RelationInputUpsertResult.Written -> apiV6RelationMapper.toDto(result.relations.single())
             is RelationInputUpsertResult.Rejected -> throw apiV6RelationMapper.toUpsertException(result.errors)

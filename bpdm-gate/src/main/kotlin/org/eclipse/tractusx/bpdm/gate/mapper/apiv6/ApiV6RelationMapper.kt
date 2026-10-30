@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType as RelationTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationAlreadyExistsException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputDeleteException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationInputUpsertException
@@ -34,8 +34,8 @@ class ApiV6RelationMapper {
     /**
      * Returns the API relation for [record].
      */
-    fun toDto(record: RelationInputRecord): RelationDto =
-        RelationDto(
+    fun toDto(record: RelationInputRecord): RelationV6Dto =
+        RelationV6Dto(
             externalId = record.externalId,
             relationType = toDto(record.relationType),
             businessPartnerSourceExternalId = record.sourceExternalId,
@@ -87,11 +87,11 @@ class ApiV6RelationMapper {
     private fun relation(externalId: String?) =
         if (externalId != null) "Relation '$externalId'" else "Relation without external ID"
 
-    private fun toDto(relationType: RelationType): RelationTypeDto =
+    private fun toDto(relationType: RelationType): RelationTypeV6 =
         when (relationType) {
-            RelationType.IsManagedBy -> RelationTypeDto.IsManagedBy
-            RelationType.IsAlternativeHeadquarterFor -> RelationTypeDto.IsAlternativeHeadquarterFor
-            RelationType.IsOwnedBy -> RelationTypeDto.IsOwnedBy
-            RelationType.IsReplacedBy -> RelationTypeDto.IsReplacedBy
+            RelationType.IsManagedBy -> RelationTypeV6.IsManagedBy
+            RelationType.IsAlternativeHeadquarterFor -> RelationTypeV6.IsAlternativeHeadquarterFor
+            RelationType.IsOwnedBy -> RelationTypeV6.IsOwnedBy
+            RelationType.IsReplacedBy -> RelationTypeV6.IsReplacedBy
         }
 }

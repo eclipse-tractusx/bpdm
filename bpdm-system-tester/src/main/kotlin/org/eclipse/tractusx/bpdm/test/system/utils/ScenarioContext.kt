@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import io.cucumber.java.Scenario
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
@@ -89,14 +89,14 @@ data class AdditionalLegalEntityAddressWithParent(
 data class RecordState(
     val member: SharingMember,
     val contentSeed: String? = null,
-    val currentInput: BusinessPartnerInputRequest? = null,
+    val currentInput: BusinessPartnerInputV7Request? = null,
     val legalEntity: LegalEntityWithLegalAddressVerboseDto? = null,
     val poolSite: SiteWithMainAddressVerboseDto? = null,
     val poolAddress: LogisticAddressVerboseDto? = null,
 )
 
 data class RelationState(
-    val submittedEntry: RelationPutEntry,
+    val submittedEntry: RelationPutV7Entry,
     val sourceRecordId: String,
     val targetRecordId: String,
     val resolvedSourceBpn: String? = null,

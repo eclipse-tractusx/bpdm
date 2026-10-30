@@ -19,13 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -45,34 +45,34 @@ import kotlin.random.Random
  */
 class GateTestDataClientV6 (
     val testDataFactory: GateTestDataFactoryV6,
-    val operatorClient: GateClientV6,
+    val operatorClient: GateV6Client,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationService: GoldenRecordTaskCreationApplicationService,
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val tenantBpnL: String,
     private val poolMockDataFactory: PoolMockDataFactory
 ){
-    fun createBusinessPartnerInput(seed: String, externalId: String = seed, externalSequenceTimestamp: Instant? = null): BusinessPartnerInputDto{
+    fun createBusinessPartnerInput(seed: String, externalId: String = seed, externalSequenceTimestamp: Instant? = null): BusinessPartnerInputV6Dto{
         val createRequest = testDataFactory.request.createFullValid(seed, externalId).copy(externalSequenceTimestamp = externalSequenceTimestamp)
         return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(createRequest)).body!!.single()
     }
 
-    fun createBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
+    fun createBusinessPartnerInput(request: BusinessPartnerInputV6Request): BusinessPartnerInputV6Dto {
         return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(request)).body!!.single()
     }
 
-    fun createRelation(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto, relationType: RelationType): RelationDto{
-        return operatorClient.relations.post(RelationPostRequest(externalId, relationType, source.externalId, target.externalId))
+    fun createRelation(externalId: String, source: BusinessPartnerInputV6Dto, target: BusinessPartnerInputV6Dto, relationType: RelationTypeV6): RelationV6Dto{
+        return operatorClient.relations.post(RelationPostV6Request(externalId, relationType, source.externalId, target.externalId))
     }
 
-    fun createRelationWithBusinessPartners(externalId: String, relationType: RelationType, seed: String = externalId): RelationDto{
+    fun createRelationWithBusinessPartners(externalId: String, relationType: RelationTypeV6, seed: String = externalId): RelationV6Dto{
         val sourceInput = createBusinessPartnerInput("$seed Source")
         val targetInput = createBusinessPartnerInput("$seed Target")
 
-        return operatorClient.relations.post(RelationPostRequest(externalId, relationType, sourceInput.externalId, targetInput.externalId))
+        return operatorClient.relations.post(RelationPostV6Request(externalId, relationType, sourceInput.externalId, targetInput.externalId))
     }
 
-    fun refineToLegalEntity(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
+    fun refineToLegalEntity(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -83,7 +83,7 @@ class GateTestDataClientV6 (
         return poolMockResult
     }
 
-    fun refineToLegalEntityOnSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
+    fun refineToLegalEntityOnSite(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
         val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -100,7 +100,7 @@ class GateTestDataClientV6 (
         return poolMockResult
     }
 
-    fun refineToSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
+    fun refineToSite(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
         val poolMockResult = poolMockDataFactory.mockSiteAndMainAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -117,7 +117,7 @@ class GateTestDataClientV6 (
         return poolMockResult
     }
 
-    fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
+    fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -136,7 +136,7 @@ class GateTestDataClientV6 (
     }
 
     fun refineToAdditionalAddressOfSite(
-        input: BusinessPartnerInputDto,
+        input: BusinessPartnerInputV6Dto,
         legalEntityRequest: LegalEntityPartnerCreateRequest,
         siteRequest: SitePartnerCreateRequest,
         additionalAddressRequest: AddressPartnerCreateRequest,
@@ -162,7 +162,7 @@ class GateTestDataClientV6 (
 
 
     fun setStateToReady(externalId: String){
-        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
+        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(externalId)))
     }
 
     fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto{
@@ -207,7 +207,7 @@ class GateTestDataClientV6 (
     }
 
     private fun shareBusinessPartnerAndResolve(externalId: String){
-        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
+        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(externalId)))
         taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
     }

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -52,8 +52,8 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
      * THEN input consumer sees the relations
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relations`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `find relations`(relationType: RelationTypeV6) {
         //GIVEN
         val relation1 = testDataClient.createRelationWithBusinessPartners("$testName 1", relationType)
         val relation2 = testDataClient.createRelationWithBusinessPartners("$testName 2", relationType)
@@ -74,8 +74,8 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
      * THEN input consumer sees only relation with that external-ID
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find created relation by external-ID`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `find created relation by external-ID`(relationType: RelationTypeV6) {
         //GIVEN
         val inquiredRelation = testDataClient.createRelationWithBusinessPartners("$testName 1", relationType)
         testDataClient.createRelationWithBusinessPartners("$testName 2", relationType)
@@ -96,8 +96,8 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
      * THEN input consumer sees only relation with that relation type
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find created relation by relation type`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `find created relation by relation type`(relationType: RelationTypeV6) {
         //GIVEN
         val inquiredRelation = testDataClient.createRelationWithBusinessPartners("$testName 1", relationType)
         testDataClient.createRelationWithBusinessPartners("$testName 2", relationType.toNewType())
@@ -118,8 +118,8 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
      * THEN input consumer sees only relation with that source
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find created relation by source`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `find created relation by source`(relationType: RelationTypeV6) {
         //GIVEN
         val inquiredRelation = testDataClient.createRelationWithBusinessPartners("$testName 1", relationType)
         testDataClient.createRelationWithBusinessPartners("$testName 2", relationType.toNewType())
@@ -140,8 +140,8 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
      * THEN input consumer sees only relation with that target
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find created relation by target`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `find created relation by target`(relationType: RelationTypeV6) {
         //GIVEN
         val inquiredRelation = testDataClient.createRelationWithBusinessPartners("$testName 1", relationType)
         testDataClient.createRelationWithBusinessPartners("$testName 2", relationType.toNewType())
@@ -162,8 +162,8 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
      * THEN input consumer sees only relation updated after that time
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find created relation by updatedAt time`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `find created relation by updatedAt time`(relationType: RelationTypeV6) {
         //GIVEN
         testDataClient.createRelationWithBusinessPartners("$testName 2", relationType.toNewType())
         testDataClient.createRelationWithBusinessPartners("$testName 3", relationType.toNewType())
@@ -179,5 +179,5 @@ class RelationSearchV6IT: UnscheduledGateV6TestBase() {
         assertRepo.assertRelations(response, expected)
     }
 
-    private fun RelationType.toNewType() = RelationType.entries.find { it != this }!!
+    private fun RelationTypeV6.toNewType() = RelationTypeV6.entries.find { it != this }!!
 }

@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.exception.BusinessPartnerSharingError as BusinessPartnerSharingErrorDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.SharingStateType as SharingStateTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.exception.BusinessPartnerSharingErrorV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.SharingStateTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateRecord
 import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyError.InvalidSharingState
@@ -33,8 +33,8 @@ class ApiV6SharingStateMapper {
     /**
      * Returns the API response for [record].
      */
-    fun toDto(record: SharingStateRecord): SharingStateDto =
-        SharingStateDto(
+    fun toDto(record: SharingStateRecord): SharingStateV6Dto =
+        SharingStateV6Dto(
             externalId = record.externalId,
             sharingStateType = toDto(record.sharingStateType),
             sharingErrorCode = record.sharingErrorCode?.let(::toDto),
@@ -55,26 +55,26 @@ class ApiV6SharingStateMapper {
                         "but only business partners in an initial or error state can be set ready"
         }
 
-    private fun toDto(sharingStateType: SharingStateType): SharingStateTypeDto =
+    private fun toDto(sharingStateType: SharingStateType): SharingStateTypeV6 =
         when (sharingStateType) {
-            SharingStateType.Pending -> SharingStateTypeDto.Pending
-            SharingStateType.Success -> SharingStateTypeDto.Success
-            SharingStateType.Error -> SharingStateTypeDto.Error
-            SharingStateType.Initial -> SharingStateTypeDto.Initial
-            SharingStateType.Ready -> SharingStateTypeDto.Ready
+            SharingStateType.Pending -> SharingStateTypeV6.Pending
+            SharingStateType.Success -> SharingStateTypeV6.Success
+            SharingStateType.Error -> SharingStateTypeV6.Error
+            SharingStateType.Initial -> SharingStateTypeV6.Initial
+            SharingStateType.Ready -> SharingStateTypeV6.Ready
         }
 
-    private fun toDto(sharingError: BusinessPartnerSharingErrorCode): BusinessPartnerSharingErrorDto =
+    private fun toDto(sharingError: BusinessPartnerSharingErrorCode): BusinessPartnerSharingErrorV6 =
         when (sharingError) {
-            BusinessPartnerSharingErrorCode.SharingProcessError -> BusinessPartnerSharingErrorDto.SharingProcessError
-            BusinessPartnerSharingErrorCode.SharingTimeout -> BusinessPartnerSharingErrorDto.SharingTimeout
-            BusinessPartnerSharingErrorCode.BpnNotInPool -> BusinessPartnerSharingErrorDto.BpnNotInPool
-            BusinessPartnerSharingErrorCode.MissingTaskID -> BusinessPartnerSharingErrorDto.MissingTaskID
-            BusinessPartnerSharingErrorCode.NaturalPersonError -> BusinessPartnerSharingErrorDto.NaturalPersonError
-            BusinessPartnerSharingErrorCode.BpnErrorNotFound -> BusinessPartnerSharingErrorDto.BpnErrorNotFound
-            BusinessPartnerSharingErrorCode.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorDto.BpnErrorTooManyOptions
-            BusinessPartnerSharingErrorCode.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorDto.MandatoryFieldValidationFailed
-            BusinessPartnerSharingErrorCode.BlacklistCountryPresent -> BusinessPartnerSharingErrorDto.BlacklistCountryPresent
-            BusinessPartnerSharingErrorCode.UnknownSpecialCharacters -> BusinessPartnerSharingErrorDto.UnknownSpecialCharacters
+            BusinessPartnerSharingErrorCode.SharingProcessError -> BusinessPartnerSharingErrorV6.SharingProcessError
+            BusinessPartnerSharingErrorCode.SharingTimeout -> BusinessPartnerSharingErrorV6.SharingTimeout
+            BusinessPartnerSharingErrorCode.BpnNotInPool -> BusinessPartnerSharingErrorV6.BpnNotInPool
+            BusinessPartnerSharingErrorCode.MissingTaskID -> BusinessPartnerSharingErrorV6.MissingTaskID
+            BusinessPartnerSharingErrorCode.NaturalPersonError -> BusinessPartnerSharingErrorV6.NaturalPersonError
+            BusinessPartnerSharingErrorCode.BpnErrorNotFound -> BusinessPartnerSharingErrorV6.BpnErrorNotFound
+            BusinessPartnerSharingErrorCode.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorV6.BpnErrorTooManyOptions
+            BusinessPartnerSharingErrorCode.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorV6.MandatoryFieldValidationFailed
+            BusinessPartnerSharingErrorCode.BlacklistCountryPresent -> BusinessPartnerSharingErrorV6.BlacklistCountryPresent
+            BusinessPartnerSharingErrorCode.UnknownSpecialCharacters -> BusinessPartnerSharingErrorV6.UnknownSpecialCharacters
         }
 }

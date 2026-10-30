@@ -24,8 +24,8 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
@@ -273,14 +273,14 @@ class ScriptVariantStepDefs(
     private fun stateOf(recordId: String) =
         context.records[recordId] ?: error("record '$recordId' must be shared and refined by earlier steps")
 
-    private fun inputResponseOf(recordId: String): BusinessPartnerInputDto =
+    private fun inputResponseOf(recordId: String): BusinessPartnerInputV7Dto =
         testDataFactoryGate.businessPartner.input.response.fromRequest(stateOf(recordId).currentInput!!)
 
     /**
      * Asserts the single Gate output for [recordId] carries [expected]'s script variants (and only those) and
      * returns that output partner so the caller can read the referenced BPNs for the Pool cross-check.
      */
-    private fun assertGateOutputScriptVariants(recordId: String, expected: BusinessPartnerOutputDto): BusinessPartnerOutputDto {
+    private fun assertGateOutputScriptVariants(recordId: String, expected: BusinessPartnerOutputV7Dto): BusinessPartnerOutputV7Dto {
         val runId = context.runId(recordId)
         val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
@@ -297,7 +297,7 @@ class ScriptVariantStepDefs(
      * the same script variants as [expected], proving the output reflects the golden record rather than just
      * carrying matching content inline.
      */
-    private fun assertPoolReflectsScriptVariants(expected: BusinessPartnerOutputDto, poolAsOutput: BusinessPartnerOutputDto) {
+    private fun assertPoolReflectsScriptVariants(expected: BusinessPartnerOutputV7Dto, poolAsOutput: BusinessPartnerOutputV7Dto) {
         assertRepository.assertBusinessPartnerOutput(
             listOf(poolAsOutput),
             listOf(expected),

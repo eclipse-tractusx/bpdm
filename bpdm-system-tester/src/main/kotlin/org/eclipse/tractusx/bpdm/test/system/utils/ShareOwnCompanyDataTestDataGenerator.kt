@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -128,7 +128,7 @@ class ShareOwnCompanyDataTestDataGenerator(
         return SiteResult(siteWithParent, taskData)
     }
 
-    fun buildInputData(id: String): BusinessPartnerInputRequest {
+    fun buildInputData(id: String): BusinessPartnerInputV7Request {
         val context = ScenarioContext.current()!!
         return testDataFactoryGate.businessPartner.input.request.fromSeed(scenarioId(id))
             .withRunUniqueReferences(context.runId(id))
@@ -253,7 +253,7 @@ class ShareOwnCompanyDataTestDataGenerator(
             )
         )
 
-    private fun BusinessPartnerInputRequest.withRunUniqueReferences(runUniqueId: String): BusinessPartnerInputRequest =
+    private fun BusinessPartnerInputV7Request.withRunUniqueReferences(runUniqueId: String): BusinessPartnerInputV7Request =
         copy(
             identifiers = identifiers.mapIndexed { index, it ->
                 it.copy(value = "Identifier Value ${index + 1} $runUniqueId")

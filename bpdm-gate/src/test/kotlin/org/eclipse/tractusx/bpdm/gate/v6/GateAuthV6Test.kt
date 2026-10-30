@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.gate.v6
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutV6Entry
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
@@ -41,12 +41,12 @@ class GateAuthV6Test: UnscheduledGateV6TestBase() {
     @Autowired
     lateinit var gateTestClientProvider: GateTestClientProviderV6
 
-    lateinit var operatorClient: GateClientV6
-    lateinit var inputConsumerClient: GateClientV6
-    lateinit var inputManagerClient: GateClientV6
-    lateinit var outputConsumerClient: GateClientV6
-    lateinit var unauthorizedClientV6: GateClientV6
-    lateinit var anonymousClientV6: GateClientV6
+    lateinit var operatorClient: GateV6Client
+    lateinit var inputConsumerClient: GateV6Client
+    lateinit var inputManagerClient: GateV6Client
+    lateinit var outputConsumerClient: GateV6Client
+    lateinit var unauthorizedClientV6: GateV6Client
+    lateinit var anonymousClientV6: GateV6Client
 
     @PostConstruct
     private fun init() {
@@ -92,7 +92,7 @@ class GateAuthV6Test: UnscheduledGateV6TestBase() {
             inputConsumer = AuthExpectationType.Authorized,
             outputConsumer = AuthExpectationType.Forbidden
         ){
-            gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
+            gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchV6Request())
         }
     }
 
@@ -103,7 +103,7 @@ class GateAuthV6Test: UnscheduledGateV6TestBase() {
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Authorized
         ){
-            gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
+            gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchV6Request())
         }
     }
 
@@ -125,7 +125,7 @@ class GateAuthV6Test: UnscheduledGateV6TestBase() {
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Forbidden
         ){
-            gateClient.relations.post(RelationPostRequest(null, RelationType.IsManagedBy, "", ""))
+            gateClient.relations.post(RelationPostV6Request(null, RelationTypeV6.IsManagedBy, "", ""))
         }
     }
 
@@ -136,7 +136,7 @@ class GateAuthV6Test: UnscheduledGateV6TestBase() {
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Forbidden
         ){
-            gateClient.relations.put(true, RelationPutEntryV6("", RelationType.IsManagedBy, "", ""))
+            gateClient.relations.put(true, RelationPutV6Entry("", RelationTypeV6.IsManagedBy, "", ""))
         }
     }
 
@@ -158,7 +158,7 @@ class GateAuthV6Test: UnscheduledGateV6TestBase() {
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Forbidden
         ){
-            gateClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(emptyList()))
+            gateClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(emptyList()))
         }
     }
 

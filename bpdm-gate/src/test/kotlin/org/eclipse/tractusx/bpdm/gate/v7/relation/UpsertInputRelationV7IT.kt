@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationValidityPeriodV7Dto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
@@ -51,8 +51,8 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN the created relation is returned with correct data for each relation type
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `upsert new input relation`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `upsert new input relation`(relationType: RelationTypeV7) {
         //GIVEN + WHEN
         val request = testData.relation.input.request.fromSeed(testName).withRelationType(relationType)
         val response = testDataClient.relation.upsertRelationInputWithBusinessPartners(request)
@@ -67,8 +67,8 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN the updated relation data is returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `upsert existing input relation updates it`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `upsert existing input relation updates it`(relationType: RelationTypeV7) {
         //GIVEN
         val initial = testData.relation.input.request.fromSeed(testName).withRelationType(relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners(initial)
@@ -90,8 +90,8 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN the updated relation data is returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `update existing input relation`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `update existing input relation`(relationType: RelationTypeV7) {
         //GIVEN
         val initial = testData.relation.input.request.fromSeed(testName).withRelationType(relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners(initial)
@@ -121,17 +121,17 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         val entries = listOf(
             testData.relation.input.request.fromSeed("$testName rel1")
-                .withRelationType(RelationType.IsManagedBy)
+                .withRelationType(RelationTypeV7.IsManagedBy)
                 .withSource(source.externalId)
                 .withTarget(target1.externalId),
             testData.relation.input.request.fromSeed("$testName rel2")
-                .withRelationType(RelationType.IsOwnedBy)
+                .withRelationType(RelationTypeV7.IsOwnedBy)
                 .withSource(source.externalId)
                 .withTarget(target2.externalId)
         )
 
         //WHEN
-        val response = gateClient.relation.put(createIfNotExist = true, RelationPutRequest(entries))
+        val response = gateClient.relation.put(createIfNotExist = true, RelationPutV7Request(entries))
 
         //THEN
         val expected = entries.map { testData.relation.input.response.fromRequest(it) }
@@ -147,7 +147,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
     fun `upsert relation with open-ended validity period`() {
         //GIVEN + WHEN
         val request = testData.relation.input.request.fromSeed(testName)
-            .withValidityPeriods(listOf(RelationValidityPeriodDto(validFrom = LocalDate.of(2020, 1, 1), validTo = null)))
+            .withValidityPeriods(listOf(RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2020, 1, 1), validTo = null)))
         val response = testDataClient.relation.upsertRelationInputWithBusinessPartners(request)
 
         //THEN
@@ -164,7 +164,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         //GIVEN + WHEN
         val request = testData.relation.input.request.fromSeed(testName)
             .withValidityPeriods(listOf(
-                RelationValidityPeriodDto(validFrom = LocalDate.of(2020, 1, 1), validTo = LocalDate.of(2025, 12, 31))
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2020, 1, 1), validTo = LocalDate.of(2025, 12, 31))
             ))
         val response = testDataClient.relation.upsertRelationInputWithBusinessPartners(request)
 
@@ -182,9 +182,9 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         //GIVEN + WHEN
         val request = testData.relation.input.request.fromSeed(testName)
             .withValidityPeriods(listOf(
-                RelationValidityPeriodDto(validFrom = LocalDate.of(2010, 1, 1), validTo = LocalDate.of(2015, 12, 31)),
-                RelationValidityPeriodDto(validFrom = LocalDate.of(2018, 1, 1), validTo = LocalDate.of(2022, 12, 31)),
-                RelationValidityPeriodDto(validFrom = LocalDate.of(2024, 1, 1), validTo = null)
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2010, 1, 1), validTo = LocalDate.of(2015, 12, 31)),
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2018, 1, 1), validTo = LocalDate.of(2022, 12, 31)),
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2024, 1, 1), validTo = null)
             ))
         val response = testDataClient.relation.upsertRelationInputWithBusinessPartners(request)
 
@@ -277,7 +277,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         //GIVEN
         val sameDate = LocalDate.of(2024, 6, 15)
         val request = testData.relation.input.request.fromSeed(testName)
-            .withValidityPeriods(listOf(RelationValidityPeriodDto(validFrom = sameDate, validTo = sameDate)))
+            .withValidityPeriods(listOf(RelationValidityPeriodV7Dto(validFrom = sameDate, validTo = sameDate)))
         testDataClient.businessPartner.upsertInput(request.businessPartnerSourceExternalId)
         testDataClient.businessPartner.upsertInput(request.businessPartnerTargetExternalId)
 
@@ -297,7 +297,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         //GIVEN
         val request = testData.relation.input.request.fromSeed(testName)
             .withValidityPeriods(listOf(
-                RelationValidityPeriodDto(validFrom = LocalDate.of(2025, 1, 1), validTo = LocalDate.of(2020, 1, 1))
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2025, 1, 1), validTo = LocalDate.of(2020, 1, 1))
             ))
         testDataClient.businessPartner.upsertInput(request.businessPartnerSourceExternalId)
         testDataClient.businessPartner.upsertInput(request.businessPartnerTargetExternalId)
@@ -326,12 +326,12 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = assertThrows<BadRequest> {
-            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(unknownTarget, selfRelation)))
+            gateClient.relation.put(createIfNotExist = true, RelationPutV7Request(listOf(unknownTarget, selfRelation)))
         }
 
         //THEN
         assertRepo.assertErrorPerExternalId(
-            response.getResponseBodyAs(GateErrorResponse::class.java)!!,
+            response.getResponseBodyAs(GateErrorV7Response::class.java)!!,
             listOf(unknownTarget.externalId, selfRelation.externalId)
         )
     }
@@ -350,7 +350,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN + THEN
         assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(request, request)))
+            gateClient.relation.put(createIfNotExist = true, RelationPutV7Request(listOf(request, request)))
         }
     }
 
@@ -366,7 +366,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN + THEN
         assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(entries))
+            gateClient.relation.put(createIfNotExist = true, RelationPutV7Request(entries))
         }
     }
 
@@ -387,11 +387,11 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         assertThrows<BadRequest> {
-            gateClient.relation.put(createIfNotExist = true, RelationPutRequest(listOf(valid, invalid)))
+            gateClient.relation.put(createIfNotExist = true, RelationPutV7Request(listOf(valid, invalid)))
         }
 
         //THEN
-        val actualResponse = gateClient.relation.postSearch(RelationSearchRequest(externalIds = listOf(valid.externalId, invalid.externalId)))
+        val actualResponse = gateClient.relation.postSearch(RelationSearchV7Request(externalIds = listOf(valid.externalId, invalid.externalId)))
         assertRepo.assertRelations(actualResponse, PageDto(0, 0, 0, 0, emptyList()))
     }
 }

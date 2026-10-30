@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationOutputApi
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationOutputSearchRequest as RelationOutputSearchRequestDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationOutputV7Api
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationOutputSearchV7Request
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
@@ -41,13 +41,13 @@ class RelationOutputController(
     private val outputSearchApplicationService: RelationOutputSearchApplicationService,
     private val apiV7RelationMapper: ApiV7RelationMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper
-): GateRelationOutputApi {
+): GateRelationOutputV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
     override fun postSearch(
-        searchRequest: RelationOutputSearchRequestDto,
+        searchRequest: RelationOutputSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<RelationOutputDto> {
+    ): PageDto<RelationOutputV7Dto> {
         val request = RelationOutputSearchRaw(
             externalIds = searchRequest.externalIds,
             relationType = searchRequest.relationType?.let(apiV7InboundMapper::toModel),

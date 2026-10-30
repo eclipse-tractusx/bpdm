@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaV6Response
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
@@ -46,7 +46,7 @@ class GetConfidenceCriteriaStatsV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.getConfidenceCriteriaStats()
 
         //THEN
-        val expected = StatsConfidenceCriteriaResponse(0f, 0, 0, 0, 0f)
+        val expected = StatsConfidenceCriteriaV6Response(0f, 0, 0, 0, 0f)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -107,7 +107,7 @@ class GetConfidenceCriteriaStatsV6IT: UnscheduledGateV6TestBase() {
         val confidenceCriteriaCount = 6f
         val sharingMemberSum = legalEntityConfidence1.numberOfSharingMembers + siteConfidence1.numberOfSharingMembers + addressConfidence1.numberOfSharingMembers + legalEntityConfidence2.numberOfSharingMembers + siteConfidence2.numberOfSharingMembers + addressConfidence2.numberOfSharingMembers
         val expectedSharingMemberAverage = sharingMemberSum  / confidenceCriteriaCount
-        val expected = StatsConfidenceCriteriaResponse(expectedSharingMemberAverage, 2, 3, 3, 3f)
+        val expected = StatsConfidenceCriteriaV6Response(expectedSharingMemberAverage, 2, 3, 3, 3f)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }

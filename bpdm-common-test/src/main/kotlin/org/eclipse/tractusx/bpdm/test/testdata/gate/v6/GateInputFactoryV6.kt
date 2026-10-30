@@ -23,13 +23,13 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.AlternativePostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.PhysicalPostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.StreetV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.AddressRepresentationInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.LegalEntityRepresentationInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SiteRepresentationInputV6Dto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
 import kotlin.random.Random
@@ -38,7 +38,7 @@ class GateInputFactoryV6(
     private val testMetadata: TestMetadata,
     private val testRunData: TestRunData?
 ) {
-    fun createFullValid(seed: String, externalId: String = seed, withTestRunContext: Boolean = true): BusinessPartnerInputRequest {
+    fun createFullValid(seed: String, externalId: String = seed, withTestRunContext: Boolean = true): BusinessPartnerInputV6Request {
         return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData?.toExternalId(externalId)?.takeIf { withTestRunContext } ?: externalId)
     }
 
@@ -50,16 +50,16 @@ class GateInputFactoryV6(
         private val listRange = 1 .. 3
 
 
-        fun createAllFieldsFilled(): BusinessPartnerInputRequest{
+        fun createAllFieldsFilled(): BusinessPartnerInputV6Request{
 
-            return BusinessPartnerInputRequest(
+            return BusinessPartnerInputV6Request(
                 externalId = testRunData?.let { "${seed}_${testRunData.testTime}" } ?: seed ,
                 nameParts = listRange.map { "Name Part $seed $it" },
                 identifiers = emptyList(),
                 roles = BusinessPartnerRole.entries,
                 isOwnCompanyData = true,
                 states = emptyList(),
-                legalEntity = LegalEntityRepresentationInputDto(
+                legalEntity = LegalEntityRepresentationInputV6Dto(
                     legalEntityBpn = "BPNL $seed",
                     legalName = "Legal Name $seed",
                     shortName = "Short Name $seed",
@@ -67,11 +67,11 @@ class GateInputFactoryV6(
                     ownershipUltimate = null,
                     ultimateOwnerBpnl = null
                 ),
-                site = SiteRepresentationInputDto(
+                site = SiteRepresentationInputV6Dto(
                     siteBpn = "BPNS $seed",
                     name = "Site Name $seed"
                 ),
-                address = AddressRepresentationInputDto(
+                address = AddressRepresentationInputV6Dto(
                     addressBpn = "BPNA $seed",
                     name = "Address Name $seed",
                     addressType = AddressType.AdditionalAddress,
@@ -81,8 +81,8 @@ class GateInputFactoryV6(
             )
         }
 
-        private fun createPhysicalAddress(): PhysicalPostalAddressDto{
-            return PhysicalPostalAddressDto(
+        private fun createPhysicalAddress(): PhysicalPostalAddressV6Dto{
+            return PhysicalPostalAddressV6Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
@@ -91,7 +91,7 @@ class GateInputFactoryV6(
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 district = "District $seed",
-                street = StreetDto(
+                street = StreetV6Dto(
                     name = "Street Name $seed",
                     houseNumber = "House Number $seed",
                     houseNumberSupplement = "House Number Supplement $seed",
@@ -111,8 +111,8 @@ class GateInputFactoryV6(
             )
         }
 
-        private fun createAlternativeAddress(): AlternativePostalAddressDto{
-            return AlternativePostalAddressDto(
+        private fun createAlternativeAddress(): AlternativePostalAddressV6Dto{
+            return AlternativePostalAddressV6Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = getCountryReference(),
                 administrativeAreaLevel1 =  testMetadata.adminAreas.random(random),

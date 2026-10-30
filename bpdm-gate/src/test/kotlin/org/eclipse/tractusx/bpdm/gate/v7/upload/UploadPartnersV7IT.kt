@@ -25,15 +25,15 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.BusinessPartnerIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.BusinessPartnerStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.StreetV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SiteRepresentationInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -174,22 +174,22 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
 
         val tenantLegalName = "Limited Liability Company Name"
 
-        val validEntry1 = BusinessPartnerInputDto(
+        val validEntry1 = BusinessPartnerInputV7Dto(
             externalId = "external-1",
             nameParts = emptyList(),
             isOwnCompanyData = true,
             identifiers = listOf(
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     value = "DE123456789",
                     type = "VAT_DE",
                     issuingBody = "Agency X"
                 ),
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     value = "US123456789",
                     type = "VAT_US",
                     issuingBody = "Body Y"
                 ),
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     value = "FR123456789",
                     type = "VAT_FR",
                     issuingBody = null
@@ -197,21 +197,21 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
             ),
             states = emptyList(),
             roles = emptyList(),
-            legalEntity = LegalEntityRepresentationInputDto(
+            legalEntity = LegalEntityRepresentationInputV7Dto(
                 legalEntityBpn = "BPNL000000000001",
                 shortName = null,
                 legalName = tenantLegalName,
                 legalForm = null
             ),
-            site = SiteRepresentationInputDto(
+            site = SiteRepresentationInputV7Dto(
                 siteBpn = null,
                 name = "Site Name"
             ),
-            address = AddressRepresentationInputDto(
+            address = AddressRepresentationInputV7Dto(
                 addressBpn = "BPNA0000000001XY",
                 name = "Address Name",
                 addressType = AddressType.SiteMainAddress,
-                physicalPostalAddress =  PhysicalPostalAddressDto(
+                physicalPostalAddress =  PhysicalPostalAddressV7Dto(
                     geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
                     country = CountryCode.US.alpha2,
                     postalCode = "70547",
@@ -225,7 +225,7 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                     building = "Building Two",
                     floor = "Floor Two",
                     door = "Door Two",
-                    street = StreetDto(
+                    street = StreetV7Dto(
                         namePrefix = "Prefix",
                         additionalNamePrefix = "Additional Prefix",
                         name = "TODO",
@@ -233,7 +233,7 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                         houseNumberSupplement = "B"
                     ),
                 ),
-                alternativePostalAddress = AlternativePostalAddressDto(
+                alternativePostalAddress = AlternativePostalAddressV7Dto(
                     country = CountryCode.DE.alpha2,
                     city = "Stuttgart",
                     deliveryServiceType = DeliveryServiceType.PO_BOX,
@@ -254,12 +254,12 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
             externalId = "external-2",
             site = validEntry1.site.copy(
                 name = "Site Name 2",
-                states = listOf(BusinessPartnerStateDto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
+                states = listOf(BusinessPartnerStateV7Dto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
             ),
             address = validEntry1.address.copy(
                 addressBpn = "BPNA0000000002XY",
                 physicalPostalAddress = validEntry1.address.physicalPostalAddress.copy(
-                    street = StreetDto(name = "TODO", direction = "direction1", houseNumberSupplement = "B")
+                    street = StreetV7Dto(name = "TODO", direction = "direction1", houseNumberSupplement = "B")
                 ),
                 alternativePostalAddress = null
             )

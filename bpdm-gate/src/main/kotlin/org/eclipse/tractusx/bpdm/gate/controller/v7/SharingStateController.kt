@@ -23,10 +23,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.GateSharingStateApi
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.GateSharingStateV7Api
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.PostSharingStateReadyV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
@@ -48,15 +48,15 @@ class SharingStateController(
     private val apiV7SharingStateMapper: ApiV7SharingStateMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val tenantResolver: TenantResolver
-): GateSharingStateApi {
+): GateSharingStateV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?,
-        sharingStateTypes: Collection<SharingStateType>?,
+        sharingStateTypes: Collection<SharingStateTypeV7>?,
         updatedAfter: Instant?,
-    ): PageDto<SharingStateDto> {
+    ): PageDto<SharingStateV7Dto> {
         val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
         return sharingStateSearchApplicationService.search(request, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(apiV7SharingStateMapper::toDto)
@@ -64,7 +64,7 @@ class SharingStateController(
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
-    override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
+    override fun postSharingStateReady(request: PostSharingStateReadyV7Request) {
         val readyRequest = SharingStateReadyRaw(request.externalIds)
         when (val result = sharingStateReadyApplicationService.setReady(readyRequest, tenantResolver.currentUserBpn())) {
             is SharingStateReadyResult.Readied -> Unit

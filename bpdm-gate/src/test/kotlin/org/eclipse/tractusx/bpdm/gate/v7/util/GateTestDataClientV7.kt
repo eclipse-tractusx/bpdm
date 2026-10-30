@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 
 class GateTestDataClientV7(
-    gateClient: GateClient,
+    gateClient: GateV7Client,
     testDataFactory: TestDataFactoryGateV7,
     orchestratorMockDataFactory: OrchestratorMockDataFactory,
     taskCreationService: GoldenRecordTaskCreationApplicationService,

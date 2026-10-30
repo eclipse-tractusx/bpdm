@@ -13,10 +13,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsAddressTypesResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsStagesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsAddressTypesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsConfidenceCriteriaV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsSharingStatesV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.StatsStagesV6Response
 import org.eclipse.tractusx.bpdm.gate.model.output.stats.AddressTypeStats
 import org.eclipse.tractusx.bpdm.gate.model.output.stats.ConfidenceCriteriaStats
 import org.eclipse.tractusx.bpdm.gate.model.output.stats.SharingStateStats
@@ -32,8 +32,8 @@ class ApiV6StatsMapper {
     /**
      * Returns the API response for [stats].
      */
-    fun toDto(stats: SharingStateStats): StatsSharingStatesResponse =
-        StatsSharingStatesResponse(
+    fun toDto(stats: SharingStateStats): StatsSharingStatesV6Response =
+        StatsSharingStatesV6Response(
             initialTotal = stats.initialTotal,
             readyTotal = stats.readyTotal,
             pendingTotal = stats.pendingTotal,
@@ -44,8 +44,8 @@ class ApiV6StatsMapper {
     /**
      * Returns the API response for [stats].
      */
-    fun toDto(stats: StageStats): StatsStagesResponse =
-        StatsStagesResponse(
+    fun toDto(stats: StageStats): StatsStagesV6Response =
+        StatsStagesV6Response(
             inputTotal = stats.inputTotal,
             outputTotal = stats.outputTotal
         )
@@ -53,8 +53,8 @@ class ApiV6StatsMapper {
     /**
      * Returns the API response for [stats].
      */
-    fun toDto(stats: AddressTypeStats): StatsAddressTypesResponse =
-        StatsAddressTypesResponse(
+    fun toDto(stats: AddressTypeStats): StatsAddressTypesV6Response =
+        StatsAddressTypesV6Response(
             legalAndSiteTotal = stats.legalAndSiteTotal,
             legalTotal = stats.legalTotal,
             siteTotal = stats.siteTotal,
@@ -64,8 +64,8 @@ class ApiV6StatsMapper {
     /**
      * Returns the API response for [stats].
      */
-    fun toDto(stats: ConfidenceCriteriaStats): StatsConfidenceCriteriaResponse =
-        StatsConfidenceCriteriaResponse(
+    fun toDto(stats: ConfidenceCriteriaStats): StatsConfidenceCriteriaV6Response =
+        StatsConfidenceCriteriaV6Response(
             numberOfBusinessPartnersAverage = stats.numberOfBusinessPartnersAverage,
             uniqueTotal = stats.uniqueTotal,
             sharedByOwnerTotal = stats.sharedByOwnerTotal,

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClientImpl
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.DefaultGateV7Client
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
@@ -35,8 +35,8 @@ class GateClientV7Config{
     fun gateClient(webServerAppCtxt: ServletWebServerApplicationContext,
                    bpdmWebClientProvider: BpdmWebClientProvider,
                    properties: SelfClientConfigProperties
-                   ): GateClient {
-        return GateClientImpl {
+                   ): GateV7Client {
+        return DefaultGateV7Client {
             val baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}"
             bpdmWebClientProvider.builder(properties.copy(baseUrl = baseUrl)).build()
         }

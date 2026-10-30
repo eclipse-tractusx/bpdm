@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.RelationSearchV7Request
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.other
 import org.junit.jupiter.api.Test
@@ -39,8 +39,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN all three relations are returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find all upserted relations`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find all upserted relations`(relationType: RelationTypeV7) {
         //GIVEN
         val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
@@ -65,7 +65,7 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.relation.postSearch()
 
         //THEN
-        val expected = PageDto<RelationDto>(0L, 0, 0, 0, emptyList())
+        val expected = PageDto<RelationV7Dto>(0L, 0, 0, 0, emptyList())
         assertRepo.assertRelations(response, expected)
     }
 
@@ -75,15 +75,15 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only the relation with that external ID is returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relation by external ID`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relation by external ID`(relationType: RelationTypeV7) {
         //GIVEN
         val inquired = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", relationType)
 
         //WHEN
-        val response = gateClient.relation.postSearch(RelationSearchRequest(externalIds = listOf(inquired.externalId)))
+        val response = gateClient.relation.postSearch(RelationSearchV7Request(externalIds = listOf(inquired.externalId)))
 
         //THEN
         val expected = PageDto(1L, 1, 0, 1, listOf(inquired))
@@ -96,8 +96,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only the two matching relations are returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relations by multiple external IDs`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relations by multiple external IDs`(relationType: RelationTypeV7) {
         //GIVEN
         val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
@@ -105,7 +105,7 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = gateClient.relation.postSearch(
-            RelationSearchRequest(externalIds = listOf(rel1.externalId, rel2.externalId))
+            RelationSearchV7Request(externalIds = listOf(rel1.externalId, rel2.externalId))
         )
 
         //THEN
@@ -119,15 +119,15 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only relations of that type are returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relations by relation type`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relations by relation type`(relationType: RelationTypeV7) {
         //GIVEN
         val inquired = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType.other())
         testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", relationType.other())
 
         //WHEN
-        val response = gateClient.relation.postSearch(RelationSearchRequest(relationType = relationType))
+        val response = gateClient.relation.postSearch(RelationSearchV7Request(relationType = relationType))
 
         //THEN
         val expected = PageDto(1L, 1, 0, 1, listOf(inquired))
@@ -140,8 +140,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only the relation with that source is returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relation by source external ID`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relation by source external ID`(relationType: RelationTypeV7) {
         //GIVEN
         val inquired = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
@@ -149,7 +149,7 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = gateClient.relation.postSearch(
-            RelationSearchRequest(businessPartnerSourceExternalIds = listOf(inquired.businessPartnerSourceExternalId))
+            RelationSearchV7Request(businessPartnerSourceExternalIds = listOf(inquired.businessPartnerSourceExternalId))
         )
 
         //THEN
@@ -163,8 +163,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only the two matching relations are returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relations by multiple source external IDs`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relations by multiple source external IDs`(relationType: RelationTypeV7) {
         //GIVEN
         val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
@@ -172,7 +172,7 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = gateClient.relation.postSearch(
-            RelationSearchRequest(
+            RelationSearchV7Request(
                 businessPartnerSourceExternalIds = listOf(
                     rel1.businessPartnerSourceExternalId,
                     rel2.businessPartnerSourceExternalId
@@ -191,8 +191,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only the relation with that target is returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relation by target external ID`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relation by target external ID`(relationType: RelationTypeV7) {
         //GIVEN
         val inquired = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
@@ -200,7 +200,7 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = gateClient.relation.postSearch(
-            RelationSearchRequest(businessPartnerTargetExternalIds = listOf(inquired.businessPartnerTargetExternalId))
+            RelationSearchV7Request(businessPartnerTargetExternalIds = listOf(inquired.businessPartnerTargetExternalId))
         )
 
         //THEN
@@ -214,8 +214,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
      * THEN only the two matching relations are returned
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `find relations by multiple target external IDs`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `find relations by multiple target external IDs`(relationType: RelationTypeV7) {
         //GIVEN
         val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", relationType)
         val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", relationType)
@@ -223,7 +223,7 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //WHEN
         val response = gateClient.relation.postSearch(
-            RelationSearchRequest(
+            RelationSearchV7Request(
                 businessPartnerTargetExternalIds = listOf(
                     rel1.businessPartnerTargetExternalId,
                     rel2.businessPartnerTargetExternalId
@@ -244,16 +244,16 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relations updated after timestamp`() {
         //GIVEN
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName old 1", RelationType.IsManagedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName old 2", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName old 1", RelationTypeV7.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName old 2", RelationTypeV7.IsOwnedBy)
 
         val updatedAtFrom = Instant.now()
 
-        val new1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName new 1", RelationType.IsManagedBy)
-        val new2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName new 2", RelationType.IsOwnedBy)
+        val new1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName new 1", RelationTypeV7.IsManagedBy)
+        val new2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName new 2", RelationTypeV7.IsOwnedBy)
 
         //WHEN
-        val response = gateClient.relation.postSearch(RelationSearchRequest(updatedAtFrom = updatedAtFrom))
+        val response = gateClient.relation.postSearch(RelationSearchV7Request(updatedAtFrom = updatedAtFrom))
 
         //THEN
         val expected = PageDto(2L, 1, 0, 2, listOf(new1, new2))
@@ -268,15 +268,15 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation using combined filters`() {
         //GIVEN
-        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
-        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationTypeV7.IsManagedBy)
+        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationTypeV7.IsOwnedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationTypeV7.IsManagedBy)
 
         //WHEN
         val response = gateClient.relation.postSearch(
-            RelationSearchRequest(
+            RelationSearchV7Request(
                 externalIds = listOf(rel1.externalId, rel3.externalId),
-                relationType = RelationType.IsManagedBy,
+                relationType = RelationTypeV7.IsManagedBy,
                 businessPartnerSourceExternalIds = listOf(rel1.businessPartnerSourceExternalId)
             )
         )
@@ -294,9 +294,9 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate relations across multiple pages`() {
         //GIVEN
-        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
-        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsAlternativeHeadquarterFor)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationTypeV7.IsManagedBy)
+        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationTypeV7.IsOwnedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationTypeV7.IsAlternativeHeadquarterFor)
 
         //WHEN
         val page0 = gateClient.relation.postSearch(paginationRequest = PaginationRequest(page = 0, size = 2))
@@ -316,8 +316,8 @@ class SearchInputRelationV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `get page beyond available relations returns empty`() {
         //GIVEN
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationTypeV7.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationTypeV7.IsOwnedBy)
 
         //WHEN
         val response = gateClient.relation.postSearch(paginationRequest = PaginationRequest(page = 1, size = 5))

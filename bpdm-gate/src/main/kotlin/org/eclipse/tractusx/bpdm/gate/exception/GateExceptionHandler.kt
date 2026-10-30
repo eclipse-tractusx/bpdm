@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.exception
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.GateErrorV7Response
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -32,43 +32,43 @@ import java.time.Instant
 class GateExceptionHandler : BpdmExceptionHandler() {
 
     @ExceptionHandler(BpdmInvalidPartnerUploadException::class)
-    fun handleInvalidPartnerUploadException(ex:BpdmInvalidPartnerUploadException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleInvalidPartnerUploadException(ex:BpdmInvalidPartnerUploadException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.errors, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
     @ExceptionHandler(BpdmBusinessPartnerInputUpsertException::class)
-    fun handleBusinessPartnerInputUpsertException(ex: BpdmBusinessPartnerInputUpsertException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleBusinessPartnerInputUpsertException(ex: BpdmBusinessPartnerInputUpsertException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.messages, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
     @ExceptionHandler(BpdmSharingStateReadyException::class)
-    fun handleSharingStateReadyException(ex: BpdmSharingStateReadyException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleSharingStateReadyException(ex: BpdmSharingStateReadyException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.messages, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
     @ExceptionHandler(BpdmRelationInputUpsertException::class)
-    fun handleRelationInputUpsertException(ex: BpdmRelationInputUpsertException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleRelationInputUpsertException(ex: BpdmRelationInputUpsertException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.messages, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
     @ExceptionHandler(BpdmRelationInputDeleteException::class)
-    fun handleRelationInputDeleteException(ex: BpdmRelationInputDeleteException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleRelationInputDeleteException(ex: BpdmRelationInputDeleteException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.messages, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
     @ExceptionHandler(BpdmRelationAlreadyExistsException::class)
-    fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.CONFLICT)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
     @ExceptionHandler(BpdmInvalidRelationException::class)
-    fun handleInvalidRelationException(ex: BpdmInvalidRelationException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+    fun handleInvalidRelationException(ex: BpdmInvalidRelationException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
         val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.BAD_REQUEST)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
@@ -81,21 +81,21 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         BpdmTenantResolutionException::class,
         BpdmInvalidTenantBpnlException::class
     )
-    fun handleGenericBadRequestException(ex: RuntimeException, request: WebRequest): ResponseEntity<GateErrorResponse>{
+    fun handleGenericBadRequestException(ex: RuntimeException, request: WebRequest): ResponseEntity<GateErrorV7Response>{
         val errorResponse = createResponse(ex, request)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
-    private fun createResponse(exception: RuntimeException, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorResponse{
+    private fun createResponse(exception: RuntimeException, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorV7Response{
         return createResponse(listOf(exception.message ?: ""), request, status)
     }
 
-    private fun createResponse(error: String, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorResponse{
+    private fun createResponse(error: String, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorV7Response{
         return createResponse(listOf(error), request, status)
     }
 
-    private fun createResponse(errors: List<String>, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorResponse{
-        return GateErrorResponse(
+    private fun createResponse(errors: List<String>, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorV7Response{
+        return GateErrorV7Response(
             timestamp = Instant.now(),
             status = status,
             error = errors,

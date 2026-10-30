@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withoutAlternativeAddressScriptVariants
 import org.junit.jupiter.api.Test
@@ -35,7 +35,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `create empty business partner input`(){
         //WHEN
-        val emptyBusinessPartner = BusinessPartnerInputRequest(externalId = testName)
+        val emptyBusinessPartner = BusinessPartnerInputV7Request(externalId = testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(emptyBusinessPartner)).body!!
 
         //THEN

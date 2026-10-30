@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationSharingStateApi
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.v7.GateRelationSharingStateV7Api
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
@@ -42,15 +42,15 @@ class RelationSharingStateController(
     private val searchApplicationService: RelationSharingStateSearchApplicationService,
     private val apiV7RelationMapper: ApiV7RelationMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper
-): GateRelationSharingStateApi {
+): GateRelationSharingStateV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun get(
         externalIds: Collection<String>?,
-        sharingStateTypes: Collection<RelationSharingStateType>?,
+        sharingStateTypes: Collection<RelationSharingStateTypeV7>?,
         updatedAfter: Instant?,
         paginationRequest: PaginationRequest
-    ): PageDto<RelationSharingStateDto> {
+    ): PageDto<RelationSharingStateV7Dto> {
         val request = RelationSharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
         return searchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
             .toPageDto(apiV7RelationMapper::toDto)

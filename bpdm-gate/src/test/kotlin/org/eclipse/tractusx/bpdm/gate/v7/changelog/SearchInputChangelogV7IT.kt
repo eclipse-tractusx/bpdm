@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v7.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.request.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.response.PageChangeLogV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -43,11 +43,11 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
         testDataClient.businessPartner.upsertInput(testName)
 
         //WHEN
-        val response = gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
+        val response = gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchV7Request())
 
         //THEN
-        val expectedEntry = ChangelogGateDto(testName, anyTime, ChangelogType.CREATE)
-        val expected = PageChangeLogDto(1, 1, 0, 1, listOf(expectedEntry), 0, emptyList())
+        val expectedEntry = ChangelogGateV7Dto(testName, anyTime, ChangelogTypeV7.CREATE)
+        val expected = PageChangeLogV7Dto(1, 1, 0, 1, listOf(expectedEntry), 0, emptyList())
         assertRepo.assertChangelog(response, expected)
     }
 
@@ -65,14 +65,14 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
         )
 
         //WHEN
-        val response = gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
+        val response = gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchV7Request())
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
-            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
+            ChangelogGateV7Dto(testName, anyTime, ChangelogTypeV7.CREATE),
+            ChangelogGateV7Dto(testName, anyTime, ChangelogTypeV7.UPDATE)
         )
-        val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
+        val expected = PageChangeLogV7Dto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
         assertRepo.assertChangelog(response, expected)
     }
 
@@ -89,12 +89,12 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
         testDataClient.businessPartner.upsertInput("$testName 3")
 
         //WHEN
-        val request = ChangelogSearchRequest(externalIds = setOf(createdToBeFound.externalId))
+        val request = ChangelogSearchV7Request(externalIds = setOf(createdToBeFound.externalId))
         val response = gateClient.changelog.getInputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expectedEntries = listOf(ChangelogGateDto(createdToBeFound.externalId, anyTime, ChangelogType.CREATE))
-        val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
+        val expectedEntries = listOf(ChangelogGateV7Dto(createdToBeFound.externalId, anyTime, ChangelogTypeV7.CREATE))
+        val expected = PageChangeLogV7Dto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
         assertRepo.assertChangelog(response, expected)
     }
 
@@ -114,12 +114,12 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
         val createdToBeFound = testDataClient.businessPartner.upsertInput("$testName 3")
 
         //WHEN
-        val request = ChangelogSearchRequest(timestampAfter = timeX)
+        val request = ChangelogSearchV7Request(timestampAfter = timeX)
         val response = gateClient.changelog.getInputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expectedEntries = listOf(ChangelogGateDto(createdToBeFound.externalId, anyTime, ChangelogType.CREATE))
-        val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
+        val expectedEntries = listOf(ChangelogGateV7Dto(createdToBeFound.externalId, anyTime, ChangelogTypeV7.CREATE))
+        val expected = PageChangeLogV7Dto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
         assertRepo.assertChangelog(response, expected)
     }
 }

@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.v7.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateErrorCodeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationSharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.RelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
 import org.junit.jupiter.api.Test
@@ -40,17 +40,17 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation sharing state by external id`() {
         //GIVEN
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("IGNORED 1 $testName", RelationType.IsManagedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("IGNORED 2 $testName", RelationType.IsOwnedBy)
-        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("IGNORED 1 $testName", RelationTypeV7.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("IGNORED 2 $testName", RelationTypeV7.IsOwnedBy)
+        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationTypeV7.IsManagedBy)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = RelationSharingStateDto(
+        val expected = RelationSharingStateV7Dto(
             externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Ready,
+            sharingStateType = RelationSharingStateTypeV7.Ready,
             taskId = null,
             updatedAt = Instant.MIN
         )
@@ -66,9 +66,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation sharing states by multiple external ids`() {
         //GIVEN
-        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
-        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
-        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("3 $testName", RelationType.IsAlternativeHeadquarterFor)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationTypeV7.IsManagedBy)
+        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationTypeV7.IsOwnedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("3 $testName", RelationTypeV7.IsAlternativeHeadquarterFor)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get(
@@ -77,9 +77,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
         //THEN
         val expectedStates = listOf(rel1, rel2, rel3).map { rel ->
-            RelationSharingStateDto(
+            RelationSharingStateV7Dto(
                 externalId = rel.externalId,
-                sharingStateType = RelationSharingStateType.Ready,
+                sharingStateType = RelationSharingStateTypeV7.Ready,
                 taskId = null,
                 updatedAt = Instant.MIN
             )
@@ -96,15 +96,15 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find ready relation sharing state`() {
         //GIVEN
-        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationTypeV7.IsManagedBy)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get()
 
         //THEN
-        val expected = RelationSharingStateDto(
+        val expected = RelationSharingStateV7Dto(
             externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Ready,
+            sharingStateType = RelationSharingStateTypeV7.Ready,
             taskId = null,
             updatedAt = Instant.MIN
         )
@@ -127,9 +127,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val actualResponse = gateClient.relationSharingState.get()
 
         //THEN
-        val expected = RelationSharingStateDto(
+        val expected = RelationSharingStateV7Dto(
             externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Pending,
+            sharingStateType = RelationSharingStateTypeV7.Pending,
             taskId = createdTask.taskId,
             updatedAt = Instant.MIN
         )
@@ -152,9 +152,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val actualResponse = gateClient.relationSharingState.get()
 
         //THEN
-        val expected = RelationSharingStateDto(
+        val expected = RelationSharingStateV7Dto(
             externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Success,
+            sharingStateType = RelationSharingStateTypeV7.Success,
             taskId = refinedTask.taskId,
             updatedAt = Instant.MIN
         )
@@ -177,10 +177,10 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val actualResponse = gateClient.relationSharingState.get()
 
         //THEN
-        val expected = RelationSharingStateDto(
+        val expected = RelationSharingStateV7Dto(
             externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Error,
-            sharingErrorCode = RelationSharingStateErrorCode.SharingProcessError,
+            sharingStateType = RelationSharingStateTypeV7.Error,
+            sharingErrorCode = RelationSharingStateErrorCodeV7.SharingProcessError,
             sharingErrorMessage = errorTask.processingState.errors.single().description,
             taskId = errorTask.taskId,
             updatedAt = Instant.MIN
@@ -200,27 +200,27 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val relPending = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs("pending $testName")
         val createdTask = testDataClient.relation.setRelationStateToPending(relPending.externalId)
 
-        val relReady = testDataClient.relation.upsertRelationInputWithBusinessPartners("ready $testName", RelationType.IsOwnedBy)
+        val relReady = testDataClient.relation.upsertRelationInputWithBusinessPartners("ready $testName", RelationTypeV7.IsOwnedBy)
 
         //WHEN filter by Pending
-        val pendingResponse = gateClient.relationSharingState.get(sharingStateTypes = listOf(RelationSharingStateType.Pending))
+        val pendingResponse = gateClient.relationSharingState.get(sharingStateTypes = listOf(RelationSharingStateTypeV7.Pending))
 
         //THEN only the Pending relation is returned
-        val expectedPending = RelationSharingStateDto(
+        val expectedPending = RelationSharingStateV7Dto(
             externalId = relPending.externalId,
-            sharingStateType = RelationSharingStateType.Pending,
+            sharingStateType = RelationSharingStateTypeV7.Pending,
             taskId = createdTask.taskId,
             updatedAt = Instant.MIN
         )
         assertRepo.assertRelationSharingStates(pendingResponse, PageDto(1L, 1, 0, 1, listOf(expectedPending)))
 
         //WHEN filter by Ready
-        val readyResponse = gateClient.relationSharingState.get(sharingStateTypes = listOf(RelationSharingStateType.Ready))
+        val readyResponse = gateClient.relationSharingState.get(sharingStateTypes = listOf(RelationSharingStateTypeV7.Ready))
 
         //THEN only the Ready relation is returned
-        val expectedReady = RelationSharingStateDto(
+        val expectedReady = RelationSharingStateV7Dto(
             externalId = relReady.externalId,
-            sharingStateType = RelationSharingStateType.Ready,
+            sharingStateType = RelationSharingStateTypeV7.Ready,
             taskId = null,
             updatedAt = Instant.MIN
         )
@@ -235,9 +235,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate relation sharing states across multiple pages`() {
         //GIVEN
-        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
-        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
-        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("3 $testName", RelationType.IsAlternativeHeadquarterFor)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationTypeV7.IsManagedBy)
+        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationTypeV7.IsOwnedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("3 $testName", RelationTypeV7.IsAlternativeHeadquarterFor)
 
         //WHEN
         val page0 = gateClient.relationSharingState.get(paginationRequest = PaginationRequest(page = 0, size = 2))
@@ -249,9 +249,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
         val allReturned = page0.content + page1.content
         val expectedStates = listOf(rel1, rel2, rel3).map { rel ->
-            RelationSharingStateDto(
+            RelationSharingStateV7Dto(
                 externalId = rel.externalId,
-                sharingStateType = RelationSharingStateType.Ready,
+                sharingStateType = RelationSharingStateTypeV7.Ready,
                 taskId = null,
                 updatedAt = Instant.MIN
             )
@@ -267,8 +267,8 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `get page beyond available relation sharing states returns empty`() {
         //GIVEN
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationTypeV7.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationTypeV7.IsOwnedBy)
 
         //WHEN
         val response = gateClient.relationSharingState.get(paginationRequest = PaginationRequest(page = 1, size = 5))
@@ -286,7 +286,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between two site outputs leads to pending sharing state`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsReplacedBy,
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
@@ -309,7 +309,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between legal entity source and site target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsManagedBy,
             { testDataClient.businessPartner.refineToLegalEntity(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
@@ -332,7 +332,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between site source and legal entity target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsManagedBy,
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
@@ -355,7 +355,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between legal entity source and additional address target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsManagedBy,
             { testDataClient.businessPartner.refineToLegalEntity(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
@@ -378,7 +378,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between additional address source and legal entity target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsManagedBy,
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
             { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
@@ -401,7 +401,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsOwnedBy between two sites leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsOwnedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsOwnedBy,
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
@@ -424,7 +424,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsAlternativeHeadquarterFor between two additional addresses leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsAlternativeHeadquarterFor,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsAlternativeHeadquarterFor,
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
@@ -446,16 +446,16 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between two legal entities is shared as legal entity relation`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName, RelationType.IsReplacedBy)
+        val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName, RelationTypeV7.IsReplacedBy)
         val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId)
 
         //WHEN
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
 
         //THEN
-        val expected = RelationSharingStateDto(
+        val expected = RelationSharingStateV7Dto(
             externalId = relation.externalId,
-            sharingStateType = RelationSharingStateType.Pending,
+            sharingStateType = RelationSharingStateTypeV7.Pending,
             taskId = createdTask.taskId,
             updatedAt = Instant.MIN
         )
@@ -472,7 +472,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between site source and additional address target is shared as address relation`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsReplacedBy,
             { testDataClient.businessPartner.refineToSite(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
@@ -496,7 +496,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between legal entity source and site target is shared as address relation`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsReplacedBy,
             { testDataClient.businessPartner.refineToLegalEntity(it) },
             { testDataClient.businessPartner.refineToSite(it) }
         )
@@ -519,7 +519,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between two additional addresses is shared as address relation`() {
         //GIVEN
-        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationTypeV7.IsReplacedBy,
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
             { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
@@ -533,17 +533,17 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
     }
 
-    private fun expectedPendingState(externalId: String, taskId: String?) = RelationSharingStateDto(
+    private fun expectedPendingState(externalId: String, taskId: String?) = RelationSharingStateV7Dto(
         externalId = externalId,
-        sharingStateType = RelationSharingStateType.Pending,
+        sharingStateType = RelationSharingStateTypeV7.Pending,
         taskId = taskId,
         updatedAt = Instant.MIN
     )
 
-    private fun expectedErrorState(externalId: String) = RelationSharingStateDto(
+    private fun expectedErrorState(externalId: String) = RelationSharingStateV7Dto(
         externalId = externalId,
-        sharingStateType = RelationSharingStateType.Error,
-        sharingErrorCode = RelationSharingStateErrorCode.SharingProcessError,
+        sharingStateType = RelationSharingStateTypeV7.Error,
+        sharingErrorCode = RelationSharingStateErrorCodeV7.SharingProcessError,
         taskId = null,
         updatedAt = Instant.MIN
     )

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateClientImpl
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.DefaultGateV7Client
 import org.springframework.boot.web.server.WebServer
 
 class GateTestClientProviderV7(
@@ -30,8 +30,8 @@ class GateTestClientProviderV7(
     private val bpdmWebClientProvider: BpdmWebClientProvider
 ) {
 
-    fun createClient(oauth2RegistrationId: String?): GateClient {
-        return GateClientImpl {
+    fun createClient(oauth2RegistrationId: String?): GateV7Client {
+        return DefaultGateV7Client {
             bpdmWebClientProvider.builder(
                 BpdmClientCreateProperties(
                     oauth2RegistrationId ?: "",

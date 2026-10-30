@@ -13,9 +13,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.ChangelogType as ChangelogTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.ChangelogTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.PageChangeLogV6Dto
 import org.eclipse.tractusx.bpdm.gate.model.output.changelog.ChangelogEntryRecord
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.springframework.data.domain.Page
@@ -30,13 +30,13 @@ class ApiV6ChangelogMapper {
     /**
      * Returns the API response for [page], which never reports invalid entries.
      */
-    fun toPageDto(page: Page<ChangelogEntryRecord>): PageChangeLogDto<ChangelogGateDto> =
-        PageChangeLogDto(
+    fun toPageDto(page: Page<ChangelogEntryRecord>): PageChangeLogV6Dto<ChangelogGateV6Dto> =
+        PageChangeLogV6Dto(
             totalElements = page.totalElements,
             totalPages = page.totalPages,
             page = page.number,
             contentSize = page.numberOfElements,
-            content = page.content.map { ChangelogGateDto(externalId = it.externalId, timestamp = it.createdAt, changelogType = toDto(it.changelogType)) },
+            content = page.content.map { ChangelogGateV6Dto(externalId = it.externalId, timestamp = it.createdAt, changelogType = toDto(it.changelogType)) },
             invalidEntries = 0,
             errors = emptyList()
         )
@@ -44,9 +44,9 @@ class ApiV6ChangelogMapper {
     /**
      * Returns the API changelog type for [changelogType].
      */
-    fun toDto(changelogType: ChangelogType): ChangelogTypeDto =
+    fun toDto(changelogType: ChangelogType): ChangelogTypeV6 =
         when (changelogType) {
-            ChangelogType.CREATE -> ChangelogTypeDto.CREATE
-            ChangelogType.UPDATE -> ChangelogTypeDto.UPDATE
+            ChangelogType.CREATE -> ChangelogTypeV6.CREATE
+            ChangelogType.UPDATE -> ChangelogTypeV6.UPDATE
         }
 }
