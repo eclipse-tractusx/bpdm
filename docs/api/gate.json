@@ -1673,7 +1673,7 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateResponseDto"
             }
           },
           "identifiers" : {
@@ -2030,7 +2030,7 @@
             "type" : "array",
             "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateResponseDto"
             }
           },
           "roles" : {
@@ -2121,12 +2121,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "Date since when the status is/was valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "Date until the status was valid, if applicable."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : [ "string", "null" ],
@@ -2134,6 +2134,27 @@
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
         }
+      },
+      "BusinessPartnerStateResponseDto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "The type of this specified status.",
+            "enum" : [ "ACTIVE", "INACTIVE" ]
+          }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "ChangelogGateDto" : {
         "type" : "object",
@@ -2349,7 +2370,7 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateResponseDto"
             }
           },
           "goldenRecordRelations" : {
@@ -3167,7 +3188,7 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateResponseDto"
             }
           },
           "goldenRecordRelations" : {
