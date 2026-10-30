@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.union
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.union
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResolutionPageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw

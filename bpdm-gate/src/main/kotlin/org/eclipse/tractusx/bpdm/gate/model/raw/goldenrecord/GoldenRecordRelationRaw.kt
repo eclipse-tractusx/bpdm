@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-data class GoldenRecordRelation<T : Enum<T>>(
+data class GoldenRecordRelationRaw<T : Enum<T>>(
     val type: T,
     val sourceBpn: String,
     val targetBpn: String

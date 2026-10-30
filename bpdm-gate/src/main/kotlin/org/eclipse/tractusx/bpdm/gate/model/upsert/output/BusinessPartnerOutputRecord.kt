@@ -14,10 +14,10 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
@@ -50,7 +50,7 @@ data class BusinessPartnerOutputRecord(
         val ownershipUltimate: Boolean?,
         val ultimateOwnerBpnl: String?,
         val states: List<StateRaw>,
-        val goldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
+        val goldenRecordRelations: List<GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )
 
@@ -59,7 +59,7 @@ data class BusinessPartnerOutputRecord(
         val name: String?,
         val confidence: ConfidenceCriteriaRaw,
         val states: List<StateRaw>,
-        val goldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
+        val goldenRecordRelations: List<GoldenRecordRelationRaw<SiteGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )
 
@@ -71,7 +71,7 @@ data class BusinessPartnerOutputRecord(
         val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?,
         val confidence: ConfidenceCriteriaRaw,
         val states: List<StateRaw>,
-        val goldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
+        val goldenRecordRelations: List<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )
 }

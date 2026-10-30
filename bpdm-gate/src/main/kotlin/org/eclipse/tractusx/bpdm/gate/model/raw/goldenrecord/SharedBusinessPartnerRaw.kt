@@ -11,11 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-data class PoolGoldenRecordsRequest(
-    val requested: GoldenRecordBpns,
-    val legalEntities: Map<String, LegalEntityGoldenRecordRequest>,
-    val sites: Map<String, SiteGoldenRecordRequest>,
-    val addresses: Map<String, AddressGoldenRecordRequest>
+data class SharedBusinessPartnerRaw(
+    val sharingStateId: Long,
+    val referencedBpns: GoldenRecordBpnsRaw
 )

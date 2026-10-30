@@ -11,9 +11,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord
 
-data class SharedBusinessPartner(
-    val sharingStateId: Long,
-    val referencedBpns: GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
+
+data class GoldenRecordConsistencyCheckParsed(
+    val sharingState: SharingStateDb,
+    val checkedBpns: GoldenRecordBpnsRaw,
+    val currentBpns: GoldenRecordBpnsRaw,
+    val missingBpns: List<String>
 )

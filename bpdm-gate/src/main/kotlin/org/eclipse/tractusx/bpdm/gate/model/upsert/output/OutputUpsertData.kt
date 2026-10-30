@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
@@ -58,9 +58,9 @@ data class OutputUpsertData(
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
     val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
-    val legalEntityGoldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
-    val siteGoldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
-    val addressGoldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
+    val legalEntityGoldenRecordRelations: List<GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>>,
+    val siteGoldenRecordRelations: List<GoldenRecordRelationRaw<SiteGoldenRecordRelationType>>,
+    val addressGoldenRecordRelations: List<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean? = null,
     val ultimateOwnerBpnl: String? = null,
     val additionalSites: List<AdditionalSiteRaw> = emptyList()

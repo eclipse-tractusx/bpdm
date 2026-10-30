@@ -11,14 +11,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord
 
-import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
+/**
+ * Reason a shared business partner whose golden records were checked cannot be resolved for the consistency check.
+ */
+sealed interface GoldenRecordConsistencyCheckError {
+    val sharingStateId: Long
 
-data class BusinessPartnerOutputParsed(
-    val sharingState: SharingStateDb,
-    val storedOutput: BusinessPartnerDb?,
-    val data: OutputUpsertData
-)
+    data class SharingStateMissing(override val sharingStateId: Long) : GoldenRecordConsistencyCheckError
+}

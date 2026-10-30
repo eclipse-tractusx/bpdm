@@ -14,10 +14,10 @@ package org.eclipse.tractusx.bpdm.gate.mapper.gatev7.outbound
 
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.BusinessPartnerOutputRecord
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
 import org.springframework.stereotype.Component
 import java.time.Instant
 

@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.goldenrecord
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordConsistencyCheckParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService

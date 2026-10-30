@@ -17,8 +17,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordUpdatePageRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordUpdatePageRaw
 import org.eclipse.tractusx.bpdm.gate.service.gateway.PoolGoldenRecordGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.BusinessPartnerOutputOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sync.SyncRecordOperationService
@@ -59,7 +59,7 @@ class GoldenRecordUpdateApplicationService(
         } while (page.changes.hasMore)
     }
 
-    private fun update(page: GoldenRecordUpdatePageRequest) {
+    private fun update(page: GoldenRecordUpdatePageRaw) {
         pageTransaction.executeWithoutResult {
             val parsed = updateParser.parse(page).mapNotNull { result ->
                 when (result) {

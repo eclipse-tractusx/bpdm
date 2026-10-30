@@ -11,23 +11,30 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.value.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.StateRaw
 import java.time.Instant
 
-data class SiteGoldenRecordRequest(
+data class LegalEntityGoldenRecordRaw(
     val bpn: String,
-    val name: String,
+    val legalName: String,
+    val shortName: String?,
+    val legalForm: String?,
+    val identifiers: List<IdentifierRaw>,
     val states: List<StateRaw>,
     val confidence: ConfidenceCriteriaRaw,
-    val relations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
+    val relations: List<GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>>,
+    val ownershipUltimate: Boolean?,
+    val ultimateOwnerBpnl: String?,
     val scriptVariants: List<ScriptVariant>,
     val updatedAt: Instant
 ) {
     data class ScriptVariant(
         val scriptCode: String,
-        val name: String
+        val legalName: String,
+        val shortName: String?
     )
 }

@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
@@ -40,9 +40,9 @@ class GoldenRecordTaskResultRequestMapper(
             ResultState.Error -> toFailed(task)
         }
 
-    private fun toBpns(businessPartner: BusinessPartner): GoldenRecordBpns =
+    private fun toBpns(businessPartner: BusinessPartner): GoldenRecordBpnsRaw =
         with(businessPartner) {
-            GoldenRecordBpns(
+            GoldenRecordBpnsRaw(
                 legalEntities = setOfNotNull(legalEntity.bpnReference.referenceValue),
                 sites = setOfNotNull(site?.bpnReference?.referenceValue),
                 addresses = setOfNotNull(

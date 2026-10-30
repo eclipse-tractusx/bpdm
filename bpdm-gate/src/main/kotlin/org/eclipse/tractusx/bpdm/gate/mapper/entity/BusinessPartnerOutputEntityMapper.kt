@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.mapper.entity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
@@ -106,21 +106,21 @@ class BusinessPartnerOutputEntityMapper(
             alternativeAddress = scriptVariant.alternativeAddressCity?.let(inputEntityMapper::toAlternativeAddressScriptVariant)
         )
 
-    private fun toLegalEntityGoldenRecordRelation(relation: GoldenRecordRelation<LegalEntityGoldenRecordRelationType>) =
+    private fun toLegalEntityGoldenRecordRelation(relation: GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>) =
         LegalEntityGoldenRecordRelationDb(
             relationType = relation.type,
             sourceBpn = relation.sourceBpn,
             targetBpn = relation.targetBpn
         )
 
-    private fun toSiteGoldenRecordRelation(relation: GoldenRecordRelation<SiteGoldenRecordRelationType>) =
+    private fun toSiteGoldenRecordRelation(relation: GoldenRecordRelationRaw<SiteGoldenRecordRelationType>) =
         SiteGoldenRecordRelationDb(
             relationType = relation.type,
             sourceBpn = relation.sourceBpn,
             targetBpn = relation.targetBpn
         )
 
-    private fun toAddressGoldenRecordRelation(relation: GoldenRecordRelation<AddressGoldenRecordRelationType>) =
+    private fun toAddressGoldenRecordRelation(relation: GoldenRecordRelationRaw<AddressGoldenRecordRelationType>) =
         AddressGoldenRecordRelationDb(
             relationType = relation.type,
             sourceBpn = relation.sourceBpn,

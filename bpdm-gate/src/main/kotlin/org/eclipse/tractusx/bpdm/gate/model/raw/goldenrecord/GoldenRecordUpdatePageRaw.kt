@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-data class GoldenRecordUpdatePageRequest(
-    val changes: PoolChangePageRequest,
-    val goldenRecords: PoolGoldenRecordsRequest
+data class GoldenRecordUpdatePageRaw(
+    val changes: PoolChangePageRaw,
+    val goldenRecords: PoolGoldenRecordsRaw
 )

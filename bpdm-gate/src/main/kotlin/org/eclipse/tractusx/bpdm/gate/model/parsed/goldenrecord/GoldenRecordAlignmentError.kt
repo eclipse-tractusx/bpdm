@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord
 
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 

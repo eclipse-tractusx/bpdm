@@ -11,14 +11,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
-
-data class AddressAlignmentParsed(
-    val address: AddressGoldenRecordRequest,
-    val addressType: AddressType,
-    val additionalSites: List<AdditionalSiteRaw>,
-    val adoptedSite: SiteGoldenRecordRequest?
+data class GoldenRecordConsistencyCheckPageRaw(
+    val sharedBusinessPartners: List<SharedBusinessPartnerRaw>,
+    val existingBpns: GoldenRecordBpnsRaw
 )

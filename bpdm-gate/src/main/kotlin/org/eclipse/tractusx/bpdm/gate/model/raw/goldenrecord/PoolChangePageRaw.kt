@@ -11,12 +11,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
 import java.time.Instant
 
-data class PoolChangePageRequest(
-    val changed: GoldenRecordBpns,
+data class PoolChangePageRaw(
+    val changed: GoldenRecordBpnsRaw,
     val changedUntil: Instant?,
     val hasMore: Boolean
 )

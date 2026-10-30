@@ -20,9 +20,9 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SharedBusinessPartner
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskCreationParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SharedBusinessPartnerRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.PendingGoldenRecordTaskRaw
@@ -92,10 +92,10 @@ class SharingStateOperationService(
      * the order of their sharing state id and starting after [sharingStateId].
      */
     @Transactional(readOnly = true)
-    fun findSharedAfter(sharingStateId: Long, limit: Int): List<SharedBusinessPartner> {
+    fun findSharedAfter(sharingStateId: Long, limit: Int): List<SharedBusinessPartnerRaw> {
         val sharingStates = sharingStateRepository.findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(SharingStateType.Success, sharingStateId, Pageable.ofSize(limit))
         val outputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Output).associateBy { it.sharingState.id }
-        return sharingStates.map { SharedBusinessPartner(it.id, outputsBySharingStateId[it.id]?.referencedBpns() ?: GoldenRecordBpns.NONE) }
+        return sharingStates.map { SharedBusinessPartnerRaw(it.id, outputsBySharingStateId[it.id]?.referencedBpns() ?: GoldenRecordBpnsRaw.NONE) }
     }
 
     /**

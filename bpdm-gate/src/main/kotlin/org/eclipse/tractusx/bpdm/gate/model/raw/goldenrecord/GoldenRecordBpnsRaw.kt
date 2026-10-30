@@ -11,24 +11,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.tractusx.bpdm.gate.model.goldenrecord
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
 
 
-data class GoldenRecordBpns(
+data class GoldenRecordBpnsRaw(
     val legalEntities: Set<String>,
     val sites: Set<String>,
     val addresses: Set<String>
 ) {
     companion object {
-        val NONE = GoldenRecordBpns(emptySet(), emptySet(), emptySet())
+        val NONE = GoldenRecordBpnsRaw(emptySet(), emptySet(), emptySet())
     }
 }
 
 /**
  * Returns every BPN of these collections, by business partner type.
  */
-fun Iterable<GoldenRecordBpns>.union(): GoldenRecordBpns =
-    GoldenRecordBpns(
+fun Iterable<GoldenRecordBpnsRaw>.union(): GoldenRecordBpnsRaw =
+    GoldenRecordBpnsRaw(
         legalEntities = flatMap { it.legalEntities }.toSet(),
         sites = flatMap { it.sites }.toSet(),
         addresses = flatMap { it.addresses }.toSet()

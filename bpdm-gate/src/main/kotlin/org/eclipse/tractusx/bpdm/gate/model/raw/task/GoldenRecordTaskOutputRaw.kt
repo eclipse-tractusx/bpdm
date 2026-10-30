@@ -16,10 +16,10 @@ package org.eclipse.tractusx.bpdm.gate.model.raw.task
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import java.time.Instant
 import java.time.LocalDateTime
@@ -47,9 +47,9 @@ data class GoldenRecordTaskOutputRaw(
     val siteUpdatedAt: Instant?,
     val addressUpdatedAt: Instant?,
     val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
-    val legalEntityGoldenRecordRelations: List<GoldenRecordRelation<LegalEntityGoldenRecordRelationType>>,
-    val siteGoldenRecordRelations: List<GoldenRecordRelation<SiteGoldenRecordRelationType>>,
-    val addressGoldenRecordRelations: List<GoldenRecordRelation<AddressGoldenRecordRelationType>>,
+    val legalEntityGoldenRecordRelations: List<GoldenRecordRelationRaw<LegalEntityGoldenRecordRelationType>>,
+    val siteGoldenRecordRelations: List<GoldenRecordRelationRaw<SiteGoldenRecordRelationType>>,
+    val addressGoldenRecordRelations: List<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,
     val ownershipUltimate: Boolean?,
     val ultimateOwnerBpnl: String?,
     val additionalSites: List<BusinessPartnerValuesRaw.AdditionalSite>

@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
@@ -34,8 +34,8 @@ class SiteAlignmentParser {
     fun parse(
         sharingState: SharingStateDb,
         base: OutputUpsertData,
-        goldenRecords: PoolGoldenRecordsRequest
-    ): ParseResult<SiteGoldenRecordRequest?, GoldenRecordAlignmentError> {
+        goldenRecords: PoolGoldenRecordsRaw
+    ): ParseResult<SiteGoldenRecordRaw?, GoldenRecordAlignmentError> {
         val bpn = base.siteBpn?.takeIf { it in goldenRecords.requested.sites } ?: return ParseResult.Success(null)
         val site = goldenRecords.sites[bpn]
             ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(sharingState, bpn))
@@ -47,6 +47,6 @@ class SiteAlignmentParser {
     /**
      * Returns [site] with one script variant per script code.
      */
-    fun normalize(site: SiteGoldenRecordRequest): SiteGoldenRecordRequest =
+    fun normalize(site: SiteGoldenRecordRaw): SiteGoldenRecordRaw =
         site.copy(scriptVariants = site.scriptVariants.distinctBy { it.scriptCode })
 }

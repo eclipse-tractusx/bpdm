@@ -15,10 +15,10 @@ package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskOutputRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.GeoCoordinateRaw
@@ -233,7 +233,7 @@ class GoldenRecordTaskOutputRequestMapper {
     }
 
     private fun toRelation(relation: LegalEntityGoldenRecordRelation) =
-        GoldenRecordRelation(
+        GoldenRecordRelationRaw(
             type = when (relation.relationType) {
                 OrchestratorLegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
                 OrchestratorLegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
@@ -245,7 +245,7 @@ class GoldenRecordTaskOutputRequestMapper {
         )
 
     private fun toRelation(relation: SiteGoldenRecordRelation) =
-        GoldenRecordRelation(
+        GoldenRecordRelationRaw(
             type = when (relation.relationType) {
                 OrchestratorSiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
             },
@@ -254,7 +254,7 @@ class GoldenRecordTaskOutputRequestMapper {
         )
 
     private fun toRelation(relation: AddressGoldenRecordRelation) =
-        GoldenRecordRelation(
+        GoldenRecordRelationRaw(
             type = when (relation.relationType) {
                 OrchestratorAddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
             },

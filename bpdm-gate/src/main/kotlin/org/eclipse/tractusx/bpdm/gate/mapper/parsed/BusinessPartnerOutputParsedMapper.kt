@@ -16,10 +16,10 @@ package org.eclipse.tractusx.bpdm.gate.mapper.parsed
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.AddressAlignmentParsed
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SiteGoldenRecordRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.AddressAlignmentParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.BusinessPartnerValuesRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Component
@@ -38,8 +38,8 @@ class BusinessPartnerOutputParsedMapper {
         sharingState: SharingStateDb,
         storedOutput: BusinessPartnerDb?,
         base: OutputUpsertData,
-        legalEntity: LegalEntityGoldenRecordRequest?,
-        site: SiteGoldenRecordRequest?,
+        legalEntity: LegalEntityGoldenRecordRaw?,
+        site: SiteGoldenRecordRaw?,
         address: AddressAlignmentParsed?
     ): BusinessPartnerOutputParsed {
         val aligned = base
@@ -49,7 +49,7 @@ class BusinessPartnerOutputParsedMapper {
         return BusinessPartnerOutputParsed(sharingState, storedOutput, aligned)
     }
 
-    private fun withLegalEntity(data: OutputUpsertData, legalEntity: LegalEntityGoldenRecordRequest): OutputUpsertData =
+    private fun withLegalEntity(data: OutputUpsertData, legalEntity: LegalEntityGoldenRecordRaw): OutputUpsertData =
         data.copy(
             identifiers = data.identifiers.filterNot { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY } + legalEntity.identifiers,
             states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY } + legalEntity.states,
@@ -66,7 +66,7 @@ class BusinessPartnerOutputParsedMapper {
             }
         )
 
-    private fun withSite(data: OutputUpsertData, site: SiteGoldenRecordRequest): OutputUpsertData =
+    private fun withSite(data: OutputUpsertData, site: SiteGoldenRecordRaw): OutputUpsertData =
         data.copy(
             siteBpn = site.bpn,
             states = data.states.filterNot { it.businessPartnerType == BusinessPartnerType.SITE } + site.states,

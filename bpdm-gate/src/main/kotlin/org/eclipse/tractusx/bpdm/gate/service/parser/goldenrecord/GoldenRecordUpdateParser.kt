@@ -16,9 +16,9 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.mapper.record.OutputUpsertDataMapper
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordUpdatePageRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordUpdatePageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.stereotype.Service
@@ -38,7 +38,7 @@ class GoldenRecordUpdateParser(
      * Returns the output data each successfully shared output referencing a golden record changed in [page] takes on.
      */
     @Transactional(readOnly = true)
-    fun parse(page: GoldenRecordUpdatePageRequest): List<ParseResult<BusinessPartnerOutputParsed, GoldenRecordAlignmentError>> {
+    fun parse(page: GoldenRecordUpdatePageRaw): List<ParseResult<BusinessPartnerOutputParsed, GoldenRecordAlignmentError>> {
         val changed = page.changes.changed
         val referencingOutputs = businessPartnerRepository.findByStageAndBpnLIn(StageType.Output, changed.legalEntities) +
                 businessPartnerRepository.findByStageAndBpnSIn(StageType.Output, changed.sites) +

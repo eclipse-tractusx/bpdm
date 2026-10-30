@@ -16,7 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.mapper.record
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordRelation
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordRelationRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.AlternativeAddressRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.value.ConfidenceCriteriaRaw
@@ -69,9 +69,9 @@ class OutputUpsertDataMapper(
                 siteUpdatedAt = siteUpdatedAt,
                 addressUpdatedAt = addressUpdatedAt,
                 scriptVariants = scriptVariants.map(valueMapper::toValue),
-                legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
-                siteGoldenRecordRelations = siteGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
-                addressGoldenRecordRelations = addressGoldenRecordRelations.map { GoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) },
+                legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
+                siteGoldenRecordRelations = siteGoldenRecordRelations.map { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
+                addressGoldenRecordRelations = addressGoldenRecordRelations.map { GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn) },
                 ownershipUltimate = ownershipUltimate,
                 ultimateOwnerBpnl = ultimateOwnerBpnl,
                 additionalSites = additionalSites.map { AdditionalSiteRaw(it.bpn ?: throw missing(AdditionalSiteDb::bpn, id), it.name) }

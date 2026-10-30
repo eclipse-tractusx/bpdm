@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
 import java.time.Instant
 import java.util.*
 
@@ -157,8 +157,8 @@ class BusinessPartnerDb(
     /**
      * Returns the BPNs of the golden records this business partner references.
      */
-    fun referencedBpns(): GoldenRecordBpns =
-        GoldenRecordBpns(
+    fun referencedBpns(): GoldenRecordBpnsRaw =
+        GoldenRecordBpnsRaw(
             legalEntities = setOfNotNull(bpnL),
             sites = setOfNotNull(bpnS),
             addresses = setOfNotNull(bpnA)

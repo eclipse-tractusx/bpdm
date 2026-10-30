@@ -15,10 +15,10 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordConsistencyCheckError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordConsistencyCheckParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordConsistencyCheckPageRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.stereotype.Service
@@ -36,7 +36,7 @@ class GoldenRecordConsistencyCheckParser(
      * Resolves the sharing state and current output of each checked business partner in [page], failing those whose
      * sharing state no longer exists.
      */
-    fun parse(page: GoldenRecordConsistencyCheckPageRequest): List<ParseResult<GoldenRecordConsistencyCheckParsed, GoldenRecordConsistencyCheckError>> {
+    fun parse(page: GoldenRecordConsistencyCheckPageRaw): List<ParseResult<GoldenRecordConsistencyCheckParsed, GoldenRecordConsistencyCheckError>> {
         val sharingStatesById = sharingStateRepository.findAllById(page.sharedBusinessPartners.map { it.sharingStateId }).associateBy { it.id }
         val outputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStatesById.values, StageType.Output)
             .associateBy { it.sharingState.id }
@@ -48,14 +48,14 @@ class GoldenRecordConsistencyCheckParser(
                 GoldenRecordConsistencyCheckParsed(
                     sharingState = sharingState,
                     checkedBpns = shared.referencedBpns,
-                    currentBpns = outputsBySharingStateId[sharingState.id]?.referencedBpns() ?: GoldenRecordBpns.NONE,
+                    currentBpns = outputsBySharingStateId[sharingState.id]?.referencedBpns() ?: GoldenRecordBpnsRaw.NONE,
                     missingBpns = findMissing(shared.referencedBpns, page.existingBpns)
                 )
             )
         }
     }
 
-    private fun findMissing(checked: GoldenRecordBpns, existing: GoldenRecordBpns): List<String> =
+    private fun findMissing(checked: GoldenRecordBpnsRaw, existing: GoldenRecordBpnsRaw): List<String> =
         checked.legalEntities.minus(existing.legalEntities).toList() +
             checked.sites.minus(existing.sites) +
             checked.addresses.minus(existing.addresses)

@@ -15,9 +15,9 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.LegalEntityGoldenRecordRequest
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.springframework.stereotype.Service
 
@@ -34,8 +34,8 @@ class LegalEntityAlignmentParser {
     fun parse(
         sharingState: SharingStateDb,
         base: OutputUpsertData,
-        goldenRecords: PoolGoldenRecordsRequest
-    ): ParseResult<LegalEntityGoldenRecordRequest?, GoldenRecordAlignmentError> {
+        goldenRecords: PoolGoldenRecordsRaw
+    ): ParseResult<LegalEntityGoldenRecordRaw?, GoldenRecordAlignmentError> {
         val bpn = base.legalEntityBpn.takeIf { it in goldenRecords.requested.legalEntities } ?: return ParseResult.Success(null)
         val legalEntity = goldenRecords.legalEntities[bpn]
             ?: return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(sharingState, bpn))

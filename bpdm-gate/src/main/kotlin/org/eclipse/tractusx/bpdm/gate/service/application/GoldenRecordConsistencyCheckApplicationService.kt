@@ -16,10 +16,10 @@ package org.eclipse.tractusx.bpdm.gate.service.application
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckPageRequest
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SharedBusinessPartner
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.union
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordConsistencyCheckError
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordConsistencyCheckPageRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SharedBusinessPartnerRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.union
 import org.eclipse.tractusx.bpdm.gate.service.gateway.PoolGoldenRecordGateway
 import org.eclipse.tractusx.bpdm.gate.service.operation.goldenrecord.GoldenRecordConsistencyCheckOperationService
 import org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.SharingStateOperationService
@@ -53,15 +53,15 @@ class GoldenRecordConsistencyCheckApplicationService(
     fun checkSharedBusinessPartners() {
         var shared = findSharedAfter(Long.MIN_VALUE)
         while (shared.isNotEmpty()) {
-            checkPage(GoldenRecordConsistencyCheckPageRequest(shared, poolGateway.fetchExistingBpns(shared.map { it.referencedBpns }.union())))
+            checkPage(GoldenRecordConsistencyCheckPageRaw(shared, poolGateway.fetchExistingBpns(shared.map { it.referencedBpns }.union())))
             shared = findSharedAfter(shared.last().sharingStateId)
         }
     }
 
-    private fun findSharedAfter(sharingStateId: Long): List<SharedBusinessPartner> =
+    private fun findSharedAfter(sharingStateId: Long): List<SharedBusinessPartnerRaw> =
         sharingStateOperation.findSharedAfter(sharingStateId, taskProperties.consistencyCheck.batchSize)
 
-    private fun checkPage(page: GoldenRecordConsistencyCheckPageRequest) {
+    private fun checkPage(page: GoldenRecordConsistencyCheckPageRaw) {
         pageTransaction.executeWithoutResult {
             val checks = consistencyCheckParser.parse(page).mapNotNull { result ->
                 when (result) {

@@ -13,7 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.raw.task
 
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordBpnsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 
 sealed interface GoldenRecordTaskResultRaw {
@@ -24,7 +24,7 @@ sealed interface GoldenRecordTaskResultRaw {
     data class Succeeded(
         override val taskId: String,
         val output: GoldenRecordTaskOutputRaw,
-        val bpns: GoldenRecordBpns
+        val bpns: GoldenRecordBpnsRaw
     ) : GoldenRecordTaskResultRaw
 
     data class Failed(

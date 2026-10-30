@@ -18,12 +18,12 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.BusinessPartnerOutputParsed
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordAlignmentError
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.PoolGoldenRecordsRequest
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.BusinessPartnerOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.goldenrecord.GoldenRecordAlignmentError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskOutputError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.GoldenRecordTaskResolutionParsed
+import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.PoolGoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResolutionPageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
@@ -81,7 +81,7 @@ class GoldenRecordTaskResolutionParser(
         result: GoldenRecordTaskResultRaw.Succeeded,
         input: BusinessPartnerDb?,
         storedOutput: BusinessPartnerDb?,
-        goldenRecords: PoolGoldenRecordsRequest
+        goldenRecords: PoolGoldenRecordsRaw
     ): ParseResult<GoldenRecordTaskResolutionParsed, GoldenRecordTaskResolutionError> {
         if (input == null) return ParseResult.ofSingleFailure(GoldenRecordTaskResolutionError.InputMissing(sharingState))
 
