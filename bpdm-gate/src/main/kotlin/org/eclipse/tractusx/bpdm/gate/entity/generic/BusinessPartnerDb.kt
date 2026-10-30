@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import java.time.Instant
 import java.util.*
 
@@ -152,5 +153,15 @@ class BusinessPartnerDb(
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "businessPartner")
     val scriptVariants: MutableList<BusinessPartnerScriptVariantDb> = mutableListOf()
+
+    /**
+     * Returns the BPNs of the golden records this business partner references.
+     */
+    fun referencedBpns(): GoldenRecordBpns =
+        GoldenRecordBpns(
+            legalEntities = setOfNotNull(bpnL),
+            sites = setOfNotNull(bpnS),
+            addresses = setOfNotNull(bpnA)
+        )
 }
 

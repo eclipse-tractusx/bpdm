@@ -19,7 +19,6 @@ import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckError
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckPageRequest
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordConsistencyCheckParsed
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.referencedBpns
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.stereotype.Service

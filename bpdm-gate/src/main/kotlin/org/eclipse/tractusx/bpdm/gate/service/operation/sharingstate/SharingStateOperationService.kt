@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.businesspartner.BusinessPartnerChange
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.GoldenRecordBpns
 import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.SharedBusinessPartner
-import org.eclipse.tractusx.bpdm.gate.model.goldenrecord.referencedBpns
 import org.eclipse.tractusx.bpdm.gate.model.task.GoldenRecordTaskCreationParsed
 import org.eclipse.tractusx.bpdm.gate.model.task.PendingGoldenRecordTask
 import org.eclipse.tractusx.bpdm.gate.model.task.TaskReference
