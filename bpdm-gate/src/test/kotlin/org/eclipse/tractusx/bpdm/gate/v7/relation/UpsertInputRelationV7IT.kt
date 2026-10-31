@@ -76,8 +76,13 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         //THEN
         assertRepo.assertRelation(response, testData.relation.input.response.fromRequest(updated))
         assertRepo.assertTimestampsUpdated(response.createdAt, response.updatedAt, created.createdAt, created.updatedAt)
-        val read = gateClient.relation.postSearch(RelationSearchRequest(externalIds = listOf(response.externalId)))
+        val search = RelationSearchRequest(externalIds = listOf(response.externalId))
+        val read = gateClient.relation.postSearch(search)
         assertRepo.assertRelations(read, PageDto(1, 1, 0, 1, listOf(response)))
+        assertRepo.assertRelations(
+            gateClient.relation.postSearch(search.copy(updatedAtFrom = response.updatedAt)),
+            PageDto(0, 0, 0, 0, emptyList())
+        )
         val unchanged = testDataClient.relation.upsertRelationInput(updated)
         assertRepo.assertTimestampsUnchanged(unchanged.createdAt, unchanged.updatedAt, response.createdAt, response.updatedAt)
     }
@@ -150,17 +155,6 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //THEN
         assertRepo.assertRelation(response, testData.relation.input.response.fromRequest(request))
-
-        val update = request.withValidityPeriods(listOf(RelationValidityPeriodDto(LocalDate.of(2021, 1, 1), null)))
-        val updated = testDataClient.relation.upsertRelationInput(update)
-        assertRepo.assertRelation(updated, testData.relation.input.response.fromRequest(update))
-        assertRepo.assertTimestampsUpdated(updated.createdAt, updated.updatedAt, response.createdAt, response.updatedAt)
-        val search = RelationSearchRequest(externalIds = listOf(updated.externalId))
-        assertRepo.assertRelations(gateClient.relation.postSearch(search), PageDto(1, 1, 0, 1, listOf(updated)))
-        assertRepo.assertRelations(
-            gateClient.relation.postSearch(search.copy(updatedAtFrom = updated.updatedAt)),
-            PageDto(0, 0, 0, 0, emptyList())
-        )
     }
 
     /**

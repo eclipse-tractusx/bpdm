@@ -82,7 +82,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
 
     /**
      * GIVEN business partner input without external sequence timestamp
-     * WHEN input manager updates only the business partner's name parts
+     * WHEN input manager updates the business partner input with new data
      * THEN response contains updated business partner input data
      */
     @Test
@@ -93,7 +93,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
         val created = testDataClient.businessPartner.upsertInput(initial)
 
         //WHEN
-        val request = initial.copy(nameParts = listOf("Updated $testName"))
+        val request = testData.businessPartner.input.request.fromSeed("Updated $testName").copy(externalId = testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!
 
         //THEN
