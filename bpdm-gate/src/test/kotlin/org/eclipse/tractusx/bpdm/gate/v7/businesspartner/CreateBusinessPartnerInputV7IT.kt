@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -87,10 +88,9 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `update business partner input`() {
         //GIVEN
-        testDataClient.businessPartner.upsertInput(
-            testData.businessPartner.input.request.fromSeed("Initial $testName")
-                .copy(externalId = testName, externalSequenceTimestamp = null)
-        )
+        val initial = testData.businessPartner.input.request.fromSeed("Initial $testName")
+            .copy(externalId = testName, externalSequenceTimestamp = null)
+        val created = testDataClient.businessPartner.upsertInput(initial)
 
         //WHEN
         val request = testData.businessPartner.input.request.fromSeed("Updated $testName").copy(externalId = testName)
@@ -99,6 +99,10 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
         //THEN
         val expected = testData.businessPartner.input.response.fromRequest(request)
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
+        val updated = response.single()
+        assertRepo.assertTimestampsUpdated(updated.createdAt, updated.updatedAt, created.createdAt, created.updatedAt)
+        val read = gateClient.businessParters.getBusinessPartnersInput(listOf(testName))
+        assertRepo.assertBusinessPartnerInputRead(read, PageDto(1, 1, 0, 1, listOf(updated)))
     }
 
     /**
@@ -133,13 +137,15 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
         //GIVEN
         // No external sequence timestamp, so that change detection alone decides whether the update is taken
         val request = testData.businessPartner.input.request.fromSeed(testName).copy(externalSequenceTimestamp = null)
-        testDataClient.businessPartner.upsertInput(request)
+        val created = testDataClient.businessPartner.upsertInput(request)
 
         //WHEN
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body
 
         //THEN
         Assertions.assertThat(response).isEmpty()
+        val read = gateClient.businessParters.getBusinessPartnersInput(listOf(testName))
+        assertRepo.assertBusinessPartnerInputRead(read, PageDto(1, 1, 0, 1, listOf(created)))
     }
 
     /**

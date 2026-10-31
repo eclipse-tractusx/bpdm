@@ -23,9 +23,11 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
-import java.time.Instant
+import org.hibernate.annotations.Type
 
 @Embeddable
 data class RelationSharingStateDb (
@@ -41,7 +43,8 @@ data class RelationSharingStateDb (
     var sharingErrorMessage: String?,
 
     @Column(name = "sharing_state_updated_at", nullable = true)
-    var updatedAt: Instant,
+    @Type(DbTimestampConverter::class)
+    var updatedAt: DbTimestamp,
 
     @Column(name = "record_id", nullable = true)
     var recordId: String?,

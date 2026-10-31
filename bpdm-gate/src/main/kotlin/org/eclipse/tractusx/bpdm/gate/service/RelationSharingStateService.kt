@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
@@ -66,7 +67,7 @@ class RelationSharingStateService(
 
     private fun RelationSharingStateDb.toDto(externalId: String): RelationSharingStateDto{
         return RelationSharingStateDto(
-            externalId, sharingStateType, sharingErrorCode, sharingErrorMessage, taskId, updatedAt
+            externalId, sharingStateType, sharingErrorCode, sharingErrorMessage, taskId, updatedAt.instant
         )
     }
 
@@ -77,10 +78,11 @@ class RelationSharingStateService(
             sharingErrorMessage = null,
             recordId = relation.sharingState?.recordId,
             taskId = null,
-            updatedAt = Instant.now(),
+            updatedAt = DbTimestamp.now(),
             isStaged = false
         ).takeIf { canBeShared(relationType) }
 
+        relation.updatedAt = DbTimestamp.now()
         relationRepository.save(relation)
     }
 
@@ -91,10 +93,11 @@ class RelationSharingStateService(
             sharingErrorMessage = null,
             recordId = recordId,
             taskId = taskId,
-            updatedAt = Instant.now(),
+            updatedAt = DbTimestamp.now(),
             isStaged = false
         )
 
+        relation.updatedAt = DbTimestamp.now()
         relationRepository.save(relation)
     }
 
@@ -105,9 +108,10 @@ class RelationSharingStateService(
             sharingErrorMessage = null,
             recordId = relation.sharingState?.recordId,
             taskId = relation.sharingState?.taskId,
-            updatedAt = Instant.now(),
+            updatedAt = DbTimestamp.now(),
             isStaged = false
         )
+        relation.updatedAt = DbTimestamp.now()
     }
 
     fun setError(relation: RelationDb, errorCode: RelationSharingStateErrorCode, errorMessage: String){
@@ -117,9 +121,10 @@ class RelationSharingStateService(
             sharingErrorMessage = errorMessage,
             recordId = relation.sharingState?.recordId,
             taskId = relation.sharingState?.taskId,
-            updatedAt = Instant.now(),
+            updatedAt = DbTimestamp.now(),
             isStaged = false
         )
+        relation.updatedAt = DbTimestamp.now()
     }
 
     private fun canBeShared(relationType: RelationType): Boolean{
