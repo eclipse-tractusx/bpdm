@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
@@ -351,19 +352,19 @@ class ExpectedBusinessPartnerV6ResultFactory(
 
     fun mapToExpectedResult(givenRequest: LegalEntityStateDtoV6): LegalEntityStateVerboseDtoV6 {
         return with(givenRequest) {
-            LegalEntityStateVerboseDtoV6(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            LegalEntityStateVerboseDtoV6(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
     fun mapToExpectedResult(givenRequest: AddressStateDtoV6): AddressStateVerboseDtoV6 {
         return with(givenRequest) {
-            AddressStateVerboseDtoV6(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            AddressStateVerboseDtoV6(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
     fun mapToExpectedResult(givenRequest: SiteStateDtoV6): SiteStateVerboseDtoV6 {
         return with(givenRequest) {
-            SiteStateVerboseDtoV6(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            SiteStateVerboseDtoV6(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 

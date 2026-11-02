@@ -446,7 +446,8 @@ Send a business partner input request that
 
 * carries both states on the part of the record it concerns - `legalEntity.states`, `site.states` or
   `address.states`: the `ACTIVE` one now with a `validTo` of that date, and an `INACTIVE` one with a
-  `validFrom` of the same date and no `validTo`
+  `validFrom` of the same date and no `validTo` - the output reports it with the latest date
+  `9999-12-31T23:59:59`
 * is otherwise the record as you last shared it
 
 Send both, because a request replaces the record as a whole.

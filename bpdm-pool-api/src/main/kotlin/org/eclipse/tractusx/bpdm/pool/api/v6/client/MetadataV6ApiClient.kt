@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.client
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
@@ -52,7 +51,7 @@ interface MetadataV6ApiClient: PoolMetadataV6Api {
     override fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @RequestParam businessPartnerType: IdentifierBusinessPartnerTypeV6,
-        @RequestParam country: CountryCode?
+        @RequestParam country: String?
     ): PageDto<IdentifierTypeDtoV6>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/legal-forms")

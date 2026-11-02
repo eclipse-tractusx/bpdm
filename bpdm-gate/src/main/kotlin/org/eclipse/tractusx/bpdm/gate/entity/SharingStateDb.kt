@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import java.time.LocalDateTime
@@ -63,7 +63,6 @@ class SharingStateDb(
     @Column(name = "task_id", nullable = true)
     var taskId: String? = null
 
-) : BaseEntity()
-
+) : BaseEntityWithExplicitTimestamps()
 
 

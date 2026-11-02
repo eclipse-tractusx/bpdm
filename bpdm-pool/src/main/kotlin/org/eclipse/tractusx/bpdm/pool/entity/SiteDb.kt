@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(name = "sites")
@@ -42,7 +42,7 @@ class SiteDb(
     @CollectionTable(name = "site_script_variants", joinColumns = [JoinColumn(name = "site_id")])
     val scriptVariants: MutableList<SiteScriptVariantDb> = mutableListOf(),
 
-    ) : BaseEntity() {
+    ) : BaseEntityWithExplicitTimestamps() {
 
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<SiteStateDb> = mutableSetOf()

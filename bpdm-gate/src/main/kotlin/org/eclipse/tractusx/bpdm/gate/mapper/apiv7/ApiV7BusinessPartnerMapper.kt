@@ -14,6 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.*
@@ -181,7 +182,11 @@ class ApiV7BusinessPartnerMapper {
      * Returns the API form of a business state.
      */
     fun toDto(state: StateRaw) =
-        BusinessPartnerStateV7Dto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
+        BusinessPartnerStateOutputV7Dto(
+            type = state.type,
+            validFrom = BusinessStateDates.reportValidFrom(state.validFrom),
+            validTo = BusinessStateDates.reportValidTo(state.validTo)
+        )
 
     /**
      * Returns the API form of confidence criteria.

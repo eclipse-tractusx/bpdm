@@ -13,6 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.csv
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
@@ -38,6 +39,10 @@ class BusinessPartnerCsvStateParser(
             dateTimeParser.parse(validFrom),
             dateTimeParser.parse(validTo)
         ) { parsedType, parsedValidFrom, parsedValidTo ->
-            BusinessPartnerInputUpsertRaw.State(type = parsedType, validFrom = parsedValidFrom, validTo = parsedValidTo)
+            BusinessPartnerInputUpsertRaw.State(
+                type = parsedType,
+                validFrom = BusinessStateDates.receiveValidFrom(parsedValidFrom),
+                validTo = BusinessStateDates.receiveValidTo(parsedValidTo)
+            )
         }
 }

@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.task.RelationTaskCreationParsed
@@ -28,7 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 /**
  * Moves the sharing states of relations through their lifecycle.
@@ -51,9 +51,10 @@ class RelationSharingStateOperationService(
             sharingErrorMessage = null,
             recordId = relation.sharingState?.recordId,
             taskId = null,
-            updatedAt = Instant.now(),
+            updatedAt = DbTimestamp.now(),
             isStaged = false
         )
+        relation.updatedAt = DbTimestamp.now()
         relationRepository.save(relation)
     }
 
@@ -86,6 +87,7 @@ class RelationSharingStateOperationService(
                 is RelationTaskPreparationParsed.Sendable -> Unit
                 is RelationTaskPreparationParsed.Deferred -> {
                     checkNotNull(relation.sharingState).isStaged = false
+                    relation.updatedAt = DbTimestamp.now()
                     relationRepository.save(relation)
                     logger.debug { "Deferred the golden record task of relation ${relation.externalId}: its endpoints are not yet shared" }
                 }
@@ -110,9 +112,10 @@ class RelationSharingStateOperationService(
                 sharingErrorMessage = null,
                 recordId = creation.recordId,
                 taskId = creation.taskId,
-                updatedAt = Instant.now(),
+                updatedAt = DbTimestamp.now(),
                 isStaged = false
             )
+            relation.updatedAt = DbTimestamp.now()
             relationRepository.save(relation)
             logChange(relation)
             logger.debug { "Started golden record task ${creation.taskId} of relation ${relation.externalId}" }
@@ -141,9 +144,10 @@ class RelationSharingStateOperationService(
                 sharingErrorMessage = null,
                 recordId = relation.sharingState?.recordId,
                 taskId = relation.sharingState?.taskId,
-                updatedAt = Instant.now(),
+                updatedAt = DbTimestamp.now(),
                 isStaged = false
             )
+            relation.updatedAt = DbTimestamp.now()
             relationRepository.save(relation)
             logChange(relation)
             logger.debug { "Resolved golden record task ${relation.sharingState?.taskId} of relation ${relation.externalId} as success" }
@@ -166,9 +170,10 @@ class RelationSharingStateOperationService(
             sharingErrorMessage = errorMessage,
             recordId = relation.sharingState?.recordId,
             taskId = relation.sharingState?.taskId,
-            updatedAt = Instant.now(),
+            updatedAt = DbTimestamp.now(),
             isStaged = false
         )
+        relation.updatedAt = DbTimestamp.now()
         relationRepository.save(relation)
         logChange(relation)
     }

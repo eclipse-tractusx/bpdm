@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
@@ -66,6 +67,7 @@ class SharingStateOperationService(
         sharingState.sharingErrorMessage = null
         sharingState.sharingProcessStarted = null
         sharingState.taskId = null
+        sharingState.updatedAt = DbTimestamp.now()
         sharingStateRepository.save(sharingState)
         logChange(sharingState)
     }
@@ -114,11 +116,13 @@ class SharingStateOperationService(
                     sharingState.sharingErrorMessage = null
                     sharingState.sharingProcessStarted = sharingState.sharingProcessStarted ?: LocalDateTime.now()
                     sharingState.taskId = creation.taskId
+                    sharingState.updatedAt = DbTimestamp.now()
                     sharingStateRepository.save(sharingState)
                     logChange(sharingState)
                     logger.debug { "Started golden record task ${creation.taskId} of business partner ${sharingState.externalId}" }
                 }
                 is GoldenRecordTaskCreationParsed.Stale -> if (creation.recordIdToAssign != null) {
+                    sharingState.updatedAt = DbTimestamp.now()
                     sharingStateRepository.save(sharingState)
                     logChange(sharingState)
                 }
@@ -136,6 +140,7 @@ class SharingStateOperationService(
             sharingState.sharingErrorCode = null
             sharingState.sharingErrorMessage = null
             sharingState.sharingProcessStarted = sharingState.sharingProcessStarted ?: LocalDateTime.now()
+            sharingState.updatedAt = DbTimestamp.now()
             sharingStateRepository.save(sharingState)
             logChange(sharingState)
             logger.debug { "Resolved golden record task ${sharingState.taskId} of business partner ${sharingState.externalId} as success" }
@@ -151,6 +156,7 @@ class SharingStateOperationService(
         sharingState.sharingErrorCode = errorCode
         sharingState.sharingErrorMessage = errorMessage
         sharingState.sharingProcessStarted = sharingState.sharingProcessStarted ?: LocalDateTime.now()
+        sharingState.updatedAt = DbTimestamp.now()
         sharingStateRepository.save(sharingState)
         logChange(sharingState)
         logger.debug { "Resolved golden record task ${sharingState.taskId} of business partner ${sharingState.externalId} as error $errorCode" }

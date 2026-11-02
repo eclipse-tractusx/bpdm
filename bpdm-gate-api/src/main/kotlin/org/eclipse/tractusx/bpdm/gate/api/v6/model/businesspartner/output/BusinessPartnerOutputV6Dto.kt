@@ -34,7 +34,7 @@ data class BusinessPartnerOutputV6Dto(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
     override val identifiers: Collection<BusinessPartnerIdentifierV6Dto> = emptyList(),
-    override val states: Collection<BusinessPartnerStateV6Dto> = emptyList(),
+    override val states: Collection<BusinessPartnerStateOutputV6Dto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
     override val legalEntity: LegalEntityRepresentationOutputV6Dto,
@@ -60,7 +60,7 @@ data class LegalEntityRepresentationOutputV6Dto(
     override val shortName: String? = null,
     override val legalForm: String? = null,
     val confidenceCriteria: ConfidenceCriteriaV6Dto,
-    override val states: Collection<BusinessPartnerStateV6Dto> = emptyList()
+    override val states: Collection<BusinessPartnerStateOutputV6Dto> = emptyList()
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
@@ -70,7 +70,7 @@ data class SiteRepresentationOutputV6Dto(
     override val siteBpn: String,
     override val name: String? = null,
     val confidenceCriteria: ConfidenceCriteriaV6Dto,
-    override val states: Collection<BusinessPartnerStateV6Dto> = emptyList()
+    override val states: Collection<BusinessPartnerStateOutputV6Dto> = emptyList()
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -84,5 +84,5 @@ data class AddressComponentOutputV6Dto(
     override val physicalPostalAddress: PhysicalPostalAddressV6Dto = PhysicalPostalAddressV6Dto(),
     override val alternativePostalAddress: AlternativePostalAddressV6Dto? = null,
     val confidenceCriteria: ConfidenceCriteriaV6Dto,
-    override val states: Collection<BusinessPartnerStateV6Dto> = emptyList()
+    override val states: Collection<BusinessPartnerStateOutputV6Dto> = emptyList()
 ) : IBaseAddressRepresentation

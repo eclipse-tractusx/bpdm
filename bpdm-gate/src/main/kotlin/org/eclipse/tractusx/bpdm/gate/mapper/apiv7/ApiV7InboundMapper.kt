@@ -13,6 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
@@ -78,7 +79,13 @@ class ApiV7InboundMapper {
         )
 
     private fun toStates(states: Collection<BusinessPartnerStateV7Dto>) =
-        states.map { BusinessPartnerInputUpsertRaw.State(type = it.type, validFrom = it.validFrom, validTo = it.validTo) }
+        states.map {
+            BusinessPartnerInputUpsertRaw.State(
+                type = it.type,
+                validFrom = BusinessStateDates.receiveValidFrom(it.validFrom),
+                validTo = BusinessStateDates.receiveValidTo(it.validTo)
+            )
+        }
 
     private fun toValue(address: PhysicalPostalAddressV7Dto) =
         with(address) {

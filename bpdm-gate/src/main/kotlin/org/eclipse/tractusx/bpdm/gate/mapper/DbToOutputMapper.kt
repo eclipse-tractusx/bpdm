@@ -53,8 +53,8 @@ class DbToOutputMapper(
             externalId = entity.sharingState.externalId,
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             content = dbToParsedMapper.toContent(entity),
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt
+            createdAt = entity.createdAt.instant,
+            updatedAt = entity.updatedAt.instant
         )
 
     /**
@@ -118,8 +118,8 @@ class DbToOutputMapper(
                     name = it.name
                 )
             },
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt
+            createdAt = entity.createdAt.instant,
+            updatedAt = entity.updatedAt.instant
         )
     }
 
@@ -143,8 +143,8 @@ class DbToOutputMapper(
             targetExternalId = input.target.externalId,
             validityPeriods = input.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
             reasonCode = input.reasonCode,
-            createdAt = input.createdAt,
-            updatedAt = input.updatedAt
+            createdAt = input.createdAt.instant,
+            updatedAt = input.updatedAt.instant
         )
 
     /**
@@ -159,7 +159,7 @@ class DbToOutputMapper(
             targetBpn = output.targetBpn,
             validityPeriods = output.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
             reasonCode = output.reasonCode,
-            updatedAt = output.resultUpdatedAt
+            updatedAt = output.resultUpdatedAt.instant
         )
     }
 
@@ -174,7 +174,7 @@ class DbToOutputMapper(
             sharingErrorCode = sharingState.sharingErrorCode,
             sharingErrorMessage = sharingState.sharingErrorMessage,
             taskId = sharingState.taskId,
-            updatedAt = sharingState.updatedAt
+            updatedAt = sharingState.updatedAt.instant
         )
     }
 
@@ -189,6 +189,6 @@ class DbToOutputMapper(
             sharingErrorMessage = entity.sharingErrorMessage,
             sharingProcessStarted = entity.sharingProcessStarted,
             taskId = entity.taskId,
-            updatedAt = entity.updatedAt
+            updatedAt = entity.updatedAt.instant
         )
 }

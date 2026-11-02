@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 
 data class LegalFormCreateParsed(
@@ -29,8 +29,8 @@ data class LegalFormCreateParsed(
     val transliteratedName: String?,
     val abbreviations: String?,
     val transliteratedAbbreviations: String?,
-    val country: CountryCode?,
-    val language: LanguageCode?,
+    val country: CountryDb?,
+    val language: String?,
     val administrativeArea: RegionDb?,
     val isActive: Boolean
 )

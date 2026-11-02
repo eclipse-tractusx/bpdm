@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
@@ -49,9 +48,9 @@ class GoldenRecordProcessMockConfig {
                 IdentifierTypeDto("addressIdType3", IdentifierBusinessPartnerType.ADDRESS, "addressIdType3", null, null, null, null, sortedSetOf(), emptyList())
             ),
             adminAreas = listOf(
-                CountrySubdivisionDto(CountryCode.DE.alpha2, "adminArea1", "adminArea1"),
-                CountrySubdivisionDto(CountryCode.US.alpha2, "adminArea2", "adminArea2"),
-                CountrySubdivisionDto(CountryCode.CN.alpha2, "adminArea3", "adminArea3"),
+                CountrySubdivisionDto("DE", "adminArea1", "adminArea1"),
+                CountrySubdivisionDto("US", "adminArea2", "adminArea2"),
+                CountrySubdivisionDto("CN", "adminArea3", "adminArea3"),
             ),
             countries = listOf(
                 CountryDto("DE", "Germany", null),

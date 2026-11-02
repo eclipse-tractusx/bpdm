@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
@@ -126,7 +125,7 @@ class IdentifierTypeCreateV7IT : UnscheduledPoolTestBaseV7() {
             format = "$seed-format",
             categories = sortedSetOf(IdentifierTypeCategory.entries.random(random)),
             details = (1..random.nextInt(3, 10))
-                .map { CountryCode.entries.random(random) }
+                .map { listOf("DE", "US", "FR", "CN", "PL").random(random) }
                 .toSet()
                 .map { IdentifierTypeDetailDto(it, random.nextBoolean()) }
         )

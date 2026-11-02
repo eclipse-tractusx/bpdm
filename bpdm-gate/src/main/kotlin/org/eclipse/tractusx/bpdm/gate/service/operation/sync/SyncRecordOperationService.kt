@@ -14,6 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.service.operation.sync
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.SyncRecordDb
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.repository.SyncRecordRepository
@@ -52,6 +53,7 @@ class SyncRecordOperationService(
         val record = syncRecordRepository.findByType(type) ?: SyncRecordDb(type = type, fromTime = INITIAL_FROM_TIME)
         if (record.fromTime == until) return
         record.fromTime = until
+        record.updatedAt = DbTimestamp.now()
         syncRecordRepository.save(record)
         logger.debug { "Advanced sync record $type to $until" }
     }

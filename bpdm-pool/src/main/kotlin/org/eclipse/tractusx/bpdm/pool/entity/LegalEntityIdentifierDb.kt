@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(
@@ -45,4 +45,4 @@ class LegalEntityIdentifierDb(
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntityDb
 
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()

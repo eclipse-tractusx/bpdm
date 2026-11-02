@@ -76,9 +76,10 @@ data class BusinessPartnerPostalAddress(
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
 )
 
+@Schema(requiredProperties = ["validFrom", "validTo"])
 data class BusinessPartnerStateDto(
-    val validFrom: LocalDateTime?,
-    val validTo: LocalDateTime?,
+    val validFrom: LocalDateTime,
+    val validTo: LocalDateTime,
     val type: BusinessStateType?
 )
 

@@ -17,21 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.generation
+package org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output
 
-import org.eclipse.tractusx.bpdm.common.mapping.BpdmStringMapper
-import org.eclipse.tractusx.bpdm.common.mapping.CommonValidationErrorCodes
-import org.eclipse.tractusx.bpdm.common.mapping.MappingResult
-import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
-import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-class AdminAreaMapper(
-    private val regionRepository: RegionRepository
-): BpdmStringMapper<RegionDb> {
-    override fun map(valueToMap: String, context: ValidationContext): MappingResult<RegionDb> {
-       return MappingResult.errorOnNull(regionRepository.findByRegionCodeIn(setOf(valueToMap)).firstOrNull()){
-           listOf(CommonValidationErrorCodes.ISO31662.toValidationError(valueToMap, context))
-       }
-    }
-}
+@Schema(requiredProperties = ["validFrom", "validTo"])
+data class BusinessPartnerStateOutputV7Dto(
+
+    override val validFrom: LocalDateTime,
+    override val validTo: LocalDateTime,
+    override val type: BusinessStateType?
+
+) : IBusinessPartnerStateDto

@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
@@ -60,7 +62,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 updatedAfter?.let {
                     builder.greaterThan(root
                         .get<RelationSharingStateDb>(RelationDb::sharingState.name)
-                        .get(RelationSharingStateDb::updatedAt.name), updatedAfter)
+                        .get<DbTimestamp>(RelationSharingStateDb::updatedAt.name), updatedAfter.toTimestamp())
                 }
             }
 
@@ -118,9 +120,9 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 Specification<RelationDb> { root, _, builder ->
                     val updatedAtPath = root
                         .get<RelationOutputDb>(RelationDb::output.name)
-                        .get<Instant>(RelationOutputDb::resultUpdatedAt.name)
+                        .get<DbTimestamp>(RelationOutputDb::resultUpdatedAt.name)
 
-                    builder.greaterThan(updatedAtPath, updatedAfter)
+                    builder.greaterThan(updatedAtPath, updatedAfter.toTimestamp())
                 }
             } ?: Specification.unrestricted()
 
@@ -128,7 +130,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
             Specification<RelationDb> { root, _, builder ->
                root
                     .get<RelationOutputDb>(RelationDb::output.name)
-                    .get<Instant>(RelationOutputDb::resultUpdatedAt.name)
+                    .get<DbTimestamp>(RelationOutputDb::resultUpdatedAt.name)
                     .isNotNull
             }
 

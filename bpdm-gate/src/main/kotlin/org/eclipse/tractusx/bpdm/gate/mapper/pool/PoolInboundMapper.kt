@@ -14,6 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.pool
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeAddressRaw
@@ -113,7 +114,12 @@ class PoolInboundMapper {
     }
 
     private fun toState(dto: IBaseStateDto, businessPartnerType: BusinessPartnerType) =
-        StateRaw(validFrom = dto.validFrom, validTo = dto.validTo, type = dto.type!!, businessPartnerType = businessPartnerType)
+        StateRaw(
+            validFrom = BusinessStateDates.receiveValidFrom(dto.validFrom),
+            validTo = BusinessStateDates.receiveValidTo(dto.validTo),
+            type = dto.type!!,
+            businessPartnerType = businessPartnerType
+        )
 
     private fun toConfidence(dto: ConfidenceCriteriaDto) =
         ConfidenceCriteriaRaw(

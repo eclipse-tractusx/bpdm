@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.common.service
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
@@ -33,13 +31,6 @@ fun <T : NamedType> T.toDto(): TypeKeyNameVerboseDto<T> {
     return TypeKeyNameVerboseDto(this, getTypeName())
 }
 
-fun LanguageCode.toDto(): TypeKeyNameVerboseDto<LanguageCode> {
-    return TypeKeyNameVerboseDto(this, getName())
-}
-
-fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
-    return TypeKeyNameVerboseDto(this, getName())
-}
 fun PaginationRequest.toPageRequest(sort: Sort = Sort.unsorted()) =
     PageRequest.of(page, size, sort)
 

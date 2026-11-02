@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.upload
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -209,7 +208,7 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                 addressType = AddressType.SiteMainAddress,
                 physicalPostalAddress =  PhysicalPostalAddressV7Dto(
                     geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
-                    country = CountryCode.US.alpha2,
+                    country = "US",
                     postalCode = "70547",
                     city = "Atlanta",
                     administrativeAreaLevel1 = "adminAreaLevel1RegionCode_2",
@@ -230,7 +229,7 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                     ),
                 ),
                 alternativePostalAddress = AlternativePostalAddressV7Dto(
-                    country = CountryCode.DE.alpha2,
+                    country = "DE",
                     city = "Stuttgart",
                     deliveryServiceType = DeliveryServiceType.PO_BOX,
                     deliveryServiceQualifier = "DHL",

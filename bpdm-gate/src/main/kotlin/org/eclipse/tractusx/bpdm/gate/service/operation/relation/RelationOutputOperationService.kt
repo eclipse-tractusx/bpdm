@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
@@ -28,7 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 /**
  * Writes the output stage of relations.
@@ -57,7 +57,7 @@ class RelationOutputOperationService(
             relationType = output.relationType,
             sourceBpn = output.sourceBpn,
             targetBpn = output.targetBpn,
-            resultUpdatedAt = Instant.now(),
+            resultUpdatedAt = DbTimestamp.now(),
             validityPeriods = output.validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList(),
             reasonCode = output.reasonCode
         )

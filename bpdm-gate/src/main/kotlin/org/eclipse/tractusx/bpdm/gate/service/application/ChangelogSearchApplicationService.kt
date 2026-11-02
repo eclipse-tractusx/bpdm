@@ -44,5 +44,5 @@ class ChangelogSearchApplicationService(
         pageable: Pageable
     ): Page<ChangelogEntryRecord> =
         operationService.search(parser.parse(request), stage, goldenRecordType, tenantBpnl, pageable)
-            .map { ChangelogEntryRecord(externalId = it.externalId, createdAt = it.createdAt, changelogType = it.changelogType) }
+            .map { ChangelogEntryRecord(externalId = it.externalId, createdAt = it.createdAt.instant, changelogType = it.changelogType) }
 }

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -86,7 +85,7 @@ interface PoolMetadataV6Api {
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @Parameter businessPartnerType: IdentifierBusinessPartnerTypeV6,
-        @Parameter country: CountryCode?
+        @Parameter country: String?
     ):
             PageDto<IdentifierTypeDtoV6>
 

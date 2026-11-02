@@ -17,19 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.mapping
+package org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output
 
-import com.neovisionaries.i18n.CountryCode
-import org.springframework.stereotype.Component
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Component
-class BpdmCountryCodeMapper: BpdmStringMapper<CountryCode> {
+@Schema(requiredProperties = ["validFrom", "validTo"])
+data class BusinessPartnerStateOutputV6Dto(
 
-    private val entriesByName = CountryCode.entries.associateBy { it.name }
+    override val validFrom: LocalDateTime,
+    override val validTo: LocalDateTime,
+    override val type: BusinessStateType?
 
-    override fun map(valueToMap: String, context: ValidationContext): MappingResult<CountryCode> {
-        return MappingResult.errorOnNull(entriesByName[valueToMap]){
-            listOf(CommonValidationErrorCodes.ISO31661.toValidationError(valueToMap, context))
-        }
-    }
-}
+) : IBusinessPartnerStateDto

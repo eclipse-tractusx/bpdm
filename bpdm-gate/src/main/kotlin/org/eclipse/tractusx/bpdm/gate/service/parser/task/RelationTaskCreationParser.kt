@@ -62,6 +62,6 @@ class RelationTaskCreationParser(
         val sharingState = relation.sharingState ?: return false
         return sharingState.sharingStateType == RelationSharingStateType.Ready
                 && sharingState.isStaged
-                && sharingState.updatedAt == candidate.sharingStateUpdatedAt
+                && sharingState.updatedAt.instant == candidate.sharingStateUpdatedAt
     }
 }

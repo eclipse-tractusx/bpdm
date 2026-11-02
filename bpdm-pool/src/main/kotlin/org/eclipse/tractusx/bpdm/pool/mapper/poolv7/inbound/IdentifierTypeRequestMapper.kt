@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
@@ -52,6 +51,6 @@ class IdentifierTypeRequestMapper {
     /**
      * Returns the search request holding the criteria a client sent.
      */
-    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerType, country: CountryCode?): IdentifierTypeSearchRequest =
+    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerType, country: String?): IdentifierTypeSearchRequest =
         IdentifierTypeSearchRequest(businessPartnerType = businessPartnerType, country = country)
 }

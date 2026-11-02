@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.Busines
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.AddressComponentOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerStateOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.LegalEntityRepresentationOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.SiteRepresentationOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
@@ -63,7 +64,7 @@ class ExpectedGateResultV6Factory {
             externalId = input.externalId,
             nameParts = input.nameParts,
             identifiers = addressGoldenRecord.identifiers.map { BusinessPartnerIdentifierV6Dto(it.type, it.value, null) },
-            states = addressGoldenRecord.states.map { BusinessPartnerStateV6Dto(it.validFrom, it.validTo, it.type) },
+            states = addressGoldenRecord.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(goldenRecordLegalEntity.header),
@@ -104,7 +105,7 @@ class ExpectedGateResultV6Factory {
             shortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
             confidenceCriteria = buildConfidence(legalEntity.confidenceCriteria),
-            states = legalEntity.states.map { BusinessPartnerStateV6Dto(it.validFrom, it.validTo, it.type) }
+            states = legalEntity.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) }
         )
     }
 
@@ -116,7 +117,7 @@ class ExpectedGateResultV6Factory {
             physicalPostalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
-            states = logisticAddress.states.map { BusinessPartnerStateV6Dto(it.validFrom, it.validTo, it.type) }
+            states = logisticAddress.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) }
         )
     }
 
@@ -172,7 +173,7 @@ class ExpectedGateResultV6Factory {
             siteBpn = site.bpns,
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
-            states = site.states.map { BusinessPartnerStateV6Dto(it.validFrom, it.validTo, it.type) }
+            states = site.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) }
         )
     }
 

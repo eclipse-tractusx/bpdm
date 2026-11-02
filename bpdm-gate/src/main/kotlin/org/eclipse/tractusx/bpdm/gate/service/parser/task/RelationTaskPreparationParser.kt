@@ -81,7 +81,7 @@ class RelationTaskPreparationParser(
         val candidate = RelationTaskCandidateParsed(
             relationId = relation.id,
             externalId = relation.externalId,
-            sharingStateUpdatedAt = sharingState.updatedAt,
+            sharingStateUpdatedAt = sharingState.updatedAt.instant,
             recordId = sharingState.recordId,
             relationType = input.relationType,
             sourceBpn = sourceBpn,

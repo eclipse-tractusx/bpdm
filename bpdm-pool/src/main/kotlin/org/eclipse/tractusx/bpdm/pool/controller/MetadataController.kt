@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
@@ -62,7 +61,7 @@ class MetadataController(
     override fun getIdentifierTypes(
         paginationRequest: PaginationRequest,
         businessPartnerType: IdentifierBusinessPartnerType,
-        country: CountryCode?
+        country: String?
     ): PageDto<IdentifierTypeDto> {
         return identifierTypeSearchApplicationV7Service.searchIdentifierTypes(businessPartnerType, country, paginationRequest)
     }

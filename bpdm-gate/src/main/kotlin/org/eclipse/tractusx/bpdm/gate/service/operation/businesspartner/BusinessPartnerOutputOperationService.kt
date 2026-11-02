@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
@@ -73,6 +74,7 @@ class BusinessPartnerOutputOperationService(
 
     private fun update(content: BusinessPartnerOutputContentParsed, output: BusinessPartnerDb): BusinessPartnerDb {
         write(content, output)
+        output.updatedAt = DbTimestamp.now()
         persist(output, ChangelogType.UPDATE)
         return output
     }

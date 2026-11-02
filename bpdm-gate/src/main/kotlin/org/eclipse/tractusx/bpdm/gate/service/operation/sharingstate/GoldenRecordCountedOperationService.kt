@@ -16,6 +16,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
@@ -74,6 +75,7 @@ class GoldenRecordCountedOperationService(
 
         changed.forEach { sync ->
             sync.sharingState.syncedIsGoldenRecordCounted = sync.sentIsGoldenRecordCounted
+            sync.sharingState.updatedAt = DbTimestamp.now()
             sharingStateRepository.save(sync.sharingState)
             logChange(sync.sharingState)
         }
@@ -83,6 +85,7 @@ class GoldenRecordCountedOperationService(
         if (sharingState.isGoldenRecordCounted == isGoldenRecordCounted) return
 
         sharingState.isGoldenRecordCounted = isGoldenRecordCounted
+        sharingState.updatedAt = DbTimestamp.now()
         sharingStateRepository.save(sharingState)
         logChange(sharingState)
     }

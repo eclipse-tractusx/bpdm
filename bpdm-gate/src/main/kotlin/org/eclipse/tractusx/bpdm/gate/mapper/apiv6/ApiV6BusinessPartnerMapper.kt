@@ -14,11 +14,13 @@
 package org.eclipse.tractusx.bpdm.gate.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.*
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.*
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.AddressComponentOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerStateOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.LegalEntityRepresentationOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.SiteRepresentationOutputV6Dto
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerInputRecord
@@ -146,7 +148,11 @@ class ApiV6BusinessPartnerMapper {
         BusinessPartnerIdentifierV6Dto(type = identifier.type, value = identifier.value, issuingBody = identifier.issuingBody)
 
     private fun toDto(state: StateRaw) =
-        BusinessPartnerStateV6Dto(type = state.type, validFrom = state.validFrom, validTo = state.validTo)
+        BusinessPartnerStateOutputV6Dto(
+            type = state.type,
+            validFrom = BusinessStateDates.reportValidFrom(state.validFrom),
+            validTo = BusinessStateDates.reportValidTo(state.validTo)
+        )
 
     private fun toDto(confidence: ConfidenceCriteriaRaw) =
         ConfidenceCriteriaV6Dto(

@@ -19,10 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.legalentity
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
@@ -45,6 +50,29 @@ class LegalEntityCreationV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedLegalEntities = response.entities.map { testDataFactory.result.buildExpectedLegalEntityCreateResponse(legalEntityRequest) }
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapperV6(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityCreate(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator creates a legal entity with a state that has neither start nor end date
+     * THEN created legal entity reports that state from the earliest to the latest date
+     */
+    @Test
+    fun `create legal entity with state without start and end date`(){
+        //WHEN
+        val seededRequest = testDataFactory.request.buildLegalEntityCreateRequest(testName)
+        val openState = LegalEntityStateDtoV6(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE)
+        val legalEntityRequest = seededRequest.copy(legalEntity = seededRequest.legalEntity.copy(states = listOf(openState)))
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedState = LegalEntityStateVerboseDtoV6(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
+        val expectedLegalEntities = response.entities.map {
+            val expected = testDataFactory.result.buildExpectedLegalEntityCreateResponse(legalEntityRequest)
+            expected.copy(legalEntity = expected.legalEntity.copy(states = listOf(expectedState)))
+        }
         val expectedResponse = LegalEntityPartnerCreateResponseWrapperV6(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreate(response, expectedResponse)

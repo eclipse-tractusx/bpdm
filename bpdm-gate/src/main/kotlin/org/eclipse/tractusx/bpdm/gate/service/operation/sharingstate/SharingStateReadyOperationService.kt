@@ -15,6 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.sharingstate.SharingStateReadyParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
@@ -44,6 +45,7 @@ class SharingStateReadyOperationService(
             sharingState.sharingErrorMessage = null
             sharingState.sharingProcessStarted = null
             sharingState.taskId = null
+            sharingState.updatedAt = DbTimestamp.now()
         }
 
         return sharingStateRepository.saveAll(parsed.sharingStates).toList()

@@ -19,6 +19,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Changed
 
+- BPDM Pool: Legal forms and identifier types in V6 and V7 now accept countries from the Pool country catalogue, including when filtering identifier-type searches. Legal-form languages are represented as strings.
 - BPDM Gate: Address country codes in the V6 and V7 input and output schemas are strings instead of an enumeration. Sharing members can submit provider-maintained countries through the API or CSV upload; generated API clients must be regenerated.
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
 - BPDM Pool: Address countries are validated against the provider-maintained country catalogue at request time. The address country schema is now a string instead of an enumeration, so generated API clients must be regenerated.
@@ -29,6 +30,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error. A malformed or incomplete geographic coordinate is now reported as an error instead of being stored as `0.0`.
 - BPDM Gate: Upserting input relations through the V7 API reports every invalid relation at once, with one error message for each problem, instead of only the first one found. A request that names the same external ID more than once is rejected instead of letting the later entry win, and a request with more relations than the configured upsert limit (`bpdm.api.upsert-limit`, 100 by default) is rejected.
 - BPDM Gate: Creating or updating an input relation through the V6 API stores it without a reason code instead of an empty one, so the V7 API returns `null` as its reason code. Errors other than an already existing relation report every problem of the relation at once.
+- BPDM Pool and Gate: Business partner states in the V6 and V7 Pool responses and the Gate output always carry `validFrom` and `validTo`. A missing start is reported as the earliest date `1900-01-01T00:00:00`, a missing end as the latest date `9999-12-31T23:59:59` (UTC). On input both dates stay optional; dates before the earliest or after the latest date are treated as that date, a start on the earliest date counts as a missing start and an end on the latest date as a missing end. Gate output states use the new `BusinessPartnerStateResponseDto` in the API module.
 
 ### Fixed
 
@@ -36,6 +38,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: The CSV upload no longer adds an empty alternative postal address, or coordinates of `0.0`, to business partners whose CSV row leaves those columns blank.
 - BPDM Gate: The CSV upload keeps a site or address state that has a type but no validity dates, instead of dropping it, and stores an empty house number as absent.
 - BPDM Gate: Updating an input relation through the V6 API stores the validity periods given in the request. Before, they were ignored and the relation's validity periods were removed.
+- BPDM Gate: Creation and update timestamps now match subsequent reads. Changes to child records update the parent timestamp, while unchanged inputs preserve it.
 
 ## [7.5.0] - 2026-09-08
 

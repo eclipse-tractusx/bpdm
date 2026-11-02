@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
@@ -71,7 +73,7 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
         fun byUpdatedAfter(updatedAfter: Instant?) =
             Specification<RelationStageDb> { root, _, builder ->
                 updatedAfter?.let {
-                    builder.greaterThan(root.get(RelationStageDb::updatedAt.name), updatedAfter)
+                    builder.greaterThan(root.get<DbTimestamp>(RelationStageDb::updatedAt.name), updatedAfter.toTimestamp())
                 }
             }
 

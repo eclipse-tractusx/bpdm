@@ -17,6 +17,7 @@ package org.eclipse.tractusx.bpdm.gate.service.operation.relation
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.model.parsed.relation.RelationInputUpsertEntryResult
@@ -31,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.service.operation.changelog.ChangelogCreateOperationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 import java.util.*
 
 /**
@@ -92,7 +92,7 @@ class RelationInputUpsertOperationService(
         input.target = request.target
         input.validityPeriods = request.validityPeriods.map(::toEntity).toMutableList()
         input.reasonCode = request.reasonCode
-        input.updatedAt = Instant.now()
+        input.updatedAt = DbTimestamp.now()
         persist(input, ChangelogType.UPDATE)
 
         sharingStateOperation.reset(input.relation)

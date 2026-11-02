@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -140,7 +141,7 @@ class RefinementTestDataFactory {
             legalShortName = goldenRecord.header.legalShortName,
             legalForm = goldenRecord.header.legalForm,
             identifiers = goldenRecord.header.identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
-            states = goldenRecord.header.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = goldenRecord.header.states.map { BusinessState(BusinessStateDates.receiveValidFrom(it.validFrom)?.toUtcInstant(), BusinessStateDates.receiveValidTo(it.validTo)?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(goldenRecord.header.confidenceCriteria),
             isParticipantData = goldenRecord.header.isParticipantData,
             hasChanged = true,
@@ -156,7 +157,7 @@ class RefinementTestDataFactory {
         return Site(
             bpnReference = BpnReference(goldenRecord.site.bpns, null, BpnReferenceType.Bpn),
             siteName = goldenRecord.site.name,
-            states = goldenRecord.site.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = goldenRecord.site.states.map { BusinessState(BusinessStateDates.receiveValidFrom(it.validFrom)?.toUtcInstant(), BusinessStateDates.receiveValidTo(it.validTo)?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(goldenRecord.site.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = buildPostalAddress(goldenRecord.mainAddress),
@@ -169,7 +170,7 @@ class RefinementTestDataFactory {
         return Site(
             bpnReference = BpnReference(goldenRecord.bpns, null, BpnReferenceType.Bpn),
             siteName = goldenRecord.name,
-            states = goldenRecord.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = goldenRecord.states.map { BusinessState(BusinessStateDates.receiveValidFrom(it.validFrom)?.toUtcInstant(), BusinessStateDates.receiveValidTo(it.validTo)?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(goldenRecord.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = null,
@@ -202,7 +203,7 @@ class RefinementTestDataFactory {
             hasChanged = true,
             addressName = logisticAddress.name,
             identifiers = logisticAddress.identifiers.map { Identifier(it.value, it.type, null) },
-            states = logisticAddress.states.map {  BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = logisticAddress.states.map {  BusinessState(BusinessStateDates.receiveValidFrom(it.validFrom)?.toUtcInstant(), BusinessStateDates.receiveValidTo(it.validTo)?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
             physicalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
             alternativeAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
