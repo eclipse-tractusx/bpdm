@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.common.model.BaseSyncRecord
 import java.time.Instant
 
@@ -34,4 +34,4 @@ class SyncRecordDb(
     @Column(name = "from_time", nullable = false)
     override var fromTime: Instant
 
-    ) : BaseEntity(), BaseSyncRecord<SyncTypeDb>
+    ) : BaseEntityWithExplicitTimestamps(), BaseSyncRecord<SyncTypeDb>

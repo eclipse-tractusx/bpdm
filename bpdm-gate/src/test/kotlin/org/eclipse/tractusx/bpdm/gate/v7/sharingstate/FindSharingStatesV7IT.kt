@@ -107,6 +107,8 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         //GIVEN
         val input = testDataClient.businessPartner.upsertInput(testName)
         testDataClient.businessPartner.setStateToReady(input.externalId)
+        val stamped = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(input.externalId))
+            .content.single().updatedAt
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
@@ -116,6 +118,11 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
+        assertRepo.assertSharingStateTimestamp(actualResponse.content.single(), stamped)
+        assertRepo.assertSharingStates(
+            gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(input.externalId), updatedAfter = stamped),
+            PageDto(0, 0, 0, 0, emptyList())
+        )
     }
 
     /**

@@ -80,9 +80,8 @@ fun StreetDb.toStreetDto(): StreetDto {
 fun ChangelogEntryDb.toGateDto(): ChangelogGateDto {
     return ChangelogGateDto(
         externalId = externalId,
-        timestamp = createdAt,
+        timestamp = createdAt.instant,
         changelogType = changelogType
     )
 }
-
 

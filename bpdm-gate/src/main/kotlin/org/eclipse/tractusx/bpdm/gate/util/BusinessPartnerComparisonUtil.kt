@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
 import org.springframework.stereotype.Component
 
@@ -49,8 +50,16 @@ class BusinessPartnerComparisonUtil {
                 entity.siteGoldenRecordRelations != persistedBP.siteGoldenRecordRelations ||
                 entity.addressGoldenRecordRelations != persistedBP.addressGoldenRecordRelations ||
                 entity.additionalSites != persistedBP.additionalSites ||
+                confidenceValues(entity.legalEntityConfidence) != confidenceValues(persistedBP.legalEntityConfidence) ||
+                confidenceValues(entity.siteConfidence) != confidenceValues(persistedBP.siteConfidence) ||
+                confidenceValues(entity.addressConfidence) != confidenceValues(persistedBP.addressConfidence) ||
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress) ||
                 scriptVariantsHaveChanges(entity.scriptVariants, persistedBP.scriptVariants)
+    }
+
+    private fun confidenceValues(confidence: ConfidenceCriteriaDb?): List<Any>? = confidence?.run {
+        listOf(sharedByOwner, checkedByExternalDataSource, numberOfBusinessPartners,
+            lastConfidenceCheckAt, nextConfidenceCheckAt, confidenceLevel)
     }
 
     private fun postalAddressHasChanges(entityPostalAddress: PostalAddressDb, persistedPostalAddress: PostalAddressDb): Boolean {

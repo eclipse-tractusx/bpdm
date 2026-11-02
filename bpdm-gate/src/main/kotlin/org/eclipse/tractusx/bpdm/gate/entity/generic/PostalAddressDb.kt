@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
 
@@ -39,4 +39,4 @@ class PostalAddressDb(
     @Embedded
     var alternativePostalAddress: AlternativePostalAddressDb? = null
 
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()

@@ -23,6 +23,7 @@ import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
@@ -259,11 +260,13 @@ class RelationTaskCreationService(
 
     private fun stage(relation: RelationDb){
         relation.sharingState?.isStaged = true
+        relation.updatedAt = DbTimestamp.now()
         relationRepository.save(relation)
     }
 
     private fun unstage(relation: RelationDb){
         relation.sharingState?.isStaged = false
+        relation.updatedAt = DbTimestamp.now()
         relationRepository.save(relation)
     }
 

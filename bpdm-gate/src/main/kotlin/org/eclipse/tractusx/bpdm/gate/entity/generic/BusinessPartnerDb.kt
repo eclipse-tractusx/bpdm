@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
@@ -136,7 +136,7 @@ class BusinessPartnerDb(
     @CollectionTable(name = "business_partners_additional_sites", joinColumns = [JoinColumn(name = "business_partner_id")])
     val additionalSites: MutableList<AdditionalSiteDb> = mutableListOf()
 
-    ) : BaseEntity() {
+    ) : BaseEntityWithExplicitTimestamps() {
 
     companion object {
         fun createEmpty(sharingState: SharingStateDb, stage: StageType) =
@@ -153,4 +153,3 @@ class BusinessPartnerDb(
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "businessPartner")
     val scriptVariants: MutableList<BusinessPartnerScriptVariantDb> = mutableListOf()
 }
-

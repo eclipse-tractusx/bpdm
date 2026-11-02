@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.springframework.data.domain.Page
@@ -57,7 +59,7 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
             Specification<SharingStateDb> { root, _, builder ->
                 updatedAfter?.let {
                     builder.greaterThan(root
-                        .get(SharingStateDb::updatedAt.name), updatedAfter)
+                        .get<DbTimestamp>(SharingStateDb::updatedAt.name), updatedAfter.toTimestamp())
                 }
             }
 

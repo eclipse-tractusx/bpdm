@@ -26,6 +26,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Regions, subdivisions and field quality rules use plain country codes validated against the provider-maintained country catalogue instead of the compiled enum. Unknown countries are rejected with an error naming the code.
 - BPDM Pool and Gate: Business partner states in the V6 and V7 Pool responses and the Gate output always carry `validFrom` and `validTo`. A missing start is reported as the earliest date `1900-01-01T00:00:00`, a missing end as the latest date `9999-12-31T23:59:59` (UTC). On input both dates stay optional; dates before the earliest or after the latest date are treated as that date, a start on the earliest date counts as a missing start and an end on the latest date as a missing end. Gate output states use the new `BusinessPartnerStateResponseDto` in the API module.
 
+### Fixed
+
+- BPDM Gate: Creation and update timestamps now match subsequent reads. Changes to child records update the parent timestamp, while unchanged inputs preserve it.
+
 ## [7.5.0] - 2026-09-08
 
 ### Breaking

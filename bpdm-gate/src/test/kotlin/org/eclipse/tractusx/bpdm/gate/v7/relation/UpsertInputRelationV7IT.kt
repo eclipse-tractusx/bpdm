@@ -20,9 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
@@ -62,7 +64,7 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
     fun `upsert existing input relation updates it`(relationType: RelationType) {
         //GIVEN
         val initial = testData.relation.input.request.fromSeed(testName).withRelationType(relationType)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners(initial)
+        val created = testDataClient.relation.upsertRelationInputWithBusinessPartners(initial)
 
         val newSource = testDataClient.businessPartner.upsertInput("$testName new source")
         val newTarget = testDataClient.businessPartner.upsertInput("$testName new target")
@@ -73,6 +75,16 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
 
         //THEN
         assertRepo.assertRelation(response, testData.relation.input.response.fromRequest(updated))
+        assertRepo.assertTimestampsUpdated(response.createdAt, response.updatedAt, created.createdAt, created.updatedAt)
+        val search = RelationSearchRequest(externalIds = listOf(response.externalId))
+        val read = gateClient.relation.postSearch(search)
+        assertRepo.assertRelations(read, PageDto(1, 1, 0, 1, listOf(response)))
+        assertRepo.assertRelations(
+            gateClient.relation.postSearch(search.copy(updatedAtFrom = response.updatedAt)),
+            PageDto(0, 0, 0, 0, emptyList())
+        )
+        val unchanged = testDataClient.relation.upsertRelationInput(updated)
+        assertRepo.assertTimestampsUnchanged(unchanged.createdAt, unchanged.updatedAt, response.createdAt, response.updatedAt)
     }
 
     /**

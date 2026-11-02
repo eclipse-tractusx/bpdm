@@ -193,6 +193,32 @@ class GateAssertRepositoryV7(
         assertBusinessPartnerInput(actual.content, expected.content)
     }
 
+    fun assertBusinessPartnerInputRead(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>) {
+        assertBusinessPartnerInput(actual, expected)
+        val expectedById = expected.content.associateBy { it.externalId }
+        actual.content.forEach {
+            val previous = expectedById.getValue(it.externalId)
+            assertTimestampsUnchanged(it.createdAt, it.updatedAt, previous.createdAt, previous.updatedAt)
+        }
+    }
+
+    fun assertTimestampsUnchanged(createdAt: Instant, updatedAt: Instant, expectedCreatedAt: Instant, expectedUpdatedAt: Instant) {
+        Assertions.assertThat(createdAt).isEqualTo(expectedCreatedAt)
+        Assertions.assertThat(updatedAt).isEqualTo(expectedUpdatedAt)
+        Assertions.assertThat(createdAt.nano % 1000).isZero()
+        Assertions.assertThat(updatedAt.nano % 1000).isZero()
+    }
+
+    fun assertTimestampsUpdated(createdAt: Instant, updatedAt: Instant, previousCreatedAt: Instant, previousUpdatedAt: Instant) {
+        Assertions.assertThat(createdAt).isEqualTo(previousCreatedAt)
+        Assertions.assertThat(updatedAt).isAfter(previousUpdatedAt)
+    }
+
+    fun assertSharingStateTimestamp(actual: SharingStateDto, expected: Instant) {
+        Assertions.assertThat(actual.updatedAt).isEqualTo(expected)
+        Assertions.assertThat(actual.updatedAt.nano % 1000).isZero()
+    }
+
     fun assertBusinessPartnerOutput(
         actual: Collection<BusinessPartnerOutputDto>,
         expected: Collection<BusinessPartnerOutputDto>,
@@ -279,6 +305,11 @@ class GateAssertRepositoryV7(
     fun assertRelations(actual: PageDto<RelationDto>, expected: PageDto<RelationDto>) {
         assertPageHeader(actual, expected)
         assertRelations(actual.content, expected.content)
+        val expectedById = expected.content.associateBy { it.externalId }
+        actual.content.forEach {
+            val previous = expectedById.getValue(it.externalId)
+            assertTimestampsUnchanged(it.createdAt, it.updatedAt, previous.createdAt, previous.updatedAt)
+        }
     }
 
     fun assertRelationOutput(actual: Collection<RelationOutputDto>, expected: Collection<RelationOutputDto>) {
