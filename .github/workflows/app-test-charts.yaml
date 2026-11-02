@@ -97,7 +97,7 @@ jobs:
 
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.9'
+          python-version: '3.13'
           check-latest: true
 
       - name: Set up chart-testing
@@ -136,32 +136,32 @@ jobs:
       - name: Push Pool Image to Kind
         run: |
           docker load --input /tmp/bpdm-pool.tar
-          docker image tag bpdm-pool:test kind-registry:5000/bpdm-pool:test
-          docker push kind-registry:5000/bpdm-pool:test
+          docker image tag bpdm-pool:test localhost:5000/bpdm-pool:test
+          docker push localhost:5000/bpdm-pool:test
 
       - name: Push Gate Image to Kind
         run: |
           docker load --input /tmp/bpdm-gate.tar
-          docker image tag bpdm-gate:test kind-registry:5000/bpdm-gate:test
-          docker push kind-registry:5000/bpdm-gate:test
+          docker image tag bpdm-gate:test localhost:5000/bpdm-gate:test
+          docker push localhost:5000/bpdm-gate:test
 
       - name: Push Orchestrator Image to Kind
         run: |
           docker load --input /tmp/bpdm-orchestrator.tar
-          docker image tag bpdm-orchestrator:test kind-registry:5000/bpdm-orchestrator:test
-          docker push kind-registry:5000/bpdm-orchestrator:test
+          docker image tag bpdm-orchestrator:test localhost:5000/bpdm-orchestrator:test
+          docker push localhost:5000/bpdm-orchestrator:test
 
       - name: Push Cleaning Service Dummy Image to Kind
         run: |
           docker load --input /tmp/bpdm-cleaning-service-dummy.tar
-          docker image tag bpdm-cleaning-service-dummy:test kind-registry:5000/bpdm-cleaning-service-dummy:test
-          docker push kind-registry:5000/bpdm-cleaning-service-dummy:test
+          docker image tag bpdm-cleaning-service-dummy:test localhost:5000/bpdm-cleaning-service-dummy:test
+          docker push localhost:5000/bpdm-cleaning-service-dummy:test
 
       - name: Push System Tester Image to Kind
         run: |
           docker load --input /tmp/bpdm-system-tester.tar
-          docker image tag bpdm-system-tester:test kind-registry:5000/bpdm-system-tester:test
-          docker push kind-registry:5000/bpdm-system-tester:test
+          docker image tag bpdm-system-tester:test localhost:5000/bpdm-system-tester:test
+          docker push localhost:5000/bpdm-system-tester:test
 
       - name: Create Test Values
         env:
