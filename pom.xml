@@ -33,7 +33,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
     </parent>
 
     <modules>
@@ -58,7 +58,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <kotlin.compiler.languageVersion>2.3</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>2.3</kotlin.compiler.apiVersion>
-        <spring-boot.version>3.2.5</spring-boot.version>
+        <spring-boot.version>4.1.2</spring-boot.version>
         <kotlin.version>2.4.10</kotlin.version>
         <kotlin.coroutines.version>1.8.1</kotlin.coroutines.version>
         <springdoc.version>3.2.0</springdoc.version>
@@ -73,8 +73,6 @@
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
-        <!-- Override Spring Boot's managed Tomcat version to fix a vulnerability -->
-        <tomcat.version>11.0.25</tomcat.version>
         <!-- Sonar related properties -->
         <sonar.version>5.7.0.6970</sonar.version>
         <sonar.coverage.jacoco.xmlReportPaths>
