@@ -17,7 +17,11 @@ import jakarta.persistence.*
 import org.hibernate.annotations.Type
 import java.util.UUID
 
-/** Write services own updatedAt; flushing must not change timestamps already returned to clients. */
+/**
+ * Supplies the technical identity and the creation and update timestamps of an entity.
+ *
+ * Nothing sets updatedAt automatically: whoever changes the entity sets it before saving.
+ */
 @MappedSuperclass
 abstract class BaseEntityWithExplicitTimestamps(
     @Id
