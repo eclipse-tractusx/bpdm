@@ -1,240 +1,260 @@
 # BPDM Application Code Guide
 
-This guide describes how we design and organize **application code** in BPDM services — the code that turns a request into an operation on the service's data and a response.
-It applies to every BPDM service: Pool, Gate, Orchestrator, and any service added later.
-
-> **Note:** This guide describes the ideal we strive toward — not a description of the current state of the codebase.
-> The Pool create/update write-path is the reference implementation. Gate and Orchestrator do not follow it yet, and even in Pool the flat `service/` package still holds code that predates this structure.
-> Contributions that bring application code closer to this ideal are very welcome.
-
----
-
-## Table of Contents
-
-- [Part 1 — The Big Picture](#part-1--the-big-picture)
-  - [1.1 What "application code" means here](#11-what-application-code-means-here)
-  - [1.2 The layered pipeline](#12-the-layered-pipeline)
-  - [1.3 The three layers](#13-the-three-layers)
-  - [1.4 Supporting components](#14-supporting-components)
-  - [1.5 How a batch flows](#15-how-a-batch-flows)
-  - [1.6 When this pattern applies](#16-when-this-pattern-applies)
-- [Part 2 — Rules](#part-2--rules)
-  - [2.1 Layering & dependencies](#21-layering--dependencies)
-  - [2.2 Application layer](#22-application-layer)
-  - [2.3 Parser layer](#23-parser-layer)
-  - [2.4 Operation layer](#24-operation-layer)
-  - [2.5 Models & naming](#25-models--naming)
-  - [2.6 Mappers](#26-mappers)
-  - [2.7 Errors](#27-errors)
-  - [2.8 Transactions](#28-transactions)
-  - [2.9 Batch & correlation contract](#29-batch--correlation-contract)
-- [NOTICE](#notice)
+This guide describes how we design **application code** in BPDM services: the code between a REST endpoint or a scheduled
+trigger and the database or a remote service. It applies to Pool, Gate, Orchestrator and every service added later.
 
 ---
 
 # Part 1 — The Big Picture
 
-*This part is explanatory. It gives the shared mental model and the rationale behind it. The binding rules are in [Part 2](#part-2--rules).*
+*Explanatory. The binding rules are in [Part 2](#part-2--rules).*
 
-## 1.1 What "application code" means here
+## 1.1 Components
 
-Application code is the request-handling core of a service: everything between the REST controller and the database. Its job is to take a request, decide whether it is valid, carry out the operation, and report the outcome. An *operation* is any service action — in principle the full range of create, read, search, update, and delete — and a single operation may combine several of these, sometimes across more than one entity.
+A **use case** is anything the service does: an endpoint call or a background job. Each use case is one
+**application service**. It tells the whole story of the use case from top to bottom and is written for a reader, not
+for reuse. It achieves its story with a **toolbox** of reusable components:
 
-We split that job into **three layers** that never blur together, connected by **four representations of the same concept** as data flows through them. The guiding idea is a strict separation between *deciding* (pure, reads only, can fail) and *doing* (impure — reads or changes stored data, must not fail silently).
+| Component             | Job                                                                                         | Purity                          |
+|-----------------------|---------------------------------------------------------------------------------------------|---------------------------------|
+| **Parser**            | Turns untrusted data into data an operation may rely on: normalize, validate, resolve.     | Reads the database, never writes |
+| **Operation service** | Carries out the service logic: invariants, state transitions, writes, changelog.           | Reads and writes the database   |
+| **Gateway**           | Talks to one remote service and translates its models into ours.                          | Remote I/O only, no database    |
+| **Mapper**            | Translates one model layer into another.                                                   | Pure                            |
 
-## 1.2 The layered pipeline
-
-A request is transformed step by step. Each arrow is a translation; each layer owns one kind of work.
+Around them sit the **controllers**, the presentation boundary: they speak one API version, decode the wire format
+and hand the application service API-neutral data.
 
 ```mermaid
 flowchart LR
-    DTO["API DTO<br/><i>…Dto</i>"]
-    REQ["Unified request<br/><i>…Request</i>"]
-    PARSED["Validated model<br/><i>…Parsed</i>"]
-    DB["Managed entity<br/><i>…Db</i>"]
-    OUT["Response DTO + ErrorInfo"]
-
-    DTO -->|inbound mapper| REQ
-    REQ -->|"parser — normalize · validate · resolve"| PARSED
-    PARSED -->|"operation — issue BPN · persist · changelog"| DB
-    DB -->|outbound mapper| OUT
-
-    subgraph APP["application &nbsp;·&nbsp; API- and version-aware"]
-        DTO
-        REQ
-        OUT
-    end
-    subgraph PARSE["parser &nbsp;·&nbsp; API-neutral, read-only"]
-        PARSED
-    end
-    subgraph OP["operation &nbsp;·&nbsp; API-neutral, write authority"]
-        DB
-    end
+    C["Controller<br/><i>API version</i>"] --> A["Application service<br/><i>one use case</i>"]
+    A --> P[Parser]
+    A --> O[Operation service]
+    A --> G[Gateway]
+    O --> O
+    P --> DB[(Database)]
+    O --> DB
+    G --> R[[Remote service]]
 ```
 
-The four representations, by suffix:
+## 1.2 Models
 
-| Representation  | Suffix     | Nature                                                                                                     |
-|-----------------|------------|------------------------------------------------------------------------------------------------------------|
-| API model       | `…Dto`     | The versioned wire contract. Lives only in the application layer and mappers.                              |
-| Unified request | `…Request` | A loose, source-neutral **superset** of every inbound shape (v6, v7, Orchestrator). Nullable, unvalidated. |
-| Validated model | `…Parsed`  | Fully validated and non-null; carries already-resolved entities. Safe to persist as-is.                    |
-| Entity          | `…Db`      | The JPA entity. Lives only in the operation layer and the entity mapper.                                   |
+Data changes its *guarantee level* as it flows through a use case. Each level is its own model layer. The diagram below
+shows the order in which data passes through the layers during a use case; which layer may reference which is a
+separate matter, settled by MDL.2.
 
-## 1.3 The three layers
+| Layer      | Suffix                         | Guarantees                                                                                                     |
+|------------|--------------------------------|----------------------------------------------------------------------------------------------------------------|
+| API        | `…V7Dto`, `…V7Request`, …     | The wire contract of one API version. Lives only at the controller boundary.                                   |
+| Raw        | `…Raw`                         | None. Anything that has not passed a parser: API input, remote responses, data prepared for a remote call. Raw from a controller MAY rely on CTL.3. |
+| Parsed     | `…Parsed`                      | Normalized, validated, resolved. Each type stands for one documented set of guarantees.                       |
+| Output     | `…Record`, `…Result`, `…Stats` | What a use case hands back to the controller. No entities.                                                    |
+| Entity     | `…Db`                          | The persisted state. Trusted without parsing.                                                                  |
 
-**Application** — the API boundary. One service per *(domain × operation × API version)*. It is the only layer that knows about API DTOs and API versions. It maps the incoming DTO to a `…Request`, drives the parse-then-execute flow, owns the transaction, and maps the outcome back to response DTOs and errors. It contains no validation and no business rules of its own.
+```mermaid
+flowchart LR
+    API["API model<br/>(per version)"] -->|inbound mapper| RAW[Raw]
+    REM["Remote DTO"] -->|"gateway (mapper)"| RAW
+    RAW -->|parser| PARSED[Parsed]
+    PARSED -->|operation| DB[(Db)]
+    DB -->|output mapper| OUT[Output]
+    OUT -->|outbound mapper| API2["API model<br/>(per version)"]
+```
 
-**Parser** — the decision layer. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors. It is the only layer that handles **data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed.
+Each major API version owns a complete copy of every type it exposes. A version is frozen once superseded: when the
+internal model changes, only that version's mappers change. This is what lets several versions live side by side
+without one dragging the other along.
 
-It has exactly three responsibilities:
+## 1.3 How a use case flows
 
-- **Normalization** — bringing an accepted value into the one canonical form the rest of the code works in: trimming, dropping blanks, upper-casing a BPN, defaulting an omitted identifier type. Normalization decides nothing and rejects nothing; it removes variation that no later layer should have to know about.
-- **Validation** — deciding whether the value is acceptable at all, and rejecting it with an error when it is not.
-- **Resolution** — turning an accepted reference into the thing it names: a BPN into its entity, a metadata key into its record. Resolution is how the parser decides a reference is valid, so the resolved entity is part of its verdict.
+The default use case is one **parse → operate** chain inside one transaction: the parser resolves and validates
+everything the operation needs, the operation decides and writes, the application service shapes the outcome.
 
-The three run in that order — a value is normalized before it is judged, and judged before it is resolved — which is why a caller never normalizes on a parser's behalf.
-
-A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. The parser itself is pure (it only reads) and API-neutral (it never sees a DTO), which is what lets one parser serve every version and every context that embeds the same content: a standalone address, a site's main address, a legal entity's address.
-
-**Operation** — the execution layer. It carries out the operation against the service's data — reading, writing, or both — and in principle spans the full range of CRUD; one operation may be composite, combining several CRUD steps, sometimes across more than one entity. For any part that writes, the operation service is *the single authority* for that entity's write — the one place it happens — so BPN issuance, persistence, and changelog live in exactly one location. It works in internal domain and managed models and returns them, never response DTOs.
-
-*Why separate `…Request` from the DTO?* So the parser and operation never depend on a versioned API model. Every inbound source maps into the one `…Request`, and a single body of parsing and writing logic serves all of them.
-
-*Why separate parse from execute?* Deciding can fail and must be exhaustive; doing must not. Keeping them apart lets us validate a whole batch, report every problem, and then execute only what survived — without half-written state.
-
-## 1.4 Supporting components
-
-- **`ParseResult<T, E>`** — the backbone type: per entry, either `Success(parsed)` or `Failure(errors)`. It is covariant in the error type, so a parser with a narrow error type composes into an operation with a wider one.
-- **Combinators** — `zipParseResults` (combine several parsers for the same entry, accumulating errors), `chainParseResults` (feed one parse stage into the next), `parseWherePresent` (run a strict parse over the entries a request actually names), and `parseAndExecute` (the application-to-operation contract: parse the batch, execute only the successes, weave results back into the original positions).
-- **Mappers** — `@Component`, translation only, each covering a single direction: *inbound* (DTO → `…Request`), *entity* (`…Parsed` → `…Db`), *outbound* (errors and results → response DTOs / `ErrorInfo` / the error an endpoint raises).
-- **`Pending…Write`** — a staged entity plus its `UpsertType` (`Created` / `Updated` / `NoChange`); the currency between staging and committing when a write must be split (see [2.4](#24-operation-layer)).
-
-## 1.5 How a batch flows
-
-Application code is batch-first: a request carries many entries, and each entry gets its own verdict. `parseAndExecute` is what keeps a bad entry from spoiling its neighbours while still writing valid ones in a single pass.
+Remote calls change that picture. They are slow, can fail independently, and must not hold a database transaction
+open. So the use case **splits its chain around every remote call**:
 
 ```mermaid
 sequenceDiagram
     participant App as Application service
-    participant Parser as Parser
-    participant Op as Operation service
-    participant Map as Mappers
-
-    App->>Parser: parse(all requests)
-    Note over Parser: validate + resolve every entry,<br/>accumulate errors (no fail-fast)
-    Parser-->>App: per-entry verdicts (Success or Failure), in order
-    App->>Op: execute(successful parses only)
-    Note over Op: issue BPNs · persist · emit changelog
-    Op-->>App: managed entities, in order
-    Note over App: results woven back into<br/>the original request positions
-    App->>Map: successes → response DTOs,<br/>failures → ErrorInfo
-    Map-->>App: response wrapper
+    participant Op as Parser / Operation
+    participant GW as Gateway
+    App->>Op: load what the remote call needs (own short transaction or read)
+    App->>GW: remote call (no transaction)
+    GW-->>App: Raw response
+    App->>Op: transaction: parse response + re-check local state → operate
 ```
 
-The list is **positional throughout**: the same size in and out, and the i-th result always belongs to the i-th request. That order *is* the correlation between request and response — no separate identifier is needed.
+Data a remote call needs is loaded first, by parsers and operations; the gateway only sends and translates. The
+response comes back as Raw and is parsed like any other untrusted input. Because local state may have changed while
+the call ran, the parser of the next segment re-resolves what it relies on and rejects stale data.
 
-## 1.6 When this pattern applies
+An application service MAY call another application service. No rule forbids it, but the shape above usually does: a
+segment parses everything before it operates, and calling another application service in the middle of a segment
+would run that service's parse → operate chain inside our own, operating before we have finished parsing. So within a
+segment, the outer use case composes the inner one's parsers and operations instead. At a remote call boundary the
+chain splits anyway, and a complete segment on either side of the call can be another application service.
 
-This structure governs **operations** — create, read, search, update, and delete, and the composite operations built from them. It is the target for all of them across every service.
+## 1.4 Typical structures
 
-The write-specific obligations — single write authority, changelog, owning the transaction — apply to whichever parts of an operation change state. A pure read or search uses the same layering, with the parser validating any external input and the operation layer querying rather than writing.
+Most application services take one of three shapes.
 
-Sometimes there is nothing left for the operation layer to do. Because a parser resolves the references it validates, a fetch-by-identifier has already produced its own result by the time parsing is done: the entity the response is built from. Such an operation gets no operation service — the application service maps what the parser resolved. An operation service earns its place by carrying out work the parse did not: a query with criteria, a fetch of associations, a projection, or any write.
+**Local use case.** No remote call: one parse → operate chain inside one transaction. Most endpoints look like this,
+for example the business partner input upsert.
 
-Background jobs and internal process orchestration are not request-driven operations of this kind and are not forced into this exact shape, though the same principles (pure vs. impure, API-neutral core, mappers for translation) still guide them.
+```mermaid
+flowchart LR
+    subgraph T[Transaction]
+        P[Parse] --> O[Operate]
+    end
+    T --> R[Shape outcome]
+```
+
+**Remote round trip.** Remote calls surround the parse → operate chain: the local state the call needs is read first,
+the remote service is called without a transaction, and the response is parsed and operated on in a transaction of its
+own. A remote write follows the commit of the transaction that prepared it. Background jobs that fetch from another
+service look like this, for example the resolution of finished golden record tasks.
+
+```mermaid
+flowchart LR
+    L[Read local state] --> G[Remote call]
+    G --> T
+    subgraph T[Transaction]
+        P[Parse response] --> O[Operate]
+    end
+```
+
+**Composed use case.** The application service calls other application services, each a complete parse → operate
+segment, and places the remote calls between them. It suits a use case whose segments are use-case-shaped on their own,
+for example the relation task creation: one application service prepares the staged relations, the gateway creates
+the tasks, and a final segment records them.
+
+```mermaid
+flowchart LR
+    subgraph A1[Application service A]
+        P1[Parse] --> O1[Operate]
+    end
+    A1 --> G[Remote call]
+    G --> A2
+    subgraph A2[Application service B or own segment]
+        P2[Parse response] --> O2[Operate]
+    end
+```
 
 ---
 
 # Part 2 — Rules
 
-*Binding rules. MUST = required; MUST NOT = forbidden; SHOULD = strong default, deviate only with a documented reason. A few rules describe the target where current code differs; these are marked and are still the direction of travel.*
+*MUST / MUST NOT are binding. SHOULD is the default; its exception clause names the case we had in mind. MAY is
+permitted, not expected.*
 
-## 2.1 Layering & dependencies
+*Rule IDs are stable: a new rule is appended to its section, a removed rule leaves a gap, and no ID is ever reused.*
 
-- The layers MUST depend only downward: application → parser and application → operation. Parser and operation MUST NOT depend on the application layer.
-- Parser and operation code MUST be API-neutral and version-neutral: no `…Dto` types, no awareness of API versions.
-- Only the application layer and mappers MAY reference API DTOs or be partitioned by API version.
-- Business decisions and side effects MUST live in the parser (decisions) and operation (side effects) layers, never in the application layer.
+## 2.1 API models (`API`)
 
-## 2.2 Application layer
+- **API.1** Each major API version MUST own a complete set of its types (models, enums, error codes, interfaces,
+  clients) in its own `v<N>` package. A version MUST NOT reference another version's types.
+- **API.2** Every API type MUST carry its version in its name (`RelationV7Dto`, `RelationTypeV7`, `GateErrorCodesV7`).
+- **API.3** API types MUST NOT appear outside controllers and their version's mappers. Shared enums from `bpdm-common`
+  MAY be used throughout.
+- **API.4** A superseded API version MUST NOT change. Changes to the internal model MUST be absorbed by that version's
+  mappers.
 
-- There MUST be one application service per *(domain × operation × API version)*. A single service MAY host several closely related endpoints of the same operation.
-- It MUST contain only orchestration and translation — no validation, no business rules, no persistence.
-- It MUST be the only layer that maps to or from API DTOs.
-- It MUST own the outer transaction boundary.
-- It MUST drive the flow through `parseAndExecute` (parse the whole batch, execute only successes) and preserve input order in the response.
+## 2.2 Controllers (`CTL`)
 
-## 2.3 Parser layer
+- **CTL.1** A controller MUST only: authorize, decode the wire format into Raw (JSON, CSV), resolve request context such
+  as the tenant, call one application service, and map its Output or rejection to the API version's response.
+- **CTL.2** A payload the controller cannot decode (invalid JSON or CSV syntax) MUST be rejected at the controller as a
+  presentation error, never handed to a parser.
+- **CTL.3** A controller MUST reject, as a presentation error, a request that violates a constraint formally declared in
+  the API version's OpenAPI specification: data type, required field, enum value, format, length or size bound. Raw
+  types MAY rely on these constraints. Every other constraint — anything stated only in prose descriptions, cross-field
+  rules, references to existing data, business rules — MUST be left to the parser. The test: the controller rejects
+  exactly what a client could have detected from the specification alone.
 
-A parser has exactly three responsibilities — **normalization**, **validation** and **resolution** — and it MUST own all three, in that order, for the data it accepts.
+## 2.3 Application services (`APP`)
 
-**Scope and purity**
+- **APP.1** Every use case — endpoint or background job — MUST be entered through exactly one application service,
+  independent of API versions.
+- **APP.2** An application service SHOULD implement its use case by composing the toolbox, and MUST NOT access the
+  database or speak a remote protocol itself. It owns the transactions and shapes the outcome. It MAY make decisions
+  that belong to its use case alone: which operation to run, whether a step is needed, how to react to a rejection. A
+  decision that protects persisted state — an invariant, a state transition, a stale guard — MUST live in an operation,
+  because every use case that writes that state must obey it.
+- **APP.3** An application service SHOULD run one parse → operate chain inside one transaction.
+  *Exception:* a use case with remote calls splits its chain at each call — see APP.4.
+- **APP.4** A transaction MUST NOT span a remote call. Remote reads happen before the transaction that uses them; remote
+  writes happen after the transaction that prepared them has committed.
+- **APP.5** An application service MUST return Output models — a sealed `…Result` where a use case can be rejected — and
+  MUST NOT throw to signal a rejection. Background use cases MUST report rejections (log, failed state), not throw.
 
-- A parser MUST parse all data entering the application from outside its own database: both requests received on our API endpoints and responses received from calls the application makes to other services. Data read from our own database is trusted and MUST NOT require parsing.
-- A parser MUST be free of side effects other than database reads; it MUST NOT write.
-- A parser MUST be annotated `@Transactional(readOnly = true)` when a single parse issues more than one database query. *(Current gap: several parsers do multiple reads without this annotation.)*
+## 2.4 Parsers (`PRS`)
 
-**Normalization**
+- **PRS.1** Every model that does not come from our own database MUST pass through a parser before an operation receives
+  it — API input and remote responses alike.
+- **PRS.2** A parser MUST NOT write. It MUST return rejections as a `ParseResult` failure, accumulating every error it
+  finds.
+- **PRS.3** A parser MUST resolve every reference the operation needs to the entity it names; a missing referent is a
+  parse error.
+- **PRS.4** A parser MUST make business decisions only in the form of validation: whether data is acceptable. What to
+  do with valid data — classify, transition, skip as stale — is the operation's call.
+- **PRS.5** A parser that can reject nothing MUST return its Parsed value directly, without a `ParseResult`.
+- **PRS.6** Parsers MAY call other parsers; reuse is their purpose.
 
-- No other layer MAY normalize an inbound value: not the controller, not the application service, not a mapper, and not a caller preparing input for a parser. Normalization MUST happen once, in the parser that owns the value — for a shared reference, that is the resolving parser every path funnels through, not each of its callers. A value that reaches a `…Parsed` MUST already be canonical.
-- A parser SHOULD normalize the inbound value rather than widen its lookup. Matching a stored value loosely (a case-insensitive or otherwise tolerant query) hides the canonical form and gives up an exact indexed lookup; normalizing the input keeps both.
+## 2.5 Operation services (`OPS`)
 
-**Validation**
+- **OPS.1** An operation service MUST hold the service logic that protects persisted state: invariants, state
+  transitions, change detection, writes. It MUST be the single place an aggregate is written, including its changelog
+  and persisted-change log line.
+- **OPS.2** An operation service MUST take Parsed models or entities and return entities, Parsed models, or the Raw models
+  a remote call needs. It MUST NOT build Output, and MUST NOT call gateways.
+- **OPS.3** Operation services MAY call other operation services; reuse is their purpose.
+- **OPS.4** An operation service MUST NOT exist only to pass through what a parser already resolved.
 
-- A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
-- A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.7](#27-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
-- An error a parser reports SHOULD quote the value as the caller sent it, not its normalized form, so the client recognises its own input.
-- A parser that can reject nothing MAY return its `…Parsed` value directly instead of a `ParseResult`. Normalizing search criteria is the typical case: an unknown or malformed filter value simply matches nothing, so there is no verdict to report. As soon as one input can be rejected, the parser MUST return a `ParseResult`.
+## 2.6 Gateways (`GW`)
 
-**Resolution**
+- **GW.1** A gateway MUST wrap exactly one remote service and do translation only: protocol, chunking, paging, and
+  mapping remote models to and from internal models. It MUST NOT parse, decide, access the database or open
+  transactions.
+- **GW.2** A gateway MUST expose collection-based methods only; remote calls are coarse-grained.
+- **GW.3** Remote models MUST NOT appear outside gateways and their mappers.
 
-- A parser SHOULD resolve the references it validates to the entities they name, rather than passing the identifier on for a later layer to look up.
-- A resolving parser MUST NOT offer optional resolution: A parser always reports a missing referenced object as a parse error. Where a reference is optional, the *caller* handles that.
+## 2.7 Internal models (`MDL`)
 
-## 2.4 Operation layer
+- **MDL.1** Internal models MUST belong to exactly one layer — Raw, Parsed, Output — or be an entity, and carry its
+  suffix (`…Raw`, `…Parsed`, `…Db`; Output by role: `…Record`, `…Result`, `…Stats`). Enums need no suffix. They live in
+  `model/{raw,parsed,output}/<domain>`, where the domain is the thing described, not the system it comes from.
+- **MDL.2** A type MAY reference only its own layer and the layers it is built from: Output → Parsed → Raw. Parsed MAY
+  reference entities; Raw and Output MUST NOT.
+- **MDL.3** A Parsed type MUST stand for exactly one set of guarantees and document, in its KDoc, the validation
+  guarantees its structure does not show. An operation chooses the guarantees it relies on by choosing its parameter
+  type.
+- **MDL.4** A Parsed type SHOULD reuse Raw types for parts that carry no guarantee of their own.
+  *Exception:* a part gets its own Parsed type once an operation relies on a guarantee about it.
+- **MDL.5** A batch MUST be a plain list unless the operation relies on a cross-entry guarantee or the entries were
+  resolved against shared context (e.g. one tenant); then it gets its own `…BatchParsed`.
+- **MDL.6** Parse errors MUST be sealed hierarchies in the Parsed layer, mapped exhaustively to API error codes by each
+  API version's mapper.
 
-- An operation service MUST carry out one operation against the service's data — a single CRUD action (create, read, search, update, delete) or a composite built from several of them.
-- It MUST consume validated `…Parsed` input wherever the operation takes external input, and MUST return internal domain or managed models (`…Db` / `UpsertResult` / query results); it MUST NOT return or reference API DTOs or response models.
-- For any part of an operation that writes, the operation service MUST be the single authority for that entity's write: the only place that issues the entity's BPN, persists it, and emits its changelog at the entity's own aggregate boundary.
-- An operation service MUST NOT be created for an operation the parse already completes. Where a parser's resolution has produced the operation's whole result — a fetch by identifier is the typical case — the application service maps that result directly; a pass-through operation service adds a layer without adding authority.
-- An operation service SHOULD expose the simplest form its callers need. The stage/commit split MUST be introduced only when a composite must wire an unsaved, cyclically-referenced graph before flushing — not as a default shape.
-- An update MUST NOT be able to change an entity's identity or parentage. This MUST be enforced structurally (e.g. a mutator that exposes only the permitted writes), not by convention.
+## 2.8 Mappers (`MAP`)
 
-## 2.5 Models & naming
+- **MAP.1** A mapper MUST translate only: no decisions, no business-rule defaults, no I/O. It is a `@Component` in the
+  `mapper` package.
+- **MAP.2** There SHOULD be one mapper class per layer boundary, named by the boundary: internal ones by layer pair
+  (`RawToParsedMapper`, `DbToOutputMapper`), external ones by system and direction (`ApiV7InboundMapper`,
+  `PoolInboundMapper`, `OrchestratorOutboundMapper`).
+  *Exception:* a boundary class that grows too large to navigate is split by domain (e.g. `ApiV7RelationMapper`), never
+  finer.
+- **MAP.3** Wire-format codecs (CSV reading and writing) are not mappers and MAY live beside the API mappers.
+- **MAP.4** Services SHOULD translate between models through mappers.
+  *Exception:* a short, single-use translation MAY stay inline.
 
-- Every representation MUST carry its suffix: `…Dto` (API), `…Request` (unified input), `…Parsed` (validated), `…Db` (entity).
-- The `…Request` model MUST be a superset that captures the content of all inbound sources (v6, v7, Orchestrator), so one parsing path feeds one domain model.
-- A `…Parsed` value MUST be fully validated, normalized and non-null — safe to persist without further checks, and carrying every value in its canonical form.
-- Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types. Where an internal model duplicates the shape of an API DTO, it SHOULD reuse the shared value types and enums rather than cloning them — only the DTO wrapper is duplicated, not the vocabulary it is built from.
-- Types SHOULD be named domain-noun first, with the role/stage as a suffix (`AddressCreateParsed`, not `ParsedAddressCreate`).
+## 2.9 Batches & transactions (`TX`)
 
-## 2.6 Mappers
-
-- A mapper MUST be a `@Component` — not a `@Service`, because it is a humble translation object and holds none of a service's authority — do translation only (no business logic, no side effects), and live in the `mapper` package.
-- A decision, a rule-based default, or a branch on business state is business logic: it MUST NOT appear in a mapper, and MUST live in the parser (if it decides) or the operation (if it acts). No size or convenience argument justifies an exception.
-- The reverse does not hold: a service MAY carry out a translation inline. Deterministic conversions — `Instant`↔`LocalDateTime`, enum and key formatting, restructuring — are translation wherever they live, and a one-off two-line conversion does not deserve its own mapper.
-- Translation SHOULD be extracted into a mapper once it grows beyond a few lines or is needed in more than one place. The threshold is a judgement call; extract before the mapping starts to obscure what the service does.
-- A mapper MUST cover exactly one direction: inbound (DTO → `…Request`), entity (`…Parsed` → `…Db`), or outbound (errors/results → response DTO / `ErrorInfo`). It MUST NOT merge two directions, and one direction MUST NOT be fragmented across several mappers for the same content.
-- Once extracted, mapping — including response shaping — MUST live in the `mapper` package as a proper `@Component` mapper. It MUST NOT be left as loose extension functions in a service package. *(Current gap: outbound response mapping still lives as extension functions outside the mapper package.)*
-
-## 2.7 Errors
-
-- Parse errors MUST be modelled as sealed hierarchies.
-- A shared content error SHOULD subtype each embedding operation's error interface, so it surfaces as that operation's error directly, without wrapping.
-- Error-to-code mapping MUST be exhaustive over the sealed type, so that adding a new error fails to compile until it is mapped.
-- An operation that answers with a single result rather than per-entry outcomes — a get, a search — MUST still model its parse errors as a sealed hierarchy and map them exhaustively. The mapping yields the error the endpoint raises instead of an `ErrorInfo` entry, and the application layer raises it; the parser still only returns the failure.
-- A genuinely unreachable or internal error SHOULD map to a thrown 500, not to a client-facing error code.
-
-## 2.8 Transactions
-
-- A class MUST declare `@Transactional` only when it needs it: the application layer owns the outer boundary; operation methods are transactional so they are safe as standalone entry points and participate in the outer transaction otherwise; parsers use `@Transactional(readOnly = true)` when they read repeatedly (see [2.3](#23-parser-layer)).
-
-## 2.9 Batch & correlation contract
-
-- Every layer MUST preserve order: the i-th response corresponds to the i-th request. A parser's verdict list and an operation's result list therefore have the same size as their input.
-- Every layer MUST query and write in batch, not once per entry: a lookup a batch shares — metadata, referenced entities, existing rows — is issued once for the whole batch. This applies to parsers and operation services alike.
-- New APIs MUST NOT introduce a client-supplied correlation index; request/response order is the correlation. Existing index fields are legacy and are not to be extended to new operations.
+- **TX.1** Every layer MUST preserve order: the i-th result belongs to the i-th entry. New APIs MUST NOT introduce a
+  client-supplied correlation index.
+- **TX.2** Parsers and operations MUST query and write per batch, not per entry.
+- **TX.3** A parser SHOULD be `@Transactional(readOnly = true)` when it issues more than one query.
+  *Exception:* a parser only ever called inside its application service's transaction may rely on it.
 
 ---
 
