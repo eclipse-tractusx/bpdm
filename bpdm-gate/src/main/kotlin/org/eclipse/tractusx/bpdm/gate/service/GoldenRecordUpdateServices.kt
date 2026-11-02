@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -46,6 +47,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -199,30 +201,25 @@ class GoldenRecordUpdateChunkService(
 
         val addressesByBpn = addresses.associateBy { it.address.bpna }
 
-        // Resolve names in one batch for every site an address belongs to. The Pool's `bpnSite` (its oldest member)
-        // may itself be "additional" for an output that follows a different site, so it is a name candidate too.
-        val siteNamesByBpn = resolveSiteNames(addresses.flatMap { listOfNotNull(it.address.bpnSite) + it.address.additionalSites })
+        val sitesByBpn = resolveSites(
+            addresses.flatMap { listOfNotNull(it.address.bpnSite) + it.address.additionalSites } +
+                    businessPartnersToUpdate.mapNotNull { it.bpnS }
+        )
 
         return businessPartnersToUpdate.mapNotNull { output ->
             val address = addressesByBpn[output.bpnA!!] ?: return@mapNotNull null
-            val upsertData = address.toUpsertData(output, siteNamesByBpn) ?: return@mapNotNull null
+            val upsertData = address.toUpsertData(output, sitesByBpn) ?: return@mapNotNull null
             businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
     }
 
-    private fun fetchSite(siteBpn: String): SiteVerboseDto? {
-        val searchRequest = SiteSearchRequest(siteBpns = listOf(siteBpn))
-        return poolClient.sites.getSites(searchRequest, PaginationRequest(size = 1)).content.map { it.site }.firstOrNull()
-    }
-
-    private fun resolveSiteNames(siteBpns: Collection<String>): Map<String, String> {
+    private fun resolveSites(siteBpns: Collection<String>): Map<String, SiteWithMainAddressVerboseDto> {
         val distinctBpns = siteBpns.distinct()
         if (distinctBpns.isEmpty()) return emptyMap()
 
         val searchRequest = SiteSearchRequest(siteBpns = distinctBpns)
         return poolClient.sites.getSites(searchRequest, PaginationRequest(size = distinctBpns.size)).content
-            .map { it.site }
-            .associate { it.bpns to it.name }
+            .associateBy { it.site.bpns }
     }
 
     private fun LegalEntityWithLegalAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
@@ -241,10 +238,10 @@ class GoldenRecordUpdateChunkService(
         return copy.toUpsertData()
     }
 
-    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb, siteNamesByBpn: Map<String, String>): OutputUpsertData? {
+    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb, sitesByBpn: Map<String, SiteWithMainAddressVerboseDto>): OutputUpsertData? {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
-        return update(copy, this, siteNamesByBpn)
+        return update(copy, this, sitesByBpn)
     }
 
     private fun BusinessPartnerDb.toUpsertData(): OutputUpsertData {
@@ -408,14 +405,35 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto, siteNamesByBpn: Map<String, String>) : OutputUpsertData?{
+    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto, sitesByBpn: Map<String, SiteWithMainAddressVerboseDto>) : OutputUpsertData?{
         val addressProperties = address.address
+        val trackedSiteBpn = businessPartner.bpnS ?: addressProperties.bpnSite
+        val trackedSite = trackedSiteBpn?.let { sitesByBpn[it] }
+        if (trackedSiteBpn != null && trackedSite == null) {
+            logger.warn {
+                "Cannot resolve site '$trackedSiteBpn' for address '${addressProperties.bpna}'. " +
+                        "Skipping the update of business partner output '${businessPartner.sharingState.externalId}'."
+            }
+            return null
+        }
+
+        val poolAddressType = addressProperties.addressType
+            ?: throw createMappingException(LogisticAddressInvariantVerboseDto::addressType)
+        val isLegalAddress = poolAddressType == AddressType.LegalAddress || poolAddressType == AddressType.LegalAndSiteMainAddress
+        // The Pool type describes all sites; only the tracked site's main address determines this output's role.
+        val isSiteMainAddress = trackedSite?.mainAddress?.bpna == addressProperties.bpna
+        val addressType = when {
+            isLegalAddress && isSiteMainAddress -> AddressType.LegalAndSiteMainAddress
+            isLegalAddress -> AddressType.LegalAddress
+            isSiteMainAddress -> AddressType.SiteMainAddress
+            else -> AddressType.AdditionalAddress
+        }
 
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
         updateStates(businessPartner.states, addressProperties.states, BusinessPartnerType.ADDRESS)
         businessPartner.addressName = addressProperties.name
         businessPartner.addressUpdatedAt = addressProperties.updatedAt
-        businessPartner.postalAddress.addressType = addressProperties.addressType
+        businessPartner.postalAddress.addressType = addressType
         businessPartner.postalAddress.physicalPostalAddress = addressProperties.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
@@ -425,12 +443,11 @@ class GoldenRecordUpdateChunkService(
         // `bpnSite` (its oldest member): the output tracks the site that was shared (bpnS), which may be any member.
         // If the output does not yet track a site but the address is a site main, it starts tracking `bpnSite` below,
         // so anticipate that here. Everything else the address belongs to becomes an additional site.
-        val trackedSiteBpn = businessPartner.bpnS ?: addressProperties.bpnSite
         val additionalSiteBpns = (listOfNotNull(addressProperties.bpnSite) + addressProperties.additionalSites)
             .distinct()
             .filterNot { it == trackedSiteBpn }
         businessPartner.additionalSites.clear()
-        businessPartner.additionalSites.addAll(additionalSiteBpns.map { AdditionalSiteDb(it, siteNamesByBpn[it]) })
+        businessPartner.additionalSites.addAll(additionalSiteBpns.map { AdditionalSiteDb(it, sitesByBpn[it]?.site?.name) })
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
         address.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->
@@ -447,23 +464,11 @@ class GoldenRecordUpdateChunkService(
         //When addressType has been changed from AdditionalAddress to SiteMainAddress
         val bpnSiteToAdopt = addressProperties.bpnSite
         if (bpnSiteToAdopt != null && businessPartner.bpnS == null) {
-            // The additional sites above are already resolved relative to this site, so a site the Pool does not return
-            // leaves nothing coherent to write: the output would carry neither that site nor it among its additional
-            // sites. Skip the whole update and let the address's next change carry it.
-            val siteToAdopt = fetchSite(bpnSiteToAdopt)
-            if (siteToAdopt == null) {
-                logger.warn {
-                    "Address '${addressProperties.bpna}' reports belonging to site '$bpnSiteToAdopt' which the Pool does not return. " +
-                            "Skipping the update of business partner output '${businessPartner.sharingState.externalId}'."
-                }
-                return null
-            }
-
             businessPartner.bpnS = bpnSiteToAdopt
             //as addressType has been updated, so there is no siteConfidence criteria.
             //fill the fake confidence to prevent the error which will update in further steps.
             businessPartner.siteConfidence = ConfidenceCriteriaDb(false,false,0, LocalDateTime.now(), LocalDateTime.now(),0)
-            return siteToAdopt.toUpsertData(businessPartner)
+            return requireNotNull(trackedSite).site.toUpsertData(businessPartner)
         }
 
         return businessPartner.toUpsertData()

@@ -4,6 +4,11 @@ The BPDM Gate is a core service with a standardized API used within data spaces 
 
 The BPDM Gate offers an [API](../bpdm-gate-api) to query and share business partners.
 
+The output's `address.addressType` describes the address's role towards the site
+in `site`, not towards any site in `additionalSites`. Pool synchronization uses
+that site's main address to determine the site-main role and preserves the
+address's legal-address role.
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
