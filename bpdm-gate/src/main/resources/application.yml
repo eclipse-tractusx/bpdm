@@ -37,7 +37,7 @@ bpdm:
     # Additionally, if set and security is enabled all incoming tokens need to have a "BPN" claim with the matching BPNL or otherwise they will not be authorized
     owner-bpn-l:
   api:
-    # The maximum amount of business partner entries a sharing member can upsert per request
+    # The maximum amount of business partner or relation entries a sharing member can upsert per request
     upsert-limit: 100
   tasks:
     creation:

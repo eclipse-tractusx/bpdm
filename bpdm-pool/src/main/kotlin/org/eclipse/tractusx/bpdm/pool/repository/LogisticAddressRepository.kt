@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
@@ -79,6 +80,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
 
     }
 
+    @EntityGraph(attributePaths = ["physicalPostalAddress.country", "alternativePostalAddress.country"])
     fun findByBpn(bpn: String): LogisticAddressDb?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LogisticAddressDb>
@@ -89,8 +91,11 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
     @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.sites s LEFT JOIN FETCH s.mainAddress WHERE a IN :addresses")
     fun joinSites(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb>
 
-    @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.physicalPostalAddress.administrativeAreaLevel1 LEFT JOIN FETCH a.alternativePostalAddress.administrativeAreaLevel1 WHERE a IN :addresses")
+    @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.physicalPostalAddress.administrativeAreaLevel1 LEFT JOIN FETCH a.alternativePostalAddress.administrativeAreaLevel1 JOIN FETCH a.physicalPostalAddress.country LEFT JOIN FETCH a.alternativePostalAddress.country WHERE a IN :addresses")
     fun joinRegions(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb>
+
+    @Query("SELECT DISTINCT a FROM LogisticAddressDb a JOIN FETCH a.physicalPostalAddress.country LEFT JOIN FETCH a.alternativePostalAddress.country WHERE a IN :addresses")
+    fun joinCountries(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb>
 
     @Query("SELECT DISTINCT p FROM LogisticAddressDb p LEFT JOIN FETCH p.identifiers WHERE p IN :partners")
     fun joinIdentifiers(partners: Set<LogisticAddressDb>): Set<LogisticAddressDb>
@@ -150,7 +155,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                 )
                 AND (
                     CAST(:#{#searchRequest.country} AS text) IS NULL
-                    OR la.physicalPostalAddress.country = CAST(:#{#searchRequest.country} AS text)
+                    OR la.physicalPostalAddress.country.countryCode = CAST(:#{#searchRequest.country} AS text)
                 )
                 AND (
                        (

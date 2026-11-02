@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
@@ -68,7 +69,7 @@ class AddressDtoRequestMapperV6 {
     private fun toPhysicalRequest(physical: PhysicalPostalAddressDtoV6): PhysicalPostalAddressRequest =
         PhysicalPostalAddressRequest(
             geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
-            country = physical.country.alpha2,
+            country = physical.country,
             administrativeAreaLevel1 = physical.administrativeAreaLevel1,
             administrativeAreaLevel2 = physical.administrativeAreaLevel2,
             administrativeAreaLevel3 = physical.administrativeAreaLevel3,
@@ -87,7 +88,7 @@ class AddressDtoRequestMapperV6 {
     private fun toAlternativeRequest(alternative: AlternativePostalAddressDtoV6): AlternativePostalAddressRequest =
         AlternativePostalAddressRequest(
             geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
-            country = alternative.country.alpha2,
+            country = alternative.country,
             administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
             postalCode = alternative.postalCode,
             city = alternative.city,
@@ -105,7 +106,7 @@ class AddressDtoRequestMapperV6 {
         )
 
     private fun toStateRequest(state: AddressStateDtoV6): AddressStateRequest =
-        AddressStateRequest(validFrom = state.validFrom?.toUtcInstant(), validTo = state.validTo?.toUtcInstant(), type = state.type)
+        AddressStateRequest(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
 
     private fun toIdentifierRequest(identifier: AddressIdentifierDtoV6): AddressIdentifierRequest =
         AddressIdentifierRequest(value = identifier.value, type = identifier.type)
@@ -127,4 +128,8 @@ class AddressDtoRequestMapperV6 {
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

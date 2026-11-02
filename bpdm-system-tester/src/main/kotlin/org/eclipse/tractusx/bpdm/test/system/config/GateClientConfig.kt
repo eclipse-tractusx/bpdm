@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcClientProperties
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.DefaultGateV7Client
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGate
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
@@ -201,8 +201,8 @@ class GateClientConfig{
         webClientProvider: BpdmWebClientProvider,
         clientConnector: ClientHttpConnector
     ): SharingMemberGate {
-        val inputCredential = GateClientImpl { webClientProvider.builder(credentials.input).clientConnector(clientConnector).build() }
-        val outputCredential = GateClientImpl { webClientProvider.builder(credentials.output).clientConnector(clientConnector).build() }
+        val inputCredential = DefaultGateV7Client { webClientProvider.builder(credentials.input).clientConnector(clientConnector).build() }
+        val outputCredential = DefaultGateV7Client { webClientProvider.builder(credentials.output).clientConnector(clientConnector).build() }
         val client = RoleSplitGateClient(inputCredential, outputCredential)
         return SharingMemberGate(credentials.member, client, SharingStateWatcher(client, credentials.member))
     }

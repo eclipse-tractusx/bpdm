@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
@@ -49,7 +49,7 @@ data class ConfidenceCriteriaParsed(
 
 data class PhysicalPostalAddressParsed(
     val geographicCoordinates: GeoCoordinate?,
-    val country: CountryCode,
+    val country: CountryDb,
     val administrativeAreaLevel1: RegionDb?,
     val administrativeAreaLevel2: String?,
     val administrativeAreaLevel3: String?,
@@ -67,7 +67,7 @@ data class PhysicalPostalAddressParsed(
 
 data class AlternativePostalAddressParsed(
     val geographicCoordinates: GeoCoordinate?,
-    val country: CountryCode,
+    val country: CountryDb,
     val administrativeAreaLevel1: RegionDb?,
     val postalCode: String?,
     val city: String,

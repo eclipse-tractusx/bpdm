@@ -20,13 +20,12 @@
 package org.eclipse.tractusx.orchestrator.api.v6.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 
 @Schema(description = "Request object for posting step results of previously reserved tasks")
-data class TaskStepResultRequest(
+data class TaskStepResultRequestV6(
 
     @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
-    val step: TaskStep,
+    val step: TaskStepV6,
 
-    val results: List<TaskStepResultEntryDto>
+    val results: List<TaskStepResultEntryDtoV6>
 )

@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.address
 
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
@@ -26,10 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.jdbc.core.JdbcTemplate
 
-class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
-
-    /**
+class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
      * GIVEN legal entity
      * WHEN owner creates a new valid additional address for the legal entity
      * THEN created address with shared by sharing member confidence is returned
@@ -253,6 +256,28 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedError = ErrorInfo(AddressCreateError.RegionNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to create a new additional address with an unknown physical country
+     * THEN operator sees country not found error
+     */
+    @Test
+    fun `try create additional address with unknown physical country`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
+            .withPhysicalCountry("ZZ")
+        val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressCreateError.CountryNotFound, "IGNORED", addressRequest.index)
         val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)

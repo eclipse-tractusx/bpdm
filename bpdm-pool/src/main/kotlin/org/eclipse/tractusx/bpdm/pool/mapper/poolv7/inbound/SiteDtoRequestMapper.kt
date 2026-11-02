@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
@@ -47,7 +48,7 @@ class SiteDtoRequestMapper(
             legalEntityBpn = request.bpnLParent,
             header = SiteHeaderRequest(
                 name = request.name,
-                states = request.states.map { SiteState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+                states = request.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
                 scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
             )
@@ -65,7 +66,7 @@ class SiteDtoRequestMapper(
     private fun toHeaderRequest(site: SiteDto): SiteHeaderRequest =
         SiteHeaderRequest(
             name = site.name,
-            states = site.states.map { SiteState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = site.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
             scriptVariants = site.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
         )
@@ -79,4 +80,8 @@ class SiteDtoRequestMapper(
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

@@ -19,18 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(
     name = "regions",
 )
 class RegionDb(
-    @Column(name = "country_code")
-    @Enumerated(EnumType.STRING)
-    val countryCode: CountryCode,
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "country_id", nullable = false)
+    val country: CountryDb,
 
     @Column(name = "region_code")
     val regionCode: String,
@@ -38,4 +37,4 @@ class RegionDb(
     @Column(name = "region_name")
     val regionName: String
 )
-: BaseEntity()
+: BaseEntityWithExplicitTimestamps()

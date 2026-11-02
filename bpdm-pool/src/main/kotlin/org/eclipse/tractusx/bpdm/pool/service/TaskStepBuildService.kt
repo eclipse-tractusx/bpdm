@@ -582,7 +582,6 @@ class TaskStepBuildService(
             AddressFieldParseError.AlternativeDeliveryServiceTypeMissing -> CleaningError.ALTERNATIVE_ADDRESS_DELIVERY_SERVICE_TYPE_MISSING.message
             AddressFieldParseError.AlternativeDeliveryServiceNumberMissing -> CleaningError.ALTERNATIVE_ADDRESS_DELIVERY_SERVICE_NUMBER_MISSING.message
             AddressFieldParseError.ConfidenceCriteriaMissing -> CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING.message
-            is AddressFieldParseError.CountryCodeNotRecognized -> "Country Code not recognized"
             is AddressFieldParseError.IdentifierValueMissing -> "Identifier value is null"
             is AddressFieldParseError.IdentifierTypeMissing -> "Identifier type is null"
             is AddressFieldParseError.StateTypeMissing -> "Business Partner state type is null"
@@ -591,6 +590,8 @@ class TaskStepBuildService(
     private fun renderAddressMetadataError(error: AddressMetadataParseError): String =
         when (error) {
             is AddressMetadataParseError.IdentifierTypeNotFound -> "Address identifier type '${error.type}' is not known"
+            is AddressMetadataParseError.PhysicalCountryNotFound -> "Country '${error.country}' in physical address is not known"
+            is AddressMetadataParseError.AlternativeCountryNotFound -> "Country '${error.country}' in alternative address is not known"
             is AddressMetadataParseError.PhysicalRegionNotFound -> "Region '${error.regionCode}' in physical address is not known"
             is AddressMetadataParseError.AlternativeRegionNotFound -> "Region '${error.regionCode}' in alternative address is not known"
             is AddressMetadataParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"

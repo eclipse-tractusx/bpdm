@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class SharingStateWatcher(
-    private val gateClient: GateClient,
+    private val gateClient: GateV7Client,
     member: SharingMember
 ) {
 
@@ -42,18 +42,18 @@ class SharingStateWatcher(
         // Success is completed after a fixed delay (see CONFIDENCE_SYNC_DELAY_SECONDS) rather
         // than immediately, because the golden record process may silently adjust confidence
         // criteria for up to 30 seconds after reporting Success.
-        private val TERMINAL_STATES = setOf(SharingStateType.Error, SharingStateType.Initial)
-        private val RELATION_TERMINAL_STATES = setOf(RelationSharingStateType.Error, RelationSharingStateType.Ready)
+        private val TERMINAL_STATES = setOf(SharingStateTypeV7.Error, SharingStateTypeV7.Initial)
+        private val RELATION_TERMINAL_STATES = setOf(RelationSharingStateTypeV7.Error, RelationSharingStateTypeV7.Ready)
         private val WAIT_TIMEOUT = Duration.ofMinutes(6)
         private const val POLL_INTERVAL_SECONDS = 10L
         private const val CONFIDENCE_SYNC_DELAY_SECONDS = 35L
         private const val PAGE_SIZE = 100
     }
 
-    private val awaitingCompletedState         = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
-    private val awaitingTaskId                 = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
-    private val awaitingRelationCompletedState = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateType>>()
-    private val awaitingRelationTaskId         = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateType>>()
+    private val awaitingCompletedState         = ConcurrentHashMap<String, CompletableFuture<SharingStateTypeV7>>()
+    private val awaitingTaskId                 = ConcurrentHashMap<String, CompletableFuture<SharingStateTypeV7>>()
+    private val awaitingRelationCompletedState = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateTypeV7>>()
+    private val awaitingRelationTaskId         = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateTypeV7>>()
 
     private val memberName = member.name.lowercase()
 
@@ -65,7 +65,7 @@ class SharingStateWatcher(
         scheduler.scheduleWithFixedDelay(::poll, 0, POLL_INTERVAL_SECONDS, TimeUnit.SECONDS)
     }
 
-    fun waitForCompletedState(recordId: String): SharingStateType {
+    fun waitForCompletedState(recordId: String): SharingStateTypeV7 {
         val scenario = ScenarioContext.current()?.scenarioName
         val externalId = ScenarioContext.current()!!.runId(recordId)
         logger.info { "[$scenario] Waiting for completed sharing state of '$recordId'" }
@@ -83,7 +83,7 @@ class SharingStateWatcher(
         }
     }
 
-    fun waitForTaskId(recordId: String): SharingStateType {
+    fun waitForTaskId(recordId: String): SharingStateTypeV7 {
         val scenario = ScenarioContext.current()?.scenarioName
         val externalId = ScenarioContext.current()!!.runId(recordId)
         logger.info { "[$scenario] Waiting for task ID assignment of '$recordId'" }
@@ -101,7 +101,7 @@ class SharingStateWatcher(
         }
     }
 
-    fun waitForRelationCompletedState(recordId: String): RelationSharingStateType {
+    fun waitForRelationCompletedState(recordId: String): RelationSharingStateTypeV7 {
         val scenario = ScenarioContext.current()?.scenarioName
         val externalId = ScenarioContext.current()!!.runId(recordId)
         logger.info { "[$scenario] Waiting for completed relation sharing state of '$recordId'" }
@@ -119,7 +119,7 @@ class SharingStateWatcher(
         }
     }
 
-    fun waitForRelationTaskId(recordId: String): RelationSharingStateType {
+    fun waitForRelationTaskId(recordId: String): RelationSharingStateTypeV7 {
         val scenario = ScenarioContext.current()?.scenarioName
         val externalId = ScenarioContext.current()!!.runId(recordId)
         logger.info { "[$scenario] Waiting for task ID assignment of relation '$recordId'" }
@@ -155,11 +155,11 @@ class SharingStateWatcher(
                     externalIds
                 )
                 response.content.forEach { state ->
-                    if (state.sharingStateType == SharingStateType.Success) {
+                    if (state.sharingStateType == SharingStateTypeV7.Success) {
                         val future = awaitingCompletedState.remove(state.externalId)
                         if (future != null) {
                             scheduler.schedule(
-                                { future.complete(SharingStateType.Success) },
+                                { future.complete(SharingStateTypeV7.Success) },
                                 CONFIDENCE_SYNC_DELAY_SECONDS,
                                 TimeUnit.SECONDS
                             )
@@ -167,7 +167,7 @@ class SharingStateWatcher(
                     } else if (state.sharingStateType in TERMINAL_STATES) {
                         awaitingCompletedState.remove(state.externalId)?.complete(state.sharingStateType)
                     }
-                    if (state.taskId != null || state.sharingStateType == SharingStateType.Error || state.sharingStateType == SharingStateType.Success) {
+                    if (state.taskId != null || state.sharingStateType == SharingStateTypeV7.Error || state.sharingStateType == SharingStateTypeV7.Success) {
                         awaitingTaskId.remove(state.externalId)?.complete(state.sharingStateType)
                     }
                 }
@@ -194,11 +194,11 @@ class SharingStateWatcher(
                     paginationRequest = PaginationRequest(page, PAGE_SIZE)
                 )
                 response.content.forEach { state ->
-                    if (state.sharingStateType == RelationSharingStateType.Success) {
+                    if (state.sharingStateType == RelationSharingStateTypeV7.Success) {
                         val future = awaitingRelationCompletedState.remove(state.externalId)
                         if (future != null) {
                             scheduler.schedule(
-                                { future.complete(RelationSharingStateType.Success) },
+                                { future.complete(RelationSharingStateTypeV7.Success) },
                                 CONFIDENCE_SYNC_DELAY_SECONDS,
                                 TimeUnit.SECONDS
                             )
@@ -206,7 +206,7 @@ class SharingStateWatcher(
                     } else if (state.sharingStateType in RELATION_TERMINAL_STATES) {
                         awaitingRelationCompletedState.remove(state.externalId)?.complete(state.sharingStateType)
                     }
-                    if (state.taskId != null || state.sharingStateType == RelationSharingStateType.Error || state.sharingStateType == RelationSharingStateType.Success) {
+                    if (state.taskId != null || state.sharingStateType == RelationSharingStateTypeV7.Error || state.sharingStateType == RelationSharingStateTypeV7.Success) {
                         awaitingRelationTaskId.remove(state.externalId)?.complete(state.sharingStateType)
                     }
                 }

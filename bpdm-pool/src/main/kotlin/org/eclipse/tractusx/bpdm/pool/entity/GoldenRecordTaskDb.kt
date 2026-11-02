@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import java.time.Instant
 
 
@@ -37,4 +37,4 @@ class GoldenRecordTaskDb(
     var isResolved: Boolean,
     @Column(name = "last_checked", nullable = false)
     var lastChecked: Instant
-): BaseEntity()
+): BaseEntityWithExplicitTimestamps()

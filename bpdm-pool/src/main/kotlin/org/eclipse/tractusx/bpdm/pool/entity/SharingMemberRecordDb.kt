@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(
@@ -38,4 +38,4 @@ class SharingMemberRecordDb(
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
     var address: LogisticAddressDb
-): BaseEntity()
+): BaseEntityWithExplicitTimestamps()

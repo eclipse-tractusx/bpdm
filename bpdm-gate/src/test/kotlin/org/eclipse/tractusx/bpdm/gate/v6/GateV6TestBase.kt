@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6
 
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -34,7 +34,7 @@ abstract class GateV6TestBase: GateTestBase() {
     @Autowired
     lateinit var testDataClient: GateTestDataClientV6
     @Autowired
-    lateinit var gateClient: GateClientV6
+    lateinit var gateClient: GateV6Client
 
     val requestFactory get() = testDataClient.testDataFactory.request
     val expectedResultFactory get() = testDataClient.testDataFactory.result

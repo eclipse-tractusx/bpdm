@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb.Companion.EVENT_TYPE_COLUMN
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb.Companion.IS_PROCESSED_COLUMN
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb.Companion.RELATION_ID_COLUMN
@@ -49,7 +49,7 @@ class LegalEntityRelationEventTriggerDb(
     @ManyToOne
     @JoinColumn(name = RELATION_ID_COLUMN, nullable = false)
     var relation: RelationDb
-) : BaseEntity() {
+) : BaseEntityWithExplicitTimestamps() {
     companion object {
         const val TRIGGER_DATE_COLUMN = "trigger_date"
         const val EVENT_TYPE_COLUMN = "event_type"
@@ -57,4 +57,3 @@ class LegalEntityRelationEventTriggerDb(
         const val IS_PROCESSED_COLUMN = "is_processed"
     }
 }
-

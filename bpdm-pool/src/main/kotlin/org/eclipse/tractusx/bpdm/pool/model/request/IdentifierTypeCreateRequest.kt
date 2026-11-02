@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
 
@@ -36,6 +35,6 @@ data class IdentifierTypeCreateRequest(
 )
 
 data class IdentifierTypeDetailRequest(
-    val country: CountryCode?,
+    val country: String?,
     val mandatory: Boolean
 )

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -71,11 +71,11 @@ class CreateBusinessPartnerInputV6IT: UnscheduledGateV6TestBase() {
     @Test
     fun `create empty business partner input`(){
         //WHEN
-        val emptyRequest = BusinessPartnerInputRequest(externalId = testName)
+        val emptyRequest = BusinessPartnerInputV6Request(externalId = testName)
         val response = gateClient.businessPartners.upsertBusinessPartnersInput(listOf(emptyRequest)).body!!
 
         //THEN
-        val expected = BusinessPartnerInputDto(externalId = testName, createdAt = Instant.MIN, updatedAt = Instant.MIN)
+        val expected = BusinessPartnerInputV6Dto(externalId = testName, createdAt = Instant.MIN, updatedAt = Instant.MIN)
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }
 

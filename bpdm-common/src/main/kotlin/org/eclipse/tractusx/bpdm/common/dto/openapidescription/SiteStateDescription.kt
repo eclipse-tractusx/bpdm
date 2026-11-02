@@ -25,7 +25,7 @@ object SiteStateDescription {
             "but it describes whether the site is still operating."
 
     const val description = "The description from the original source indicating the state of the site."
-    const val validFrom = "The date from which the state is valid."
-    const val validTo = "The date until the state is valid."
+    const val validFrom = BusinessStateDescription.validFrom
+    const val validTo = BusinessStateDescription.validTo
     const val type = "One of the state types: active, inactive."
 }

@@ -19,18 +19,21 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.time.Instant
 
@@ -59,7 +62,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 updatedAfter?.let {
                     builder.greaterThan(root
                         .get<RelationSharingStateDb>(RelationDb::sharingState.name)
-                        .get(RelationSharingStateDb::updatedAt.name), updatedAfter)
+                        .get<DbTimestamp>(RelationSharingStateDb::updatedAt.name), updatedAfter.toTimestamp())
                 }
             }
 
@@ -92,8 +95,8 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 }
             } ?: Specification.unrestricted()
 
-        fun byOutputSourceBpnLs(sourceBpnLs: List<String>) =
-            sourceBpnLs.takeIf { it.isNotEmpty() }?.let {
+        fun byOutputSourceBpnLs(sourceBpnLs: Collection<String>?) =
+            sourceBpnLs?.takeIf { it.isNotEmpty() }?.let {
                 Specification<RelationDb> { root, _, builder ->
                     root
                         .get<RelationOutputDb>(RelationDb::output.name)
@@ -102,8 +105,8 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 }
             } ?: Specification.unrestricted()
 
-        fun byOutputTargetBpnLs(targetBpnLs: List<String>) =
-            targetBpnLs.takeIf { it.isNotEmpty() }?.let {
+        fun byOutputTargetBpnLs(targetBpnLs: Collection<String>?) =
+            targetBpnLs?.takeIf { it.isNotEmpty() }?.let {
                 Specification<RelationDb> { root, _, builder ->
                    root
                         .get<RelationOutputDb>(RelationDb::output.name)
@@ -117,9 +120,9 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 Specification<RelationDb> { root, _, builder ->
                     val updatedAtPath = root
                         .get<RelationOutputDb>(RelationDb::output.name)
-                        .get<Instant>(RelationOutputDb::resultUpdatedAt.name)
+                        .get<DbTimestamp>(RelationOutputDb::resultUpdatedAt.name)
 
-                    builder.greaterThan(updatedAtPath, updatedAfter)
+                    builder.greaterThan(updatedAtPath, updatedAfter.toTimestamp())
                 }
             } ?: Specification.unrestricted()
 
@@ -127,17 +130,19 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
             Specification<RelationDb> { root, _, builder ->
                root
                     .get<RelationOutputDb>(RelationDb::output.name)
-                    .get<Instant>(RelationOutputDb::resultUpdatedAt.name)
+                    .get<DbTimestamp>(RelationOutputDb::resultUpdatedAt.name)
                     .isNotNull
             }
 
     }
 
 
-    fun findByTenantBpnLAndExternalId(tenantBpnL: String,  externalId: String): RelationDb?
-
     @Query("SELECT r FROM RelationDb r WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = :isStaged")
     fun findBySharingStateAndStaged(sharingStateType: RelationSharingStateType, isStaged: Boolean, pageable: Pageable): Page<RelationDb>
+
+    @Modifying
+    @Query("UPDATE RelationDb r SET r.sharingState.isStaged = true WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = false")
+    fun stageBySharingStateType(sharingStateType: RelationSharingStateType): Int
 
     fun findBySharingStateTaskIdIn(taskIds: Set<String>): Set<RelationDb>
 }

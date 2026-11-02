@@ -3,6 +3,9 @@
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [7.5.x to 7.6.x](#75x-to-76x)
+    * [Country Catalogue](#country-catalogue)
+    * [Region and Field Quality Rule Countries](#region-and-field-quality-rule-countries)
+    * [Legal Form and Identifier Type Countries](#legal-form-and-identifier-type-countries)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
@@ -30,7 +33,28 @@
 
 ## 7.5.x to 7.6.x
 
-_No migration steps yet._
+### Country Catalogue
+
+The Pool now serves the accepted set of country codes from a provider-maintained database table rather than the built-in `CountryCode` enum.
+A new Flyway migration seeds the table with the same values the previous release accepted, including codes that are not officially assigned under ISO 3166-1.
+
+Operators should review the seeded list and adapt it to the countries their network accepts before consumers rely on the new `/v7/countries` and `/v6/countries` endpoints.
+Entries that are not officially assigned are recognisable from their description.
+
+Before upgrading, ensure every stored Pool address uses a country in the maintained list, including any alternative address.
+The address-country foreign-key migration fails and names the unresolved codes (including `UNDEFINED`) if any are missing; add the intended countries to the list or correct the addresses before upgrading.
+
+### Region and Field Quality Rule Countries
+
+Before upgrading, ensure every region's `country_code` and every non-null `country_code` in `field_quality_rule` exists in the maintained `countries` catalogue.
+The migration resolves these codes to `countries.id`, replaces the stored `country_code` columns with `country_id` foreign keys, and preserves the country codes returned by the API.
+If a code cannot be resolved, the upgrade fails with an error naming the unresolved codes; add the intended countries or correct the metadata before retrying.
+Null-country field quality rules remain valid as country-independent defaults.
+
+### Legal Form and Identifier Type Countries
+
+Before upgrading, correct or clear every non-null `country_code` in `legal_forms` and `identifier_type_details` that is absent from the `countries` catalogue.
+The migration fails and names any unresolved codes, so add intended countries to the catalogue or correct the affected metadata before upgrading.
 
 ## 7.4.x to 7.5.x
 

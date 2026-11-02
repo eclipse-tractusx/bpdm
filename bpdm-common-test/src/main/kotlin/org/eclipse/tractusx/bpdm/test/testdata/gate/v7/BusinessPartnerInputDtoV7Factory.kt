@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import java.time.Instant
 
 class BusinessPartnerInputDtoV7Factory {
 
-    fun fromRequest(request: BusinessPartnerInputRequest, createdAt: Instant = Instant.now(), updatedAt: Instant = createdAt): BusinessPartnerInputDto =
-        BusinessPartnerInputDto(
+    fun fromRequest(request: BusinessPartnerInputV7Request, createdAt: Instant = Instant.now(), updatedAt: Instant = createdAt): BusinessPartnerInputV7Dto =
+        BusinessPartnerInputV7Dto(
             externalId = request.externalId,
             nameParts = request.nameParts,
             identifiers = request.identifiers,

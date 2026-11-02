@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(
@@ -54,7 +54,7 @@ class LogisticAddressDb(
     @CollectionTable(name = "address_script_variants", joinColumns = [JoinColumn(name = "logistic_address_id")])
     val scriptVariants: MutableList<LogisticAddressScriptVariantDb> = mutableListOf(),
 
-    ) : BaseEntity() {
+    ) : BaseEntityWithExplicitTimestamps() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<AddressIdentifierDb> = mutableSetOf()
 

@@ -21,11 +21,14 @@ package org.eclipse.tractusx.bpdm.gate.v7
 
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
-import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestDataClientV7
@@ -49,13 +52,19 @@ abstract class GateTestBaseV7 : GateTestBase(){
 
     //gate services
     @Autowired
-    lateinit var taskCreationBatchService: TaskCreationBatchService
+    lateinit var taskCreationService: GoldenRecordTaskCreationApplicationService
     @Autowired
-    lateinit var taskResolutionBatchService: TaskResolutionBatchService
+    lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
     @Autowired
-    lateinit var relationTaskResolutionService: RelationTaskResolutionService
+    lateinit var taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService
     @Autowired
-    lateinit var relationTaskCreationService: RelationTaskCreationService
+    lateinit var consistencyCheckService: GoldenRecordConsistencyCheckApplicationService
+    @Autowired
+    lateinit var goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService
+    @Autowired
+    lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
+    @Autowired
+    lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
 
     //mock utilities
     @Autowired
@@ -67,7 +76,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var goldenRecordMockFactory: GoldenRecordMockFactory
 
-    lateinit var gateClient: GateClient
+    lateinit var gateClient: GateV7Client
     lateinit var testDataClient: GateTestDataClientV7
 
     @PostConstruct
@@ -77,8 +86,11 @@ abstract class GateTestBaseV7 : GateTestBase(){
             gateClient,
             testData,
             orchestratorMockDataFactory,
-            taskCreationBatchService,
-            taskResolutionBatchService,
+            taskCreationService,
+            taskResolutionService,
+            taskHealthCheckService,
+            consistencyCheckService,
+            goldenRecordCountedSyncService,
             relationTaskResolutionService,
             relationTaskCreationService,
             goldenRecordMockFactory,

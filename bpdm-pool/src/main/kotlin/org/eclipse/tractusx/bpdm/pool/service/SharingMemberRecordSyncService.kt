@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
@@ -89,6 +90,7 @@ class SharingMemberRecordSyncService(
         // Resuming after the last entry of the page is only lossless because the Orchestrator returns the records
         // oldest update first: every record this batch has not seen was updated after the one the cursor stops at.
         syncRecord.fromTime =  updatedSharingMemberRecords.content.lastOrNull()?.updatedAt ?: syncRecord.fromTime
+        syncRecord.updatedAt = DbTimestamp.now()
         syncRecordRepository.save(syncRecord)
 
         return updatedSharingMemberRecords.totalElements > updatedSharingMemberRecords.contentSize

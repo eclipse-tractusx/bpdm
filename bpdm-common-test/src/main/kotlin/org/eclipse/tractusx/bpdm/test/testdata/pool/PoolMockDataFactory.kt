@@ -170,6 +170,23 @@ class PoolMockDataFactory(
         )
     }
 
+    fun mockNoLegalEntitySearchResult(){
+        WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
+
+        val emptyLegalEntityPage = PageDto<LegalEntityWithLegalAddressVerboseDto>(0, 0, 0, 0, emptyList())
+        WireMock.stubFor(
+            WireMock
+                .get(WireMock.urlPathEqualTo(ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(emptyLegalEntityPage)))
+        )
+    }
+
+    fun mockNoGoldenRecordSearchResults(){
+        mockNoLegalEntitySearchResult()
+        mockSiteSearchResult(emptyList())
+        mockAddressSearchResult(emptyList())
+    }
+
     private fun mockSiteSearchResult(siteResult: SiteWithMainAddressVerboseDto) = mockSiteSearchResult(listOf(siteResult))
 
     private fun mockSiteSearchResult(siteResults: List<SiteWithMainAddressVerboseDto>){
@@ -182,9 +199,11 @@ class PoolMockDataFactory(
         )
     }
 
-    private fun mockAddressSearchResult(addressResult: LogisticAddressVerboseDto){
+    private fun mockAddressSearchResult(addressResult: LogisticAddressVerboseDto) = mockAddressSearchResult(listOf(addressResult))
 
-        val mockedAddressPage = PageDto(1, 1, 0, 1, listOf(addressResult))
+    private fun mockAddressSearchResult(addressResults: List<LogisticAddressVerboseDto>){
+
+        val mockedAddressPage = PageDto(addressResults.size.toLong(), 1, 0, addressResults.size, addressResults)
         WireMock.stubFor(
             WireMock
                 .get(WireMock.urlPathEqualTo(ApiCommons.ADDRESS_BASE_PATH_V7))

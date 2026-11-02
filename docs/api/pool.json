@@ -1487,8 +1487,7 @@
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -2278,8 +2277,7 @@
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -2803,17 +2801,16 @@
     "/v7/field-quality-rules/" : {
       "get" : {
         "tags" : [ "Metadata Controller" ],
-        "summary" : "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
+        "summary" : "Get all field quality rules filtered by a maintained country code",
         "description" : "List the country specific data rules for entity fields.All fields that are not in this list are considered to be forbidden.",
         "operationId" : "getFieldQualityRules",
         "parameters" : [ {
           "name" : "country",
           "in" : "query",
-          "description" : "ISO 3166-1 alpha-2 country code",
+          "description" : "Country code from the maintained country catalogue",
           "required" : true,
           "schema" : {
-            "type" : "string",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -2826,6 +2823,54 @@
                   "items" : {
                     "$ref" : "#/components/schemas/FieldQualityRuleDto"
                   }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Country code not found in the maintained catalogue"
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      }
+    },
+    "/v7/countries" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Returns all countries",
+        "description" : "Lists all currently known countries in a paginated result",
+        "operationId" : "getCountries",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "0",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "10",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing countries, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoCountryDto"
                 }
               }
             }
@@ -3114,17 +3159,16 @@
     "/v6/field-quality-rules/" : {
       "get" : {
         "tags" : [ "Metadata Controller" ],
-        "summary" : "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
+        "summary" : "Get all field quality rules filtered by a maintained country code",
         "description" : "List the country specific data rules for entity fields.All fields that are not in this list are considered to be forbidden.",
         "operationId" : "getFieldQualityRules_1",
         "parameters" : [ {
           "name" : "country",
           "in" : "query",
-          "description" : "ISO 3166-1 alpha-2 country code",
+          "description" : "Country code from the maintained country catalogue",
           "required" : true,
           "schema" : {
-            "type" : "string",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -3137,6 +3181,55 @@
                   "items" : {
                     "$ref" : "#/components/schemas/FieldQualityRuleDtoV6"
                   }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Country code not found in the maintained catalogue"
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        },
+        "deprecated" : true
+      }
+    },
+    "/v6/countries" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Returns all countries",
+        "description" : "Lists all currently known countries in a paginated result",
+        "operationId" : "getCountries_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "0",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "10",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing countries, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoCountryDto"
                 }
               }
             }
@@ -3404,11 +3497,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3697,11 +3790,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3896,12 +3989,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -3918,12 +4011,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -3937,20 +4030,21 @@
         "description" : "An address state indicates if the address is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the business partner is still operating at that address.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "AddressStateVerboseDtoV6" : {
         "type" : "object",
@@ -3958,20 +4052,21 @@
         "description" : "An address state indicates if the address is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the business partner is still operating at that address.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "AlternativeAddressScriptVariantDto" : {
         "type" : "object",
@@ -3995,8 +4090,7 @@
           },
           "country" : {
             "type" : "string",
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ],
@@ -4040,8 +4134,7 @@
           },
           "country" : {
             "type" : "string",
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ],
@@ -4104,7 +4197,7 @@
             "description" : "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
           },
           "country" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
             "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
@@ -4151,7 +4244,7 @@
             "description" : "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
           },
           "country" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
             "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
@@ -4409,18 +4502,19 @@
         "type" : "object",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time"
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time"
           },
           "type" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "ChangelogEntryVerboseDto" : {
         "type" : "object",
@@ -4588,14 +4682,28 @@
           }
         }
       },
+      "CountryDto" : {
+        "type" : "object",
+        "description" : "Describes a country accepted by the Pool",
+        "properties" : {
+          "countryCode" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
       "CountrySubdivisionDto" : {
         "type" : "object",
         "description" : "Country subdivision",
         "properties" : {
           "countryCode" : {
             "type" : "string",
-            "description" : "Country code",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "Country code from the maintained country catalogue"
           },
           "code" : {
             "type" : "string",
@@ -4614,8 +4722,7 @@
         "properties" : {
           "countryCode" : {
             "type" : "string",
-            "description" : "Country code",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "Country code from the maintained country catalogue"
           },
           "code" : {
             "type" : "string",
@@ -4680,7 +4787,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressCreateError",
-            "enum" : [ "BpnNotValid", "SiteNotFound", "SiteNotInLegalEntity", "LegalEntityNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode" ]
+            "enum" : [ "BpnNotValid", "SiteNotFound", "SiteNotInLegalEntity", "LegalEntityNotFound", "RegionNotFound", "CountryNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode" ]
           },
           "message" : {
             "type" : "string"
@@ -4698,7 +4805,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressUpdateError",
-            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "CountryNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
           },
           "message" : {
             "type" : "string"
@@ -4716,7 +4823,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "LegalEntityCreateError",
-            "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode" ]
+            "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressCountryNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode" ]
           },
           "message" : {
             "type" : "string"
@@ -4734,7 +4841,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "LegalEntityUpdateError",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressCountryNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
           },
           "message" : {
             "type" : "string"
@@ -4752,7 +4859,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "SiteCreateError",
-            "enum" : [ "LegalEntityNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantNotCoveredByMainAddress" ]
+            "enum" : [ "LegalEntityNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressCountryNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantNotCoveredByMainAddress" ]
           },
           "message" : {
             "type" : "string"
@@ -4770,7 +4877,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "SiteUpdateError",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressCountryNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
           },
           "message" : {
             "type" : "string"
@@ -4790,7 +4897,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "AddressCreateErrorV6",
-            "enum" : [ "BpnNotValid", "SiteNotFound", "SiteNotInLegalEntity", "LegalEntityNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
+            "enum" : [ "BpnNotValid", "SiteNotFound", "SiteNotInLegalEntity", "LegalEntityNotFound", "RegionNotFound", "CountryNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4810,7 +4917,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "AddressUpdateErrorV6",
-            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
+            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "CountryNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4830,7 +4937,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "LegalEntityCreateErrorV6",
-            "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressCountryNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4850,7 +4957,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "LegalEntityUpdateErrorV6",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressCountryNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4870,7 +4977,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "SiteCreateErrorV6",
-            "enum" : [ "LegalEntityNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressCountryNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4890,7 +4997,7 @@
             "type" : "string",
             "deprecated" : true,
             "description" : "SiteUpdateErrorV6",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressCountryNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4915,8 +5022,7 @@
           },
           "country" : {
             "type" : "string",
-            "description" : "Country for wich the rule is valid",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "Maintained country code for which the rule is valid"
           },
           "qualityLevel" : {
             "type" : "string",
@@ -4940,8 +5046,7 @@
           },
           "country" : {
             "type" : "string",
-            "description" : "Country for wich the rule is valid",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "Maintained country code for which the rule is valid"
           },
           "qualityLevel" : {
             "type" : "string",
@@ -4977,8 +5082,7 @@
         "properties" : {
           "country" : {
             "type" : [ "string", "null" ],
-            "description" : "2-digit country code for which this identifier is valid; null for universal identifiers.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "2-digit country code for which this identifier is valid; null for universal identifiers."
           },
           "mandatory" : {
             "type" : "boolean",
@@ -4993,8 +5097,7 @@
         "properties" : {
           "country" : {
             "type" : [ "string", "null" ],
-            "description" : "2-digit country code for which this identifier is valid; null for universal identifiers.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "2-digit country code for which this identifier is valid; null for universal identifiers."
           },
           "mandatory" : {
             "type" : "boolean",
@@ -5340,11 +5443,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5653,11 +5756,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5702,8 +5805,7 @@
             "type" : [ "string", "null" ]
           },
           "country" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : [ "string", "null" ]
           }
         }
       },
@@ -5761,12 +5863,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -5783,12 +5885,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -5802,20 +5904,21 @@
         "description" : "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "LegalEntityStateVerboseDtoV6" : {
         "type" : "object",
@@ -5823,20 +5926,21 @@
         "description" : "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "LegalEntityWithLegalAddressVerboseDto" : {
         "type" : "object",
@@ -6003,12 +6107,10 @@
             "description" : "The abbreviated name of the legal form, such as AG for German Aktiengesellschaft."
           },
           "country" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : [ "string", "null" ]
           },
           "language" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "undefined", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu" ]
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ]
@@ -6042,12 +6144,10 @@
             "description" : "The abbreviated name of the legal form, such as AG for German Aktiengesellschaft."
           },
           "country" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : [ "string", "null" ]
           },
           "language" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "undefined", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu" ]
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ]
@@ -6080,12 +6180,10 @@
             "type" : [ "string", "null" ]
           },
           "country" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : [ "string", "null" ]
           },
           "language" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "undefined", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu" ]
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ]
@@ -6117,12 +6215,10 @@
             "type" : [ "string", "null" ]
           },
           "country" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "type" : [ "string", "null" ]
           },
           "language" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "undefined", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu" ]
+            "type" : [ "string", "null" ]
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ]
@@ -6499,6 +6595,39 @@
             "description" : "Collection of results in the page",
             "items" : {
               "$ref" : "#/components/schemas/ChangelogEntryVerboseDtoV6"
+            }
+          }
+        }
+      },
+      "PageDtoCountryDto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/CountryDto"
             }
           }
         }
@@ -7174,8 +7303,7 @@
           },
           "country" : {
             "type" : "string",
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ],
@@ -7248,8 +7376,7 @@
           },
           "country" : {
             "type" : "string",
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ],
@@ -7371,7 +7498,7 @@
             "description" : "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
           },
           "country" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
             "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
@@ -7448,7 +7575,7 @@
             "description" : "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
           },
           "country" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
             "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
@@ -7498,8 +7625,7 @@
         "properties" : {
           "countryCode" : {
             "type" : "string",
-            "description" : "Country code",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "Country code from the maintained country catalogue"
           },
           "regionCode" : {
             "type" : "string",
@@ -7518,8 +7644,7 @@
         "properties" : {
           "countryCode" : {
             "type" : "string",
-            "description" : "Country code",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "Country code from the maintained country catalogue"
           },
           "regionCode" : {
             "type" : "string",
@@ -7767,11 +7892,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -8001,11 +8126,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -8123,12 +8248,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -8145,12 +8270,12 @@
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : "string",
@@ -8164,20 +8289,21 @@
         "description" : "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "SiteStateVerboseDtoV6" : {
         "type" : "object",
@@ -8185,20 +8311,21 @@
         "description" : "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating.",
         "properties" : {
           "validFrom" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date from which the state is valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "format" : "date-time",
-            "description" : "The date until the state is valid."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        }
+        },
+        "required" : [ "validFrom", "validTo" ]
       },
       "SiteVerboseDto" : {
         "type" : "object",
@@ -8516,21 +8643,6 @@
             "type" : "string",
             "description" : "Unique key of this type for reference",
             "enum" : [ "ACTIVE", "INACTIVE" ]
-          },
-          "name" : {
-            "type" : "string",
-            "description" : "Name or denotation of this type"
-          }
-        }
-      },
-      "TypeKeyNameVerboseDtoCountryCode" : {
-        "type" : "object",
-        "description" : "Named type uniquely identified by its technical key",
-        "properties" : {
-          "technicalKey" : {
-            "type" : "string",
-            "description" : "Unique key of this type for reference",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
           },
           "name" : {
             "type" : "string",

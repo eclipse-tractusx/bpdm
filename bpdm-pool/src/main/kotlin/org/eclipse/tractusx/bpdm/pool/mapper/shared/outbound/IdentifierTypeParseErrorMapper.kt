@@ -24,6 +24,10 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError.TechnicalKeyAlreadyTaken
 import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
+import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
 
 /**
  * Maps the identifier type parser's sealed parse errors to the errors the identifier type endpoints report them with.
@@ -39,5 +43,12 @@ class IdentifierTypeParseErrorMapper {
         when (val error = errors.first()) {
             is TechnicalKeyAlreadyTaken ->
                 BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${error.technicalKey}/${error.businessPartnerType}")
+            is IdentifierTypeCreateParseError.CountryNotFound ->
+                BpdmValidationErrorException(errors.filterIsInstance<IdentifierTypeCreateParseError.CountryNotFound>().map {
+                    ValidationError(
+                        "CountryNotFound", "Country '${it.country}' not found in catalogue.", it.country,
+                        ValidationContext.fromRoot(IdentifierTypeCreateRequest::class, "request", IdentifierTypeCreateRequest::details)
+                    )
+                })
         }
 }

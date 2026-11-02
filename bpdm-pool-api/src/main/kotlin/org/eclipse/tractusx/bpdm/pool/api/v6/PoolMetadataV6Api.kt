@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -29,6 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
@@ -85,7 +85,7 @@ interface PoolMetadataV6Api {
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @Parameter businessPartnerType: IdentifierBusinessPartnerTypeV6,
-        @Parameter country: CountryCode?
+        @Parameter country: String?
     ):
             PageDto<IdentifierTypeDtoV6>
 
@@ -124,19 +124,20 @@ interface PoolMetadataV6Api {
 
     @Operation(
         deprecated = true,
-        summary = "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
+        summary = "Get all field quality rules filtered by a maintained country code",
         description = "List the country specific data rules for entity fields." +
                 "All fields that are not in this list are considered to be forbidden."
     )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "List of the existing rules for the given country"),
+            ApiResponse(responseCode = "404", description = "Country code not found in the maintained catalogue", content = [Content()]),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/field-quality-rules/"])
-    fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
+    fun getFieldQualityRules(@Parameter(description = "Country code from the maintained country catalogue") @RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
 
     @Operation(
         deprecated = true,
@@ -152,5 +153,20 @@ interface PoolMetadataV6Api {
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/administrative-areas-level1"])
     fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6>
+
+    @Operation(
+        deprecated = true,
+        summary = "Returns all countries",
+        description = "Lists all currently known countries in a paginated result"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing countries, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/countries"])
+    fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
 
 }

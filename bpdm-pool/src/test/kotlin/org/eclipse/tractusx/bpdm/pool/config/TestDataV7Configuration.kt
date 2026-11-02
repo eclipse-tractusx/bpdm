@@ -20,9 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
 import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
@@ -62,7 +64,8 @@ class TestDataV7Configuration {
     fun testMetadataV7(
         legalFormEntryImporter: LegalFormEntryImporter,
         adminAreaLevel1EntryImporter: AdminAreaLevel1EntryImporter,
-        identifierTypeEntryImporter: IdentifierTypeEntryImporter
+        identifierTypeEntryImporter: IdentifierTypeEntryImporter,
+        countryRepository: CountryRepository
     ): TestMetadataV7{
         val legalFormV7Importer = LegalFormV7Importer(legalFormEntryImporter)
         val adminAreaLevel1V7Importer = AdminAreaLevel1V7Importer(adminAreaLevel1EntryImporter)
@@ -83,6 +86,7 @@ class TestDataV7Configuration {
             ReasonCodeDto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
             ReasonCodeDto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
         )
+        val countries = countryRepository.findAll().map { CountryDto(countryCode = it.countryCode, name = it.name, description = it.description) }
 
         return TestMetadataV7(
             legalForms = legalForms,
@@ -90,7 +94,8 @@ class TestDataV7Configuration {
             addressIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.ADDRESS },
             adminAreas = adminAreas,
             scriptCodes = scriptCodes,
-            reasonCodes = reasonCodes
+            reasonCodes = reasonCodes,
+            countries = countries
         )
     }
 

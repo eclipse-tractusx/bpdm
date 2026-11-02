@@ -19,43 +19,43 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import java.time.Instant
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 
 class RelationOutputDtoV7Factory {
 
-    fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations): RelationOutputDto{
-        return RelationOutputDto(
+    fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations): RelationOutputV7Dto{
+        return RelationOutputV7Dto(
             externalId,
             when (goldenRecordRelation.relationType) {
-                RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
-                RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
-                RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
-                RelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
+                RelationType.IsAlternativeHeadquarterFor -> SharableRelationTypeV7.IsAlternativeHeadquarterFor
+                RelationType.IsManagedBy -> SharableRelationTypeV7.IsManagedBy
+                RelationType.IsOwnedBy -> SharableRelationTypeV7.IsOwnedBy
+                RelationType.IsReplacedBy -> SharableRelationTypeV7.IsReplacedBy
             },
             goldenRecordRelation.businessPartnerSourceBpn,
             goldenRecordRelation.businessPartnerTargetBpn,
             goldenRecordRelation.validityPeriods.map {
-                RelationValidityPeriodDto(it.validFrom, it.validTo)
+                RelationValidityPeriodV7Dto(it.validFrom, it.validTo)
             },
             goldenRecordRelation.reasonCode,
             Instant.MIN
         )
     }
 
-    fun fromInput(entry: RelationPutEntry): RelationOutputDto = RelationOutputDto(
+    fun fromInput(entry: RelationPutV7Entry): RelationOutputV7Dto = RelationOutputV7Dto(
         externalId = entry.externalId,
         relationType = when (entry.relationType) {
-            GateRelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
-            GateRelationType.IsManagedBy -> SharableRelationType.IsManagedBy
-            GateRelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
-            GateRelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
+            RelationTypeV7.IsAlternativeHeadquarterFor -> SharableRelationTypeV7.IsAlternativeHeadquarterFor
+            RelationTypeV7.IsManagedBy -> SharableRelationTypeV7.IsManagedBy
+            RelationTypeV7.IsOwnedBy -> SharableRelationTypeV7.IsOwnedBy
+            RelationTypeV7.IsReplacedBy -> SharableRelationTypeV7.IsReplacedBy
         },
         sourceBpn = "",
         targetBpn = "",

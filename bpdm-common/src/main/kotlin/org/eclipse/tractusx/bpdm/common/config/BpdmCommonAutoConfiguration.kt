@@ -19,11 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.common.config
 
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 
 @Configuration
 @ComponentScan
 @ConfigurationPropertiesScan
+@Import(PersistedChangeLogger::class)
 class BpdmCommonAutoConfiguration

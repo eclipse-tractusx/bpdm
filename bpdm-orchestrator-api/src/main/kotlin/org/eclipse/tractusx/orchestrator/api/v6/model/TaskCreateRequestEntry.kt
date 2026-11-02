@@ -21,9 +21,9 @@ package org.eclipse.tractusx.orchestrator.api.v6.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class TaskCreateRequestEntry(
+data class TaskCreateRequestEntryV6(
     @get:Schema(description = "The unique identifier for this record which was previously issued by the Orchestrator")
     val recordId: String?,
     @get:Schema(description = "The business partner data to be processed")
-    val businessPartner: BusinessPartner
+    val businessPartner: BusinessPartnerV6
 )

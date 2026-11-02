@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
@@ -28,5 +29,6 @@ data class TestMetadataV6(
     val legalForms: List<LegalFormDtoV6>,
     val legalEntityIdentifierTypes: List<IdentifierTypeDtoV6>,
     val addressIdentifierTypes: List<IdentifierTypeDtoV6>,
-    val adminAreas: List<CountrySubdivisionDtoV6>
+    val adminAreas: List<CountrySubdivisionDtoV6>,
+    val countries: List<CountryDto> = emptyList()
 )

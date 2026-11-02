@@ -79,7 +79,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     val fixedTaskId = "1"
-    val businessPartnerFactory = BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
+    val businessPartnerFactory = BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon(countries = listOf("DE")))
     val defaultBpnRequest = BpnReference("IGNORED", null, BpnReferenceType.BpnRequestIdentifier)
     val expectedConfidenceCriteria = cleaningServiceDummy.dummyConfidenceCriteria.copy(sharedByOwner = true)
 
