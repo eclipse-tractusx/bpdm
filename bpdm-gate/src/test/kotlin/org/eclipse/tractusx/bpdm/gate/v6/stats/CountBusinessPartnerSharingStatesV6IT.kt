@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.stats
 
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsSharingStatesV6Response
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 
@@ -36,7 +36,7 @@ class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        val expected = StatsSharingStatesResponse(0, 0, 0, 0, 0)
+        val expected = StatsSharingStatesV6Response(0, 0, 0, 0, 0)
 
         assertRepo.assertSharingStateStats(response, expected)
     }
@@ -57,7 +57,7 @@ class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        val expected = StatsSharingStatesResponse(3, 0, 0, 0, 0)
+        val expected = StatsSharingStatesV6Response(3, 0, 0, 0, 0)
 
         assertRepo.assertSharingStateStats(response, expected)
     }
@@ -82,7 +82,7 @@ class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        val expected = StatsSharingStatesResponse(0, 3, 0, 0, 0)
+        val expected = StatsSharingStatesV6Response(0, 3, 0, 0, 0)
 
         assertRepo.assertSharingStateStats(response, expected)
     }
@@ -107,7 +107,7 @@ class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        val expected = StatsSharingStatesResponse(0, 0, 3, 0, 0)
+        val expected = StatsSharingStatesV6Response(0, 0, 3, 0, 0)
 
         assertRepo.assertSharingStateStats(response, expected)
     }
@@ -132,7 +132,7 @@ class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        val expected = StatsSharingStatesResponse(0, 0, 0, 3, 0)
+        val expected = StatsSharingStatesV6Response(0, 0, 0, 3, 0)
 
         assertRepo.assertSharingStateStats(response, expected)
     }
@@ -157,7 +157,7 @@ class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        val expected = StatsSharingStatesResponse(0, 0, 0, 0, 3)
+        val expected = StatsSharingStatesV6Response(0, 0, 0, 0, 3)
 
         assertRepo.assertSharingStateStats(response, expected)
     }

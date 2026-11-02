@@ -23,12 +23,16 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.StreetV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -36,32 +40,28 @@ class GateInputFactory(
     private val testMetadata: TestMetadata,
     private val testRunData: TestRunData?
 ) {
-    fun createAllFieldsFilled(seed: String, transform: (BusinessPartnerInputRequest) -> BusinessPartnerInputRequest = {it}): InputTestData {
+    fun createAllFieldsFilled(seed: String, transform: (BusinessPartnerInputV7Request) -> BusinessPartnerInputV7Request = {it}): InputTestData {
         return InputTestData(seed, transform(SeededTestDataCreator(seed).createAllFieldsFilled()))
-    }
-
-    fun createFullValid(seed: String, externalId: String = seed, withTestRunContext: Boolean = true): BusinessPartnerInputRequest {
-        return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData?.toExternalId(externalId)?.takeIf { withTestRunContext } ?: externalId)
     }
 
     fun buildRelation(
         externalId: String,
-        relationType: RelationType,
+        relationType: RelationTypeV7,
         businessPartnerSourceExternalId: String,
         businessPartnerTargetExternalId: String,
         seed: String = externalId,
-    ): RelationPutEntry{
+    ): RelationPutV7Entry{
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return RelationPutEntry(
+        return RelationPutV7Entry(
             externalId = externalId,
             relationType = relationType,
             businessPartnerSourceExternalId = businessPartnerSourceExternalId,
             businessPartnerTargetExternalId = businessPartnerTargetExternalId,
             reasonCode = testMetadata.reasonCodes.random(random),
             validityPeriods = listOf(
-                RelationValidityPeriodDto(LocalDate.of(1970, 1, 1), LocalDate.of(9999, 12, 31)))
+                RelationValidityPeriodV7Dto(LocalDate.of(1970, 1, 1), LocalDate.of(9999, 12, 31)))
         )
     }
 
@@ -73,16 +73,16 @@ class GateInputFactory(
         private val listRange = 1 .. 3
 
 
-        fun createAllFieldsFilled(): BusinessPartnerInputRequest{
+        fun createAllFieldsFilled(): BusinessPartnerInputV7Request{
 
-            return BusinessPartnerInputRequest(
+            return BusinessPartnerInputV7Request(
                 externalId = testRunData?.let { "${seed}_${testRunData.testTime}" } ?: seed ,
                 nameParts = listRange.map { "Name Part $seed $it" },
                 identifiers = emptyList(),
                 roles = BusinessPartnerRole.entries,
                 isOwnCompanyData = true,
                 states = emptyList(),
-                legalEntity = LegalEntityRepresentationInputDto(
+                legalEntity = LegalEntityRepresentationInputV7Dto(
                     legalEntityBpn = "BPNL $seed",
                     legalName = "Legal Name $seed",
                     shortName = "Short Name $seed",
@@ -90,11 +90,11 @@ class GateInputFactory(
                     ownershipUltimate = null,
                     ultimateOwnerBpnl = null
                 ),
-                site = SiteRepresentationInputDto(
+                site = SiteRepresentationInputV7Dto(
                     siteBpn = "BPNS $seed",
                     name = "Site Name $seed"
                 ),
-                address = AddressRepresentationInputDto(
+                address = AddressRepresentationInputV7Dto(
                     addressBpn = "BPNA $seed",
                     name = "Address Name $seed",
                     addressType = AddressType.AdditionalAddress,
@@ -104,8 +104,8 @@ class GateInputFactory(
             )
         }
 
-        private fun createPhysicalAddress(): PhysicalPostalAddressDto{
-            return PhysicalPostalAddressDto(
+        private fun createPhysicalAddress(): PhysicalPostalAddressV7Dto{
+            return PhysicalPostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
@@ -114,7 +114,7 @@ class GateInputFactory(
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 district = "District $seed",
-                street = StreetDto(
+                street = StreetV7Dto(
                     name = "Street Name $seed",
                     houseNumber = "House Number $seed",
                     houseNumberSupplement = "House Number Supplement $seed",
@@ -134,8 +134,8 @@ class GateInputFactory(
             )
         }
 
-        private fun createAlternativeAddress(): AlternativePostalAddressDto{
-            return AlternativePostalAddressDto(
+        private fun createAlternativeAddress(): AlternativePostalAddressV7Dto{
+            return AlternativePostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = getCountryReference(),
                 administrativeAreaLevel1 =  testMetadata.adminAreas.random(random),
@@ -154,7 +154,7 @@ class GateInputFactory(
 
 data class InputTestData(
     val seed: String,
-    val request: BusinessPartnerInputRequest
+    val request: BusinessPartnerInputV7Request
 )
 
 data class TestMetadata(
@@ -165,8 +165,8 @@ data class TestMetadata(
     val countries: List<String>
 )
 
-fun BusinessPartnerInputRequest.withoutAnyBpn() = withoutLegalEntityBpn().withoutSiteBpn().withoutAddressBpn()
-fun BusinessPartnerInputRequest.withAddressType(addressType: AddressType?) = copy(address = address.copy(addressType = addressType))
-fun BusinessPartnerInputRequest.withoutLegalEntityBpn() = copy(legalEntity = legalEntity.copy(legalEntityBpn = null))
-fun BusinessPartnerInputRequest.withoutSiteBpn() = copy(site = site.copy(siteBpn = null))
-fun BusinessPartnerInputRequest.withoutAddressBpn() = copy(address = address.copy(addressBpn = null))
+fun BusinessPartnerInputV7Request.withoutAnyBpn() = withoutLegalEntityBpn().withoutSiteBpn().withoutAddressBpn()
+fun BusinessPartnerInputV7Request.withAddressType(addressType: AddressType?) = copy(address = address.copy(addressType = addressType))
+fun BusinessPartnerInputV7Request.withoutLegalEntityBpn() = copy(legalEntity = legalEntity.copy(legalEntityBpn = null))
+fun BusinessPartnerInputV7Request.withoutSiteBpn() = copy(site = site.copy(siteBpn = null))
+fun BusinessPartnerInputV7Request.withoutAddressBpn() = copy(address = address.copy(addressBpn = null))

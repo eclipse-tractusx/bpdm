@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -44,6 +44,28 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expectedOutput =  testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN business partner output based on legal entity whose golden record the Pool changed while its task was pending
+     * WHEN output consumer searches for output with that external-ID
+     * THEN output consumer sees the changed golden record instead of the task result
+     *
+     */
+    @Test
+    fun `search legal entity business partner output changed while task was pending`(){
+        //GIVEN
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val changedGoldenRecord = testDataClient.businessPartner.refineToLegalEntityChangedInPool(createdInput)
+
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
+
+        //THEN
+        val expectedOutput =  testData.businessPartner.output.fromLegalEntity(createdInput, changedGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
@@ -131,7 +153,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
         //THEN
-        val expectedAdditionalSites = goldenRecord.additionalSites.map { AdditionalSiteOutputDto(it.site.bpns, it.site.name) }
+        val expectedAdditionalSites = goldenRecord.additionalSites.map { AdditionalSiteOutputV7Dto(it.site.bpns, it.site.name) }
         val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(
             createdInput, goldenRecord.legalEntityParent, goldenRecord.siteParent, goldenRecord.additionalAddress, expectedAdditionalSites
         )
@@ -152,7 +174,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf("non-existing-external-id"))
 
         //THEN
-        val expectedResponse = PageDto(0, 0, 0, 0, emptyList<BusinessPartnerOutputDto>())
+        val expectedResponse = PageDto(0, 0, 0, 0, emptyList<BusinessPartnerOutputV7Dto>())
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
     }

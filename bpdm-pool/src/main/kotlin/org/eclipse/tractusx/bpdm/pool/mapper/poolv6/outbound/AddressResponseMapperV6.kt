@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -66,7 +67,11 @@ class AddressResponseMapperV6(
         )
 
     private fun toState(state: AddressStateDb): AddressStateVerboseDtoV6 =
-        AddressStateVerboseDtoV6(state.validFrom, state.validTo, state.type.toDto())
+        AddressStateVerboseDtoV6(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 
     private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseDtoV6 =
         AddressIdentifierVerboseDtoV6(identifier.value, TypeKeyNameVerboseDto(identifier.type.technicalKey, identifier.type.name))

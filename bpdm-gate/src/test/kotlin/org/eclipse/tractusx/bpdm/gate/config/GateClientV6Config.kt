@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
@@ -56,7 +56,7 @@ class GateClientV6Config{
     }
 
     @Bean
-    fun gateClientV6(testClientProvider: GateTestClientProviderV6): GateClientV6 {
+    fun gateClientV6(testClientProvider: GateTestClientProviderV6): GateV6Client {
         return testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
     }
 }

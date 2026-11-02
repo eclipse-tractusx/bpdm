@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -143,8 +144,8 @@ class BusinessPartnerSearchService(
         val states: List<BusinessPartnerStateDto> =
             legalEntity.states.map { state ->
                 BusinessPartnerStateDto(
-                    validTo = state.validTo,
-                    validFrom = state.validFrom,
+                    validTo = BusinessStateDates.reportValidTo(state.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(state.validFrom),
                     type = state.type
                 )
             }
@@ -174,8 +175,8 @@ class BusinessPartnerSearchService(
             },
             states = legalEntity.states.map {
                 BusinessPartnerStateDto(
-                    validTo = it.validTo,
-                    validFrom = it.validFrom,
+                    validTo = BusinessStateDates.reportValidTo(it.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                     type = it.type
                 )
             }
@@ -197,8 +198,8 @@ class BusinessPartnerSearchService(
                 },
                 states = site.states.map {
                     BusinessPartnerStateDto(
-                        validTo = it.validTo,
-                        validFrom = it.validFrom,
+                        validTo = BusinessStateDates.reportValidTo(it.validTo),
+                        validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                         type = it.type
                     )
                 }
@@ -228,8 +229,8 @@ class BusinessPartnerSearchService(
             addressBpn = result.bpn,
             states = result.states.map {
                 BusinessPartnerStateDto(
-                    validTo = it.validTo,
-                    validFrom = it.validFrom,
+                    validTo = BusinessStateDates.reportValidTo(it.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                     type = it.type
                 )
             },

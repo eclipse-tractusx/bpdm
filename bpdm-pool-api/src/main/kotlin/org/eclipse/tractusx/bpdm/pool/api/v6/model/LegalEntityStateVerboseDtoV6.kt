@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateD
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(description = LegalEntityStateDescription.header, deprecated = true)
+@Schema(description = LegalEntityStateDescription.header, deprecated = true, requiredProperties = ["validFrom", "validTo"])
 data class LegalEntityStateVerboseDtoV6(
-    override val validFrom: LocalDateTime?,
-    override val validTo: LocalDateTime?,
+    override val validFrom: LocalDateTime,
+    override val validTo: LocalDateTime,
 
     @field:JsonProperty("type")
     @get:Schema(description = LegalEntityStateDescription.type)

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.toTimestamp
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -75,17 +75,21 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
     }
 
     fun findByExternalIdInAndTenantBpnl(externalId: Collection<String>, tenantBpnl: String?): Collection<SharingStateDb>
-    fun findByExternalIdAndTenantBpnl(externalId: String, tenantBpnl: String?): Collection<SharingStateDb>
 
     fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
+
+    fun findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(sharingStateType: SharingStateType, id: Long, pageable: Pageable): List<SharingStateDb>
 
     @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s GROUP BY s.sharingStateType")
     fun countSharingStateTypes(): List<SharingStateTypeCount>
 
     fun findByTaskIdIn(taskIds: Set<String>): Set<SharingStateDb>
 
-    @Query(value = "SELECT s FROM SharingStateDb AS s WHERE (s.isGoldenRecordCounted IS NULL AND s.syncedIsGoldenRecordCounted IS NOT NULL) OR (s.isGoldenRecordCounted IS NOT NULL AND s.syncedIsGoldenRecordCounted IS NULL) OR (s.isGoldenRecordCounted <> s.syncedIsGoldenRecordCounted)")
-    fun findByIsGoldenRecordCountedUnsynced(pageable: Pageable): Page<SharingStateDb>
+    @Query(
+        "SELECT s FROM SharingStateDb AS s WHERE s.id > :id AND s.orchestratorRecordId IS NOT NULL AND s.isGoldenRecordCounted IS NOT NULL " +
+            "AND (s.syncedIsGoldenRecordCounted IS NULL OR s.isGoldenRecordCounted <> s.syncedIsGoldenRecordCounted) ORDER BY s.id ASC"
+    )
+    fun findGoldenRecordCountedUnsyncedAfter(id: Long, pageable: Pageable): List<SharingStateDb>
 
     interface SharingStateTypeCount {
         val type: SharingStateType

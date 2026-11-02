@@ -88,18 +88,24 @@ The hard part is not the rule, it is judging whether something departs at all. A
  */
 ```
 
-The mirror case does earn a rationale, because returning the parsed value directly is the narrow exception the same rule permits, and a reader who knows the norm will otherwise look for the missing `ParseResult`:
+The mirror case is no departure either. A parser that can reject nothing returning its parsed value directly is an option the same section explicitly permits, so it sits inside the rule and gets no rationale:
 
 ```kotlin
+// Wrong. Explains a permitted option as if it were an exception.
 /**
  * Turns loose address search criteria into the normalized form the search operation queries with.
  *
  * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
  * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
+
+// Right. The responsibility, once.
+/**
+ * Turns loose address search criteria into the normalized form the search operation queries with.
+ */
 ```
 
-The test the two cases differ on: name the rule, then check which side of it the code sits on.
+The test both cases pass: name the rule, then check which side of it the code sits on. A choice the rule itself offers is on the inside.
 
 ## 6. Never document
 

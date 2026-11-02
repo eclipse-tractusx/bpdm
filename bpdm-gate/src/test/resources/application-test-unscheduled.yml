@@ -11,12 +11,17 @@ bpdm:
     check:
       cron: '-'
     healthCheck:
+      batchSize: 1
+      cron: '-'
+    consistencyCheck:
+      batchSize: 1
       cron: '-'
     relationCreation:
       cron: '-'
     relationCheck:
       cron: '-'
     recordSync:
+      batchSize: 1
       cron: '-'
 spring:
   datasource:

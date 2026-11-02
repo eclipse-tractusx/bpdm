@@ -22,9 +22,13 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AddressGoldenRecordRelationTypeV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.LegalEntityGoldenRecordRelationTypeV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.SiteGoldenRecordRelationTypeV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
 
 /**
  * Asserts that a record's Gate output reflects an established golden record relation.
@@ -54,7 +58,7 @@ class GoldenRecordRelationAssertHelper(
      * additional address record surfaces the relation through its parent legal entity.
      */
     fun assertLegalEntityRelationReflected(recordId: String, relation: RelationState, expectedParentBpnl: String? = null) {
-        val expectedType = LegalEntityGoldenRecordRelationTypeDto.valueOf(toGateType(relation).name)
+        val expectedType = LegalEntityGoldenRecordRelationTypeV7Dto.valueOf(toGateType(relation).name)
         val expectedBpns = resolvedBpnPair(relation)
 
         val output = fetchOutput(recordId)
@@ -74,7 +78,7 @@ class GoldenRecordRelationAssertHelper(
      * Asserts the [recordId] output's site reflects [relation] in its golden record relations.
      */
     fun assertSiteRelationReflected(recordId: String, relation: RelationState) {
-        val expectedType = SiteGoldenRecordRelationTypeDto.valueOf(toGateType(relation).name)
+        val expectedType = SiteGoldenRecordRelationTypeV7Dto.valueOf(toGateType(relation).name)
         val expectedBpns = resolvedBpnPair(relation)
 
         val output = fetchOutput(recordId)
@@ -89,7 +93,7 @@ class GoldenRecordRelationAssertHelper(
      * Asserts the [recordId] output's address reflects [relation] in its golden record relations.
      */
     fun assertAddressRelationReflected(recordId: String, relation: RelationState) {
-        val expectedType = AddressGoldenRecordRelationTypeDto.valueOf(toGateType(relation).name)
+        val expectedType = AddressGoldenRecordRelationTypeV7Dto.valueOf(toGateType(relation).name)
         val expectedBpns = resolvedBpnPair(relation)
 
         val output = fetchOutput(recordId)
@@ -110,10 +114,10 @@ class GoldenRecordRelationAssertHelper(
      */
     fun assertRelationOutputReflectsEstablished(relationId: String, relation: RelationState) {
         val runId = context.runId(relationId)
-        val expectedType = SharableRelationType.valueOf(toGateType(relation).name)
+        val expectedType = SharableRelationTypeV7.valueOf(toGateType(relation).name)
         val expectedBpns = resolvedBpnPair(relation)
 
-        val searchRequest = RelationOutputSearchRequest(externalIds = listOf(runId))
+        val searchRequest = RelationOutputSearchV7Request(externalIds = listOf(runId))
         val outputPage = gateOf(relation.sourceRecordId).relationOutput.postSearch(searchRequest, PaginationRequest())
         apiCallEvidence.attach("POST", "/v7/output/relations/search", searchRequest, outputPage)
 
@@ -145,14 +149,14 @@ class GoldenRecordRelationAssertHelper(
             .isIn(expectedAddressTypes)
     }
 
-    private fun toGateType(relation: RelationState): RelationType = relation.submittedEntry.relationType
+    private fun toGateType(relation: RelationState): RelationTypeV7 = relation.submittedEntry.relationType
 
     private fun resolvedBpnPair(relation: RelationState): Set<String> = setOf(
         relation.resolvedSourceBpn ?: error("relation '${relation.submittedEntry.externalId}' has not been established yet"),
         relation.resolvedTargetBpn ?: error("relation '${relation.submittedEntry.externalId}' has not been established yet")
     )
 
-    private fun fetchOutput(recordId: String): BusinessPartnerOutputDto {
+    private fun fetchOutput(recordId: String): BusinessPartnerOutputV7Dto {
         val runId = context.runId(recordId)
         val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", listOf(runId), outputPage)

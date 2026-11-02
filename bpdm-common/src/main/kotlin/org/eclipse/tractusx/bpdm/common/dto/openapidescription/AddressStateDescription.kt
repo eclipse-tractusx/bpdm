@@ -25,7 +25,7 @@ object AddressStateDescription {
             "business, but it describes whether the business partner is still operating at that address."
 
     const val description = "The description from the original source indicating the state of the address."
-    const val validFrom = "The date from which the state is valid."
-    const val validTo = "The date until the state is valid."
+    const val validFrom = BusinessStateDescription.validFrom
+    const val validTo = BusinessStateDescription.validTo
     const val type = "One of the state types: active, inactive."
 }

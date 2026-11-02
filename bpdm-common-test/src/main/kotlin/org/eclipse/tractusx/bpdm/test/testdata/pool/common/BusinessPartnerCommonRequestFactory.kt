@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.common
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -33,6 +34,11 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withSharedByOwner
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
+
+/**
+ * Bounds seeded state starts so that a state and its ten-day successor both lie before the latest date.
+ */
+val latestSeededStateSecond: Long = BusinessStateDates.LATEST.minusDays(11).toEpochSecond(ZoneOffset.UTC)
 
 abstract class BusinessPartnerCommonRequestFactory(
     protected val availableAddressIdentifiers: Collection<String>,
@@ -53,7 +59,7 @@ abstract class BusinessPartnerCommonRequestFactory(
     }
 
     fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteDto(
             name = "Site Name $seed",
@@ -79,7 +85,7 @@ abstract class BusinessPartnerCommonRequestFactory(
     }
 
     fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteCreateRequestWithLegalAddressAsMain(
             name = "Site Name $seed",
@@ -128,7 +134,7 @@ abstract class BusinessPartnerCommonRequestFactory(
     }
 
     fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
         return LogisticAddressDto(
             name = "Address Name $seed",
             states = listOf(
