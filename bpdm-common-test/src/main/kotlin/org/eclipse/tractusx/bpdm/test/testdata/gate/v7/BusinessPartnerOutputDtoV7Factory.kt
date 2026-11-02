@@ -20,15 +20,9 @@
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetScriptVariantDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.*
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
@@ -37,12 +31,12 @@ import java.time.Instant
 
 class BusinessPartnerOutputDtoV7Factory {
 
-    fun fromLegalEntity(input: BusinessPartnerInputDto, legalEntity: LegalEntityWithLegalAddressVerboseDto): BusinessPartnerOutputDto{
-        return BusinessPartnerOutputDto(
+    fun fromLegalEntity(input: BusinessPartnerInputV7Dto, legalEntity: LegalEntityWithLegalAddressVerboseDto): BusinessPartnerOutputV7Dto{
+        return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
-            identifiers = legalEntity.header.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, it.issuingBody) },
-            states = legalEntity.header.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            identifiers = legalEntity.header.identifiers.map { BusinessPartnerIdentifierV7Dto(it.type, it.value, it.issuingBody) },
+            states = legalEntity.header.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(legalEntity.header),
@@ -55,12 +49,12 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    fun fromLegalEntityOnSite(input: BusinessPartnerInputDto, legalEntity: LegalEntityWithLegalAddressVerboseDto, site: SiteWithMainAddressVerboseDto): BusinessPartnerOutputDto{
-        return BusinessPartnerOutputDto(
+    fun fromLegalEntityOnSite(input: BusinessPartnerInputV7Dto, legalEntity: LegalEntityWithLegalAddressVerboseDto, site: SiteWithMainAddressVerboseDto): BusinessPartnerOutputV7Dto{
+        return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
-            identifiers = legalEntity.header.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, it.issuingBody) },
-            states = legalEntity.header.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            identifiers = legalEntity.header.identifiers.map { BusinessPartnerIdentifierV7Dto(it.type, it.value, it.issuingBody) },
+            states = legalEntity.header.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(legalEntity.header),
@@ -77,12 +71,12 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    fun fromSite(input: BusinessPartnerInputDto, legalEntity: LegalEntityWithLegalAddressVerboseDto, site: SiteWithMainAddressVerboseDto): BusinessPartnerOutputDto{
-        return BusinessPartnerOutputDto(
+    fun fromSite(input: BusinessPartnerInputV7Dto, legalEntity: LegalEntityWithLegalAddressVerboseDto, site: SiteWithMainAddressVerboseDto): BusinessPartnerOutputV7Dto{
+        return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
             identifiers = emptyList(),
-            states = site.site.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            states = site.site.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(legalEntity.header),
@@ -100,15 +94,15 @@ class BusinessPartnerOutputDtoV7Factory {
     }
 
     fun fromAdditionalAddressOnLegalEntity(
-        input: BusinessPartnerInputDto,
+        input: BusinessPartnerInputV7Dto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
         additionalAddress: LogisticAddressVerboseDto
-    ): BusinessPartnerOutputDto {
-        return BusinessPartnerOutputDto(
+    ): BusinessPartnerOutputV7Dto {
+        return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
-            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, null) },
-            states = additionalAddress.address.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierV7Dto(it.type, it.value, null) },
+            states = additionalAddress.address.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(legalEntity.header),
@@ -126,17 +120,17 @@ class BusinessPartnerOutputDtoV7Factory {
     }
 
     fun fromAdditionalAddressOnSite(
-        input: BusinessPartnerInputDto,
+        input: BusinessPartnerInputV7Dto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
         site: SiteWithMainAddressVerboseDto,
         additionalAddress: LogisticAddressVerboseDto,
-        additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
-    ): BusinessPartnerOutputDto{
-        return BusinessPartnerOutputDto(
+        additionalSites: Collection<AdditionalSiteOutputV7Dto> = emptyList()
+    ): BusinessPartnerOutputV7Dto{
+        return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
-            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, null) },
-            states = additionalAddress.address.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierV7Dto(it.type, it.value, null) },
+            states = additionalAddress.address.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(legalEntity.header),
@@ -155,8 +149,8 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputDto{
-        return LegalEntityRepresentationOutputDto(
+    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputV7Dto{
+        return LegalEntityRepresentationOutputV7Dto(
             legalEntityBpn = legalEntity.bpnl,
             legalName = legalEntity.legalName,
             shortName = legalEntity.legalShortName,
@@ -164,26 +158,26 @@ class BusinessPartnerOutputDtoV7Factory {
             confidenceCriteria = buildConfidence(legalEntity.confidenceCriteria),
             ownershipUltimate = legalEntity.ownershipUltimate,
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
-            states = legalEntity.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            states = legalEntity.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             updatedAt = legalEntity.updatedAt
         )
     }
 
-    private fun buildAddressRepresentation(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputDto{
-        return AddressComponentOutputDto(
+    private fun buildAddressRepresentation(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputV7Dto{
+        return AddressComponentOutputV7Dto(
             addressBpn = logisticAddress.bpna,
             name = logisticAddress.name,
             addressType = addressType,
             physicalPostalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
-            states = logisticAddress.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            states = logisticAddress.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             updatedAt = logisticAddress.updatedAt
         )
     }
 
-    private fun buildPhysicalAddress(physicalAddress: PhysicalPostalAddressVerboseDto): PhysicalPostalAddressDto{
-        return PhysicalPostalAddressDto(
+    private fun buildPhysicalAddress(physicalAddress: PhysicalPostalAddressVerboseDto): PhysicalPostalAddressV7Dto{
+        return PhysicalPostalAddressV7Dto(
             geographicCoordinates = physicalAddress.geographicCoordinates,
             country = physicalAddress.country,
             administrativeAreaLevel1 = physicalAddress.administrativeAreaLevel1,
@@ -202,8 +196,8 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativePostalAddressDto{
-        return AlternativePostalAddressDto(
+    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativePostalAddressV7Dto{
+        return AlternativePostalAddressV7Dto(
             geographicCoordinates = alternativeAddress.geographicCoordinates,
             country = alternativeAddress.country,
             administrativeAreaLevel1 = alternativeAddress.administrativeAreaLevel1,
@@ -215,8 +209,8 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetDto): StreetDto{
-        return StreetDto(
+    private fun buildStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetDto): StreetV7Dto{
+        return StreetV7Dto(
             name = street.name,
             houseNumber = street.houseNumber,
             houseNumberSupplement = street.houseNumberSupplement,
@@ -229,8 +223,8 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildScriptVariantStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetScriptVariantDto): StreetScriptVariantDto{
-        return StreetScriptVariantDto(
+    private fun buildScriptVariantStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetScriptVariantDto): StreetScriptVariantV7Dto{
+        return StreetScriptVariantV7Dto(
             name = street.name,
             direction = street.direction,
             namePrefix = street.namePrefix,
@@ -240,16 +234,16 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildSiteRepresentation(site: SiteVerboseDto): SiteRepresentationOutputDto {
-        return SiteRepresentationOutputDto(
+    private fun buildSiteRepresentation(site: SiteVerboseDto): SiteRepresentationOutputV7Dto {
+        return SiteRepresentationOutputV7Dto(
             siteBpn = site.bpns,
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
-            states = site.states.map { BusinessPartnerStateResponseDto(it.validFrom, it.validTo, it.type) },
+            states = site.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
             goldenRecordRelations = site.relations.map {
-                SiteGoldenRecordRelationDto(
+                SiteGoldenRecordRelationV7Dto(
                     relationType = when (it.type) {
-                        SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeDto.IsReplacedBy
+                        SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeV7Dto.IsReplacedBy
                     },
                     sourceBpn = it.businessPartnerSourceBpns,
                     targetBpn = it.businessPartnerTargetBpns
@@ -259,9 +253,9 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    private fun buildConfidence(confidence: org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto): ConfidenceCriteriaDto{
+    private fun buildConfidence(confidence: org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto): ConfidenceCriteriaV7Dto{
         return with(confidence){
-            ConfidenceCriteriaDto(
+            ConfidenceCriteriaV7Dto(
                 sharedByOwner = sharedByOwner,
                 checkedByExternalDataSource = checkedByExternalDataSource,
                 numberOfSharingMembers = numberOfSharingMembers,
@@ -272,63 +266,63 @@ class BusinessPartnerOutputDtoV7Factory {
         }
     }
 
-    private fun buildLegalEntityScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantDto?, site: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto? = null): BusinessPartnerScriptVariantDto{
-        return BusinessPartnerScriptVariantDto(
+    private fun buildLegalEntityScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantDto?, site: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto? = null): BusinessPartnerScriptVariantV7Dto{
+        return BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptCode,
             nameParts = emptyList(),
             legalEntity = buildScriptVariantLegalEntityComponent(legalEntityScriptVariant),
-            site = site?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantDto(),
+            site = site?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantV7Dto(),
             address = buildScriptVariantAddressComponent(legalEntityScriptVariant?.legalAddress)
         )
     }
 
-    private fun buildSiteScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantDto?, siteScriptVariant: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto?): BusinessPartnerScriptVariantDto{
-        return BusinessPartnerScriptVariantDto(
+    private fun buildSiteScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantDto?, siteScriptVariant: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto?): BusinessPartnerScriptVariantV7Dto{
+        return BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptCode,
             nameParts = emptyList(),
             legalEntity = buildScriptVariantLegalEntityComponent(legalEntityScriptVariant),
-            site = siteScriptVariant?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantDto(),
+            site = siteScriptVariant?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantV7Dto(),
             address = buildScriptVariantAddressComponent(siteScriptVariant?.mainAddress)
         )
     }
 
-    private fun buildAdditionalAddressScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantDto?, addressScriptVariant: LogisticAddressScriptVariantDto?, site: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto? = null): BusinessPartnerScriptVariantDto{
-        return BusinessPartnerScriptVariantDto(
+    private fun buildAdditionalAddressScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantDto?, addressScriptVariant: LogisticAddressScriptVariantDto?, site: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto? = null): BusinessPartnerScriptVariantV7Dto{
+        return BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptCode,
             nameParts = emptyList(),
             legalEntity = buildScriptVariantLegalEntityComponent(legalEntityScriptVariant),
-            site = site?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantDto(),
+            site = site?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantV7Dto(),
             address = buildScriptVariantAddressComponent(addressScriptVariant?.address)
         )
     }
 
-    private fun buildScriptVariantLegalEntityComponent(legalEntityScriptVariant: LegalEntityScriptVariantDto?): org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityScriptVariantDto{
-        return org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityScriptVariantDto(
+    private fun buildScriptVariantLegalEntityComponent(legalEntityScriptVariant: LegalEntityScriptVariantDto?): org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto{
+        return org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto(
             legalName = legalEntityScriptVariant?.legalName,
             shortName = legalEntityScriptVariant?.shortName
         )
     }
 
-    private fun buildScriptVariantSiteComponent(siteScriptVariant: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto?): SiteScriptVariantDto{
-        return SiteScriptVariantDto(siteScriptVariant?.name)
+    private fun buildScriptVariantSiteComponent(siteScriptVariant: org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto?): SiteScriptVariantV7Dto{
+        return SiteScriptVariantV7Dto(siteScriptVariant?.name)
     }
 
-    private fun buildScriptVariantAddressComponent(addressScriptVariant: PostalAddressScriptVariantDto?): AddressScriptVariantDto {
-        return AddressScriptVariantDto(
+    private fun buildScriptVariantAddressComponent(addressScriptVariant: PostalAddressScriptVariantDto?): AddressScriptVariantV7Dto {
+        return AddressScriptVariantV7Dto(
             name = addressScriptVariant?.addressName,
             physicalAddress = addressScriptVariant?.physicalAddress?.let { p ->
-                PhysicalAddressScriptVariantDto(
+                PhysicalAddressScriptVariantV7Dto(
                     city = p.city,
                     district = p.district,
-                    street = p.street?.let { buildScriptVariantStreet(it) } ?: StreetScriptVariantDto(),
+                    street = p.street?.let { buildScriptVariantStreet(it) } ?: StreetScriptVariantV7Dto(),
                     industrialZone = p.industrialZone,
                     building = p.building,
                     floor = p.floor,
                     door = p.door
                 )
-            } ?: PhysicalAddressScriptVariantDto(),
+            } ?: PhysicalAddressScriptVariantV7Dto(),
             alternativeAddress = addressScriptVariant?.alternativeAddress?.let { a ->
-                org.eclipse.tractusx.bpdm.gate.api.model.AlternativeAddressScriptVariantDto(
+                org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto(
                     city = a.city
                 )
             }

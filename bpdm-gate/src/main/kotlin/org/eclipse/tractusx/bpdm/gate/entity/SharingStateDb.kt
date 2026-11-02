@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateType
 import java.time.LocalDateTime
 import java.util.*
 
@@ -52,7 +52,7 @@ class SharingStateDb(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sharing_error_code", nullable = true)
-    var sharingErrorCode: BusinessPartnerSharingError?,
+    var sharingErrorCode: BusinessPartnerSharingErrorCode?,
 
     @Column(name = "sharing_error_message", nullable = true)
     var sharingErrorMessage: String? = null,

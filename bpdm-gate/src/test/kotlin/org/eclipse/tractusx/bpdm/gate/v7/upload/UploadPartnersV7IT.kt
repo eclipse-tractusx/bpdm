@@ -22,15 +22,13 @@ package org.eclipse.tractusx.bpdm.gate.v7.upload
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -139,6 +137,27 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
         Assertions.assertThatExceptionOfType(WebClientResponseException.BadRequest::class.java).isThrownBy(uploadRequest)
     }
 
+    /**
+     * GIVEN the Pool knows no legal entity of the uploading tenant
+     * WHEN uploading valid business partner CSV file
+     * THEN user sees 400 HTTP error
+     */
+    @Test
+    fun `try to upload CSV file for tenant unknown to the Pool`() {
+        //GIVEN
+        poolMockDataFactory.mockNoLegalEntitySearchResult()
+
+        //WHEN
+        val uploadRequest = {
+            val partnerUploadFile = ClassPathResource("testData/valid_partner_data.csv")
+            gateClient.partnerUpload.uploadPartnerCsvFile(partnerUploadFile).body!!
+            Unit
+        }
+
+        //THEN
+        Assertions.assertThatExceptionOfType(WebClientResponseException.BadRequest::class.java).isThrownBy(uploadRequest)
+    }
+
     private fun mockExpectedTenantLegalEntity(){
         poolMockDataFactory.configureWireMock()
         val tenantLegalEntityRequest = with(poolMockDataFactory.requestFactory.createLegalEntityRequest(testName)) { copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(legalName = ExpectedResponses.tenantLegalName))) }
@@ -150,22 +169,22 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
 
         val tenantLegalName = "Limited Liability Company Name"
 
-        val validEntry1 = BusinessPartnerInputDto(
+        val validEntry1 = BusinessPartnerInputV7Dto(
             externalId = "external-1",
             nameParts = emptyList(),
             isOwnCompanyData = true,
             identifiers = listOf(
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     value = "DE123456789",
                     type = "VAT_DE",
                     issuingBody = "Agency X"
                 ),
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     value = "US123456789",
                     type = "VAT_US",
                     issuingBody = "Body Y"
                 ),
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     value = "FR123456789",
                     type = "VAT_FR",
                     issuingBody = null
@@ -173,21 +192,21 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
             ),
             states = emptyList(),
             roles = emptyList(),
-            legalEntity = LegalEntityRepresentationInputDto(
+            legalEntity = LegalEntityRepresentationInputV7Dto(
                 legalEntityBpn = "BPNL000000000001",
                 shortName = null,
                 legalName = tenantLegalName,
                 legalForm = null
             ),
-            site = SiteRepresentationInputDto(
+            site = SiteRepresentationInputV7Dto(
                 siteBpn = null,
                 name = "Site Name"
             ),
-            address = AddressRepresentationInputDto(
+            address = AddressRepresentationInputV7Dto(
                 addressBpn = "BPNA0000000001XY",
                 name = "Address Name",
                 addressType = AddressType.SiteMainAddress,
-                physicalPostalAddress =  PhysicalPostalAddressDto(
+                physicalPostalAddress =  PhysicalPostalAddressV7Dto(
                     geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
                     country = "US",
                     postalCode = "70547",
@@ -201,9 +220,15 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
                     building = "Building Two",
                     floor = "Floor Two",
                     door = "Door Two",
-                    street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
+                    street = StreetV7Dto(
+                        namePrefix = "Prefix",
+                        additionalNamePrefix = "Additional Prefix",
+                        name = "TODO",
+                        direction = "direction1",
+                        houseNumberSupplement = "B"
+                    ),
                 ),
-                alternativePostalAddress = AlternativePostalAddressDto(
+                alternativePostalAddress = AlternativePostalAddressV7Dto(
                     country = "DE",
                     city = "Stuttgart",
                     deliveryServiceType = DeliveryServiceType.PO_BOX,
@@ -222,9 +247,17 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
 
         val validEntry2 = validEntry1.copy(
             externalId = "external-2",
-            site = validEntry1.site.copy(name = "Site Name 2"),
-            address = validEntry1.address.copy(addressBpn = "BPNA0000000002XY"),
-
+            site = validEntry1.site.copy(
+                name = "Site Name 2",
+                states = listOf(BusinessPartnerStateV7Dto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
+            ),
+            address = validEntry1.address.copy(
+                addressBpn = "BPNA0000000002XY",
+                physicalPostalAddress = validEntry1.address.physicalPostalAddress.copy(
+                    street = StreetV7Dto(name = "TODO", direction = "direction1", houseNumberSupplement = "B")
+                ),
+                alternativePostalAddress = null
+            )
         )
 
         val unmaintainedCountryEntry = validEntry1.copy(

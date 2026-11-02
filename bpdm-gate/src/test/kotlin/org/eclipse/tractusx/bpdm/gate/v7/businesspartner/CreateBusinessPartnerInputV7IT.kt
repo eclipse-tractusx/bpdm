@@ -23,8 +23,8 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.BusinessPartnerStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withLegalEntityStates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withoutAlternativeAddressScriptVariants
@@ -40,7 +40,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `create empty business partner input`(){
         //WHEN
-        val emptyBusinessPartner = BusinessPartnerInputRequest(externalId = testName)
+        val emptyBusinessPartner = BusinessPartnerInputV7Request(externalId = testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(emptyBusinessPartner)).body!!
 
         //THEN
@@ -70,12 +70,12 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `create business partner input with state from the earliest to the latest date`(){
         //WHEN
-        val boundedState = BusinessPartnerStateDto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE)
+        val boundedState = BusinessPartnerStateV7Dto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE)
         val request = testData.businessPartner.input.request.fromSeed(testName).withLegalEntityStates(boundedState)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!
 
         //THEN
-        val openState = BusinessPartnerStateDto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE)
+        val openState = BusinessPartnerStateV7Dto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE)
         val expected = testData.businessPartner.input.response.fromRequest(request.withLegalEntityStates(openState))
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }

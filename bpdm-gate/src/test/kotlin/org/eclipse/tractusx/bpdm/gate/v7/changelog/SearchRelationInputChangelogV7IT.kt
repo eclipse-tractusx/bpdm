@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v7.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.junit.jupiter.api.Test
@@ -41,14 +41,14 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input create changelog`() {
         //GIVEN
-        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationTypeV7.IsManagedBy)
 
         //WHEN
-        val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
+        val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchV7Request())
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(relation.externalId, anyTime, ChangelogType.CREATE)
+            ChangelogGateV7Dto(relation.externalId, anyTime, ChangelogTypeV7.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
     }
@@ -61,17 +61,17 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input update changelog`() {
         //GIVEN
-        testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
-        val updateEntry = testData.relation.input.request.fromSeed(testName).withRelationType(RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationTypeV7.IsManagedBy)
+        val updateEntry = testData.relation.input.request.fromSeed(testName).withRelationType(RelationTypeV7.IsOwnedBy)
         testDataClient.relation.upsertRelationInput(updateEntry)
 
         //WHEN
-        val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
+        val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchV7Request())
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
-            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
+            ChangelogGateV7Dto(testName, anyTime, ChangelogTypeV7.CREATE),
+            ChangelogGateV7Dto(testName, anyTime, ChangelogTypeV7.UPDATE)
         )
         assertRepo.assertChangelog(response, expected)
     }
@@ -84,17 +84,17 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input changelogs by external-ID`() {
         //GIVEN
-        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationTypeV7.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationTypeV7.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationTypeV7.IsManagedBy)
 
         //WHEN
-        val request = ChangelogSearchRequest(externalIds = setOf(rel1.externalId))
+        val request = ChangelogSearchV7Request(externalIds = setOf(rel1.externalId))
         val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), request)
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(rel1.externalId, anyTime, ChangelogType.CREATE)
+            ChangelogGateV7Dto(rel1.externalId, anyTime, ChangelogTypeV7.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
     }
@@ -107,20 +107,20 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input changelogs by timestamp after`() {
         //GIVEN
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationTypeV7.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationTypeV7.IsOwnedBy)
 
         val timeX = Instant.now()
 
-        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationTypeV7.IsManagedBy)
 
         //WHEN
-        val request = ChangelogSearchRequest(timestampAfter = timeX)
+        val request = ChangelogSearchV7Request(timestampAfter = timeX)
         val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), request)
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(rel3.externalId, anyTime, ChangelogType.CREATE)
+            ChangelogGateV7Dto(rel3.externalId, anyTime, ChangelogTypeV7.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
     }

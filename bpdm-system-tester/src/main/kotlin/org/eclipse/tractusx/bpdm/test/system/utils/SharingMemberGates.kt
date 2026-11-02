@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
 
 /** One of the sharing members a scenario can share business partner data as. */
 enum class SharingMember { FIRST, SECOND, THIRD }
@@ -33,9 +33,9 @@ enum class SharingMember { FIRST, SECOND, THIRD }
  */
 class SharingMemberGate(
     val member: SharingMember,
-    client: GateClient,
+    client: GateV7Client,
     val sharingStates: SharingStateWatcher
-) : GateClient by client
+) : GateV7Client by client
 
 /** The Gates of the sharing members this run holds credentials for. */
 class SharingMemberGates(gates: Collection<SharingMemberGate>) {

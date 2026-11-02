@@ -21,8 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.config
 
 import io.mockk.every
 import io.mockk.mockk
-import org.eclipse.tractusx.bpdm.gate.util.OrchestratorHealthIndicator
-import org.eclipse.tractusx.bpdm.gate.util.PoolHealthIndicator
 import org.springframework.boot.health.contributor.Health
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestTypes
 import org.junit.jupiter.api.Test
@@ -66,7 +66,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     fun `search updated relation output between legal entities`(legalEntityRelationType: GateTestTypes.LegalEntityRelationType) {
         //GIVEN
         val (relationInput, _) = testDataClient.relation.createLegalEntityRelationOutput(testName, legalEntityRelationType.gateRelationType)
-        val otherType = RelationType.entries.find { it != legalEntityRelationType.gateRelationType }!!
+        val otherType = RelationTypeV7.entries.find { it != legalEntityRelationType.gateRelationType }!!
         val relationGoldenRecord = testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "Updated $testName", otherType)
 
         //WHEN
@@ -113,7 +113,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val response = gateClient.relationOutput.postSearch()
 
         //THEN
-        val emptyOutputs: List<RelationOutputDto> = emptyList()
+        val emptyOutputs: List<RelationOutputV7Dto> = emptyList()
         assertRepo.assertRelationOutput(response, PageDto(0, 0, 0, 0, emptyOutputs))
     }
 
@@ -130,7 +130,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
-        val response = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(inquired.externalId)))
+        val response = gateClient.relationOutput.postSearch(RelationOutputSearchV7Request(externalIds = listOf(inquired.externalId)))
 
         //THEN
         val expectedOutput = testData.relation.output.fromGoldenRecord(inquired.externalId, goldenRecord)
@@ -151,7 +151,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(externalIds = listOf(rel1.externalId, rel2.externalId))
+            RelationOutputSearchV7Request(externalIds = listOf(rel1.externalId, rel2.externalId))
         )
 
         //THEN
@@ -174,10 +174,10 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val (rel2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
         val (rel3, golden3) = testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
-        val filterType = SharableRelationType.valueOf(golden1.relationType.name)
+        val filterType = SharableRelationTypeV7.valueOf(golden1.relationType.name)
 
         //WHEN
-        val response = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(relationType = filterType))
+        val response = gateClient.relationOutput.postSearch(RelationOutputSearchV7Request(relationType = filterType))
 
         //THEN
         val allOutputs = listOf(
@@ -203,7 +203,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(sourceBpns = listOf(goldenRecord.businessPartnerSourceBpn))
+            RelationOutputSearchV7Request(sourceBpns = listOf(goldenRecord.businessPartnerSourceBpn))
         )
 
         //THEN
@@ -225,7 +225,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(sourceBpns = listOf(golden1.businessPartnerSourceBpn, golden2.businessPartnerSourceBpn))
+            RelationOutputSearchV7Request(sourceBpns = listOf(golden1.businessPartnerSourceBpn, golden2.businessPartnerSourceBpn))
         )
 
         //THEN
@@ -250,7 +250,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(targetBpns = listOf(goldenRecord.businessPartnerTargetBpn))
+            RelationOutputSearchV7Request(targetBpns = listOf(goldenRecord.businessPartnerTargetBpn))
         )
 
         //THEN
@@ -272,7 +272,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(targetBpns = listOf(golden1.businessPartnerTargetBpn, golden2.businessPartnerTargetBpn))
+            RelationOutputSearchV7Request(targetBpns = listOf(golden1.businessPartnerTargetBpn, golden2.businessPartnerTargetBpn))
         )
 
         //THEN
@@ -300,7 +300,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val (new2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName new 2")
 
         //WHEN
-        val response = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(updatedAtFrom = updatedAtFrom))
+        val response = gateClient.relationOutput.postSearch(RelationOutputSearchV7Request(updatedAtFrom = updatedAtFrom))
 
         //THEN
         val expectedOutputs = listOf(
@@ -322,11 +322,11 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val (rel2, _) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
         testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
-        val filterType = SharableRelationType.valueOf(golden1.relationType.name)
+        val filterType = SharableRelationTypeV7.valueOf(golden1.relationType.name)
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(
+            RelationOutputSearchV7Request(
                 externalIds = listOf(rel1.externalId, rel2.externalId),
                 relationType = filterType,
                 sourceBpns = listOf(golden1.businessPartnerSourceBpn)
@@ -346,12 +346,12 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `search updated output is findable by new source and target BPNs`() {
         //GIVEN
-        val (relationInput, initialGoldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(testName, RelationType.IsManagedBy)
-        val updatedGoldenRecord = testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "$testName updated", RelationType.IsOwnedBy)
+        val (relationInput, initialGoldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(testName, RelationTypeV7.IsManagedBy)
+        val updatedGoldenRecord = testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "$testName updated", RelationTypeV7.IsOwnedBy)
 
         //WHEN - search by new source and target BPNs
         val responseByNewBpns = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(
+            RelationOutputSearchV7Request(
                 sourceBpns = listOf(updatedGoldenRecord.businessPartnerSourceBpn),
                 targetBpns = listOf(updatedGoldenRecord.businessPartnerTargetBpn)
             )
@@ -359,7 +359,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //WHEN - search by the superseded source BPN
         val responseByOldSource = gateClient.relationOutput.postSearch(
-            RelationOutputSearchRequest(sourceBpns = listOf(initialGoldenRecord.businessPartnerSourceBpn))
+            RelationOutputSearchV7Request(sourceBpns = listOf(initialGoldenRecord.businessPartnerSourceBpn))
         )
 
         //THEN - new BPNs find the updated output

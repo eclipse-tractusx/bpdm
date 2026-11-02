@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.stats
 
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsSharingStatesV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -36,7 +36,7 @@ class CountBusinessPartnerSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        assertRepo.assertSharingStateStats(response, StatsSharingStatesResponse(0, 0, 0, 0, 0))
+        assertRepo.assertSharingStateStats(response, StatsSharingStatesV7Response(0, 0, 0, 0, 0))
     }
 
     /**
@@ -55,7 +55,7 @@ class CountBusinessPartnerSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        assertRepo.assertSharingStateStats(response, StatsSharingStatesResponse(3, 0, 0, 0, 0))
+        assertRepo.assertSharingStateStats(response, StatsSharingStatesV7Response(3, 0, 0, 0, 0))
     }
 
     /**
@@ -78,6 +78,6 @@ class CountBusinessPartnerSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.countPartnersBySharingState()
 
         //THEN
-        assertRepo.assertSharingStateStats(response, StatsSharingStatesResponse(0, 3, 0, 0, 0))
+        assertRepo.assertSharingStateStats(response, StatsSharingStatesV7Response(0, 3, 0, 0, 0))
     }
 }

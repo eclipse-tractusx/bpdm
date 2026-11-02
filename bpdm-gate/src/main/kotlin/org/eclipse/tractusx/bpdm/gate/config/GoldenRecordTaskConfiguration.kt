@@ -21,7 +21,14 @@ package org.eclipse.tractusx.bpdm.gate.config
 
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.service.*
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
@@ -30,13 +37,14 @@ import org.springframework.scheduling.support.CronTrigger
 class GoldenRecordTaskConfiguration(
     private val configProperties: GoldenRecordTaskConfigProperties,
     private val taskScheduler: TaskScheduler,
-    private val taskCreationService: TaskCreationBatchService,
-    private val taskResolutionService: TaskResolutionBatchService,
-    private val updateService: GoldenRecordUpdateBatchService,
-    private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
-    private val relationTaskCreationService: RelationTaskCreationService,
-    private val relationTaskResolutionService: RelationTaskResolutionService,
-    private val sharingMemberRecordCountedService: GoldenRecordCountedService
+    private val taskCreationService: GoldenRecordTaskCreationApplicationService,
+    private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
+    private val taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
+    private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
+    private val consistencyCheckService: GoldenRecordConsistencyCheckApplicationService,
+    private val relationTaskCreationService: RelationTaskCreationApplicationService,
+    private val relationTaskResolutionService: RelationTaskResolutionApplicationService,
+    private val goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -51,43 +59,43 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             "business partner output update from pool changes",
-            { updateService.updateOutputOnGoldenRecordChange() },
+            { goldenRecordUpdateService.updateFromPoolChanges() },
             configProperties.creation.fromPool.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record task resolution",
-            { taskResolutionService.resolveTasks() },
+            { taskResolutionService.resolveFinishedTasks() },
             configProperties.check.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record task health check",
-            { taskResolutionService.healthCheck() },
+            { taskHealthCheckService.checkPendingTasks() },
             configProperties.healthCheck.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record consistency check",
-            { goldenRecordConsistencyService.check() },
+            { consistencyCheckService.checkSharedBusinessPartners() },
             configProperties.consistencyCheck.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record relation task creation",
-            { relationTaskCreationService.sendTasks() },
+            { relationTaskCreationService.createTasksForReadyRelations() },
             configProperties.relationCreation.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record relation task resolution",
-            { relationTaskResolutionService.checkResolveTasks() },
+            { relationTaskResolutionService.resolveFinishedTasks() },
             configProperties.relationCreation.cron
         )
 
         taskScheduler.scheduleIfEnabled(
             "golden record count synchronization",
-            { sharingMemberRecordCountedService.synchronizeGoldenRecordCounted() },
+            { goldenRecordCountedSyncService.synchronizeGoldenRecordCounted() },
             configProperties.recordSync.cron
         )
     }

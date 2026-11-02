@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.stats
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsConfidenceCriteriaV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -37,6 +37,6 @@ class GetConfidenceCriteriaStatsV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.stats.getConfidenceCriteriaStats()
 
         //THEN
-        Assertions.assertThat(response).isEqualTo(StatsConfidenceCriteriaResponse(0f, 0, 0, 0, 0f))
+        Assertions.assertThat(response).isEqualTo(StatsConfidenceCriteriaV7Response(0f, 0, 0, 0, 0f))
     }
 }

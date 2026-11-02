@@ -22,12 +22,25 @@ package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AddressComponentOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.LegalEntityRepresentationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.SiteRepresentationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.PageChangeLogV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.error.GateErrorV7Response
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsSharingStatesV7Response
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -56,8 +69,8 @@ class GateAssertRepositoryV7(
 
     val outputComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withIgnoredFields(
-            BusinessPartnerOutputDto::createdAt.name,
-            BusinessPartnerOutputDto::updatedAt.name
+            BusinessPartnerOutputV7Dto::createdAt.name,
+            BusinessPartnerOutputV7Dto::updatedAt.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
@@ -65,15 +78,15 @@ class GateAssertRepositoryV7(
 
     val outputComparisonConfigNoBpn: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withIgnoredFields(
-            BusinessPartnerOutputDto::createdAt.name,
-            BusinessPartnerOutputDto::updatedAt.name,
-            "legalEntity.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
-            "site.${SiteRepresentationOutputDto::siteBpn.name}",
-            "address.${AddressComponentOutputDto::addressBpn.name}",
-            "legalEntity.${LegalEntityRepresentationOutputDto::updatedAt.name}",
-            "site.${SiteRepresentationOutputDto::updatedAt.name}",
-            "address.${AddressComponentOutputDto::updatedAt.name}",
-            BusinessPartnerOutputDto::nameParts.name
+            BusinessPartnerOutputV7Dto::createdAt.name,
+            BusinessPartnerOutputV7Dto::updatedAt.name,
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::legalEntityBpn.name}",
+            "site.${SiteRepresentationOutputV7Dto::siteBpn.name}",
+            "address.${AddressComponentOutputV7Dto::addressBpn.name}",
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::updatedAt.name}",
+            "site.${SiteRepresentationOutputV7Dto::updatedAt.name}",
+            "address.${AddressComponentOutputV7Dto::updatedAt.name}",
+            BusinessPartnerOutputV7Dto::nameParts.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
@@ -91,42 +104,42 @@ class GateAssertRepositoryV7(
      */
     val outputMasterDataComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withIgnoredFields(
-            BusinessPartnerOutputDto::createdAt.name,
-            BusinessPartnerOutputDto::updatedAt.name,
-            BusinessPartnerOutputDto::nameParts.name,
-            BusinessPartnerOutputDto::identifiers.name,
-            BusinessPartnerOutputDto::states.name,
-            BusinessPartnerOutputDto::roles.name,
-            BusinessPartnerOutputDto::isOwnCompanyData.name,
-            BusinessPartnerOutputDto::externalSequenceTimestamp.name,
-            BusinessPartnerOutputDto::scriptVariants.name,
+            BusinessPartnerOutputV7Dto::createdAt.name,
+            BusinessPartnerOutputV7Dto::updatedAt.name,
+            BusinessPartnerOutputV7Dto::nameParts.name,
+            BusinessPartnerOutputV7Dto::identifiers.name,
+            BusinessPartnerOutputV7Dto::states.name,
+            BusinessPartnerOutputV7Dto::roles.name,
+            BusinessPartnerOutputV7Dto::isOwnCompanyData.name,
+            BusinessPartnerOutputV7Dto::externalSequenceTimestamp.name,
+            BusinessPartnerOutputV7Dto::scriptVariants.name,
             // legal entity: keep only legalName / shortName / legalForm
-            "legalEntity.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
-            "legalEntity.${LegalEntityRepresentationOutputDto::confidenceCriteria.name}",
-            "legalEntity.${LegalEntityRepresentationOutputDto::states.name}",
-            "legalEntity.${LegalEntityRepresentationOutputDto::goldenRecordRelations.name}",
-            "legalEntity.${LegalEntityRepresentationOutputDto::updatedAt.name}",
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::legalEntityBpn.name}",
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::confidenceCriteria.name}",
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::states.name}",
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::goldenRecordRelations.name}",
+            "legalEntity.${LegalEntityRepresentationOutputV7Dto::updatedAt.name}",
             // site: keep only name
-            "site.${SiteRepresentationOutputDto::siteBpn.name}",
-            "site.${SiteRepresentationOutputDto::confidenceCriteria.name}",
-            "site.${SiteRepresentationOutputDto::states.name}",
-            "site.${SiteRepresentationOutputDto::goldenRecordRelations.name}",
-            "site.${SiteRepresentationOutputDto::updatedAt.name}",
+            "site.${SiteRepresentationOutputV7Dto::siteBpn.name}",
+            "site.${SiteRepresentationOutputV7Dto::confidenceCriteria.name}",
+            "site.${SiteRepresentationOutputV7Dto::states.name}",
+            "site.${SiteRepresentationOutputV7Dto::goldenRecordRelations.name}",
+            "site.${SiteRepresentationOutputV7Dto::updatedAt.name}",
             // address: keep only name / addressType / physical & alternative postal address
-            "address.${AddressComponentOutputDto::addressBpn.name}",
-            "address.${AddressComponentOutputDto::confidenceCriteria.name}",
-            "address.${AddressComponentOutputDto::states.name}",
-            "address.${AddressComponentOutputDto::identifiers.name}",
-            "address.${AddressComponentOutputDto::goldenRecordRelations.name}",
-            "address.${AddressComponentOutputDto::updatedAt.name}"
+            "address.${AddressComponentOutputV7Dto::addressBpn.name}",
+            "address.${AddressComponentOutputV7Dto::confidenceCriteria.name}",
+            "address.${AddressComponentOutputV7Dto::states.name}",
+            "address.${AddressComponentOutputV7Dto::identifiers.name}",
+            "address.${AddressComponentOutputV7Dto::goldenRecordRelations.name}",
+            "address.${AddressComponentOutputV7Dto::updatedAt.name}"
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
     /**
-     * Compares ONLY the record's top-level [BusinessPartnerOutputDto.identifiers] and
-     * [BusinessPartnerOutputDto.states]. These two fields surface the identifiers and states of the entity
+     * Compares ONLY the record's top-level [BusinessPartnerOutputV7Dto.identifiers] and
+     * [BusinessPartnerOutputV7Dto.states]. These two fields surface the identifiers and states of the entity
      * the record reflects, and which entity that is depends on the record type:
      *  - legal entity record   -> the legal entity's identifiers and states
      *  - site record           -> NO identifiers, the site's states
@@ -139,15 +152,15 @@ class GateAssertRepositoryV7(
      */
     val outputTopLevelIdentifiersAndStatesComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withComparedFields(
-            BusinessPartnerOutputDto::identifiers.name,
-            BusinessPartnerOutputDto::states.name
+            BusinessPartnerOutputV7Dto::identifiers.name,
+            BusinessPartnerOutputV7Dto::states.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
     /**
-     * Compares ONLY the record's [BusinessPartnerOutputDto.scriptVariants]. This field reflects the merged
+     * Compares ONLY the record's [BusinessPartnerOutputV7Dto.scriptVariants]. This field reflects the merged
      * script variants of the golden records the record was refined to (the matched entity and its parents),
      * keyed by script code. Everything else - master data, identifiers, states, BPNs, confidence criteria,
      * relations and timestamps - is ignored on purpose and covered by its own tests, so that script-variant
@@ -156,14 +169,14 @@ class GateAssertRepositoryV7(
      */
     val outputScriptVariantsComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withComparedFields(
-            BusinessPartnerOutputDto::scriptVariants.name
+            BusinessPartnerOutputV7Dto::scriptVariants.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
     /**
-     * Compares ONLY the record's [BusinessPartnerOutputDto.additionalSites]: the further sites the
+     * Compares ONLY the record's [BusinessPartnerOutputV7Dto.additionalSites]: the further sites the
      * record's address belongs to beyond the site the record itself follows, each surfaced as a
      * BPNS/name pair. Everything else - master data, identifiers, states, BPNs, confidence criteria,
      * relations, script variants and timestamps - is ignored on purpose and covered by its own tests,
@@ -172,28 +185,28 @@ class GateAssertRepositoryV7(
      */
     val outputAdditionalSitesComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withComparedFields(
-            BusinessPartnerOutputDto::additionalSites.name
+            BusinessPartnerOutputV7Dto::additionalSites.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
-    fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
+    fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputV7Dto>, expected: Collection<BusinessPartnerInputV7Dto>) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
             .usingRecursiveComparison()
             .ignoringFields(
-                BusinessPartnerInputDto::createdAt.name,
-                BusinessPartnerInputDto::updatedAt.name
+                BusinessPartnerInputV7Dto::createdAt.name,
+                BusinessPartnerInputV7Dto::updatedAt.name
             )
             .isEqualTo(expected.sortedBy { it.externalId }.map { it.sortContent() })
     }
 
-    fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>) {
+    fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputV7Dto>, expected: PageDto<BusinessPartnerInputV7Dto>) {
         assertPageHeader(actual, expected)
         assertBusinessPartnerInput(actual.content, expected.content)
     }
 
-    fun assertBusinessPartnerInputRead(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>) {
+    fun assertBusinessPartnerInputRead(actual: PageDto<BusinessPartnerInputV7Dto>, expected: PageDto<BusinessPartnerInputV7Dto>) {
         assertBusinessPartnerInput(actual, expected)
         val expectedById = expected.content.associateBy { it.externalId }
         actual.content.forEach {
@@ -214,14 +227,14 @@ class GateAssertRepositoryV7(
         Assertions.assertThat(updatedAt).isAfter(previousUpdatedAt)
     }
 
-    fun assertSharingStateTimestamp(actual: SharingStateDto, expected: Instant) {
+    fun assertSharingStateTimestamp(actual: SharingStateV7Dto, expected: Instant) {
         Assertions.assertThat(actual.updatedAt).isEqualTo(expected)
         Assertions.assertThat(actual.updatedAt.nano % 1000).isZero()
     }
 
     fun assertBusinessPartnerOutput(
-        actual: Collection<BusinessPartnerOutputDto>,
-        expected: Collection<BusinessPartnerOutputDto>,
+        actual: Collection<BusinessPartnerOutputV7Dto>,
+        expected: Collection<BusinessPartnerOutputV7Dto>,
         config: RecursiveComparisonConfiguration = outputComparisonConfig
     ) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
@@ -230,79 +243,92 @@ class GateAssertRepositoryV7(
     }
 
     fun assertBusinessPartnerOutput(
-        actual: PageDto<BusinessPartnerOutputDto>,
-        expected: PageDto<BusinessPartnerOutputDto>,
+        actual: PageDto<BusinessPartnerOutputV7Dto>,
+        expected: PageDto<BusinessPartnerOutputV7Dto>,
         config: RecursiveComparisonConfiguration = outputComparisonConfig
     ) {
         assertPageHeader(actual, expected)
         assertBusinessPartnerOutput(actual.content, expected.content, config)
     }
 
-    fun assertSharingStates(actual: PageDto<SharingStateDto>, expected: PageDto<SharingStateDto>) {
+    fun assertSharingStates(actual: PageDto<SharingStateV7Dto>, expected: PageDto<SharingStateV7Dto>) {
         assertPageHeader(actual, expected)
         assertSharingStates(actual.content, expected.content)
     }
 
-    fun assertSharingStates(actual: Collection<SharingStateDto>, expected: Collection<SharingStateDto>) {
+    fun assertSharingStates(actual: Collection<SharingStateV7Dto>, expected: Collection<SharingStateV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                SharingStateDto::updatedAt.name,
-                SharingStateDto::sharingProcessStarted.name,
-                SharingStateDto::taskId.name
+                SharingStateV7Dto::updatedAt.name,
+                SharingStateV7Dto::sharingProcessStarted.name,
+                SharingStateV7Dto::taskId.name
             )
             .isEqualTo(expected)
     }
 
-    fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse) {
+    fun assertSharingMemberRecordUpdates(actual: Collection<SharingMemberRecordUpdateRequest>, expected: Collection<SharingMemberRecordUpdateRequest>) {
+        Assertions.assertThat(actual.sortedBy { it.recordId })
+            .usingRecursiveComparison()
+            .isEqualTo(expected.sortedBy { it.recordId })
+    }
+
+    fun assertErrorPerExternalId(actual: GateErrorV7Response, externalIds: Collection<String>) {
+        Assertions.assertThat(actual.error).hasSameSizeAs(externalIds)
+        externalIds.forEach { externalId ->
+            Assertions.assertThat(actual.error).anySatisfy { Assertions.assertThat(it).contains("'$externalId'") }
+        }
+    }
+
+    fun assertSharingStateStats(actual: StatsSharingStatesV7Response, expected: StatsSharingStatesV7Response) {
         Assertions.assertThat(actual).isEqualTo(expected)
     }
 
-    fun assertRelationSharingStates(actual: PageDto<RelationSharingStateDto>, expected: PageDto<RelationSharingStateDto>) {
+    fun assertRelationSharingStates(actual: PageDto<RelationSharingStateV7Dto>, expected: PageDto<RelationSharingStateV7Dto>) {
         assertPageHeader(actual, expected)
         assertRelationSharingStates(actual.content, expected.content)
     }
 
-    fun assertRelationSharingStates(actual: Collection<RelationSharingStateDto>, expected: Collection<RelationSharingStateDto>) {
+    fun assertRelationSharingStates(actual: Collection<RelationSharingStateV7Dto>, expected: Collection<RelationSharingStateV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                RelationSharingStateDto::updatedAt.name,
-                RelationSharingStateDto::sharingErrorMessage.name
+                RelationSharingStateV7Dto::updatedAt.name,
+                RelationSharingStateV7Dto::sharingErrorMessage.name
             )
             .isEqualTo(expected)
     }
 
-    fun assertRelationSharingStatePageMetadata(actual: PageDto<RelationSharingStateDto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
+    fun assertRelationSharingStatePageMetadata(actual: PageDto<RelationSharingStateV7Dto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
         Assertions.assertThat(actual.totalElements).isEqualTo(totalElements)
         Assertions.assertThat(actual.totalPages).isEqualTo(totalPages)
         Assertions.assertThat(actual.page).isEqualTo(page)
         Assertions.assertThat(actual.contentSize).isEqualTo(contentSize)
     }
 
-    fun assertRelation(actual: RelationDto, expected: RelationDto) {
+    fun assertRelation(actual: RelationV7Dto, expected: RelationV7Dto) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                RelationDto::createdAt.name,
-                RelationDto::updatedAt.name
+                RelationV7Dto::createdAt.name,
+                RelationV7Dto::updatedAt.name
             )
             .isEqualTo(expected)
     }
 
-    fun assertRelations(actual: Collection<RelationDto>, expected: Collection<RelationDto>) {
+    fun assertRelations(actual: Collection<RelationV7Dto>, expected: Collection<RelationV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                RelationDto::createdAt.name,
-                RelationDto::updatedAt.name
+                RelationV7Dto::createdAt.name,
+                RelationV7Dto::updatedAt.name
             )
             .isEqualTo(expected)
     }
 
-    fun assertRelations(actual: PageDto<RelationDto>, expected: PageDto<RelationDto>) {
+    fun assertRelations(actual: PageDto<RelationV7Dto>, expected: PageDto<RelationV7Dto>) {
         assertPageHeader(actual, expected)
         assertRelations(actual.content, expected.content)
         val expectedById = expected.content.associateBy { it.externalId }
@@ -312,32 +338,32 @@ class GateAssertRepositoryV7(
         }
     }
 
-    fun assertRelationOutput(actual: Collection<RelationOutputDto>, expected: Collection<RelationOutputDto>) {
+    fun assertRelationOutput(actual: Collection<RelationOutputV7Dto>, expected: Collection<RelationOutputV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
-            .ignoringFields(RelationOutputDto::updatedAt.name)
+            .ignoringFields(RelationOutputV7Dto::updatedAt.name)
             .isEqualTo(expected)
     }
 
-    fun assertRelationOutput(actual: PageDto<RelationOutputDto>, expected: PageDto<RelationOutputDto>) {
+    fun assertRelationOutput(actual: PageDto<RelationOutputV7Dto>, expected: PageDto<RelationOutputV7Dto>) {
         assertPageHeader(actual, expected)
         assertRelationOutput(actual.content, expected.content)
     }
 
-    fun assertRelationOutputInAnyDirection(actual: PageDto<RelationOutputDto>, expected: PageDto<RelationOutputDto>) {
+    fun assertRelationOutputInAnyDirection(actual: PageDto<RelationOutputV7Dto>, expected: PageDto<RelationOutputV7Dto>) {
         assertPageHeader(actual, expected)
         assertRelationOutputInAnyDirection(actual.content, expected.content)
     }
 
-    fun assertRelationOutputInAnyDirection(actual: Collection<RelationOutputDto>, expected: Collection<RelationOutputDto>) {
+    fun assertRelationOutputInAnyDirection(actual: Collection<RelationOutputV7Dto>, expected: Collection<RelationOutputV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                RelationOutputDto::updatedAt.name,
-                RelationOutputDto::sourceBpn.name,
-                RelationOutputDto::targetBpn.name
+                RelationOutputV7Dto::updatedAt.name,
+                RelationOutputV7Dto::sourceBpn.name,
+                RelationOutputV7Dto::targetBpn.name
             )
             .isEqualTo(expected)
 
@@ -351,23 +377,23 @@ class GateAssertRepositoryV7(
         }
     }
 
-    fun assertRelationPageMetadata(actual: PageDto<RelationDto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
+    fun assertRelationPageMetadata(actual: PageDto<RelationV7Dto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
         Assertions.assertThat(actual.totalElements).isEqualTo(totalElements)
         Assertions.assertThat(actual.totalPages).isEqualTo(totalPages)
         Assertions.assertThat(actual.page).isEqualTo(page)
         Assertions.assertThat(actual.contentSize).isEqualTo(contentSize)
     }
 
-    fun assertChangelog(actual: PageChangeLogDto<ChangelogGateDto>, expected: PageChangeLogDto<ChangelogGateDto>) {
+    fun assertChangelog(actual: PageChangeLogV7Dto<ChangelogGateV7Dto>, expected: PageChangeLogV7Dto<ChangelogGateV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(PageChangeLogDto<*>::content.name)
+            .ignoringFields(PageChangeLogV7Dto<*>::content.name)
             .isEqualTo(expected)
 
         Assertions.assertThat(actual.content)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
-            .ignoringFields(ChangelogGateDto::timestamp.name)
+            .ignoringFields(ChangelogGateV7Dto::timestamp.name)
             .isEqualTo(expected.content)
     }
 
@@ -378,7 +404,7 @@ class GateAssertRepositoryV7(
             .isEqualTo(expected)
     }
 
-    private fun BusinessPartnerInputDto.sortContent() =
+    private fun BusinessPartnerInputV7Dto.sortContent() =
         copy(
             identifiers = identifiers.sortedBy { it.value },
             states = states.sortedBy { it.validFrom?.toString() },
@@ -390,16 +416,16 @@ class GateAssertRepositoryV7(
             address = address.sortContent()
         )
 
-    private fun LegalEntityRepresentationInputDto.sortContent() =
+    private fun LegalEntityRepresentationInputV7Dto.sortContent() =
         copy(states = states.sortedBy { it.validFrom?.toString() })
 
-    private fun SiteRepresentationInputDto.sortContent() =
+    private fun SiteRepresentationInputV7Dto.sortContent() =
         copy(states = states.sortedBy { it.validFrom?.toString() })
 
-    private fun AddressRepresentationInputDto.sortContent() =
+    private fun AddressRepresentationInputV7Dto.sortContent() =
         copy(states = states.sortedBy { it.validFrom?.toString() })
 
-    private fun BusinessPartnerOutputDto.sortContent() =
+    private fun BusinessPartnerOutputV7Dto.sortContent() =
         copy(
             identifiers = identifiers.sortedBy { it.value },
             states = states.sortedBy { it.validFrom?.toString() },
@@ -411,19 +437,19 @@ class GateAssertRepositoryV7(
             address = address.sortContent()
         )
 
-    private fun LegalEntityRepresentationOutputDto.sortContent() =
+    private fun LegalEntityRepresentationOutputV7Dto.sortContent() =
         copy(
             states = states.sortedBy { it.validFrom?.toString() },
             goldenRecordRelations = goldenRecordRelations.sortedBy { it.sourceBpn }
         )
 
-    private fun SiteRepresentationOutputDto.sortContent() =
+    private fun SiteRepresentationOutputV7Dto.sortContent() =
         copy(
             states = states.sortedBy { it.validFrom?.toString() },
             goldenRecordRelations = goldenRecordRelations.sortedBy { it.sourceBpn }
         )
 
-    private fun AddressComponentOutputDto.sortContent() =
+    private fun AddressComponentOutputV7Dto.sortContent() =
         copy(
             states = states.sortedBy { it.validFrom?.toString() },
             identifiers = identifiers.sortedBy { it.value },

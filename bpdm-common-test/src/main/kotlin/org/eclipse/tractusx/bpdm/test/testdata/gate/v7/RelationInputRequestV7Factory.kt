@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationV7Dto
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.random.Random
@@ -31,9 +31,9 @@ class RelationInputRequestV7Factory(
     private val testMetadata: GateTestMetadataV7
 ) {
 
-    fun fromSeed(seed: String): RelationPutEntry = SeededCreator(seed).create()
+    fun fromSeed(seed: String): RelationPutV7Entry = SeededCreator(seed).create()
 
-    fun toExpectedResponse(entry: RelationPutEntry): RelationDto = RelationDto(
+    fun toExpectedResponse(entry: RelationPutV7Entry): RelationV7Dto = RelationV7Dto(
         externalId = entry.externalId,
         relationType = entry.relationType,
         businessPartnerSourceExternalId = entry.businessPartnerSourceExternalId,
@@ -48,27 +48,27 @@ class RelationInputRequestV7Factory(
 
         private val random = Random(seed.hashCode())
 
-        fun create(): RelationPutEntry = RelationPutEntry(
+        fun create(): RelationPutV7Entry = RelationPutV7Entry(
             externalId = seed,
-            relationType = RelationType.entries.random(random),
+            relationType = RelationTypeV7.entries.random(random),
             businessPartnerSourceExternalId = "$seed Source",
             businessPartnerTargetExternalId = "$seed Target",
             reasonCode = testMetadata.reasonCodes.random(random),
             validityPeriods = createValidityPeriods()
         )
 
-        private fun createValidityPeriods(): List<RelationValidityPeriodDto> {
+        private fun createValidityPeriods(): List<RelationValidityPeriodV7Dto> {
             val validFrom = LocalDate.of(2000 + random.nextInt(0, 20), random.nextInt(1, 13), random.nextInt(1, 28))
             val validTo = if (random.nextBoolean()) validFrom.plusYears(random.nextLong(1, 30)) else null
-            return listOf(RelationValidityPeriodDto(validFrom = validFrom, validTo = validTo))
+            return listOf(RelationValidityPeriodV7Dto(validFrom = validFrom, validTo = validTo))
         }
     }
 }
 
-fun RelationPutEntry.withExternalId(externalId: String) = copy(externalId = externalId)
-fun RelationPutEntry.withRelationType(relationType: RelationType) = copy(relationType = relationType)
-fun RelationPutEntry.withSource(businessPartnerSourceExternalId: String) = copy(businessPartnerSourceExternalId = businessPartnerSourceExternalId)
-fun RelationPutEntry.withTarget(businessPartnerTargetExternalId: String) = copy(businessPartnerTargetExternalId = businessPartnerTargetExternalId)
-fun RelationPutEntry.withValidityPeriods(validityPeriods: List<RelationValidityPeriodDto>) = copy(validityPeriods = validityPeriods)
+fun RelationPutV7Entry.withExternalId(externalId: String) = copy(externalId = externalId)
+fun RelationPutV7Entry.withRelationType(relationType: RelationTypeV7) = copy(relationType = relationType)
+fun RelationPutV7Entry.withSource(businessPartnerSourceExternalId: String) = copy(businessPartnerSourceExternalId = businessPartnerSourceExternalId)
+fun RelationPutV7Entry.withTarget(businessPartnerTargetExternalId: String) = copy(businessPartnerTargetExternalId = businessPartnerTargetExternalId)
+fun RelationPutV7Entry.withValidityPeriods(validityPeriods: List<RelationValidityPeriodV7Dto>) = copy(validityPeriods = validityPeriods)
 
-fun RelationType.other(): RelationType = RelationType.entries.first { it != this }
+fun RelationTypeV7.other(): RelationTypeV7 = RelationTypeV7.entries.first { it != this }

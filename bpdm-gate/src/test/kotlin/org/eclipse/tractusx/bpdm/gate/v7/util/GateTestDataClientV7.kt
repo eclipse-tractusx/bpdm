@@ -19,23 +19,29 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
-import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordConsistencyCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyncApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 
 class GateTestDataClientV7(
-    gateClient: GateClient,
+    gateClient: GateV7Client,
     testDataFactory: TestDataFactoryGateV7,
     orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    taskCreationBatchService: TaskCreationBatchService,
-    taskResolutionBatchService: TaskResolutionBatchService,
-    relationTaskResolutionService: RelationTaskResolutionService,
-    relationTaskCreationService: RelationTaskCreationService,
+    taskCreationService: GoldenRecordTaskCreationApplicationService,
+    taskResolutionService: GoldenRecordTaskResolutionApplicationService,
+    taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService,
+    consistencyCheckService: GoldenRecordConsistencyCheckApplicationService,
+    goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService,
+    relationTaskResolutionService: RelationTaskResolutionApplicationService,
+    relationTaskCreationService: RelationTaskCreationApplicationService,
     goldenRecordMockFactory: GoldenRecordMockFactory,
     tenantBpnL: String,
 ) {
@@ -43,8 +49,11 @@ class GateTestDataClientV7(
         gateClient,
         testDataFactory,
         orchestratorMockDataFactory,
-        taskCreationBatchService,
-        taskResolutionBatchService,
+        taskCreationService,
+        taskResolutionService,
+        taskHealthCheckService,
+        consistencyCheckService,
+        goldenRecordCountedSyncService,
         goldenRecordMockFactory,
         tenantBpnL,
     )
