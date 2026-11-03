@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
@@ -30,8 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AdministrativeAreaSearchApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.CountrySearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.FieldQualityRuleSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeSearchApplicationV6Service
@@ -50,7 +53,8 @@ class MetadataV6Controller(
     val legalFormSearchApplicationV6Service: LegalFormSearchApplicationV6Service,
     val fieldQualityRuleSearchApplicationV6Service: FieldQualityRuleSearchApplicationV6Service,
     val administrativeAreaSearchApplicationV6Service: AdministrativeAreaSearchApplicationV6Service,
-    val countrySearchApplicationV6Service: CountrySearchApplicationV6Service
+    val countrySearchApplicationService: CountrySearchApplicationService,
+    val apiV6MetadataMapper: ApiV6MetadataMapper
 ) : PoolMetadataV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
@@ -89,7 +93,8 @@ class MetadataV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryV6Dto> {
-        return countrySearchApplicationV6Service.searchCountries(paginationRequest)
+        return countrySearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV6MetadataMapper::toDto)
     }
 
 }

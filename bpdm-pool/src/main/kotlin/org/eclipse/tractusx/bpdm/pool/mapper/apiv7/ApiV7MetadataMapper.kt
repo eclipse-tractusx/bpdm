@@ -19,8 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.springframework.stereotype.Component
@@ -46,6 +48,16 @@ class ApiV7MetadataMapper {
     fun toDto(record: ScriptCodeRecord): ScriptCodeV7Dto =
         ScriptCodeV7Dto(
             technicalKey = record.technicalKey,
+            description = record.description
+        )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: CountryRecord): CountryV7Dto =
+        CountryV7Dto(
+            countryCode = record.countryCode,
+            name = record.name,
             description = record.description
         )
 }

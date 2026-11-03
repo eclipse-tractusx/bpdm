@@ -35,10 +35,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AdministrativeAreaSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.CountrySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
@@ -59,7 +59,7 @@ class MetadataController(
     val administrativeAreaSearchApplicationV7Service: AdministrativeAreaSearchApplicationV7Service,
     val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
     val scriptCodeSearchApplicationService: ScriptCodeSearchApplicationService,
-    val countrySearchApplicationV7Service: CountrySearchApplicationV7Service,
+    val countrySearchApplicationService: CountrySearchApplicationService,
     val apiV7MetadataMapper: ApiV7MetadataMapper
 ) : PoolMetadataV7Api {
 
@@ -111,7 +111,8 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryV7Dto> {
-        return countrySearchApplicationV7Service.searchCountries(paginationRequest)
+        return countrySearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
 }
