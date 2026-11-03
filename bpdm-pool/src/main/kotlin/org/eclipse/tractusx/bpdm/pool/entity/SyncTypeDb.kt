@@ -17,8 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.entity
 
-enum class SyncType{
+enum class SyncTypeDb {
     SHARING_MEMBER_RECORDS
 }
