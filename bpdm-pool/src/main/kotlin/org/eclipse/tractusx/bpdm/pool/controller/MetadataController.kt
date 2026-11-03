@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AdministrativeAreaSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.CountrySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
@@ -43,7 +44,6 @@ import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreat
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.ScriptCodeSearchApplicationV7Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -58,7 +58,7 @@ class MetadataController(
     val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
     val administrativeAreaSearchApplicationV7Service: AdministrativeAreaSearchApplicationV7Service,
     val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
-    val scriptCodeSearchApplicationV7Service: ScriptCodeSearchApplicationV7Service,
+    val scriptCodeSearchApplicationService: ScriptCodeSearchApplicationService,
     val countrySearchApplicationV7Service: CountrySearchApplicationV7Service,
     val apiV7MetadataMapper: ApiV7MetadataMapper
 ) : PoolMetadataV7Api {
@@ -105,7 +105,8 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeV7Dto> {
-        return scriptCodeSearchApplicationV7Service.searchScriptCodes(paginationRequest)
+        return scriptCodeSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

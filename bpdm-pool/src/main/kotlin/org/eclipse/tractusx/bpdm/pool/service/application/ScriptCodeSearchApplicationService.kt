@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,30 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.ScriptCodeSearchService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the V7 "search script codes" operation.
+ * Searches the script codes a business partner's script variants may state, for every API version.
  */
 @Service
-class ScriptCodeSearchApplicationV7Service(
-    private val scriptCodeSearchService: ScriptCodeSearchService
+class ScriptCodeSearchApplicationService(
+    private val scriptCodeSearchService: ScriptCodeSearchService,
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
      * Returns the requested page of all known script codes.
      */
     @Transactional(readOnly = true)
-    fun searchScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeV7Dto> =
-        scriptCodeSearchService.search(paginationRequest.toPageRequest())
-            .toPageDto { ScriptCodeV7Dto(it.technicalKey, it.description) }
+    fun search(pageable: Pageable): Page<ScriptCodeRecord> =
+        scriptCodeSearchService.search(pageable)
+            .map(dbToOutputMapper::toRecord)
 }

@@ -20,7 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.mapper
 
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
+import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.springframework.stereotype.Component
 
 /**
@@ -34,6 +36,15 @@ class DbToOutputMapper {
      */
     fun toRecord(entity: ReasonCodeDb): ReasonCodeRecord =
         ReasonCodeRecord(
+            technicalKey = entity.technicalKey,
+            description = entity.description
+        )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: ScriptCodeDb): ScriptCodeRecord =
+        ScriptCodeRecord(
             technicalKey = entity.technicalKey,
             description = entity.description
         )
