@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
+import org.hibernate.annotations.Type
 import java.util.*
 
 @Entity
@@ -41,12 +41,12 @@ class SharingMemberRecordDb (
     val id: Long = 0,
 
     @Column(updatable = false, nullable = false, name = "CREATED_AT")
-    @CreationTimestamp
-    var createdAt: Instant = Instant.now(),
+    @Type(DbTimestampConverter::class)
+    var createdAt: DbTimestamp = DbTimestamp.now(),
 
     @Column(nullable = false, name = "UPDATED_AT")
-    @UpdateTimestamp
-    var updatedAt: Instant = Instant.now(),
+    @Type(DbTimestampConverter::class)
+    var updatedAt: DbTimestamp = createdAt,
 
     @Column(name = "public_id", columnDefinition = "UUID", nullable = false, unique = true)
     var publicId: UUID,
