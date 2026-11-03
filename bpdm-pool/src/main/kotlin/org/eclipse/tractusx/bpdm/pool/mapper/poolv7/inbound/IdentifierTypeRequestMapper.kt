@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPa
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeDetailRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -51,6 +51,6 @@ class IdentifierTypeRequestMapper {
     /**
      * Returns the search request holding the criteria a client sent.
      */
-    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerTypeV7, country: String?): IdentifierTypeSearchRequest =
-        IdentifierTypeSearchRequest(businessPartnerType = businessPartnerType, country = country)
+    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerTypeV7, country: String?): IdentifierTypeSearchRaw =
+        IdentifierTypeSearchRaw(businessPartnerType = businessPartnerType, country = country)
 }

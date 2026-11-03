@@ -19,12 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeDetailV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
 import org.springframework.stereotype.Component
 
 /**
@@ -68,4 +75,29 @@ class ApiV6MetadataMapper {
             administrativeAreaLevel1 = record.administrativeAreaCode,
             isActive = record.isActive
         )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: IdentifierTypeRecord): IdentifierTypeV6Dto =
+        IdentifierTypeV6Dto(
+            technicalKey = record.technicalKey,
+            businessPartnerType = IdentifierBusinessPartnerTypeV6.valueOf(record.businessPartnerType.name),
+            name = record.name,
+            abbreviation = record.abbreviation,
+            transliteratedName = record.transliteratedName,
+            transliteratedAbbreviation = record.transliteratedAbbreviation,
+            details = record.details.map { IdentifierTypeDetailV6Dto(country = it.countryCode, mandatory = it.mandatory) }
+        )
+
+    /**
+     * Returns the validation error the API reports [error] with.
+     */
+    fun toValidationError(error: IdentifierTypeSearchError): ValidationError =
+        when (error) {
+            is IdentifierTypeSearchError.CountryNotFound -> ValidationError(
+                "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
+                ValidationContext(classType = "", objectId = "request", propertyPath = listOf("country"))
+            )
+        }
 }

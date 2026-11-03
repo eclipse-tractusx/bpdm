@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolMetadataV7Api
@@ -34,15 +35,17 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -52,7 +55,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MetadataController(
     val identifierTypeCreateApplicationV7Service: IdentifierTypeCreateApplicationV7Service,
-    val identifierTypeSearchApplicationV7Service: IdentifierTypeSearchApplicationV7Service,
+    val identifierTypeSearchApplicationService: IdentifierTypeSearchApplicationService,
     val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
     val legalFormSearchApplicationService: LegalFormSearchApplicationService,
     val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
@@ -60,7 +63,8 @@ class MetadataController(
     val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
     val scriptCodeSearchApplicationService: ScriptCodeSearchApplicationService,
     val countrySearchApplicationService: CountrySearchApplicationService,
-    val apiV7MetadataMapper: ApiV7MetadataMapper
+    val apiV7MetadataMapper: ApiV7MetadataMapper,
+    val apiV7InboundMapper: ApiV7InboundMapper
 ) : PoolMetadataV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
@@ -74,7 +78,11 @@ class MetadataController(
         businessPartnerType: IdentifierBusinessPartnerTypeV7,
         country: String?
     ): PageDto<IdentifierTypeV7Dto> {
-        return identifierTypeSearchApplicationV7Service.searchIdentifierTypes(businessPartnerType, country, paginationRequest)
+        val request = apiV7InboundMapper.toIdentifierTypeSearchRaw(businessPartnerType, country)
+        return when (val result = identifierTypeSearchApplicationService.search(request, paginationRequest.toPageRequest())) {
+            is IdentifierTypeSearchResult.Found -> result.page.toPageDto(apiV7MetadataMapper::toDto)
+            is IdentifierTypeSearchResult.Rejected -> throw BpdmValidationErrorException(result.errors.map(apiV7MetadataMapper::toValidationError))
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")

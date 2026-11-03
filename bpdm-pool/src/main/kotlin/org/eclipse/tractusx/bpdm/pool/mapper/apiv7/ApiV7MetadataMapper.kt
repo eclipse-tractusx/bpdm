@@ -19,16 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeDetailV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
 import org.springframework.stereotype.Component
 
 /**
@@ -90,4 +96,31 @@ class ApiV7MetadataMapper {
             administrativeAreaLevel1 = record.administrativeAreaCode,
             isActive = record.isActive
         )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: IdentifierTypeRecord): IdentifierTypeV7Dto =
+        IdentifierTypeV7Dto(
+            technicalKey = record.technicalKey,
+            businessPartnerType = record.businessPartnerType,
+            name = record.name,
+            abbreviation = record.abbreviation,
+            transliteratedName = record.transliteratedName,
+            transliteratedAbbreviation = record.transliteratedAbbreviation,
+            format = record.format,
+            categories = record.categories.toSortedSet(),
+            details = record.details.map { IdentifierTypeDetailV7Dto(country = it.countryCode, mandatory = it.mandatory) }
+        )
+
+    /**
+     * Returns the validation error the API reports [error] with.
+     */
+    fun toValidationError(error: IdentifierTypeSearchError): ValidationError =
+        when (error) {
+            is IdentifierTypeSearchError.CountryNotFound -> ValidationError(
+                "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
+                ValidationContext(classType = "", objectId = "request", propertyPath = listOf("country"))
+            )
+        }
 }

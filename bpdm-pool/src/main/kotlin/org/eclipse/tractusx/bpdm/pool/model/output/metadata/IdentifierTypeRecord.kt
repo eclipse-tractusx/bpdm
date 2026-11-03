@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,13 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
 
-
-data class IdentifierTypeSearchParsed(
+data class IdentifierTypeRecord(
+    val technicalKey: String,
     val businessPartnerType: IdentifierBusinessPartnerTypeV7,
-    val country: CountryDb?
+    val name: String,
+    val abbreviation: String?,
+    val transliteratedName: String?,
+    val transliteratedAbbreviation: String?,
+    val format: String?,
+    val categories: Set<IdentifierTypeCategoryV7>,
+    val details: List<IdentifierTypeDetailRecord>
+)
+
+data class IdentifierTypeDetailRecord(
+    val countryCode: String?,
+    val mandatory: Boolean
 )

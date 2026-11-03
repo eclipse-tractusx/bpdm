@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository.Specs.byBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository.Specs.byCountry

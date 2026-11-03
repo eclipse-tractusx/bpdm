@@ -29,7 +29,3 @@ sealed interface IdentifierTypeCreateParseError {
         val businessPartnerType: IdentifierBusinessPartnerTypeV7
     ) : IdentifierTypeCreateParseError
 }
-
-sealed interface IdentifierTypeSearchParseError {
-    data class CountryNotFound(val country: String) : IdentifierTypeSearchParseError
-}

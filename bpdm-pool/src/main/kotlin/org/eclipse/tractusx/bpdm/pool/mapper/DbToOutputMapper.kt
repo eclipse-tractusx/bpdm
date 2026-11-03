@@ -20,12 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.mapper
 
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeDetailRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
@@ -89,5 +92,21 @@ class DbToOutputMapper {
             languageCode = entity.languageCode,
             administrativeAreaCode = entity.administrativeArea?.regionCode,
             isActive = entity.isActive
+        )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: IdentifierTypeDb): IdentifierTypeRecord =
+        IdentifierTypeRecord(
+            technicalKey = entity.technicalKey,
+            businessPartnerType = entity.businessPartnerType,
+            name = entity.name,
+            abbreviation = entity.abbreviation,
+            transliteratedName = entity.transliteratedName,
+            transliteratedAbbreviation = entity.transliteratedAbbreviation,
+            format = entity.format,
+            categories = entity.categories.toSet(),
+            details = entity.details.map { IdentifierTypeDetailRecord(countryCode = it.country?.countryCode, mandatory = it.mandatory) }
         )
 }
