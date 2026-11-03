@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -29,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.toCountryVerbose
 import java.time.Instant
 
 class PoolResponseFactoryV7(
@@ -50,7 +52,11 @@ class PoolResponseFactoryV7(
     }
 
     fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateRequest, bpnAFrom: LegalEntityWithLegalAddressVerboseDto): LegalEntityPartnerCreateVerboseDto{
-        return buildLegalEntityUpdate(withValuesFrom, bpnAFrom.legalAddress.bpna)
+        val expected = buildLegalEntityUpdate(withValuesFrom, bpnAFrom.legalAddress.bpna)
+        return expected.copy(legalEntity = expected.legalEntity.copy(
+            header = expected.legalEntity.header.copy(createdAt = bpnAFrom.header.createdAt, updatedAt = bpnAFrom.header.updatedAt),
+            legalAddress = expected.legalEntity.legalAddress.copy(createdAt = bpnAFrom.legalAddress.createdAt, updatedAt = bpnAFrom.legalAddress.updatedAt)
+        ))
     }
 
     fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateRequest, bpnA: String = anyStringValue): LegalEntityPartnerCreateVerboseDto{
@@ -115,7 +121,9 @@ class PoolResponseFactoryV7(
             site = buildSite(
                 withValuesFrom = withValuesFrom.site,
                 bpnS = existingSite.site.bpns,
-                bpnLegalEntity = existingSite.site.bpnLegalEntity
+                bpnLegalEntity = existingSite.site.bpnLegalEntity,
+                createdAt = existingSite.site.createdAt,
+                updatedAt = existingSite.site.updatedAt
             ),
             mainAddress = buildInvariantAddress(
                 withValuesFrom = withValuesFrom.site.mainAddress,
@@ -123,7 +131,9 @@ class PoolResponseFactoryV7(
                 isParticipantData = true,
                 givenBpnA = existingSite.mainAddress.bpna,
                 bpnLegalEntity = existingSite.site.bpnLegalEntity,
-                bpnSite = existingSite.site.bpns
+                bpnSite = existingSite.site.bpns,
+                createdAt = existingSite.mainAddress.createdAt,
+                updatedAt = existingSite.mainAddress.updatedAt
             ).withConfidence(TestDataV7.SharedByOwnerConfidence),
             index = withValuesFrom.bpns
         )
@@ -280,7 +290,9 @@ class PoolResponseFactoryV7(
             isParticipantData = legalEntity.header.isParticipantData,
             givenBpnA = legalEntity.legalAddress.bpna,
             bpnLegalEntity = legalEntity.header.bpnl,
-            bpnSite = null
+            bpnSite = null,
+            createdAt = legalEntity.legalAddress.createdAt,
+            updatedAt = legalEntity.legalAddress.updatedAt
         )
         return AddressPartnerUpdateVerboseDto(
             address = invariantAddress,
@@ -298,7 +310,9 @@ class PoolResponseFactoryV7(
             isParticipantData = true,
             givenBpnA = site.mainAddress.bpna,
             bpnLegalEntity = site.site.bpnLegalEntity,
-            bpnSite = site.site.bpns
+            bpnSite = site.site.bpns,
+            createdAt = site.mainAddress.createdAt,
+            updatedAt = site.mainAddress.updatedAt
         ).withConfidence(TestDataV7.SharedByOwnerConfidence)
         return AddressPartnerUpdateVerboseDto(
             address = invariantAddress,
@@ -317,7 +331,9 @@ class PoolResponseFactoryV7(
             isParticipantData = isParticipantData,
             givenBpnA = existingAddress.address.bpna,
             bpnLegalEntity = existingAddress.address.bpnLegalEntity,
-            bpnSite = existingAddress.address.bpnSite
+            bpnSite = existingAddress.address.bpnSite,
+            createdAt = existingAddress.address.createdAt,
+            updatedAt = existingAddress.address.updatedAt
         )
         return AddressPartnerUpdateVerboseDto(
             address = invariantAddress,
@@ -388,19 +404,19 @@ class PoolResponseFactoryV7(
 
     private fun buildLegalBusinessState(withValuesFrom: LegalEntityStateDto): LegalEntityStateVerboseDto {
         return with(withValuesFrom) {
-            LegalEntityStateVerboseDto(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            LegalEntityStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
     private fun buildSiteBusinessState(withValuesFrom: SiteStateDto): SiteStateVerboseDto {
         return with(withValuesFrom) {
-            SiteStateVerboseDto(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            SiteStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
     private fun buildAddressBusinessState(withValuesFrom: AddressStateDto): AddressStateVerboseDto {
         return with(withValuesFrom) {
-            AddressStateVerboseDto(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            AddressStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
@@ -408,7 +424,7 @@ class PoolResponseFactoryV7(
         return with(withValuesFrom) {
             PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { buildAdminArea(it) },
                 administrativeAreaLevel2,
                 administrativeAreaLevel3,
@@ -430,7 +446,7 @@ class PoolResponseFactoryV7(
         return with(withValuesFrom) {
             AlternativePostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { buildAdminArea(it) },
                 postalCode, city, deliveryServiceType, deliveryServiceQualifier, deliveryServiceNumber
             )

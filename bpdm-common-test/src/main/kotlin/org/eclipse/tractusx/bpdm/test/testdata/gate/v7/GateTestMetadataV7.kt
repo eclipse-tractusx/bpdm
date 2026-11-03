@@ -24,5 +24,6 @@ data class GateTestMetadataV7(
     val legalForms: List<String>,
     val adminAreas: List<String>,
     val scriptVariants: List<String>,
-    val reasonCodes: List<String>
+    val reasonCodes: List<String>,
+    val countries: List<String>
 )

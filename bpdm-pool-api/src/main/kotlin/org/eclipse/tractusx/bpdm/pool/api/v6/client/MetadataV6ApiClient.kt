@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.client
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
@@ -51,15 +51,18 @@ interface MetadataV6ApiClient: PoolMetadataV6Api {
     override fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @RequestParam businessPartnerType: IdentifierBusinessPartnerTypeV6,
-        @RequestParam country: CountryCode?
+        @RequestParam country: String?
     ): PageDto<IdentifierTypeDtoV6>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/legal-forms")
     override fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDtoV6>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/field-quality-rules/")
-    override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
+    override fun getFieldQualityRules(@RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/administrative-areas-level1")
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6>
+
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/countries")
+    override fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
 }

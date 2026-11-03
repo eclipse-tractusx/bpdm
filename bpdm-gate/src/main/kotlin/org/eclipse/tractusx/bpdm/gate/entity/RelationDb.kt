@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_EXTERNAL_ID
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_TENANT
 
@@ -41,7 +41,7 @@ class RelationDb(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, optional = true)
     @JoinColumn(name = "output_id", foreignKey = ForeignKey(name = "fk_relation_output"))
     var output: RelationOutputDb?
-) : BaseEntity(){
+) : BaseEntityWithExplicitTimestamps(){
     companion object{
         const val COLUMN_EXTERNAL_ID = "external_id"
         const val COLUMN_TENANT = "tenant_bpnl"

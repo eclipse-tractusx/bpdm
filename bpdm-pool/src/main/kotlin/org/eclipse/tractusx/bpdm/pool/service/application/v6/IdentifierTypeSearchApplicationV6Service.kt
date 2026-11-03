@@ -19,8 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeSearchParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
@@ -50,10 +55,20 @@ class IdentifierTypeSearchApplicationV6Service(
     @Transactional(readOnly = true)
     fun searchIdentifierTypes(
         businessPartnerType: IdentifierBusinessPartnerTypeV6,
-        country: CountryCode?,
+        country: String?,
         paginationRequest: PaginationRequest
     ): PageDto<IdentifierTypeDtoV6> {
-        val criteria = identifierTypeSearchParser.parse(identifierTypeRequestMapperV6.toSearchRequest(businessPartnerType, country))
+        val criteria = when (val result = identifierTypeSearchParser.parse(identifierTypeRequestMapperV6.toSearchRequest(businessPartnerType, country))) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> throw BpdmValidationErrorException(result.errors.map { error ->
+                when (error) {
+                    is IdentifierTypeSearchParseError.CountryNotFound -> ValidationError(
+                        "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
+                        ValidationContext.fromRoot(IdentifierTypeSearchRequest::class, "request", IdentifierTypeSearchRequest::country)
+                    )
+                }
+            })
+        }
 
         return identifierTypeSearchService.search(criteria, paginationRequest.toPageRequest())
             .toPageDto { identifierTypeResponseMapperV6.toIdentifierType(it) }

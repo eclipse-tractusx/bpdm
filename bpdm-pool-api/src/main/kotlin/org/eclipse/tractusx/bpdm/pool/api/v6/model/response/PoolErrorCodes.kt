@@ -33,6 +33,7 @@ enum class LegalEntityCreateErrorV6 : ErrorCodeV6 {
     LegalFormNotFound,
     LegalEntityIdentifierNotFound,
     LegalAddressRegionNotFound,
+    LegalAddressCountryNotFound,
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
@@ -46,6 +47,7 @@ enum class LegalEntityUpdateErrorV6 : ErrorCodeV6 {
     LegalFormNotFound,
     LegalEntityIdentifierNotFound,
     LegalAddressRegionNotFound,
+    LegalAddressCountryNotFound,
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
@@ -57,6 +59,7 @@ enum class SiteCreateErrorV6 : ErrorCodeV6 {
     LegalEntityNotFound,
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
+    MainAddressCountryNotFound,
     MainAddressDuplicateIdentifier,
     MainAddressIdentifiersTooMany
 }
@@ -66,6 +69,7 @@ enum class SiteUpdateErrorV6 : ErrorCodeV6 {
     SiteNotFound,
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
+    MainAddressCountryNotFound,
     MainAddressDuplicateIdentifier,
     MainAddressIdentifiersTooMany
 }
@@ -77,6 +81,7 @@ enum class AddressCreateErrorV6 : ErrorCodeV6 {
     SiteNotInLegalEntity,
     LegalEntityNotFound,
     RegionNotFound,
+    CountryNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
     IdentifiersTooMany
@@ -87,6 +92,7 @@ enum class AddressUpdateErrorV6 : ErrorCodeV6 {
     AddressNotFound,
     SiteNotInLegalEntity,
     RegionNotFound,
+    CountryNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
     IdentifiersTooMany

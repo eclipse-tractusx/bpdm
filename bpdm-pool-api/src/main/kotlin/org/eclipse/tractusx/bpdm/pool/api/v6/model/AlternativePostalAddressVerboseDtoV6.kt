@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.api.v6.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
@@ -36,7 +35,7 @@ data class AlternativePostalAddressVerboseDtoV6(
 
     @field:JsonProperty("country")
     @get:Schema(description = PostalAddressDescription.country)
-    val countryVerbose: TypeKeyNameVerboseDto<CountryCode>,
+    val countryVerbose: TypeKeyNameVerboseDto<String>,
 
     @field:JsonProperty("administrativeAreaLevel1")
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
@@ -51,7 +50,7 @@ data class AlternativePostalAddressVerboseDtoV6(
 ) : IBaseAlternativePostalAddressDto {
 
     @get:JsonIgnore
-    override val country: CountryCode
+    override val country: String
         get() = countryVerbose.technicalKey
 
     @get:JsonIgnore

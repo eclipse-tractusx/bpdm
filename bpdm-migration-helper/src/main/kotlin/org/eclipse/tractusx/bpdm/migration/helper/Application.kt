@@ -19,8 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.migration.helper
 
+import org.eclipse.tractusx.bpdm.migration.helper.country.CountryMigrationFileCreator
 import org.eclipse.tractusx.bpdm.migration.helper.identifier.type.MigrationFileCreator
 
 fun main(args: Array<String>) {
     MigrationFileCreator().create()
+    CountryMigrationFileCreator().create()
 }

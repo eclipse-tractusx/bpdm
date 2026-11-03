@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
@@ -57,7 +58,7 @@ class LegalEntityDtoRequestMapper(
             legalShortName = header.legalShortName,
             legalForm = header.legalForm,
             identifiers = header.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
-            states = header.states.map { LegalEntityState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = header.states.map { LegalEntityState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(header.confidenceCriteria),
             isDataSpaceParticipant = header.isParticipantData,
             ownershipUltimate = header.ownershipUltimate,
@@ -74,4 +75,8 @@ class LegalEntityDtoRequestMapper(
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

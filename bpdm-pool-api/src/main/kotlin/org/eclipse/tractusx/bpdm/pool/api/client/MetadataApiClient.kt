@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
@@ -45,13 +44,13 @@ interface MetadataApiClient: PoolMetadataApi {
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/field-quality-rules/")
-    override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
+    override fun getFieldQualityRules(@RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDto>>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/identifier-types")
     override fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @RequestParam businessPartnerType: IdentifierBusinessPartnerType,
-        @RequestParam country: CountryCode?
+        @RequestParam country: String?
     ): PageDto<IdentifierTypeDto>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/legal-forms")
@@ -62,4 +61,7 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/reason-codes")
     override fun getReasonCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>
+
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/countries")
+    override fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
 }

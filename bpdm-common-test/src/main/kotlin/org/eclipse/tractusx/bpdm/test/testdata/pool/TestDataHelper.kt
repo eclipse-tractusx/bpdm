@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 
@@ -38,14 +39,20 @@ class PoolDataHelper(
         val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
         val scriptCodes = poolClient.metadata.getScriptCodes(PaginationRequest()).content.toList()
+        val countries = fetchAllCountries()
 
-
-        val testMetadata = TestMetadataV7(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, scriptCodes, reasonCodes)
+        val testMetadata = TestMetadataV7(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, scriptCodes, reasonCodes, countries)
 
         val requestFactory = BusinessPartnerRequestFactory(testMetadata)
         val expectedResultFactory = ExpectedBusinessPartnerResultFactory(testMetadata)
 
         return TestDataEnvironment(testMetadata, requestFactory, expectedResultFactory)
+    }
+
+    // Catalogue can exceed one page (max size 100), so every page is read
+    private fun fetchAllCountries(): List<CountryDto> {
+        val firstPage = poolClient.metadata.getCountries(PaginationRequest(0, 100))
+        return firstPage.content.toList() + (1 until firstPage.totalPages).flatMap { poolClient.metadata.getCountries(PaginationRequest(it, 100)).content }
     }
 }
 data class TestDataEnvironment(
@@ -60,5 +67,9 @@ data class TestMetadataV7(
     val addressIdentifierTypes: List<IdentifierTypeDto>,
     val adminAreas: List<CountrySubdivisionDto>,
     val scriptCodes: List<ScriptCodeDto>,
-    val reasonCodes: List<ReasonCodeDto>
+    val reasonCodes: List<ReasonCodeDto>,
+    val countries: List<CountryDto> = emptyList()
 )
+
+fun List<CountryDto>.toCountryVerbose(countryCode: String): TypeKeyNameVerboseDto<String> =
+    TypeKeyNameVerboseDto(countryCode, find { it.countryCode == countryCode }?.name ?: countryCode)

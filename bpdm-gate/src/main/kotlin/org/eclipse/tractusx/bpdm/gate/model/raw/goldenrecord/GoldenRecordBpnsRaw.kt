@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
+
+
+data class GoldenRecordBpnsRaw(
+    val legalEntities: Set<String>,
+    val sites: Set<String>,
+    val addresses: Set<String>
+) {
+    companion object {
+        val NONE = GoldenRecordBpnsRaw(emptySet(), emptySet(), emptySet())
+    }
+}
+
+/**
+ * Returns every BPN of these collections, by business partner type.
+ */
+fun Iterable<GoldenRecordBpnsRaw>.union(): GoldenRecordBpnsRaw =
+    GoldenRecordBpnsRaw(
+        legalEntities = flatMap { it.legalEntities }.toSet(),
+        sites = flatMap { it.sites }.toSet(),
+        addresses = flatMap { it.addresses }.toSet()
+    )

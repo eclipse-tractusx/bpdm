@@ -21,23 +21,28 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeSearchParseError
+import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 
 /**
  * Turns loose identifier type search criteria into the form the search operation queries with.
- *
- * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
- * can be rejected — a country no identifier type details apply to matches nothing — so there is no failure to report.
  */
 @Service
-class IdentifierTypeSearchParser {
+class IdentifierTypeSearchParser(private val countryRepository: CountryRepository) {
 
     /**
      * Returns the criteria the search filters identifier types by.
      */
-    fun parse(request: IdentifierTypeSearchRequest): IdentifierTypeSearchParsed =
-        IdentifierTypeSearchParsed(
+    fun parse(request: IdentifierTypeSearchRequest): ParseResult<IdentifierTypeSearchParsed, IdentifierTypeSearchParseError> {
+        val country = request.country?.let { code ->
+            countryRepository.findByCountryCode(code)
+                ?: return ParseResult.ofSingleFailure(IdentifierTypeSearchParseError.CountryNotFound(code))
+        }
+        return ParseResult.Success(IdentifierTypeSearchParsed(
             businessPartnerType = request.businessPartnerType,
-            country = request.country
-        )
+            country = country
+        ))
+    }
 }

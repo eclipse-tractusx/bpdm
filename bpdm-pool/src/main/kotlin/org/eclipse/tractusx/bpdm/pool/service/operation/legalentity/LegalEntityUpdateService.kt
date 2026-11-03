@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
@@ -70,6 +71,7 @@ class LegalEntityUpdateService(
 
         val updatedLegalEntities = legalEntityChangeResults.filter { it.upsertType == UpsertType.Updated }
 
+        updatedLegalEntities.forEach { it.value.updatedAt = DbTimestamp.now() }
         repository.saveAll(updatedLegalEntities.map { it.value })
         changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
 

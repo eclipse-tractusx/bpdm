@@ -20,10 +20,12 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
+import org.eclipse.tractusx.bpdm.test.testdata.pool.toCountryVerbose
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import java.time.Instant
 
@@ -350,19 +352,19 @@ class ExpectedBusinessPartnerV6ResultFactory(
 
     fun mapToExpectedResult(givenRequest: LegalEntityStateDtoV6): LegalEntityStateVerboseDtoV6 {
         return with(givenRequest) {
-            LegalEntityStateVerboseDtoV6(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            LegalEntityStateVerboseDtoV6(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
     fun mapToExpectedResult(givenRequest: AddressStateDtoV6): AddressStateVerboseDtoV6 {
         return with(givenRequest) {
-            AddressStateVerboseDtoV6(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            AddressStateVerboseDtoV6(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
     fun mapToExpectedResult(givenRequest: SiteStateDtoV6): SiteStateVerboseDtoV6 {
         return with(givenRequest) {
-            SiteStateVerboseDtoV6(validFrom = validFrom, validTo = validTo, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            SiteStateVerboseDtoV6(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
@@ -370,7 +372,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         return with(givenRequest) {
             PhysicalPostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
                 administrativeAreaLevel2,
                 administrativeAreaLevel3,
@@ -392,7 +394,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         return with(givenRequest) {
             AlternativePostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates,
-                countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
+                countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
                 postalCode, city, deliveryServiceType, deliveryServiceQualifier, deliveryServiceNumber
             )

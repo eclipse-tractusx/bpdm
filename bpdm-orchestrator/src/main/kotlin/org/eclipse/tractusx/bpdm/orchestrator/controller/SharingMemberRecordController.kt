@@ -27,6 +27,8 @@ import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecordApi
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -40,7 +42,7 @@ class SharingMemberRecordController(
        return sharingMemberRecordApplicationService.updateRecord(request)
     }
 
-    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, \"PoolSync\")")
+    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, T(org.eclipse.tractusx.orchestrator.api.model.TaskStep).PoolSync)")
     override fun queryRecords(
         request: SharingMemberRecordQueryRequest,
         paginationRequest: PaginationRequest

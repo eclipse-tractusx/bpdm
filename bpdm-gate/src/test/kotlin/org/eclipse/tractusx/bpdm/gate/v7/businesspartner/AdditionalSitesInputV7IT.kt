@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.junit.jupiter.api.Test
@@ -77,7 +77,7 @@ class AdditionalSitesInputV7IT : UnscheduledGateTestBaseV7() {
     fun `try to create business partner input with additional sites but no site`() {
         //WHEN
         val request = testData.businessPartner.input.request.fromSeed(testName).copy(
-            site = SiteRepresentationInputDto(),
+            site = SiteRepresentationInputV7Dto(),
             additionalSites = additionalSites()
         )
 
@@ -87,7 +87,7 @@ class AdditionalSitesInputV7IT : UnscheduledGateTestBaseV7() {
     }
 
     private fun additionalSites() = listOf(
-        AdditionalSiteInputDto(siteBpn = "BPNS0000000042XY", name = "Known Additional Site $testName"),
-        AdditionalSiteInputDto(siteBpn = null, name = "Unknown Additional Site $testName")
+        AdditionalSiteInputV7Dto(siteBpn = "BPNS0000000042XY", name = "Known Additional Site $testName"),
+        AdditionalSiteInputV7Dto(siteBpn = null, name = "Unknown Additional Site $testName")
     )
 }

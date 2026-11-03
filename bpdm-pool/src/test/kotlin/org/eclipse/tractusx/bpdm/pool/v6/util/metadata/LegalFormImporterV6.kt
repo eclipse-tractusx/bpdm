@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
 
@@ -35,8 +33,8 @@ class LegalFormImporterV6(
                 name = entry.name!!,
                 transliteratedName = entry.transliteratedName?.takeIf { it.isNotBlank() },
                 abbreviation = entry.abbreviation?.takeIf { it.isNotBlank() },
-                country = entry.countryCode?.let { CountryCode.getByAlpha2Code(it) },
-                language = entry.languageCode?.let { LanguageCode.getByCodeIgnoreCase(it) },
+                country = entry.countryCode?.takeIf { it.isNotBlank() },
+                language = entry.languageCode?.takeIf { it.isNotBlank() }?.lowercase(),
                 administrativeAreaLevel1 = entry.countrySubdivisionCode?.takeIf { it.isNotBlank() },
                 transliteratedAbbreviations = entry.transliteratedAbbreviations?.takeIf { it.isNotBlank() },
                 isActive = entry.elfStatus?.uppercase() == "ACTV"

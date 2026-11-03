@@ -33,8 +33,9 @@ import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest as TaskCreateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponse as TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskModeV6
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -55,7 +56,7 @@ class GoldenRecordTaskCreateApplicationV6Service(
     @Transactional
     fun createTasks(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {
         val requests = createRequest.requests.map { inboundMapperV6.toRequest(it) }
-        val createdTasks = createTasksInternal(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = null)
+        val createdTasks = createTasksInternal(createRequest.mode.toTaskMode(), requests, newGateRecordIsGoldenRecordCounted = null)
 
         return createdTasks
             .map { task -> outboundMapperV6.toClientState(responseMapper.toClientState(task, calculateTaskRetentionTimeout(task))) }
@@ -92,4 +93,10 @@ class GoldenRecordTaskCreateApplicationV6Service(
 
     private fun calculateTaskRetentionTimeout(task: GoldenRecordTaskDb) =
         task.createdAt.instant.plus(taskConfigProperties.taskRetentionTimeout)
+
+    private fun TaskModeV6.toTaskMode() =
+        when (this) {
+            TaskModeV6.UpdateFromSharingMember -> TaskMode.UpdateFromSharingMember
+            TaskModeV6.UpdateFromPool -> TaskMode.UpdateFromPool
+        }
 }

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -93,7 +92,8 @@ class TaskResolutionServiceTest @Autowired constructor(
                     addressIdentifierTypes = testDataEnvironment.metadata.addressIdentifierTypes.map { it.technicalKey },
                     adminAreas = testDataEnvironment.metadata.adminAreas.map { it.code },
                     scriptCodes = testDataEnvironment.metadata.scriptCodes.map { it.technicalKey },
-                    reasonCodes = testDataEnvironment.metadata.reasonCodes.map { it.technicalKey }
+                    reasonCodes = testDataEnvironment.metadata.reasonCodes.map { it.technicalKey },
+                    countries = testDataEnvironment.metadata.countries.map { it.countryCode }
                 )
             )
         )
@@ -397,6 +397,27 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
         assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+    }
+
+    @Test
+    fun `create legal entity with unknown address country`() {
+
+        val createLegalEntityRequest = with(minValidLegalEntity()){
+            copy(
+                legalEntity = legalEntity.copy(
+                    legalAddress = legalEntity.legalAddress.copy(
+                        physicalAddress = legalEntity.legalAddress.physicalAddress.copy(
+                            country = "ZZ"
+                        )
+                    )
+                )
+            )
+        }.withLegalReferences("987".toBpnRequest(), "654".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Country 'ZZ' in physical address is not known")
     }
 
     @Test
@@ -1134,7 +1155,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             copy(
                 confidenceCriteria = fullConfidenceCriteria(),
                 physicalAddress = physicalAddress.copy(
-                    country = CountryCode.DE.alpha2,
+                    country = "DE",
                     city = "Stuttgart"
                 )
             )

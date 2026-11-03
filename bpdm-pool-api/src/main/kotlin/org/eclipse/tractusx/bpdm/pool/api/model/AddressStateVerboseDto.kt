@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescr
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(description = AddressStateDescription.header)
+@Schema(description = AddressStateDescription.header, requiredProperties = ["validFrom", "validTo"])
 data class AddressStateVerboseDto(
-    override val validFrom: LocalDateTime?,
-    override val validTo: LocalDateTime?,
+    override val validFrom: LocalDateTime,
+    override val validTo: LocalDateTime,
 
     @field:JsonProperty("type")
     // TODO OpenAPI description for complex field does not work!!

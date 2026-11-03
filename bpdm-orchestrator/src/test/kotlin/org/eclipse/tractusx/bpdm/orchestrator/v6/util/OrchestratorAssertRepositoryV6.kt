@@ -21,28 +21,32 @@ package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.IPageDto
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
-import org.eclipse.tractusx.orchestrator.api.model.TaskProcessingStateDto
-import org.eclipse.tractusx.orchestrator.api.v6.model.*
+import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskProcessingStateDtoV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
 import java.time.temporal.ChronoUnit
 
 class OrchestratorAssertRepositoryV6 {
 
-    fun assertCreatedTasksForNewSharingMemberRecords(actual: TaskCreateResponse, expected: TaskCreateResponse) {
+    fun assertCreatedTasksForNewSharingMemberRecords(actual: TaskCreateResponseV6, expected: TaskCreateResponseV6) {
         assertCreatedTasksForNewSharingMemberRecords(actual.createdTasks, expected.createdTasks)
     }
 
-    fun assertCreatedTasksForExistingSharingMemberRecords(actual: TaskCreateResponse, expected: TaskCreateResponse) {
+    fun assertCreatedTasksForExistingSharingMemberRecords(actual: TaskCreateResponseV6, expected: TaskCreateResponseV6) {
         assertCreatedTasksForExistingSharingMemberRecords(actual.createdTasks, expected.createdTasks)
     }
 
-    fun assertCreatedTasksForNewSharingMemberRecords(actual: List<TaskClientStateDto>, expected: List<TaskClientStateDto>){
+    fun assertCreatedTasksForNewSharingMemberRecords(actual: List<TaskClientStateDtoV6>, expected: List<TaskClientStateDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                TaskClientStateDto::taskId.name,
-                TaskClientStateDto::recordId.name,
-                TaskClientStateDto::processingState.name
+                TaskClientStateDtoV6::taskId.name,
+                TaskClientStateDtoV6::recordId.name,
+                TaskClientStateDtoV6::processingState.name
             )
             .ignoringFieldsMatchingRegexes("(?i).*updatedAt")
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
@@ -50,16 +54,16 @@ class OrchestratorAssertRepositoryV6 {
         assertProcessingStates(actual.map { it.processingState }, expected.map { it.processingState })
     }
 
-    fun assertCreatedTasksForExistingSharingMemberRecords(actual: List<TaskClientStateDto>, expected: List<TaskClientStateDto>){
+    fun assertCreatedTasksForExistingSharingMemberRecords(actual: List<TaskClientStateDtoV6>, expected: List<TaskClientStateDtoV6>){
         assertCreatedTasksForNewSharingMemberRecords(actual, expected)
         actual.zip(expected){ actualEntry, expectedEntry -> Assertions.assertThat(actualEntry.recordId).isEqualTo(expectedEntry.recordId) }
     }
 
-    fun assertSearchedTaskClientState(actual: List<TaskClientStateDto>, expected: List<TaskClientStateDto>){
+    fun assertSearchedTaskClientState(actual: List<TaskClientStateDtoV6>, expected: List<TaskClientStateDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                TaskClientStateDto::processingState.name
+                TaskClientStateDtoV6::processingState.name
             )
             .ignoringFieldsMatchingRegexes("(?i).*updatedAt")
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
@@ -69,25 +73,25 @@ class OrchestratorAssertRepositoryV6 {
     }
 
 
-    fun assertTaskReservationResponse(actual: TaskStepReservationResponse, expected: TaskStepReservationResponse){
+    fun assertTaskReservationResponse(actual: TaskStepReservationResponseV6, expected: TaskStepReservationResponseV6){
         assertTaskReservationEntry(actual.reservedTasks, expected.reservedTasks)
 
         Assertions.assertThat(actual.timeout).isCloseTo(expected.timeout, Assertions.within(1, ChronoUnit.SECONDS))
     }
 
-    fun assertTaskStateResponse(actual: TaskStateResponse, expected: TaskStateResponse){
+    fun assertTaskStateResponse(actual: TaskStateResponseV6, expected: TaskStateResponseV6){
         assertSearchedTaskClientState(actual.tasks, expected.tasks)
     }
 
-    fun assertFinishedTasksResponse(actual: FinishedTaskEventsResponse, expected: FinishedTaskEventsResponse){
+    fun assertFinishedTasksResponse(actual: FinishedTaskEventsResponseV6, expected: FinishedTaskEventsResponseV6){
         assertPageDto(actual, expected)
         assertFinishedTaskEvents(actual.content, expected.content)
     }
 
-    fun assertFinishedTaskEvents(actual: Collection<FinishedTaskEventsResponse.Event>, expected: Collection<FinishedTaskEventsResponse.Event>){
+    fun assertFinishedTaskEvents(actual: Collection<FinishedTaskEventsResponseV6.Event>, expected: Collection<FinishedTaskEventsResponseV6.Event>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(FinishedTaskEventsResponse.Event::timestamp.name)
+            .ignoringFields(FinishedTaskEventsResponseV6.Event::timestamp.name)
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
 
@@ -96,24 +100,24 @@ class OrchestratorAssertRepositoryV6 {
         }
     }
 
-    fun assertTaskReservationEntry(actual: List<TaskStepReservationEntryDto>, expected: List<TaskStepReservationEntryDto>){
+    fun assertTaskReservationEntry(actual: List<TaskStepReservationEntryDtoV6>, expected: List<TaskStepReservationEntryDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                TaskStepReservationEntryDto::taskId.name,
-                TaskStepReservationEntryDto::recordId.name
+                TaskStepReservationEntryDtoV6::taskId.name,
+                TaskStepReservationEntryDtoV6::recordId.name
             )
             .ignoringFieldsMatchingRegexes("(?i).*updatedAt")
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
     }
 
-    fun assertProcessingStates(actual: List<TaskProcessingStateDto>, expected: List<TaskProcessingStateDto>) {
+    fun assertProcessingStates(actual: List<TaskProcessingStateDtoV6>, expected: List<TaskProcessingStateDtoV6>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(TaskProcessingStateDto::createdAt.name)
-            .ignoringFields(TaskProcessingStateDto::modifiedAt.name)
-            .ignoringFields(TaskProcessingStateDto::timeout.name)
+            .ignoringFields(TaskProcessingStateDtoV6::createdAt.name)
+            .ignoringFields(TaskProcessingStateDtoV6::modifiedAt.name)
+            .ignoringFields(TaskProcessingStateDtoV6::timeout.name)
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
 

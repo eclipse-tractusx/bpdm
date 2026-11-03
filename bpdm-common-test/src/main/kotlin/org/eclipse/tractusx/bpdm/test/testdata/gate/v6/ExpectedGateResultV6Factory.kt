@@ -20,17 +20,17 @@
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.AddressComponentOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerStateOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.LegalEntityRepresentationOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.SiteRepresentationOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -40,9 +40,9 @@ class ExpectedGateResultV6Factory {
 
     private val anyTime = Instant.MIN
 
-    fun buildBusinessPartnerInputCreateResult(request: BusinessPartnerInputRequest): BusinessPartnerInputDto{
+    fun buildBusinessPartnerInputCreateResult(request: BusinessPartnerInputV6Request): BusinessPartnerInputV6Dto{
         return with(request){
-            BusinessPartnerInputDto(
+            BusinessPartnerInputV6Dto(
                 externalId = externalId,
                 nameParts = nameParts,
                 identifiers = identifiers,
@@ -59,12 +59,12 @@ class ExpectedGateResultV6Factory {
         }
     }
 
-    fun buildBusinessPartnerOutput(input: BusinessPartnerInputDto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressInvariantVerboseDto): BusinessPartnerOutputDto{
-        return BusinessPartnerOutputDto(
+    fun buildBusinessPartnerOutput(input: BusinessPartnerInputV6Dto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressInvariantVerboseDto): BusinessPartnerOutputV6Dto{
+        return BusinessPartnerOutputV6Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
-            identifiers = addressGoldenRecord.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, null) },
-            states = addressGoldenRecord.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            identifiers = addressGoldenRecord.identifiers.map { BusinessPartnerIdentifierV6Dto(it.type, it.value, null) },
+            states = addressGoldenRecord.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
             legalEntity = buildLegalEntityRepresentation(goldenRecordLegalEntity.header),
@@ -76,8 +76,8 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    fun buildRelationDto(putRequest: RelationPutEntryV6): RelationDto{
-        return RelationDto(
+    fun buildRelationDto(putRequest: RelationPutV6Entry): RelationV6Dto{
+        return RelationV6Dto(
             externalId = putRequest.externalId,
             relationType = putRequest.relationType,
             businessPartnerSourceExternalId = putRequest.businessPartnerSourceExternalId,
@@ -87,8 +87,8 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    fun buildRelationDto(postRequest: RelationPostRequest): RelationDto{
-        return RelationDto(
+    fun buildRelationDto(postRequest: RelationPostV6Request): RelationV6Dto{
+        return RelationV6Dto(
             externalId = postRequest.externalId!!,
             relationType = postRequest.relationType,
             businessPartnerSourceExternalId = postRequest.businessPartnerSourceExternalId,
@@ -98,31 +98,31 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputDto{
-        return LegalEntityRepresentationOutputDto(
+    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputV6Dto{
+        return LegalEntityRepresentationOutputV6Dto(
             legalEntityBpn = legalEntity.bpnl,
             legalName = legalEntity.legalName,
             shortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
             confidenceCriteria = buildConfidence(legalEntity.confidenceCriteria),
-            states = legalEntity.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = legalEntity.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) }
         )
     }
 
-    private fun buildAddressComponent(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputDto{
-        return AddressComponentOutputDto(
+    private fun buildAddressComponent(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputV6Dto{
+        return AddressComponentOutputV6Dto(
             addressBpn = logisticAddress.bpna,
             name = logisticAddress.name,
             addressType = addressType,
             physicalPostalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
-            states = logisticAddress.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = logisticAddress.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) }
         )
     }
 
-    private fun buildPhysicalAddress(physicalAddress: PhysicalPostalAddressVerboseDto): PhysicalPostalAddressDto{
-        return PhysicalPostalAddressDto(
+    private fun buildPhysicalAddress(physicalAddress: PhysicalPostalAddressVerboseDto): PhysicalPostalAddressV6Dto{
+        return PhysicalPostalAddressV6Dto(
             geographicCoordinates = physicalAddress.geographicCoordinates,
             country = physicalAddress.country,
             administrativeAreaLevel1 = physicalAddress.administrativeAreaLevel1,
@@ -141,8 +141,8 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativePostalAddressDto{
-        return AlternativePostalAddressDto(
+    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativePostalAddressV6Dto{
+        return AlternativePostalAddressV6Dto(
             geographicCoordinates = alternativeAddress.geographicCoordinates,
             country = alternativeAddress.country,
             administrativeAreaLevel1 = alternativeAddress.administrativeAreaLevel1,
@@ -154,8 +154,8 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetDto): StreetDto{
-        return StreetDto(
+    private fun buildStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetDto): StreetV6Dto{
+        return StreetV6Dto(
             name = street.name,
             houseNumber = street.houseNumber,
             houseNumberSupplement = street.houseNumberSupplement,
@@ -168,18 +168,18 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildSiteRepresentation(site: SiteVerboseDto): SiteRepresentationOutputDto {
-        return SiteRepresentationOutputDto(
+    private fun buildSiteRepresentation(site: SiteVerboseDto): SiteRepresentationOutputV6Dto {
+        return SiteRepresentationOutputV6Dto(
             siteBpn = site.bpns,
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
-            states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = site.states.map { BusinessPartnerStateOutputV6Dto(it.validFrom, it.validTo, it.type) }
         )
     }
 
-    private fun buildConfidence(confidence: org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto): ConfidenceCriteriaDto{
+    private fun buildConfidence(confidence: org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto): ConfidenceCriteriaV6Dto{
         return with(confidence){
-            ConfidenceCriteriaDto(
+            ConfidenceCriteriaV6Dto(
                 sharedByOwner = sharedByOwner,
                 checkedByExternalDataSource = checkedByExternalDataSource,
                 numberOfSharingMembers = numberOfSharingMembers,

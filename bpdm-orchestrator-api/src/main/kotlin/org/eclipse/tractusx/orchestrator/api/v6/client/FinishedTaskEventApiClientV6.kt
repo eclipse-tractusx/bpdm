@@ -21,8 +21,8 @@ package org.eclipse.tractusx.orchestrator.api.v6.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.eclipse.tractusx.orchestrator.api.v6.FinishedTaskEventApiV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
@@ -30,8 +30,8 @@ import org.springframework.web.service.annotation.HttpExchange
 import java.time.Instant
 
 @HttpExchange
-interface FinishedTaskEventApiClientV6: FinishedTaskEventApi {
+interface FinishedTaskEventApiClientV6: FinishedTaskEventApiV6 {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/finished-events")
-    override fun getEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponse
+    override fun getEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponseV6
 }

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import java.time.Instant
 
 @Entity
@@ -58,7 +58,7 @@ class LegalEntityDb(
     @CollectionTable(name = "legal_entity_script_variants", joinColumns = [JoinColumn(name = "legal_entity_id")])
     val scriptVariants: MutableList<LegalEntityScriptVariantDb> = mutableListOf(),
 
-) : BaseEntity() {
+) : BaseEntityWithExplicitTimestamps() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<LegalEntityIdentifierDb> = mutableSetOf()
 

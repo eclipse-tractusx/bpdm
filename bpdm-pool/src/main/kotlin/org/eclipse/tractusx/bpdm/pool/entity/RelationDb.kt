@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 
 @Entity
@@ -55,5 +55,4 @@ class RelationDb(
     @ManyToOne
     @JoinColumn(name = "reason_code_id")
     var reasonCode: ReasonCodeDb?
-) : BaseEntity()
-
+) : BaseEntityWithExplicitTimestamps()

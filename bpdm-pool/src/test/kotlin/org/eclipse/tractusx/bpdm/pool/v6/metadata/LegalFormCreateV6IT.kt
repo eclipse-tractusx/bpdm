@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
@@ -107,8 +105,8 @@ class LegalFormCreateV6IT: UnscheduledPoolTestBaseV6(){
             transliteratedName = "$seed ${LegalFormRequestV6::transliteratedName.name}",
             abbreviation = "$seed ${LegalFormRequestV6::abbreviation.name}",
             transliteratedAbbreviations = "$seed ${LegalFormRequestV6::transliteratedAbbreviations.name}",
-            country = CountryCode.DE,
-            language = LanguageCode.de,
+            country = "DE",
+            language = "de",
             administrativeAreaLevel1 = "DE-BW",
             isActive = true
         )

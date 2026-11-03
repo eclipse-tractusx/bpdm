@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -43,8 +44,8 @@ class AddressResponseMapperV6(
             bpna = address.bpn,
             bpnLegalEntity = address.legalEntity?.bpn,
             bpnSite = address.mainSite?.bpn,
-            createdAt = address.createdAt,
-            updatedAt = address.updatedAt,
+            createdAt = address.createdAt.instant,
+            updatedAt = address.updatedAt.instant,
             name = address.name,
             states = address.states.map { toState(it) },
             identifiers = address.identifiers.map { toIdentifier(it) },
@@ -66,7 +67,11 @@ class AddressResponseMapperV6(
         )
 
     private fun toState(state: AddressStateDb): AddressStateVerboseDtoV6 =
-        AddressStateVerboseDtoV6(state.validFrom, state.validTo, state.type.toDto())
+        AddressStateVerboseDtoV6(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 
     private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseDtoV6 =
         AddressIdentifierVerboseDtoV6(identifier.value, TypeKeyNameVerboseDto(identifier.type.technicalKey, identifier.type.name))
@@ -75,7 +80,7 @@ class AddressResponseMapperV6(
         with(address) {
             PhysicalPostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = country.toDto(),
+                countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { toRegion(it) },
                 administrativeAreaLevel2 = administrativeAreaLevel2,
                 administrativeAreaLevel3 = administrativeAreaLevel3,
@@ -96,7 +101,7 @@ class AddressResponseMapperV6(
         with(address) {
             AlternativePostalAddressVerboseDtoV6(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = country.toDto(),
+                countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { toRegion(it) },
                 postalCode = postCode,
                 city = city,
@@ -107,7 +112,7 @@ class AddressResponseMapperV6(
         }
 
     private fun toRegion(region: RegionDb): RegionDtoV6 =
-        RegionDtoV6(region.countryCode, region.regionCode, region.regionName)
+        RegionDtoV6(region.country.countryCode, region.regionCode, region.regionName)
 
     private fun toGeoCoordinate(coordinate: GeographicCoordinateDb): GeoCoordinateDto =
         GeoCoordinateDto(coordinate.longitude, coordinate.latitude, coordinate.altitude)

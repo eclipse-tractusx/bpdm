@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 
 @Embeddable
@@ -30,9 +29,9 @@ class PhysicalPostalAddressDb(
     @AttributeOverride(name = "altitude", column = Column(name = "phy_altitude"))
     val geographicCoordinates: GeographicCoordinateDb?,
 
-    @Column(name = "phy_country")
-    @Enumerated(EnumType.STRING)
-    val country: CountryCode,
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "phy_country_id", nullable = false)
+    val country: CountryDb,
 
     /**
      * Region within the country

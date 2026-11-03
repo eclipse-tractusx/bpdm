@@ -19,9 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
@@ -60,6 +65,65 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.SharedByOwnerConfidence))
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator creates a legal entity with a state that has neither start nor end date
+     * THEN created legal entity reports that state from the earliest to the latest date
+     */
+    @Test
+    fun `create legal entity with state without start and end date`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
+            .withStates(LegalEntityStateDto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val openState = LegalEntityStateVerboseDto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
+        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence).withStates(openState))
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator creates a legal entity with a state starting before the earliest date and ending after the latest date
+     * THEN created legal entity reports that state from the earliest to the latest date
+     */
+    @Test
+    fun `create legal entity with state dates beyond the earliest and latest date`(){
+        //WHEN
+        val beforeEarliest = BusinessStateDates.EARLIEST.minusYears(100)
+        val afterLatest = BusinessStateDates.LATEST.plusNanos(500_000_000)
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
+            .withStates(LegalEntityStateDto(validFrom = beforeEarliest, validTo = afterLatest, type = BusinessStateType.ACTIVE))
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val openState = LegalEntityStateVerboseDto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
+        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence).withStates(openState))
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator creates a legal entity with a state starting on the latest date and ending on the earliest date
+     * THEN created legal entity reports that state with exactly these dates
+     */
+    @Test
+    fun `create legal entity with state starting on the latest and ending on the earliest date`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
+            .withStates(LegalEntityStateDto(validFrom = BusinessStateDates.LATEST, validTo = BusinessStateDates.EARLIEST, type = BusinessStateType.ACTIVE))
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val reversedState = LegalEntityStateVerboseDto(BusinessStateDates.LATEST, BusinessStateDates.EARLIEST, BusinessStateType.ACTIVE.toDto())
+        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence).withStates(reversedState))
         val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)

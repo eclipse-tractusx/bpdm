@@ -88,7 +88,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagClient)
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/result-state/search", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"])
     fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse
 
     @Operation(

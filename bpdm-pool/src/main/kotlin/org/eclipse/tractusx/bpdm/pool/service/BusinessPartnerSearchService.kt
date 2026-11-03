@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -33,6 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 
 /**
@@ -47,6 +49,7 @@ class BusinessPartnerSearchService(
      * @see searchBusinessPartner
      *
      */
+    @Transactional(readOnly = true)
     override fun searchBusinessPartner(
         searchRequest: LegalEntityPropertiesSearchRequest,
         searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
@@ -92,6 +95,9 @@ class BusinessPartnerSearchService(
             pageable
         )
 
+        if (matchedAddress.hasContent()) {
+            logisticAddressRepository.joinCountries(matchedAddress.content.toSet())
+        }
         results.addAll(matchedAddress.map{ searchAddressResultMapping(it) })
 
         return PageDto(
@@ -138,8 +144,8 @@ class BusinessPartnerSearchService(
         val states: List<BusinessPartnerStateDto> =
             legalEntity.states.map { state ->
                 BusinessPartnerStateDto(
-                    validTo = state.validTo,
-                    validFrom = state.validFrom,
+                    validTo = BusinessStateDates.reportValidTo(state.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(state.validFrom),
                     type = state.type
                 )
             }
@@ -169,8 +175,8 @@ class BusinessPartnerSearchService(
             },
             states = legalEntity.states.map {
                 BusinessPartnerStateDto(
-                    validTo = it.validTo,
-                    validFrom = it.validFrom,
+                    validTo = BusinessStateDates.reportValidTo(it.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                     type = it.type
                 )
             }
@@ -192,8 +198,8 @@ class BusinessPartnerSearchService(
                 },
                 states = site.states.map {
                     BusinessPartnerStateDto(
-                        validTo = it.validTo,
-                        validFrom = it.validFrom,
+                        validTo = BusinessStateDates.reportValidTo(it.validTo),
+                        validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                         type = it.type
                     )
                 }
@@ -223,8 +229,8 @@ class BusinessPartnerSearchService(
             addressBpn = result.bpn,
             states = result.states.map {
                 BusinessPartnerStateDto(
-                    validTo = it.validTo,
-                    validFrom = it.validFrom,
+                    validTo = BusinessStateDates.reportValidTo(it.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                     type = it.type
                 )
             },
@@ -241,7 +247,7 @@ class BusinessPartnerSearchService(
                 street = streetDto,
                 postalCode = physical.postCode,
                 city = physical.city,
-                country = physical.country,
+                country = physical.country.countryCode,
                 district = physical.districtLevel1,
                 companyPostalCode = physical.companyPostCode,
                 industrialZone = physical.industrialZone,
@@ -257,8 +263,8 @@ class BusinessPartnerSearchService(
                         latitude = it.latitude,
                         altitude = it.altitude
                     )},
-                country = alternative?.country,
-                administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.countryCode?.name,
+                country = alternative?.country?.countryCode,
+                administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.regionCode,
                 postalCode = alternative?.postCode,
                 city = alternative?.city,
                 deliveryServiceType =  alternative?.deliveryServiceType,

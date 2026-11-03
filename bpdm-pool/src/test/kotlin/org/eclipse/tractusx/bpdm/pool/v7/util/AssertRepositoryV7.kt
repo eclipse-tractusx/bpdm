@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.util
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
@@ -33,11 +35,38 @@ import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.Instant
 import java.time.LocalDateTime
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class AssertRepositoryV7(
     instantSecondsComparator: InstantSecondsComparator,
     localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
 ) {
+
+    fun assertCountryPage(actual: PageDto<CountryDto>, page: Int, pageSize: Int) {
+        Assertions.assertThat(actual.page).isEqualTo(page)
+        Assertions.assertThat(actual.totalElements).isGreaterThan((page * pageSize).toLong())
+        Assertions.assertThat(actual.totalPages).isEqualTo(((actual.totalElements + pageSize - 1) / pageSize).toInt())
+        val expectedSize = minOf(pageSize.toLong(), actual.totalElements - page.toLong() * pageSize).toInt()
+        Assertions.assertThat(actual.contentSize).isEqualTo(expectedSize)
+        Assertions.assertThat(actual.content).hasSize(expectedSize)
+        Assertions.assertThat(actual.content.map { it.countryCode }).isSorted()
+    }
+
+    fun assertCountryCatalog(actual: Collection<CountryDto>, expectedCountry: CountryDto) {
+        Assertions.assertThat(actual).contains(expectedCountry)
+        Assertions.assertThat(actual).allSatisfy {
+            Assertions.assertThat(it.countryCode).isNotBlank()
+            Assertions.assertThat(it.name).isNotBlank()
+        }
+    }
+
+    fun assertFieldQualityRules(actual: Collection<FieldQualityRuleDto>, expected: Collection<FieldQualityRuleDto>) {
+        Assertions.assertThat(actual).containsExactlyInAnyOrderElementsOf(expected)
+    }
+
+    fun assertNotFound(actual: WebClientResponseException.NotFound, expectedDetail: String) {
+        Assertions.assertThat(actual.responseBodyAsString).contains(expectedDetail)
+    }
 
     val comparisonConfigurationForCreated: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
         .withIgnoredFieldsMatchingRegexes(
@@ -69,6 +98,13 @@ class AssertRepositoryV7(
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
+    private val comparisonConfigurationForRead: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withIgnoredFieldsMatchingRegexes(".*errors.message", ".*currentness", ".*bpnSite")
+        .withIgnoreCollectionOrder(false)
+        .withComparatorForType(Comparator.naturalOrder<Instant>(), Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
     fun assertLegalEntityCreateResponseWrapperIsEqual(actual: LegalEntityPartnerCreateResponseWrapper, expected: LegalEntityPartnerCreateResponseWrapper){
         Assertions.assertThat(actual.sortContent())
             .usingRecursiveComparison(comparisonConfigurationForCreated)
@@ -79,17 +115,23 @@ class AssertRepositoryV7(
         Assertions.assertThat(actual.sortContent())
             .usingRecursiveComparison(comparisonConfigurationForExisting)
             .isEqualTo(expected.sortContent())
+        val expectedByBpn = expected.entities.associateBy { it.legalEntity.header.bpnl }
+        actual.entities.forEach {
+            val previous = expectedByBpn.getValue(it.legalEntity.header.bpnl).legalEntity
+            assertUpdatedTimestamps(it.legalEntity.header.createdAt, it.legalEntity.header.updatedAt, previous.header.createdAt, previous.header.updatedAt)
+            assertUpdatedTimestamps(it.legalEntity.legalAddress.createdAt, it.legalEntity.legalAddress.updatedAt, previous.legalAddress.createdAt, previous.legalAddress.updatedAt)
+        }
     }
 
     fun assertLegalEntitySearchResponse(actual: PageDto<LegalEntityWithLegalAddressVerboseDto>, expected: PageDto<LegalEntityWithLegalAddressVerboseDto>){
         Assertions.assertThat(actual.sortLegalEntityWithAddress())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortLegalEntityWithAddress())
     }
 
     fun assertLegalEntityWithLegalAddressIsEqual(actual: LegalEntityWithLegalAddressVerboseDto, expected: LegalEntityWithLegalAddressVerboseDto){
         Assertions.assertThat(actual.sortContent())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortContent())
     }
 
@@ -101,7 +143,7 @@ class AssertRepositoryV7(
 
     fun assertSiteSearchResponse(actual: PageDto<SiteWithMainAddressVerboseDto>, expected: PageDto<SiteWithMainAddressVerboseDto>){
         Assertions.assertThat(actual.sortSiteWithAddress())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortSiteWithAddress())
     }
 
@@ -109,17 +151,23 @@ class AssertRepositoryV7(
         Assertions.assertThat(actual.sortContent())
             .usingRecursiveComparison(comparisonConfigurationForExisting)
             .isEqualTo(expected.sortContent())
+        val expectedByBpn = expected.entities.associateBy { it.site.bpns }
+        actual.entities.forEach {
+            val previous = expectedByBpn.getValue(it.site.bpns)
+            assertUpdatedTimestamps(it.site.createdAt, it.site.updatedAt, previous.site.createdAt, previous.site.updatedAt)
+            assertUpdatedTimestamps(it.mainAddress.createdAt, it.mainAddress.updatedAt, previous.mainAddress.createdAt, previous.mainAddress.updatedAt)
+        }
     }
 
     fun assertSiteGetIsEqual(actual: SiteWithMainAddressVerboseDto, expected: SiteWithMainAddressVerboseDto){
         Assertions.assertThat(actual.sortContent())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortContent())
     }
 
     fun assertLegalEntitySitesResponse(actual: PageDto<SiteVerboseDto>, expected: PageDto<SiteVerboseDto>){
         Assertions.assertThat(actual.sortSite())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortSite())
     }
 
@@ -133,23 +181,28 @@ class AssertRepositoryV7(
         Assertions.assertThat(actual.sortContent())
             .usingRecursiveComparison(comparisonConfigurationForExisting)
             .isEqualTo(expected.sortContent())
+        val expectedByBpn = expected.entities.associateBy { it.address.bpna }
+        actual.entities.forEach {
+            val previous = expectedByBpn.getValue(it.address.bpna).address
+            assertUpdatedTimestamps(it.address.createdAt, it.address.updatedAt, previous.createdAt, previous.updatedAt)
+        }
     }
 
     fun assertAddressSearch(actual: PageDto<LogisticAddressVerboseDto>, expected: PageDto<LogisticAddressVerboseDto>){
         Assertions.assertThat(actual.sortLogisticAddress())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortLogisticAddress())
     }
 
     fun assertAddressGet(actual: LogisticAddressVerboseDto, expected: LogisticAddressVerboseDto){
         Assertions.assertThat(actual.sortContent())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortContent())
     }
 
     fun assertParticipantAddressSearch(actual: PageDto<LogisticAddressInvariantVerboseDto>, expected: PageDto<LogisticAddressInvariantVerboseDto>){
         Assertions.assertThat(actual.sortLogisticAddressInvariant())
-            .usingRecursiveComparison(comparisonConfigurationForExisting)
+            .usingRecursiveComparison(comparisonConfigurationForRead)
             .isEqualTo(expected.sortLogisticAddressInvariant())
     }
 
@@ -167,6 +220,11 @@ class AssertRepositoryV7(
     fun assertSiteScriptVariantsCleared(actual: SiteWithMainAddressVerboseDto, previousScriptVariants: Collection<SiteScriptVariantDto>){
         Assertions.assertThat(previousScriptVariants).isNotEmpty()
         Assertions.assertThat(actual.site.scriptVariants).isEmpty()
+    }
+
+    private fun assertUpdatedTimestamps(createdAt: Instant, updatedAt: Instant, previousCreatedAt: Instant, previousUpdatedAt: Instant) {
+        Assertions.assertThat(createdAt).isEqualTo(previousCreatedAt)
+        Assertions.assertThat(updatedAt).isAfter(previousUpdatedAt)
     }
 
     private fun LegalEntityPartnerCreateResponseWrapper.sortContent() =

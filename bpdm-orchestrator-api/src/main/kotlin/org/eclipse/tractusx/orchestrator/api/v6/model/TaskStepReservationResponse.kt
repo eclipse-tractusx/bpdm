@@ -24,10 +24,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
 @Schema(description = "Response object for giving a list of reserved tasks")
-data class TaskStepReservationResponse(
+data class TaskStepReservationResponseV6(
 
     @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
-    val reservedTasks: List<TaskStepReservationEntryDto>,
+    val reservedTasks: List<TaskStepReservationEntryDtoV6>,
 
     @get:Schema(description = "The timestamp until the reservation is valid and results are accepted", deprecated = true)
     val timeout: Instant

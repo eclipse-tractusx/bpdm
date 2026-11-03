@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
@@ -50,6 +51,7 @@ class ScriptVariantCoverageService(
         if (uncovered.isEmpty()) return false
 
         legalEntity.scriptVariants.removeAll(uncovered)
+        legalEntity.updatedAt = DbTimestamp.now()
         legalEntityRepository.save(legalEntity)
         logger.debug {
             "Removed script variants of legal entity '${legalEntity.bpn}' that its legal address does not cover: " +

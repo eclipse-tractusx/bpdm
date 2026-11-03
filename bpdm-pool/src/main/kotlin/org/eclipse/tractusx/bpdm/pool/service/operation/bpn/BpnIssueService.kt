@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.bpn
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntryDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpnInvalidCounterValueException
@@ -82,6 +83,7 @@ class BpnIssueService(
             }
 
         counterEntry.value = (startCounter + count).toString()
+        counterEntry.updatedAt = DbTimestamp.now()
         configurationEntryRepository.save(counterEntry)
 
         logger.debug { "Created BPNs: ${createdBpns.joinToString()}" }

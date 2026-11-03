@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponse
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -39,12 +39,12 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask = testDataClient.createTask(testName)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = createdTask.processingState.step)
+        val reservationRequest = TaskStepReservationRequestV6(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
         val expectedEntry = expectedResultFactory.buildTaskStepReservationEntry(createdTask.businessPartnerResult)
-        val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(expectedResultFactory.pendingTimeout))
+        val expectedResult = TaskStepReservationResponseV6(listOf(expectedEntry), Instant.now().plus(expectedResultFactory.pendingTimeout))
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
@@ -56,11 +56,11 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `reserve no queued tasks`(){
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = TaskStep.CleanAndSync)
+        val reservationRequest = TaskStepReservationRequestV6(step = TaskStepV6.CleanAndSync)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationResponseV6(emptyList(), Instant.now())
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
@@ -75,11 +75,11 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask = testDataClient.createTask(testName)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = getDifferentStep(createdTask.processingState.step))
+        val reservationRequest = TaskStepReservationRequestV6(step = getDifferentStep(createdTask.processingState.step))
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationResponseV6(emptyList(), Instant.now())
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
@@ -95,15 +95,15 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
         testDataClient.reserveTasks(createdTask.processingState.step)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = createdTask.processingState.step)
+        val reservationRequest = TaskStepReservationRequestV6(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationResponseV6(emptyList(), Instant.now())
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
-    private fun getDifferentStep(step: TaskStep): TaskStep {
-        return TaskStep.entries.find { it != step }!!
+    private fun getDifferentStep(step: TaskStepV6): TaskStepV6 {
+        return TaskStepV6.entries.find { it != step }!!
     }
 }

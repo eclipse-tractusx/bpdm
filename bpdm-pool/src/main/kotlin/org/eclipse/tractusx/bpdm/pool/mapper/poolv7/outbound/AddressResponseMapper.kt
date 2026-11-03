@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
@@ -55,8 +57,8 @@ class AddressResponseMapper(
             bpnLegalEntity = address.legalEntity?.bpn,
             bpnSite = address.mainSite?.bpn,
             additionalSites = address.additionalSites.map { it.bpn },
-            createdAt = address.createdAt,
-            updatedAt = address.updatedAt,
+            createdAt = address.createdAt.instant,
+            updatedAt = address.updatedAt.instant,
             name = address.name,
             states = address.states.map { toState(it) },
             identifiers = address.identifiers.map { toIdentifier(it) },
@@ -101,7 +103,11 @@ class AddressResponseMapper(
         scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode.technicalKey, toPostalAddressScriptVariant(it)) }
 
     private fun toState(state: AddressStateDb): AddressStateVerboseDto =
-        AddressStateVerboseDto(state.validFrom, state.validTo, state.type.toDto())
+        AddressStateVerboseDto(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 
     private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseDto =
         AddressIdentifierVerboseDto(identifier.value, identifierTypeResponseMapper.toTypeKeyName(identifier.type))
@@ -110,10 +116,10 @@ class AddressResponseMapper(
         with(address) {
             PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = country.toDto(),
+                countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 postalCode = postCode,
                 city = city,
-                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
+                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.country.countryCode, it.regionCode, it.regionName) },
                 administrativeAreaLevel2 = administrativeAreaLevel2,
                 administrativeAreaLevel3 = administrativeAreaLevel3,
                 district = districtLevel1,
@@ -131,10 +137,10 @@ class AddressResponseMapper(
         with(address) {
             AlternativePostalAddressVerboseDto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
-                countryVerbose = country.toDto(),
+                countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 postalCode = postCode,
                 city = city,
-                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
+                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.country.countryCode, it.regionCode, it.regionName) },
                 deliveryServiceType = deliveryServiceType,
                 deliveryServiceNumber = deliveryServiceNumber,
                 deliveryServiceQualifier = deliveryServiceQualifier

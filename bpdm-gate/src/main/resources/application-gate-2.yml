@@ -25,7 +25,7 @@
 # both members reflecting each other's master data changes, and the sharing member count of the
 # golden record rising. One Gate cannot stand in for two: it keeps the members' data apart by the
 # BPNL in the token, but decides which of its records count towards a golden record's sharing member
-# count across all of them (see GoldenRecordCountedService), so a second member inside the same Gate
+# count across all of them (see GoldenRecordCountedOperationService), so a second member inside the same Gate
 # would not be counted.
 #
 # The database is a separate one, created by docker/compose/dependencies/postgres-init.sh.

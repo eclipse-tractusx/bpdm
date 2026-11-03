@@ -19,17 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AddressRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.LegalEntityRepresentationInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -38,13 +37,13 @@ import kotlin.random.Random
 class BusinessPartnerInputRequestV7Factory(
     val testMetadata: GateTestMetadataV7
 ) {
-    fun fromSeed(seed: String): BusinessPartnerInputRequest = SeededCreator(seed).create()
+    fun fromSeed(seed: String): BusinessPartnerInputV7Request = SeededCreator(seed).create()
 
     private inner class SeededCreator(private val seed: String) {
 
         private val random = Random(seed.hashCode())
 
-        fun create(): BusinessPartnerInputRequest = BusinessPartnerInputRequest(
+        fun create(): BusinessPartnerInputV7Request = BusinessPartnerInputV7Request(
             externalId = seed,
             nameParts = (1..2).map { "Name Part $it $seed" },
             identifiers = createIdentifiers(),
@@ -58,26 +57,26 @@ class BusinessPartnerInputRequestV7Factory(
             scriptVariants = createScriptVariants()
         )
 
-        private fun createIdentifiers(): List<BusinessPartnerIdentifierDto> =
+        private fun createIdentifiers(): List<BusinessPartnerIdentifierV7Dto> =
             testMetadata.identifierTypes.shuffled(random).take(2).mapIndexed { i, type ->
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerIdentifierV7Dto(
                     type = type,
                     value = "Identifier Value ${i + 1} $seed",
                     issuingBody = "Issuing Body ${i + 1} $seed"
                 )
             }
 
-        private fun createStates(): List<BusinessPartnerStateDto> =
+        private fun createStates(): List<BusinessPartnerStateV7Dto> =
             (1..2).map {
-                BusinessPartnerStateDto(
+                BusinessPartnerStateV7Dto(
                     validFrom = randomLocalDateTime(2000, 2015),
                     validTo = randomLocalDateTime(2016, 2030),
                     type = BusinessStateType.entries.random(random)
                 )
             }
 
-        private fun createLegalEntity(): LegalEntityRepresentationInputDto =
-            LegalEntityRepresentationInputDto(
+        private fun createLegalEntity(): LegalEntityRepresentationInputV7Dto =
+            LegalEntityRepresentationInputV7Dto(
                 legalEntityBpn = "BPNL $seed",
                 legalName = "Legal Name $seed",
                 shortName = "Short Name $seed",
@@ -85,15 +84,15 @@ class BusinessPartnerInputRequestV7Factory(
                 states = createStates()
             )
 
-        private fun createSite(): SiteRepresentationInputDto =
-            SiteRepresentationInputDto(
+        private fun createSite(): SiteRepresentationInputV7Dto =
+            SiteRepresentationInputV7Dto(
                 siteBpn = "BPNS $seed",
                 name = "Site Name $seed",
                 states = createStates()
             )
 
-        private fun createAddress(): AddressRepresentationInputDto =
-            AddressRepresentationInputDto(
+        private fun createAddress(): AddressRepresentationInputV7Dto =
+            AddressRepresentationInputV7Dto(
                 addressBpn = "BPNA $seed",
                 name = "Address Name $seed",
                 addressType = AddressType.entries.random(random),
@@ -102,21 +101,21 @@ class BusinessPartnerInputRequestV7Factory(
                 states = createStates()
             )
 
-        private fun createPhysicalAddress(): PhysicalPostalAddressDto =
-            PhysicalPostalAddressDto(
+        private fun createPhysicalAddress(): PhysicalPostalAddressV7Dto =
+            PhysicalPostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(
                     longitude = random.nextDouble(-180.0, 180.0),
                     latitude = random.nextDouble(-90.0, 90.0),
                     altitude = random.nextDouble(0.0, 5000.0)
                 ),
-                country = CountryCode.entries.random(random),
+                country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 district = "District $seed",
-                street = StreetDto(
+                street = StreetV7Dto(
                     namePrefix = "Name Prefix $seed",
                     additionalNamePrefix = "Additional Name Prefix $seed",
                     name = "Street Name $seed",
@@ -135,14 +134,14 @@ class BusinessPartnerInputRequestV7Factory(
                 taxJurisdictionCode = random.nextInt(100, 1000).toString()
             )
 
-        private fun createAlternativeAddress(): AlternativePostalAddressDto =
-            AlternativePostalAddressDto(
+        private fun createAlternativeAddress(): AlternativePostalAddressV7Dto =
+            AlternativePostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(
                     longitude = random.nextDouble(-180.0, 180.0),
                     latitude = random.nextDouble(-90.0, 90.0),
                     altitude = random.nextDouble(0.0, 5000.0)
                 ),
-                country = CountryCode.entries.random(random),
+                country = getCountryReference(),
                 administrativeAreaLevel1 = testMetadata.adminAreas.random(random),
                 postalCode = "Alt Postal Code $seed",
                 city = "Alt City $seed",
@@ -151,25 +150,28 @@ class BusinessPartnerInputRequestV7Factory(
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             )
 
-        private fun createScriptVariants(): List<BusinessPartnerScriptVariantDto> =
+        private fun getCountryReference(): String =
+            testMetadata.countries.random(random)
+
+        private fun createScriptVariants(): List<BusinessPartnerScriptVariantV7Dto> =
             testMetadata.scriptVariants.shuffled(random).take(2).mapIndexed { idx, scriptCode ->
                 val i = idx + 1
-                BusinessPartnerScriptVariantDto(
+                BusinessPartnerScriptVariantV7Dto(
                     scriptCode = scriptCode,
                     nameParts = (1..2).map { "Name Part Variant $it $i $seed" },
-                    legalEntity = LegalEntityScriptVariantDto(
+                    legalEntity = LegalEntityScriptVariantV7Dto(
                         legalName = "Legal Name Variant $i $seed",
                         shortName = "Short Name Variant $i $seed"
                     ),
-                    site = SiteScriptVariantDto(
+                    site = SiteScriptVariantV7Dto(
                         name = "Site Name Variant $i $seed"
                     ),
-                    address = AddressScriptVariantDto(
+                    address = AddressScriptVariantV7Dto(
                         name = "Address Name Variant $i $seed",
-                        physicalAddress = PhysicalAddressScriptVariantDto(
+                        physicalAddress = PhysicalAddressScriptVariantV7Dto(
                             city = "City Variant $i $seed",
                             district = "District Variant $i $seed",
-                            street = StreetScriptVariantDto(
+                            street = StreetScriptVariantV7Dto(
                                 name = "Street Name Variant $i $seed",
                                 direction = "Direction Variant $i $seed"
                             ),
@@ -178,7 +180,7 @@ class BusinessPartnerInputRequestV7Factory(
                             floor = "Floor Variant $i $seed",
                             door = "Door Variant $i $seed"
                         ),
-                        alternativeAddress = AlternativeAddressScriptVariantDto(
+                        alternativeAddress = AlternativeAddressScriptVariantV7Dto(
                             city = "Alt City Variant $i $seed"
                         )
                     )

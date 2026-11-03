@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.test.testdata.pool.common.latestSeededStateSecond
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.common.BusinessPartnerCommonRequestFactory
@@ -67,7 +68,7 @@ class BusinessPartnerRequestFactory(
 
 
     fun createLegalEntityHeaderDto(seed: String, random: Random =  Random(seed.hashCode().toLong()), isCatenaXMemberData: Boolean = true): LegalEntityHeaderDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return LegalEntityHeaderDto(
             legalName = "Legal Name $seed",

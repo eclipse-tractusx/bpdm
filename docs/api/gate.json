@@ -30,7 +30,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationPutRequest"
+                "$ref" : "#/components/schemas/RelationPutV7Request"
               }
             }
           },
@@ -42,7 +42,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/RelationPutResponse"
+                  "$ref" : "#/components/schemas/RelationPutV7Response"
                 }
               }
             }
@@ -52,7 +52,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
+                  "$ref" : "#/components/schemas/GateErrorV7Response"
                 }
               }
             }
@@ -60,7 +60,7 @@
         }
       }
     },
-    "/v6/input/business-partners" : {
+    "/v7/input/business-partners" : {
       "put" : {
         "tags" : [ "business-partner-controller" ],
         "summary" : "Create or update business partner with given external ID",
@@ -72,7 +72,7 @@
               "schema" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/BusinessPartnerInputRequest"
+                  "$ref" : "#/components/schemas/BusinessPartnerInputV7Request"
                 }
               }
             }
@@ -87,7 +87,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                    "$ref" : "#/components/schemas/BusinessPartnerInputV7Dto"
                   }
                 }
               }
@@ -99,7 +99,7 @@
         }
       }
     },
-    "/v7/input/business-partners" : {
+    "/v6/input/business-partners" : {
       "put" : {
         "tags" : [ "business-partner-controller" ],
         "summary" : "Create or update business partner with given external ID",
@@ -111,7 +111,7 @@
               "schema" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/BusinessPartnerInputRequest"
+                  "$ref" : "#/components/schemas/BusinessPartnerInputV6Request"
                 }
               }
             }
@@ -126,7 +126,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                    "$ref" : "#/components/schemas/BusinessPartnerInputV6Dto"
                   }
                 }
               }
@@ -257,7 +257,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationPutEntryV6"
+                "$ref" : "#/components/schemas/RelationPutV6Entry"
               }
             }
           },
@@ -279,7 +279,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
+                  "$ref" : "#/components/schemas/GateErrorV6Response"
                 }
               }
             }
@@ -295,7 +295,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationPostRequest"
+                "$ref" : "#/components/schemas/RelationPostV6Request"
               }
             }
           },
@@ -317,7 +317,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
+                  "$ref" : "#/components/schemas/GateErrorV6Response"
                 }
               }
             }
@@ -327,7 +327,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
+                  "$ref" : "#/components/schemas/GateErrorV6Response"
                 }
               }
             }
@@ -358,7 +358,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
+                  "$ref" : "#/components/schemas/GateErrorV6Response"
                 }
               }
             }
@@ -398,7 +398,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationOutputSearchRequest"
+                "$ref" : "#/components/schemas/RelationOutputSearchV7Request"
               }
             }
           }
@@ -409,7 +409,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationOutputDto"
+                  "$ref" : "#/components/schemas/PageDtoRelationOutputV7Dto"
                 }
               }
             }
@@ -449,7 +449,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+                "$ref" : "#/components/schemas/ChangelogSearchV7Request"
               }
             }
           },
@@ -461,7 +461,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                  "$ref" : "#/components/schemas/PageChangeLogV7DtoChangelogGateV7Dto"
                 }
               }
             }
@@ -518,7 +518,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerOutputDto"
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerOutputV7Dto"
                 }
               }
             }
@@ -529,7 +529,7 @@
         }
       }
     },
-    "/v6/output/changelog/search" : {
+    "/v7/output/business-partners/changelog/search" : {
       "post" : {
         "tags" : [ "changelog-controller" ],
         "summary" : "Returns changelog entries for changes to the business partner output stage",
@@ -561,7 +561,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+                "$ref" : "#/components/schemas/ChangelogSearchV7Request"
               }
             }
           },
@@ -573,62 +573,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/v7/output/business-partners/changelog/search" : {
-      "post" : {
-        "tags" : [ "changelog-controller" ],
-        "summary" : "Returns changelog entries for changes to the business partner output stage",
-        "description" : "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getOutputChangelog_2",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "default" : "0",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "default" : "10",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "The changelog entries for the specified parameters",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                  "$ref" : "#/components/schemas/PageChangeLogV7DtoChangelogGateV7Dto"
                 }
               }
             }
@@ -671,7 +616,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationSearchRequest"
+                "$ref" : "#/components/schemas/RelationSearchV7Request"
               }
             }
           }
@@ -682,7 +627,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                  "$ref" : "#/components/schemas/PageDtoRelationV7Dto"
                 }
               }
             }
@@ -722,7 +667,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+                "$ref" : "#/components/schemas/ChangelogSearchV7Request"
               }
             }
           },
@@ -734,7 +679,121 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                  "$ref" : "#/components/schemas/PageChangeLogV7DtoChangelogGateV7Dto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/input/partner-upload-process" : {
+      "post" : {
+        "tags" : [ "partner-upload-controller" ],
+        "summary" : "Create or update business partners from uploaded CSV file",
+        "description" : "Create or update generic business partners. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a requested file. ",
+        "operationId" : "uploadPartnerCsvFile",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                },
+                "required" : [ "file" ]
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Business partners were successfully updated or created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BusinessPartnerInputV7Dto"
+                  }
+                }
+              },
+              "multipart/form-data" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BusinessPartnerInputV7Dto"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed Business partner upload request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GateErrorV7Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/input/business-partners/search" : {
+      "post" : {
+        "tags" : [ "business-partner-controller" ],
+        "summary" : "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
+        "description" : "Get page of business partners filtered by a collection of external IDs.",
+        "operationId" : "getBusinessPartnersInput",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "0",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "10",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The requested page of busines partners",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerInputV7Dto"
                 }
               }
             }
@@ -777,7 +836,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+                "$ref" : "#/components/schemas/ChangelogSearchV7Request"
               }
             }
           },
@@ -789,7 +848,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                  "$ref" : "#/components/schemas/PageChangeLogV7DtoChangelogGateV7Dto"
                 }
               }
             }
@@ -800,12 +859,64 @@
         }
       }
     },
-    "/v6/input/changelog/search" : {
+    "/v7/business-partners/sharing-state/ready" : {
+      "post" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Sets the given business partners into ready to be shared state",
+        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
+        "operationId" : "postSharingStateReady",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostSharingStateReadyV7Request"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "All business partners put in ready to be shared state"
+          },
+          "400" : {
+            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
+          }
+        }
+      }
+    },
+    "/v6/sharing-state/ready" : {
+      "post" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Sets the given business partners into ready to be shared state",
+        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
+        "operationId" : "postSharingStateReady_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostSharingStateReadyV6Request"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "All business partners put in ready to be shared state"
+          },
+          "400" : {
+            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
+          }
+        }
+      }
+    },
+    "/v6/output/changelog/search" : {
       "post" : {
         "tags" : [ "changelog-controller" ],
-        "summary" : "Returns changelog entries for changes to the business partner input stage",
-        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getInputChangelog_2",
+        "summary" : "Returns changelog entries for changes to the business partner output stage",
+        "description" : "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId" : "getOutputChangelog_2",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -832,7 +943,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+                "$ref" : "#/components/schemas/ChangelogSearchV6Request"
               }
             }
           },
@@ -844,65 +955,13 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                  "$ref" : "#/components/schemas/PageChangeLogV6DtoChangelogGateV6Dto"
                 }
               }
             }
           },
           "400" : {
             "description" : "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/v7/business-partners/sharing-state/ready" : {
-      "post" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Sets the given business partners into ready to be shared state",
-        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
-        "operationId" : "postSharingStateReady",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "204" : {
-            "description" : "All business partners put in ready to be shared state"
-          },
-          "400" : {
-            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
-          }
-        }
-      }
-    },
-    "/v6/sharing-state/ready" : {
-      "post" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Sets the given business partners into ready to be shared state",
-        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
-        "operationId" : "postSharingStateReady_1",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "204" : {
-            "description" : "All business partners put in ready to be shared state"
-          },
-          "400" : {
-            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
           }
         }
       }
@@ -953,7 +1012,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerOutputDto"
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerOutputV6Dto"
                 }
               }
             }
@@ -965,63 +1024,6 @@
       }
     },
     "/v6/input/partner-upload-process" : {
-      "post" : {
-        "tags" : [ "partner-upload-controller" ],
-        "summary" : "Create or update business partners from uploaded CSV file",
-        "description" : "Create or update generic business partners. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a requested file. ",
-        "operationId" : "uploadPartnerCsvFile",
-        "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "type" : "object",
-                "properties" : {
-                  "file" : {
-                    "type" : "string",
-                    "format" : "binary"
-                  }
-                },
-                "required" : [ "file" ]
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "Business partners were successfully updated or created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
-                  }
-                }
-              },
-              "multipart/form-data" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
-                  }
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed Business partner upload request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/input/partner-upload-process" : {
       "post" : {
         "tags" : [ "partner-upload-controller" ],
         "summary" : "Create or update business partners from uploaded CSV file",
@@ -1051,7 +1053,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                    "$ref" : "#/components/schemas/BusinessPartnerInputV6Dto"
                   }
                 }
               },
@@ -1059,7 +1061,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                    "$ref" : "#/components/schemas/BusinessPartnerInputV6Dto"
                   }
                 }
               }
@@ -1070,7 +1072,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GateErrorResponse"
+                  "$ref" : "#/components/schemas/GateErrorV6Response"
                 }
               }
             }
@@ -1078,12 +1080,12 @@
         }
       }
     },
-    "/v6/input/business-partners/search" : {
+    "/v6/input/changelog/search" : {
       "post" : {
-        "tags" : [ "business-partner-controller" ],
-        "summary" : "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
-        "description" : "Get page of business partners filtered by a collection of external IDs.",
-        "operationId" : "getBusinessPartnersInput",
+        "tags" : [ "changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to the business partner input stage",
+        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId" : "getInputChangelog_2",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1110,21 +1112,19 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "array",
-                "items" : {
-                  "type" : "string"
-                }
+                "$ref" : "#/components/schemas/ChangelogSearchV6Request"
               }
             }
-          }
+          },
+          "required" : true
         },
         "responses" : {
           "200" : {
-            "description" : "The requested page of busines partners",
+            "description" : "The changelog entries for the specified parameters",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerInputDto"
+                  "$ref" : "#/components/schemas/PageChangeLogV6DtoChangelogGateV6Dto"
                 }
               }
             }
@@ -1135,7 +1135,7 @@
         }
       }
     },
-    "/v7/input/business-partners/search" : {
+    "/v6/input/business-partners/search" : {
       "post" : {
         "tags" : [ "business-partner-controller" ],
         "summary" : "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
@@ -1181,13 +1181,94 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerInputDto"
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerInputV6Dto"
                 }
               }
             }
           },
           "400" : {
             "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/stats/{stage}/address-types" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countAddressTypes",
+        "parameters" : [ {
+          "name" : "stage",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "Input", "Output" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsAddressTypesV7Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/stages" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countPartnersPerStage",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsStagesV7Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/sharing-states" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countPartnersBySharingState",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsSharingStatesV7Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/confidence-criteria" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "getConfidenceCriteriaStats",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaV7Response"
+                }
+              }
+            }
           }
         }
       }
@@ -1257,7 +1338,34 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationSharingStateDto"
+                  "$ref" : "#/components/schemas/PageDtoRelationSharingStateV7Dto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/input/partner-upload-template" : {
+      "get" : {
+        "tags" : [ "partner-upload-controller" ],
+        "summary" : "Get CSV template with headers in file",
+        "description" : "Create empty CSV file template including headers.Generated CSV file can later be used for uploading business partner data.",
+        "operationId" : "getPartnerCsvTemplate",
+        "responses" : {
+          "200" : {
+            "description" : "CSV file template generated successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              },
+              "multipart/form-data" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
                 }
               }
             }
@@ -1330,7 +1438,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
+                  "$ref" : "#/components/schemas/PageDtoSharingStateV7Dto"
                 }
               }
             }
@@ -1339,33 +1447,6 @@
       }
     },
     "/v6/stats/{stage}/address-types" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
-        "operationId" : "countAddressTypes",
-        "parameters" : [ {
-          "name" : "stage",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "Input", "Output" ]
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsAddressTypesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/stats/{stage}/address-types" : {
       "get" : {
         "tags" : [ "stats-controller" ],
         "operationId" : "countAddressTypes_1",
@@ -1384,25 +1465,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/StatsAddressTypesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/stats/stages" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
-        "operationId" : "countPartnersPerStage",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsStagesResponse"
+                  "$ref" : "#/components/schemas/StatsAddressTypesV6Response"
                 }
               }
             }
@@ -1420,7 +1483,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/StatsStagesResponse"
+                  "$ref" : "#/components/schemas/StatsStagesV6Response"
                 }
               }
             }
@@ -1431,24 +1494,6 @@
     "/v6/stats/sharing-states" : {
       "get" : {
         "tags" : [ "stats-controller" ],
-        "operationId" : "countPartnersBySharingState",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsSharingStatesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/stats/sharing-states" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
         "operationId" : "countPartnersBySharingState_1",
         "responses" : {
           "200" : {
@@ -1456,7 +1501,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/StatsSharingStatesResponse"
+                  "$ref" : "#/components/schemas/StatsSharingStatesV6Response"
                 }
               }
             }
@@ -1467,24 +1512,6 @@
     "/v6/stats/confidence-criteria" : {
       "get" : {
         "tags" : [ "stats-controller" ],
-        "operationId" : "getConfidenceCriteriaStats",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/stats/confidence-criteria" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
         "operationId" : "getConfidenceCriteriaStats_1",
         "responses" : {
           "200" : {
@@ -1492,7 +1519,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaResponse"
+                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaV6Response"
                 }
               }
             }
@@ -1544,7 +1571,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
+                  "$ref" : "#/components/schemas/PageDtoSharingStateV6Dto"
                 }
               }
             }
@@ -1553,33 +1580,6 @@
       }
     },
     "/v6/input/partner-upload-template" : {
-      "get" : {
-        "tags" : [ "partner-upload-controller" ],
-        "summary" : "Get CSV template with headers in file",
-        "description" : "Create empty CSV file template including headers.Generated CSV file can later be used for uploading business partner data.",
-        "operationId" : "getPartnerCsvTemplate",
-        "responses" : {
-          "200" : {
-            "description" : "CSV file template generated successfully",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "string",
-                  "format" : "binary"
-                }
-              },
-              "multipart/form-data" : {
-                "schema" : {
-                  "type" : "string",
-                  "format" : "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/input/partner-upload-template" : {
       "get" : {
         "tags" : [ "partner-upload-controller" ],
         "summary" : "Get CSV template with headers in file",
@@ -1609,7 +1609,7 @@
   },
   "components" : {
     "schemas" : {
-      "AdditionalSiteInputDto" : {
+      "AdditionalSiteInputV6Dto" : {
         "type" : "object",
         "description" : "A further site the business partner's address belongs to, next to the site in 'site'",
         "properties" : {
@@ -1623,7 +1623,21 @@
           }
         }
       },
-      "AdditionalSiteOutputDto" : {
+      "AdditionalSiteInputV7Dto" : {
+        "type" : "object",
+        "description" : "A further site the business partner's address belongs to, next to the site in 'site'",
+        "properties" : {
+          "siteBpn" : {
+            "type" : [ "string", "null" ],
+            "description" : "The BPNS of the site, if it is known"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the site"
+          }
+        }
+      },
+      "AdditionalSiteOutputV7Dto" : {
         "type" : "object",
         "description" : "A further site a business partner's address belongs to, in addition to its primary site",
         "properties" : {
@@ -1638,7 +1652,7 @@
         },
         "required" : [ "siteBpn" ]
       },
-      "AddressComponentOutputDto" : {
+      "AddressComponentOutputV6Dto" : {
         "type" : "object",
         "description" : "Address properties of business partner output data",
         "properties" : {
@@ -1656,36 +1670,77 @@
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
           },
           "physicalPostalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalPostalAddressDto",
+            "$ref" : "#/components/schemas/PhysicalPostalAddressV6Dto",
             "description" : "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc."
           },
           "alternativePostalAddress" : {
             "description" : "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else.",
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativePostalAddressDto"
+              "$ref" : "#/components/schemas/AlternativePostalAddressV6Dto"
             }, {
               "type" : "null"
             } ]
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV6Dto"
           },
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV6Dto"
+            }
+          }
+        },
+        "required" : [ "bpnA" ]
+      },
+      "AddressComponentOutputV7Dto" : {
+        "type" : "object",
+        "description" : "Address properties of business partner output data",
+        "properties" : {
+          "addressBpn" : {
+            "type" : "string",
+            "description" : "The BPNA of the address, on which the business partner provides a view."
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the address, on which the business partner provides a view. This is not according to official registers but according to the name the sharing members agree on, such as the name of a gate or any other additional names that designate the address in common parlance."
+          },
+          "addressType" : {
+            "type" : [ "string", "null" ],
+            "description" : "One of the address types: Legal Address, Site Main Address, Legal and Site Main Address, Additional Address. ",
+            "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "physicalPostalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalPostalAddressV7Dto",
+            "description" : "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc."
+          },
+          "alternativePostalAddress" : {
+            "description" : "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else.",
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativePostalAddressV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV7Dto"
             }
           },
           "identifiers" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/AddressIdentifierDto"
+              "$ref" : "#/components/schemas/AddressIdentifierV7Dto"
             }
           },
           "goldenRecordRelations" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/AddressGoldenRecordRelationDto"
+              "$ref" : "#/components/schemas/AddressGoldenRecordRelationV7Dto"
             }
           },
           "updatedAt" : {
@@ -1696,7 +1751,7 @@
         },
         "required" : [ "bpnA" ]
       },
-      "AddressGoldenRecordRelationDto" : {
+      "AddressGoldenRecordRelationV7Dto" : {
         "type" : "object",
         "properties" : {
           "relationType" : {
@@ -1711,7 +1766,7 @@
           }
         }
       },
-      "AddressIdentifierDto" : {
+      "AddressIdentifierV7Dto" : {
         "type" : "object",
         "description" : "An address identifier (uniquely) identifies the address, such as the Global Location Number (GLN).",
         "properties" : {
@@ -1725,7 +1780,7 @@
           }
         }
       },
-      "AddressRepresentationInputDto" : {
+      "AddressRepresentationInputV6Dto" : {
         "type" : "object",
         "properties" : {
           "addressBpn" : {
@@ -1742,13 +1797,13 @@
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
           },
           "physicalPostalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalPostalAddressDto",
+            "$ref" : "#/components/schemas/PhysicalPostalAddressV6Dto",
             "description" : "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc."
           },
           "alternativePostalAddress" : {
             "description" : "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else.",
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativePostalAddressDto"
+              "$ref" : "#/components/schemas/AlternativePostalAddressV6Dto"
             }, {
               "type" : "null"
             } ]
@@ -1756,30 +1811,84 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateV6Dto"
             }
           }
         }
       },
-      "AddressScriptVariantDto" : {
+      "AddressRepresentationInputV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "addressBpn" : {
+            "type" : [ "string", "null" ],
+            "description" : "The BPNA of the address, on which the business partner provides a view."
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the address, on which the business partner provides a view. This is not according to official registers but according to the name the sharing members agree on, such as the name of a gate or any other additional names that designate the address in common parlance."
+          },
+          "addressType" : {
+            "type" : [ "string", "null" ],
+            "description" : "One of the address types: Legal Address, Site Main Address, Legal and Site Main Address, Additional Address. ",
+            "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "physicalPostalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalPostalAddressV7Dto",
+            "description" : "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc."
+          },
+          "alternativePostalAddress" : {
+            "description" : "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else.",
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativePostalAddressV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateV7Dto"
+            }
+          }
+        }
+      },
+      "AddressScriptVariantV6Dto" : {
         "type" : "object",
         "properties" : {
           "name" : {
             "type" : [ "string", "null" ]
           },
           "physicalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantDto"
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantV6Dto"
           },
           "alternativeAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddressScriptVariantDto"
+              "$ref" : "#/components/schemas/AlternativeAddressScriptVariantV6Dto"
             }, {
               "type" : "null"
             } ]
           }
         }
       },
-      "AlternativeAddressScriptVariantDto" : {
+      "AddressScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ]
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantV7Dto"
+          },
+          "alternativeAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddressScriptVariantV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          }
+        }
+      },
+      "AlternativeAddressScriptVariantV6Dto" : {
         "type" : "object",
         "properties" : {
           "city" : {
@@ -1787,7 +1896,15 @@
           }
         }
       },
-      "AlternativePostalAddressDto" : {
+      "AlternativeAddressScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "city" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "AlternativePostalAddressV6Dto" : {
         "type" : "object",
         "description" : "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else.",
         "properties" : {
@@ -1800,8 +1917,7 @@
           },
           "country" : {
             "type" : [ "string", "null" ],
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ],
@@ -1830,7 +1946,49 @@
           }
         }
       },
-      "BusinessPartnerIdentifierDto" : {
+      "AlternativePostalAddressV7Dto" : {
+        "type" : "object",
+        "description" : "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else.",
+        "properties" : {
+          "geographicCoordinates" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/GeoCoordinateDto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "country" : {
+            "type" : [ "string", "null" ],
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
+          },
+          "administrativeAreaLevel1" : {
+            "type" : [ "string", "null" ],
+            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
+          },
+          "postalCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
+          },
+          "city" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the city of the physical postal address, synonyms: town, village, municipality."
+          },
+          "deliveryServiceType" : {
+            "type" : [ "string", "null" ],
+            "description" : "One of the alternative postal address types: P.O. box, private bag, boite postale.",
+            "enum" : [ "PO_BOX", "PRIVATE_BAG", "BOITE_POSTALE" ]
+          },
+          "deliveryServiceQualifier" : {
+            "type" : [ "string", "null" ],
+            "description" : "The qualifier uniquely identifying the delivery service endpoint of the alternative postal address in conjunction with the delivery service number. In some countries for example, entering a P.O. box number, postal code and city is not sufficient to uniquely identify a P.O. box, because the same P.O. box number is assigned multiple times in some cities."
+          },
+          "deliveryServiceNumber" : {
+            "type" : [ "string", "null" ],
+            "description" : "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
+          }
+        }
+      },
+      "BusinessPartnerIdentifierV6Dto" : {
         "type" : "object",
         "properties" : {
           "type" : {
@@ -1847,7 +2005,24 @@
           }
         }
       },
-      "BusinessPartnerInputDto" : {
+      "BusinessPartnerIdentifierV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "The type of the identifier."
+          },
+          "value" : {
+            "type" : [ "string", "null" ],
+            "description" : "The value of the identifier like “DE123465789."
+          },
+          "issuingBody" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Registergericht and Registerart."
+          }
+        }
+      },
+      "BusinessPartnerInputV6Dto" : {
         "type" : "object",
         "description" : "Generic business partner with external id",
         "properties" : {
@@ -1866,14 +2041,14 @@
             "type" : "array",
             "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierV6Dto"
             }
           },
           "states" : {
             "type" : "array",
             "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateV6Dto"
             }
           },
           "roles" : {
@@ -1885,15 +2060,15 @@
             }
           },
           "legalEntity" : {
-            "$ref" : "#/components/schemas/LegalEntityRepresentationInputDto",
+            "$ref" : "#/components/schemas/LegalEntityRepresentationInputV6Dto",
             "description" : "The legal entity, on which the business partner provides a view."
           },
           "site" : {
-            "$ref" : "#/components/schemas/SiteRepresentationInputDto",
+            "$ref" : "#/components/schemas/SiteRepresentationInputV6Dto",
             "description" : "The site, on which the business partner provides a view."
           },
           "address" : {
-            "$ref" : "#/components/schemas/AddressRepresentationInputDto",
+            "$ref" : "#/components/schemas/AddressRepresentationInputV6Dto",
             "description" : "The address, on which the business partner provides a view. "
           },
           "externalSequenceTimestamp" : {
@@ -1904,14 +2079,14 @@
           "scriptVariants" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantDto"
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantV6Dto"
             }
           },
           "additionalSites" : {
             "type" : "array",
             "description" : "The further sites this business partner's address belongs to, next to the site in 'site'. A site is identified by its BPNS or, where that is unknown, by its name, which the golden record process resolves to an existing site or creates a new site for. An address is never taken away from a site it already belongs to, so removing an entry here has no effect.",
             "items" : {
-              "$ref" : "#/components/schemas/AdditionalSiteInputDto"
+              "$ref" : "#/components/schemas/AdditionalSiteInputV6Dto"
             }
           },
           "createdAt" : {
@@ -1931,7 +2106,7 @@
         },
         "required" : [ "bpnA", "bpnL", "externalId", "postalAddress" ]
       },
-      "BusinessPartnerInputRequest" : {
+      "BusinessPartnerInputV6Request" : {
         "type" : "object",
         "description" : "Generic business partner with external id",
         "properties" : {
@@ -1950,14 +2125,14 @@
             "type" : "array",
             "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierV6Dto"
             }
           },
           "states" : {
             "type" : "array",
             "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateV6Dto"
             }
           },
           "roles" : {
@@ -1969,15 +2144,15 @@
             }
           },
           "legalEntity" : {
-            "$ref" : "#/components/schemas/LegalEntityRepresentationInputDto",
+            "$ref" : "#/components/schemas/LegalEntityRepresentationInputV6Dto",
             "description" : "The legal entity, on which the business partner provides a view."
           },
           "site" : {
-            "$ref" : "#/components/schemas/SiteRepresentationInputDto",
+            "$ref" : "#/components/schemas/SiteRepresentationInputV6Dto",
             "description" : "The site, on which the business partner provides a view."
           },
           "address" : {
-            "$ref" : "#/components/schemas/AddressRepresentationInputDto",
+            "$ref" : "#/components/schemas/AddressRepresentationInputV6Dto",
             "description" : "The address, on which the business partner provides a view. "
           },
           "externalSequenceTimestamp" : {
@@ -1988,14 +2163,14 @@
           "scriptVariants" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantDto"
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantV6Dto"
             }
           },
           "additionalSites" : {
             "type" : "array",
             "description" : "The further sites this business partner's address belongs to, next to the site in 'site'. A site is identified by its BPNS or, where that is unknown, by its name, which the golden record process resolves to an existing site or creates a new site for. An address is never taken away from a site it already belongs to, so removing an entry here has no effect.",
             "items" : {
-              "$ref" : "#/components/schemas/AdditionalSiteInputDto"
+              "$ref" : "#/components/schemas/AdditionalSiteInputV6Dto"
             }
           },
           "isOwnCompanyData" : {
@@ -2005,7 +2180,165 @@
         },
         "required" : [ "externalId" ]
       },
-      "BusinessPartnerOutputDto" : {
+      "BusinessPartnerInputV7Dto" : {
+        "type" : "object",
+        "description" : "Generic business partner with external id",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
+          },
+          "nameParts" : {
+            "type" : "array",
+            "description" : "The list of name parts to accommodate the different number of name fields in different systems.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierV7Dto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateV7Dto"
+            }
+          },
+          "roles" : {
+            "type" : "array",
+            "description" : "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "SUPPLIER", "CUSTOMER", "ONE_TIME_SUPPLIER", "ONE_TIME_CUSTOMER" ]
+            }
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntityRepresentationInputV7Dto",
+            "description" : "The legal entity, on which the business partner provides a view."
+          },
+          "site" : {
+            "$ref" : "#/components/schemas/SiteRepresentationInputV7Dto",
+            "description" : "The site, on which the business partner provides a view."
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/AddressRepresentationInputV7Dto",
+            "description" : "The address, on which the business partner provides a view. "
+          },
+          "externalSequenceTimestamp" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "The timestamp indicates the last time point of change from the user side"
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantV7Dto"
+            }
+          },
+          "additionalSites" : {
+            "type" : "array",
+            "description" : "The further sites this business partner's address belongs to, next to the site in 'site'. A site is identified by its BPNS or, where that is unknown, by its name, which the golden record process resolves to an existing site or creates a new site for. An address is never taken away from a site it already belongs to, so removing an entry here has no effect.",
+            "items" : {
+              "$ref" : "#/components/schemas/AdditionalSiteInputV7Dto"
+            }
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been created."
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Timestamp when the business partner record was last updated"
+          },
+          "isOwnCompanyData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
+          }
+        },
+        "required" : [ "bpnA", "bpnL", "externalId", "postalAddress" ]
+      },
+      "BusinessPartnerInputV7Request" : {
+        "type" : "object",
+        "description" : "Generic business partner with external id",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
+          },
+          "nameParts" : {
+            "type" : "array",
+            "description" : "The list of name parts to accommodate the different number of name fields in different systems.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierV7Dto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateV7Dto"
+            }
+          },
+          "roles" : {
+            "type" : "array",
+            "description" : "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "SUPPLIER", "CUSTOMER", "ONE_TIME_SUPPLIER", "ONE_TIME_CUSTOMER" ]
+            }
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntityRepresentationInputV7Dto",
+            "description" : "The legal entity, on which the business partner provides a view."
+          },
+          "site" : {
+            "$ref" : "#/components/schemas/SiteRepresentationInputV7Dto",
+            "description" : "The site, on which the business partner provides a view."
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/AddressRepresentationInputV7Dto",
+            "description" : "The address, on which the business partner provides a view. "
+          },
+          "externalSequenceTimestamp" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "The timestamp indicates the last time point of change from the user side"
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantV7Dto"
+            }
+          },
+          "additionalSites" : {
+            "type" : "array",
+            "description" : "The further sites this business partner's address belongs to, next to the site in 'site'. A site is identified by its BPNS or, where that is unknown, by its name, which the golden record process resolves to an existing site or creates a new site for. An address is never taken away from a site it already belongs to, so removing an entry here has no effect.",
+            "items" : {
+              "$ref" : "#/components/schemas/AdditionalSiteInputV7Dto"
+            }
+          },
+          "isOwnCompanyData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
+          }
+        },
+        "required" : [ "externalId" ]
+      },
+      "BusinessPartnerOutputV6Dto" : {
         "type" : "object",
         "description" : "Generic business partner output with external id",
         "properties" : {
@@ -2024,14 +2357,14 @@
             "type" : "array",
             "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierV6Dto"
             }
           },
           "states" : {
             "type" : "array",
             "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV6Dto"
             }
           },
           "roles" : {
@@ -2043,19 +2376,94 @@
             }
           },
           "legalEntity" : {
-            "$ref" : "#/components/schemas/LegalEntityRepresentationOutputDto",
+            "$ref" : "#/components/schemas/LegalEntityRepresentationOutputV6Dto",
             "description" : "The legal entity, on which the business partner provides a view."
           },
           "site" : {
             "description" : "The site, on which the business partner provides a view.",
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/SiteRepresentationOutputDto"
+              "$ref" : "#/components/schemas/SiteRepresentationOutputV6Dto"
             }, {
               "type" : "null"
             } ]
           },
           "address" : {
-            "$ref" : "#/components/schemas/AddressComponentOutputDto",
+            "$ref" : "#/components/schemas/AddressComponentOutputV6Dto",
+            "description" : "The address, on which the business partner provides a view. "
+          },
+          "externalSequenceTimestamp" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "The timestamp indicates the last time point of change from the user side"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been created."
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
+          },
+          "isOwnCompanyData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
+          }
+        },
+        "required" : [ "externalId" ]
+      },
+      "BusinessPartnerOutputV7Dto" : {
+        "type" : "object",
+        "description" : "Generic business partner output with external id",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
+          },
+          "nameParts" : {
+            "type" : "array",
+            "description" : "The list of name parts to accommodate the different number of name fields in different systems.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierV7Dto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV7Dto"
+            }
+          },
+          "roles" : {
+            "type" : "array",
+            "description" : "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "SUPPLIER", "CUSTOMER", "ONE_TIME_SUPPLIER", "ONE_TIME_CUSTOMER" ]
+            }
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntityRepresentationOutputV7Dto",
+            "description" : "The legal entity, on which the business partner provides a view."
+          },
+          "site" : {
+            "description" : "The site, on which the business partner provides a view.",
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/SiteRepresentationOutputV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/AddressComponentOutputV7Dto",
             "description" : "The address, on which the business partner provides a view. "
           },
           "externalSequenceTimestamp" : {
@@ -2066,14 +2474,14 @@
           "scriptVariants" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantDto"
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantV7Dto"
             }
           },
           "additionalSites" : {
             "type" : "array",
             "description" : "The further sites this business partner's address belongs to, in addition to the primary 'site'.",
             "items" : {
-              "$ref" : "#/components/schemas/AdditionalSiteOutputDto"
+              "$ref" : "#/components/schemas/AdditionalSiteOutputV7Dto"
             }
           },
           "createdAt" : {
@@ -2093,7 +2501,7 @@
         },
         "required" : [ "externalId" ]
       },
-      "BusinessPartnerScriptVariantDto" : {
+      "BusinessPartnerScriptVariantV6Dto" : {
         "type" : "object",
         "properties" : {
           "scriptCode" : {
@@ -2106,28 +2514,93 @@
             }
           },
           "legalEntity" : {
-            "$ref" : "#/components/schemas/LegalEntityScriptVariantDto"
+            "$ref" : "#/components/schemas/LegalEntityScriptVariantV6Dto"
           },
           "site" : {
-            "$ref" : "#/components/schemas/SiteScriptVariantDto"
+            "$ref" : "#/components/schemas/SiteScriptVariantV6Dto"
           },
           "address" : {
-            "$ref" : "#/components/schemas/AddressScriptVariantDto"
+            "$ref" : "#/components/schemas/AddressScriptVariantV6Dto"
           }
         }
       },
-      "BusinessPartnerStateDto" : {
+      "BusinessPartnerScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "nameParts" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntityScriptVariantV7Dto"
+          },
+          "site" : {
+            "$ref" : "#/components/schemas/SiteScriptVariantV7Dto"
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/AddressScriptVariantV7Dto"
+          }
+        }
+      },
+      "BusinessPartnerStateOutputV6Dto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "The type of this specified status.",
+            "enum" : [ "ACTIVE", "INACTIVE" ]
+          }
+        },
+        "required" : [ "validFrom", "validTo" ]
+      },
+      "BusinessPartnerStateOutputV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "The type of this specified status.",
+            "enum" : [ "ACTIVE", "INACTIVE" ]
+          }
+        },
+        "required" : [ "validFrom", "validTo" ]
+      },
+      "BusinessPartnerStateV6Dto" : {
         "type" : "object",
         "properties" : {
           "validFrom" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "Date since when the status is/was valid."
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "description" : "Date until the status was valid, if applicable."
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
           },
           "type" : {
             "type" : [ "string", "null" ],
@@ -2136,7 +2609,27 @@
           }
         }
       },
-      "ChangelogGateDto" : {
+      "BusinessPartnerStateV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "The date from which the state is valid. The earliest date 1900-01-01T00:00:00 (UTC) stands for a state without start; an earlier date counts as the earliest date."
+          },
+          "validTo" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "The date until the state is valid. The latest date 9999-12-31T23:59:59 (UTC) stands for a state without end; a later date counts as the latest date."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "The type of this specified status.",
+            "enum" : [ "ACTIVE", "INACTIVE" ]
+          }
+        }
+      },
+      "ChangelogGateV6Dto" : {
         "type" : "object",
         "description" : "An entry of the changelog, which is created each time a business partner is modified and contains data about the change. The actual new state of the business partner is not included.",
         "properties" : {
@@ -2156,7 +2649,27 @@
           }
         }
       },
-      "ChangelogSearchRequest" : {
+      "ChangelogGateV7Dto" : {
+        "type" : "object",
+        "description" : "An entry of the changelog, which is created each time a business partner is modified and contains data about the change. The actual new state of the business partner is not included.",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The external identifier of the business partner for which the changelog entry was created."
+          },
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date and time when the changelog entry was created."
+          },
+          "changelogType" : {
+            "type" : "string",
+            "description" : "One of the actions for which the changelog entry was created: create, update.",
+            "enum" : [ "CREATE", "UPDATE" ]
+          }
+        }
+      },
+      "ChangelogSearchV6Request" : {
         "type" : "object",
         "properties" : {
           "timestampAfter" : {
@@ -2175,7 +2688,26 @@
           }
         }
       },
-      "ConfidenceCriteriaDto" : {
+      "ChangelogSearchV7Request" : {
+        "type" : "object",
+        "properties" : {
+          "timestampAfter" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "Only changelog entries created after this time. Ignored if empty.",
+            "example" : "2023-03-20T10:23:28.194Z"
+          },
+          "externalIds" : {
+            "type" : [ "array", "null" ],
+            "description" : "Only for business partners with the given array of external IDs. Ignored if empty.",
+            "items" : {
+              "type" : "string"
+            },
+            "uniqueItems" : true
+          }
+        }
+      },
+      "ConfidenceCriteriaV6Dto" : {
         "type" : "object",
         "properties" : {
           "sharedByOwner" : {
@@ -2202,7 +2734,34 @@
           }
         }
       },
-      "ErrorInfoChangeLogOutputError" : {
+      "ConfidenceCriteriaV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "sharedByOwner" : {
+            "type" : "boolean"
+          },
+          "checkedByExternalDataSource" : {
+            "type" : "boolean"
+          },
+          "numberOfSharingMembers" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastConfidenceCheckAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "nextConfidenceCheckAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "confidenceLevel" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "ErrorInfoV6ChangeLogOutputErrorV6" : {
         "type" : "object",
         "description" : "Holds information about failures",
         "properties" : {
@@ -2220,9 +2779,52 @@
             "description" : "Key (externalId) of the entity that failed"
           }
         },
-        "title" : "ErrorInfo"
+        "title" : "ErrorInfoV6"
       },
-      "GateErrorResponse" : {
+      "ErrorInfoV7ChangeLogOutputErrorV7" : {
+        "type" : "object",
+        "description" : "Holds information about failures",
+        "properties" : {
+          "errorCode" : {
+            "type" : "string",
+            "description" : "Error code identifying the error",
+            "enum" : [ "ExternalIdNotFound" ]
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Error message that explains the error"
+          },
+          "entityKey" : {
+            "type" : [ "string", "null" ],
+            "description" : "Key (externalId) of the entity that failed"
+          }
+        },
+        "title" : "ErrorInfoV7"
+      },
+      "GateErrorV6Response" : {
+        "type" : "object",
+        "description" : "Error response for invalid partner upload",
+        "properties" : {
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "100 CONTINUE", "101 SWITCHING_PROTOCOLS", "102 PROCESSING", "103 EARLY_HINTS", "200 OK", "201 CREATED", "202 ACCEPTED", "203 NON_AUTHORITATIVE_INFORMATION", "204 NO_CONTENT", "205 RESET_CONTENT", "206 PARTIAL_CONTENT", "207 MULTI_STATUS", "208 ALREADY_REPORTED", "226 IM_USED", "300 MULTIPLE_CHOICES", "301 MOVED_PERMANENTLY", "302 FOUND", "303 SEE_OTHER", "304 NOT_MODIFIED", "307 TEMPORARY_REDIRECT", "308 PERMANENT_REDIRECT", "400 BAD_REQUEST", "401 UNAUTHORIZED", "402 PAYMENT_REQUIRED", "403 FORBIDDEN", "404 NOT_FOUND", "405 METHOD_NOT_ALLOWED", "406 NOT_ACCEPTABLE", "407 PROXY_AUTHENTICATION_REQUIRED", "408 REQUEST_TIMEOUT", "409 CONFLICT", "410 GONE", "411 LENGTH_REQUIRED", "412 PRECONDITION_FAILED", "413 CONTENT_TOO_LARGE", "413 PAYLOAD_TOO_LARGE", "414 URI_TOO_LONG", "415 UNSUPPORTED_MEDIA_TYPE", "416 REQUESTED_RANGE_NOT_SATISFIABLE", "417 EXPECTATION_FAILED", "418 I_AM_A_TEAPOT", "421 MISDIRECTED_REQUEST", "422 UNPROCESSABLE_CONTENT", "422 UNPROCESSABLE_ENTITY", "423 LOCKED", "424 FAILED_DEPENDENCY", "425 TOO_EARLY", "426 UPGRADE_REQUIRED", "428 PRECONDITION_REQUIRED", "429 TOO_MANY_REQUESTS", "431 REQUEST_HEADER_FIELDS_TOO_LARGE", "451 UNAVAILABLE_FOR_LEGAL_REASONS", "500 INTERNAL_SERVER_ERROR", "501 NOT_IMPLEMENTED", "502 BAD_GATEWAY", "503 SERVICE_UNAVAILABLE", "504 GATEWAY_TIMEOUT", "505 HTTP_VERSION_NOT_SUPPORTED", "506 VARIANT_ALSO_NEGOTIATES", "507 INSUFFICIENT_STORAGE", "508 LOOP_DETECTED", "509 BANDWIDTH_LIMIT_EXCEEDED", "510 NOT_EXTENDED", "511 NETWORK_AUTHENTICATION_REQUIRED" ]
+          },
+          "error" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "path" : {
+            "type" : "string"
+          }
+        }
+      },
+      "GateErrorV7Response" : {
         "type" : "object",
         "description" : "Error response for invalid partner upload",
         "properties" : {
@@ -2266,7 +2868,7 @@
           }
         }
       },
-      "LegalEntityGoldenRecordRelationDto" : {
+      "LegalEntityGoldenRecordRelationV7Dto" : {
         "type" : "object",
         "properties" : {
           "relationType" : {
@@ -2281,7 +2883,7 @@
           }
         }
       },
-      "LegalEntityRepresentationInputDto" : {
+      "LegalEntityRepresentationInputV6Dto" : {
         "type" : "object",
         "properties" : {
           "legalEntityBpn" : {
@@ -2311,12 +2913,47 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateV6Dto"
             }
           }
         }
       },
-      "LegalEntityRepresentationOutputDto" : {
+      "LegalEntityRepresentationInputV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "legalEntityBpn" : {
+            "type" : [ "string", "null" ],
+            "description" : "The BPNL of the legal entity, on which the business partner provides a view."
+          },
+          "legalName" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the legal entity, on which the business partner provides a view, according to official registers."
+          },
+          "shortName" : {
+            "type" : [ "string", "null" ],
+            "description" : "The abbreviated name of the legal entity, on which the business partner provides a view."
+          },
+          "legalForm" : {
+            "type" : [ "string", "null" ],
+            "description" : "The legal form of the legal entity, on which the business partner provides a view."
+          },
+          "ownershipUltimate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Designates whether this legal entity is the ultimate owner in an ownership chain."
+          },
+          "ultimateOwnerBpnl" : {
+            "type" : [ "string", "null" ],
+            "description" : "The BPNL of the designated ultimate owner up in the ownership chain."
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateV7Dto"
+            }
+          }
+        }
+      },
+      "LegalEntityRepresentationOutputV6Dto" : {
         "type" : "object",
         "description" : "Legal Entity properties of business partner output data",
         "properties" : {
@@ -2337,7 +2974,39 @@
             "description" : "The legal form of the legal entity, on which the business partner provides a view."
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV6Dto"
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV6Dto"
+            }
+          }
+        },
+        "required" : [ "bpnL" ]
+      },
+      "LegalEntityRepresentationOutputV7Dto" : {
+        "type" : "object",
+        "description" : "Legal Entity properties of business partner output data",
+        "properties" : {
+          "legalEntityBpn" : {
+            "type" : "string",
+            "description" : "The BPNL of the legal entity, on which the business partner provides a view."
+          },
+          "legalName" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the legal entity, on which the business partner provides a view, according to official registers."
+          },
+          "shortName" : {
+            "type" : [ "string", "null" ],
+            "description" : "The abbreviated name of the legal entity, on which the business partner provides a view."
+          },
+          "legalForm" : {
+            "type" : [ "string", "null" ],
+            "description" : "The legal form of the legal entity, on which the business partner provides a view."
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
           },
           "ownershipUltimate" : {
             "type" : [ "boolean", "null" ],
@@ -2350,13 +3019,13 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV7Dto"
             }
           },
           "goldenRecordRelations" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelationDto"
+              "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelationV7Dto"
             }
           },
           "updatedAt" : {
@@ -2367,7 +3036,7 @@
         },
         "required" : [ "bpnL" ]
       },
-      "LegalEntityScriptVariantDto" : {
+      "LegalEntityScriptVariantV6Dto" : {
         "type" : "object",
         "properties" : {
           "legalName" : {
@@ -2378,7 +3047,18 @@
           }
         }
       },
-      "PageChangeLogDtoChangelogGateDto" : {
+      "LegalEntityScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "legalName" : {
+            "type" : [ "string", "null" ]
+          },
+          "shortName" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "PageChangeLogV6DtoChangelogGateV6Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2406,24 +3086,26 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/ChangelogGateDto"
+              "$ref" : "#/components/schemas/ChangelogGateV6Dto"
             }
           },
           "invalidEntries" : {
             "type" : "integer",
             "format" : "int32",
-            "description" : "Number of entries in the page that have been omitted due to being invalid (error)"
+            "deprecated" : true,
+            "description" : "Deprecated: always 0, since unknown external IDs are ignored by the search."
           },
           "errors" : {
             "type" : "array",
-            "description" : "Infos about the entries with errors",
+            "deprecated" : true,
+            "description" : "Deprecated: always empty, since unknown external IDs are ignored by the search.",
             "items" : {
-              "$ref" : "#/components/schemas/ErrorInfoChangeLogOutputError"
+              "$ref" : "#/components/schemas/ErrorInfoV6ChangeLogOutputErrorV6"
             }
           }
         }
       },
-      "PageDtoBusinessPartnerInputDto" : {
+      "PageChangeLogV7DtoChangelogGateV7Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2451,12 +3133,26 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+              "$ref" : "#/components/schemas/ChangelogGateV7Dto"
+            }
+          },
+          "invalidEntries" : {
+            "type" : "integer",
+            "format" : "int32",
+            "deprecated" : true,
+            "description" : "Deprecated: always 0, since unknown external IDs are ignored by the search."
+          },
+          "errors" : {
+            "type" : "array",
+            "deprecated" : true,
+            "description" : "Deprecated: always empty, since unknown external IDs are ignored by the search.",
+            "items" : {
+              "$ref" : "#/components/schemas/ErrorInfoV7ChangeLogOutputErrorV7"
             }
           }
         }
       },
-      "PageDtoBusinessPartnerOutputDto" : {
+      "PageDtoBusinessPartnerInputV6Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2484,12 +3180,12 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerOutputDto"
+              "$ref" : "#/components/schemas/BusinessPartnerInputV6Dto"
             }
           }
         }
       },
-      "PageDtoRelationDto" : {
+      "PageDtoBusinessPartnerInputV7Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2517,12 +3213,12 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/RelationDto"
+              "$ref" : "#/components/schemas/BusinessPartnerInputV7Dto"
             }
           }
         }
       },
-      "PageDtoRelationOutputDto" : {
+      "PageDtoBusinessPartnerOutputV6Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2550,12 +3246,12 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/RelationOutputDto"
+              "$ref" : "#/components/schemas/BusinessPartnerOutputV6Dto"
             }
           }
         }
       },
-      "PageDtoRelationSharingStateDto" : {
+      "PageDtoBusinessPartnerOutputV7Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2583,7 +3279,73 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/RelationSharingStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerOutputV7Dto"
+            }
+          }
+        }
+      },
+      "PageDtoRelationOutputV7Dto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationOutputV7Dto"
+            }
+          }
+        }
+      },
+      "PageDtoRelationSharingStateV7Dto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationSharingStateV7Dto"
             }
           }
         }
@@ -2621,7 +3383,7 @@
           }
         }
       },
-      "PageDtoSharingStateDto" : {
+      "PageDtoRelationV7Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -2649,12 +3411,78 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/SharingStateDto"
+              "$ref" : "#/components/schemas/RelationV7Dto"
             }
           }
         }
       },
-      "PhysicalAddressScriptVariantDto" : {
+      "PageDtoSharingStateV6Dto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/SharingStateV6Dto"
+            }
+          }
+        }
+      },
+      "PageDtoSharingStateV7Dto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/SharingStateV7Dto"
+            }
+          }
+        }
+      },
+      "PhysicalAddressScriptVariantV6Dto" : {
         "type" : "object",
         "properties" : {
           "city" : {
@@ -2664,7 +3492,7 @@
             "type" : [ "string", "null" ]
           },
           "street" : {
-            "$ref" : "#/components/schemas/StreetScriptVariantDto"
+            "$ref" : "#/components/schemas/StreetScriptVariantV6Dto"
           },
           "industrialZone" : {
             "type" : [ "string", "null" ]
@@ -2680,7 +3508,33 @@
           }
         }
       },
-      "PhysicalPostalAddressDto" : {
+      "PhysicalAddressScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "city" : {
+            "type" : [ "string", "null" ]
+          },
+          "district" : {
+            "type" : [ "string", "null" ]
+          },
+          "street" : {
+            "$ref" : "#/components/schemas/StreetScriptVariantV7Dto"
+          },
+          "industrialZone" : {
+            "type" : [ "string", "null" ]
+          },
+          "building" : {
+            "type" : [ "string", "null" ]
+          },
+          "floor" : {
+            "type" : [ "string", "null" ]
+          },
+          "door" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "PhysicalPostalAddressV6Dto" : {
         "type" : "object",
         "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
         "properties" : {
@@ -2693,8 +3547,7 @@
           },
           "country" : {
             "type" : [ "string", "null" ],
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
           "administrativeAreaLevel1" : {
             "type" : [ "string", "null" ],
@@ -2722,7 +3575,7 @@
           },
           "street" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/StreetDto"
+              "$ref" : "#/components/schemas/StreetV6Dto"
             }, {
               "type" : "null"
             } ]
@@ -2753,7 +3606,79 @@
           }
         }
       },
-      "PostSharingStateReadyRequest" : {
+      "PhysicalPostalAddressV7Dto" : {
+        "type" : "object",
+        "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
+        "properties" : {
+          "geographicCoordinates" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/GeoCoordinateDto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "country" : {
+            "type" : [ "string", "null" ],
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
+          },
+          "administrativeAreaLevel1" : {
+            "type" : [ "string", "null" ],
+            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
+          },
+          "administrativeAreaLevel2" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the locally regulated secondary country subdivision of the physical postal address, such as county within a country."
+          },
+          "administrativeAreaLevel3" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the locally regulated tertiary country subdivision of the physical address, such as townships within a country."
+          },
+          "postalCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
+          },
+          "city" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the city of the physical postal address, synonyms: town, village, municipality."
+          },
+          "district" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the district of the physical postal address which divides the city in several smaller areas."
+          },
+          "street" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/StreetV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "companyPostalCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "The company postal code of the physical postal address, which is sometimes required for large companies."
+          },
+          "industrialZone" : {
+            "type" : [ "string", "null" ],
+            "description" : "The industrial zone of the physical postal address, designating an area for industrial development, synonym: industrial area."
+          },
+          "building" : {
+            "type" : [ "string", "null" ],
+            "description" : "The alphanumeric identifier of the building addressed by the physical postal address."
+          },
+          "floor" : {
+            "type" : [ "string", "null" ],
+            "description" : "The number of a floor in the building addressed by the physical postal address, synonym: level."
+          },
+          "door" : {
+            "type" : [ "string", "null" ],
+            "description" : "The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite."
+          },
+          "taxJurisdictionCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
+          }
+        }
+      },
+      "PostSharingStateReadyV6Request" : {
         "type" : "object",
         "description" : "Request for setting business partners into ready to be shared to golden record state",
         "properties" : {
@@ -2765,89 +3690,19 @@
           }
         }
       },
-      "RelationDto" : {
+      "PostSharingStateReadyV7Request" : {
         "type" : "object",
-        "description" : "A relation from one business partner (the source) to another business partner (the target).",
+        "description" : "Request for setting business partners into ready to be shared to golden record state",
         "properties" : {
-          "externalId" : {
-            "type" : "string",
-            "description" : "The identifier with which to reference this relation"
-          },
-          "relationType" : {
-            "type" : "string",
-            "description" : "The type of relation between the business partners",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
-          },
-          "businessPartnerSourceExternalId" : {
-            "type" : "string",
-            "description" : "The business partner from which the relation emerges (the source)"
-          },
-          "businessPartnerTargetExternalId" : {
-            "type" : "string",
-            "description" : "The business partner to which this relation goes (the target)"
-          },
-          "validityPeriods" : {
+          "externalIds" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
+              "type" : "string"
             }
-          },
-          "reasonCode" : {
-            "type" : [ "string", "null" ],
-            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
-          },
-          "updatedAt" : {
-            "type" : "string",
-            "format" : "date-time",
-            "description" : "The time when this relation was last modified"
-          },
-          "createdAt" : {
-            "type" : "string",
-            "format" : "date-time",
-            "description" : "The time when this relation was created"
           }
         }
       },
-      "RelationOutputDto" : {
-        "type" : "object",
-        "description" : "A relation from one business partner (the source) to another business partner (the target).",
-        "properties" : {
-          "externalId" : {
-            "type" : "string",
-            "description" : "The identifier with which to reference this relation"
-          },
-          "relationType" : {
-            "type" : "string",
-            "description" : "The type of relation between the business partners",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
-          },
-          "sourceBpn" : {
-            "type" : "string",
-            "description" : "The business partner from which the relation emerges (the source)"
-          },
-          "targetBpn" : {
-            "type" : "string",
-            "description" : "The business partner to which this relation goes (the target)"
-          },
-          "validityPeriods" : {
-            "type" : "array",
-            "description" : "A relation validity describes a timeframe in which a relation is active.",
-            "items" : {
-              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
-            }
-          },
-          "reasonCode" : {
-            "type" : [ "string", "null" ],
-            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
-          },
-          "updatedAt" : {
-            "type" : "string",
-            "format" : "date-time",
-            "description" : "The time when this relation was last modified"
-          }
-        }
-      },
-      "RelationOutputSearchRequest" : {
+      "RelationOutputSearchV7Request" : {
         "type" : "object",
         "description" : "Request payload containing search parameters for business partner output relations",
         "properties" : {
@@ -2879,7 +3734,46 @@
           }
         }
       },
-      "RelationPostRequest" : {
+      "RelationOutputV7Dto" : {
+        "type" : "object",
+        "description" : "A relation from one business partner (the source) to another business partner (the target).",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier with which to reference this relation"
+          },
+          "relationType" : {
+            "type" : "string",
+            "description" : "The type of relation between the business partners",
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
+          },
+          "sourceBpn" : {
+            "type" : "string",
+            "description" : "The business partner from which the relation emerges (the source)"
+          },
+          "targetBpn" : {
+            "type" : "string",
+            "description" : "The business partner to which this relation goes (the target)"
+          },
+          "validityPeriods" : {
+            "type" : "array",
+            "description" : "A relation validity describes a timeframe in which a relation is active.",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriodV7Dto"
+            }
+          },
+          "reasonCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The time when this relation was last modified"
+          }
+        }
+      },
+      "RelationPostV6Request" : {
         "type" : "object",
         "description" : "A request to create a new relation between two business partners",
         "properties" : {
@@ -2898,7 +3792,32 @@
           }
         }
       },
-      "RelationPutEntry" : {
+      "RelationPutV6Entry" : {
+        "type" : "object",
+        "description" : "A request to update the content of the given business partner relation",
+        "properties" : {
+          "externalId" : {
+            "type" : "string"
+          },
+          "relationType" : {
+            "type" : "string",
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
+          },
+          "businessPartnerSourceExternalId" : {
+            "type" : "string"
+          },
+          "businessPartnerTargetExternalId" : {
+            "type" : "string"
+          },
+          "validityPeriods" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriodV6Dto"
+            }
+          }
+        }
+      },
+      "RelationPutV7Entry" : {
         "type" : "object",
         "description" : "A request to update the content of the given business partner relation",
         "properties" : {
@@ -2922,60 +3841,35 @@
           "validityPeriods" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
+              "$ref" : "#/components/schemas/RelationValidityPeriodV7Dto"
             }
           }
         }
       },
-      "RelationPutEntryV6" : {
-        "type" : "object",
-        "description" : "A request to update the content of the given business partner relation",
-        "properties" : {
-          "externalId" : {
-            "type" : "string"
-          },
-          "relationType" : {
-            "type" : "string",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
-          },
-          "businessPartnerSourceExternalId" : {
-            "type" : "string"
-          },
-          "businessPartnerTargetExternalId" : {
-            "type" : "string"
-          },
-          "validityPeriods" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
-            }
-          }
-        }
-      },
-      "RelationPutRequest" : {
+      "RelationPutV7Request" : {
         "type" : "object",
         "description" : "A request to upsert the contents of the given relations",
         "properties" : {
           "relations" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/RelationPutEntry"
+              "$ref" : "#/components/schemas/RelationPutV7Entry"
             }
           }
         }
       },
-      "RelationPutResponse" : {
+      "RelationPutV7Response" : {
         "type" : "object",
         "properties" : {
           "upsertedRelations" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/RelationDto"
+              "$ref" : "#/components/schemas/RelationV7Dto"
             }
           }
         }
       },
-      "RelationSearchRequest" : {
+      "RelationSearchV7Request" : {
         "type" : "object",
         "description" : "Request payload containing search parameters for business partner relations",
         "properties" : {
@@ -3007,7 +3901,7 @@
           }
         }
       },
-      "RelationSharingStateDto" : {
+      "RelationSharingStateV7Dto" : {
         "type" : "object",
         "properties" : {
           "externalId" : {
@@ -3066,7 +3960,50 @@
           }
         }
       },
-      "RelationValidityPeriodDto" : {
+      "RelationV7Dto" : {
+        "type" : "object",
+        "description" : "A relation from one business partner (the source) to another business partner (the target).",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier with which to reference this relation"
+          },
+          "relationType" : {
+            "type" : "string",
+            "description" : "The type of relation between the business partners",
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
+          },
+          "businessPartnerSourceExternalId" : {
+            "type" : "string",
+            "description" : "The business partner from which the relation emerges (the source)"
+          },
+          "businessPartnerTargetExternalId" : {
+            "type" : "string",
+            "description" : "The business partner to which this relation goes (the target)"
+          },
+          "validityPeriods" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriodV7Dto"
+            }
+          },
+          "reasonCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The time when this relation was last modified"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The time when this relation was created"
+          }
+        }
+      },
+      "RelationValidityPeriodV6Dto" : {
         "type" : "object",
         "properties" : {
           "validFrom" : {
@@ -3079,7 +4016,52 @@
           }
         }
       },
-      "SharingStateDto" : {
+      "RelationValidityPeriodV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "validTo" : {
+            "type" : [ "string", "null" ],
+            "format" : "date"
+          }
+        }
+      },
+      "SharingStateV6Dto" : {
+        "type" : "object",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The external identifier of the business partner for which the sharing state entry was created."
+          },
+          "sharingStateType" : {
+            "type" : "string",
+            "description" : "One of the sharing state types of the current sharing state.",
+            "enum" : [ "Pending", "Success", "Error", "Initial", "Ready" ]
+          },
+          "sharingErrorCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "One of the sharing error codes in case the current sharing state type is \"error\". \n* `NaturalPersonError`: The provided record contains natural person information.\n* `BpnErrorNotFound`: The provided record can not be matched to a legal entity or an address.\n* `BpnErrorTooManyOptions`: The provided record can not link to a clear legal entity.\n* `MandatoryFieldValidationFailed`: The provided record does not fulfill mandatory validation rules.\n* `BlacklistCountryPresent`: The provided record is part of a country that is not allowed to be processed by the GR process (example: Brazil).\n* `UnknownSpecialCharacters`: The provided record contains unallowed special characters.",
+            "enum" : [ "SharingProcessError", "SharingTimeout", "BpnNotInPool", "MissingTaskID", "NaturalPersonError", "BpnErrorNotFound", "BpnErrorTooManyOptions", "MandatoryFieldValidationFailed", "BlacklistCountryPresent", "UnknownSpecialCharacters" ]
+          },
+          "sharingErrorMessage" : {
+            "type" : [ "string", "null" ],
+            "description" : "The error message in case the current sharing state type is \"error\"."
+          },
+          "sharingProcessStarted" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "The date and time when the sharing process was started."
+          },
+          "taskId" : {
+            "type" : [ "string", "null" ],
+            "description" : "The orchestrator task identifier that was created"
+          }
+        }
+      },
+      "SharingStateV7Dto" : {
         "type" : "object",
         "description" : "A sharing state entry shows the progress in the sharing process and is updated each time the progress for a business partner changes. The business partner is identified by a combination of external ID and business partner type.\n",
         "properties" : {
@@ -3117,7 +4099,7 @@
           }
         }
       },
-      "SiteGoldenRecordRelationDto" : {
+      "SiteGoldenRecordRelationV7Dto" : {
         "type" : "object",
         "properties" : {
           "relationType" : {
@@ -3132,7 +4114,7 @@
           }
         }
       },
-      "SiteRepresentationInputDto" : {
+      "SiteRepresentationInputV6Dto" : {
         "type" : "object",
         "properties" : {
           "siteBpn" : {
@@ -3146,12 +4128,31 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateV6Dto"
             }
           }
         }
       },
-      "SiteRepresentationOutputDto" : {
+      "SiteRepresentationInputV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "siteBpn" : {
+            "type" : [ "string", "null" ],
+            "description" : "The BPNS of the site, on which the business partner provides a view."
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses."
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateV7Dto"
+            }
+          }
+        }
+      },
+      "SiteRepresentationOutputV6Dto" : {
         "type" : "object",
         "description" : "Site properties of business partner output data",
         "properties" : {
@@ -3164,18 +4165,41 @@
             "description" : "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses."
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV6Dto"
           },
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV6Dto"
+            }
+          }
+        }
+      },
+      "SiteRepresentationOutputV7Dto" : {
+        "type" : "object",
+        "description" : "Site properties of business partner output data",
+        "properties" : {
+          "siteBpn" : {
+            "type" : "string",
+            "description" : "The BPNS of the site, on which the business partner provides a view."
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses."
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateOutputV7Dto"
             }
           },
           "goldenRecordRelations" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/SiteGoldenRecordRelationDto"
+              "$ref" : "#/components/schemas/SiteGoldenRecordRelationV7Dto"
             }
           },
           "updatedAt" : {
@@ -3185,7 +4209,7 @@
           }
         }
       },
-      "SiteScriptVariantDto" : {
+      "SiteScriptVariantV6Dto" : {
         "type" : "object",
         "properties" : {
           "name" : {
@@ -3193,7 +4217,15 @@
           }
         }
       },
-      "StatsAddressTypesResponse" : {
+      "SiteScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "StatsAddressTypesV6Response" : {
         "type" : "object",
         "properties" : {
           "legalAndSiteTotal" : {
@@ -3214,7 +4246,28 @@
           }
         }
       },
-      "StatsConfidenceCriteriaResponse" : {
+      "StatsAddressTypesV7Response" : {
+        "type" : "object",
+        "properties" : {
+          "legalAndSiteTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "legalTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "siteTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "additionalTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "StatsConfidenceCriteriaV6Response" : {
         "type" : "object",
         "properties" : {
           "numberOfBusinessPartnersAverage" : {
@@ -3239,7 +4292,32 @@
           }
         }
       },
-      "StatsSharingStatesResponse" : {
+      "StatsConfidenceCriteriaV7Response" : {
+        "type" : "object",
+        "properties" : {
+          "numberOfBusinessPartnersAverage" : {
+            "type" : "number",
+            "format" : "float"
+          },
+          "uniqueTotal" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "sharedByOwnerTotal" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "checkedByExternalDataSourceTotal" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "confidenceLevelAverage" : {
+            "type" : "number",
+            "format" : "float"
+          }
+        }
+      },
+      "StatsSharingStatesV6Response" : {
         "type" : "object",
         "properties" : {
           "initialTotal" : {
@@ -3264,7 +4342,32 @@
           }
         }
       },
-      "StatsStagesResponse" : {
+      "StatsSharingStatesV7Response" : {
+        "type" : "object",
+        "properties" : {
+          "initialTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "readyTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pendingTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "successTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "errorTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "StatsStagesV6Response" : {
         "type" : "object",
         "properties" : {
           "inputTotal" : {
@@ -3277,7 +4380,66 @@
           }
         }
       },
-      "StreetDto" : {
+      "StatsStagesV7Response" : {
+        "type" : "object",
+        "properties" : {
+          "inputTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "outputTotal" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "StreetScriptVariantV6Dto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ]
+          },
+          "direction" : {
+            "type" : [ "string", "null" ]
+          },
+          "namePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNamePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "nameSuffix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNameSuffix" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "StreetScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ]
+          },
+          "direction" : {
+            "type" : [ "string", "null" ]
+          },
+          "namePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNamePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "nameSuffix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNameSuffix" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "StreetV6Dto" : {
         "type" : "object",
         "description" : "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway",
         "properties" : {
@@ -3318,26 +4480,44 @@
           }
         }
       },
-      "StreetScriptVariantDto" : {
+      "StreetV7Dto" : {
         "type" : "object",
+        "description" : "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway",
         "properties" : {
-          "name" : {
-            "type" : [ "string", "null" ]
-          },
-          "direction" : {
-            "type" : [ "string", "null" ]
-          },
           "namePrefix" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "description" : "The street related information, which is usually printed before the official street name on an address label."
           },
           "additionalNamePrefix" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "description" : "The additional street related information, which is usually printed before the official street name on an address label."
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of the street."
           },
           "nameSuffix" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "description" : "The street related information, which is usually printed after the official street name on an address label."
           },
           "additionalNameSuffix" : {
+            "type" : [ "string", "null" ],
+            "description" : "The additional street related information, which is usually printed after the official street name on an address label."
+          },
+          "houseNumber" : {
+            "type" : [ "string", "null" ],
+            "description" : "The number representing the exact location of a building within the street."
+          },
+          "houseNumberSupplement" : {
             "type" : [ "string", "null" ]
+          },
+          "milestone" : {
+            "type" : [ "string", "null" ],
+            "description" : "The number representing the exact location of an addressed object within a street without house numbers, such as within long roads."
+          },
+          "direction" : {
+            "type" : [ "string", "null" ],
+            "description" : "The cardinal direction describing where the exit to the location of the addressed object on large highways / motorways is located, such as Highway 101 South."
           }
         }
       }

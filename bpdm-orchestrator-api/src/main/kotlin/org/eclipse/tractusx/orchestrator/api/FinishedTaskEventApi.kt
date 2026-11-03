@@ -53,7 +53,7 @@ interface FinishedTaskEventApi {
         ]
     )
     @Tag(name = TagClient)
-    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/finished-events", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events"])
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events"])
     fun getEvents(@RequestParam timestamp: Instant,
                   @ParameterObject paginationRequest: PaginationRequest
     ): FinishedTaskEventsResponse

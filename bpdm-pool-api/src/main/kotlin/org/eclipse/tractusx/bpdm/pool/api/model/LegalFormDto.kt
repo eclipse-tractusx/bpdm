@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
 
@@ -38,9 +36,9 @@ data class LegalFormDto(
     @get:Schema(description = LegalFormDescription.abbreviation)
     val abbreviations: String? = null,
 
-    val country: CountryCode?,
+    val country: String?,
 
-    val language: LanguageCode?,
+    val language: String?,
 
     val administrativeAreaLevel1: String?,
 

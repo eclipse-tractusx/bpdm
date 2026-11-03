@@ -33,5 +33,5 @@ class AdministrativeAreaResponseMapper {
      * Returns the given region as the country subdivision the API reports it as.
      */
     fun toCountrySubdivision(region: RegionDb): CountrySubdivisionDto =
-        CountrySubdivisionDto(countryCode = region.countryCode, code = region.regionCode, name = region.regionName)
+        CountrySubdivisionDto(countryCode = region.country.countryCode, code = region.regionCode, name = region.regionName)
 }

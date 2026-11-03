@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
@@ -56,6 +57,7 @@ class RelationUpsertService(
             if (validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
                 existingRelation.validityPeriods.clear()
                 existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
+                existingRelation.updatedAt = DbTimestamp.now()
                 relationRepository.save(existingRelation)
                 UpsertResult(existingRelation, UpsertType.Updated)
             } else {
@@ -63,6 +65,12 @@ class RelationUpsertService(
             }
         } else {
             UpsertResult(createNewRelation(upsertRequest), UpsertType.Created)
+        }
+
+        if (upsertResult.upsertType != UpsertType.NoChange) {
+            val updatedAt = DbTimestamp.now()
+            source.updatedAt = updatedAt
+            target.updatedAt = updatedAt
         }
 
         val relation = "${upsertRequest.legalEntityRelationType} relation from legal entity '${source.bpn}' to '${target.bpn}'"

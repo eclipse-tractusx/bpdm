@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.entity.generic
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import java.time.LocalDateTime
 
 
@@ -41,4 +41,4 @@ class ConfidenceCriteriaDb(
     var nextConfidenceCheckAt: LocalDateTime,
     @Column(name = "confidence_level", nullable = false)
     var confidenceLevel: Int,
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()

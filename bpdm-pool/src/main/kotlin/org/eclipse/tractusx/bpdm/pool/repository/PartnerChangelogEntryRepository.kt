@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
@@ -50,7 +52,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
         fun byUpdatedGreaterThan(modifiedAfter: Instant?) =
             Specification<PartnerChangelogEntryDb> { root, _, builder ->
                 modifiedAfter?.let {
-                    builder.greaterThan(root.get(PartnerChangelogEntryDb::updatedAt.name), modifiedAfter)
+                    builder.greaterThan(root.get<DbTimestamp>(PartnerChangelogEntryDb::updatedAt.name), modifiedAfter.toTimestamp())
                 }
             }
 

@@ -19,11 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationType
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -48,7 +50,7 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
                 }
             }
 
-        fun bySourceExternalIds(sourceBusinessPartnerExternalIds: List<String>?) =
+        fun bySourceExternalIds(sourceBusinessPartnerExternalIds: Collection<String>?) =
             Specification<RelationStageDb> { root, _, _ ->
                 sourceBusinessPartnerExternalIds?.takeIf { it.isNotEmpty() }?.let {
                     root
@@ -58,7 +60,7 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
                 }
             }
 
-        fun byTargetExternalIds(targetBusinessPartnerExternalIds: List<String>?) =
+        fun byTargetExternalIds(targetBusinessPartnerExternalIds: Collection<String>?) =
             Specification<RelationStageDb> { root, _, _ ->
                 targetBusinessPartnerExternalIds?.takeIf { it.isNotEmpty() }?.let {
                     root
@@ -71,7 +73,7 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
         fun byUpdatedAfter(updatedAfter: Instant?) =
             Specification<RelationStageDb> { root, _, builder ->
                 updatedAfter?.let {
-                    builder.greaterThan(root.get(RelationStageDb::updatedAt.name), updatedAfter)
+                    builder.greaterThan(root.get<DbTimestamp>(RelationStageDb::updatedAt.name), updatedAfter.toTimestamp())
                 }
             }
 
@@ -92,6 +94,5 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
             }
     }
 
-    fun findByRelationAndStage(relationDb: RelationDb, stage: StageType): RelationStageDb?
     fun findByRelationInAndStage(relations: Set<RelationDb>, stage: StageType): Set<RelationStageDb>
 }

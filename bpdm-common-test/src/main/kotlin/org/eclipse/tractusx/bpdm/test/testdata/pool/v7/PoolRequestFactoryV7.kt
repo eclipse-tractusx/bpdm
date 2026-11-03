@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v7
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.test.testdata.pool.common.latestSeededStateSecond
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -70,7 +70,7 @@ class PoolRequestFactoryV7(
     }
 
     fun buildLegalEntityHeaderDto(seed: String, random: Random = createRandom(seed), isParticipantData: Boolean = false): LegalEntityHeaderDto{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return LegalEntityHeaderDto(
             legalName = "Legal Name $seed",
@@ -154,7 +154,7 @@ class PoolRequestFactoryV7(
     }
 
     fun buildLegalSiteCreateRequest(seed: String, bpnlParent: String, random: Random = Random(seed.hashCode().toLong())): SiteCreateRequestWithLegalAddressAsMain{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteCreateRequestWithLegalAddressAsMain(
             name = "Site Name $seed",
@@ -196,7 +196,7 @@ class PoolRequestFactoryV7(
     }
 
     fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteDto(
             name = "Site Name $seed",
@@ -218,7 +218,7 @@ class PoolRequestFactoryV7(
     }
 
     fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteCreateRequestWithLegalAddressAsMain(
             name = "Site Name $seed",
@@ -255,7 +255,7 @@ class PoolRequestFactoryV7(
     }
 
     fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
         return LogisticAddressDto(
             name = "Address Name $seed",
             states = listOf(
@@ -265,7 +265,7 @@ class PoolRequestFactoryV7(
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.random(random),
+                country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
@@ -292,7 +292,7 @@ class PoolRequestFactoryV7(
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
-                country = CountryCode.entries.random(random),
+                country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 postalCode = "Postal Code $seed",
                 city = "City $seed",

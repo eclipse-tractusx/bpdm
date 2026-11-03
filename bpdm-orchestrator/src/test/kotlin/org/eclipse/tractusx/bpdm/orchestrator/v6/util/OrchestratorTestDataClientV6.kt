@@ -22,12 +22,16 @@ package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponse
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultEntryDto
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorDtoV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorTypeV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultEntryDtoV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
 
 class OrchestratorTestDataClientV6(
     private val operatorClient: OrchestratorApiClientV6,
@@ -38,38 +42,37 @@ class OrchestratorTestDataClientV6(
         return createTask(seed).recordId
     }
 
-    fun createTask(seed: String, taskMode: TaskMode = TaskMode.UpdateFromSharingMember, recordId: String? = null): TaskClientStateDto{
+    fun createTask(seed: String, taskMode: TaskMode = TaskMode.UpdateFromSharingMember, recordId: String? = null): TaskClientStateDtoV6{
         val newTask = requestFactory.buildTaskCreate(seed).copy(recordId = recordId)
-        val createRequest = TaskCreateRequest(taskMode, listOf(newTask))
+        val createRequest = TaskCreateRequestV6(taskMode.toV6(), listOf(newTask))
         val createResult = operatorClient.goldenRecordTasks.createTasks(createRequest)
 
         return createResult.createdTasks.single()
     }
 
-    fun reserveTasks(step: TaskStep): TaskStepReservationResponse{
-        val reservationRequest = TaskStepReservationRequest(step = step)
+    fun reserveTasks(step: TaskStepV6): TaskStepReservationResponseV6{
+        val reservationRequest = TaskStepReservationRequestV6(step = step)
         return operatorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
     }
 
-    fun resolveTask(taskId: String, step: TaskStep, seed: String): TaskStepResultEntryDto{
+    fun resolveTask(taskId: String, step: TaskStepV6, seed: String): TaskStepResultEntryDtoV6{
         reserveTasks(step)
         val businessPartnerResult = requestFactory.buildBusinessPartner(seed)
-        val resultEntry = TaskStepResultEntryDto(taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryDtoV6(taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultRequestV6(step, listOf(resultEntry))
         operatorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry
     }
 
-    fun failTask(taskId: String, step: TaskStep): TaskStepResultEntryDto{
+    fun failTask(taskId: String, step: TaskStepV6): TaskStepResultEntryDtoV6{
         reserveTasks(step)
 
-        val resultEntry = TaskStepResultEntryDto(taskId, BusinessPartner.empty, listOf(TaskErrorDto(TaskErrorType.Unspecified, "Error Description")))
-        val resultRequest = TaskStepResultRequest(step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryDtoV6(taskId, BusinessPartnerV6.empty, listOf(TaskErrorDtoV6(TaskErrorTypeV6.Unspecified, "Error Description")))
+        val resultRequest = TaskStepResultRequestV6(step, listOf(resultEntry))
         operatorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry
     }
-
 
 }

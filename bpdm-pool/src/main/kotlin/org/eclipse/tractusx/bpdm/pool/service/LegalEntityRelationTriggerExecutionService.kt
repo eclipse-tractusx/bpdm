@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
@@ -49,9 +50,9 @@ class LegalEntityRelationTriggerExecutionService(
         }
 
         nextUnprocessedTrigger.isProcessed = true
+        nextUnprocessedTrigger.updatedAt = DbTimestamp.now()
         legalEntityRelationEventTriggerRepository.save(nextUnprocessedTrigger)
 
         return true
     }
 }
-

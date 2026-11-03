@@ -23,7 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 
 @Entity
 @Table(
@@ -38,4 +38,4 @@ class BpnRequestIdentifierMappingDb(
     var requestIdentifier: String,
     @Column(name = "bpn", nullable = false)
     var bpn: String
-) : BaseEntity()
+) : BaseEntityWithExplicitTimestamps()

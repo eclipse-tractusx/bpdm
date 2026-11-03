@@ -25,15 +25,15 @@ import io.cucumber.java.en.When
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
 import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDate
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 /**
@@ -60,7 +60,7 @@ class GoldenRecordRelationsInOutputStepDefs(
     companion object {
         private val logger = KotlinLogging.logger { }
 
-        private val ADDRESS_CAPABLE_RELATION_TYPES = setOf(GateRelationType.IsReplacedBy)
+        private val ADDRESS_CAPABLE_RELATION_TYPES = setOf(RelationTypeV7.IsReplacedBy)
 
         // A relocated address that became the headquarter may be a plain legal address or, for a site-based
         // legal entity, the combined legal and site main address.
@@ -201,15 +201,15 @@ class GoldenRecordRelationsInOutputStepDefs(
         val baseEntry = testDataFactoryGate.relation.input.request
             .fromSeed("$relationId${context.scenarioSuffix}")
             .withExternalId(context.runId(relationId))
-            .withRelationType(GateRelationType.valueOf(relationType))
+            .withRelationType(RelationTypeV7.valueOf(relationType))
             .withSource(context.runId(sourceRecordId))
             .withTarget(context.runId(targetRecordId))
         val entry = if (currentlyValid)
-            baseEntry.withValidityPeriods(listOf(RelationValidityPeriodDto(validFrom = LocalDate.now(), validTo = null)))
+            baseEntry.withValidityPeriods(listOf(RelationValidityPeriodV7Dto(validFrom = LocalDate.now(), validTo = null)))
         else
             baseEntry
 
-        val request = RelationPutRequest(listOf(entry))
+        val request = RelationPutV7Request(listOf(entry))
         val response = gateOf(sourceRecordId).relation.put(true, request)
         apiCallEvidence.attach("PUT", "/v7/input/relations", request = request, response = response)
         context.relations[relationId] = RelationState(
@@ -298,7 +298,7 @@ class GoldenRecordRelationsInOutputStepDefs(
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private fun goldenRecordOutputOf(recordId: String): BusinessPartnerOutputDto {
+    private fun goldenRecordOutputOf(recordId: String): BusinessPartnerOutputV7Dto {
         val runId = context.runId(recordId)
         val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
@@ -311,9 +311,9 @@ class GoldenRecordRelationsInOutputStepDefs(
      * does not decide which - the two records' address types do.
      */
     private fun goldenRecordBpnsOf(
-        relationType: GateRelationType,
-        sourceOutput: BusinessPartnerOutputDto,
-        targetOutput: BusinessPartnerOutputDto
+        relationType: RelationTypeV7,
+        sourceOutput: BusinessPartnerOutputV7Dto,
+        targetOutput: BusinessPartnerOutputV7Dto
     ): Pair<String, String> {
         val outputs = listOf(sourceOutput, targetOutput)
         val bothLegalEntities = outputs.all { it.address.addressType in LEGAL_ADDRESS_TYPES }
@@ -329,6 +329,6 @@ class GoldenRecordRelationsInOutputStepDefs(
         }
     }
 
-    private fun siteBpnOf(output: BusinessPartnerOutputDto): String =
+    private fun siteBpnOf(output: BusinessPartnerOutputV7Dto): String =
         output.site?.siteBpn ?: error("record output '${output.externalId}' must have a site to take part in a site relation")
 }

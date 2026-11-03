@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 
 import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -95,7 +95,7 @@ class ConfidenceAssertHelper(
         component: OutputComponent,
         expected: Int,
         criterion: String,
-        actualOf: (ConfidenceCriteriaDto) -> Int
+        actualOf: (ConfidenceCriteriaV7Dto) -> Int
     ) {
         val runId = context.runId(recordId)
         val deadline = Instant.now().plus(CRITERION_WAIT_TIMEOUT)
@@ -120,7 +120,7 @@ class ConfidenceAssertHelper(
             .isEqualTo(expected)
     }
 
-    private fun confidenceOf(output: BusinessPartnerOutputDto, component: OutputComponent): ConfidenceCriteriaDto =
+    private fun confidenceOf(output: BusinessPartnerOutputV7Dto, component: OutputComponent): ConfidenceCriteriaV7Dto =
         when (component) {
             OutputComponent.LEGAL_ENTITY       -> output.legalEntity.confidenceCriteria
             OutputComponent.LEGAL_ADDRESS      -> output.address.confidenceCriteria

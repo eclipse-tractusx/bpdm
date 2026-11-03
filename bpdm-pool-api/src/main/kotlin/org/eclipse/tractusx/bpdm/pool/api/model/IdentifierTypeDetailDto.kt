@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.IdentifierTypeDescription
 
@@ -27,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.IdentifierTypeDes
 data class IdentifierTypeDetailDto(
 
     @get:Schema(description = IdentifierTypeDescription.detailCountry)
-    val country: CountryCode?,
+    val country: String?,
 
     @get:Schema(description = IdentifierTypeDescription.detailMandatory)
     val mandatory: Boolean
