@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntitySearchRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntitySearchService
@@ -48,9 +48,9 @@ class LegalEntitySearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchLegalEntities(
-        searchRequest: LegalEntitySearchRequestV6,
+        searchRequest: LegalEntitySearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> =
+    ): PageDto<LegalEntityWithLegalAddressVerboseV6Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = null)
 
     /**
@@ -58,12 +58,12 @@ class LegalEntitySearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchMemberLegalEntities(
-        searchRequest: LegalEntitySearchRequestV6,
+        searchRequest: LegalEntitySearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> =
+    ): PageDto<LegalEntityWithLegalAddressVerboseV6Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
-    private fun search(searchRequest: LegalEntitySearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+    private fun search(searchRequest: LegalEntitySearchV6Request, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         legalEntitySearchService.search(
             legalEntitySearchParser.parse(legalEntitySearchRequestMapperV6.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()

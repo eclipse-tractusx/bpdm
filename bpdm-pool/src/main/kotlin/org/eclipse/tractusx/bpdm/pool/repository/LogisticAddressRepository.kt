@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -175,7 +175,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
             """
     )
     fun searchBusinessPartner(
-        searchRequest: LegalEntityPropertiesSearchRequest,
+        searchRequest: LegalEntityPropertiesSearchV7Request,
         isLegalEntity: Boolean,
         isSite: Boolean,
         isAdditionalAddress: Boolean,

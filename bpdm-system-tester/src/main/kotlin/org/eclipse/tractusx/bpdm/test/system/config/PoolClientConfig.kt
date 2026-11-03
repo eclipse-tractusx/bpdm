@@ -23,13 +23,13 @@ import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcCapableClientProperties
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcClientProperties
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ClientHttpConnector
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.DefaultPoolV7Client
 
 
 @ConfigurationProperties(prefix = PoolClientConfigurationProperties.PREFIX)
@@ -59,8 +59,8 @@ class PoolClientConfiguration{
         webClientProvider: BpdmWebClientProvider,
         properties: PoolClientConfigurationProperties,
         clientConnector: ClientHttpConnector
-    ): PoolApiClient {
-        return PoolClientImpl { webClientProvider.builder(properties).clientConnector(clientConnector).build() }
+    ): PoolV7Client {
+        return DefaultPoolV7Client { webClientProvider.builder(properties).clientConnector(clientConnector).build() }
     }
 }
 

@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import org.hibernate.annotations.Formula

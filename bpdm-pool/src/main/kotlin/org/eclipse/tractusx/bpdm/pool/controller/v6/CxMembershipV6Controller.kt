@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolCxMembershipV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.CxMembershipSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.CxMembershipUpdateApplicationV6Service
@@ -38,12 +38,12 @@ class CxMembershipV6Controller(
 ): PoolCxMembershipV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
-    override fun get(searchRequest: CxMembershipSearchRequestV6, paginationRequest: PaginationRequest): PageDto<CxMembershipDtoV6> {
+    override fun get(searchRequest: CxMembershipSearchV6Request, paginationRequest: PaginationRequest): PageDto<CxMembershipV6Dto> {
        return cxMembershipSearchApplicationV6Service.searchMemberships(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
-    override fun put(updateRequest: CxMembershipUpdateRequestV6) {
+    override fun put(updateRequest: CxMembershipUpdateV6Request) {
         return cxMembershipUpdateApplicationV6Service.updateMemberships(updateRequest)
     }
 }

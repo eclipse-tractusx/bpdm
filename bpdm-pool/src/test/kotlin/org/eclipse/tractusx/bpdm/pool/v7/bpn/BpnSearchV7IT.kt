@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.v7.bpn
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnIdentifierMappingV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierMappingV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
@@ -54,11 +54,11 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.bpns.findBpnsByIdentifiers(
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))
+            IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))
         ).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, legalEntityResponseA.header.bpnl))
+        val expectedBpns = setOf(BpnIdentifierMappingV7Dto(identifierX.value, legalEntityResponseA.header.bpnl))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -78,11 +78,11 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.bpns.findBpnsByIdentifiers(
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, identifierX.type, listOf(identifierX.value))
+            IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.ADDRESS, identifierX.type, listOf(identifierX.value))
         ).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, legalEntityResponseA.legalAddress.bpna))
+        val expectedBpns = setOf(BpnIdentifierMappingV7Dto(identifierX.value, legalEntityResponseA.legalAddress.bpna))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -101,11 +101,11 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.bpns.findBpnsByIdentifiers(
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, identifierX.type, listOf(identifierX.value))
+            IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.ADDRESS, identifierX.type, listOf(identifierX.value))
         ).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, additionalAddress.address.bpna))
+        val expectedBpns = setOf(BpnIdentifierMappingV7Dto(identifierX.value, additionalAddress.address.bpna))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -126,13 +126,13 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.bpns.findBpnsByIdentifiers(
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, legalIdentifierA.type, listOf(legalIdentifierA.value, legalIdentifierB.value))
+            IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, legalIdentifierA.type, listOf(legalIdentifierA.value, legalIdentifierB.value))
         ).body
 
         //THEN
         val expectedBpns = setOf(
-            BpnIdentifierMappingDto(legalIdentifierA.value, legalEntityResponseA.header.bpnl),
-            BpnIdentifierMappingDto(legalIdentifierB.value, legalEntityResponseB.header.bpnl)
+            BpnIdentifierMappingV7Dto(legalIdentifierA.value, legalEntityResponseA.header.bpnl),
+            BpnIdentifierMappingV7Dto(legalIdentifierB.value, legalEntityResponseB.header.bpnl)
         )
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
@@ -150,7 +150,7 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.bpns.findBpnsByIdentifiers(
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierX.type, listOf("UNKNOWN_VALUE"))
+            IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, identifierX.type, listOf("UNKNOWN_VALUE"))
         ).body
 
         //THEN
@@ -170,7 +170,7 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         Assertions.assertThatThrownBy {  poolClient.bpns.findBpnsByIdentifiers(
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, identifierX.type, listOf(identifierX.value))
+            IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.ADDRESS, identifierX.type, listOf(identifierX.value))
         )}
             .isInstanceOf(WebClientResponseException.NotFound::class.java)
     }
@@ -185,10 +185,10 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         val bpnl = processedBusinessPartner.legalEntity.bpnReference.referenceValue!!
 
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnlRequestIdentifier))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf(bpnlRequestIdentifier))).body
 
         //THEN
-        val expected = setOf(BpnRequestIdentifierMappingDto(bpnlRequestIdentifier, bpnl))
+        val expected = setOf(BpnRequestIdentifierMappingV7Dto(bpnlRequestIdentifier, bpnl))
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -208,10 +208,10 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         val bpna = processedBusinessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!
 
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf(bpnaRequestIdentifier))).body
 
         //THEN
-        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        val expected = setOf(BpnRequestIdentifierMappingV7Dto(bpnaRequestIdentifier, bpna))
         Assertions.assertThat(response).isEqualTo(expected)
     }
 
@@ -230,10 +230,10 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         val bpns = processedBusinessPartner.site!!.bpnReference.referenceValue!!
 
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnsRequestIdentifier))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf(bpnsRequestIdentifier))).body
 
         //THEN
-        val expected = setOf(BpnRequestIdentifierMappingDto(bpnsRequestIdentifier, bpns))
+        val expected = setOf(BpnRequestIdentifierMappingV7Dto(bpnsRequestIdentifier, bpns))
         Assertions.assertThat(response).isEqualTo(expected)
     }
 
@@ -252,10 +252,10 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         val bpna = processedBusinessPartner.site!!.siteMainAddress!!.bpnReference.referenceValue!!
 
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf(bpnaRequestIdentifier))).body
 
         //THEN
-        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        val expected = setOf(BpnRequestIdentifierMappingV7Dto(bpnaRequestIdentifier, bpna))
         Assertions.assertThat(response).isEqualTo(expected)
     }
 
@@ -274,10 +274,10 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         val bpna = processedBusinessPartner.additionalAddress!!.bpnReference.referenceValue!!
 
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf(bpnaRequestIdentifier))).body
 
         //THEN
-        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        val expected = setOf(BpnRequestIdentifierMappingV7Dto(bpnaRequestIdentifier, bpna))
         Assertions.assertThat(response).isEqualTo(expected)
     }
 
@@ -296,10 +296,10 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         val bpna = processedBusinessPartner.additionalAddress!!.bpnReference.referenceValue!!
 
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf(bpnaRequestIdentifier))).body
 
         //THEN
-        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        val expected = setOf(BpnRequestIdentifierMappingV7Dto(bpnaRequestIdentifier, bpna))
         Assertions.assertThat(response).isEqualTo(expected)
     }
 
@@ -318,7 +318,7 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
         //WHEN / THEN
         Assertions.assertThatThrownBy {
             poolClient.bpns.findBpnsByIdentifiers(
-                IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierX.type, tooManyIdentifierValues)
+                IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, identifierX.type, tooManyIdentifierValues)
             )
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
@@ -335,7 +335,7 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN / THEN
         Assertions.assertThatThrownBy {
-            poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(tooManyRequestedIdentifiers))
+            poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(tooManyRequestedIdentifiers))
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
@@ -347,7 +347,7 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `find bpn by unknown requested identifier returns empty`() {
         //WHEN
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf("UNKNOWN_REQUEST_IDENTIFIER"))).body
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchV7Request(setOf("UNKNOWN_REQUEST_IDENTIFIER"))).body
 
         //THEN
         Assertions.assertThat(response).isEmpty()

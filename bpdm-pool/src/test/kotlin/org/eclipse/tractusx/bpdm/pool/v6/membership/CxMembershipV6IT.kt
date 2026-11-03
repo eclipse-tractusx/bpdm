@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.v6.membership
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -42,12 +42,12 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         val bpnL = createLegalEntity(testName, false)
 
         //WHEN
-        val updatedMembership =  CxMembershipDtoV6(bpnL, true)
-        val updateRequest = CxMembershipUpdateRequestV6(listOf(updatedMembership))
+        val updatedMembership =  CxMembershipV6Dto(bpnL, true)
+        val updateRequest = CxMembershipUpdateV6Request(listOf(updatedMembership))
         poolClient.memberships.put(updateRequest)
 
         //THEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf(bpnL), true), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(listOf(bpnL), true), PaginationRequest())
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(updatedMembership))
 
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -64,12 +64,12 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         val bpnL = createLegalEntity(testName, true)
 
         //WHEN
-        val updatedMembership =  CxMembershipDtoV6(bpnL, false)
-        val updateRequest = CxMembershipUpdateRequestV6(listOf(updatedMembership))
+        val updatedMembership =  CxMembershipV6Dto(bpnL, false)
+        val updateRequest = CxMembershipUpdateV6Request(listOf(updatedMembership))
         poolClient.memberships.put(updateRequest)
 
         //THEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf(bpnL), false), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(listOf(bpnL), false), PaginationRequest())
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(updatedMembership))
 
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -89,14 +89,14 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         val nonMemberBpnlD = createLegalEntity("$testName D", false)
 
         //WHEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(null, null), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(null, null), PaginationRequest())
 
         //THEN
         val expectedMemberships = listOf(
-            CxMembershipDtoV6(memberBpnlA, true),
-            CxMembershipDtoV6(memberBpnlB, true),
-            CxMembershipDtoV6(nonMemberBpnlC, false),
-            CxMembershipDtoV6(nonMemberBpnlD, false),
+            CxMembershipV6Dto(memberBpnlA, true),
+            CxMembershipV6Dto(memberBpnlB, true),
+            CxMembershipV6Dto(nonMemberBpnlC, false),
+            CxMembershipV6Dto(nonMemberBpnlD, false),
         )
         val expectedResponse = PageDto(expectedMemberships.size.toLong(), 1, 0, expectedMemberships.size, expectedMemberships)
 
@@ -117,12 +117,12 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         createLegalEntity("$testName D", false)
 
         //WHEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(null, true), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(null, true), PaginationRequest())
 
         //THEN
         val expectedMemberships = listOf(
-            CxMembershipDtoV6(memberBpnlA, true),
-            CxMembershipDtoV6(memberBpnlB, true),
+            CxMembershipV6Dto(memberBpnlA, true),
+            CxMembershipV6Dto(memberBpnlB, true),
         )
         val expectedResponse = PageDto(expectedMemberships.size.toLong(), 1, 0, expectedMemberships.size, expectedMemberships)
 
@@ -143,12 +143,12 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         val nonMemberBpnlD = createLegalEntity("$testName D", false)
 
         //WHEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(null, false), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(null, false), PaginationRequest())
 
         //THEN
         val expectedMemberships = listOf(
-            CxMembershipDtoV6(nonMemberBpnlC, false),
-            CxMembershipDtoV6(nonMemberBpnlD, false),
+            CxMembershipV6Dto(nonMemberBpnlC, false),
+            CxMembershipV6Dto(nonMemberBpnlD, false),
         )
         val expectedResponse = PageDto(expectedMemberships.size.toLong(), 1, 0, expectedMemberships.size, expectedMemberships)
 
@@ -169,12 +169,12 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         createLegalEntity("$testName D", false)
 
         //WHEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf(memberBpnlA, nonMemberBpnlC), null), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(listOf(memberBpnlA, nonMemberBpnlC), null), PaginationRequest())
 
         //THEN
         val expectedMemberships = listOf(
-            CxMembershipDtoV6(memberBpnlA, true),
-            CxMembershipDtoV6(nonMemberBpnlC, false),
+            CxMembershipV6Dto(memberBpnlA, true),
+            CxMembershipV6Dto(nonMemberBpnlC, false),
         )
         val expectedResponse = PageDto(expectedMemberships.size.toLong(), 1, 0, expectedMemberships.size, expectedMemberships)
 
@@ -193,10 +193,10 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         createLegalEntity(testName, true)
 
         //WHEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf("NO BPNL"), null), PaginationRequest())
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(listOf("NO BPNL"), null), PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<CxMembershipDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<CxMembershipV6Dto>(0, 0, 0, 0, emptyList())
 
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
@@ -213,15 +213,15 @@ class CxMembershipV6IT: UnscheduledPoolTestBaseV6() {
         val bpnL = createLegalEntity(testName, false)
 
         //WHEN
-        val updateRequest = CxMembershipUpdateRequestV6(
-            listOf(CxMembershipDtoV6(bpnL, true), CxMembershipDtoV6("BPNL0000000000XY", true))
+        val updateRequest = CxMembershipUpdateV6Request(
+            listOf(CxMembershipV6Dto(bpnL, true), CxMembershipV6Dto("BPNL0000000000XY", true))
         )
         Assertions.assertThatThrownBy { poolClient.memberships.put(updateRequest) }
             .isInstanceOf(WebClientResponseException.NotFound::class.java)
 
         //THEN
-        val searchResponse = poolClient.memberships.get(CxMembershipSearchRequestV6(listOf(bpnL), null), PaginationRequest())
-        val expectedResponse = PageDto(1, 1, 0, 1, listOf(CxMembershipDtoV6(bpnL, false)))
+        val searchResponse = poolClient.memberships.get(CxMembershipSearchV6Request(listOf(bpnL), null), PaginationRequest())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(CxMembershipV6Dto(bpnL, false)))
 
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }

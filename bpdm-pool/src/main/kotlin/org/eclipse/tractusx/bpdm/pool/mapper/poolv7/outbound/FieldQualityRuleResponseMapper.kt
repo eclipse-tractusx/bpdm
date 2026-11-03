@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.FieldQualityRuleV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.FieldQualityRule
 import org.springframework.stereotype.Component
 
@@ -32,8 +32,8 @@ class FieldQualityRuleResponseMapper {
     /**
      * Returns the given field quality rule as the API reports it.
      */
-    fun toFieldQualityRule(rule: FieldQualityRule): FieldQualityRuleDto =
-        FieldQualityRuleDto(
+    fun toFieldQualityRule(rule: FieldQualityRule): FieldQualityRuleV7Dto =
+        FieldQualityRuleV7Dto(
             fieldPath = rule.fieldPath,
             schemaName = rule.schemaName,
             country = rule.country,

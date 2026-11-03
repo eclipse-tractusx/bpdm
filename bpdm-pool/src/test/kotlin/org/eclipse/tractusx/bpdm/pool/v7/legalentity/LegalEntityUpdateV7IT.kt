@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteHeaderScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityUpdate(updateRequest, givenLegalEntity).withConfidence(TestDataV7.SharedByOwnerConfidence))
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -70,7 +70,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityUpdate(updateRequest, givenLegalEntity).withConfidence(TestDataV7.NoConfidence))
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -92,8 +92,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityDuplicateIdentifier, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalEntityDuplicateIdentifier, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -115,8 +115,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressDuplicateIdentifier, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressDuplicateIdentifier, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -139,8 +139,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequestA, updateRequestB))
 
         //THEN
-        val expectedErrors = listOf(updateRequestA, updateRequestB).map { ErrorInfo(LegalEntityUpdateError.LegalEntityDuplicateIdentifier, "IGNORED", it.bpnl) }
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(updateRequestA, updateRequestB).map { ErrorInfoV7(LegalEntityUpdateErrorV7.LegalEntityDuplicateIdentifier, "IGNORED", it.bpnl) }
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -163,8 +163,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequestA, updateRequestB))
 
         //THEN
-        val expectedErrors = listOf(updateRequestA, updateRequestB).map { ErrorInfo(LegalEntityUpdateError.LegalAddressDuplicateIdentifier, "IGNORED", it.bpnl) }
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(updateRequestA, updateRequestB).map { ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressDuplicateIdentifier, "IGNORED", it.bpnl) }
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -180,8 +180,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityNotFound, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalEntityNotFound, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -201,8 +201,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalFormNotFound, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalFormNotFound, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -222,8 +222,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressRegionNotFound, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressRegionNotFound, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -243,8 +243,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressRegionNotFound, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressRegionNotFound, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -260,13 +260,13 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
 
         //WHEN
-        val unknownIdentifier = LegalEntityIdentifierDto(value = "Any Value", type = "UNKNOWN", issuingBody = null)
+        val unknownIdentifier = LegalEntityIdentifierV7Dto(value = "Any Value", type = "UNKNOWN", issuingBody = null)
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl).withLegalIdentifiers(unknownIdentifier)
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifierNotFound, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalEntityIdentifierNotFound, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -282,13 +282,13 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
 
         //WHEN
-        val unknownIdentifier = AddressIdentifierDto(value = "Any Value", type = "UNKNOWN")
+        val unknownIdentifier = AddressIdentifierV7Dto(value = "Any Value", type = "UNKNOWN")
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl).withLegalAddressIdentifiers(unknownIdentifier)
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressIdentifierNotFound, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressIdentifierNotFound, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -309,8 +309,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalEntityIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -331,8 +331,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -355,8 +355,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.MultipleUltimateOwnersInHierarchy, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -379,8 +379,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.MultipleUltimateOwnersInHierarchy, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -406,9 +406,9 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedErrors = listOf(updateRequestA, updateRequestB).map {
-            ErrorInfo(LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy, "IGNORED", it.bpnl)
+            ErrorInfoV7(LegalEntityUpdateErrorV7.MultipleUltimateOwnersInHierarchy, "IGNORED", it.bpnl)
         }
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -433,7 +433,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, owningLegalEntity)
             .withUltimateOwner(ownershipUltimate = true, ultimateOwnerBpnl = null)
             .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(listOf(expectedLegalEntity), emptyList())
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -459,7 +459,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, ownedLegalEntity)
             .withUltimateOwner(ownershipUltimate = false, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
             .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(listOf(expectedLegalEntity), emptyList())
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -494,7 +494,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
                 .withUltimateOwner(true, null)
                 .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
         )
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -516,8 +516,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantLegalNameMissing, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.ScriptVariantLegalNameMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -539,8 +539,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -563,10 +563,10 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedErrors = listOf(
-            ErrorInfo(LegalEntityUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl),
-            ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl)
+            ErrorInfoV7(LegalEntityUpdateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl),
+            ErrorInfoV7(LegalEntityUpdateErrorV7.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl)
         )
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -583,7 +583,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
         val coveredScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
         val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", givenLegalEntity)
-            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(coveredScriptCode, "Site Name $testName"))) }
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantV7Dto(coveredScriptCode, "Site Name $testName"))) }
         val givenSite = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
 
         //WHEN
@@ -593,8 +593,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
         assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode })
@@ -619,8 +619,8 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.AlternativeHeadquarterCannotOwnUltimately, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.AlternativeHeadquarterCannotOwnUltimately, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }

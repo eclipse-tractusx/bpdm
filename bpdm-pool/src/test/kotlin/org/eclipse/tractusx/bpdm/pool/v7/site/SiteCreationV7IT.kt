@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteHeaderScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
@@ -48,7 +48,7 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedSite = resultFactory.buildSiteSiteCreate(siteRequest)
-        val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(listOf(expectedSite), emptyList())
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -69,7 +69,7 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedSite = resultFactory.buildLegalSiteCreate(siteRequest, legalEntityResponse)
-        val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(listOf(expectedSite), emptyList())
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -115,8 +115,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response2 = poolClient.sites.createSite(listOf(siteRequest2))
 
         //THEN
-        val expectedResponse1 = SitePartnerCreateResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest1)), emptyList())
-        val expectedResponse2 = SitePartnerCreateResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest2)), emptyList())
+        val expectedResponse1 = SitePartnerCreateV7ResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest1)), emptyList())
+        val expectedResponse2 = SitePartnerCreateV7ResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest2)), emptyList())
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response1, expectedResponse1)
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response2, expectedResponse2)
@@ -136,12 +136,12 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
-            .withMainAddressIdentifiers(AddressIdentifierDto(identifierX.value, identifierX.typeVerbose.technicalKey))
+            .withMainAddressIdentifiers(AddressIdentifierV7Dto(identifierX.value, identifierX.typeVerbose.technicalKey))
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -164,8 +164,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest1, siteRequest2))
 
         //THEN
-        val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -182,12 +182,12 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
-            .withMainAddressIdentifiers(AddressIdentifierDto(value = "Any Value", type = "UNKNOWN"))
+            .withMainAddressIdentifiers(AddressIdentifierV7Dto(value = "Any Value", type = "UNKNOWN"))
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressIdentifierNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.MainAddressIdentifierNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -203,8 +203,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.LegalEntityNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.LegalEntityNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -225,8 +225,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -247,8 +247,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -269,8 +269,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressIdentifiersTooMany, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.MainAddressIdentifiersTooMany, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -291,8 +291,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNameMissing, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.ScriptVariantNameMissing, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -313,8 +313,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressScriptVariantCityMissing, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.MainAddressScriptVariantCityMissing, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -338,10 +338,10 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         // One script variant carries both the site name and the main address in that script, so a duplicated script code is
         // reported by the site and by the main address.
         val expectedErrors = listOf(
-            ErrorInfo(SiteCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index),
-            ErrorInfo(SiteCreateError.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index)
+            ErrorInfoV7(SiteCreateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index),
+            ErrorInfoV7(SiteCreateErrorV7.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index)
         )
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -364,8 +364,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         // This endpoint has no request index, so the entity key is the request's position.
-        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNameMissing, "IGNORED", "0")
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.ScriptVariantNameMissing, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -387,8 +387,8 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", "0")
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -407,12 +407,12 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         //WHEN
         val uncoveredScriptCode = scriptCodeOtherThan(legalEntityResponse.scriptVariants.map { it.scriptCode }.toSet())
         val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
-            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(uncoveredScriptCode, "Site Name $testName"))) }
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantV7Dto(uncoveredScriptCode, "Site Name $testName"))) }
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNotCoveredByMainAddress, "IGNORED", "0")
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteCreateErrorV7.ScriptVariantNotCoveredByMainAddress, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }

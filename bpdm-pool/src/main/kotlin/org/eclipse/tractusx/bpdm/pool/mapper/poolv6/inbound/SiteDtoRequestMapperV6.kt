@@ -19,17 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 
 /**
  * Maps a **v6** site request into the shared loose site request models. v6 sites carry no script variants, so a site
@@ -43,19 +44,19 @@ class SiteDtoRequestMapperV6(
     /**
      * Returns the create request for the site a client sent, under the parent legal entity it named.
      */
-    fun toCreateRequest(request: SitePartnerCreateRequestV6): SiteCreateRequest =
+    fun toCreateRequest(request: SitePartnerCreateV6Request): SiteCreateRequest =
         SiteCreateRequest(legalEntityBpn = request.bpnlParent, content = toContentRequest(request.site))
 
     /**
      * Returns the update request for the site a client sent, addressed by its BPN.
      */
-    fun toUpdateRequest(request: SitePartnerUpdateRequestV6): SiteUpdateRequest =
+    fun toUpdateRequest(request: SitePartnerUpdateV6Request): SiteUpdateRequest =
         SiteUpdateRequest(siteBpn = request.bpns, content = toContentRequest(request.site))
 
     /**
      * Returns the create request for the site a client sent that takes its parent's legal address as main address.
      */
-    fun toCreateWithLegalAddressAsMainRequest(request: SiteCreateRequestWithLegalAddressAsMainV6): SiteCreateWithLegalAddressAsMainRequest =
+    fun toCreateWithLegalAddressAsMainRequest(request: SiteCreateWithLegalAddressAsMainV6Request): SiteCreateWithLegalAddressAsMainRequest =
         SiteCreateWithLegalAddressAsMainRequest(
             legalEntityBpn = request.bpnLParent,
             header = SiteHeaderRequest(
@@ -66,13 +67,13 @@ class SiteDtoRequestMapperV6(
             )
         )
 
-    private fun toContentRequest(site: SiteDtoV6): SiteContentRequest =
+    private fun toContentRequest(site: SiteV6Dto): SiteContentRequest =
         SiteContentRequest(
             header = toHeaderRequest(site),
             mainAddress = addressDtoRequestMapperV6.toContentRequest(site.mainAddress)
         )
 
-    private fun toHeaderRequest(site: SiteDtoV6): SiteHeaderRequest =
+    private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRequest =
         SiteHeaderRequest(
             name = site.name,
             states = site.states.map { toStateRequest(it) },
@@ -80,10 +81,10 @@ class SiteDtoRequestMapperV6(
             scriptVariants = emptyList()
         )
 
-    private fun toStateRequest(state: SiteStateDtoV6): SiteState =
-        SiteState(state.validFrom?.toUtcInstant(), state.validTo?.toUtcInstant(), state.type)
+    private fun toStateRequest(state: SiteStateV6Dto): SiteState =
+        SiteState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
@@ -92,4 +93,8 @@ class SiteDtoRequestMapperV6(
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

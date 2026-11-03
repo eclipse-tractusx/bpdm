@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import jakarta.persistence.criteria.Predicate
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.springframework.data.jpa.domain.Specification
@@ -31,7 +31,7 @@ import org.springframework.data.jpa.repository.Query
 interface AddressRelationRepository : JpaRepository<AddressRelationDb, Long>, JpaSpecificationExecutor<AddressRelationDb> {
 
     companion object {
-        fun byRelation(startAddress: LogisticAddressDb?, endAddress: LogisticAddressDb?, type: AddressRelationType?) =
+        fun byRelation(startAddress: LogisticAddressDb?, endAddress: LogisticAddressDb?, type: AddressRelationTypeV7?) =
             Specification<AddressRelationDb> { root, _, builder ->
                 val predicates = mutableListOf<Predicate>()
 
@@ -44,7 +44,7 @@ interface AddressRelationRepository : JpaRepository<AddressRelationDb, Long>, Jp
                 }
 
                 type?.let {
-                    predicates.add(builder.equal(root.get<AddressRelationType>(AddressRelationDb::type.name), it))
+                    predicates.add(builder.equal(root.get<AddressRelationTypeV7>(AddressRelationDb::type.name), it))
                 }
 
                 builder.and(*predicates.toTypedArray())
@@ -52,7 +52,7 @@ interface AddressRelationRepository : JpaRepository<AddressRelationDb, Long>, Jp
     }
 
     @Query("SELECT r FROM AddressRelationDb r WHERE r.type = :addressRelationType AND (r.startAddress = :address OR r.endAddress = :address)")
-    fun findInSourceOrTarget(addressRelationType: AddressRelationType, address: LogisticAddressDb): Set<AddressRelationDb>
+    fun findInSourceOrTarget(addressRelationType: AddressRelationTypeV7, address: LogisticAddressDb): Set<AddressRelationDb>
 
-    fun findByTypeAndStartAddress(addressRelationType: AddressRelationType, address: LogisticAddressDb): Set<AddressRelationDb>
+    fun findByTypeAndStartAddress(addressRelationType: AddressRelationTypeV7, address: LogisticAddressDb): Set<AddressRelationDb>
 }

@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties

@@ -23,7 +23,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.ChangelogSearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.ChangelogResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.ChangelogParseErrorMapper
@@ -32,7 +31,8 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogSearc
 import org.eclipse.tractusx.bpdm.pool.service.parser.ChangelogSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest as ChangelogSearchRequestDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
 
 /**
  * The REST-API boundary for the V7 "search changelog entries" operation.
@@ -51,9 +51,9 @@ class ChangelogSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchChangelogEntries(
-        searchRequest: ChangelogSearchRequestDto,
+        searchRequest: ChangelogSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDto> =
+    ): PageDto<ChangelogEntryVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = null)
 
     /**
@@ -61,12 +61,12 @@ class ChangelogSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchMemberChangelogEntries(
-        searchRequest: ChangelogSearchRequestDto,
+        searchRequest: ChangelogSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDto> =
+    ): PageDto<ChangelogEntryVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
-    private fun search(searchRequest: ChangelogSearchRequestDto, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+    private fun search(searchRequest: ChangelogSearchV7Request, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         when (val criteria = changelogSearchParser.parse(changelogSearchRequestMapper.toSearchRequest(searchRequest, isDataSpaceParticipant))) {
             is ParseResult.Failure -> throw changelogParseErrorMapper.toSearchException(criteria.errors)
             is ParseResult.Success -> changelogSearchService.search(criteria.parsed, paginationRequest.toPageRequest())

@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.CxMembershipResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantSearchService
@@ -48,9 +48,9 @@ class CxMembershipSearchApplicationV6Service(
      */
     @Transactional(readOnly = true)
     fun searchMemberships(
-        searchRequest: CxMembershipSearchRequestV6,
+        searchRequest: CxMembershipSearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<CxMembershipDtoV6> {
+    ): PageDto<CxMembershipV6Dto> {
         val criteria = dataSpaceParticipantSearchParser.parse(cxMembershipRequestMapperV6.toSearchRequest(searchRequest))
 
         return dataSpaceParticipantSearchService.search(criteria, paginationRequest.toPageRequest())

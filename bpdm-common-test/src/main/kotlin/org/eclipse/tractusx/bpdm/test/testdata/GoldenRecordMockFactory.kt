@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata
 
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
@@ -38,10 +38,26 @@ class GoldenRecordMockFactory(
         val taskState: TaskClientStateDto
     )
 
-    fun mockLegalEntityRefinement(seed: String, owningCompany: String?, nameParts: List<String>): LegalEntityWithLegalAddressVerboseDto {
+    fun mockLegalEntityRefinement(seed: String, owningCompany: String?, nameParts: List<String>): LegalEntityWithLegalAddressVerboseV7Dto {
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, nameParts)
         return poolMockResult
+    }
+
+    fun mockLegalEntityRefinementChangedInPool(seed: String, owningCompany: String?, nameParts: List<String>): LegalEntityWithLegalAddressVerboseV7Dto {
+        val taskGoldenRecord = mockLegalEntityRefinement(seed, owningCompany, nameParts)
+        val changedGoldenRecord = taskGoldenRecord.copy(
+            header = taskGoldenRecord.header.copy(
+                legalName = "Changed ${taskGoldenRecord.header.legalName}",
+                updatedAt = taskGoldenRecord.header.updatedAt.plusSeconds(1)
+            )
+        )
+        poolMockDataFactory.mockLegalEntitySearchResult(changedGoldenRecord)
+        return changedGoldenRecord
+    }
+
+    fun mockGoldenRecordsDeletedInPool() {
+        poolMockDataFactory.mockNoGoldenRecordSearchResults()
     }
 
     fun mockLegalEntityOnSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>): PoolMockDataFactory.SiteWithLegalEntityParent {

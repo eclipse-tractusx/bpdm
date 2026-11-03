@@ -19,11 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressCreateErrorV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
@@ -33,6 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateSer
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.AddressCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
 
 /**
  * The REST-API boundary for the legacy v6 "create additional address" operation, using the v6 request/response shapes.
@@ -51,11 +51,11 @@ class AddressCreateApplicationV6Service(
      * address or the errors that stopped it.
      */
     @Transactional
-    fun createAddresses(requests: Collection<AddressPartnerCreateRequestV6>): AddressPartnerCreateResponseWrapperV6 {
+    fun createAddresses(requests: Collection<AddressPartnerCreateV6Request>): AddressPartnerCreateV6ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map { addressDtoRequestMapperV6.toCreateRequest(it) }
 
-        val responses = mutableListOf<AddressPartnerCreateVerboseDtoV6>()
+        val responses = mutableListOf<AddressPartnerCreateVerboseV6Dto>()
         val errors = mutableListOf<ErrorInfoV6<AddressCreateErrorV6>>()
         requestList.zip(parseAndExecute(createRequests, untypedParentAddressCreateParser::parse, addressCreateService::create)).forEach { (request, result) ->
             when (result) {
@@ -64,6 +64,6 @@ class AddressCreateApplicationV6Service(
             }
         }
 
-        return AddressPartnerCreateResponseWrapperV6(responses, errors)
+        return AddressPartnerCreateV6ResponseWrapper(responses, errors)
     }
 }

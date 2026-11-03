@@ -20,12 +20,18 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.common.latestSeededStateSecond
 import org.eclipse.tractusx.bpdm.test.testdata.pool.common.BusinessPartnerCommonRequestFactory
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
 
 
 /**
@@ -46,18 +52,18 @@ class BusinessPartnerRequestFactory(
     fun createLegalEntityRequest(
         seed: String,
         isParticipantData: Boolean = true
-    ): LegalEntityPartnerCreateRequest {
+    ): LegalEntityPartnerCreateV7Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return LegalEntityPartnerCreateRequest(
+        return LegalEntityPartnerCreateV7Request(
             legalEntity = createLegalEntityDto(seed, random, isParticipantData),
             index = seed
         )
     }
 
-    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong()), isParticipantData: Boolean = true): LegalEntityDto{
-        return LegalEntityDto(
+    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong()), isParticipantData: Boolean = true): LegalEntityV7Dto{
+        return LegalEntityV7Dto(
             header = createLegalEntityHeaderDto(seed, random, isParticipantData),
             legalAddress = createAddressDto(seed, random),
             scriptVariants = listOf(buildLegalEntityScriptVariant(seed, random))
@@ -66,21 +72,21 @@ class BusinessPartnerRequestFactory(
 
 
 
-    fun createLegalEntityHeaderDto(seed: String, random: Random =  Random(seed.hashCode().toLong()), isCatenaXMemberData: Boolean = true): LegalEntityHeaderDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun createLegalEntityHeaderDto(seed: String, random: Random =  Random(seed.hashCode().toLong()), isCatenaXMemberData: Boolean = true): LegalEntityHeaderV7Dto {
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return LegalEntityHeaderDto(
+        return LegalEntityHeaderV7Dto(
             legalName = "Legal Name $seed",
             legalShortName = "Legal Short Name $seed",
             legalForm = availableLegalForms.randomOrNull(random),
             identifiers = listOf(availableLegalEntityIdentifiers.randomOrNull(random), availableLegalEntityIdentifiers.randomOrNull(random))
                 .mapNotNull{ it }
-                .mapIndexed { index, idKey -> LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed") },
+                .mapIndexed { index, idKey -> LegalEntityIdentifierV7Dto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed") },
             states = listOf(
-                LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                LegalEntityStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                LegalEntityStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 1,
@@ -92,10 +98,10 @@ class BusinessPartnerRequestFactory(
         )
     }
 
-    fun buildLegalEntityScriptVariant(seed: String, random: Random =  Random(seed.hashCode().toLong())): LegalEntityScriptVariantDto {
+    fun buildLegalEntityScriptVariant(seed: String, random: Random =  Random(seed.hashCode().toLong())): LegalEntityScriptVariantV7Dto {
         val scriptCode = availableScriptCodes.random(random)
 
-        return LegalEntityScriptVariantDto(
+        return LegalEntityScriptVariantV7Dto(
            scriptCode = scriptCode,
             legalName = "Legal Name $seed Variant $scriptCode",
             shortName = "Short Name $seed Variant $scriptCode",

@@ -20,18 +20,45 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.test.testdata.pool.common.latestSeededStateSecond
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto as AddressPartnerCreateVerboseDtoV7
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteHeaderScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
 
 class PoolRequestFactoryV7(
     private val testMetadata: TestMetadataV7
@@ -40,47 +67,47 @@ class PoolRequestFactoryV7(
     private val availableAdminAreas: Collection<String> = testMetadata.adminAreas.map { it.code }
     private val availableScriptCodes: Collection<String> = testMetadata.scriptCodes.map { it.technicalKey }
 
-    fun buildLegalEntityCreateRequest(seed: String, isParticipantData: Boolean = false): LegalEntityPartnerCreateRequest {
+    fun buildLegalEntityCreateRequest(seed: String, isParticipantData: Boolean = false): LegalEntityPartnerCreateV7Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return LegalEntityPartnerCreateRequest(
+        return LegalEntityPartnerCreateV7Request(
             legalEntity = buildLegalEntity(seed, random, isParticipantData),
             index = seed
         )
     }
 
-    fun buildLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateRequest {
+    fun buildLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateV7Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return LegalEntityPartnerUpdateRequest(
+        return LegalEntityPartnerUpdateV7Request(
             bpnl = bpnl,
             legalEntity = buildLegalEntity(seed, random)
         )
     }
 
-    fun buildLegalEntity(seed: String, random: Random = createRandom(seed), isParticipantData: Boolean = false): LegalEntityDto {
-        return LegalEntityDto(
+    fun buildLegalEntity(seed: String, random: Random = createRandom(seed), isParticipantData: Boolean = false): LegalEntityV7Dto {
+        return LegalEntityV7Dto(
             header = buildLegalEntityHeaderDto(seed, random, isParticipantData),
             legalAddress = createAddressDto("Legal Address $seed", random),
             scriptVariants = listOf(buildLegalEntityScriptVariantDto(seed, random)),
         )
     }
 
-    fun buildLegalEntityHeaderDto(seed: String, random: Random = createRandom(seed), isParticipantData: Boolean = false): LegalEntityHeaderDto{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun buildLegalEntityHeaderDto(seed: String, random: Random = createRandom(seed), isParticipantData: Boolean = false): LegalEntityHeaderV7Dto{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return LegalEntityHeaderDto(
+        return LegalEntityHeaderV7Dto(
             legalName = "Legal Name $seed",
             legalShortName = "Legal Short Name $seed",
             legalForm = testMetadata.legalForms.random(random).technicalKey,
             identifiers = listOf(buildLegalEntityIdentifier(seed, 0, random), buildLegalEntityIdentifier(seed, 1, random)),
             states = listOf(
-                LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                LegalEntityStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                LegalEntityStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 0,
@@ -92,15 +119,15 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildLegalEntityIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): LegalEntityIdentifierDto{
+    fun buildLegalEntityIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): LegalEntityIdentifierV7Dto{
         val idKey = testMetadata.legalEntityIdentifierTypes.random(random).technicalKey
-        return LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed")
+        return LegalEntityIdentifierV7Dto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed")
     }
 
-    fun buildLegalEntityScriptVariantDto(seed: String, random: Random = createRandom(seed)): LegalEntityScriptVariantDto {
+    fun buildLegalEntityScriptVariantDto(seed: String, random: Random = createRandom(seed)): LegalEntityScriptVariantV7Dto {
         val scriptCode = availableScriptCodes.random(random)
 
-        return LegalEntityScriptVariantDto(
+        return LegalEntityScriptVariantV7Dto(
             scriptCode = scriptCode,
             legalName = buildScriptVariantStringValue("Legal Name", seed, scriptCode),
             shortName = buildScriptVariantStringValue("Legal Short Name", seed, scriptCode),
@@ -108,29 +135,29 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityWithLegalAddressVerboseDto): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityWithLegalAddressVerboseV7Dto): SitePartnerCreateV7Request {
         return with(buildSiteCreateRequest(seed, legalEntityParent.header.bpnl)){ copy(site = site.withMainAddressIsShared()) }
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityWithLegalAddressVerboseDto): SiteCreateRequestWithLegalAddressAsMain {
+    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityWithLegalAddressVerboseV7Dto): SiteCreateWithLegalAddressAsMainV7Request {
         return buildLegalAddressSiteCreateRequest(seed, legalEntityParent.header.bpnl)
     }
 
-    fun createSiteUpdateRequest(seed: String, siteToUpdate: SitePartnerCreateVerboseDto): SitePartnerUpdateRequest {
+    fun createSiteUpdateRequest(seed: String, siteToUpdate: SitePartnerCreateVerboseV7Dto): SitePartnerUpdateV7Request {
         return with(createSiteUpdateRequest(seed, siteToUpdate.site.bpns)){ copy(site = site.withMainAddressIsShared()) }
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntity: LegalEntityWithLegalAddressVerboseDto): AddressPartnerCreateRequest =
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntity: LegalEntityWithLegalAddressVerboseV7Dto): AddressPartnerCreateV7Request =
         buildAdditionalAddressCreateRequest(seed, legalEntity.header.bpnl)
 
-    fun buildAdditionalAddressCreateRequest(seed: String, site: SitePartnerCreateVerboseDto): AddressPartnerCreateRequest =
+    fun buildAdditionalAddressCreateRequest(seed: String, site: SitePartnerCreateVerboseV7Dto): AddressPartnerCreateV7Request =
         buildAdditionalAddressCreateRequest(seed, site.site.bpns)
 
-    fun buildAddressUpdateRequest(seed: String, legalEntity: LegalEntityWithLegalAddressVerboseDto): AddressPartnerUpdateRequest =
+    fun buildAddressUpdateRequest(seed: String, legalEntity: LegalEntityWithLegalAddressVerboseV7Dto): AddressPartnerUpdateV7Request =
         buildAddressUpdateRequest(seed, legalEntity.legalAddress.bpna)
             .copy(scriptVariants = buildAddressScriptVariants(legalEntity.scriptVariants.map { it.scriptCode }, seed))
 
-    fun buildAddressUpdateRequest(seed: String, site: SitePartnerCreateVerboseDto): AddressPartnerUpdateRequest =
+    fun buildAddressUpdateRequest(seed: String, site: SitePartnerCreateVerboseV7Dto): AddressPartnerUpdateV7Request =
         buildAddressUpdateRequest(seed, site.mainAddress.bpna)
             .copy(scriptVariants = buildAddressScriptVariants(site.site.scriptVariants.map { it.scriptCode }, seed))
 
@@ -138,37 +165,37 @@ class PoolRequestFactoryV7(
      * Builds one address script variant per given script code. A legal or site main address has to keep covering every
      * script code its legal entity or site is named in, so an update of such an address states them explicitly.
      */
-    fun buildAddressScriptVariants(scriptCodes: List<String>, seed: String): List<LogisticAddressScriptVariantDto> =
-        scriptCodes.map { LogisticAddressScriptVariantDto(it, buildPostalAddressScriptVariant(it, seed)) }
+    fun buildAddressScriptVariants(scriptCodes: List<String>, seed: String): List<LogisticAddressScriptVariantV7Dto> =
+        scriptCodes.map { LogisticAddressScriptVariantV7Dto(it, buildPostalAddressScriptVariant(it, seed)) }
 
-    fun buildAddressUpdateRequest(seed: String, createdAddress: AddressPartnerCreateVerboseDtoV7): AddressPartnerUpdateRequest =
+    fun buildAddressUpdateRequest(seed: String, createdAddress: AddressPartnerCreateVerboseV7Dto): AddressPartnerUpdateV7Request =
         buildAddressUpdateRequest(seed, createdAddress.address.bpna)
 
-    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateRequest {
-        return AddressPartnerUpdateRequest(bpna, createAddressDto(seed, random), listOfNotNull(buildLogisticAddressScriptVariant(seed, random)))
+    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateV7Request {
+        return AddressPartnerUpdateV7Request(bpna, createAddressDto(seed, random), listOfNotNull(buildLogisticAddressScriptVariant(seed, random)))
     }
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): SitePartnerCreateV7Request {
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
-    fun buildLegalSiteCreateRequest(seed: String, bpnlParent: String, random: Random = Random(seed.hashCode().toLong())): SiteCreateRequestWithLegalAddressAsMain{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun buildLegalSiteCreateRequest(seed: String, bpnlParent: String, random: Random = Random(seed.hashCode().toLong())): SiteCreateWithLegalAddressAsMainV7Request{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteCreateRequestWithLegalAddressAsMain(
+        return SiteCreateWithLegalAddressAsMainV7Request(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             scriptVariants = availableScriptCodes.shuffled(random).take(2).map { scriptCode ->
-                SiteHeaderScriptVariantDto(
+                SiteHeaderScriptVariantV7Dto(
                     scriptCode = scriptCode,
                     name = buildScriptVariantStringValue("Site Name", seed, scriptCode)
                 )
             },
             bpnLParent = bpnlParent,
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -179,33 +206,33 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
-        return SitePartnerCreateRequest(
+    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateV7Request {
+        return SitePartnerCreateV7Request(
             bpnlParent = bpnlParent,
             index = seed,
             site = createSiteDto("Main Address $seed")
         )
     }
 
-    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateRequest {
-        return SitePartnerUpdateRequest(
+    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateV7Request {
+        return SitePartnerUpdateV7Request(
             bpns = bpns,
             site = createSiteDto("Main Address $seed")
         )
     }
 
-    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteV7Dto {
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteDto(
+        return SiteV7Dto(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
             scriptVariants = listOfNotNull(buildSiteScriptVariant(seed, random)),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -216,17 +243,17 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateWithLegalAddressAsMainV7Request{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteCreateRequestWithLegalAddressAsMain(
+        return SiteCreateWithLegalAddressAsMainV7Request(
             name = "Site Name $seed",
             bpnLParent = bpnL,
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -237,15 +264,15 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerCreateV7Request {
         return buildAdditionalAddressCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateV7Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return AddressPartnerCreateRequest(
+        return AddressPartnerCreateV7Request(
             bpnParent = bpnParent,
             index = seed,
             address = createAddressDto(seed, random),
@@ -253,16 +280,16 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDto {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
-        return LogisticAddressDto(
+    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressV7Dto {
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        return LogisticAddressV7Dto(
             name = "Address Name $seed",
             states = listOf(
-                AddressStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                AddressStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                AddressStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                AddressStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
-            physicalPostalAddress = PhysicalPostalAddressDto(
+            physicalPostalAddress = PhysicalPostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
@@ -271,7 +298,7 @@ class PoolRequestFactoryV7(
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 district = "District $seed",
-                street = StreetDto(
+                street = StreetV7Dto(
                     name = "Street Name $seed",
                     houseNumber = "House Number $seed",
                     houseNumberSupplement = "House Number Supplement $seed",
@@ -289,7 +316,7 @@ class PoolRequestFactoryV7(
                 door = "Door $seed",
                 taxJurisdictionCode = "Tax Jurisdiction Code $seed"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
+            alternativePostalAddress = AlternativePostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
@@ -299,7 +326,7 @@ class PoolRequestFactoryV7(
                 deliveryServiceType = DeliveryServiceType.entries.random(random),
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 0,
@@ -310,9 +337,9 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDto{
+    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierV7Dto{
         val idKey = availableAddressIdentifiers.random(random)
-        return AddressIdentifierDto("$idKey Value $seed $index", idKey)
+        return AddressIdentifierV7Dto("$idKey Value $seed $index", idKey)
     }
 
     /**
@@ -322,36 +349,36 @@ class PoolRequestFactoryV7(
     fun scriptCodeFor(seed: String, random: Random = Random(seed.hashCode().toLong())): String? =
         availableScriptCodes.randomOrNull(random)
 
-    fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantDto?{
+    fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantV7Dto?{
         val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
-        return SiteScriptVariantDto(
+        return SiteScriptVariantV7Dto(
             scriptCode = scriptCode,
             name = buildScriptVariantStringValue("Site Name", seed, scriptCode),
             mainAddress = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
-    fun buildLogisticAddressScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressScriptVariantDto? {
+    fun buildLogisticAddressScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressScriptVariantV7Dto? {
         val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
-        return LogisticAddressScriptVariantDto(
+        return LogisticAddressScriptVariantV7Dto(
             scriptCode = scriptCode,
             address = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
-    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariantDto{
-        return PostalAddressScriptVariantDto(
+    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariantV7Dto{
+        return PostalAddressScriptVariantV7Dto(
             addressName = buildScriptVariantStringValue("Address Name", seed, scriptCode),
             physicalAddress = buildPhysicalAddressScriptVariant(scriptCode, seed),
             alternativeAddress = buildAlternativeAddressScriptVariant(scriptCode, seed)
         )
     }
 
-    fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDto{
-        return PhysicalAddressScriptVariantDto(
+    fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantV7Dto{
+        return PhysicalAddressScriptVariantV7Dto(
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
-            street = StreetScriptVariantDto(
+            street = StreetScriptVariantV7Dto(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
@@ -366,8 +393,8 @@ class PoolRequestFactoryV7(
         )
     }
 
-    fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDto{
-        return AlternativeAddressScriptVariantDto(
+    fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantV7Dto{
+        return AlternativeAddressScriptVariantV7Dto(
             city = buildScriptVariantStringValue("City", seed, scriptCode)
         )
     }
@@ -378,7 +405,7 @@ class PoolRequestFactoryV7(
 
     private fun createRandom(seed: String) =  Random(seed.hashCode().toLong())
 
-    private fun SiteDto.withMainAddressIsShared() =
+    private fun SiteV7Dto.withMainAddressIsShared() =
         copy(mainAddress = mainAddress.copy(confidenceCriteria = mainAddress.confidenceCriteria.withGivenConfidence(TestDataV7.SharedByOwner)))
 
 }

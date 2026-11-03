@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.springframework.stereotype.Component
 
@@ -32,6 +32,6 @@ class AdministrativeAreaResponseMapperV6 {
     /**
      * Returns the given region as the country subdivision the v6 API reports it as.
      */
-    fun toCountrySubdivision(region: RegionDb): CountrySubdivisionDtoV6 =
-        CountrySubdivisionDtoV6(countryCode = region.country.countryCode, code = region.regionCode, name = region.regionName)
+    fun toCountrySubdivision(region: RegionDb): CountrySubdivisionV6Dto =
+        CountrySubdivisionV6Dto(countryCode = region.country.countryCode, code = region.regionCode, name = region.regionName)
 }

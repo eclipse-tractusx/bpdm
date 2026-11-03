@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityGetParseError
@@ -56,7 +56,7 @@ class LegalEntityGetParser(
 
     private fun resolveByIdentifier(identifierTypeKey: String, identifierValue: String): ParseResult<LegalEntityDb, LegalEntityGetParseError> {
         val legalEntity = legalEntityRepository.findByIdentifierTypeKeyAndValueIgnoreCase(
-            IdentifierBusinessPartnerType.LEGAL_ENTITY,
+            IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY,
             identifierTypeKey,
             identifierValue
         )

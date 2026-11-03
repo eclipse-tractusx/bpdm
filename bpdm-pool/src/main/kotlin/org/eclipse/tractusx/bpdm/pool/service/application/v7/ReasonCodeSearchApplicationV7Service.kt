@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.ReasonCodeSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +40,7 @@ class ReasonCodeSearchApplicationV7Service(
      * Returns the requested page of all known reason codes.
      */
     @Transactional(readOnly = true)
-    fun searchReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeDto> =
+    fun searchReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeV7Dto> =
         reasonCodeSearchService.search(paginationRequest.toPageRequest())
-            .toPageDto { ReasonCodeDto(technicalKey = it.technicalKey, description = it.description) }
+            .toPageDto { ReasonCodeV7Dto(technicalKey = it.technicalKey, description = it.description) }
 }

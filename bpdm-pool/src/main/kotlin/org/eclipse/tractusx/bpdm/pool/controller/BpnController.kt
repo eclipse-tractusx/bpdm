@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.PoolBpnV7Api
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnIdentifierMappingV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierMappingV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.BpnSearchApplicationV7Service
 import org.springframework.http.HttpStatus
@@ -35,15 +35,15 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class BpnController(
     private val bpnSearchApplicationService: BpnSearchApplicationV7Service
-) : PoolBpnApi {
+) : PoolBpnV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>> {
+    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchV7Request): ResponseEntity<Set<BpnIdentifierMappingV7Dto>> {
         return ResponseEntity(bpnSearchApplicationService.searchBpnsByIdentifiers(request), HttpStatus.OK)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>> {
+    override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchV7Request): ResponseEntity<Set<BpnRequestIdentifierMappingV7Dto>> {
         return ResponseEntity(bpnSearchApplicationService.searchBpnsByRequestedIdentifiers(request), HttpStatus.OK)
     }
 }

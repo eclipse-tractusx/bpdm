@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.system.config
 
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
@@ -53,6 +51,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 
 /**
  * The test data and assertion helpers the step definitions share.
@@ -95,9 +95,9 @@ class TestDataConfiguration {
     }
 
     @Bean
-    fun testMetadataV7(poolClient: PoolApiClient): TestMetadataV7 {
+    fun testMetadataV7(poolClient: PoolV7Client): TestMetadataV7 {
         val poolDataHelper = PoolDataHelper(poolClient, listOf(
-            ReasonCodeDto("HEADQUARTER_RELOCATION", "HEADQUARTER_RELOCATION description")
+            ReasonCodeV7Dto("HEADQUARTER_RELOCATION", "HEADQUARTER_RELOCATION description")
         ))
         return poolDataHelper.createTestDataEnvironment().metadata
     }

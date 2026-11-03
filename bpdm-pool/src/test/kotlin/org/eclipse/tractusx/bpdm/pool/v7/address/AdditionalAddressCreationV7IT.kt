@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.v7.address
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
@@ -48,7 +48,7 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
 
         //THEN
         val expectedAddress = resultFactory.buildAdditionalAddressCreate(addressRequest, legalEntityResponse).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -69,7 +69,7 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
 
         //THEN
         val expectedAddress = resultFactory.buildAdditionalAddressCreate(addressRequest, legalEntityResponse).withConfidence(TestDataV7.NoConfidence)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -91,7 +91,7 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
 
         //THEN
         val expectedAddress = resultFactory.buildAdditionalAddressCreate(addressRequest, siteResponse).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -113,7 +113,7 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
 
         //THEN
         val expectedAddress = resultFactory.buildAdditionalAddressCreate(addressRequest, siteResponse).withConfidence(TestDataV7.NoConfidence)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -129,8 +129,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.BpnNotValid, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.BpnNotValid, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -146,8 +146,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.LegalEntityNotFound, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.LegalEntityNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -163,8 +163,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.SiteNotFound, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.SiteNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -182,12 +182,12 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
 
         //WHEN
         val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
-            .withIdentifiers(AddressIdentifierDto(identifierX.value, identifierX.typeVerbose.technicalKey))
+            .withIdentifiers(AddressIdentifierV7Dto(identifierX.value, identifierX.typeVerbose.technicalKey))
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.AddressDuplicateIdentifier, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.AddressDuplicateIdentifier, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -211,8 +211,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest1, addressRequest2))
 
         //THEN
-        val expectedErrors = listOf(addressRequest1, addressRequest2).map { ErrorInfo(AddressCreateError.AddressDuplicateIdentifier, "IGNORED", it.index) }
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(addressRequest1, addressRequest2).map { ErrorInfoV7(AddressCreateErrorV7.AddressDuplicateIdentifier, "IGNORED", it.index) }
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -233,8 +233,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.RegionNotFound, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.RegionNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -255,8 +255,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.RegionNotFound, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.RegionNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -277,8 +277,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.CountryNotFound, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.CountryNotFound, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -299,8 +299,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.IdentifiersTooMany, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.IdentifiersTooMany, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -321,8 +321,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.ScriptVariantCityMissing, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.ScriptVariantCityMissing, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -343,8 +343,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.ScriptVariantCityMissing, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.ScriptVariantCityMissing, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -365,8 +365,8 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() { /**
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", addressRequest.index)
-        val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressCreateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", addressRequest.index)
+        val expectedResponse = AddressPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressCreateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }

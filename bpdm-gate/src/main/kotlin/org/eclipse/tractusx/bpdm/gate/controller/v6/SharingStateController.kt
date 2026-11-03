@@ -21,41 +21,47 @@ package org.eclipse.tractusx.bpdm.gate.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateV6Api
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
-import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
+import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv6.ApiV6SharingStateMapper
+import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
+import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
+import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateReadyApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.SharingStateSearchApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto as SharingStateDtoV7
 
 @RestController("SharingStateControllerLegacy")
 class SharingStateController(
-    private val sharingStateService: SharingStateService,
-    private val principalUtil: PrincipalUtil
-): GateSharingStateApi {
+    private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
+    private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
+    private val apiV6SharingStateMapper: ApiV6SharingStateMapper,
+    private val tenantResolver: TenantResolver
+): GateSharingStateV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageDto<SharingStateDto> {
-        return sharingStateService.findSharingStates(paginationRequest, externalIds, null, null, principalUtil.resolveTenantBpnl().value)
-            .let { PageDto(it.totalElements, it.totalPages, it.page, it.contentSize, content = it.content.map(::toV6Dto)) }
+    ): PageDto<SharingStateV6Dto> {
+        val request = SharingStateSearchRaw(externalIds, sharingStateTypes = null, updatedAfter = null)
+        return sharingStateSearchApplicationService.search(request, tenantResolver.resolveTenantBpnl().value, paginationRequest.toPageRequest())
+            .toPageDto(apiV6SharingStateMapper::toDto)
     }
 
-    private fun toV6Dto(sharingStateV7: SharingStateDtoV7): SharingStateDto{
-        return with(sharingStateV7){
-            SharingStateDto(
-                externalId = externalId,
-                sharingStateType = sharingStateType,
-                sharingErrorCode = sharingErrorCode,
-                sharingErrorMessage = sharingErrorMessage,
-                sharingProcessStarted = sharingProcessStarted,
-                taskId = taskId
-            )
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
+    override fun postSharingStateReady(request: PostSharingStateReadyV6Request) {
+        val readyRequest = SharingStateReadyRaw(request.externalIds)
+        when (val result = sharingStateReadyApplicationService.setReady(readyRequest, tenantResolver.currentUserBpn())) {
+            is SharingStateReadyResult.Readied -> Unit
+            is SharingStateReadyResult.Rejected -> throw BpdmSharingStateReadyException(result.errors.map(apiV6SharingStateMapper::toMessage))
         }
     }
-
 }

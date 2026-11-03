@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -40,7 +40,7 @@ class SiteGetV7IT: UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
-        val response = poolClient.sites.postSiteSearch(SiteSearchRequest(siteBpns = listOf(siteResponse.site.bpns)), PaginationRequest())
+        val response = poolClient.sites.postSiteSearch(SiteSearchV7Request(siteBpns = listOf(siteResponse.site.bpns)), PaginationRequest())
 
         //THEN
         val expectedSite = resultFactory.buildSiteSearchResponse(siteResponse)
@@ -61,7 +61,7 @@ class SiteGetV7IT: UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
-        val response = poolClient.sites.postSiteSearch(SiteSearchRequest(legalEntityBpns = listOf(legalEntityResponse.header.bpnl)), PaginationRequest())
+        val response = poolClient.sites.postSiteSearch(SiteSearchV7Request(legalEntityBpns = listOf(legalEntityResponse.header.bpnl)), PaginationRequest())
 
         //THEN
         val expectedSite = resultFactory.buildSiteSearchResponse(siteResponse)

@@ -20,16 +20,34 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.test.testdata.pool.common.latestSeededStateSecond
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityIdentifierV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AlternativePostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
 
 class BusinessPartnerV6RequestFactory(
     testMetadata: TestMetadataV6
@@ -39,45 +57,45 @@ class BusinessPartnerV6RequestFactory(
     private val availableAddressIdentifiers: Collection<String> =  testMetadata.addressIdentifierTypes.map { it.technicalKey }
     private val availableAdminAreas: Collection<String> = testMetadata.adminAreas.map { it.code }
 
-    fun buildLegalEntityCreateRequest(seed: String): LegalEntityPartnerCreateRequestV6 {
+    fun buildLegalEntityCreateRequest(seed: String): LegalEntityPartnerCreateV6Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return LegalEntityPartnerCreateRequestV6(
+        return LegalEntityPartnerCreateV6Request(
             legalEntity = createLegalEntityDto(seed, random),
             legalAddress = createAddressDto("Legal Address $seed", random),
             index = seed
         )
     }
 
-    fun createLegalEntityUpdateRequest(seed: String, legalEntityToUpdate: LegalEntityPartnerCreateVerboseDtoV6): LegalEntityPartnerUpdateRequestV6 {
+    fun createLegalEntityUpdateRequest(seed: String, legalEntityToUpdate: LegalEntityPartnerCreateVerboseV6Dto): LegalEntityPartnerUpdateV6Request {
         return createLegalEntityUpdateRequest(seed, legalEntityToUpdate.legalEntity.bpnl)
     }
 
-    fun createLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateRequestV6 {
+    fun createLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateV6Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return LegalEntityPartnerUpdateRequestV6(
+        return LegalEntityPartnerUpdateV6Request(
             bpnl = bpnl,
             legalEntity = createLegalEntityDto(seed, random),
             legalAddress = createAddressDto("Legal Address $seed", random)
         )
     }
 
-    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong())): LegalEntityDtoV6 {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong())): LegalEntityV6Dto {
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return LegalEntityDtoV6(
+        return LegalEntityV6Dto(
             legalName = "Legal Name $seed",
             legalShortName = "Legal Short Name $seed",
             legalForm = availableLegalForms.randomOrNull(random),
             identifiers = listOf(createLegalEntityIdentifier(seed, 0, random), createLegalEntityIdentifier(seed, 1, random)),
             states = listOf(
-                LegalEntityStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                LegalEntityStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                LegalEntityStateV6Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                LegalEntityStateV6Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            confidenceCriteria = ConfidenceCriteriaDtoV6(
+            confidenceCriteria = ConfidenceCriteriaV6Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 1,
@@ -89,48 +107,48 @@ class BusinessPartnerV6RequestFactory(
         )
     }
 
-    fun createLegalEntityIdentifier(seed: String, index: Int, random: Random = Random("$seed $index".hashCode().toLong())): LegalEntityIdentifierDtoV6{
+    fun createLegalEntityIdentifier(seed: String, index: Int, random: Random = Random("$seed $index".hashCode().toLong())): LegalEntityIdentifierV6Dto{
         val idKey = availableLegalEntityIdentifiers.random(random)
-        return LegalEntityIdentifierDtoV6("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed")
+        return LegalEntityIdentifierV6Dto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed")
     }
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): SitePartnerCreateRequestV6 {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): SitePartnerCreateV6Request {
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
-    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateRequestV6 {
-        return SitePartnerCreateRequestV6(
+    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateV6Request {
+        return SitePartnerCreateV6Request(
             bpnlParent = bpnlParent,
             index = seed,
             site = createSiteDto("Main Address $seed")
         )
     }
 
-    fun createSiteUpdateRequest(seed: String, siteToUpdate: SitePartnerCreateVerboseDtoV6): SitePartnerUpdateRequestV6 {
-        return SitePartnerUpdateRequestV6(
+    fun createSiteUpdateRequest(seed: String, siteToUpdate: SitePartnerCreateVerboseV6Dto): SitePartnerUpdateV6Request {
+        return SitePartnerUpdateV6Request(
             bpns = siteToUpdate.site.bpns,
             site = createSiteDto("Main Address $seed")
         )
     }
 
-    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateRequestV6 {
-        return SitePartnerUpdateRequestV6(
+    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateV6Request {
+        return SitePartnerUpdateV6Request(
             bpns = bpns,
             site = createSiteDto("Main Address $seed")
         )
     }
 
-    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDtoV6 {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteV6Dto {
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteDtoV6(
+        return SiteV6Dto(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV6Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV6Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
-            confidenceCriteria = ConfidenceCriteriaDtoV6(
+            confidenceCriteria = ConfidenceCriteriaV6Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -141,21 +159,21 @@ class BusinessPartnerV6RequestFactory(
         )
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMainV6 {
+    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto, random: Random = Random(seed.hashCode().toLong())):SiteCreateWithLegalAddressAsMainV6Request {
         return buildLegalAddressSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl, random)
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMainV6{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateWithLegalAddressAsMainV6Request{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteCreateRequestWithLegalAddressAsMainV6(
+        return SiteCreateWithLegalAddressAsMainV6Request(
             name = "Site Name $seed",
             bpnLParent = bpnL,
             states = listOf(
-                SiteStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV6Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV6Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            confidenceCriteria = ConfidenceCriteriaDtoV6(
+            confidenceCriteria = ConfidenceCriteriaV6Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -166,43 +184,43 @@ class BusinessPartnerV6RequestFactory(
         )
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerCreateRequestV6 {
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerCreateV6Request {
         return buildAdditionalAddressCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateRequestV6 {
+    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateV6Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return AddressPartnerCreateRequestV6(
+        return AddressPartnerCreateV6Request(
             bpnParent = bpnParent,
             index = seed,
             address = createAddressDto(seed, random)
         )
     }
 
-    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequestV6 {
+    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerUpdateV6Request {
         return buildAddressUpdateRequest(seed, legalAddressToUpdate.legalAddress.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequestV6 {
+    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseV6Dto): AddressPartnerUpdateV6Request {
         return buildAddressUpdateRequest(seed, addressToUpdate.address.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateRequestV6 {
-        return AddressPartnerUpdateRequestV6(bpna, createAddressDto(seed, random))
+    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateV6Request {
+        return AddressPartnerUpdateV6Request(bpna, createAddressDto(seed, random))
     }
 
-    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDtoV6 {
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
-        return LogisticAddressDtoV6(
+    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressV6Dto {
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
+        return LogisticAddressV6Dto(
             name = "Address Name $seed",
             states = listOf(
-                AddressStateDtoV6(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                AddressStateDtoV6(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                AddressStateV6Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                AddressStateV6Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
-            physicalPostalAddress = PhysicalPostalAddressDtoV6(
+            physicalPostalAddress = PhysicalPostalAddressV6Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
@@ -211,7 +229,7 @@ class BusinessPartnerV6RequestFactory(
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 district = "District $seed",
-                street = StreetDtoV6(
+                street = StreetV6Dto(
                     name = "Street Name $seed",
                     houseNumber = "House Number $seed",
                     houseNumberSupplement = "House Number Supplement $seed",
@@ -229,7 +247,7 @@ class BusinessPartnerV6RequestFactory(
                 door = "Door $seed",
                 taxJurisdictionCode = "Tax Jurisdiction Code $seed"
             ),
-            alternativePostalAddress = AlternativePostalAddressDtoV6(
+            alternativePostalAddress = AlternativePostalAddressV6Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
@@ -239,7 +257,7 @@ class BusinessPartnerV6RequestFactory(
                 deliveryServiceType = DeliveryServiceType.entries.random(random),
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             ),
-            confidenceCriteria = ConfidenceCriteriaDtoV6(
+            confidenceCriteria = ConfidenceCriteriaV6Dto(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 0,
@@ -250,11 +268,11 @@ class BusinessPartnerV6RequestFactory(
         )
     }
 
-    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDtoV6{
+    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierV6Dto{
         val idKey = availableAddressIdentifiers.random(random)
-        return AddressIdentifierDtoV6("$idKey Value $seed $index", idKey)
+        return AddressIdentifierV6Dto("$idKey Value $seed $index", idKey)
     }
 
-    private fun LogisticAddressDtoV6.withSharedByOwner(isSharedByOwner: Boolean) =
+    private fun LogisticAddressV6Dto.withSharedByOwner(isSharedByOwner: Boolean) =
         copy(confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isSharedByOwner))
 }

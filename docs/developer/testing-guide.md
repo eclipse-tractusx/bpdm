@@ -231,10 +231,12 @@ abstract class GateTestBaseV7 : GateTestBase() {
     @Autowired lateinit var testData: TestDataFactoryGateV7
 
     // Gate internal services — triggered directly in TestDataClient to drive the sharing pipeline
-    @Autowired lateinit var taskCreationBatchService: TaskCreationBatchService
-    @Autowired lateinit var taskResolutionBatchService: TaskResolutionBatchService
-    @Autowired lateinit var relationTaskCreationService: RelationTaskCreationService
-    @Autowired lateinit var relationTaskResolutionService: RelationTaskResolutionService
+    @Autowired lateinit var taskCreationService: GoldenRecordTaskCreationApplicationService
+    @Autowired lateinit var taskResolutionService: GoldenRecordTaskResolutionApplicationService
+    @Autowired lateinit var taskHealthCheckService: GoldenRecordTaskHealthCheckApplicationService
+    @Autowired lateinit var consistencyCheckService: GoldenRecordConsistencyCheckApplicationService
+    @Autowired lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
+    @Autowired lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
 
     // Mock factories for simulating Pool and Orchestrator APIs
     @Autowired lateinit var orchestratorMockDataFactory: OrchestratorMockDataFactory
@@ -242,7 +244,7 @@ abstract class GateTestBaseV7 : GateTestBase() {
     @Autowired lateinit var goldenRecordMockFactory: GoldenRecordMockFactory
 
     // Initialised after startup (requires the random server port)
-    lateinit var gateClient: GateClient
+    lateinit var gateClient: GateV7Client
     lateinit var testDataClient: GateTestDataClientV7
 
     @PostConstruct
@@ -250,7 +252,7 @@ abstract class GateTestBaseV7 : GateTestBase() {
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
         testDataClient = GateTestDataClientV7(
             gateClient, testData, orchestratorMockDataFactory,
-            taskCreationBatchService, taskResolutionBatchService,
+            taskCreationService, taskResolutionService, taskHealthCheckService, consistencyCheckService,
             relationTaskResolutionService, relationTaskCreationService,
             goldenRecordMockFactory, tenantBPNL
         )
@@ -333,7 +335,7 @@ val goldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInp
 val request = testData.businessPartner.input.request.fromSeed(testName)
 gateClient.businessParters.upsertBusinessPartnersInput(listOf(request))
 gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
-taskCreationBatchService.createTasksForReadyBusinessPartners()
+taskCreationService.createTasksForReadyBusinessPartners()
 // ... more steps
 ```
 
@@ -385,8 +387,8 @@ The Gate V7 tests use `testData` (of type `TestDataFactoryGateV7`) with this str
 testData
   ├── businessPartner
   │   ├── input
-  │   │   ├── request.fromSeed(seed)         → BusinessPartnerInputRequest
-  │   │   └── response.fromRequest(request)  → BusinessPartnerInputDto
+  │   │   ├── request.fromSeed(seed)         → BusinessPartnerInputV7Request
+  │   │   └── response.fromRequest(request)  → BusinessPartnerInputV7Dto
   │   └── output
   │       ├── fromLegalEntity(input, legalEntity)
   │       ├── fromLegalEntityOnSite(input, legalEntity, site)
@@ -394,8 +396,8 @@ testData
   │       └── fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress)
   ├── relation
   │   ├── input
-  │   │   ├── request.fromSeed(seed)         → RelationPutEntry
-  │   │   └── response.fromRequest(entry)    → RelationDto
+  │   │   ├── request.fromSeed(seed)         → RelationPutV7Entry
+  │   │   └── response.fromRequest(entry)    → RelationV7Dto
   │   └── output
   │       └── fromGoldenRecord(externalId, goldenRecord)
   └── changelog
@@ -413,12 +415,12 @@ The seed drives a `Random` instance via `Random(seed.hashCode())`, which is used
 ```kotlin
 class BusinessPartnerInputRequestV7Factory(val testMetadata: GateTestMetadataV7) {
 
-    fun fromSeed(seed: String): BusinessPartnerInputRequest = SeededCreator(seed).create()
+    fun fromSeed(seed: String): BusinessPartnerInputV7Request = SeededCreator(seed).create()
 
     private inner class SeededCreator(private val seed: String) {
         private val random = Random(seed.hashCode())
 
-        fun create(): BusinessPartnerInputRequest = BusinessPartnerInputRequest(
+        fun create(): BusinessPartnerInputV7Request = BusinessPartnerInputV7Request(
             externalId = seed,
             nameParts = (1..2).map { "Name Part $it $seed" },
             identifiers = createIdentifiers(),
@@ -522,23 +524,23 @@ val legalEntityGoldenRecord = testDataClient.businessPartner.refineToLegalEntity
 
 **Upsert** — submit business partner data to the Gate API:
 ```kotlin
-fun upsertInput(seed: String): BusinessPartnerInputDto
-fun upsertInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto
+fun upsertInput(seed: String): BusinessPartnerInputV7Dto
+fun upsertInput(request: BusinessPartnerInputV7Request): BusinessPartnerInputV7Dto
 ```
 
 **Refinement** — drive a business partner through the sharing pipeline to a specific golden record outcome:
 ```kotlin
-fun refineToLegalEntity(input: BusinessPartnerInputDto): LegalEntityWithLegalAddressVerboseDto
-fun refineToLegalEntityOnSite(input: BusinessPartnerInputDto): PoolMockDataFactory.SiteWithLegalEntityParent
-fun refineToSite(input: BusinessPartnerInputDto): PoolMockDataFactory.SiteWithLegalEntityParent
-fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto): PoolMockDataFactory.AdditionalAddressOfSiteResult
-fun refineToSuccess(input: BusinessPartnerInputDto): BusinessPartnerOutputDto
+fun refineToLegalEntity(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseDto
+fun refineToLegalEntityOnSite(input: BusinessPartnerInputV7Dto): PoolMockDataFactory.SiteWithLegalEntityParent
+fun refineToSite(input: BusinessPartnerInputV7Dto): PoolMockDataFactory.SiteWithLegalEntityParent
+fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputV7Dto): PoolMockDataFactory.AdditionalAddressOfSiteResult
+fun refineToSuccess(input: BusinessPartnerInputV7Dto): BusinessPartnerOutputV7Dto
 ```
 
 **Compound** — upsert and immediately refine in one call:
 ```kotlin
-fun createOutput(seed: String): BusinessPartnerOutputDto
-fun updateOutput(output: BusinessPartnerOutputDto, newSeed: String): BusinessPartnerOutputDto
+fun createOutput(seed: String): BusinessPartnerOutputV7Dto
+fun updateOutput(output: BusinessPartnerOutputV7Dto, newSeed: String): BusinessPartnerOutputV7Dto
 ```
 
 **State progression** — move a sharing state to a specific stage without full refinement:
@@ -561,19 +563,19 @@ val (relationInput, goldenRecord) = testDataClient.relation.createLegalEntityRel
 
 **Upsert** — submit relation data to the Gate API:
 ```kotlin
-fun upsertRelationInput(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto
-fun upsertRelationInput(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto): RelationDto
-fun upsertRelationInputWithBusinessPartners(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto
-fun upsertRelationInputWithBusinessPartners(seed: String, relationType: RelationType): RelationDto
+fun upsertRelationInput(entry: RelationPutV7Entry, createIfNotExist: Boolean = true): RelationV7Dto
+fun upsertRelationInput(externalId: String, source: BusinessPartnerInputV7Dto, target: BusinessPartnerInputV7Dto): RelationV7Dto
+fun upsertRelationInputWithBusinessPartners(entry: RelationPutV7Entry, createIfNotExist: Boolean = true): RelationV7Dto
+fun upsertRelationInputWithBusinessPartners(seed: String, relationType: RelationTypeV7): RelationV7Dto
 ```
 
 **Compound** — set up the full relation pipeline including business partner refinement:
 ```kotlin
-fun createRelationInputWithRefinedLegalEntityBPs(seed: String, relationType: RelationType): RelationDto
-fun createLegalEntityRelationOutput(seed: String, relationType: RelationType): Pair<RelationDto, BusinessPartnerRelations>
-fun createAddressRelationOutput(seed: String, relationType: RelationType): Pair<RelationDto, BusinessPartnerRelations>
-fun updateLegalEntityRelationOutput(original: RelationDto, updateSeed: String, relationType: RelationType): BusinessPartnerRelations
-fun refineRelationToSuccess(input: RelationDto, seed: String = input.externalId): BusinessPartnerRelations
+fun createRelationInputWithRefinedLegalEntityBPs(seed: String, relationType: RelationTypeV7): RelationV7Dto
+fun createLegalEntityRelationOutput(seed: String, relationType: RelationTypeV7): Pair<RelationV7Dto, BusinessPartnerRelations>
+fun createAddressRelationOutput(seed: String, relationType: RelationTypeV7): Pair<RelationV7Dto, BusinessPartnerRelations>
+fun updateLegalEntityRelationOutput(original: RelationV7Dto, updateSeed: String, relationType: RelationTypeV7): BusinessPartnerRelations
+fun refineRelationToSuccess(input: RelationV7Dto, seed: String = input.externalId): BusinessPartnerRelations
 ```
 
 **State progression** — move a relation sharing state to a specific stage:
@@ -597,7 +599,7 @@ Tests never construct HTTP requests manually.
 
 ### Configuration
 
-Clients are created by `GateTestClientProviderV7`, which builds a `GateClient` pointed at the running test application.
+Clients are created by `GateTestClientProviderV7`, which builds a `GateV7Client` pointed at the running test application.
 Because the application starts on a random port (`RANDOM_PORT`), clients are initialised in `@PostConstruct` — after the port is known — not at field declaration time.
 
 ```kotlin
@@ -674,12 +676,12 @@ In the Gate V7 tests this is `GateAssertRepositoryV7` (`bpdm-gate/src/test/kotli
 Assertions use AssertJ's `.usingRecursiveComparison()` to compare the full object graph field by field:
 
 ```kotlin
-fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputDto>, expected: Collection<BusinessPartnerOutputDto>) {
+fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputV7Dto>, expected: Collection<BusinessPartnerOutputV7Dto>) {
     Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
         .usingRecursiveComparison()
         .ignoringFields(
-            BusinessPartnerOutputDto::createdAt.name,
-            BusinessPartnerOutputDto::updatedAt.name
+            BusinessPartnerOutputV7Dto::createdAt.name,
+            BusinessPartnerOutputV7Dto::updatedAt.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
@@ -720,20 +722,20 @@ When adding assertions for new DTO types, check whether the new type contains `I
 Some tests need to verify the same behaviour across multiple values — for example, testing that all legal-entity relation types produce valid output, or that all address relation types are handled correctly.
 Rather than duplicating test methods, use JUnit 5's `@ParameterizedTest` with `@EnumSource`.
 
-The enum passed to `@EnumSource` can be an existing application model enum (e.g., `RelationType`) or a dedicated test utility enum that wraps or subsets domain values.
+The enum passed to `@EnumSource` can be an existing application model enum (e.g., `RelationTypeV7`) or a dedicated test utility enum that wraps or subsets domain values.
 Dedicated test enums belong in `bpdm-common-test` so they are reusable across modules.
 The Gate V7 tests use `GateTestTypes` for this purpose:
 
 ```kotlin
 object GateTestTypes {
-    enum class LegalEntityRelationType(val gateRelationType: RelationType) {
-        IsOwnedBy(RelationType.IsOwnedBy),
-        IsAlternativeHeadquarterFor(RelationType.IsAlternativeHeadquarterFor),
-        IsManagedBy(RelationType.IsManagedBy)
+    enum class LegalEntityRelationType(val gateRelationType: RelationTypeV7) {
+        IsOwnedBy(RelationTypeV7.IsOwnedBy),
+        IsAlternativeHeadquarterFor(RelationTypeV7.IsAlternativeHeadquarterFor),
+        IsManagedBy(RelationTypeV7.IsManagedBy)
     }
 
-    enum class AddressRelationType(val gateRelationType: RelationType) {
-        IsReplacedBy(RelationType.IsReplacedBy)
+    enum class AddressRelationType(val gateRelationType: RelationTypeV7) {
+        IsReplacedBy(RelationTypeV7.IsReplacedBy)
     }
 }
 ```
@@ -747,7 +749,7 @@ fun `search relation output between legal entities`(legalEntityRelationType: Gat
     //GIVEN
     val (relationInput, goldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(
         testName,
-        legalEntityRelationType.gateRelationType
+        legalEntityRelationTypeV7.gateRelationType
     )
 
     //WHEN
@@ -840,8 +842,8 @@ If a utility is missing from the base class, add it there — not in the concret
 val request = testData.businessPartner.input.request.fromSeed(testName)
 gateClient.businessParters.upsertBusinessPartnersInput(listOf(request))
 gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
-taskCreationBatchService.createTasksForReadyBusinessPartners()
-taskResolutionBatchService.resolveTasks()
+taskCreationService.createTasksForReadyBusinessPartners()
+taskResolutionService.resolveFinishedTasks()
 
 // Good — test communicates what state it needs
 //GIVEN

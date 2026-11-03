@@ -25,15 +25,15 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
@@ -66,7 +66,7 @@ import java.time.LocalDate
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     private val taskRelationsResolutionService: TaskRelationsResolutionService,
-    private val poolApiClient: PoolApiClient,
+    private val poolApiClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers,
     private val poolAssertHelper: PoolAssertHelper
@@ -172,7 +172,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
-        val expectedLegalEntity = LegalEntityWithLegalAddressVerboseDto(
+        val expectedLegalEntity = LegalEntityWithLegalAddressVerboseV7Dto(
             header = createdLegalEntity.legalEntity.header,
             legalAddress = createdLegalEntity.legalEntity.legalAddress.copy(relations = createdLegalEntity.legalEntity.legalAddress.relations.plus(buildAddressReplacedByRelation(replacedByRelation))),
             scriptVariants = createdLegalEntity.legalEntity.scriptVariants
@@ -204,18 +204,18 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
 
         //THEN
-        val searchResponse = poolApiClient.changelogs.getChangelogEntries(ChangelogSearchRequest(timestampAfter = beforeRelocation), PaginationRequest(0, 20))
+        val searchResponse = poolApiClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(timestampAfter = beforeRelocation), PaginationRequest(0, 20))
 
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(createdLegalEntity.legalEntity.header.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(createdLegalEntity.legalEntity.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(createdAddAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE)
+            ChangelogEntryVerboseV7Dto(createdLegalEntity.legalEntity.header.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV7.UPDATE),
+            ChangelogEntryVerboseV7Dto(createdLegalEntity.legalEntity.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV7.UPDATE),
+            ChangelogEntryVerboseV7Dto(createdAddAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV7.UPDATE)
         )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
         assertThat(searchResponse)
             .usingRecursiveComparison()
-            .ignoringFields("${PageDto<*>::content.name}.${ChangelogEntryVerboseDto::timestamp.name}")
+            .ignoringFields("${PageDto<*>::content.name}.${ChangelogEntryVerboseV7Dto::timestamp.name}")
             .isEqualTo(expectedResponse)
     }
 
@@ -224,13 +224,13 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     }
 
     private fun buildExpectedRelocatedHeadquarterLegalEntity(
-        legalEntity: LegalEntityPartnerCreateVerboseDto,
-        newLegalAddress: AddressPartnerCreateVerboseDto,
+        legalEntity: LegalEntityPartnerCreateVerboseV7Dto,
+        newLegalAddress: AddressPartnerCreateVerboseV7Dto,
         replacedByRelation: BusinessPartnerRelations
-        ): LegalEntityWithLegalAddressVerboseDto{
+        ): LegalEntityWithLegalAddressVerboseV7Dto{
         val newReplacedRelation = buildAddressReplacedByRelation(replacedByRelation)
 
-        return LegalEntityWithLegalAddressVerboseDto(
+        return LegalEntityWithLegalAddressVerboseV7Dto(
             header = legalEntity.legalEntity.header,
             legalAddress = newLegalAddress.address.copy(addressType = AddressType.LegalAddress, relations = newLegalAddress.address.relations.plus(newReplacedRelation)),
             // The new legal address covers none of the old script codes, so the legal entity keeps no script variant.
@@ -238,12 +238,12 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         )
     }
 
-    private fun buildAddressReplacedByRelation(replacedByRelation: BusinessPartnerRelations): AddressRelationVerboseDto{
-        return AddressRelationVerboseDto(
-            type = AddressRelationType.IsReplacedBy,
+    private fun buildAddressReplacedByRelation(replacedByRelation: BusinessPartnerRelations): AddressRelationVerboseV7Dto{
+        return AddressRelationVerboseV7Dto(
+            type = AddressRelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpna = replacedByRelation.businessPartnerSourceBpn,
             businessPartnerTargetBpna = replacedByRelation.businessPartnerTargetBpn,
-            validityPeriods = replacedByRelation.validityPeriods.map { org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod(it.validFrom, it.validTo) },
+            validityPeriods = replacedByRelation.validityPeriods.map { org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationValidityPeriodV7Dto(it.validFrom, it.validTo) },
             reasonCode = replacedByRelation.reasonCode
         )
     }

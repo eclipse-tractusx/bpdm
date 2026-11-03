@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 
 /**
@@ -70,46 +70,46 @@ class TestDataFactoryGateV7(
             val response = ResponseFactory()
 
             inner class RequestFactory {
-                fun fromSeed(seed: String): BusinessPartnerInputRequest =
+                fun fromSeed(seed: String): BusinessPartnerInputV7Request =
                     bpInputRequestFactory.fromSeed(seed)
             }
 
             inner class ResponseFactory {
-                fun fromRequest(request: BusinessPartnerInputRequest): BusinessPartnerInputDto =
+                fun fromRequest(request: BusinessPartnerInputV7Request): BusinessPartnerInputV7Dto =
                     bpInputDtoFactory.fromRequest(request)
             }
         }
 
         inner class OutputFactory {
             fun fromLegalEntity(
-                input: BusinessPartnerInputDto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto
+                input: BusinessPartnerInputV7Dto,
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromLegalEntity(input, legalEntity)
 
             fun fromLegalEntityOnSite(
-                input: BusinessPartnerInputDto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                site: SiteWithMainAddressVerboseDto
+                input: BusinessPartnerInputV7Dto,
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                site: SiteWithMainAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromLegalEntityOnSite(input, legalEntity, site)
 
             fun fromSite(
-                input: BusinessPartnerInputDto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                site: SiteWithMainAddressVerboseDto
+                input: BusinessPartnerInputV7Dto,
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                site: SiteWithMainAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromSite(input, legalEntity, site)
 
             fun fromAdditionalAddressOnSite(
-                input: BusinessPartnerInputDto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                site: SiteWithMainAddressVerboseDto,
-                additionalAddress: LogisticAddressVerboseDto,
-                additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
+                input: BusinessPartnerInputV7Dto,
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                site: SiteWithMainAddressVerboseV7Dto,
+                additionalAddress: LogisticAddressVerboseV7Dto,
+                additionalSites: Collection<AdditionalSiteOutputV7Dto> = emptyList()
             ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress, additionalSites)
 
             fun fromAdditionalAddressOnLegalEntity(
-                input: BusinessPartnerInputDto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                additionalAddress: LogisticAddressVerboseDto
+                input: BusinessPartnerInputV7Dto,
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                additionalAddress: LogisticAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromAdditionalAddressOnLegalEntity(input, legalEntity, additionalAddress)
         }
     }
@@ -123,12 +123,12 @@ class TestDataFactoryGateV7(
             val response = ResponseFactory()
 
             inner class RequestFactory {
-                fun fromSeed(seed: String): RelationPutEntry =
+                fun fromSeed(seed: String): RelationPutV7Entry =
                     relationInputRequestFactory.fromSeed(seed)
             }
 
             inner class ResponseFactory {
-                fun fromRequest(entry: RelationPutEntry) =
+                fun fromRequest(entry: RelationPutV7Entry) =
                     relationInputRequestFactory.toExpectedResponse(entry)
             }
         }
@@ -137,13 +137,13 @@ class TestDataFactoryGateV7(
             fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations) =
                 relationOutputDtoFactory.fromGoldenRecord(externalId, goldenRecordRelation)
 
-            fun fromInput(entry: RelationPutEntry) =
+            fun fromInput(entry: RelationPutV7Entry) =
                 relationOutputDtoFactory.fromInput(entry)
         }
     }
 
     inner class ChangelogFactory {
-        fun ofOnePage(vararg entries: ChangelogGateDto) =
+        fun ofOnePage(vararg entries: ChangelogGateV7Dto) =
             pageChangeLogFactory.ofOnePageWithoutInvalids(*entries)
     }
 }

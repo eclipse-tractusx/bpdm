@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.address
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressUpdateErrorV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.AddressUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
@@ -45,7 +45,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedAddress = testDataFactory.result.buildExpectedLegalAddressUpdateResponse(addressRequest, legalEntityResponse)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -67,7 +67,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedAddress = testDataFactory.result.buildExpectedMainAddressUpdateResponse(addressRequest, siteResponse)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -89,7 +89,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedAddress = testDataFactory.result.buildExpectedMainAddressUpdateResponse(addressRequest, siteResponse)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -111,7 +111,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedAddress = testDataFactory.result.buildExpectedAdditionalAddressUpdateResponse(addressUpdateRequest, legalEntityResponse)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdate(addressUpdateResponse, expectedResponse)
     }
@@ -134,7 +134,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedAddress = testDataFactory.result.buildExpectedAdditionalAddressUpdateResponse(addressUpdateRequest, siteResponse)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdate(addressUpdateResponse, expectedResponse)
     }
@@ -151,7 +151,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedError = ErrorInfoV6(AddressUpdateErrorV6.AddressNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -171,13 +171,13 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //WHEN
         val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, addressCreateResponse)){
-            copy(address = address.copy(identifiers = listOf(AddressIdentifierDtoV6(identifierX.value, identifierX.type))))
+            copy(address = address.copy(identifiers = listOf(AddressIdentifierV6Dto(identifierX.value, identifierX.type))))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
         val expectedError = ErrorInfoV6(AddressUpdateErrorV6.AddressDuplicateIdentifier, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -200,7 +200,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedError = ErrorInfoV6(AddressUpdateErrorV6.RegionNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -223,7 +223,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedError = ErrorInfoV6(AddressUpdateErrorV6.RegionNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -247,7 +247,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedError = ErrorInfoV6(AddressUpdateErrorV6.IdentifierNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
@@ -271,7 +271,7 @@ class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedError = ErrorInfoV6(AddressUpdateErrorV6.IdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
+        val expectedResponse = AddressPartnerUpdateV6ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }

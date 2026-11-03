@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.v7.util
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
 import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
@@ -42,7 +42,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationE
 import java.util.UUID
 
 class TestDataClientV7(
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolV7Client,
     private val requestFactory: PoolRequestFactoryV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskBatchResolutionService: TaskBatchResolutionService,
@@ -50,24 +50,24 @@ class TestDataClientV7(
 ) {
 
 
-    fun createLegalEntity(seed: String): LegalEntityWithLegalAddressVerboseDto{
+    fun createLegalEntity(seed: String): LegalEntityWithLegalAddressVerboseV7Dto{
         return createLegalEntity(requestFactory.buildLegalEntity(seed))
     }
 
-    fun createParticipantLegalEntity(seed: String): LegalEntityWithLegalAddressVerboseDto{
+    fun createParticipantLegalEntity(seed: String): LegalEntityWithLegalAddressVerboseV7Dto{
         return createLegalEntity(requestFactory.buildLegalEntity(seed).withParticipantData(true))
     }
 
-    fun createLegalEntity(request: LegalEntityDto): LegalEntityWithLegalAddressVerboseDto{
-        return poolClient.legalEntities.createBusinessPartners(listOf(LegalEntityPartnerCreateRequest(request, null))).entities.first().legalEntity
+    fun createLegalEntity(request: LegalEntityV7Dto): LegalEntityWithLegalAddressVerboseV7Dto{
+        return poolClient.legalEntities.createBusinessPartners(listOf(LegalEntityPartnerCreateV7Request(request, null))).entities.first().legalEntity
     }
 
-    fun updateLegalEntity(bpnL: String, seed: String): LegalEntityWithLegalAddressVerboseDto{
+    fun updateLegalEntity(bpnL: String, seed: String): LegalEntityWithLegalAddressVerboseV7Dto{
         return updateLegalEntity(bpnL, requestFactory.buildLegalEntity(seed))
     }
 
-    fun updateLegalEntity(bpnL: String, request: LegalEntityDto): LegalEntityWithLegalAddressVerboseDto{
-        return poolClient.legalEntities.updateBusinessPartners(listOf(LegalEntityPartnerUpdateRequest(bpnL, request))).entities.first().legalEntity
+    fun updateLegalEntity(bpnL: String, request: LegalEntityV7Dto): LegalEntityWithLegalAddressVerboseV7Dto{
+        return poolClient.legalEntities.updateBusinessPartners(listOf(LegalEntityPartnerUpdateV7Request(bpnL, request))).entities.first().legalEntity
     }
 
     /**
@@ -114,27 +114,27 @@ class TestDataClientV7(
         check(errors.isEmpty()) { "Could not make '$alternativeBpnL' alternative headquarter of '$mainBpnL': $errors" }
     }
 
-    fun createSite(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): SitePartnerCreateVerboseDto {
+    fun createSite(legalEntity: LegalEntityWithLegalAddressVerboseV7Dto, seed: String): SitePartnerCreateVerboseV7Dto {
         val request = requestFactory.buildSiteCreateRequest(seed, legalEntity)
         return poolClient.sites.createSite(listOf(request)).entities.first()
     }
 
-    fun createLegalAddressSite(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): SitePartnerCreateVerboseDto {
+    fun createLegalAddressSite(legalEntity: LegalEntityWithLegalAddressVerboseV7Dto, seed: String): SitePartnerCreateVerboseV7Dto {
         val request = requestFactory.buildLegalAddressSiteCreateRequest(seed, legalEntity)
         return poolClient.sites.createSiteWithLegalReference(listOf(request)).entities.first()
     }
 
-    fun updateSite(existingSite: SitePartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto {
+    fun updateSite(existingSite: SitePartnerCreateVerboseV7Dto, seed: String): SitePartnerCreateVerboseV7Dto {
         val request = requestFactory.createSiteUpdateRequest(seed, existingSite)
         return poolClient.sites.updateSite(listOf(request)).entities.first()
     }
 
-    fun createAdditionalAddress(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): AddressPartnerCreateVerboseDto {
+    fun createAdditionalAddress(legalEntity: LegalEntityWithLegalAddressVerboseV7Dto, seed: String): AddressPartnerCreateVerboseV7Dto {
         val request = requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity)
         return poolClient.addresses.createAddresses(listOf(request)).entities.first()
     }
 
-    fun createAdditionalAddress(site: SitePartnerCreateVerboseDto, seed: String): AddressPartnerCreateVerboseDto {
+    fun createAdditionalAddress(site: SitePartnerCreateVerboseV7Dto, seed: String): AddressPartnerCreateVerboseV7Dto {
         val request = requestFactory.buildAdditionalAddressCreateRequest(seed, site)
         return poolClient.addresses.createAddresses(listOf(request)).entities.first()
     }

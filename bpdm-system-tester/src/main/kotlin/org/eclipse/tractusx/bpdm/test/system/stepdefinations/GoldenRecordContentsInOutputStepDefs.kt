@@ -26,12 +26,12 @@ import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
@@ -42,7 +42,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 
 class GoldenRecordContentsInOutputStepDefs(
     private val sharingMemberGates: SharingMemberGates,
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolV7Client,
     private val shareActions: BusinessPartnerShareActions,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertRepository: GateAssertRepositoryV7,
@@ -168,7 +168,7 @@ class GoldenRecordContentsInOutputStepDefs(
         }
         // The other record has already been refined, so its site exists as a golden record and the sharing
         // member can name it by its BPNS - the case where a member knows the site it wants to join.
-        val statedSite = AdditionalSiteInputDto(siteBpn = siteBpnOf(otherRecordId), name = null)
+        val statedSite = AdditionalSiteInputV7Dto(siteBpn = siteBpnOf(otherRecordId), name = null)
         shareActions.upload(recordId, isOwnCompanyData = true, additionalSites = listOf(statedSite))
     }
 
@@ -179,7 +179,7 @@ class GoldenRecordContentsInOutputStepDefs(
                 "'$siteName' as an additional site of its address"
         }
         // No such site exists yet, so the member can only name it and the golden record process has to create it.
-        val statedSite = AdditionalSiteInputDto(siteBpn = null, name = context.runId(siteName))
+        val statedSite = AdditionalSiteInputV7Dto(siteBpn = null, name = context.runId(siteName))
         shareActions.upload(recordId, isOwnCompanyData = true, additionalSites = listOf(statedSite))
     }
 
@@ -661,7 +661,7 @@ class GoldenRecordContentsInOutputStepDefs(
         val expectedAdditionalSites = otherRecordIds.map { other ->
             val otherSite = outputOf(other).site
                 ?: error("record '$other' output has no site to surface as an additional site")
-            AdditionalSiteOutputDto(otherSite.siteBpn, otherSite.name)
+            AdditionalSiteOutputV7Dto(otherSite.siteBpn, otherSite.name)
         }
 
         val actualOutput = outputOf(recordId)
@@ -673,7 +673,7 @@ class GoldenRecordContentsInOutputStepDefs(
     }
 
     /** Reads the single Gate output for [recordId], attaching the call for scenario diagnostics. */
-    private fun outputOf(recordId: String): BusinessPartnerOutputDto {
+    private fun outputOf(recordId: String): BusinessPartnerOutputV7Dto {
         val runId = context.runId(recordId)
         val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
@@ -686,7 +686,7 @@ class GoldenRecordContentsInOutputStepDefs(
             ?: error("record '$recordId' output has no site")
 
     /** The Pool golden record address [recordId]'s output references, fetched by its BPNA. */
-    private fun poolAddressOf(recordId: String): LogisticAddressVerboseDto {
+    private fun poolAddressOf(recordId: String): LogisticAddressVerboseV7Dto {
         val bpna = outputOf(recordId).address.addressBpn
         val poolAddress = poolClient.addresses.getAddress(bpna)
         apiCallEvidence.attach("GET", "/v7/addresses/$bpna", response = poolAddress)
@@ -696,14 +696,14 @@ class GoldenRecordContentsInOutputStepDefs(
     private fun String.splitRecordIds(): List<String> =
         split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
-    private fun inputResponseOf(recordId: String): BusinessPartnerInputDto =
+    private fun inputResponseOf(recordId: String): BusinessPartnerInputV7Dto =
         testDataFactoryGate.businessPartner.input.response.fromRequest(context.records[recordId]!!.currentInput!!)
 
     /**
      * Asserts the single Gate output for [recordId] carries [expectedOutput]'s master data inline and returns
      * that output partner for the follow-up Pool reference checks.
      */
-    private fun assertGateOutputCarriesMasterData(recordId: String, expectedOutput: BusinessPartnerOutputDto): BusinessPartnerOutputDto {
+    private fun assertGateOutputCarriesMasterData(recordId: String, expectedOutput: BusinessPartnerOutputV7Dto): BusinessPartnerOutputV7Dto {
         val runId = context.runId(recordId)
         val actualOutputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
@@ -720,7 +720,7 @@ class GoldenRecordContentsInOutputStepDefs(
      * states - the fields that surface the identifiers/states of the reflected entity - and nothing else is
      * compared.
      */
-    private fun assertGateOutputTopLevelIdentifiersAndStates(recordId: String, expectedOutput: BusinessPartnerOutputDto) {
+    private fun assertGateOutputTopLevelIdentifiersAndStates(recordId: String, expectedOutput: BusinessPartnerOutputV7Dto) {
         val runId = context.runId(recordId)
         val actualOutputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
         apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
@@ -736,7 +736,7 @@ class GoldenRecordContentsInOutputStepDefs(
      * carries the same master data as [expectedOutput], proving the output reflects the golden record rather
      * than just carrying matching content inline.
      */
-    private fun assertPoolGoldenRecordReflectsMasterData(expectedOutput: BusinessPartnerOutputDto, poolAsOutput: BusinessPartnerOutputDto) {
+    private fun assertPoolGoldenRecordReflectsMasterData(expectedOutput: BusinessPartnerOutputV7Dto, poolAsOutput: BusinessPartnerOutputV7Dto) {
         assertRepository.assertBusinessPartnerOutput(
             listOf(poolAsOutput),
             listOf(expectedOutput),

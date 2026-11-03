@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
@@ -56,7 +56,7 @@ class OwnedByRelationUpsertService(
             RelationUpsertService.UpsertRequest(
                 source = proposedSource,
                 target = proposedTarget,
-                legalEntityRelationType = LegalEntityRelationType.IsOwnedBy,
+                legalEntityRelationType = LegalEntityRelationTypeV7.IsOwnedBy,
                 validityPeriods = upsertRequest.validityPeriods,
                 existingRelation = upsertRequest.existingRelation,
                 reasonCode = upsertRequest.reasonCode,
@@ -128,7 +128,7 @@ class OwnedByRelationUpsertService(
         val child = upsertRequest.source
         val parent = upsertRequest.target
 
-        val allChildRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, child)
+        val allChildRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsOwnedBy, child)
         val allOverlappingChildRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allChildRelations)
 
         allOverlappingChildRelations.forEach { relation ->
@@ -154,7 +154,7 @@ class OwnedByRelationUpsertService(
         val target = upsertRequest.target
 
         // Check if source is an alternative (startNode in IsAlternativeHeadquarterFor)
-        val sourceAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, source)
+        val sourceAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, source)
         val overlappingSourceAlternative = relationUpsertService.filterOverlappingRelations(upsertRequest, sourceAsAlternative)
         if (overlappingSourceAlternative.isNotEmpty()) {
             val relation = overlappingSourceAlternative.first()
@@ -165,7 +165,7 @@ class OwnedByRelationUpsertService(
         }
 
         // Check if target is an alternative (startNode in IsAlternativeHeadquarterFor)
-        val targetAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, target)
+        val targetAsAlternative = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, target)
         val overlappingTargetAlternative = relationUpsertService.filterOverlappingRelations(upsertRequest, targetAsAlternative)
         if (overlappingTargetAlternative.isNotEmpty()) {
             val relation = overlappingTargetAlternative.first()
@@ -193,7 +193,7 @@ class OwnedByRelationUpsertService(
             allParents.add(currentParent)
 
             // Fetch Relations in which the currently processed parent node is a child
-            val parentParentRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, currentParent)
+            val parentParentRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsOwnedBy, currentParent)
             val overlappingParentParentRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, parentParentRelations)
 
             val parentsOfCurrent = overlappingParentParentRelations.map { it.endNode }

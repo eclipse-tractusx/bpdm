@@ -20,13 +20,12 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import io.cucumber.java.Scenario
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import java.time.Instant
@@ -44,7 +43,7 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
 
     private val timeSuffix = timeSuffix.truncatedTo(ChronoUnit.SECONDS)
 
-    val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseDto> = mutableMapOf()
+    val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseV7Dto> = mutableMapOf()
     val sites: MutableMap<String, SiteWithParent> = mutableMapOf()
     val additionalSiteAddresses: MutableMap<String, AdditionalSiteAddressWithParent> = mutableMapOf()
     val additionalLegalEntityAddresses: MutableMap<String, AdditionalLegalEntityAddressWithParent> = mutableMapOf()
@@ -67,36 +66,36 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
 }
 
 data class SiteBasedLegalEntity(
-    val legalEntity: LegalEntityWithLegalAddressVerboseDto,
-    val site: SiteVerboseDto
+    val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+    val site: SiteVerboseV7Dto
 )
 
 data class SiteWithParent(
-    val legalEntity: LegalEntityWithLegalAddressVerboseDto,
-    val site: SiteWithMainAddressVerboseDto
+    val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+    val site: SiteWithMainAddressVerboseV7Dto
 )
 
 data class AdditionalSiteAddressWithParent(
     val siteWithParent: SiteWithParent,
-    val address: LogisticAddressVerboseDto
+    val address: LogisticAddressVerboseV7Dto
 )
 
 data class AdditionalLegalEntityAddressWithParent(
-    val legalEntity: LegalEntityWithLegalAddressVerboseDto,
-    val address: LogisticAddressVerboseDto
+    val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+    val address: LogisticAddressVerboseV7Dto
 )
 
 data class RecordState(
     val member: SharingMember,
     val contentSeed: String? = null,
-    val currentInput: BusinessPartnerInputRequest? = null,
-    val legalEntity: LegalEntityWithLegalAddressVerboseDto? = null,
-    val poolSite: SiteWithMainAddressVerboseDto? = null,
-    val poolAddress: LogisticAddressVerboseDto? = null,
+    val currentInput: BusinessPartnerInputV7Request? = null,
+    val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto? = null,
+    val poolSite: SiteWithMainAddressVerboseV7Dto? = null,
+    val poolAddress: LogisticAddressVerboseV7Dto? = null,
 )
 
 data class RelationState(
-    val submittedEntry: RelationPutEntry,
+    val submittedEntry: RelationPutV7Entry,
     val sourceRecordId: String,
     val targetRecordId: String,
     val resolvedSourceBpn: String? = null,

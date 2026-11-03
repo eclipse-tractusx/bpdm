@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolDataSpaceParticipantsApi
-import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.PoolDataSpaceParticipantsV7Api
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.DataSpaceParticipantSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.DataSpaceParticipantUpdateApplicationV7Service
@@ -35,15 +35,15 @@ import org.springframework.web.bind.annotation.RestController
 class DataSpaceParticipantsController(
     private val dataSpaceParticipantSearchApplicationV7Service: DataSpaceParticipantSearchApplicationV7Service,
     private val dataSpaceParticipantUpdateApplicationV7Service: DataSpaceParticipantUpdateApplicationV7Service
-): PoolDataSpaceParticipantsApi {
+): PoolDataSpaceParticipantsV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
-    override fun get(searchRequest: DataSpaceParticipantSearchRequest, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantDto> {
+    override fun get(searchRequest: DataSpaceParticipantSearchV7Request, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantV7Dto> {
        return dataSpaceParticipantSearchApplicationV7Service.searchParticipants(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
-    override fun put(updateRequest: DataSpaceParticipantUpdateRequest) {
+    override fun put(updateRequest: DataSpaceParticipantUpdateV7Request) {
         return dataSpaceParticipantUpdateApplicationV7Service.updateParticipants(updateRequest)
     }
 }

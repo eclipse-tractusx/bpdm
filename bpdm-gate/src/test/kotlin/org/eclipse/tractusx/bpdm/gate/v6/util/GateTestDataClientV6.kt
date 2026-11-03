@@ -19,19 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateV6Client
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
@@ -45,34 +45,34 @@ import kotlin.random.Random
  */
 class GateTestDataClientV6 (
     val testDataFactory: GateTestDataFactoryV6,
-    val operatorClient: GateClientV6,
+    val operatorClient: GateV6Client,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    private val taskCreationBatchService: TaskCreationBatchService,
-    private val taskResolutionBatchService: TaskResolutionBatchService,
+    private val taskCreationService: GoldenRecordTaskCreationApplicationService,
+    private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     private val tenantBpnL: String,
     private val poolMockDataFactory: PoolMockDataFactory
 ){
-    fun createBusinessPartnerInput(seed: String, externalId: String = seed, externalSequenceTimestamp: Instant? = null): BusinessPartnerInputDto{
+    fun createBusinessPartnerInput(seed: String, externalId: String = seed, externalSequenceTimestamp: Instant? = null): BusinessPartnerInputV6Dto{
         val createRequest = testDataFactory.request.createFullValid(seed, externalId).copy(externalSequenceTimestamp = externalSequenceTimestamp)
         return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(createRequest)).body!!.single()
     }
 
-    fun createBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
+    fun createBusinessPartnerInput(request: BusinessPartnerInputV6Request): BusinessPartnerInputV6Dto {
         return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(request)).body!!.single()
     }
 
-    fun createRelation(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto, relationType: RelationType): RelationDto{
-        return operatorClient.relations.post(RelationPostRequest(externalId, relationType, source.externalId, target.externalId))
+    fun createRelation(externalId: String, source: BusinessPartnerInputV6Dto, target: BusinessPartnerInputV6Dto, relationType: RelationTypeV6): RelationV6Dto{
+        return operatorClient.relations.post(RelationPostV6Request(externalId, relationType, source.externalId, target.externalId))
     }
 
-    fun createRelationWithBusinessPartners(externalId: String, relationType: RelationType, seed: String = externalId): RelationDto{
+    fun createRelationWithBusinessPartners(externalId: String, relationType: RelationTypeV6, seed: String = externalId): RelationV6Dto{
         val sourceInput = createBusinessPartnerInput("$seed Source")
         val targetInput = createBusinessPartnerInput("$seed Target")
 
-        return operatorClient.relations.post(RelationPostRequest(externalId, relationType, sourceInput.externalId, targetInput.externalId))
+        return operatorClient.relations.post(RelationPostV6Request(externalId, relationType, sourceInput.externalId, targetInput.externalId))
     }
 
-    fun refineToLegalEntity(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
+    fun refineToLegalEntity(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto{
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -83,7 +83,7 @@ class GateTestDataClientV6 (
         return poolMockResult
     }
 
-    fun refineToLegalEntityOnSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
+    fun refineToLegalEntityOnSite(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
         val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -100,7 +100,7 @@ class GateTestDataClientV6 (
         return poolMockResult
     }
 
-    fun refineToSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
+    fun refineToSite(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
         val poolMockResult = poolMockDataFactory.mockSiteAndMainAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -117,7 +117,7 @@ class GateTestDataClientV6 (
         return poolMockResult
     }
 
-    fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
+    fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -136,10 +136,10 @@ class GateTestDataClientV6 (
     }
 
     fun refineToAdditionalAddressOfSite(
-        input: BusinessPartnerInputDto,
-        legalEntityRequest: LegalEntityPartnerCreateRequest,
-        siteRequest: SitePartnerCreateRequest,
-        additionalAddressRequest: AddressPartnerCreateRequest,
+        input: BusinessPartnerInputV6Dto,
+        legalEntityRequest: LegalEntityPartnerCreateV7Request,
+        siteRequest: SitePartnerCreateV7Request,
+        additionalAddressRequest: AddressPartnerCreateV7Request,
         seed: String = input.externalId
     ): PoolMockDataFactory.AdditionalAddressOfSiteResult{
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(legalEntityRequest, siteRequest, additionalAddressRequest, seed)
@@ -162,13 +162,13 @@ class GateTestDataClientV6 (
 
 
     fun setStateToReady(externalId: String){
-        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
+        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(externalId)))
     }
 
     fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto{
         setStateToReady(externalId)
         val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
 
         return createdTask
     }
@@ -185,8 +185,8 @@ class GateTestDataClientV6 (
         )
 
         setStateToReady(externalId)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
 
         return mockedRefinedTask
     }
@@ -200,15 +200,15 @@ class GateTestDataClientV6 (
         val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
 
         setStateToReady(externalId)
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
 
         return errorTask
     }
 
     private fun shareBusinessPartnerAndResolve(externalId: String){
-        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
+        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(externalId)))
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
     }
 }

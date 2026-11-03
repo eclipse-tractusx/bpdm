@@ -24,13 +24,13 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolSiteV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -44,33 +44,33 @@ interface SiteV6ApiClient: PoolSiteV6Api {
 
     @PostExchange(value = ApiCommons.SITE_BASE_PATH_V6)
     override fun createSite(
-        @RequestBody requests: Collection<SitePartnerCreateRequestV6>
-    ): SitePartnerCreateResponseWrapperV6
+        @RequestBody requests: Collection<SitePartnerCreateV6Request>
+    ): SitePartnerCreateV6ResponseWrapper
 
     @PostExchange(value = "${ApiCommons.SITE_BASE_PATH_V6}/legal-main-sites")
     override fun createSiteWithLegalReference(
-        @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMainV6>
-    ): SitePartnerCreateResponseWrapperV6
+        @RequestBody request: Collection<SiteCreateWithLegalAddressAsMainV6Request>
+    ): SitePartnerCreateV6ResponseWrapper
 
     @PutExchange(value = ApiCommons.SITE_BASE_PATH_V6)
     override fun updateSite(
-        @RequestBody requests: Collection<SitePartnerUpdateRequestV6>
-    ): SitePartnerUpdateResponseWrapperV6
+        @RequestBody requests: Collection<SitePartnerUpdateV6Request>
+    ): SitePartnerUpdateV6ResponseWrapper
 
     @PostExchange(value = "${ApiCommons.SITE_BASE_PATH_V6}/search")
     override fun postSiteSearch(
-        @RequestBody searchRequest: SiteSearchRequestV6,
+        @RequestBody searchRequest: SiteSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDtoV6>
+    ): PageDto<SiteWithMainAddressVerboseV6Dto>
 
     @GetExchange(value = ApiCommons.SITE_BASE_PATH_V6)
     override fun getSites(
-        @ParameterObject searchRequest: SiteSearchRequestV6,
+        @ParameterObject searchRequest: SiteSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDtoV6>
+    ): PageDto<SiteWithMainAddressVerboseV6Dto>
 
     @GetExchange(value = "${ApiCommons.SITE_BASE_PATH_V6}/{bpns}")
     override fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
-    ): SiteWithMainAddressVerboseDtoV6
+    ): SiteWithMainAddressVerboseV6Dto
 }

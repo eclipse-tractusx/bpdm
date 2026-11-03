@@ -25,9 +25,9 @@ import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
@@ -68,7 +68,7 @@ class SharingMemberRecordSyncService(
     }
 
     private fun synchronizeBatch(): Boolean{
-        val syncRecord = syncRecordService.getOrCreateRecord(SyncType.SHARING_MEMBER_RECORDS)
+        val syncRecord = syncRecordService.getOrCreateRecord(SyncTypeDb.SHARING_MEMBER_RECORDS)
 
         val queryRequest = SharingMemberRecordQueryRequest(syncRecord.fromTime)
         val updatedSharingMemberRecords = orchestrationApiClient.sharingMemberRecords.queryRecords(

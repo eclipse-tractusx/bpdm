@@ -21,15 +21,15 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolMembersApi
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.PoolMembersV7Api
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.ChangelogSearchApplicationV7Service
@@ -44,32 +44,32 @@ class MemberController(
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val changelogSearchApplicationService: ChangelogSearchApplicationV7Service
-) : PoolMembersApi {
+) : PoolMembersV7Api {
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchLegalEntities(
-        searchRequest: LegalEntitySearchRequest,
+        searchRequest: LegalEntitySearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
+    ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> {
         return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
-    override fun postSiteSearch(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
+    override fun postSiteSearch(searchRequest: SiteSearchV7Request, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseV7Dto> {
         return siteSearchApplicationService.searchMemberSites(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
-    override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressInvariantVerboseDto> {
+    override fun searchAddresses(searchRequest: AddressSearchV7Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressInvariantVerboseV7Dto> {
         return addressSearchApplicationService.searchMemberAddresses(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")
     override fun searchChangelogEntries(
-        changelogSearchRequest: ChangelogSearchRequest,
+        changelogSearchRequest: ChangelogSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDto> {
+    ): PageDto<ChangelogEntryVerboseV7Dto> {
         return changelogSearchApplicationService.searchMemberChangelogEntries(changelogSearchRequest, paginationRequest)
     }
 

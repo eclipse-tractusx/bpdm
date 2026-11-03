@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchFilterTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchResultV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 
 /**
  * Provides search functionality on the Catena-x data for the BPDM system
@@ -34,9 +34,9 @@ interface SearchService {
      * Find business partner by matching their field values to [searchRequest] field query texts
      */
     fun searchBusinessPartner(
-        searchRequest: LegalEntityPropertiesSearchRequest,
-        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
+        searchRequest: LegalEntityPropertiesSearchV7Request,
+        searchResultFilter: Set<BusinessPartnerSearchFilterTypeV7>?,
         paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerSearchResultDto>
+    ): PageDto<BusinessPartnerSearchResultV7Dto>
 
 }

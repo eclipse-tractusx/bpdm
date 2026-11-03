@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolAddressV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressGetApplicationV6Service
@@ -45,36 +45,36 @@ class AddressV6Controller(
 ) : PoolAddressV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getAddresses(addressSearchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> {
+    override fun getAddresses(addressSearchRequest: AddressSearchV6Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV6Dto> {
         return searchAddresses(addressSearchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getAddress(
         bpna: String
-    ): LogisticAddressVerboseDtoV6 {
+    ): LogisticAddressVerboseV6Dto {
         return addressGetApplicationService.getAddress(bpna)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchAddresses(
-        searchRequest: AddressSearchRequestV6,
+        searchRequest: AddressSearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDtoV6> {
+    ): PageDto<LogisticAddressVerboseV6Dto> {
         return addressSearchApplicationService.searchAddresses(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createAddresses(
-        requests: Collection<AddressPartnerCreateRequestV6>
-    ): AddressPartnerCreateResponseWrapperV6 {
+        requests: Collection<AddressPartnerCreateV6Request>
+    ): AddressPartnerCreateV6ResponseWrapper {
         return addressCreateApplicationService.createAddresses(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateAddresses(
-        requests: Collection<AddressPartnerUpdateRequestV6>
-    ): AddressPartnerUpdateResponseWrapperV6 {
+        requests: Collection<AddressPartnerUpdateV6Request>
+    ): AddressPartnerUpdateV6ResponseWrapper {
         return addressUpdateApplicationService.updateAddresses(requests)
     }
 }

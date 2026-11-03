@@ -19,12 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
@@ -36,41 +37,41 @@ class SiteDtoRequestMapper(
     private val addressDtoRequestMapper: AddressDtoRequestMapper
 ) {
 
-    fun toCreateRequest(request: SitePartnerCreateRequest): SiteCreateRequest =
+    fun toCreateRequest(request: SitePartnerCreateV7Request): SiteCreateRequest =
         SiteCreateRequest(legalEntityBpn = request.bpnlParent, content = toContentRequest(request.site))
 
-    fun toUpdateRequest(request: SitePartnerUpdateRequest): SiteUpdateRequest =
+    fun toUpdateRequest(request: SitePartnerUpdateV7Request): SiteUpdateRequest =
         SiteUpdateRequest(siteBpn = request.bpns, content = toContentRequest(request.site))
 
-    fun toCreateWithLegalAddressAsMainRequest(request: SiteCreateRequestWithLegalAddressAsMain): SiteCreateWithLegalAddressAsMainRequest =
+    fun toCreateWithLegalAddressAsMainRequest(request: SiteCreateWithLegalAddressAsMainV7Request): SiteCreateWithLegalAddressAsMainRequest =
         SiteCreateWithLegalAddressAsMainRequest(
             legalEntityBpn = request.bpnLParent,
             header = SiteHeaderRequest(
                 name = request.name,
-                states = request.states.map { SiteState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+                states = request.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
                 scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
             )
         )
 
-    private fun toContentRequest(site: SiteDto): SiteContentRequest =
+    private fun toContentRequest(site: SiteV7Dto): SiteContentRequest =
         SiteContentRequest(
             header = toHeaderRequest(site),
             mainAddress = addressDtoRequestMapper.toContentRequest(
                 site.mainAddress,
-                site.scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode, it.mainAddress) }
+                site.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, it.mainAddress) }
             )
         )
 
-    private fun toHeaderRequest(site: SiteDto): SiteHeaderRequest =
+    private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRequest =
         SiteHeaderRequest(
             name = site.name,
-            states = site.states.map { SiteState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            states = site.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
             scriptVariants = site.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDto): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
@@ -79,4 +80,8 @@ class SiteDtoRequestMapper(
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
+
+    private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
+
+    private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
 }

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
@@ -48,7 +48,7 @@ class IsReplacedByRelationUpsertService(
             RelationUpsertService.UpsertRequest(
                 source = upsertRequest.source,
                 target = upsertRequest.target,
-                legalEntityRelationType = LegalEntityRelationType.IsReplacedBy,
+                legalEntityRelationType = LegalEntityRelationTypeV7.IsReplacedBy,
                 validityPeriods = upsertRequest.validityPeriods,
                 existingRelation = upsertRequest.existingRelation,
                 reasonCode = upsertRequest.reasonCode
@@ -62,7 +62,7 @@ class IsReplacedByRelationUpsertService(
         val predecessor = upsertRequest.source
         val successor = upsertRequest.target
 
-        val existingSuccessions = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsReplacedBy, predecessor)
+        val existingSuccessions = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsReplacedBy, predecessor)
         val overlappingSuccessions = relationUpsertService.filterOverlappingRelations(upsertRequest, existingSuccessions)
 
         overlappingSuccessions.forEach { succession ->
@@ -97,7 +97,7 @@ class IsReplacedByRelationUpsertService(
             if (!visitedBpnls.add(currentSuccessor.bpn))
                 continue
 
-            val successionsOfCurrent = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsReplacedBy, currentSuccessor)
+            val successionsOfCurrent = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsReplacedBy, currentSuccessor)
             relationUpsertService.filterOverlappingRelations(upsertRequest, successionsOfCurrent)
                 .forEach { successorProcessingQueue.addFirst(it.endNode) }
         }

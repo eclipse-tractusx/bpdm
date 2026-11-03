@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSearchRequest
 import org.springframework.stereotype.Component
 
@@ -33,7 +33,7 @@ class AddressSearchRequestMapperV6 {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: AddressSearchRequestV6, isDataSpaceParticipant: Boolean?): AddressSearchRequest =
+    fun toSearchRequest(searchRequest: AddressSearchV6Request, isDataSpaceParticipant: Boolean?): AddressSearchRequest =
         AddressSearchRequest(
             addressBpns = searchRequest.addressBpns,
             siteBpns = searchRequest.siteBpns,

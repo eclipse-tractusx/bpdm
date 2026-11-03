@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -98,13 +98,13 @@ class LegalFormCreateV6IT: UnscheduledPoolTestBaseV6(){
 
 
 
-    private fun createLegalFormRequest(seed: String): LegalFormRequestV6 {
-        return LegalFormRequestV6(
+    private fun createLegalFormRequest(seed: String): LegalFormV6Request {
+        return LegalFormV6Request(
             technicalKey = seed,
-            name = "$seed ${LegalFormRequestV6::name.name}",
-            transliteratedName = "$seed ${LegalFormRequestV6::transliteratedName.name}",
-            abbreviation = "$seed ${LegalFormRequestV6::abbreviation.name}",
-            transliteratedAbbreviations = "$seed ${LegalFormRequestV6::transliteratedAbbreviations.name}",
+            name = "$seed ${LegalFormV6Request::name.name}",
+            transliteratedName = "$seed ${LegalFormV6Request::transliteratedName.name}",
+            abbreviation = "$seed ${LegalFormV6Request::abbreviation.name}",
+            transliteratedAbbreviations = "$seed ${LegalFormV6Request::transliteratedAbbreviations.name}",
             country = "DE",
             language = "de",
             administrativeAreaLevel1 = "DE-BW",
@@ -112,8 +112,8 @@ class LegalFormCreateV6IT: UnscheduledPoolTestBaseV6(){
         )
     }
 
-    private fun createExpectedLegalForm(request: LegalFormRequestV6): LegalFormDtoV6 {
-        return LegalFormDtoV6(
+    private fun createExpectedLegalForm(request: LegalFormV6Request): LegalFormV6Dto {
+        return LegalFormV6Dto(
             technicalKey = request.technicalKey,
             name = request.name,
             transliteratedName = request.transliteratedName,

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.orchestrator.entity.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.data.domain.PageRequest

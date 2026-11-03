@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.v6.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.exception.BusinessPartnerSharingErrorV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.PostSharingStateReadyV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
@@ -66,7 +66,7 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), listOf(testName))
 
         //THEN
-        val expectedSharingState = SharingStateDto(testName, SharingStateType.Initial, null, null, null, null)
+        val expectedSharingState = SharingStateV6Dto(testName, SharingStateTypeV6.Initial, null, null, null, null)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
@@ -88,7 +88,7 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), listOf(input1.externalId, input2.externalId, input3.externalId))
 
         //THEN
-        val expectedSharingStates = listOf(input1, input2, input3).map { SharingStateDto(it.externalId, SharingStateType.Initial, null, null, null, null) }
+        val expectedSharingStates = listOf(input1, input2, input3).map { SharingStateV6Dto(it.externalId, SharingStateTypeV6.Initial, null, null, null, null) }
         val expectedResponse = PageDto(3, 1, 0, 3, expectedSharingStates)
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
@@ -108,7 +108,7 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
 
         //THEN
-        val expectedSharingState = SharingStateDto(input.externalId, SharingStateType.Initial, null, null, null, null)
+        val expectedSharingState = SharingStateV6Dto(input.externalId, SharingStateTypeV6.Initial, null, null, null, null)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
@@ -123,13 +123,13 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
     fun `find ready sharing state`(){
         //GIVEN
         val input = testDataClient.createBusinessPartnerInput(testName)
-        testDataClient.operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(input.externalId)))
+        testDataClient.operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(input.externalId)))
 
         //WHEN
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
 
         //THEN
-        val expectedSharingState = SharingStateDto(input.externalId, SharingStateType.Ready, null, null, null, null)
+        val expectedSharingState = SharingStateV6Dto(input.externalId, SharingStateTypeV6.Ready, null, null, null, null)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
@@ -150,7 +150,7 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
 
         //THEN
-        val expectedSharingState = SharingStateDto(input.externalId, SharingStateType.Pending, null, null, null, createdTask.taskId)
+        val expectedSharingState = SharingStateV6Dto(input.externalId, SharingStateTypeV6.Pending, null, null, null, createdTask.taskId)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
@@ -171,7 +171,7 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
 
         //THEN
-        val expectedSharingState = SharingStateDto(input.externalId, SharingStateType.Success, null, null, null, refinedTask.taskId)
+        val expectedSharingState = SharingStateV6Dto(input.externalId, SharingStateTypeV6.Success, null, null, null, refinedTask.taskId)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
@@ -192,10 +192,10 @@ class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
 
         //THEN
-        val expectedSharingState = SharingStateDto(
+        val expectedSharingState = SharingStateV6Dto(
             input.externalId,
-            SharingStateType.Error,
-            BusinessPartnerSharingError.NaturalPersonError,
+            SharingStateTypeV6.Error,
+            BusinessPartnerSharingErrorV6.NaturalPersonError,
             errorTask.processingState.errors.single().description,
             null,
             errorTask.taskId

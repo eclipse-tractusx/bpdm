@@ -19,11 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.springframework.stereotype.Component
@@ -40,9 +41,9 @@ class SiteResponseMapperV6(
     /**
      * Returns the given site as the v6 API reports it.
      */
-    fun toSite(site: SiteDb): SiteVerboseDtoV6 =
+    fun toSite(site: SiteDb): SiteVerboseV6Dto =
         with(site) {
-            SiteVerboseDtoV6(
+            SiteVerboseV6Dto(
                 bpn,
                 name,
                 states = states.map { toState(it) },
@@ -57,8 +58,8 @@ class SiteResponseMapperV6(
     /**
      * Returns the given site together with its main address as the v6 API reports them.
      */
-    fun toSiteWithMainAddress(site: SiteDb): SiteWithMainAddressVerboseDtoV6 =
-        SiteWithMainAddressVerboseDtoV6(
+    fun toSiteWithMainAddress(site: SiteDb): SiteWithMainAddressVerboseV6Dto =
+        SiteWithMainAddressVerboseV6Dto(
             site = toSite(site),
             mainAddress = addressResponseMapperV6.toAddress(site.mainAddress)
         )
@@ -67,13 +68,17 @@ class SiteResponseMapperV6(
      * Returns the given created or updated site as the v6 API reports it, tagged with the key of the request that
      * wrote it.
      */
-    fun toUpsertResponse(site: SiteDb, entryId: String?): SitePartnerCreateVerboseDtoV6 =
-        SitePartnerCreateVerboseDtoV6(
+    fun toUpsertResponse(site: SiteDb, entryId: String?): SitePartnerCreateVerboseV6Dto =
+        SitePartnerCreateVerboseV6Dto(
             site = toSite(site),
             mainAddress = addressResponseMapperV6.toAddress(site.mainAddress),
             index = entryId
         )
 
-    private fun toState(state: SiteStateDb): SiteStateVerboseDtoV6 =
-        SiteStateVerboseDtoV6(state.validFrom, state.validTo, state.type.toDto())
+    private fun toState(state: SiteStateDb): SiteStateVerboseV6Dto =
+        SiteStateVerboseV6Dto(
+            BusinessStateDates.reportValidFrom(state.validFrom),
+            BusinessStateDates.reportValidTo(state.validTo),
+            state.type.toDto()
+        )
 }

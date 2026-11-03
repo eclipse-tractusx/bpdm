@@ -19,12 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.relation
 
-import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.error.GateErrorV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -37,8 +39,8 @@ class RelationDeletionV6IT: UnscheduledGateV6TestBase() {
      * THEN input manager sees relation deleted
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `delete existing relation`(relationType: RelationType){
+    @EnumSource(RelationTypeV6::class)
+    fun `delete existing relation`(relationType: RelationTypeV6){
         // GIVEN
         val givenRelation = testDataClient.createRelationWithBusinessPartners(testName, relationType)
 
@@ -47,22 +49,45 @@ class RelationDeletionV6IT: UnscheduledGateV6TestBase() {
 
         //THEN
         val searchResponse = gateClient.relations.get(externalIds = listOf(givenRelation.externalId))
-        val expected = PageDto<RelationDto>(0, 0, 0, 0, emptyList())
+        val expected = PageDto<RelationV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepo.assertRelations(searchResponse, expected)
     }
 
 
     /**
+     * GIVEN deleted relation between two business partners
+     * WHEN input manager creates a relation with the same external ID between the same business partners
+     * THEN input manager sees the new relation
+     */
+    @Test
+    fun `create relation again after deletion`(){
+        // GIVEN
+        val givenRelation = testDataClient.createRelationWithBusinessPartners(testName, RelationTypeV6.IsManagedBy)
+        gateClient.relations.delete(givenRelation.externalId)
+
+        //WHEN
+        val response = gateClient.relations.post(RelationPostV6Request(
+            givenRelation.externalId,
+            givenRelation.relationType,
+            givenRelation.businessPartnerSourceExternalId,
+            givenRelation.businessPartnerTargetExternalId
+        ))
+
+        //THEN
+        assertRepo.assertRelation(response, givenRelation)
+    }
+
+    /**
      * WHEN input manager requests deletion of not existing relation
-     * THEN input manager sees 400 HTTP error response
+     * THEN input manager sees 400 HTTP error response naming that relation
      */
     @Test
     fun `try delete not-existing relation`(){
         //WHEN
-        val request: () -> Unit  = { gateClient.relations.delete("NOT EXISTING") }
+        val response = assertThrows<WebClientResponseException.BadRequest> { gateClient.relations.delete("NOT EXISTING") }
 
         //THEN
-        Assertions.assertThatThrownBy(request).isInstanceOf(WebClientResponseException.BadRequest::class.java)
+        assertRepo.assertErrorPerExternalId(response.getResponseBodyAs(GateErrorV6Response::class.java)!!, listOf("NOT EXISTING"))
     }
 }

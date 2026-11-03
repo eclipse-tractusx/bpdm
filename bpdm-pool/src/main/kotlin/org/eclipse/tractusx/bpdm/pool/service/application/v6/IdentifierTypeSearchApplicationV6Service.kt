@@ -29,14 +29,14 @@ import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.IdentifierTypeRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.IdentifierTypeResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.IdentifierTypeSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.IdentifierTypeSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 
 /**
  * The REST-API boundary for the legacy v6 "search identifier types" operation, using the v6 request/response shapes.
@@ -57,7 +57,7 @@ class IdentifierTypeSearchApplicationV6Service(
         businessPartnerType: IdentifierBusinessPartnerTypeV6,
         country: String?,
         paginationRequest: PaginationRequest
-    ): PageDto<IdentifierTypeDtoV6> {
+    ): PageDto<IdentifierTypeV6Dto> {
         val criteria = when (val result = identifierTypeSearchParser.parse(identifierTypeRequestMapperV6.toSearchRequest(businessPartnerType, country))) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmValidationErrorException(result.errors.map { error ->

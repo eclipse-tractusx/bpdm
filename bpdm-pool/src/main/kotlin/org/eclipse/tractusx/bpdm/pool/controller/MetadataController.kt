@@ -21,9 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.PoolMetadataV7Api
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.FieldQualityRuleV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AdministrativeAreaSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.CountrySearchApplicationV7Service
@@ -50,54 +57,54 @@ class MetadataController(
     val reasonCodeSearchApplicationV7Service: ReasonCodeSearchApplicationV7Service,
     val scriptCodeSearchApplicationV7Service: ScriptCodeSearchApplicationV7Service,
     val countrySearchApplicationV7Service: CountrySearchApplicationV7Service
-) : PoolMetadataApi {
+) : PoolMetadataV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createIdentifierType(identifierType: IdentifierTypeDto): IdentifierTypeDto {
+    override fun createIdentifierType(identifierType: IdentifierTypeV7Dto): IdentifierTypeV7Dto {
         return identifierTypeCreateApplicationV7Service.createIdentifierType(identifierType)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getIdentifierTypes(
         paginationRequest: PaginationRequest,
-        businessPartnerType: IdentifierBusinessPartnerType,
+        businessPartnerType: IdentifierBusinessPartnerTypeV7,
         country: String?
-    ): PageDto<IdentifierTypeDto> {
+    ): PageDto<IdentifierTypeV7Dto> {
         return identifierTypeSearchApplicationV7Service.searchIdentifierTypes(businessPartnerType, country, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
+    override fun createLegalForm(type: LegalFormV7Request): LegalFormV7Dto {
         return legalFormCreateApplicationV7Service.createLegalForm(type)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto> {
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormV7Dto> {
         return legalFormSearchApplicationV7Service.searchLegalForms(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleDto>> {
+    override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleV7Dto>> {
         return ResponseEntity(fieldQualityRuleSearchApplicationV7Service.searchFieldQualityRules(country), HttpStatus.OK)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
+    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV7Dto> {
         return administrativeAreaSearchApplicationV7Service.searchAdministrativeAreas(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeDto> {
+    override fun getReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeV7Dto> {
         return reasonCodeSearchApplicationV7Service.searchReasonCodes(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
+    override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeV7Dto> {
         return scriptCodeSearchApplicationV7Service.searchScriptCodes(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryDto> {
+    override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryV7Dto> {
         return countrySearchApplicationV7Service.searchCountries(paginationRequest)
     }
 

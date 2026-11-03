@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
@@ -32,9 +32,9 @@ interface IdentifierTypeRepository :
     PagingAndSortingRepository<IdentifierTypeDb, Long>, CrudRepository<IdentifierTypeDb, Long>, JpaSpecificationExecutor<IdentifierTypeDb> {
 
     object Specs {
-        fun byBusinessPartnerType(businessPartnerType: IdentifierBusinessPartnerType) =
+        fun byBusinessPartnerType(businessPartnerType: IdentifierBusinessPartnerTypeV7) =
             Specification<IdentifierTypeDb> { root, _, builder ->
-                builder.equal(root.get<IdentifierBusinessPartnerType>(IdentifierTypeDb::businessPartnerType.name), businessPartnerType)
+                builder.equal(root.get<IdentifierBusinessPartnerTypeV7>(IdentifierTypeDb::businessPartnerType.name), businessPartnerType)
             }
 
         fun byCountry(countryCode: CountryDb?) =
@@ -63,6 +63,6 @@ interface IdentifierTypeRepository :
             } ?: Specification.unrestricted()
     }
 
-    fun findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType: IdentifierBusinessPartnerType, key: String): IdentifierTypeDb?
-    fun findByBusinessPartnerTypeAndTechnicalKeyIn(businessPartnerType: IdentifierBusinessPartnerType, technicalKeys: Set<String>): Set<IdentifierTypeDb>
+    fun findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType: IdentifierBusinessPartnerTypeV7, key: String): IdentifierTypeDb?
+    fun findByBusinessPartnerTypeAndTechnicalKeyIn(businessPartnerType: IdentifierBusinessPartnerTypeV7, technicalKeys: Set<String>): Set<IdentifierTypeDb>
 }

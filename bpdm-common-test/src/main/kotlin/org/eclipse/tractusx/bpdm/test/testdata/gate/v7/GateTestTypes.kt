@@ -19,21 +19,21 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 
 object GateTestTypes {
-    enum class LegalEntityRelationType(val gateRelationType: RelationType){
-        IsOwnedBy(RelationType.IsOwnedBy),
-        IsAlternativeHeadquarterFor(RelationType.IsAlternativeHeadquarterFor),
-        IsManagedBy(RelationType.IsManagedBy),
-        IsReplacedBy(RelationType.IsReplacedBy)
+    enum class LegalEntityRelationType(val gateRelationType: RelationTypeV7){
+        IsOwnedBy(RelationTypeV7.IsOwnedBy),
+        IsAlternativeHeadquarterFor(RelationTypeV7.IsAlternativeHeadquarterFor),
+        IsManagedBy(RelationTypeV7.IsManagedBy),
+        IsReplacedBy(RelationTypeV7.IsReplacedBy)
     }
 
-    enum class SiteRelationType(val gateRelationType: RelationType){
-        IsReplacedBy(RelationType.IsReplacedBy)
+    enum class SiteRelationType(val gateRelationType: RelationTypeV7){
+        IsReplacedBy(RelationTypeV7.IsReplacedBy)
     }
 
-    enum class AddressRelationType(val gateRelationType: RelationType){
-        IsReplacedBy(RelationType.IsReplacedBy)
+    enum class AddressRelationType(val gateRelationType: RelationTypeV7){
+        IsReplacedBy(RelationTypeV7.IsReplacedBy)
     }
 }

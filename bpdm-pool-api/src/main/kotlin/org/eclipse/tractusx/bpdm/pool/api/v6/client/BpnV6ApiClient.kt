@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.api.v6.client
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolBpnV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnRequestIdentifierMappingDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnIdentifierMappingV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappingV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
@@ -35,8 +35,8 @@ import org.springframework.web.service.annotation.PostExchange
 interface BpnV6ApiClient : PoolBpnV6Api {
 
     @PostExchange(value = "${ApiCommons.BPN_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}")
-    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequestV6): ResponseEntity<Set<BpnIdentifierMappingDtoV6>>
+    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchV6Request): ResponseEntity<Set<BpnIdentifierMappingV6Dto>>
 
     @PostExchange(value = "${ApiCommons.BPN_BASE_PATH_V6}/request-ids/search")
-    override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequestV6): ResponseEntity<Set<BpnRequestIdentifierMappingDtoV6>>
+    override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchV6Request): ResponseEntity<Set<BpnRequestIdentifierMappingV6Dto>>
 }

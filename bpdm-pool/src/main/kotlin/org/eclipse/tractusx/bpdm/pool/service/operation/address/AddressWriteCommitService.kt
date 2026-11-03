@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -58,8 +58,8 @@ class AddressWriteCommitService(
 
         changelogCreateService.record(staged.mapNotNull {
             when (it.upsertType) {
-                UpsertType.Created -> ChangelogRecord(it.address.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
-                UpsertType.Updated -> ChangelogRecord(it.address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
+                UpsertType.Created -> ChangelogRecord(it.address.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.ADDRESS)
+                UpsertType.Updated -> ChangelogRecord(it.address.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS)
                 UpsertType.NoChange -> null
             }
         })

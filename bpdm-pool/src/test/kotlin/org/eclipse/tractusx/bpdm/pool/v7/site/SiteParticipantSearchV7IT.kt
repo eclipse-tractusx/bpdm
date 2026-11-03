@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -45,7 +45,7 @@ class SiteParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(nonParticipantLE, "$testName Site 3")
 
         //WHEN
-        val searchResponse = poolClient.members.postSiteSearch(SiteSearchRequest(), PaginationRequest())
+        val searchResponse = poolClient.members.postSiteSearch(SiteSearchV7Request(), PaginationRequest())
 
         //THEN
         val expectedSites = listOf(participantSite1, participantSite2).map { resultFactory.buildSiteSearchResponse(it) }
@@ -71,7 +71,7 @@ class SiteParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(nonParticipantLE, "$testName Site 3")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(siteBpns = listOf(participantSite1.site.bpns))
+        val searchRequest = SiteSearchV7Request(siteBpns = listOf(participantSite1.site.bpns))
         val searchResponse = poolClient.members.postSiteSearch(searchRequest, PaginationRequest())
 
         //THEN
@@ -98,7 +98,7 @@ class SiteParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(nonParticipantLE, "$testName Site 3")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(legalEntityBpns = listOf(participantLE1.header.bpnl))
+        val searchRequest = SiteSearchV7Request(legalEntityBpns = listOf(participantLE1.header.bpnl))
         val searchResponse = poolClient.members.postSiteSearch(searchRequest, PaginationRequest())
 
         //THEN
@@ -121,11 +121,11 @@ class SiteParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         val nonParticipantSite = testDataClient.createSite(nonParticipantLE, "$testName Site")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(siteBpns = listOf(nonParticipantSite.site.bpns))
+        val searchRequest = SiteSearchV7Request(siteBpns = listOf(nonParticipantSite.site.bpns))
         val searchResponse = poolClient.members.postSiteSearch(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<SiteWithMainAddressVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<SiteWithMainAddressVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertSiteSearchResponse(searchResponse, expectedResponse)
     }
@@ -143,11 +143,11 @@ class SiteParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(nonParticipantLE, "$testName Site")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(legalEntityBpns = listOf(nonParticipantLE.header.bpnl))
+        val searchRequest = SiteSearchV7Request(legalEntityBpns = listOf(nonParticipantLE.header.bpnl))
         val searchResponse = poolClient.members.postSiteSearch(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<SiteWithMainAddressVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<SiteWithMainAddressVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertSiteSearchResponse(searchResponse, expectedResponse)
     }

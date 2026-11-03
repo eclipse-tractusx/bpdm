@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -33,6 +31,8 @@ import org.eclipse.tractusx.bpdm.pool.repository.SiteRelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 
 /**
  * Writes succession between two sites of one legal entity, in which the source site is replaced by the target site.
@@ -115,7 +115,7 @@ class SiteRelationUpsertService(
         val predecessor = upsertRequest.source
         val successor = upsertRequest.target
 
-        val existingSuccessions = siteRelationRepository.findByTypeAndStartSite(SiteRelationType.IsReplacedBy, predecessor)
+        val existingSuccessions = siteRelationRepository.findByTypeAndStartSite(SiteRelationTypeV7.IsReplacedBy, predecessor)
 
         filterOverlappingRelations(upsertRequest, existingSuccessions).forEach { succession ->
             if (succession.endSite.bpn != successor.bpn)
@@ -149,7 +149,7 @@ class SiteRelationUpsertService(
             if (!visitedBpns.add(currentSuccessor.bpn))
                 continue
 
-            val successionsOfCurrent = siteRelationRepository.findByTypeAndStartSite(SiteRelationType.IsReplacedBy, currentSuccessor)
+            val successionsOfCurrent = siteRelationRepository.findByTypeAndStartSite(SiteRelationTypeV7.IsReplacedBy, currentSuccessor)
             filterOverlappingRelations(upsertRequest, successionsOfCurrent)
                 .forEach { successorProcessingQueue.addFirst(it.endSite) }
         }
@@ -162,7 +162,7 @@ class SiteRelationUpsertService(
         val target = upsertRequest.target
 
         val newRelation = SiteRelationDb(
-            type = SiteRelationType.IsReplacedBy,
+            type = SiteRelationTypeV7.IsReplacedBy,
             startSite = source,
             endSite = target,
             validityPeriods = upsertRequest.validityPeriods.map { RelationValidityPeriodDb(it.validFrom, it.validTo) }.toMutableList(),
@@ -171,8 +171,8 @@ class SiteRelationUpsertService(
 
         siteRelationRepository.save(newRelation)
 
-        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE))
-        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE))
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
 
         return newRelation
     }

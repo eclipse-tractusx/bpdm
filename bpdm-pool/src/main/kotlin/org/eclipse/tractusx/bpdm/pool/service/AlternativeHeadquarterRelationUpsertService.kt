@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
@@ -54,7 +54,7 @@ class AlternativeHeadquarterRelationUpsertService(
             RelationUpsertService.UpsertRequest(
                 source = alternative,
                 target = main,
-                legalEntityRelationType = LegalEntityRelationType.IsAlternativeHeadquarterFor,
+                legalEntityRelationType = LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor,
                 validityPeriods = upsertRequest.validityPeriods,
                 existingRelation = upsertRequest.existingRelation,
                 reasonCode = upsertRequest.reasonCode
@@ -99,7 +99,7 @@ class AlternativeHeadquarterRelationUpsertService(
 
 
     private fun validateStarTopology(alternative: LegalEntityDb, main: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
-        val allAltHqRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, alternative)
+        val allAltHqRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, alternative)
         val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allAltHqRelations)
 
         val otherRelations = overlappingRelations.filterNot { it.startNode.bpn == alternative.bpn && it.endNode.bpn == main.bpn }
@@ -128,7 +128,7 @@ class AlternativeHeadquarterRelationUpsertService(
             }
         }
 
-        val allMainRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, main)
+        val allMainRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, main)
         val overlappingMainRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allMainRelations)
 
         val conflictingRelation = overlappingMainRelations.find {
@@ -153,7 +153,7 @@ class AlternativeHeadquarterRelationUpsertService(
 
 
     private fun validateAlternativeNotInOwnership(alternative: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
-        val ownedByRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsOwnedBy, alternative)
+        val ownedByRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsOwnedBy, alternative)
         val overlappingOwnedByRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, ownedByRelations)
 
         if (overlappingOwnedByRelations.isNotEmpty()) {

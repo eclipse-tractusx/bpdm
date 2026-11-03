@@ -23,8 +23,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
@@ -58,7 +58,7 @@ import java.time.LocalDate
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
     private val taskRelationsResolutionService: TaskRelationsResolutionService,
-    private val poolApiClient: PoolApiClient,
+    private val poolApiClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
 ) {
@@ -147,7 +147,7 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
     private fun addressTypeOf(bpna: String) = poolApiClient.addresses.getAddress(bpna).address.addressType
 
     private fun successionsOf(bpna: String) =
-        poolApiClient.addresses.getAddress(bpna).address.relations.filter { it.type == AddressRelationType.IsReplacedBy }
+        poolApiClient.addresses.getAddress(bpna).address.relations.filter { it.type == AddressRelationTypeV7.IsReplacedBy }
 
     private fun anyReasonCode(): String {
         return poolApiClient.metadata.getReasonCodes(PaginationRequest()).content.first().technicalKey

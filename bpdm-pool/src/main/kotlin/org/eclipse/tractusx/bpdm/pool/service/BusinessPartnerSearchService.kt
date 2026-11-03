@@ -20,13 +20,23 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchAddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchAlternativeAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchFilterTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchLegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchPhysicalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchResultV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchSiteV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BusinessPartnerSearchException
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -50,10 +60,10 @@ class BusinessPartnerSearchService(
      */
     @Transactional(readOnly = true)
     override fun searchBusinessPartner(
-        searchRequest: LegalEntityPropertiesSearchRequest,
-        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
+        searchRequest: LegalEntityPropertiesSearchV7Request,
+        searchResultFilter: Set<BusinessPartnerSearchFilterTypeV7>?,
         paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerSearchResultDto> {
+    ): PageDto<BusinessPartnerSearchResultV7Dto> {
 
         fun String?.startsWithWhitespace(): Boolean = this?.firstOrNull()?.isWhitespace() == true
 
@@ -80,11 +90,11 @@ class BusinessPartnerSearchService(
         }
 
         val pageable = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val includeLegalEntities = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterType.IncludeLegalEntities)
-        val includeSites = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterType.IncludeSites)
-        val includeAdditionalAddresses = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterType.IncludeAdditionalAddresses)
+        val includeLegalEntities = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities)
+        val includeSites = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterTypeV7.IncludeSites)
+        val includeAdditionalAddresses = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterTypeV7.IncludeAdditionalAddresses)
 
-        val results = mutableListOf<BusinessPartnerSearchResultDto>()
+        val results = mutableListOf<BusinessPartnerSearchResultV7Dto>()
 
         val matchedAddress = logisticAddressRepository.searchBusinessPartner(
             searchRequest,
@@ -109,13 +119,13 @@ class BusinessPartnerSearchService(
     }
 
     private fun shouldInclude(
-        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
-        filterType: BusinessPartnerSearchFilterType
+        searchResultFilter: Set<BusinessPartnerSearchFilterTypeV7>?,
+        filterType: BusinessPartnerSearchFilterTypeV7
     ): Boolean {
         return searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(filterType)
     }
 
-    private fun searchAddressResultMapping(result: LogisticAddressDb): BusinessPartnerSearchResultDto {
+    private fun searchAddressResultMapping(result: LogisticAddressDb): BusinessPartnerSearchResultV7Dto {
 
         val legalEntity = requireNotNull(result.legalEntity) {
             "searchAddressResultMapping requires LogisticAddressDb.legalEntity to be non-null"
@@ -131,39 +141,39 @@ class BusinessPartnerSearchService(
             else -> AddressType.AdditionalAddress
         }
 
-        val identifiers: List<BusinessPartnerIdentifierDto> =
+        val identifiers: List<BusinessPartnerSearchIdentifierV7Dto> =
             legalEntity.identifiers.map { identifier ->
-                BusinessPartnerIdentifierDto(
+                BusinessPartnerSearchIdentifierV7Dto(
                     type = identifier.type.technicalKey,
                     value = identifier.value,
                     issuingBody = identifier.issuingBody
                 )
             }
 
-        val states: List<BusinessPartnerStateDto> =
+        val states: List<BusinessPartnerSearchStateV7Dto> =
             legalEntity.states.map { state ->
-                BusinessPartnerStateDto(
-                    validTo = state.validTo,
-                    validFrom = state.validFrom,
+                BusinessPartnerSearchStateV7Dto(
+                    validTo = BusinessStateDates.reportValidTo(state.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(state.validFrom),
                     type = state.type
                 )
             }
 
-        val addressIdentifiers: Collection<AddressIdentifierDto> =
+        val addressIdentifiers: Collection<BusinessPartnerSearchAddressIdentifierV7Dto> =
             result.identifiers.map { identifier ->
-                AddressIdentifierDto(
+                BusinessPartnerSearchAddressIdentifierV7Dto(
                     type = identifier.type.technicalKey,
                     value = identifier.value
                 )
             }
 
-        val legalEntityDto = BusinessPartnerLegalEntity(
+        val legalEntityDto = BusinessPartnerSearchLegalEntityV7Dto(
             legalEntityBpn = legalEntity.bpn,
             legalName = legalEntity.legalName.value,
             shortName = legalEntity.legalName.shortName,
             legalForm = legalEntity.legalForm?.technicalKey,
             confidenceCriteria = with(legalEntity.confidenceCriteria) {
-                BusinessPartnerConfidenceCriteriaDto(
+                BusinessPartnerSearchConfidenceCriteriaV7Dto(
                     sharedByOwner = sharedByOwner,
                     checkedByExternalDataSource = checkedByExternalDataSource,
                     numberOfSharingMembers = numberOfSharingMembers,
@@ -173,20 +183,20 @@ class BusinessPartnerSearchService(
                 )
             },
             states = legalEntity.states.map {
-                BusinessPartnerStateDto(
-                    validTo = it.validTo,
-                    validFrom = it.validFrom,
+                BusinessPartnerSearchStateV7Dto(
+                    validTo = BusinessStateDates.reportValidTo(it.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                     type = it.type
                 )
             }
         )
 
         val siteDto = result.mainSite?.let { site ->
-            BusinessPartnerSite(
+            BusinessPartnerSearchSiteV7Dto(
                 siteBpn = site.bpn,
                 name = site.name,
                 confidenceCriteria = with(site.confidenceCriteria) {
-                    BusinessPartnerConfidenceCriteriaDto(
+                    BusinessPartnerSearchConfidenceCriteriaV7Dto(
                         sharedByOwner = sharedByOwner,
                         checkedByExternalDataSource = checkedByExternalDataSource,
                         numberOfSharingMembers = numberOfSharingMembers,
@@ -196,9 +206,9 @@ class BusinessPartnerSearchService(
                     )
                 },
                 states = site.states.map {
-                    BusinessPartnerStateDto(
-                        validTo = it.validTo,
-                        validFrom = it.validFrom,
+                    BusinessPartnerSearchStateV7Dto(
+                        validTo = BusinessStateDates.reportValidTo(it.validTo),
+                        validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                         type = it.type
                     )
                 }
@@ -208,7 +218,7 @@ class BusinessPartnerSearchService(
         val physical = result.physicalPostalAddress
         val alternative = result.alternativePostalAddress
         val streetDto = physical.street?.let { street ->
-            StreetDto(
+            StreetV7Dto(
                 name = street.name,
                 houseNumber = street.houseNumber,
                 houseNumberSupplement = street.houseNumberSupplement,
@@ -221,19 +231,19 @@ class BusinessPartnerSearchService(
             )
         }
 
-        val addressDto = BusinessPartnerPostalAddress(
+        val addressDto = BusinessPartnerSearchPostalAddressV7Dto(
             name = result.name,
             addressType = addressType,
             identifiers = addressIdentifiers,
             addressBpn = result.bpn,
             states = result.states.map {
-                BusinessPartnerStateDto(
-                    validTo = it.validTo,
-                    validFrom = it.validFrom,
+                BusinessPartnerSearchStateV7Dto(
+                    validTo = BusinessStateDates.reportValidTo(it.validTo),
+                    validFrom = BusinessStateDates.reportValidFrom(it.validFrom),
                     type = it.type
                 )
             },
-            physicalPostalAddress = PhysicalPostalAddressDto(
+            physicalPostalAddress = BusinessPartnerSearchPhysicalAddressV7Dto(
                 geographicCoordinates = physical.geographicCoordinates?.let {
                     GeoCoordinateDto(
                     longitude = it.longitude,
@@ -255,7 +265,7 @@ class BusinessPartnerSearchService(
                 door = physical.door,
                 taxJurisdictionCode = physical.taxJurisdictionCode
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
+            alternativePostalAddress = BusinessPartnerSearchAlternativeAddressV7Dto(
                 geographicCoordinates = alternative?.geographicCoordinates?.let {
                     GeoCoordinateDto(
                         longitude = it.longitude,
@@ -272,7 +282,7 @@ class BusinessPartnerSearchService(
 
             ),
             confidenceCriteria = with(result.confidenceCriteria) {
-                BusinessPartnerConfidenceCriteriaDto(
+                BusinessPartnerSearchConfidenceCriteriaV7Dto(
                     sharedByOwner = sharedByOwner,
                     checkedByExternalDataSource = checkedByExternalDataSource,
                     numberOfSharingMembers = numberOfSharingMembers,
@@ -283,7 +293,7 @@ class BusinessPartnerSearchService(
             }
         )
 
-        return BusinessPartnerSearchResultDto(
+        return BusinessPartnerSearchResultV7Dto(
             identifiers = identifiers,
             states = states,
             legalEntity = legalEntityDto,

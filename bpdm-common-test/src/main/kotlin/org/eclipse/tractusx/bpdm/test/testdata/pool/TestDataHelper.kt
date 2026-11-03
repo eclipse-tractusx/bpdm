@@ -21,21 +21,27 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 
 /**
  * This class provides functionality to create a [TestDataEnvironment] to support creating and comparing business partner data
  * Also it has functionality to easily create hierarchical business partner data
  */
 class PoolDataHelper(
-    private val poolClient: PoolApiClient,
-    private val reasonCodes: List<ReasonCodeDto>
+    private val poolClient: PoolV7Client,
+    private val reasonCodes: List<ReasonCodeV7Dto>
 ) {
 
     fun createTestDataEnvironment(): TestDataEnvironment {
-        val legalEntityIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.LEGAL_ENTITY, null).content.toList()
-        val addressIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.ADDRESS, null).content.toList()
+        val legalEntityIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, null).content.toList()
+        val addressIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.ADDRESS, null).content.toList()
         val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
         val scriptCodes = poolClient.metadata.getScriptCodes(PaginationRequest()).content.toList()
@@ -50,7 +56,7 @@ class PoolDataHelper(
     }
 
     // Catalogue can exceed one page (max size 100), so every page is read
-    private fun fetchAllCountries(): List<CountryDto> {
+    private fun fetchAllCountries(): List<CountryV7Dto> {
         val firstPage = poolClient.metadata.getCountries(PaginationRequest(0, 100))
         return firstPage.content.toList() + (1 until firstPage.totalPages).flatMap { poolClient.metadata.getCountries(PaginationRequest(it, 100)).content }
     }
@@ -62,14 +68,14 @@ data class TestDataEnvironment(
 )
 
 data class TestMetadataV7(
-    val legalForms: List<LegalFormDto>,
-    val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
-    val addressIdentifierTypes: List<IdentifierTypeDto>,
-    val adminAreas: List<CountrySubdivisionDto>,
-    val scriptCodes: List<ScriptCodeDto>,
-    val reasonCodes: List<ReasonCodeDto>,
-    val countries: List<CountryDto> = emptyList()
+    val legalForms: List<LegalFormV7Dto>,
+    val legalEntityIdentifierTypes: List<IdentifierTypeV7Dto>,
+    val addressIdentifierTypes: List<IdentifierTypeV7Dto>,
+    val adminAreas: List<CountrySubdivisionV7Dto>,
+    val scriptCodes: List<ScriptCodeV7Dto>,
+    val reasonCodes: List<ReasonCodeV7Dto>,
+    val countries: List<CountryV7Dto> = emptyList()
 )
 
-fun List<CountryDto>.toCountryVerbose(countryCode: String): TypeKeyNameVerboseDto<String> =
+fun List<CountryV7Dto>.toCountryVerbose(countryCode: String): TypeKeyNameVerboseDto<String> =
     TypeKeyNameVerboseDto(countryCode, find { it.countryCode == countryCode }?.name ?: countryCode)

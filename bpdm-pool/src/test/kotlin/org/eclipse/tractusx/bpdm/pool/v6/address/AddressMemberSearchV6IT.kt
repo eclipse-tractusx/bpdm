@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v6.address
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -46,7 +46,7 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         val memberSiteAddress =  testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchResponse = poolClient.members.searchAddresses(AddressSearchRequestV6(), PaginationRequest())
+        val searchResponse = poolClient.members.searchAddresses(AddressSearchV6Request(), PaginationRequest())
 
         //THEN
         val expectedAddresses = listOf(member1.legalAddress, member2.legalAddress, memberSite.mainAddress, memberAddress.address, memberSiteAddress.address)
@@ -73,7 +73,7 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(addressBpns = listOf(memberAddress.address.bpna))
+        val searchRequest = AddressSearchV6Request(addressBpns = listOf(memberAddress.address.bpna))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -101,7 +101,7 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(name = memberAddress.address.name)
+        val searchRequest = AddressSearchV6Request(name = memberAddress.address.name)
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -129,7 +129,7 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         val memberSiteAddress = testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(legalEntityBpns = listOf(member1.legalEntity.bpnl))
+        val searchRequest = AddressSearchV6Request(legalEntityBpns = listOf(member1.legalEntity.bpnl))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -157,7 +157,7 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         val memberSiteAddress = testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(siteBpns = listOf(memberSite.site.bpns))
+        val searchRequest = AddressSearchV6Request(siteBpns = listOf(memberSite.site.bpns))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -185,11 +185,11 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(siteBpns = listOf(nonMember.legalAddress.bpna))
+        val searchRequest = AddressSearchV6Request(siteBpns = listOf(nonMember.legalAddress.bpna))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressVerboseDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressVerboseV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertAddressSearch(searchResponse, expectedResponse)
     }
@@ -212,11 +212,11 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(name = nonMember.legalAddress.name)
+        val searchRequest = AddressSearchV6Request(name = nonMember.legalAddress.name)
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressVerboseDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressVerboseV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertAddressSearch(searchResponse, expectedResponse)
     }
@@ -239,11 +239,11 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(name = nonMember.legalAddress.bpnLegalEntity)
+        val searchRequest = AddressSearchV6Request(name = nonMember.legalAddress.bpnLegalEntity)
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressVerboseDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressVerboseV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertAddressSearch(searchResponse, expectedResponse)
     }
@@ -267,11 +267,11 @@ class AddressMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(memberSite, "$testName Member Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequestV6(siteBpns = listOf(nonMemberSite.site.bpns))
+        val searchRequest = AddressSearchV6Request(siteBpns = listOf(nonMemberSite.site.bpns))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressVerboseDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressVerboseV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertAddressSearch(searchResponse, expectedResponse)
     }

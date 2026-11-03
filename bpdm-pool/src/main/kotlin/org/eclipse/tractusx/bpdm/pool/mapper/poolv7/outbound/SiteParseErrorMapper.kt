@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.ErrorCodeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes, delegating main-address errors to
+ * Maps the site services' sealed parse errors to the `/sites` [ErrorInfoV7] codes, delegating main-address errors to
  * [AddressParseErrorMapper].
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
@@ -40,16 +40,16 @@ class SiteParseErrorMapper(
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
-    fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
+    fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
         when (error) {
             is UnresolvableLegalEntity ->
-                ErrorInfo(SiteCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+                ErrorInfoV7(SiteCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is LegalAddressAlreadyMainAddress ->
-                ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
+                ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress ->
-                ErrorInfo(
-                    SiteCreateError.ScriptVariantNotCoveredByMainAddress,
+                ErrorInfoV7(
+                    SiteCreateErrorV7.ScriptVariantNotCoveredByMainAddress,
                     "Script code '${error.scriptCode}' is not covered by the site's main address",
                     entityKey
                 )
@@ -58,19 +58,19 @@ class SiteParseErrorMapper(
             is SiteContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
-                scriptVariantNameMissing = SiteCreateError.ScriptVariantNameMissing,
-                scriptVariantDuplicateScriptCode = SiteCreateError.ScriptVariantDuplicateScriptCode
+                scriptVariantNameMissing = SiteCreateErrorV7.ScriptVariantNameMissing,
+                scriptVariantDuplicateScriptCode = SiteCreateErrorV7.ScriptVariantDuplicateScriptCode
             )
         }
 
-    fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
+    fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
         when (error) {
             is UnresolvableSite ->
-                ErrorInfo(SiteUpdateError.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
+                ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
             is ScriptVariantCoverageStillNeeded ->
-                ErrorInfo(
-                    SiteUpdateError.ScriptVariantCoverageStillNeeded,
+                ErrorInfoV7(
+                    SiteUpdateErrorV7.ScriptVariantCoverageStillNeeded,
                     "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
                             "'${error.requiredByBpn}' is named in that script",
                     entityKey
@@ -79,22 +79,22 @@ class SiteParseErrorMapper(
             is SiteContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
-                scriptVariantNameMissing = SiteUpdateError.ScriptVariantNameMissing,
-                scriptVariantDuplicateScriptCode = SiteUpdateError.ScriptVariantDuplicateScriptCode
+                scriptVariantNameMissing = SiteUpdateErrorV7.ScriptVariantNameMissing,
+                scriptVariantDuplicateScriptCode = SiteUpdateErrorV7.ScriptVariantDuplicateScriptCode
             )
         }
 
-    private fun <E : ErrorCode> contentErrorInfo(
+    private fun <E : ErrorCodeV7> contentErrorInfo(
         error: SiteContentParseError,
         entityKey: String?,
         scriptVariantNameMissing: E,
         scriptVariantDuplicateScriptCode: E
-    ): ErrorInfo<E> =
+    ): ErrorInfoV7<E> =
         when (error) {
             is SiteContentParseError.ScriptVariantNameMissing ->
-                ErrorInfo(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
+                ErrorInfoV7(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
             is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
-                ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
+                ErrorInfoV7(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
             is SiteContentParseError.NameMissing,
             is SiteContentParseError.ConfidenceCriteriaMissing,
             is SiteContentParseError.ScriptCodeNotFound -> throw internalError(error)

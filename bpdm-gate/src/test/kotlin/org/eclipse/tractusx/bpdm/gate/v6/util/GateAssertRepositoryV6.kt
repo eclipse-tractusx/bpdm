@@ -21,13 +21,14 @@ package org.eclipse.tractusx.bpdm.gate.v6.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.input.BusinessPartnerInputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.BusinessPartnerOutputV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.ChangelogGateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.changelog.PageChangeLogV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.error.GateErrorV6Response
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsSharingStatesV6Response
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.stereotype.Component
@@ -42,59 +43,59 @@ class GateAssertRepositoryV6 {
     private val localDatetimeSecondsComparator = LocalDatetimeSecondsComparator(InstantSecondsComparator())
 
 
-    fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>){
+    fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputV6Dto>, expected: Collection<BusinessPartnerInputV6Dto>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                BusinessPartnerInputDto::createdAt.name,
-                BusinessPartnerInputDto::updatedAt.name
+                BusinessPartnerInputV6Dto::createdAt.name,
+                BusinessPartnerInputV6Dto::updatedAt.name
             )
             .isEqualTo(expected)
     }
 
-    fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>){
+    fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputV6Dto>, expected: PageDto<BusinessPartnerInputV6Dto>){
         assertPageHeader(actual, expected)
         assertBusinessPartnerInput(actual.content, expected.content)
     }
 
 
-    fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputDto>, expected: Collection<BusinessPartnerOutputDto>){
+    fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputV6Dto>, expected: Collection<BusinessPartnerOutputV6Dto>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                BusinessPartnerOutputDto::createdAt.name,
-                BusinessPartnerOutputDto::updatedAt.name
+                BusinessPartnerOutputV6Dto::createdAt.name,
+                BusinessPartnerOutputV6Dto::updatedAt.name
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
     }
 
-    fun assertBusinessPartnerOutput(actual: PageDto<BusinessPartnerOutputDto>, expected: PageDto<BusinessPartnerOutputDto>){
+    fun assertBusinessPartnerOutput(actual: PageDto<BusinessPartnerOutputV6Dto>, expected: PageDto<BusinessPartnerOutputV6Dto>){
         assertPageHeader(actual, expected)
         assertBusinessPartnerOutput(actual.content, expected.content)
     }
 
-    fun assertSharingStates(actual: PageDto<SharingStateDto>, expected: PageDto<SharingStateDto>){
+    fun assertSharingStates(actual: PageDto<SharingStateV6Dto>, expected: PageDto<SharingStateV6Dto>){
         assertPageHeader(actual, expected)
         assertSharingStates(actual.content, expected.content)
     }
 
-    fun assertSharingStates(actual: Collection<SharingStateDto>, expected: Collection<SharingStateDto>){
+    fun assertSharingStates(actual: Collection<SharingStateV6Dto>, expected: Collection<SharingStateV6Dto>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(SharingStateDto::sharingProcessStarted.name)
+            .ignoringFields(SharingStateV6Dto::sharingProcessStarted.name)
             .isEqualTo(expected)
     }
 
-    fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse){
+    fun assertSharingStateStats(actual: StatsSharingStatesV6Response, expected: StatsSharingStatesV6Response){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .isEqualTo(expected)
     }
 
-    fun assertChangelog(actual: PageChangeLogDto<ChangelogGateDto>, expected: PageChangeLogDto<ChangelogGateDto>){
+    fun assertChangelog(actual: PageChangeLogV6Dto<ChangelogGateV6Dto>, expected: PageChangeLogV6Dto<ChangelogGateV6Dto>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -105,34 +106,41 @@ class GateAssertRepositoryV6 {
         Assertions.assertThat(actual.content)
             .usingRecursiveComparison()
             .ignoringFields(
-                ChangelogGateDto::timestamp.name
+                ChangelogGateV6Dto::timestamp.name
             )
             .isEqualTo(expected.content)
     }
 
-    fun assertRelation(actual: RelationDto, expected: RelationDto){
+    fun assertRelation(actual: RelationV6Dto, expected: RelationV6Dto){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                RelationDto::createdAt.name,
-                RelationDto::updatedAt.name
+                RelationV6Dto::createdAt.name,
+                RelationV6Dto::updatedAt.name
             )
             .isEqualTo(expected)
     }
 
-    fun assertRelations(actual: PageDto<RelationDto>, expected: PageDto<RelationDto>){
+    fun assertRelations(actual: PageDto<RelationV6Dto>, expected: PageDto<RelationV6Dto>){
         assertPageHeader(actual, expected)
         assertRelations(actual.content, expected.content)
     }
 
-    fun assertRelations(actual: Collection<RelationDto>, expected: Collection<RelationDto>){
+    fun assertRelations(actual: Collection<RelationV6Dto>, expected: Collection<RelationV6Dto>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                RelationDto::createdAt.name,
-                RelationDto::updatedAt.name
+                RelationV6Dto::createdAt.name,
+                RelationV6Dto::updatedAt.name
             )
             .isEqualTo(expected)
+    }
+
+    fun assertErrorPerExternalId(actual: GateErrorV6Response, externalIds: Collection<String>) {
+        Assertions.assertThat(actual.error).hasSameSizeAs(externalIds)
+        externalIds.forEach { externalId ->
+            Assertions.assertThat(actual.error).anySatisfy { Assertions.assertThat(it).contains("'$externalId'") }
+        }
     }
 
     private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){

@@ -20,13 +20,15 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
+import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS
+import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
@@ -56,7 +58,7 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToLegalEntity(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -72,8 +74,8 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToLegalEntityOnSite(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -94,8 +96,8 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToSite(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteWithMainAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -111,9 +113,9 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToAdditionalAddressOfSite(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteWithMainAddressVerboseDto,
-        addressGoldenRecord: LogisticAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
+        addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -167,6 +169,23 @@ class OrchestratorMockDataFactory(
         return loggedRequests
             .map { jsonMapper.readValue(it.body, TaskCreateRequest::class.java) }
             .flatMap { createRequest -> createRequest.requests.map { it.businessPartner } }
+    }
+
+    fun mockSharingMemberRecordUpdates(){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(
+            WireMock
+                .put(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(SharingMemberRecord("", null, Instant.now(), Instant.now()))))
+        )
+    }
+
+    fun getSharingMemberRecordUpdates(): List<SharingMemberRecordUpdateRequest>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.putRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS)))
+            .map { jsonMapper.readValue(it.body, SharingMemberRecordUpdateRequest::class.java) }
     }
 
     fun mockTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{
@@ -226,6 +245,42 @@ class OrchestratorMockDataFactory(
         )))
 
         return mockedErrorTasks.tasks.single()
+    }
+
+    fun mockMissingTask(seed: String): TaskClientStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(
+                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, mockedCreatedTask.taskId)
+                ))
+            )
+        )))
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(TaskStateResponse(emptyList()))
+        )))
+
+        return mockedCreatedTask
+    }
+
+    fun mockTasksLost(){
+        mockTaskResultStates(null)
+    }
+
+    fun mockTasksPending(){
+        mockTaskResultStates(ResultState.Pending)
+    }
+
+    private fun mockTaskResultStates(resultState: ResultState?){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(TaskResultStateSearchResponse(listOf(resultState)))
+        )))
     }
 
     fun mockRelationSharingError(seed: String, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto{

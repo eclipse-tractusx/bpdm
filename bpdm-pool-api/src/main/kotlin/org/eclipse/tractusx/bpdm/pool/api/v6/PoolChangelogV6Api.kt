@@ -27,8 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogEntryVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
@@ -52,7 +52,7 @@ interface PoolChangelogV6Api {
     @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
     @PostMapping(value = ["${ApiCommons.CHANGELOG_BASE_PATH_V6}/search"])
     fun getChangelogEntries(
-        @RequestBody changelogSearchRequest: ChangelogSearchRequestV6,
+        @RequestBody changelogSearchRequest: ChangelogSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDtoV6>
+    ): PageDto<ChangelogEntryVerboseV6Dto>
 }

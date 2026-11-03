@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.v7.sharingmemberrecord
 
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
@@ -114,7 +115,7 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val timeX = Instant.now()
 
         val createdTask3 = testDataClient.createBusinessPartnerTask(testName)
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask3.recordId, true))
+        val updatedRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask3.recordId, true))
 
         //WHEN
         val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(timeX), PaginationRequest())
@@ -125,6 +126,8 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecord(sharingMemberRecordId, true, Instant.now(), Instant.now())))
 
         assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
+        assertThat(searchResult.content.single().createdAt).isEqualTo(updatedRecord.createdAt)
+        assertThat(searchResult.content.single().updatedAt).isEqualTo(updatedRecord.updatedAt)
     }
 
     /**

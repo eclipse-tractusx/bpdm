@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.stats.StatsConfidenceCriteriaV6Response
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -46,7 +46,7 @@ class GetConfidenceCriteriaStatsV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.stats.getConfidenceCriteriaStats()
 
         //THEN
-        val expected = StatsConfidenceCriteriaResponse(0f, 0, 0, 0, 0f)
+        val expected = StatsConfidenceCriteriaV6Response(0f, 0, 0, 0, 0f)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -65,13 +65,13 @@ class GetConfidenceCriteriaStatsV6IT: UnscheduledGateV6TestBase() {
             copy(isOwnCompanyData = false)
         }
 
-        val legalEntityConfidence1 = ConfidenceCriteriaDto(true, true, 2, LocalDateTime.now(), LocalDateTime.now(), 8)
-        val siteConfidence1 = ConfidenceCriteriaDto(true, false, 1, LocalDateTime.now(), LocalDateTime.now(), 3)
-        val addressConfidence1 = ConfidenceCriteriaDto(true, false, 2, LocalDateTime.now(), LocalDateTime.now(), 5)
+        val legalEntityConfidence1 = ConfidenceCriteriaV7Dto(true, true, 2, LocalDateTime.now(), LocalDateTime.now(), 8)
+        val siteConfidence1 = ConfidenceCriteriaV7Dto(true, false, 1, LocalDateTime.now(), LocalDateTime.now(), 3)
+        val addressConfidence1 = ConfidenceCriteriaV7Dto(true, false, 2, LocalDateTime.now(), LocalDateTime.now(), 5)
 
-        val legalEntityConfidence2 = ConfidenceCriteriaDto(false, false, 3, LocalDateTime.now(), LocalDateTime.now(), 1)
-        val siteConfidence2 = ConfidenceCriteriaDto(false, false, 1, LocalDateTime.now(), LocalDateTime.now(), 0)
-        val addressConfidence2 = ConfidenceCriteriaDto(false, false, 3, LocalDateTime.now(), LocalDateTime.now(), 1)
+        val legalEntityConfidence2 = ConfidenceCriteriaV7Dto(false, false, 3, LocalDateTime.now(), LocalDateTime.now(), 1)
+        val siteConfidence2 = ConfidenceCriteriaV7Dto(false, false, 1, LocalDateTime.now(), LocalDateTime.now(), 0)
+        val addressConfidence2 = ConfidenceCriteriaV7Dto(false, false, 3, LocalDateTime.now(), LocalDateTime.now(), 1)
 
         val legalEntityRequest1 = with(poolRequestFactory.createLegalEntityRequest("$testName 1")){
             copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(confidenceCriteria = legalEntityConfidence1)))
@@ -107,7 +107,7 @@ class GetConfidenceCriteriaStatsV6IT: UnscheduledGateV6TestBase() {
         val confidenceCriteriaCount = 6f
         val sharingMemberSum = legalEntityConfidence1.numberOfSharingMembers + siteConfidence1.numberOfSharingMembers + addressConfidence1.numberOfSharingMembers + legalEntityConfidence2.numberOfSharingMembers + siteConfidence2.numberOfSharingMembers + addressConfidence2.numberOfSharingMembers
         val expectedSharingMemberAverage = sharingMemberSum  / confidenceCriteriaCount
-        val expected = StatsConfidenceCriteriaResponse(expectedSharingMemberAverage, 2, 3, 3, 3f)
+        val expected = StatsConfidenceCriteriaV6Response(expectedSharingMemberAverage, 2, 3, 3, 3f)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }

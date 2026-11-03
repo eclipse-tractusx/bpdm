@@ -24,8 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteSearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
@@ -34,7 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntitySite
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest as SiteSearchRequestDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 
 /**
  * The REST-API boundary for the V7 "search sites" operation.
@@ -52,14 +52,14 @@ class SiteSearchApplicationV7Service(
      * Returns the requested page of sites matching the given criteria.
      */
     @Transactional(readOnly = true)
-    fun searchSites(searchRequest: SiteSearchRequestDto, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> =
+    fun searchSites(searchRequest: SiteSearchV7Request, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toPageDto { siteResponseMapper.toSiteWithMainAddress(it) }
 
     /**
      * Returns the requested page of sites matching the given criteria, restricted to those of Catena-X members.
      */
     @Transactional(readOnly = true)
-    fun searchMemberSites(searchRequest: SiteSearchRequestDto, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> =
+    fun searchMemberSites(searchRequest: SiteSearchV7Request, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toPageDto { siteResponseMapper.toSiteWithMainAddress(it) }
 
     /**
@@ -67,7 +67,7 @@ class SiteSearchApplicationV7Service(
      * not-found error when no legal entity carries that BPN.
      */
     @Transactional(readOnly = true)
-    fun searchLegalEntitySites(bpnl: String, paginationRequest: PaginationRequest): PageDto<SiteVerboseDto> {
+    fun searchLegalEntitySites(bpnl: String, paginationRequest: PaginationRequest): PageDto<SiteVerboseV7Dto> {
         val criteria = when (val result = legalEntitySiteSearchParser.parse(siteSearchRequestMapper.toLegalEntitySitesRequest(bpnl))) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmNotFoundException("Business Partner", bpnl)
@@ -76,7 +76,7 @@ class SiteSearchApplicationV7Service(
         return siteSearchService.search(criteria, paginationRequest.toPageRequest()).toPageDto { siteResponseMapper.toSite(it) }
     }
 
-    private fun search(searchRequest: SiteSearchRequestDto, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+    private fun search(searchRequest: SiteSearchV7Request, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         siteSearchService.search(
             siteSearchParser.parse(siteSearchRequestMapper.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()

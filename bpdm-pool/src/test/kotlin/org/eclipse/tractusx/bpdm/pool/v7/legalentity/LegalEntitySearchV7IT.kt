@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -39,8 +39,8 @@ class LegalEntitySearchV7IT: UnscheduledPoolTestBaseV7() {
         val legalEntity2 = testDataClient.createLegalEntity("$testName 2")
 
         //WHEN
-        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), PaginationRequest())
-        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), PaginationRequest())
+        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(), PaginationRequest())
+        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchV7Request(), PaginationRequest())
 
         //THEN
         val expectedResponse = resultFactory.buildSinglePageResponse(listOf(legalEntity1, legalEntity2))
@@ -63,7 +63,7 @@ class LegalEntitySearchV7IT: UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity("$testName 4")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(bpnLs = listOf(legalEntity1.header.bpnl, legalEntity2.header.bpnl))
+        val searchRequest = LegalEntitySearchV7Request(bpnLs = listOf(legalEntity1.header.bpnl, legalEntity2.header.bpnl))
         val searchResponseGet = poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(searchRequest, PaginationRequest())
 
@@ -88,7 +88,7 @@ class LegalEntitySearchV7IT: UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity("$testName 4")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(legalName = legalEntity1.header.legalName)
+        val searchRequest = LegalEntitySearchV7Request(legalName = legalEntity1.header.legalName)
         val searchResponseGet = poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(searchRequest, PaginationRequest())
 
@@ -114,8 +114,8 @@ class LegalEntitySearchV7IT: UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val paginationRequest = PaginationRequest(0, 2)
-        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(), paginationRequest)
+        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchV7Request(), paginationRequest)
 
         //THEN
         val expectedResponse = PageDto(4, 2, 0, 2, listOf(legalEntity1, legalEntity2))
@@ -139,8 +139,8 @@ class LegalEntitySearchV7IT: UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val paginationRequest = PaginationRequest(1, 2)
-        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(), paginationRequest)
+        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchV7Request(), paginationRequest)
 
         //THEN
         val expectedResponse = PageDto(4, 2, 1, 2, listOf(legalEntity3, legalEntity4))
@@ -163,8 +163,8 @@ class LegalEntitySearchV7IT: UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val paginationRequest = PaginationRequest(1, 2)
-        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(), paginationRequest)
+        val searchResponsePost = poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchV7Request(), paginationRequest)
 
         //THEN
         val expectedResponse = PageDto(3, 2, 1, 1, listOf(legalEntity3))

@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.RelationTypeV6
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -38,17 +38,17 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
      * THEN input manager sees relation created response
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create valid relation`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `create valid relation`(relationType: RelationTypeV6) {
         //GIVEN
         val input1 = testDataClient.createBusinessPartnerInput("$testName 1")
         val input2 = testDataClient.createBusinessPartnerInput("$testName 2")
 
         //WHEN
-        val response = gateClient.relations.post(RelationPostRequest(testName, relationType, input1.externalId, input2.externalId))
+        val response = gateClient.relations.post(RelationPostV6Request(testName, relationType, input1.externalId, input2.externalId))
 
         //THEN
-        val expected = RelationDto(testName, relationType, input1.externalId, input2.externalId, Instant.now(), Instant.now())
+        val expected = RelationV6Dto(testName, relationType, input1.externalId, input2.externalId, Instant.now(), Instant.now())
 
         assertRepo.assertRelation(response, expected)
     }
@@ -59,19 +59,41 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
      * THEN input manager can find relation
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create and find valid relation`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `create and find valid relation`(relationType: RelationTypeV6) {
         //GIVEN
         val input1 = testDataClient.createBusinessPartnerInput("$testName 1")
         val input2 = testDataClient.createBusinessPartnerInput("$testName 2")
 
         //WHEN
-        val createRequest = RelationPostRequest(testName, relationType, input1.externalId, input2.externalId)
+        val createRequest = RelationPostV6Request(testName, relationType, input1.externalId, input2.externalId)
         gateClient.relations.post(createRequest)
 
         //THEN
         val searchResponse = gateClient.relations.get()
         val expected = PageDto(1, 1, 0, 1, listOf(expectedResultFactory.buildRelationDto(createRequest)))
+
+        assertRepo.assertRelations(searchResponse, expected)
+    }
+
+    /**
+     * GIVEN two business partners
+     * WHEN input manager posts a new relation without external ID
+     * THEN input manager can find the relation under the external ID assigned to it
+     */
+    @ParameterizedTest
+    @EnumSource(RelationTypeV6::class)
+    fun `create relation without external ID`(relationType: RelationTypeV6) {
+        //GIVEN
+        val input1 = testDataClient.createBusinessPartnerInput("$testName 1")
+        val input2 = testDataClient.createBusinessPartnerInput("$testName 2")
+
+        //WHEN
+        val response = gateClient.relations.post(RelationPostV6Request(null, relationType, input1.externalId, input2.externalId))
+
+        //THEN
+        val searchResponse = gateClient.relations.get(externalIds = listOf(response.externalId))
+        val expected = PageDto(1, 1, 0, 1, listOf(RelationV6Dto(response.externalId, relationType, input1.externalId, input2.externalId, Instant.now(), Instant.now())))
 
         assertRepo.assertRelations(searchResponse, expected)
     }
@@ -84,13 +106,13 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
      * THEN input manager sees 400 HTTP response
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `try create relation source not exists`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `try create relation source not exists`(relationType: RelationTypeV6) {
         //GIVEN
         val targetInput = testDataClient.createBusinessPartnerInput("$testName 1")
 
         //WHEN
-        val postRequest: () -> Unit = { gateClient.relations.post(RelationPostRequest(testName, relationType, "NOT EXISTS", targetInput.externalId)) }
+        val postRequest: () -> Unit = { gateClient.relations.post(RelationPostV6Request(testName, relationType, "NOT EXISTS", targetInput.externalId)) }
 
         //THEN
         Assertions.assertThatThrownBy(postRequest).isInstanceOf(WebClientResponseException.BadRequest::class.java)
@@ -102,13 +124,13 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
      * THEN input manager sees 400 HTTP response
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `try create relation target not exists`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `try create relation target not exists`(relationType: RelationTypeV6) {
         //GIVEN
         val sourceInput = testDataClient.createBusinessPartnerInput("$testName 1")
 
         //WHEN
-        val postRequest: () -> Unit = { gateClient.relations.post(RelationPostRequest(testName, relationType, sourceInput.externalId, "NOT EXISTS")) }
+        val postRequest: () -> Unit = { gateClient.relations.post(RelationPostV6Request(testName, relationType, sourceInput.externalId, "NOT EXISTS")) }
 
         //THEN
         Assertions.assertThatThrownBy(postRequest).isInstanceOf(WebClientResponseException.BadRequest::class.java)
@@ -120,8 +142,8 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
      * THEN input manager sees 409 HTTP response
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `try create duplicate relation`(relationType: RelationType) {
+    @EnumSource(RelationTypeV6::class)
+    fun `try create duplicate relation`(relationType: RelationTypeV6) {
         //GIVEN
         val sourceInput = testDataClient.createBusinessPartnerInput("$testName 1")
         val targetInput = testDataClient.createBusinessPartnerInput("$testName 2")
@@ -130,7 +152,7 @@ class RelationCreationV6IT: UnscheduledGateV6TestBase() {
 
         //WHEN
         val postRequest: () -> Unit
-                = { gateClient.relations.post(RelationPostRequest(givenRelation.externalId, relationType, sourceInput.externalId, targetInput.externalId)) }
+                = { gateClient.relations.post(RelationPostV6Request(givenRelation.externalId, relationType, sourceInput.externalId, targetInput.externalId)) }
 
         //THEN
         Assertions.assertThatThrownBy(postRequest).isInstanceOf(WebClientResponseException.Conflict::class.java)

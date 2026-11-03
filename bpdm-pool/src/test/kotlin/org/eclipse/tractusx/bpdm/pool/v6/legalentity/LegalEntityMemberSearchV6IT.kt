@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v6.legalentity
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -59,7 +59,7 @@ class LegalEntityMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createNonMemberLegalEntity("$testName Non-Member")
 
         //WHEN
-        val searchResponse = poolClient.members.searchLegalEntities(LegalEntitySearchRequestV6(), PaginationRequest())
+        val searchResponse = poolClient.members.searchLegalEntities(LegalEntitySearchV6Request(), PaginationRequest())
 
         //THEN
         val expectedLegalEntities = listOf(member1, member2).map { testDataFactory.result.buildExpectedLegalEntitySearchResponse(it) }
@@ -81,7 +81,7 @@ class LegalEntityMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createNonMemberLegalEntity("$testName Non-Member")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequestV6(bpnLs = listOf(member1.legalEntity.bpnl))
+        val searchRequest = LegalEntitySearchV6Request(bpnLs = listOf(member1.legalEntity.bpnl))
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
@@ -104,7 +104,7 @@ class LegalEntityMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createNonMemberLegalEntity("$testName Non-Member")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequestV6(legalName = member1.legalEntity.legalName)
+        val searchRequest = LegalEntitySearchV6Request(legalName = member1.legalEntity.legalName)
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
@@ -127,11 +127,11 @@ class LegalEntityMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         val nonMember = testDataClient.createNonMemberLegalEntity("$testName Non-Member")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequestV6(bpnLs = listOf(nonMember.legalEntity.bpnl))
+        val searchRequest = LegalEntitySearchV6Request(bpnLs = listOf(nonMember.legalEntity.bpnl))
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertLegalEntitySearch(searchResponse, expectedResponse)
     }
@@ -149,11 +149,11 @@ class LegalEntityMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
         val nonMember = testDataClient.createNonMemberLegalEntity("$testName Non-Member")
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequestV6(legalName = nonMember.legalEntity.legalName)
+        val searchRequest = LegalEntitySearchV6Request(legalName = nonMember.legalEntity.legalName)
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseDtoV6>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseV6Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertLegalEntitySearch(searchResponse, expectedResponse)
     }

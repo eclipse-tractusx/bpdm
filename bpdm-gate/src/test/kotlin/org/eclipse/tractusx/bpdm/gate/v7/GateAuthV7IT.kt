@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.gate.v7
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateReadyV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
@@ -37,12 +37,12 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
     @Autowired
     lateinit var authAssertionHelper: AuthAssertionHelper
 
-    lateinit var operatorClient: GateClient
-    lateinit var inputManagerClient: GateClient
-    lateinit var inputConsumerClient: GateClient
-    lateinit var outputConsumerClient: GateClient
-    lateinit var unauthorizedClient: GateClient
-    lateinit var anonymousClient: GateClient
+    lateinit var operatorClient: GateV7Client
+    lateinit var inputManagerClient: GateV7Client
+    lateinit var inputConsumerClient: GateV7Client
+    lateinit var outputConsumerClient: GateV7Client
+    lateinit var unauthorizedClient: GateV7Client
+    lateinit var anonymousClient: GateV7Client
 
     @PostConstruct
     fun initAuth() {
@@ -87,7 +87,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Authorized,
             inputConsumer = AuthExpectationType.Authorized,
             outputConsumer = AuthExpectationType.Forbidden
-        ) { gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest()) }
+        ) { gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchV7Request()) }
     }
 
     @Test
@@ -96,7 +96,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Forbidden,
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Authorized
-        ) { gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest()) }
+        ) { gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchV7Request()) }
     }
 
     @Test
@@ -114,7 +114,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Authorized,
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Forbidden
-        ) { gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(emptyList())) }
+        ) { gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(emptyList())) }
     }
 
     @Test
@@ -159,7 +159,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Authorized,
             inputConsumer = AuthExpectationType.Authorized,
             outputConsumer = AuthExpectationType.Forbidden
-        ) { gateClient.relation.postSearch(RelationSearchRequest()) }
+        ) { gateClient.relation.postSearch(RelationSearchV7Request()) }
     }
 
     @Test
@@ -168,7 +168,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Authorized,
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Forbidden
-        ) { gateClient.relation.put(true, RelationPutRequest(emptyList())) }
+        ) { gateClient.relation.put(true, RelationPutV7Request(emptyList())) }
     }
 
     @Test
@@ -195,7 +195,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Authorized,
             inputConsumer = AuthExpectationType.Authorized,
             outputConsumer = AuthExpectationType.Forbidden
-        ) { gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest()) }
+        ) { gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchV7Request()) }
     }
 
     @Test
@@ -204,7 +204,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Forbidden,
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Authorized
-        ) { gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest()) }
+        ) { gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchV7Request()) }
     }
 
     private fun assertExpectations(

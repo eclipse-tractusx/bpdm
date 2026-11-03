@@ -24,8 +24,8 @@ import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
 import org.eclipse.tractusx.bpdm.test.system.config.PoolClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.test.system.config.SharingMemberCredentialSet
 import org.eclipse.tractusx.bpdm.test.system.config.edc.EdcAccessNegotiators
@@ -42,7 +42,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  * What the API answers with is not asserted: an empty page is a pass.
  */
 class EdcAccessStepDefs(
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolV7Client,
     private val sharingMemberGates: SharingMemberGates,
     private val credentials: SharingMemberCredentialSet,
     private val negotiators: EdcAccessNegotiators,
@@ -61,7 +61,7 @@ class EdcAccessStepDefs(
     @Then("the Pool answers a read over the EDC")
     fun poolAnswersReadOverEdc() {
         readOverOffer(PoolClientConfigurationProperties.PREFIX, "GET", "/v7/legal-entities") {
-            poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), ONE_PAGE)
+            poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(), ONE_PAGE)
         }
     }
 

@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeDetailRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
@@ -35,7 +35,7 @@ class IdentifierTypeRequestMapper {
     /**
      * Returns the create request holding the identifier type a client sent.
      */
-    fun toCreateRequest(identifierType: IdentifierTypeDto): IdentifierTypeCreateRequest =
+    fun toCreateRequest(identifierType: IdentifierTypeV7Dto): IdentifierTypeCreateRequest =
         IdentifierTypeCreateRequest(
             technicalKey = identifierType.technicalKey,
             businessPartnerType = identifierType.businessPartnerType,
@@ -51,6 +51,6 @@ class IdentifierTypeRequestMapper {
     /**
      * Returns the search request holding the criteria a client sent.
      */
-    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerType, country: String?): IdentifierTypeSearchRequest =
+    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerTypeV7, country: String?): IdentifierTypeSearchRequest =
         IdentifierTypeSearchRequest(businessPartnerType = businessPartnerType, country = country)
 }

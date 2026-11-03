@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.v7.address
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedAddress = resultFactory.buildLegalAddressUpdate(addressRequest, legalEntityResponse).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -71,7 +71,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedAddress = resultFactory.buildSiteMainAddressUpdate(addressRequest, siteResponse).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -96,7 +96,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedAddress = resultFactory.buildSiteMainAddressUpdate(addressRequest, siteResponse).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -118,7 +118,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedAddress = resultFactory.buildAdditionalAddressUpdate(addressUpdateRequest, addressCreateResponse).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressUpdateResponse, expectedResponse)
     }
@@ -141,7 +141,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedAddress = resultFactory.buildAdditionalAddressUpdate(addressUpdateRequest, addressCreateResponse)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(listOf(expectedAddress), emptyList())
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressUpdateResponse, expectedResponse)
     }
@@ -157,8 +157,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.AddressNotFound, "IGNORED", "UNKNOWN")
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.AddressNotFound, "IGNORED", "UNKNOWN")
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -178,12 +178,12 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val addressRequest = requestFactory.buildAddressUpdateRequest(testName, addressCreateResponse)
-            .withIdentifiers(AddressIdentifierDto(identifierX.value, identifierX.typeVerbose.technicalKey))
+            .withIdentifiers(AddressIdentifierV7Dto(identifierX.value, identifierX.typeVerbose.technicalKey))
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.AddressDuplicateIdentifier, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.AddressDuplicateIdentifier, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -204,8 +204,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.RegionNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.RegionNotFound, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -226,8 +226,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.RegionNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.RegionNotFound, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -250,8 +250,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.IdentifierNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.IdentifierNotFound, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -272,8 +272,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.IdentifiersTooMany, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.IdentifiersTooMany, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -294,8 +294,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.ScriptVariantCityMissing, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.ScriptVariantCityMissing, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -316,8 +316,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.ScriptVariantCityMissing, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.ScriptVariantCityMissing, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -338,8 +338,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -360,8 +360,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedErrors = legalEntityResponse.scriptVariants
-            .map { ErrorInfo(AddressUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", addressRequest.bpna) }
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+            .map { ErrorInfoV7(AddressUpdateErrorV7.ScriptVariantCoverageStillNeeded, "IGNORED", addressRequest.bpna) }
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }
@@ -443,8 +443,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val updateResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.SiteNotFound, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.SiteNotFound, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(updateResponse, expectedResponse)
     }
@@ -468,8 +468,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val updateResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.SiteNotInLegalEntity, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.SiteNotInLegalEntity, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(updateResponse, expectedResponse)
     }
@@ -490,8 +490,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val updateResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.SiteMainAddressOmitted, "IGNORED", addressRequest.bpna)
-        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(AddressUpdateErrorV7.SiteMainAddressOmitted, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(updateResponse, expectedResponse)
     }
@@ -518,8 +518,8 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val updates = poolClient.changelogs
-            .getChangelogEntries(ChangelogSearchRequest(bpns = setOf(addressRequest.bpna)), PaginationRequest(0, 20))
-            .content.filter { it.changelogType == ChangelogType.UPDATE }
+            .getChangelogEntries(ChangelogSearchV7Request(bpns = setOf(addressRequest.bpna)), PaginationRequest(0, 20))
+            .content.filter { it.changelogType == ChangelogTypeV7.UPDATE }
 
         assertThat(updates).hasSize(2)
     }

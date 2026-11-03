@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.springframework.stereotype.Component
 
@@ -32,6 +32,6 @@ class DataSpaceParticipantResponseMapper {
     /**
      * Returns the data space participation the given legal entity holds.
      */
-    fun toParticipant(legalEntity: LegalEntityDb): DataSpaceParticipantDto =
-        DataSpaceParticipantDto(bpnL = legalEntity.bpn, isDataSpaceParticipant = legalEntity.isDataSpaceParticipant)
+    fun toParticipant(legalEntity: LegalEntityDb): DataSpaceParticipantV7Dto =
+        DataSpaceParticipantV7Dto(bpnL = legalEntity.bpn, isDataSpaceParticipant = legalEntity.isDataSpaceParticipant)
 }

@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDetailDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeDetailV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.springframework.stereotype.Component
 
@@ -34,16 +34,16 @@ class IdentifierTypeResponseMapperV6 {
     /**
      * Returns the given identifier type as the v6 API reports it.
      */
-    fun toIdentifierType(identifierType: IdentifierTypeDb): IdentifierTypeDtoV6 =
+    fun toIdentifierType(identifierType: IdentifierTypeDb): IdentifierTypeV6Dto =
         with(identifierType) {
-            IdentifierTypeDtoV6(
+            IdentifierTypeV6Dto(
                 technicalKey = technicalKey,
                 businessPartnerType = IdentifierBusinessPartnerTypeV6.valueOf(businessPartnerType.name),
                 name = name,
                 abbreviation = abbreviation,
                 transliteratedName = transliteratedName,
                 transliteratedAbbreviation = transliteratedAbbreviation,
-                details = details.map { IdentifierTypeDetailDtoV6(country = it.country?.countryCode, mandatory = it.mandatory) }
+                details = details.map { IdentifierTypeDetailV6Dto(country = it.country?.countryCode, mandatory = it.mandatory) }
             )
         }
 }
