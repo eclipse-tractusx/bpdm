@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,41 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.FieldQualityRuleSearchParseError
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.FieldQualityRuleResponseMapper
-import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.FieldQualityRuleSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.FieldQualityRuleSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.FieldQualityRuleV7Dto
 
 /**
- * The REST-API boundary for the V7 "search field quality rules" operation.
+ * Searches the quality rules that apply to the fields of a business partner in a country, for every API version.
  */
 @Service
-class FieldQualityRuleSearchApplicationV7Service(
+class FieldQualityRuleSearchApplicationService(
     private val fieldQualityRuleSearchParser: FieldQualityRuleSearchParser,
     private val fieldQualityRuleSearchService: FieldQualityRuleSearchService,
-    private val fieldQualityRuleResponseMapper: FieldQualityRuleResponseMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
-     * Returns the field quality rules that apply in the given country.
+     * Returns the field quality rules that apply in the country of [request], or every reason the criteria are rejected.
      */
     @Transactional(readOnly = true)
-    fun searchFieldQualityRules(country: String): Collection<FieldQualityRuleV7Dto> {
-        val criteria = when (val result = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))) {
-            is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> when (val error = result.errors.first()) {
-                is FieldQualityRuleSearchParseError.CountryNotFound -> throw BpdmNotFoundException("Country", error.country)
-            }
+    fun search(request: FieldQualityRuleSearchRaw): FieldQualityRuleSearchResult =
+        when (val parseResult = fieldQualityRuleSearchParser.parse(request)) {
+            is ParseResult.Failure -> FieldQualityRuleSearchResult.Rejected(parseResult.errors)
+            is ParseResult.Success -> FieldQualityRuleSearchResult.Found(
+                fieldQualityRuleSearchService.search(parseResult.parsed).map { dbToOutputMapper.toRecord(it, parseResult.parsed.country) }
+            )
         }
-
-        return fieldQualityRuleSearchService.search(criteria).map { fieldQualityRuleResponseMapper.toFieldQualityRule(it) }
-    }
 }

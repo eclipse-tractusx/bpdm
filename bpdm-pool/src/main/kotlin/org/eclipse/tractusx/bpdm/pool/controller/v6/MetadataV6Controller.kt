@@ -35,12 +35,13 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleSearchResult
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.FieldQualityRuleSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.FieldQualityRuleSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalFormCreateApplicationV6Service
 import org.springframework.http.HttpStatus
@@ -54,7 +55,7 @@ class MetadataV6Controller(
     val identifierTypeSearchApplicationService: IdentifierTypeSearchApplicationService,
     val legalFormCreateApplicationV6Service: LegalFormCreateApplicationV6Service,
     val legalFormSearchApplicationService: LegalFormSearchApplicationService,
-    val fieldQualityRuleSearchApplicationV6Service: FieldQualityRuleSearchApplicationV6Service,
+    val fieldQualityRuleSearchApplicationService: FieldQualityRuleSearchApplicationService,
     val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
     val countrySearchApplicationService: CountrySearchApplicationService,
     val apiV6MetadataMapper: ApiV6MetadataMapper,
@@ -92,7 +93,11 @@ class MetadataV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleV6Dto>> {
-        return ResponseEntity(fieldQualityRuleSearchApplicationV6Service.searchFieldQualityRules(country), HttpStatus.OK)
+        val request = apiV6InboundMapper.toFieldQualityRuleSearchRaw(country)
+        return when (val result = fieldQualityRuleSearchApplicationService.search(request)) {
+            is FieldQualityRuleSearchResult.Found -> ResponseEntity(result.rules.map(apiV6MetadataMapper::toDto), HttpStatus.OK)
+            is FieldQualityRuleSearchResult.Rejected -> throw apiV6MetadataMapper.toException(result.errors.first())
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,9 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
 
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 
-data class FieldQualityRuleSearchRequest(
-    val country: String
+data class FieldQualityRuleSearchParsed(
+    val country: CountryDb
 )

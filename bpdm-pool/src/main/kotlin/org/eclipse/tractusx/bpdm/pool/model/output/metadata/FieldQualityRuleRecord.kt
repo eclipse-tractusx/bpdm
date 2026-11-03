@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,26 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
+package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.FieldQualityRuleV7Dto
-import org.eclipse.tractusx.bpdm.pool.model.FieldQualityRule
-import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
 
-/**
- * Maps the results of the field quality rule search to the v7 API field quality rule DTOs.
- */
-@Component
-class FieldQualityRuleResponseMapper {
-
-    /**
-     * Returns the given field quality rule as the API reports it.
-     */
-    fun toFieldQualityRule(rule: FieldQualityRule): FieldQualityRuleV7Dto =
-        FieldQualityRuleV7Dto(
-            fieldPath = rule.fieldPath,
-            schemaName = rule.schemaName,
-            country = rule.country,
-            qualityLevel = rule.qualityLevel
-        )
-}
+data class FieldQualityRuleRecord(
+    val fieldPath: String,
+    val schemaName: String,
+    val countryCode: String,
+    val qualityLevel: QualityLevelV7
+)

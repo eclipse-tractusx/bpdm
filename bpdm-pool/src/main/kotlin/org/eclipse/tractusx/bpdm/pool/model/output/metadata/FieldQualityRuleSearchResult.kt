@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,10 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
 
-data class FieldQualityRuleSearchParsed(
-    val country: CountryDb
-)
+/**
+ * Result of a field quality rule search: either the rules that apply or every reason the criteria were rejected.
+ */
+sealed interface FieldQualityRuleSearchResult {
+    data class Found(val rules: List<FieldQualityRuleRecord>) : FieldQualityRuleSearchResult
+    data class Rejected(val errors: List<FieldQualityRuleSearchError>) : FieldQualityRuleSearchResult
+}

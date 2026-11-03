@@ -37,14 +37,15 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleSearchResult
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.FieldQualityRuleSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
 import org.springframework.http.HttpStatus
@@ -58,7 +59,7 @@ class MetadataController(
     val identifierTypeSearchApplicationService: IdentifierTypeSearchApplicationService,
     val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
     val legalFormSearchApplicationService: LegalFormSearchApplicationService,
-    val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
+    val fieldQualityRuleSearchApplicationService: FieldQualityRuleSearchApplicationService,
     val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
     val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
     val scriptCodeSearchApplicationService: ScriptCodeSearchApplicationService,
@@ -98,7 +99,11 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleV7Dto>> {
-        return ResponseEntity(fieldQualityRuleSearchApplicationV7Service.searchFieldQualityRules(country), HttpStatus.OK)
+        val request = apiV7InboundMapper.toFieldQualityRuleSearchRaw(country)
+        return when (val result = fieldQualityRuleSearchApplicationService.search(request)) {
+            is FieldQualityRuleSearchResult.Found -> ResponseEntity(result.rules.map(apiV7MetadataMapper::toDto), HttpStatus.OK)
+            is FieldQualityRuleSearchResult.Rejected -> throw apiV7MetadataMapper.toException(result.errors.first())
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

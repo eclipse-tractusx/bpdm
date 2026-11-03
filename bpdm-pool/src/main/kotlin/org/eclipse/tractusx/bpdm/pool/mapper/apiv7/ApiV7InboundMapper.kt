@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.springframework.stereotype.Component
 
@@ -34,4 +35,10 @@ class ApiV7InboundMapper {
      */
     fun toIdentifierTypeSearchRaw(businessPartnerType: IdentifierBusinessPartnerTypeV7, country: String?): IdentifierTypeSearchRaw =
         IdentifierTypeSearchRaw(businessPartnerType = businessPartnerType, country = country)
+
+    /**
+     * Returns the raw field quality rule search for [country].
+     */
+    fun toFieldQualityRuleSearchRaw(country: String): FieldQualityRuleSearchRaw =
+        FieldQualityRuleSearchRaw(country = country)
 }

@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper
 
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
@@ -27,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeDetailRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
@@ -108,5 +110,16 @@ class DbToOutputMapper {
             format = entity.format,
             categories = entity.categories.toSet(),
             details = entity.details.map { IdentifierTypeDetailRecord(countryCode = it.country?.countryCode, mandatory = it.mandatory) }
+        )
+
+    /**
+     * Returns the output record for [entity] as it applies in [country].
+     */
+    fun toRecord(entity: FieldQualityRuleDb, country: CountryDb): FieldQualityRuleRecord =
+        FieldQualityRuleRecord(
+            fieldPath = entity.fieldPath,
+            schemaName = entity.schemaName,
+            countryCode = country.countryCode,
+            qualityLevel = entity.qualityLevel
         )
 }

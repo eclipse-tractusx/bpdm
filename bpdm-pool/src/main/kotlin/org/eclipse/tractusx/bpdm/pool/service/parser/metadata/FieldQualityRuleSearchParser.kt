@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.FieldQualityRuleSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.FieldQualityRuleSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 
@@ -35,9 +35,9 @@ class FieldQualityRuleSearchParser(private val countryRepository: CountryReposit
     /**
      * Returns the criteria the search filters field quality rules by.
      */
-    fun parse(request: FieldQualityRuleSearchRequest): ParseResult<FieldQualityRuleSearchParsed, FieldQualityRuleSearchParseError> {
+    fun parse(request: FieldQualityRuleSearchRaw): ParseResult<FieldQualityRuleSearchParsed, FieldQualityRuleSearchError> {
         val country = countryRepository.findByCountryCode(request.country)
-            ?: return ParseResult.ofSingleFailure(FieldQualityRuleSearchParseError.CountryNotFound(request.country))
+            ?: return ParseResult.ofSingleFailure(FieldQualityRuleSearchError.CountryNotFound(request.country))
         return ParseResult.Success(FieldQualityRuleSearchParsed(country = country))
     }
 }

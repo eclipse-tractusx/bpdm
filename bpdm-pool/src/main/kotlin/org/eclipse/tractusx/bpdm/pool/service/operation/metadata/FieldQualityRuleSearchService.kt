@@ -21,8 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
-import org.eclipse.tractusx.bpdm.pool.model.FieldQualityRule
-import org.eclipse.tractusx.bpdm.pool.model.parsed.FieldQualityRuleSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +39,7 @@ class FieldQualityRuleSearchService(
      * same field, rules forbidding the field left out, ordered by schema and field path.
      */
     @Transactional(readOnly = true)
-    fun search(criteria: FieldQualityRuleSearchParsed): List<FieldQualityRule> {
+    fun search(criteria: FieldQualityRuleSearchParsed): List<FieldQualityRuleDb> {
         val defaultRulesByField = fieldQualityRuleRepository.findByCountryIsNullOrderBySchemaNameAscFieldPathAsc()
             .associateBy { it.field() }
         val countryRulesByField = fieldQualityRuleRepository.findByCountryOrderBySchemaNameAscFieldPathAsc(criteria.country)
@@ -49,14 +48,6 @@ class FieldQualityRuleSearchService(
         return (defaultRulesByField.keys + countryRulesByField.keys)
             .mapNotNull { field -> countryRulesByField[field] ?: defaultRulesByField[field] }
             .filter { it.qualityLevel != QualityLevelV7.FORBIDDEN }
-            .map { rule ->
-                FieldQualityRule(
-                    fieldPath = rule.fieldPath,
-                    schemaName = rule.schemaName,
-                    country = (rule.country ?: criteria.country).countryCode,
-                    qualityLevel = rule.qualityLevel
-                )
-            }
             .sortedWith(compareBy({ it.schemaName }, { it.fieldPath }))
     }
 

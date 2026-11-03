@@ -19,18 +19,23 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.FieldQualityRuleV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeDetailV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.QualityLevelV6
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
 import org.springframework.stereotype.Component
 
@@ -91,6 +96,17 @@ class ApiV6MetadataMapper {
         )
 
     /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: FieldQualityRuleRecord): FieldQualityRuleV6Dto =
+        FieldQualityRuleV6Dto(
+            fieldPath = record.fieldPath,
+            schemaName = record.schemaName,
+            country = record.countryCode,
+            qualityLevel = QualityLevelV6.valueOf(record.qualityLevel.name)
+        )
+
+    /**
      * Returns the validation error the API reports [error] with.
      */
     fun toValidationError(error: IdentifierTypeSearchError): ValidationError =
@@ -99,5 +115,13 @@ class ApiV6MetadataMapper {
                 "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
                 ValidationContext(classType = "", objectId = "request", propertyPath = listOf("country"))
             )
+        }
+
+    /**
+     * Returns the exception the API reports [error] with.
+     */
+    fun toException(error: FieldQualityRuleSearchError): BpdmNotFoundException =
+        when (error) {
+            is FieldQualityRuleSearchError.CountryNotFound -> BpdmNotFoundException("Country", error.country)
         }
 }
