@@ -74,7 +74,7 @@
         <assertj.version>3.24.2</assertj.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <!-- Sonar related properties -->
-        <sonar.version>5.7.0.6970</sonar.version>
+        <sonar.version>5.8.0.7211</sonar.version>
         <sonar.coverage.jacoco.xmlReportPaths>
             ${maven.multiModuleProjectDirectory}/bpdm-coverage-aggregate/target/site/
             jacoco-aggregate/jacoco.xml
