@@ -19,9 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
@@ -59,5 +61,15 @@ class ApiV7MetadataMapper {
             countryCode = record.countryCode,
             name = record.name,
             description = record.description
+        )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: AdministrativeAreaRecord): CountrySubdivisionV7Dto =
+        CountrySubdivisionV7Dto(
+            countryCode = record.countryCode,
+            code = record.code,
+            name = record.name
         )
 }

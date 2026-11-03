@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.springframework.stereotype.Component
 
@@ -37,5 +39,15 @@ class ApiV6MetadataMapper {
             countryCode = record.countryCode,
             name = record.name,
             description = record.description
+        )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: AdministrativeAreaRecord): CountrySubdivisionV6Dto =
+        CountrySubdivisionV6Dto(
+            countryCode = record.countryCode,
+            code = record.code,
+            name = record.name
         )
 }

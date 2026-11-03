@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,21 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
+package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
-import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.springframework.stereotype.Component
-
-/**
- * Maps stored regions to the v7 API country subdivision DTOs.
- */
-@Component
-class AdministrativeAreaResponseMapper {
-
-    /**
-     * Returns the given region as the country subdivision the API reports it as.
-     */
-    fun toCountrySubdivision(region: RegionDb): CountrySubdivisionV7Dto =
-        CountrySubdivisionV7Dto(countryCode = region.country.countryCode, code = region.regionCode, name = region.regionName)
-}
+data class AdministrativeAreaRecord(
+    val countryCode: String,
+    val code: String,
+    val name: String
+)

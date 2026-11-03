@@ -35,10 +35,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AdministrativeAreaSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
@@ -56,7 +56,7 @@ class MetadataController(
     val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
     val legalFormSearchApplicationV7Service: LegalFormSearchApplicationV7Service,
     val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
-    val administrativeAreaSearchApplicationV7Service: AdministrativeAreaSearchApplicationV7Service,
+    val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
     val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
     val scriptCodeSearchApplicationService: ScriptCodeSearchApplicationService,
     val countrySearchApplicationService: CountrySearchApplicationService,
@@ -94,7 +94,8 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV7Dto> {
-        return administrativeAreaSearchApplicationV7Service.searchAdministrativeAreas(paginationRequest)
+        return administrativeAreaSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

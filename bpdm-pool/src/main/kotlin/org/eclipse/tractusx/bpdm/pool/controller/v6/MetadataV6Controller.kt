@@ -33,8 +33,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.AdministrativeAreaSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.FieldQualityRuleSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeSearchApplicationV6Service
@@ -52,7 +52,7 @@ class MetadataV6Controller(
     val legalFormCreateApplicationV6Service: LegalFormCreateApplicationV6Service,
     val legalFormSearchApplicationV6Service: LegalFormSearchApplicationV6Service,
     val fieldQualityRuleSearchApplicationV6Service: FieldQualityRuleSearchApplicationV6Service,
-    val administrativeAreaSearchApplicationV6Service: AdministrativeAreaSearchApplicationV6Service,
+    val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
     val countrySearchApplicationService: CountrySearchApplicationService,
     val apiV6MetadataMapper: ApiV6MetadataMapper
 ) : PoolMetadataV6Api {
@@ -88,7 +88,8 @@ class MetadataV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV6Dto> {
-        return administrativeAreaSearchApplicationV6Service.searchAdministrativeAreas(paginationRequest)
+        return administrativeAreaSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV6MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

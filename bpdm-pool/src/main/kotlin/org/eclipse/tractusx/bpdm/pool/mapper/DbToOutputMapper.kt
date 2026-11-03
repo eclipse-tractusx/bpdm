@@ -21,7 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.mapper
 
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
@@ -59,5 +61,15 @@ class DbToOutputMapper {
             countryCode = entity.countryCode,
             name = entity.name,
             description = entity.description
+        )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: RegionDb): AdministrativeAreaRecord =
+        AdministrativeAreaRecord(
+            countryCode = entity.country.countryCode,
+            code = entity.regionCode,
+            name = entity.regionName
         )
 }

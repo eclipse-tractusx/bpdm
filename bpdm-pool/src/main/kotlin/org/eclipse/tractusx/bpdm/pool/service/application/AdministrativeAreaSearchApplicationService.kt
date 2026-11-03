@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,32 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v6
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AdministrativeAreaResponseMapperV6
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.AdministrativeAreaSearchService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the legacy v6 "search administrative areas level 1" operation, using the v6 response shapes.
+ * Searches the administrative areas an address may name as its level 1 area, for every API version.
  */
 @Service
-class AdministrativeAreaSearchApplicationV6Service(
+class AdministrativeAreaSearchApplicationService(
     private val administrativeAreaSearchService: AdministrativeAreaSearchService,
-    private val administrativeAreaResponseMapperV6: AdministrativeAreaResponseMapperV6
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
      * Returns the requested page of all known administrative areas level 1.
      */
     @Transactional(readOnly = true)
-    fun searchAdministrativeAreas(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV6Dto> =
-        administrativeAreaSearchService.search(paginationRequest.toPageRequest())
-            .toPageDto { administrativeAreaResponseMapperV6.toCountrySubdivision(it) }
+    fun search(pageable: Pageable): Page<AdministrativeAreaRecord> =
+        administrativeAreaSearchService.search(pageable)
+            .map(dbToOutputMapper::toRecord)
 }
