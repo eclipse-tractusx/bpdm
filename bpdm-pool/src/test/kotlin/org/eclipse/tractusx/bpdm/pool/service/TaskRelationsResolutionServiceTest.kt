@@ -21,13 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
@@ -57,7 +57,7 @@ import java.util.*
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsResolutionServiceTest @Autowired constructor(
     val taskRelationsResolutionService: TaskRelationsResolutionService,
-    val poolClient: PoolApiClient,
+    val poolClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
 ) {
@@ -93,8 +93,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     * THEN: The operation should fail, returning an error message
     * */
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `create relations with non existing source and target legal entity`(relationType: LegalEntityRelationType) {
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `create relations with non existing source and target legal entity`(relationType: LegalEntityRelationTypeV7) {
 
         val createRelationsRequest = buildAlwaysActiveRelationRequest(
             relationType = relationType,
@@ -113,8 +113,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     * THEN: The operation should fail, returning an error indicating self-relation is not allowed
     * */
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `create relations with same source and target legal entity`(relationType: LegalEntityRelationType) {
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `create relations with same source and target legal entity`(relationType: LegalEntityRelationTypeV7) {
 
         // Step 1: Create legal entity
         val entity1 = BusinessPartnerNonVerboseValues.legalEntityCreate1
@@ -137,8 +137,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create relations with same source and target address`(relationType: AddressRelationType) {
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `create relations with same source and target address`(relationType: AddressRelationTypeV7) {
         val legalEntity = createLegalEntity("$testName LE1")
         val address = createAdditionalAddress("$testName Addr1", legalEntity)
 
@@ -195,8 +195,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create relations with provided source and target address`(relationType: AddressRelationType) {
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `create relations with provided source and target address`(relationType: AddressRelationTypeV7) {
         // Step 1: Create legal entity and additional address
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -620,7 +620,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         assertThat(result.errors).isEmpty()
         val fetchedB = poolClient.legalEntities.getLegalEntity(changeCase(savedB.legalEntity.header.bpnl))
-        assertThat(fetchedB.header.relations.filter { it.type == LegalEntityRelationType.IsReplacedBy })
+        assertThat(fetchedB.header.relations.filter { it.type == LegalEntityRelationTypeV7.IsReplacedBy })
             .hasSize(2)
     }
 
@@ -651,8 +651,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(value = LegalEntityRelationType::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
-    fun `reject unsupported address relation type`(relationType: LegalEntityRelationType) {
+    @EnumSource(value = LegalEntityRelationTypeV7::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
+    fun `reject unsupported address relation type`(relationType: LegalEntityRelationTypeV7) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -674,8 +674,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `reject relation between a legal entity and an address`(relationType: AddressRelationType) {
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `reject relation between a legal entity and an address`(relationType: AddressRelationTypeV7) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -892,7 +892,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         //THEN
         assertThat(result.errors).isEmpty()
         val fetchedB = poolClient.addresses.getAddress(addressB.address.bpna)
-        assertThat(fetchedB.address.relations.filter { it.type == AddressRelationType.IsReplacedBy })
+        assertThat(fetchedB.address.relations.filter { it.type == AddressRelationTypeV7.IsReplacedBy })
             .hasSize(2)
     }
 
@@ -904,8 +904,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
      * THEN validation exception is thrown indicating invalid address relation
      */
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `reject address relation when two different legal entities involved `(relationType: AddressRelationType) {
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `reject address relation when two different legal entities involved `(relationType: AddressRelationTypeV7) {
         //Given
         val legalEntityA = createLegalEntity("$testName A")
         val legalEntityB = createLegalEntity("$testName B")
@@ -1166,7 +1166,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         //THEN
         assertThat(result.errors).isEmpty()
         val fetchedB = poolClient.sites.getSite(siteB.site.bpns)
-        assertThat(fetchedB.site.relations.filter { it.type == SiteRelationType.IsReplacedBy })
+        assertThat(fetchedB.site.relations.filter { it.type == SiteRelationTypeV7.IsReplacedBy })
             .hasSize(2)
     }
 
@@ -1336,17 +1336,17 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
 
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseV7Dto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
 
-    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
+    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseV7Dto): AddressPartnerCreateVerboseV7Dto {
         val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
-    private fun createSite(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateVerboseDto {
+    private fun createSite(seed: String, legalEntity: LegalEntityPartnerCreateVerboseV7Dto): SitePartnerCreateVerboseV7Dto {
         val request = testDataEnvironment.requestFactory.buildSiteCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
         return poolClient.sites.createSite(listOf(request)).entities.single()
     }
@@ -1357,18 +1357,18 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         return taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(taskStep)
     }
 
-    private fun LegalEntityRelationType.toTaskDto(): RelationType {
+    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
         return when(this){
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
-            LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
-            LegalEntityRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> RelationType.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> RelationType.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 
-    private fun AddressRelationType.toTaskDto(): RelationType {
+    private fun AddressRelationTypeV7.toTaskDto(): RelationType {
         return when(this){
-            AddressRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 
@@ -1412,7 +1412,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     private fun buildAlwaysActiveRelationRequest(
-        relationType: LegalEntityRelationType,
+        relationType: LegalEntityRelationTypeV7,
         businessPartnerSourceBpn: String,
         businessPartnerTargetBpn: String
     ): BusinessPartnerRelations{
@@ -1424,7 +1424,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     }
 
     private fun buildAlwaysActiveRelationRequest(
-        relationType: AddressRelationType,
+        relationType: AddressRelationTypeV7,
         businessPartnerSourceBpn: String,
         businessPartnerTargetBpn: String
     ): BusinessPartnerRelations{

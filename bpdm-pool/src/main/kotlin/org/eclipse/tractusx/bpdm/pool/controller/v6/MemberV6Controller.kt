@@ -22,14 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMembersV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogEntryVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.ChangelogSearchApplicationV6Service
@@ -49,27 +49,27 @@ class MemberV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchLegalEntities(
-        searchRequest: LegalEntitySearchRequestV6,
+        searchRequest: LegalEntitySearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
+    ): PageDto<LegalEntityWithLegalAddressVerboseV6Dto> {
         return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
-    override fun postSiteSearch(searchRequest: SiteSearchRequestV6, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDtoV6> {
+    override fun postSiteSearch(searchRequest: SiteSearchV6Request, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseV6Dto> {
         return siteSearchApplicationService.searchMemberSites(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
-    override fun searchAddresses(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> {
+    override fun searchAddresses(searchRequest: AddressSearchV6Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV6Dto> {
         return addressSearchApplicationService.searchMemberAddresses(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")
     override fun searchChangelogEntries(
-        changelogSearchRequest: ChangelogSearchRequestV6,
+        changelogSearchRequest: ChangelogSearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDtoV6> {
+    ): PageDto<ChangelogEntryVerboseV6Dto> {
         return changelogSearchApplicationService.searchMemberChangelogEntries(changelogSearchRequest, paginationRequest)
     }
 

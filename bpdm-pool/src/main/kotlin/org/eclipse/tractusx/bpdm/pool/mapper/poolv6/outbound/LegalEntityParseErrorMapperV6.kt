@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorCodeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.ErrorCodeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component

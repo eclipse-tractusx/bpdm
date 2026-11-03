@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -33,6 +32,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationE
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 
 @Service
 class TaskLegalEntityRelationsStepBuildService(
@@ -74,11 +74,11 @@ class TaskLegalEntityRelationsStepBuildService(
             )
         }
 
-        val legalEntityRelationType: LegalEntityRelationType = when(relationDto.relationType){
-            OrchestratorRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationType.IsAlternativeHeadquarterFor
-            OrchestratorRelationType.IsManagedBy -> LegalEntityRelationType.IsManagedBy
-            OrchestratorRelationType.IsOwnedBy -> LegalEntityRelationType.IsOwnedBy
-            OrchestratorRelationType.IsReplacedBy -> LegalEntityRelationType.IsReplacedBy
+        val legalEntityRelationType: LegalEntityRelationTypeV7 = when(relationDto.relationType){
+            OrchestratorRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor
+            OrchestratorRelationType.IsManagedBy -> LegalEntityRelationTypeV7.IsManagedBy
+            OrchestratorRelationType.IsOwnedBy -> LegalEntityRelationTypeV7.IsOwnedBy
+            OrchestratorRelationType.IsReplacedBy -> LegalEntityRelationTypeV7.IsReplacedBy
         }
 
         val existingRelation = relationRepository.findAll(
@@ -97,10 +97,10 @@ class TaskLegalEntityRelationsStepBuildService(
             reasonCode = reasonCode
         )
         val strategyService : IRelationUpsertStrategyService = when(legalEntityRelationType){
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
-            LegalEntityRelationType.IsManagedBy -> managedRelationUpsertService
-            LegalEntityRelationType.IsOwnedBy -> ownedByRelationService
-            LegalEntityRelationType.IsReplacedBy -> isReplacedByRelationService
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
+            LegalEntityRelationTypeV7.IsManagedBy -> managedRelationUpsertService
+            LegalEntityRelationTypeV7.IsOwnedBy -> ownedByRelationService
+            LegalEntityRelationTypeV7.IsReplacedBy -> isReplacedByRelationService
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)
@@ -127,12 +127,12 @@ class TaskLegalEntityRelationsStepBuildService(
         )
     }
 
-    private fun LegalEntityRelationType.toTaskDto(): OrchestratorRelationType{
+    private fun LegalEntityRelationTypeV7.toTaskDto(): OrchestratorRelationType{
         return when(this){
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
-            LegalEntityRelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
-            LegalEntityRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> OrchestratorRelationType.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
     }
 }

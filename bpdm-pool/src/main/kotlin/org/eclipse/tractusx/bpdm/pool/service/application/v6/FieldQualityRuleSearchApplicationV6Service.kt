@@ -22,13 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.FieldQualityRuleSearchParseError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.FieldQualityRuleResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.FieldQualityRuleSearchRequest
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.FieldQualityRuleSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.FieldQualityRuleSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.FieldQualityRuleV6Dto
 
 /**
  * The REST-API boundary for the legacy v6 "search field quality rules" operation, using the v6 response shapes.
@@ -44,7 +44,7 @@ class FieldQualityRuleSearchApplicationV6Service(
      * Returns the field quality rules that apply in the given country.
      */
     @Transactional(readOnly = true)
-    fun searchFieldQualityRules(country: String): Collection<FieldQualityRuleDtoV6> {
+    fun searchFieldQualityRules(country: String): Collection<FieldQualityRuleV6Dto> {
         val criteria = when (val result = fieldQualityRuleSearchParser.parse(FieldQualityRuleSearchRequest(country))) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> when (val error = result.errors.first()) {

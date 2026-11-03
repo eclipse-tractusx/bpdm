@@ -19,31 +19,32 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+
 
 data class LegalEntityStructureRequest(
-    val legalEntity: LegalEntityPartnerCreateRequest,
+    val legalEntity: LegalEntityPartnerCreateV7Request,
     val siteStructures: List<SiteStructureRequest> = emptyList(),
-    val addresses: List<AddressPartnerCreateRequest> = emptyList()
+    val addresses: List<AddressPartnerCreateV7Request> = emptyList()
 )
 
 data class SiteStructureRequest(
-    val site: SitePartnerCreateRequest,
-    val addresses: List<AddressPartnerCreateRequest> = emptyList()
+    val site: SitePartnerCreateV7Request,
+    val addresses: List<AddressPartnerCreateV7Request> = emptyList()
 )
 
 data class LegalEntityStructureResponse(
-    val legalEntity: LegalEntityWithLegalAddressVerboseDto,
+    val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
     val siteStructures: List<SiteStructureResponse> = emptyList(),
-    val addresses: List<AddressPartnerCreateVerboseDto> = emptyList()
+    val addresses: List<AddressPartnerCreateVerboseV7Dto> = emptyList()
 )
 
 data class SiteStructureResponse(
-    val site: SitePartnerCreateVerboseDto,
-    val addresses: List<AddressPartnerCreateVerboseDto> = emptyList()
+    val site: SitePartnerCreateVerboseV7Dto,
+    val addresses: List<AddressPartnerCreateVerboseV7Dto> = emptyList()
 )

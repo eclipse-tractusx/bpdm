@@ -19,8 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
+
 
 object BusinessPartnerNonVerboseValues {
 
@@ -29,57 +48,57 @@ object BusinessPartnerNonVerboseValues {
     val identifierType3 = BusinessPartnerVerboseValues.identifierType3
 
     val identifierTypeDto1 =
-        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType1.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType1.name, BusinessPartnerVerboseValues.identifierTypeAbbreviation1, BusinessPartnerVerboseValues.identifierTypeTransliteratedName1, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1, BusinessPartnerVerboseValues.identifierTypeFormat1, BusinessPartnerVerboseValues.identifierTypeCategories1)
+        IdentifierTypeV7Dto(BusinessPartnerVerboseValues.identifierType1.technicalKey, IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType1.name, BusinessPartnerVerboseValues.identifierTypeAbbreviation1, BusinessPartnerVerboseValues.identifierTypeTransliteratedName1, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1, BusinessPartnerVerboseValues.identifierTypeFormat1, BusinessPartnerVerboseValues.identifierTypeCategories1)
 
     val addressIdentifierTypeDto1 =
-        IdentifierTypeDto(
+        IdentifierTypeV7Dto(
             "FR_SIRET",
-            IdentifierBusinessPartnerType.ADDRESS,
+            IdentifierBusinessPartnerTypeV7.ADDRESS,
             "Numéro du système d'identification du répertoire des établissements",
             BusinessPartnerVerboseValues.addressIdentifierTypeAbbreviation1,
             BusinessPartnerVerboseValues.addressIdentifierTypeTransliteratedName1,
             BusinessPartnerVerboseValues.addressIdentifierTypeTransliteratedAbbreviation1,
             "^\\d{8}\\d{1}\\d{5}$",
-            sortedSetOf(IdentifierTypeCategory.NBR)
+            sortedSetOf(IdentifierTypeCategoryV7.NBR)
         )
     val addressIdentifierTypeDto2 = addressIdentifierTypeDto1
 
 
-    val identifier1 = LegalEntityIdentifierDto(
+    val identifier1 = LegalEntityIdentifierV7Dto(
         value = BusinessPartnerVerboseValues.identifier1.value,
         type = BusinessPartnerVerboseValues.identifierType1.technicalKey,
         issuingBody = BusinessPartnerVerboseValues.identifier1.issuingBody,
     )
 
-    val identifier2 = LegalEntityIdentifierDto(
+    val identifier2 = LegalEntityIdentifierV7Dto(
         value = BusinessPartnerVerboseValues.identifier2.value,
         type = BusinessPartnerVerboseValues.identifierType2.technicalKey,
         issuingBody = BusinessPartnerVerboseValues.identifier2.issuingBody,
     )
 
-    val identifier3 = LegalEntityIdentifierDto(
+    val identifier3 = LegalEntityIdentifierV7Dto(
         value = BusinessPartnerVerboseValues.identifier3.value,
         type = BusinessPartnerVerboseValues.identifierType3.technicalKey,
         issuingBody = BusinessPartnerVerboseValues.identifier3.issuingBody,
     )
 
-    val addressIdentifier1 = AddressIdentifierDto(
+    val addressIdentifier1 = AddressIdentifierV7Dto(
         value = "Address Identifier 1",
         type = addressIdentifierTypeDto1.technicalKey,
     )
 
-    val addressIdentifier2 = AddressIdentifierDto(
+    val addressIdentifier2 = AddressIdentifierV7Dto(
         value = "Address Identifier 2",
         type = addressIdentifierTypeDto2.technicalKey,
     )
 
 
-    val addressIdentifier = AddressIdentifierDto(
+    val addressIdentifier = AddressIdentifierV7Dto(
         value = BusinessPartnerVerboseValues.identifier3.value,
         type = addressIdentifierTypeDto1.technicalKey,
     )
 
-    val legalForm1 = LegalFormRequest(
+    val legalForm1 = LegalFormV7Request(
         technicalKey = BusinessPartnerVerboseValues.legalForm1.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm1.name,
         transliteratedName = BusinessPartnerVerboseValues.legalForm1.transliteratedName,
@@ -90,7 +109,7 @@ object BusinessPartnerNonVerboseValues {
         administrativeAreaLevel1 = BusinessPartnerVerboseValues.legalForm1.administrativeAreaLevel1,
         isActive = BusinessPartnerVerboseValues.legalForm1.isActive
     )
-    val legalForm2 = LegalFormRequest(
+    val legalForm2 = LegalFormV7Request(
         technicalKey = BusinessPartnerVerboseValues.legalForm2.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm2.name,
         transliteratedName = BusinessPartnerVerboseValues.legalForm2.transliteratedName,
@@ -102,39 +121,39 @@ object BusinessPartnerNonVerboseValues {
         isActive = BusinessPartnerVerboseValues.legalForm2.isActive
     )
 
-    private val leStatus1 = LegalEntityStateDto(
+    private val leStatus1 = LegalEntityStateV7Dto(
         BusinessPartnerVerboseValues.leStatus1.validFrom,
         BusinessPartnerVerboseValues.leStatus1.validTo,
         BusinessPartnerVerboseValues.statusType1.technicalKey
     )
-    private val leStatus2 = LegalEntityStateDto(
+    private val leStatus2 = LegalEntityStateV7Dto(
         BusinessPartnerVerboseValues.leStatus2.validFrom,
         BusinessPartnerVerboseValues.leStatus2.validTo,
         BusinessPartnerVerboseValues.statusType2.technicalKey
     )
-    private val leStatus3 = LegalEntityStateDto(
+    private val leStatus3 = LegalEntityStateV7Dto(
         BusinessPartnerVerboseValues.leStatus3.validFrom,
         BusinessPartnerVerboseValues.leStatus3.validTo,
         BusinessPartnerVerboseValues.statusType3.technicalKey
     )
 
-    val siteStatus1 = SiteStateDto(
+    val siteStatus1 = SiteStateV7Dto(
         BusinessPartnerVerboseValues.siteStatus1.validFrom,
         BusinessPartnerVerboseValues.siteStatus1.validTo,
         BusinessPartnerVerboseValues.statusType1.technicalKey
     )
-    private val siteStatus2 = SiteStateDto(
+    private val siteStatus2 = SiteStateV7Dto(
         BusinessPartnerVerboseValues.siteStatus2.validFrom,
         BusinessPartnerVerboseValues.siteStatus2.validTo,
         BusinessPartnerVerboseValues.statusType2.technicalKey
     )
-    private val siteStatus3 = SiteStateDto(
+    private val siteStatus3 = SiteStateV7Dto(
         BusinessPartnerVerboseValues.siteStatus3.validFrom,
         BusinessPartnerVerboseValues.siteStatus3.validTo,
         BusinessPartnerVerboseValues.statusType3.technicalKey
     )
 
-    private val postalAddress1 = PhysicalPostalAddressDto(
+    private val postalAddress1 = PhysicalPostalAddressV7Dto(
         geographicCoordinates = BusinessPartnerVerboseValues.address1.geographicCoordinates,
         country = BusinessPartnerVerboseValues.address1.country,
         postalCode = BusinessPartnerVerboseValues.address1.postalCode,
@@ -152,7 +171,7 @@ object BusinessPartnerNonVerboseValues {
         taxJurisdictionCode = BusinessPartnerVerboseValues.address1.taxJurisdictionCode
     )
 
-    private val postalAddress2 = PhysicalPostalAddressDto(
+    private val postalAddress2 = PhysicalPostalAddressV7Dto(
         geographicCoordinates = BusinessPartnerVerboseValues.address2.geographicCoordinates,
         country = BusinessPartnerVerboseValues.address2.country,
         postalCode = BusinessPartnerVerboseValues.address2.postalCode,
@@ -170,7 +189,7 @@ object BusinessPartnerNonVerboseValues {
         taxJurisdictionCode = BusinessPartnerVerboseValues.address2.taxJurisdictionCode
     )
 
-    private val postalAddress3 = PhysicalPostalAddressDto(
+    private val postalAddress3 = PhysicalPostalAddressV7Dto(
         geographicCoordinates = BusinessPartnerVerboseValues.address3.geographicCoordinates,
         country = BusinessPartnerVerboseValues.address3.country,
         postalCode = BusinessPartnerVerboseValues.address3.postalCode,
@@ -188,34 +207,34 @@ object BusinessPartnerNonVerboseValues {
         taxJurisdictionCode = BusinessPartnerVerboseValues.address3.taxJurisdictionCode
     )
 
-    val logisticAddress1 = LogisticAddressDto(
+    val logisticAddress1 = LogisticAddressV7Dto(
         physicalPostalAddress = postalAddress1,
         confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria
     )
 
-    val logisticAddress2 = LogisticAddressDto(
+    val logisticAddress2 = LogisticAddressV7Dto(
         physicalPostalAddress = postalAddress2,
         confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant2.confidenceCriteria
     )
 
-    val logisticAddress3 = LogisticAddressDto(
+    val logisticAddress3 = LogisticAddressV7Dto(
         physicalPostalAddress = postalAddress3,
         confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant3.confidenceCriteria
     )
-    val logisticAddress4 = LogisticAddressDto(
+    val logisticAddress4 = LogisticAddressV7Dto(
         physicalPostalAddress = postalAddress1,
         name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.legalName,
         confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria
     )
 
-    val logisticAddress5 = LogisticAddressDto(
+    val logisticAddress5 = LogisticAddressV7Dto(
         physicalPostalAddress = postalAddress1,
         identifiers = listOf(addressIdentifier),
         confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria
     )
 
-    val legalEntity1 = LegalEntityDto(
-        header = LegalEntityHeaderDto(
+    val legalEntity1 = LegalEntityV7Dto(
+        header = LegalEntityHeaderV7Dto(
             legalName = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
@@ -228,8 +247,8 @@ object BusinessPartnerNonVerboseValues {
         scriptVariants = emptyList()
     )
 
-    val legalEntity2 = LegalEntityDto(
-        header =LegalEntityHeaderDto(
+    val legalEntity2 = LegalEntityV7Dto(
+        header =LegalEntityHeaderV7Dto(
             legalName = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm2.technicalKey,
@@ -242,8 +261,8 @@ object BusinessPartnerNonVerboseValues {
         scriptVariants = emptyList()
     )
 
-    val legalEntity3 = LegalEntityDto(
-        header = LegalEntityHeaderDto(
+    val legalEntity3 = LegalEntityV7Dto(
+        header = LegalEntityHeaderV7Dto(
             legalName = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
@@ -256,8 +275,8 @@ object BusinessPartnerNonVerboseValues {
         scriptVariants = emptyList()
     )
 
-    val legalEntity4 = LegalEntityDto(
-        header = LegalEntityHeaderDto(
+    val legalEntity4 = LegalEntityV7Dto(
+        header = LegalEntityHeaderV7Dto(
             legalName = BusinessPartnerVerboseValues.legalEntityUpsert4.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
@@ -270,8 +289,8 @@ object BusinessPartnerNonVerboseValues {
         scriptVariants = emptyList()
     )
 
-    val legalEntityMultipleIdentifier = LegalEntityDto(
-        header =  LegalEntityHeaderDto(
+    val legalEntityMultipleIdentifier = LegalEntityV7Dto(
+        header =  LegalEntityHeaderV7Dto(
             legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
@@ -284,44 +303,44 @@ object BusinessPartnerNonVerboseValues {
         scriptVariants = emptyList()
     )
 
-    val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate1 = LegalEntityPartnerCreateV7Request(
         legalEntity = legalEntity1,
         index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
     )
 
-    val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate2 = LegalEntityPartnerCreateV7Request(
         legalEntity = legalEntity2,
         index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
     )
 
-    val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate3 = LegalEntityPartnerCreateV7Request(
         legalEntity = legalEntity3,
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
     )
 
-    val legalEntityCreate4 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate4 = LegalEntityPartnerCreateV7Request(
         legalEntity = legalEntity4,
         index = BusinessPartnerVerboseValues.legalEntityUpsert4.index
     )
 
 
-    val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
+    val legalEntityUpdate1 = LegalEntityPartnerUpdateV7Request(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.bpnl,
         legalEntity = legalEntityCreate1.legalEntity
     )
 
-    val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
+    val legalEntityUpdate2 = LegalEntityPartnerUpdateV7Request(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.header.bpnl,
         legalEntity = legalEntityCreate2.legalEntity
     )
 
-    val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
+    val legalEntityUpdate3 = LegalEntityPartnerUpdateV7Request(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.header.bpnl,
         legalEntity = legalEntityCreate3.legalEntity
     )
 
-    val siteCreate1 = SitePartnerCreateRequest(
-        site = SiteDto(
+    val siteCreate1 = SitePartnerCreateV7Request(
+        site = SiteV7Dto(
             name = BusinessPartnerVerboseValues.siteUpsert1.site.name,
             states = listOf(siteStatus1),
             mainAddress = logisticAddress1,
@@ -332,22 +351,22 @@ object BusinessPartnerNonVerboseValues {
         bpnlParent = legalEntityUpdate1.bpnl
     )
 
-    val siteLegalReferenceUpsert1=SiteCreateRequestWithLegalAddressAsMain(
+    val siteLegalReferenceUpsert1=SiteCreateWithLegalAddressAsMainV7Request(
         name = BusinessPartnerVerboseValues.siteUpsert1.site.name,
         bpnLParent = legalEntityUpdate1.bpnl,
         confidenceCriteria = BusinessPartnerVerboseValues.site1.confidenceCriteria,
         states = listOf(siteStatus1)
     )
 
-    val siteLegalReferenceUpsert2=SiteCreateRequestWithLegalAddressAsMain(
+    val siteLegalReferenceUpsert2=SiteCreateWithLegalAddressAsMainV7Request(
         name = BusinessPartnerVerboseValues.siteUpsert2.site.name,
         bpnLParent = legalEntityUpdate2.bpnl,
         confidenceCriteria = BusinessPartnerVerboseValues.site2.confidenceCriteria,
         states = listOf(siteStatus2)
     )
 
-    val siteCreate2 = SitePartnerCreateRequest(
-        site = SiteDto(
+    val siteCreate2 = SitePartnerCreateV7Request(
+        site = SiteV7Dto(
             name = BusinessPartnerVerboseValues.siteUpsert2.site.name,
             states = listOf(siteStatus2),
             mainAddress = logisticAddress2,
@@ -358,8 +377,8 @@ object BusinessPartnerNonVerboseValues {
         bpnlParent = legalEntityUpdate2.bpnl
     )
 
-    val siteCreate3 = SitePartnerCreateRequest(
-        site = SiteDto(
+    val siteCreate3 = SitePartnerCreateV7Request(
+        site = SiteV7Dto(
             name = BusinessPartnerVerboseValues.siteUpsert3.site.name,
             states = listOf(siteStatus3),
             mainAddress = logisticAddress3,
@@ -370,63 +389,63 @@ object BusinessPartnerNonVerboseValues {
         bpnlParent = legalEntityUpdate3.bpnl
     )
 
-    val siteUpdate1 = SitePartnerUpdateRequest(
+    val siteUpdate1 = SitePartnerUpdateV7Request(
         bpns = BusinessPartnerVerboseValues.siteUpsert1.site.bpns,
         site = siteCreate1.site
     )
 
-    val siteUpdate2 = SitePartnerUpdateRequest(
+    val siteUpdate2 = SitePartnerUpdateV7Request(
         bpns = BusinessPartnerVerboseValues.siteUpsert2.site.bpns,
         site = siteCreate2.site
     )
 
-    val siteUpdate3 = SitePartnerUpdateRequest(
+    val siteUpdate3 = SitePartnerUpdateV7Request(
         bpns = BusinessPartnerVerboseValues.siteUpsert3.site.bpns,
         site = siteCreate3.site
     )
 
-    val addressPartnerCreate1 = AddressPartnerCreateRequest(
+    val addressPartnerCreate1 = AddressPartnerCreateV7Request(
         address = logisticAddress1,
         bpnParent = legalEntityUpdate1.bpnl,
         index = BusinessPartnerVerboseValues.addressPartnerCreate1.index
     )
 
-    val addressPartnerCreate2 = AddressPartnerCreateRequest(
+    val addressPartnerCreate2 = AddressPartnerCreateV7Request(
         address = logisticAddress2,
         bpnParent = legalEntityUpdate2.bpnl,
         index = BusinessPartnerVerboseValues.addressPartnerCreate2.index
     )
 
-    val addressPartnerCreate3 = AddressPartnerCreateRequest(
+    val addressPartnerCreate3 = AddressPartnerCreateV7Request(
         address = logisticAddress3,
         bpnParent = legalEntityUpdate3.bpnl,
         index = BusinessPartnerVerboseValues.addressPartnerCreate3.index
     )
 
-    val addressPartnerCreate4 = AddressPartnerCreateRequest(
+    val addressPartnerCreate4 = AddressPartnerCreateV7Request(
         address = logisticAddress4,
         bpnParent = legalEntityUpdate3.bpnl,
         index = BusinessPartnerVerboseValues.addressPartnerCreate3.index
     )
 
-    val addressPartnerCreate5 = AddressPartnerCreateRequest(
+    val addressPartnerCreate5 = AddressPartnerCreateV7Request(
         address = logisticAddress5,
         bpnParent = legalEntityUpdate3.bpnl,
         index = BusinessPartnerVerboseValues.addressPartnerCreate3.index
     )
 
 
-    val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
+    val addressPartnerUpdate1 = AddressPartnerUpdateV7Request(
         bpna = BusinessPartnerVerboseValues.addressPartnerInvariant1.bpna,
         address = logisticAddress1
     )
 
-    val addressPartnerUpdate2 = AddressPartnerUpdateRequest(
+    val addressPartnerUpdate2 = AddressPartnerUpdateV7Request(
         bpna = BusinessPartnerVerboseValues.addressPartnerInvariant2.bpna,
         address = logisticAddress2
     )
 
-    val addressPartnerUpdate3 = AddressPartnerUpdateRequest(
+    val addressPartnerUpdate3 = AddressPartnerUpdateV7Request(
         bpna = BusinessPartnerVerboseValues.addressPartnerInvariant3.bpna,
         address = logisticAddress3
     )

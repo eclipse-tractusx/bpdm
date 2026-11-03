@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
 import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantSearchRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantUpdateRequest
 import org.springframework.stereotype.Component
@@ -34,7 +34,7 @@ class CxMembershipRequestMapperV6 {
     /**
      * Returns the search request holding the criteria a client sent.
      */
-    fun toSearchRequest(searchRequest: CxMembershipSearchRequestV6): DataSpaceParticipantSearchRequest =
+    fun toSearchRequest(searchRequest: CxMembershipSearchV6Request): DataSpaceParticipantSearchRequest =
         DataSpaceParticipantSearchRequest(
             legalEntityBpns = searchRequest.bpnLs,
             isDataSpaceParticipant = searchRequest.isCatenaXMember
@@ -43,7 +43,7 @@ class CxMembershipRequestMapperV6 {
     /**
      * Returns one update request per membership a client sent, in the order they were sent.
      */
-    fun toUpdateRequests(updateRequest: CxMembershipUpdateRequestV6): List<DataSpaceParticipantUpdateRequest> =
+    fun toUpdateRequests(updateRequest: CxMembershipUpdateV6Request): List<DataSpaceParticipantUpdateRequest> =
         updateRequest.memberships.map {
             DataSpaceParticipantUpdateRequest(legalEntityBpn = it.bpnL, isDataSpaceParticipant = it.isCatenaXMember)
         }

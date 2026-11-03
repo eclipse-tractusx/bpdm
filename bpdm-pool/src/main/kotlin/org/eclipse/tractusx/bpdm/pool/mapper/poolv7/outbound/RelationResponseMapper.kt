@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
@@ -38,8 +38,8 @@ class RelationResponseMapper {
     /**
      * Returns the given legal entity relation as the API reports it.
      */
-    fun toRelation(relation: RelationDb): RelationVerboseDto =
-        RelationVerboseDto(
+    fun toRelation(relation: RelationDb): RelationVerboseV7Dto =
+        RelationVerboseV7Dto(
             type = relation.type,
             businessPartnerSourceBpnl = relation.startNode.bpn,
             businessPartnerTargetBpnl = relation.endNode.bpn,
@@ -50,8 +50,8 @@ class RelationResponseMapper {
     /**
      * Returns the given address relation as the API reports it.
      */
-    fun toAddressRelation(relation: AddressRelationDb): AddressRelationVerboseDto =
-        AddressRelationVerboseDto(
+    fun toAddressRelation(relation: AddressRelationDb): AddressRelationVerboseV7Dto =
+        AddressRelationVerboseV7Dto(
             type = relation.type,
             businessPartnerSourceBpna = relation.startAddress.bpn,
             businessPartnerTargetBpna = relation.endAddress.bpn,
@@ -62,8 +62,8 @@ class RelationResponseMapper {
     /**
      * Returns the given site relation as the API reports it.
      */
-    fun toSiteRelation(relation: SiteRelationDb): SiteRelationVerboseDto =
-        SiteRelationVerboseDto(
+    fun toSiteRelation(relation: SiteRelationDb): SiteRelationVerboseV7Dto =
+        SiteRelationVerboseV7Dto(
             type = relation.type,
             businessPartnerSourceBpns = relation.startSite.bpn,
             businessPartnerTargetBpns = relation.endSite.bpn,
@@ -71,6 +71,6 @@ class RelationResponseMapper {
             reasonCode = relation.reasonCode?.technicalKey
         )
 
-    private fun toValidityPeriods(validityPeriods: Collection<RelationValidityPeriodDb>): List<RelationValidityPeriod> =
-        validityPeriods.sortedBy { it.validFrom }.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) }
+    private fun toValidityPeriods(validityPeriods: Collection<RelationValidityPeriodDb>): List<RelationValidityPeriodV7Dto> =
+        validityPeriods.sortedBy { it.validFrom }.map { RelationValidityPeriodV7Dto(validFrom = it.validFrom, validTo = it.validTo) }
 }

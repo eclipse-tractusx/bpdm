@@ -19,11 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
@@ -33,6 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityC
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
 
 /**
  * The REST-API boundary for the V7 "create legal entities" operation.
@@ -51,12 +51,12 @@ class LegalEntityCreateApplicationV7Service(
      * entity or the errors that stopped it.
      */
     @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
+    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateV7Request>): LegalEntityPartnerCreateV7ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map { legalEntityDtoRequestMapper.toCreateRequest(it) }
 
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<LegalEntityCreateErrorV7>>()
         requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(legalEntityResponseMapper.toUpsertResponse(result.parsed, request.index))
@@ -64,6 +64,6 @@ class LegalEntityCreateApplicationV7Service(
             }
         }
 
-        return LegalEntityPartnerCreateResponseWrapper(responses, errors)
+        return LegalEntityPartnerCreateV7ResponseWrapper(responses, errors)
     }
 }

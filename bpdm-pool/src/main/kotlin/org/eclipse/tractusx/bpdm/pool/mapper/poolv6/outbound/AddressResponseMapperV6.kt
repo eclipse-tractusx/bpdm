@@ -23,8 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AlternativePostalAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.RegionV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.stereotype.Component
 
@@ -39,8 +45,8 @@ class AddressResponseMapperV6(
     /**
      * Returns the given address as the v6 API reports it.
      */
-    fun toAddress(address: LogisticAddressDb): LogisticAddressVerboseDtoV6 =
-        LogisticAddressVerboseDtoV6(
+    fun toAddress(address: LogisticAddressDb): LogisticAddressVerboseV6Dto =
+        LogisticAddressVerboseV6Dto(
             bpna = address.bpn,
             bpnLegalEntity = address.legalEntity?.bpn,
             bpnSite = address.mainSite?.bpn,
@@ -60,25 +66,25 @@ class AddressResponseMapperV6(
      * Returns the given newly created address as the v6 API reports it, tagged with the index of the request that
      * created it.
      */
-    fun toCreateResponse(address: LogisticAddressDb, index: String?): AddressPartnerCreateVerboseDtoV6 =
-        AddressPartnerCreateVerboseDtoV6(
+    fun toCreateResponse(address: LogisticAddressDb, index: String?): AddressPartnerCreateVerboseV6Dto =
+        AddressPartnerCreateVerboseV6Dto(
             address = toAddress(address),
             index = index
         )
 
-    private fun toState(state: AddressStateDb): AddressStateVerboseDtoV6 =
-        AddressStateVerboseDtoV6(
+    private fun toState(state: AddressStateDb): AddressStateVerboseV6Dto =
+        AddressStateVerboseV6Dto(
             BusinessStateDates.reportValidFrom(state.validFrom),
             BusinessStateDates.reportValidTo(state.validTo),
             state.type.toDto()
         )
 
-    private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseDtoV6 =
-        AddressIdentifierVerboseDtoV6(identifier.value, TypeKeyNameVerboseDto(identifier.type.technicalKey, identifier.type.name))
+    private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseV6Dto =
+        AddressIdentifierVerboseV6Dto(identifier.value, TypeKeyNameVerboseDto(identifier.type.technicalKey, identifier.type.name))
 
-    private fun toPhysicalPostalAddress(address: PhysicalPostalAddressDb): PhysicalPostalAddressVerboseDtoV6 =
+    private fun toPhysicalPostalAddress(address: PhysicalPostalAddressDb): PhysicalPostalAddressVerboseV6Dto =
         with(address) {
-            PhysicalPostalAddressVerboseDtoV6(
+            PhysicalPostalAddressVerboseV6Dto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
                 countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { toRegion(it) },
@@ -97,9 +103,9 @@ class AddressResponseMapperV6(
             )
         }
 
-    private fun toAlternativePostalAddress(address: AlternativePostalAddressDb): AlternativePostalAddressVerboseDtoV6 =
+    private fun toAlternativePostalAddress(address: AlternativePostalAddressDb): AlternativePostalAddressVerboseV6Dto =
         with(address) {
-            AlternativePostalAddressVerboseDtoV6(
+            AlternativePostalAddressVerboseV6Dto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
                 countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { toRegion(it) },
@@ -111,15 +117,15 @@ class AddressResponseMapperV6(
             )
         }
 
-    private fun toRegion(region: RegionDb): RegionDtoV6 =
-        RegionDtoV6(region.country.countryCode, region.regionCode, region.regionName)
+    private fun toRegion(region: RegionDb): RegionV6Dto =
+        RegionV6Dto(region.country.countryCode, region.regionCode, region.regionName)
 
     private fun toGeoCoordinate(coordinate: GeographicCoordinateDb): GeoCoordinateDto =
         GeoCoordinateDto(coordinate.longitude, coordinate.latitude, coordinate.altitude)
 
-    private fun toStreet(street: StreetDb): StreetDtoV6 =
+    private fun toStreet(street: StreetDb): StreetV6Dto =
         with(street) {
-            StreetDtoV6(
+            StreetV6Dto(
                 name = name,
                 houseNumber = houseNumber,
                 houseNumberSupplement = houseNumberSupplement,

@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
@@ -63,7 +63,7 @@ class SiteCreateService(
         sites.zip(stagedAddresses).forEach { (site, stagedAddress) -> site.mainAddress = stagedAddress.address }
 
         siteRepository.saveAll(sites)
-        changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
+        changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.SITE) })
 
         if (sites.isNotEmpty())
             logger.info { "Created ${countForLog(sites.size, "site", "sites")}: ${sites.map { it.bpn }.joinIdentifiersForLog()}" }

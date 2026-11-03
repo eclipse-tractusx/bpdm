@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteSearchRequest
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest as SiteSearchRequestDto
 
 /**
  * Maps Pool API site search criteria into the loose search request the parser takes.
@@ -33,7 +33,7 @@ class SiteSearchRequestMapper {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: SiteSearchRequestDto, isDataSpaceParticipant: Boolean?): SiteSearchRequest =
+    fun toSearchRequest(searchRequest: SiteSearchV7Request, isDataSpaceParticipant: Boolean?): SiteSearchRequest =
         SiteSearchRequest(
             siteBpns = searchRequest.siteBpns,
             legalEntityBpns = searchRequest.legalEntityBpns,

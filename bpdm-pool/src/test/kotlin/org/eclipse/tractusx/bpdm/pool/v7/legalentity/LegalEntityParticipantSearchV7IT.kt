@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ class LegalEntityParticipantSearchV7IT: UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName Non-Participant").withParticipantData(false))
 
         //WHEN
-        val searchResponse = poolClient.members.searchLegalEntities(LegalEntitySearchRequest(), PaginationRequest())
+        val searchResponse = poolClient.members.searchLegalEntities(LegalEntitySearchV7Request(), PaginationRequest())
 
         //THEN
         val expectedResponse = resultFactory.buildSinglePageResponse(listOf(participant1, participant2))
@@ -63,7 +63,7 @@ class LegalEntityParticipantSearchV7IT: UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName Non-Participant").withParticipantData(false))
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(bpnLs = listOf(participant1.header.bpnl))
+        val searchRequest = LegalEntitySearchV7Request(bpnLs = listOf(participant1.header.bpnl))
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
@@ -85,7 +85,7 @@ class LegalEntityParticipantSearchV7IT: UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName Non-Participant").withParticipantData(false))
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(legalName = participant1.header.legalName)
+        val searchRequest = LegalEntitySearchV7Request(legalName = participant1.header.legalName)
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
@@ -107,11 +107,11 @@ class LegalEntityParticipantSearchV7IT: UnscheduledPoolTestBaseV7() {
         val nonParticipant = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName Non-Participant").withParticipantData(false))
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(bpnLs = listOf(nonParticipant.header.bpnl))
+        val searchRequest = LegalEntitySearchV7Request(bpnLs = listOf(nonParticipant.header.bpnl))
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertLegalEntitySearchResponse(searchResponse, expectedResponse)
     }
@@ -129,11 +129,11 @@ class LegalEntityParticipantSearchV7IT: UnscheduledPoolTestBaseV7() {
         val nonParticipant = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName Non-Participant").withParticipantData(false))
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(legalName = nonParticipant.header.legalName)
+        val searchRequest = LegalEntitySearchV7Request(legalName = nonParticipant.header.legalName)
         val searchResponse = poolClient.members.searchLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LegalEntityWithLegalAddressVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertLegalEntitySearchResponse(searchResponse, expectedResponse)
     }

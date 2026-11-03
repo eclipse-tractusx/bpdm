@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.v6.bpn
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnIdentifierMappingV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -46,10 +46,10 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         val identifierX = legalEntityResponseA.legalEntity.identifiers.first()
 
         //WHEN
-        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))).body
+        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchV6Request(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDtoV6(identifierX.value, legalEntityResponseA.legalEntity.bpnl))
+        val expectedBpns = setOf(BpnIdentifierMappingV6Dto(identifierX.value, legalEntityResponseA.legalEntity.bpnl))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -68,10 +68,10 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         val identifierX = legalEntityResponseA.legalAddress.identifiers.first()
 
         //WHEN
-        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.ADDRESS, identifierX.type, listOf(identifierX.value))).body
+        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchV6Request(IdentifierBusinessPartnerTypeV6.ADDRESS, identifierX.type, listOf(identifierX.value))).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDtoV6(identifierX.value, legalEntityResponseA.legalAddress.bpna))
+        val expectedBpns = setOf(BpnIdentifierMappingV6Dto(identifierX.value, legalEntityResponseA.legalAddress.bpna))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -90,7 +90,7 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         //WHEN / THEN
         Assertions.assertThatThrownBy {
             poolClient.bpns.findBpnsByIdentifiers(
-                IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, tooManyIdentifierValues)
+                IdentifiersSearchV6Request(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, tooManyIdentifierValues)
             )
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }

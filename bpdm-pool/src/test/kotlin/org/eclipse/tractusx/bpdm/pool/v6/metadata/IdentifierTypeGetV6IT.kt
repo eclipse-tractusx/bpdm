@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDetailDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeDetailV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -66,9 +66,9 @@ class IdentifierTypeGetV6IT: UnscheduledPoolTestBaseV6() {
     fun `find mandatory identifier types for country`(){
         //GIVEN
         val countryX = "DE"
-        val identifierType = IdentifierTypeDtoV6(
+        val identifierType = IdentifierTypeV6Dto(
             testName, IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, testName, testName, testName, testName,
-            listOf(IdentifierTypeDetailDtoV6(countryX, true))
+            listOf(IdentifierTypeDetailV6Dto(countryX, true))
         )
         poolClient.metadata.createIdentifierType(identifierType)
 
@@ -88,9 +88,9 @@ class IdentifierTypeGetV6IT: UnscheduledPoolTestBaseV6() {
     fun `find optional identifier types for country`(){
         //GIVEN
         val countryX = "US"
-        val identifierType = IdentifierTypeDtoV6(
+        val identifierType = IdentifierTypeV6Dto(
             testName, IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, testName, testName, testName, testName,
-            listOf(IdentifierTypeDetailDtoV6(countryX, false))
+            listOf(IdentifierTypeDetailV6Dto(countryX, false))
         )
         poolClient.metadata.createIdentifierType(identifierType)
 

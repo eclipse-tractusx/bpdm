@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSearchRequest
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest as AddressSearchRequestDto
 
 /**
  * Maps Pool API address search criteria into the loose search request the parser takes.
@@ -33,7 +33,7 @@ class AddressSearchRequestMapper {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: AddressSearchRequestDto, isDataSpaceParticipant: Boolean?): AddressSearchRequest =
+    fun toSearchRequest(searchRequest: AddressSearchV7Request, isDataSpaceParticipant: Boolean?): AddressSearchRequest =
         AddressSearchRequest(
             addressBpns = searchRequest.addressBpns,
             siteBpns = searchRequest.siteBpns,

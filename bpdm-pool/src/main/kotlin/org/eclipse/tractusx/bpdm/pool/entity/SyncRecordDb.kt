@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
 import org.eclipse.tractusx.bpdm.common.model.BaseSyncRecord
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import java.time.Instant
 
 @Entity
@@ -30,9 +29,9 @@ import java.time.Instant
 class SyncRecordDb(
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, unique = true)
-    override var type: SyncType,
+    override var type: SyncTypeDb,
 
     @Column(name = "from_time", nullable = false)
     override var fromTime: Instant
 
-) : BaseEntityWithExplicitTimestamps(), BaseSyncRecord<SyncType>
+) : BaseEntityWithExplicitTimestamps(), BaseSyncRecord<SyncTypeDb>

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.v6
 
 import org.eclipse.tractusx.bpdm.pool.UnscheduledTestEnvironment
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.v7.util.AssertRepositoryV7
 import org.eclipse.tractusx.bpdm.pool.v7.util.TestDataClientV7
 import org.junit.jupiter.api.BeforeEach
@@ -38,7 +38,7 @@ abstract class UnscheduledPoolTestBaseV6AndV7: PoolTestBaseV6() {
     @Autowired
     lateinit var assertRepositoryV7: AssertRepositoryV7
     @Autowired
-    lateinit var poolClientV7: PoolApiClient
+    lateinit var poolClientV7: PoolV7Client
 
     @BeforeEach
     override fun beforeEach(testInfo: TestInfo) {

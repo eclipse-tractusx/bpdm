@@ -25,12 +25,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolAddressV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -44,28 +44,28 @@ interface AddressV6ApiClient: PoolAddressV6Api {
 
     @PostExchange(value = ApiCommons.ADDRESS_BASE_PATH_V6)
     override fun createAddresses(
-        @RequestBody requests: Collection<AddressPartnerCreateRequestV6>
-    ): AddressPartnerCreateResponseWrapperV6
+        @RequestBody requests: Collection<AddressPartnerCreateV6Request>
+    ): AddressPartnerCreateV6ResponseWrapper
 
     @PutExchange(value = ApiCommons.ADDRESS_BASE_PATH_V6)
     override fun updateAddresses(
-        @RequestBody requests: Collection<AddressPartnerUpdateRequestV6>
-    ): AddressPartnerUpdateResponseWrapperV6
+        @RequestBody requests: Collection<AddressPartnerUpdateV6Request>
+    ): AddressPartnerUpdateV6ResponseWrapper
 
     @GetExchange(value = ApiCommons.ADDRESS_BASE_PATH_V6)
     override fun getAddresses(
-        @ParameterObject addressSearchRequest: AddressSearchRequestV6,
+        @ParameterObject addressSearchRequest: AddressSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDtoV6>
+    ): PageDto<LogisticAddressVerboseV6Dto>
 
     @PostExchange(value = "${ApiCommons.ADDRESS_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}")
     override fun searchAddresses(
-        @RequestBody searchRequest: AddressSearchRequestV6,
+        @RequestBody searchRequest: AddressSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDtoV6>
+    ): PageDto<LogisticAddressVerboseV6Dto>
 
     @GetExchange(value = "${ApiCommons.ADDRESS_BASE_PATH_V6}/{bpna}")
     override fun getAddress(
         @Parameter(description = "BPNA value") @PathVariable bpna: String
-    ): LogisticAddressVerboseDtoV6
+    ): LogisticAddressVerboseV6Dto
 }

@@ -19,17 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.util
 
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 
 class AdminAreaLevel1V7Importer(
     private val adminAreaLevel1EntryImporter: AdminAreaLevel1EntryImporter
 ) {
 
-    fun importFromResource(): List<CountrySubdivisionDto> {
+    fun importFromResource(): List<CountrySubdivisionV7Dto> {
         val entries = adminAreaLevel1EntryImporter.importFromResource()
         return entries.map { entry ->
-            CountrySubdivisionDto(
+            CountrySubdivisionV7Dto(
                 countryCode = entry.countryCode!!,
                 code = entry.code?.takeIf { it.isNotBlank() }!!,
                 name = entry.subdivisionName?.takeIf { it.isNotBlank() }!!

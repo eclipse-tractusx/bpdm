@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.v7.participation
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -46,11 +46,11 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnL = testDataClient.createLegalEntity(testName).header.bpnl
 
         //WHEN
-        val updatedParticipation = DataSpaceParticipantDto(bpnL, true)
-        poolClient.participants.put(DataSpaceParticipantUpdateRequest(listOf(updatedParticipation)))
+        val updatedParticipation = DataSpaceParticipantV7Dto(bpnL, true)
+        poolClient.participants.put(DataSpaceParticipantUpdateV7Request(listOf(updatedParticipation)))
 
         //THEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL), true), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnL), true), PaginationRequest())
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(updatedParticipation))
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
@@ -66,11 +66,11 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnL = testDataClient.createParticipantLegalEntity(testName).header.bpnl
 
         //WHEN
-        val updatedParticipation = DataSpaceParticipantDto(bpnL, false)
-        poolClient.participants.put(DataSpaceParticipantUpdateRequest(listOf(updatedParticipation)))
+        val updatedParticipation = DataSpaceParticipantV7Dto(bpnL, false)
+        poolClient.participants.put(DataSpaceParticipantUpdateV7Request(listOf(updatedParticipation)))
 
         //THEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL), false), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnL), false), PaginationRequest())
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(updatedParticipation))
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
@@ -87,12 +87,12 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnLB = testDataClient.createParticipantLegalEntity("$testName B").header.bpnl
 
         //WHEN
-        val updatedParticipationA = DataSpaceParticipantDto(bpnLA, true)
-        val updatedParticipationB = DataSpaceParticipantDto(bpnLB, false)
-        poolClient.participants.put(DataSpaceParticipantUpdateRequest(listOf(updatedParticipationA, updatedParticipationB)))
+        val updatedParticipationA = DataSpaceParticipantV7Dto(bpnLA, true)
+        val updatedParticipationB = DataSpaceParticipantV7Dto(bpnLB, false)
+        poolClient.participants.put(DataSpaceParticipantUpdateV7Request(listOf(updatedParticipationA, updatedParticipationB)))
 
         //THEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnLA, bpnLB), null), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnLA, bpnLB), null), PaginationRequest())
         val expectedParticipations = listOf(updatedParticipationA, updatedParticipationB)
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -112,14 +112,14 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnLD = testDataClient.createLegalEntity("$testName D").header.bpnl
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(null, null), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(null, null), PaginationRequest())
 
         //THEN
         val expectedParticipations = listOf(
-            DataSpaceParticipantDto(bpnLA, true),
-            DataSpaceParticipantDto(bpnLB, true),
-            DataSpaceParticipantDto(bpnLC, false),
-            DataSpaceParticipantDto(bpnLD, false),
+            DataSpaceParticipantV7Dto(bpnLA, true),
+            DataSpaceParticipantV7Dto(bpnLB, true),
+            DataSpaceParticipantV7Dto(bpnLC, false),
+            DataSpaceParticipantV7Dto(bpnLD, false),
         )
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -139,12 +139,12 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity("$testName D")
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(null, true), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(null, true), PaginationRequest())
 
         //THEN
         val expectedParticipations = listOf(
-            DataSpaceParticipantDto(bpnLA, true),
-            DataSpaceParticipantDto(bpnLB, true),
+            DataSpaceParticipantV7Dto(bpnLA, true),
+            DataSpaceParticipantV7Dto(bpnLB, true),
         )
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -164,12 +164,12 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnLD = testDataClient.createLegalEntity("$testName D").header.bpnl
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(null, false), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(null, false), PaginationRequest())
 
         //THEN
         val expectedParticipations = listOf(
-            DataSpaceParticipantDto(bpnLC, false),
-            DataSpaceParticipantDto(bpnLD, false),
+            DataSpaceParticipantV7Dto(bpnLC, false),
+            DataSpaceParticipantV7Dto(bpnLD, false),
         )
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -189,12 +189,12 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity("$testName D")
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnLA, bpnLC), null), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnLA, bpnLC), null), PaginationRequest())
 
         //THEN
         val expectedParticipations = listOf(
-            DataSpaceParticipantDto(bpnLA, true),
-            DataSpaceParticipantDto(bpnLC, false),
+            DataSpaceParticipantV7Dto(bpnLA, true),
+            DataSpaceParticipantV7Dto(bpnLC, false),
         )
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
@@ -214,10 +214,10 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createLegalEntity("$testName D")
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnLA, bpnLC), true), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnLA, bpnLC), true), PaginationRequest())
 
         //THEN
-        val expectedParticipations = listOf(DataSpaceParticipantDto(bpnLA, true))
+        val expectedParticipations = listOf(DataSpaceParticipantV7Dto(bpnLA, true))
         val expectedResponse = PageDto(expectedParticipations.size.toLong(), 1, 0, expectedParticipations.size, expectedParticipations)
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
@@ -233,10 +233,10 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnL = testDataClient.createParticipantLegalEntity(testName).header.bpnl
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL.lowercase()), null), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnL.lowercase()), null), PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, true)))
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantV7Dto(bpnL, true)))
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
 
@@ -251,10 +251,10 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf("NO BPNL"), null), PaginationRequest())
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf("NO BPNL"), null), PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<DataSpaceParticipantDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<DataSpaceParticipantV7Dto>(0, 0, 0, 0, emptyList())
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
 
@@ -269,15 +269,15 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnL = testDataClient.createLegalEntity(testName).header.bpnl
 
         //WHEN
-        val updateRequest = DataSpaceParticipantUpdateRequest(
-            listOf(DataSpaceParticipantDto(bpnL, true), DataSpaceParticipantDto(unknownBpnL, true))
+        val updateRequest = DataSpaceParticipantUpdateV7Request(
+            listOf(DataSpaceParticipantV7Dto(bpnL, true), DataSpaceParticipantV7Dto(unknownBpnL, true))
         )
         Assertions.assertThatThrownBy { poolClient.participants.put(updateRequest) }
             .isInstanceOf(WebClientResponseException.NotFound::class.java)
 
         //THEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL), null), PaginationRequest())
-        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, false)))
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnL), null), PaginationRequest())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantV7Dto(bpnL, false)))
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
 
@@ -292,15 +292,15 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnL = testDataClient.createLegalEntity(testName).header.bpnl
 
         //WHEN
-        val updateRequest = DataSpaceParticipantUpdateRequest(
-            listOf(DataSpaceParticipantDto(bpnL, true), DataSpaceParticipantDto(bpnL, false))
+        val updateRequest = DataSpaceParticipantUpdateV7Request(
+            listOf(DataSpaceParticipantV7Dto(bpnL, true), DataSpaceParticipantV7Dto(bpnL, false))
         )
         Assertions.assertThatThrownBy { poolClient.participants.put(updateRequest) }
             .isInstanceOf(WebClientResponseException.BadRequest::class.java)
 
         //THEN
-        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchRequest(listOf(bpnL), null), PaginationRequest())
-        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantDto(bpnL, false)))
+        val searchResponse = poolClient.participants.get(DataSpaceParticipantSearchV7Request(listOf(bpnL), null), PaginationRequest())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(DataSpaceParticipantV7Dto(bpnL, false)))
         Assertions.assertThat(searchResponse).isEqualTo(expectedResponse)
     }
 
@@ -313,15 +313,15 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
     fun `update participation to the value already held`() {
         //GIVEN
         val bpnL = testDataClient.createParticipantLegalEntity(testName).header.bpnl
-        val changelogBefore = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(bpns = setOf(bpnL)), PaginationRequest())
+        val changelogBefore = poolClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(bpns = setOf(bpnL)), PaginationRequest())
 
         //WHEN
-        poolClient.participants.put(DataSpaceParticipantUpdateRequest(listOf(DataSpaceParticipantDto(bpnL, true))))
+        poolClient.participants.put(DataSpaceParticipantUpdateV7Request(listOf(DataSpaceParticipantV7Dto(bpnL, true))))
 
         //THEN
-        val changelogAfter = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(bpns = setOf(bpnL)), PaginationRequest())
+        val changelogAfter = poolClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(bpns = setOf(bpnL)), PaginationRequest())
         Assertions.assertThat(changelogAfter.content).isEqualTo(changelogBefore.content)
-        Assertions.assertThat(changelogAfter.content.map { it.changelogType }).containsExactly(ChangelogType.CREATE)
+        Assertions.assertThat(changelogAfter.content.map { it.changelogType }).containsExactly(ChangelogTypeV7.CREATE)
     }
 
     /**
@@ -336,7 +336,7 @@ class DataSpaceParticipationV7IT : UnscheduledPoolTestBaseV7() {
         val bpnL = legalEntityResponse.header.bpnl
 
         //WHEN
-        poolClient.participants.put(DataSpaceParticipantUpdateRequest(listOf(DataSpaceParticipantDto(bpnL, true))))
+        poolClient.participants.put(DataSpaceParticipantUpdateV7Request(listOf(DataSpaceParticipantV7Dto(bpnL, true))))
 
         //THEN
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)

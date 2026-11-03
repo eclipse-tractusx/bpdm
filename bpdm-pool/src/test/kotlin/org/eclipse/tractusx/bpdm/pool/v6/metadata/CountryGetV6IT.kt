@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -35,7 +35,7 @@ class CountryGetV6IT : UnscheduledPoolTestBaseV6() {
 
         //THEN
         assertRepository.assertCountryPage(response, 0, pageSize)
-        assertRepository.assertCountryCatalog(response.content, CountryDto("DE", "Germany", null))
+        assertRepository.assertCountryCatalog(response.content, CountryV6Dto("DE", "Germany", null))
     }
 
     /**

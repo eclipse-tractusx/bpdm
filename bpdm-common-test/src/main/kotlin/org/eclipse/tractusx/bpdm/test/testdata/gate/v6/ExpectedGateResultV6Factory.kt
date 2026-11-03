@@ -31,9 +31,13 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.output.SiteRe
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6Request
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPutV6Entry
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import java.time.Instant
 
 class ExpectedGateResultV6Factory {
@@ -59,7 +63,7 @@ class ExpectedGateResultV6Factory {
         }
     }
 
-    fun buildBusinessPartnerOutput(input: BusinessPartnerInputV6Dto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressInvariantVerboseDto): BusinessPartnerOutputV6Dto{
+    fun buildBusinessPartnerOutput(input: BusinessPartnerInputV6Dto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseV7Dto, siteGoldenRecord: SiteWithMainAddressVerboseV7Dto, addressGoldenRecord: LogisticAddressInvariantVerboseV7Dto): BusinessPartnerOutputV6Dto{
         return BusinessPartnerOutputV6Dto(
             externalId = input.externalId,
             nameParts = input.nameParts,
@@ -98,7 +102,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputV6Dto{
+    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseV7Dto): LegalEntityRepresentationOutputV6Dto{
         return LegalEntityRepresentationOutputV6Dto(
             legalEntityBpn = legalEntity.bpnl,
             legalName = legalEntity.legalName,
@@ -109,7 +113,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildAddressComponent(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputV6Dto{
+    private fun buildAddressComponent(logisticAddress: LogisticAddressInvariantVerboseV7Dto, addressType: AddressType): AddressComponentOutputV6Dto{
         return AddressComponentOutputV6Dto(
             addressBpn = logisticAddress.bpna,
             name = logisticAddress.name,
@@ -121,7 +125,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildPhysicalAddress(physicalAddress: PhysicalPostalAddressVerboseDto): PhysicalPostalAddressV6Dto{
+    private fun buildPhysicalAddress(physicalAddress: PhysicalPostalAddressVerboseV7Dto): PhysicalPostalAddressV6Dto{
         return PhysicalPostalAddressV6Dto(
             geographicCoordinates = physicalAddress.geographicCoordinates,
             country = physicalAddress.country,
@@ -141,7 +145,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativePostalAddressV6Dto{
+    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseV7Dto): AlternativePostalAddressV6Dto{
         return AlternativePostalAddressV6Dto(
             geographicCoordinates = alternativeAddress.geographicCoordinates,
             country = alternativeAddress.country,
@@ -154,7 +158,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildStreet(street: org.eclipse.tractusx.bpdm.pool.api.model.StreetDto): StreetV6Dto{
+    private fun buildStreet(street: org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto): StreetV6Dto{
         return StreetV6Dto(
             name = street.name,
             houseNumber = street.houseNumber,
@@ -168,7 +172,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildSiteRepresentation(site: SiteVerboseDto): SiteRepresentationOutputV6Dto {
+    private fun buildSiteRepresentation(site: SiteVerboseV7Dto): SiteRepresentationOutputV6Dto {
         return SiteRepresentationOutputV6Dto(
             siteBpn = site.bpns,
             name = site.name,
@@ -177,7 +181,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildConfidence(confidence: org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto): ConfidenceCriteriaV6Dto{
+    private fun buildConfidence(confidence: org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto): ConfidenceCriteriaV6Dto{
         return with(confidence){
             ConfidenceCriteriaV6Dto(
                 sharedByOwner = sharedByOwner,

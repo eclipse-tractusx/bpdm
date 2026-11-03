@@ -21,10 +21,19 @@ package org.eclipse.tractusx.bpdm.pool.v7
 
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.util.PoolTestClientProviderV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
@@ -40,11 +49,11 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
     @Autowired
     lateinit var testClientProvider: PoolTestClientProviderV7
 
-    lateinit var operatorClient: PoolApiClient
-    lateinit var sharingMemberClient: PoolApiClient
-    lateinit var participantClient: PoolApiClient
-    lateinit var unauthorizedClient: PoolApiClient
-    lateinit var anonymousClient: PoolApiClient
+    lateinit var operatorClient: PoolV7Client
+    lateinit var sharingMemberClient: PoolV7Client
+    lateinit var participantClient: PoolV7Client
+    lateinit var unauthorizedClient: PoolV7Client
+    lateinit var anonymousClient: PoolV7Client
 
     @PostConstruct
     fun init(){
@@ -61,7 +70,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.addresses.getAddresses(AddressSearchRequest(), PaginationRequest())
+            poolClient.addresses.getAddresses(AddressSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -81,7 +90,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.addresses.searchAddresses(AddressSearchRequest(), PaginationRequest())
+            poolClient.addresses.searchAddresses(AddressSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -113,7 +122,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            val searchRequest = IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, "any", emptyList())
+            val searchRequest = IdentifiersSearchV7Request(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, "any", emptyList())
             poolClient.bpns.findBpnsByIdentifiers(searchRequest)
         }
     }
@@ -124,7 +133,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            val searchRequest = BpnRequestIdentifierSearchRequest(emptySet())
+            val searchRequest = BpnRequestIdentifierSearchV7Request(emptySet())
             poolClient.bpns.findBpnByRequestedIdentifiers(searchRequest)
         }
     }
@@ -135,7 +144,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(), PaginationRequest())
+            poolClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -145,7 +154,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest())
+            poolClient.participants.get(DataSpaceParticipantSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -155,7 +164,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            poolClient.participants.put(DataSpaceParticipantUpdateRequest(emptyList()))
+            poolClient.participants.put(DataSpaceParticipantUpdateV7Request(emptyList()))
         }
     }
 
@@ -165,7 +174,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(), PaginationRequest())
+            poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(), PaginationRequest())
         }
     }
 
@@ -185,7 +194,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequest(), PaginationRequest())
+            poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchV7Request(), PaginationRequest())
         }
     }
 
@@ -238,7 +247,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.searchLegalEntities(LegalEntitySearchRequest(), PaginationRequest())
+            poolClient.members.searchLegalEntities(LegalEntitySearchV7Request(), PaginationRequest())
         }
     }
 
@@ -248,7 +257,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.postSiteSearch(SiteSearchRequest(), PaginationRequest())
+            poolClient.members.postSiteSearch(SiteSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -258,7 +267,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.searchAddresses(AddressSearchRequest(), PaginationRequest())
+            poolClient.members.searchAddresses(AddressSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -268,7 +277,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.searchChangelogEntries(ChangelogSearchRequest(), PaginationRequest())
+            poolClient.members.searchChangelogEntries(ChangelogSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -278,7 +287,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            val identifierType = IdentifierTypeDto("any", IdentifierBusinessPartnerType.LEGAL_ENTITY, "any", null, null, null, null, sortedSetOf())
+            val identifierType = IdentifierTypeV7Dto("any", IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, "any", null, null, null, null, sortedSetOf())
             poolClient.metadata.createIdentifierType(identifierType)
         }
     }
@@ -289,7 +298,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Authorized
         ){
-            poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.LEGAL_ENTITY, null)
+            poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, null)
         }
     }
 
@@ -319,7 +328,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            val legalForm = LegalFormRequest("any", "any", null, null, null, null, null, null, true)
+            val legalForm = LegalFormV7Request("any", "any", null, null, null, null, null, null, true)
             poolClient.metadata.createLegalForm(legalForm)
         }
     }
@@ -350,7 +359,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.sites.postSiteSearch(SiteSearchRequest(), PaginationRequest())
+            poolClient.sites.postSiteSearch(SiteSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -382,7 +391,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.sites.getSites(SiteSearchRequest(), PaginationRequest())
+            poolClient.sites.getSites(SiteSearchV7Request(), PaginationRequest())
         }
     }
 
@@ -403,7 +412,7 @@ class PoolAuthV7IT: UnscheduledPoolTestBaseV7() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.businessPartners.searchBusinessPartners(LegalEntityPropertiesSearchRequest(
+            poolClient.businessPartners.searchBusinessPartners(LegalEntityPropertiesSearchV7Request(
                 legalName = null,
                 bpn = null,
                 streetName = null,

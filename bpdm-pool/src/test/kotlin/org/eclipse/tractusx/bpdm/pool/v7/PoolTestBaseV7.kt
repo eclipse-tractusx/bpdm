@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.PoolTestBase
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.v7.util.AssertRepositoryV7
 import org.eclipse.tractusx.bpdm.pool.v7.util.TestDataClientV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
@@ -39,7 +39,7 @@ abstract class PoolTestBaseV7: PoolTestBase() {
     @Autowired
     lateinit var assertRepository: AssertRepositoryV7
     @Autowired
-    lateinit var poolClient: PoolApiClient
+    lateinit var poolClient: PoolV7Client
     @Autowired
     lateinit var orchestratorRequestFactory: OrchestratorRequestFactoryV7
 

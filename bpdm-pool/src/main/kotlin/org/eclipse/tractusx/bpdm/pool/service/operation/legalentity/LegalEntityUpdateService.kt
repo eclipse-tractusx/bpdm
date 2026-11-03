@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -73,7 +73,7 @@ class LegalEntityUpdateService(
 
         updatedLegalEntities.forEach { it.value.updatedAt = DbTimestamp.now() }
         repository.saveAll(updatedLegalEntities.map { it.value })
-        changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+        changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
 
         if (updatedLegalEntities.isNotEmpty())
             logger.info {

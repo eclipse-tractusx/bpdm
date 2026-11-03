@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError
@@ -51,11 +51,11 @@ class LegalFormParseErrorMapperV6 {
                 is UnresolvableAdministrativeArea -> toValidationError(error)
                 is LegalFormCreateParseError.CountryNotFound -> ValidationError(
                     "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
-                    ValidationContext.fromRoot(LegalFormRequestV6::class, "request", LegalFormRequestV6::country)
+                    ValidationContext.fromRoot(LegalFormV6Request::class, "request", LegalFormV6Request::country)
                 )
                 is LegalFormCreateParseError.InvalidLanguage -> ValidationError(
                     "InvalidLanguage", "Language '${error.language}' is not an accepted ISO 639-1 code.", error.language,
-                    ValidationContext.fromRoot(LegalFormRequestV6::class, "request", LegalFormRequestV6::language)
+                    ValidationContext.fromRoot(LegalFormV6Request::class, "request", LegalFormV6Request::language)
                 )
                 is TechnicalKeyAlreadyTaken -> error("Technical key conflict must be handled first")
             }
@@ -67,6 +67,6 @@ class LegalFormParseErrorMapperV6 {
             validationErrorCode = ADMINISTRATIVE_AREA_NOT_FOUND,
             errorDetails = "Administrative area '${error.regionCode}' not found in system.",
             erroneousValue = error.regionCode,
-            context = ValidationContext.fromRoot(LegalFormRequestV6::class, "request", LegalFormRequestV6::administrativeAreaLevel1)
+            context = ValidationContext.fromRoot(LegalFormV6Request::class, "request", LegalFormV6Request::administrativeAreaLevel1)
         )
 }

@@ -23,13 +23,13 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
@@ -48,7 +48,7 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence))
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -65,7 +65,7 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.SharedByOwnerConfidence))
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -78,13 +78,13 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
     fun `create legal entity with state without start and end date`(){
         //WHEN
         val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
-            .withStates(LegalEntityStateDto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
+            .withStates(LegalEntityStateV7Dto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val openState = LegalEntityStateVerboseDto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
+        val openState = LegalEntityStateVerboseV7Dto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence).withStates(openState))
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -99,13 +99,13 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val beforeEarliest = BusinessStateDates.EARLIEST.minusYears(100)
         val afterLatest = BusinessStateDates.LATEST.plusNanos(500_000_000)
         val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
-            .withStates(LegalEntityStateDto(validFrom = beforeEarliest, validTo = afterLatest, type = BusinessStateType.ACTIVE))
+            .withStates(LegalEntityStateV7Dto(validFrom = beforeEarliest, validTo = afterLatest, type = BusinessStateType.ACTIVE))
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val openState = LegalEntityStateVerboseDto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
+        val openState = LegalEntityStateVerboseV7Dto(BusinessStateDates.EARLIEST, BusinessStateDates.LATEST, BusinessStateType.ACTIVE.toDto())
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence).withStates(openState))
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -118,13 +118,13 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
     fun `create legal entity with state starting on the latest and ending on the earliest date`(){
         //WHEN
         val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
-            .withStates(LegalEntityStateDto(validFrom = BusinessStateDates.LATEST, validTo = BusinessStateDates.EARLIEST, type = BusinessStateType.ACTIVE))
+            .withStates(LegalEntityStateV7Dto(validFrom = BusinessStateDates.LATEST, validTo = BusinessStateDates.EARLIEST, type = BusinessStateType.ACTIVE))
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val reversedState = LegalEntityStateVerboseDto(BusinessStateDates.LATEST, BusinessStateDates.EARLIEST, BusinessStateType.ACTIVE.toDto())
+        val reversedState = LegalEntityStateVerboseV7Dto(BusinessStateDates.LATEST, BusinessStateDates.EARLIEST, BusinessStateType.ACTIVE.toDto())
         val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence).withStates(reversedState))
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(expectedLegalEntities, emptyList())
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -145,8 +145,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(newLegalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalEntityDuplicateIdentifier, "IGNORED", newLegalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalEntityDuplicateIdentifier, "IGNORED", newLegalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -167,8 +167,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(newLegalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressDuplicateIdentifier, "IGNORED", newLegalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressDuplicateIdentifier, "IGNORED", newLegalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -186,8 +186,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(request1, request2))
 
         //THEN
-        val expectedErrors = listOf(request1, request2).map { ErrorInfo(LegalEntityCreateError.LegalEntityDuplicateIdentifier, "IGNORED", it.index) }
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(request1, request2).map { ErrorInfoV7(LegalEntityCreateErrorV7.LegalEntityDuplicateIdentifier, "IGNORED", it.index) }
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -205,8 +205,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(request1, request2))
 
         //THEN
-        val expectedErrors = listOf(request1, request2).map { ErrorInfo(LegalEntityCreateError.LegalAddressDuplicateIdentifier, "IGNORED", it.index) }
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(request1, request2).map { ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressDuplicateIdentifier, "IGNORED", it.index) }
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -222,8 +222,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalFormNotFound, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalFormNotFound, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -239,8 +239,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressRegionNotFound, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressRegionNotFound, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -256,8 +256,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressRegionNotFound, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressRegionNotFound, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -269,13 +269,13 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
     @Test
     fun `create legal entity with unknown legal identifier type`(){
         //WHEN
-        val unknownIdentifier = LegalEntityIdentifierDto(value = "Any Value", type = "UNKNOWN", issuingBody = null)
+        val unknownIdentifier = LegalEntityIdentifierV7Dto(value = "Any Value", type = "UNKNOWN", issuingBody = null)
         val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withLegalIdentifiers(unknownIdentifier)
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalEntityIdentifierNotFound, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalEntityIdentifierNotFound, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -287,13 +287,13 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
     @Test
     fun `create legal entity with unknown legal address identifier type`(){
         //WHEN
-        val unknownIdentifier = AddressIdentifierDto(value = "Any Value", type = "UNKNOWN")
+        val unknownIdentifier = AddressIdentifierV7Dto(value = "Any Value", type = "UNKNOWN")
         val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withLegalAddressIdentifiers(unknownIdentifier)
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressIdentifierNotFound, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressIdentifierNotFound, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -310,8 +310,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalEntityIdentifiersTooMany, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalEntityIdentifiersTooMany, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -328,8 +328,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressIdentifiersTooMany, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressIdentifiersTooMany, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -345,8 +345,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.ScriptVariantLegalNameMissing, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.ScriptVariantLegalNameMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -362,8 +362,8 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressScriptVariantCityMissing, "IGNORED", legalEntityRequest.index)
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressScriptVariantCityMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -382,10 +382,10 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         // One script variant carries both the legal name and the legal address in that script, so a duplicated script code
         // is reported by the legal entity and by the legal address.
         val expectedErrors = listOf(
-            ErrorInfo(LegalEntityCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index),
-            ErrorInfo(LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index)
+            ErrorInfoV7(LegalEntityCreateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index),
+            ErrorInfoV7(LegalEntityCreateErrorV7.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index)
         )
-        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedResponse = LegalEntityPartnerCreateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }

@@ -19,10 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto
 
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+
 
 data class LogisticAddressWithScriptVariantsDto (
-    val address: LogisticAddressDto,
-    val scriptVariants: List<LogisticAddressScriptVariantDto>
+    val address: LogisticAddressV7Dto,
+    val scriptVariants: List<LogisticAddressScriptVariantV7Dto>
 )

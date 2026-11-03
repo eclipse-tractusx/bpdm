@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.PoolSiteV7Api
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteGetApplicationV7Service
@@ -43,49 +43,49 @@ class SiteController(
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val siteCreateApplicationService: SiteCreateApplicationV7Service,
     private val siteUpdateApplicationService: SiteUpdateApplicationV7Service
-) : PoolSiteApi {
+) : PoolSiteV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
-    ): SiteWithMainAddressVerboseDto {
+    ): SiteWithMainAddressVerboseV7Dto {
         return siteGetApplicationService.getSite(bpns)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postSiteSearch(
-        searchRequest: SiteSearchRequest,
+        searchRequest: SiteSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDto> {
+    ): PageDto<SiteWithMainAddressVerboseV7Dto> {
         return siteSearchApplicationService.searchSites(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSite(
-        requests: Collection<SitePartnerCreateRequest>
-    ): SitePartnerCreateResponseWrapper {
+        requests: Collection<SitePartnerCreateV7Request>
+    ): SitePartnerCreateV7ResponseWrapper {
         return siteCreateApplicationService.createSitesWithMainAddress(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
-        requests: Collection<SitePartnerUpdateRequest>
-    ): SitePartnerUpdateResponseWrapper {
+        requests: Collection<SitePartnerUpdateV7Request>
+    ): SitePartnerUpdateV7ResponseWrapper {
         return siteUpdateApplicationService.updateSites(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSites(
-        searchRequest: SiteSearchRequest,
+        searchRequest: SiteSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDto> {
+    ): PageDto<SiteWithMainAddressVerboseV7Dto> {
         return postSiteSearch(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSiteWithLegalReference(
-        request: Collection<SiteCreateRequestWithLegalAddressAsMain>
-    ): SitePartnerCreateResponseWrapper {
+        request: Collection<SiteCreateWithLegalAddressAsMainV7Request>
+    ): SitePartnerCreateV7ResponseWrapper {
         return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
     }
 }

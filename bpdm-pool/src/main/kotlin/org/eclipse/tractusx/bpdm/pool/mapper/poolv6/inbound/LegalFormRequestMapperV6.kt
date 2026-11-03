@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalFormCreateRequest
 import org.springframework.stereotype.Component
 
@@ -32,7 +32,7 @@ class LegalFormRequestMapperV6 {
     /**
      * Returns the create request holding the legal form a client sent.
      */
-    fun toCreateRequest(legalForm: LegalFormRequestV6): LegalFormCreateRequest =
+    fun toCreateRequest(legalForm: LegalFormV6Request): LegalFormCreateRequest =
         LegalFormCreateRequest(
             technicalKey = legalForm.technicalKey,
             name = legalForm.name,

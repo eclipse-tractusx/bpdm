@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -32,6 +31,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationE
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 
 @Service
 class TaskAddressRelationsStepBuildService(
@@ -105,9 +105,9 @@ class TaskAddressRelationsStepBuildService(
         )
     }
 
-    private fun AddressRelationType.toTaskDto(): OrchestratorRelationType{
+    private fun AddressRelationTypeV7.toTaskDto(): OrchestratorRelationType{
         return when(this){
-            AddressRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
     }
 }

@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyn
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
@@ -142,16 +142,16 @@ class BusinessPartnerTestDataClientV7(
         return createdTasks
     }
 
-    fun setStateToSuccessAfterConsistencyCheck(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseDto {
+    fun setStateToSuccessAfterConsistencyCheck(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseV7Dto {
         val goldenRecord = refineToLegalEntity(input)
         consistencyCheckService.checkSharedBusinessPartners()
         return goldenRecord
     }
 
-    fun setStateToGoldenRecordLost(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseDto =
+    fun setStateToGoldenRecordLost(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseV7Dto =
         setStatesToGoldenRecordLost(listOf(input)).single()
 
-    fun setStatesToGoldenRecordLost(inputs: List<BusinessPartnerInputV7Dto>): List<LegalEntityWithLegalAddressVerboseDto> {
+    fun setStatesToGoldenRecordLost(inputs: List<BusinessPartnerInputV7Dto>): List<LegalEntityWithLegalAddressVerboseV7Dto> {
         val goldenRecords = inputs.map { refineToLegalEntity(it) }
         goldenRecordMockFactory.mockGoldenRecordsDeletedInPool()
         consistencyCheckService.checkSharedBusinessPartners()
@@ -175,13 +175,13 @@ class BusinessPartnerTestDataClientV7(
         return shareBusinessPartnerAndResolve(input.externalId)
     }
 
-    fun refineToLegalEntity(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto {
+    fun refineToLegalEntity(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
         val poolMockResult = prepareLegalEntityRefinement(input)
         shareBusinessPartnerAndResolve(input.externalId)
         return poolMockResult
     }
 
-    fun refineToLegalEntityChangedInPool(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto {
+    fun refineToLegalEntityChangedInPool(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
         val changedGoldenRecord = goldenRecordMockFactory.mockLegalEntityRefinementChangedInPool(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
@@ -216,7 +216,7 @@ class BusinessPartnerTestDataClientV7(
         return refinement.poolResult
     }
 
-    private fun prepareLegalEntityRefinement(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto {
+    private fun prepareLegalEntityRefinement(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
         return goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)
     }

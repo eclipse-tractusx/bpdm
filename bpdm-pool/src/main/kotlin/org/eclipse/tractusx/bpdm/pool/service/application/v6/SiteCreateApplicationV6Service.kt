@@ -19,12 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteCreateErrorV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.SiteDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.SiteResponseMapperV6
@@ -37,6 +31,12 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 
 /**
  * The REST-API boundary for the legacy v6 "create sites" operations, using the v6 request/response shapes.
@@ -58,11 +58,11 @@ class SiteCreateApplicationV6Service(
      * site or the errors that stopped it.
      */
     @Transactional
-    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequestV6>): SitePartnerCreateResponseWrapperV6 {
+    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateV6Request>): SitePartnerCreateV6ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map { siteDtoRequestMapperV6.toCreateRequest(it) }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
+        val responses = mutableListOf<SitePartnerCreateVerboseV6Dto>()
         val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
         requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
@@ -71,7 +71,7 @@ class SiteCreateApplicationV6Service(
             }
         }
 
-        return SitePartnerCreateResponseWrapperV6(responses, errors)
+        return SitePartnerCreateV6ResponseWrapper(responses, errors)
     }
 
     /**
@@ -82,11 +82,11 @@ class SiteCreateApplicationV6Service(
      * here, because the shared parse/create path deliberately does not enforce it — v7 and the task path allow it.
      */
     @Transactional
-    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMainV6>): SitePartnerCreateResponseWrapperV6 {
+    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateWithLegalAddressAsMainV6Request>): SitePartnerCreateV6ResponseWrapper {
         val requestList = requests.toList()
         val legalEntitiesByBpn = legalEntityRepository.findDistinctByBpnIn(requestList.map { it.bpnLParent }).associateBy { it.bpn }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
+        val responses = mutableListOf<SitePartnerCreateVerboseV6Dto>()
         val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
 
         val validRequests = requestList.filter { request ->
@@ -129,6 +129,6 @@ class SiteCreateApplicationV6Service(
                 }
             }
 
-        return SitePartnerCreateResponseWrapperV6(responses, errors)
+        return SitePartnerCreateV6ResponseWrapper(responses, errors)
     }
 }

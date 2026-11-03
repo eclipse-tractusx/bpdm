@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantSearchRequest
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest as DataSpaceParticipantSearchRequestDto
 
 /**
  * Creates data space participant search requests from the v7 API participant search DTO.
@@ -32,7 +32,7 @@ class DataSpaceParticipantSearchRequestMapper {
     /**
      * Returns the search request holding the criteria a client sent.
      */
-    fun toSearchRequest(searchRequest: DataSpaceParticipantSearchRequestDto): DataSpaceParticipantSearchRequest =
+    fun toSearchRequest(searchRequest: DataSpaceParticipantSearchV7Request): DataSpaceParticipantSearchRequest =
         DataSpaceParticipantSearchRequest(
             legalEntityBpns = searchRequest.bpnLs,
             isDataSpaceParticipant = searchRequest.isDataSpaceParticipant

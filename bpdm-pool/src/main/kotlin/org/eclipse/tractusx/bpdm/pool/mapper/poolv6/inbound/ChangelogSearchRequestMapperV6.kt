@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.model.request.ChangelogSearchRequest
 import org.springframework.stereotype.Component
 
@@ -33,7 +33,7 @@ class ChangelogSearchRequestMapperV6 {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: ChangelogSearchRequestV6, isDataSpaceParticipant: Boolean?): ChangelogSearchRequest =
+    fun toSearchRequest(searchRequest: ChangelogSearchV6Request, isDataSpaceParticipant: Boolean?): ChangelogSearchRequest =
         ChangelogSearchRequest(
             bpns = searchRequest.bpns,
             businessPartnerTypes = searchRequest.businessPartnerTypes,

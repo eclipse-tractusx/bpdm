@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
@@ -231,7 +231,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     private fun sitesOfMainAddress(result: BusinessPartner): List<String> {
         val addressBpn = result.site!!.siteMainAddress!!.bpnReference.referenceValue!!
         val address = poolClient.addresses
-            .getAddresses(AddressSearchRequest(addressBpns = listOf(addressBpn)), PaginationRequest())
+            .getAddresses(AddressSearchV7Request(addressBpns = listOf(addressBpn)), PaginationRequest())
             .content.single().address
 
         return listOfNotNull(address.bpnSite) + address.additionalSites

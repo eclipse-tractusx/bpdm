@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
@@ -58,7 +58,7 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToLegalEntity(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -74,8 +74,8 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToLegalEntityOnSite(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -96,8 +96,8 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToSite(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteWithMainAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
@@ -113,9 +113,9 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToAdditionalAddressOfSite(
         seed: String,
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteWithMainAddressVerboseDto,
-        addressGoldenRecord: LogisticAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
+        addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{

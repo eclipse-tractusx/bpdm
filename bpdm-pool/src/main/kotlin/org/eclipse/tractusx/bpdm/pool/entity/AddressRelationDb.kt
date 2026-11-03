@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 
 @Entity
 @Table(
@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 class AddressRelationDb(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: AddressRelationType = AddressRelationType.IsReplacedBy, //Only allowed type for address relations
+    val type: AddressRelationTypeV7 = AddressRelationTypeV7.IsReplacedBy, //Only allowed type for address relations
 
     @ManyToOne
     @JoinColumn(name = "start_address_id", nullable = false)

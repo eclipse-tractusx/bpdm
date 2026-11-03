@@ -21,10 +21,18 @@ package org.eclipse.tractusx.bpdm.pool.v6
 
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ApiClient
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6Client
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
@@ -39,11 +47,11 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
     @Autowired
     lateinit var testClientProvider: PoolTestClientProviderV6
 
-    lateinit var operatorClient: PoolV6ApiClient
-    lateinit var sharingMemberClient: PoolV6ApiClient
-    lateinit var participantClient: PoolV6ApiClient
-    lateinit var unauthorizedClient: PoolV6ApiClient
-    lateinit var anonymousClient: PoolV6ApiClient
+    lateinit var operatorClient: PoolV6Client
+    lateinit var sharingMemberClient: PoolV6Client
+    lateinit var participantClient: PoolV6Client
+    lateinit var unauthorizedClient: PoolV6Client
+    lateinit var anonymousClient: PoolV6Client
 
     @PostConstruct
     fun init(){
@@ -60,7 +68,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.addresses.getAddresses(AddressSearchRequestV6(), PaginationRequest())
+            poolClient.addresses.getAddresses(AddressSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -80,7 +88,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.addresses.searchAddresses(AddressSearchRequestV6(), PaginationRequest())
+            poolClient.addresses.searchAddresses(AddressSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -112,7 +120,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            val searchRequest = IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, "any", emptyList())
+            val searchRequest = IdentifiersSearchV6Request(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, "any", emptyList())
             poolClient.bpns.findBpnsByIdentifiers(searchRequest)
         }
     }
@@ -123,7 +131,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            val searchRequest = BpnRequestIdentifierSearchRequestV6(emptySet())
+            val searchRequest = BpnRequestIdentifierSearchV6Request(emptySet())
             poolClient.bpns.findBpnByRequestedIdentifiers(searchRequest)
         }
     }
@@ -134,7 +142,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(), PaginationRequest())
+            poolClient.changelogs.getChangelogEntries(ChangelogSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -144,7 +152,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            poolClient.memberships.get(CxMembershipSearchRequestV6(), PaginationRequest())
+            poolClient.memberships.get(CxMembershipSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -154,7 +162,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            poolClient.memberships.put(CxMembershipUpdateRequestV6(emptyList()))
+            poolClient.memberships.put(CxMembershipUpdateV6Request(emptyList()))
         }
     }
 
@@ -164,7 +172,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequestV6(), PaginationRequest())
+            poolClient.legalEntities.getLegalEntities(LegalEntitySearchV6Request(), PaginationRequest())
         }
     }
 
@@ -184,7 +192,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchRequestV6(), PaginationRequest())
+            poolClient.legalEntities.postLegalEntitySearch(LegalEntitySearchV6Request(), PaginationRequest())
         }
     }
 
@@ -236,7 +244,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.searchLegalEntities(LegalEntitySearchRequestV6(), PaginationRequest())
+            poolClient.members.searchLegalEntities(LegalEntitySearchV6Request(), PaginationRequest())
         }
     }
 
@@ -246,7 +254,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.postSiteSearch(SiteSearchRequestV6(), PaginationRequest())
+            poolClient.members.postSiteSearch(SiteSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -256,7 +264,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.searchAddresses(AddressSearchRequestV6(), PaginationRequest())
+            poolClient.members.searchAddresses(AddressSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -266,7 +274,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Authorized
         ){
-            poolClient.members.searchChangelogEntries(ChangelogSearchRequestV6(), PaginationRequest())
+            poolClient.members.searchChangelogEntries(ChangelogSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -276,7 +284,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            val identifierType = IdentifierTypeDtoV6("any", IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, "any", null, null, null, emptySet())
+            val identifierType = IdentifierTypeV6Dto("any", IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, "any", null, null, null, emptySet())
             poolClient.metadata.createIdentifierType(identifierType)
         }
     }
@@ -297,7 +305,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Forbidden,
             AuthExpectationType.Forbidden
         ){
-            val legalForm = LegalFormRequestV6("any", "any", null, null, null, null, null, null, true)
+            val legalForm = LegalFormV6Request("any", "any", null, null, null, null, null, null, true)
             poolClient.metadata.createLegalForm(legalForm)
         }
     }
@@ -328,7 +336,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.sites.postSiteSearch(SiteSearchRequestV6(), PaginationRequest())
+            poolClient.sites.postSiteSearch(SiteSearchV6Request(), PaginationRequest())
         }
     }
 
@@ -360,7 +368,7 @@ class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
             AuthExpectationType.Authorized,
             AuthExpectationType.Forbidden
         ){
-            poolClient.sites.getSites(SiteSearchRequestV6(), PaginationRequest())
+            poolClient.sites.getSites(SiteSearchV6Request(), PaginationRequest())
         }
     }
 

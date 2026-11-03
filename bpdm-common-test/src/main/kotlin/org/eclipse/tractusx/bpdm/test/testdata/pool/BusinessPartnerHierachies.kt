@@ -19,15 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+
 
 
 data class LegalEntityHierarchy(
-    val legalEntity: LegalEntityPartnerCreateRequest,
+    val legalEntity: LegalEntityPartnerCreateV7Request,
     val siteHierarchy: List<SiteHierarchy> = emptyList(),
-    val addresses: List<AddressPartnerCreateRequest> = emptyList()
+    val addresses: List<AddressPartnerCreateV7Request> = emptyList()
 ) {
     fun setParentBpnl(bpnL: String) =
         copy(
@@ -36,17 +37,17 @@ data class LegalEntityHierarchy(
         )
 
     fun with(site: SiteHierarchy) = copy(siteHierarchy = siteHierarchy.plus(site))
-    fun with(address: AddressPartnerCreateRequest) = copy(addresses = addresses.plus(address))
+    fun with(address: AddressPartnerCreateV7Request) = copy(addresses = addresses.plus(address))
 
     fun getAllSites() = siteHierarchy.map { it.site }
     fun getAllAddresses() = siteHierarchy.flatMap { it.addresses }.plus(addresses)
 }
 
 data class SiteHierarchy(
-    val site: SitePartnerCreateRequest,
-    val addresses: List<AddressPartnerCreateRequest> = emptyList()
+    val site: SitePartnerCreateV7Request,
+    val addresses: List<AddressPartnerCreateV7Request> = emptyList()
 ) {
 
     fun setParentBpns(bpnS: String) = copy(addresses = addresses.map { it.copy(bpnParent = bpnS) })
-    fun with(address: AddressPartnerCreateRequest) = copy(addresses = addresses.plus(address))
+    fun with(address: AddressPartnerCreateV7Request) = copy(addresses = addresses.plus(address))
 }

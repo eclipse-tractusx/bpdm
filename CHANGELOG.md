@@ -41,6 +41,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: The CSV upload keeps a site or address state that has a type but no validity dates, instead of dropping it, and stores an empty house number as absent.
 - BPDM Gate: Updating an input relation through the V6 API stores the validity periods given in the request. Before, they were ignored and the relation's validity periods were removed.
 - BPDM Gate: Creation and update timestamps now match subsequent reads. Changes to child records update the parent timestamp, while unchanged inputs preserve it.
+- BPDM Pool: The OpenAPI document describes the business partner search result with its own address schemas instead of sharing them with the address endpoints, and lists the `alternativePostalAddress`, `legalForm` and script variant `alternativeAddress` fields it omitted from several V6 and V7 request and response schemas.
 
 ## [7.5.0] - 2026-09-08
 

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -33,6 +32,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationE
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 
 /**
  * Turns a reserved golden record relation task between two sites into the site relation the Pool stores for it.
@@ -66,7 +66,7 @@ class TaskSiteRelationsStepBuildService(
         relationValidityPeriodValidator.validate(siteRelationDto)
 
         val siteRelationType = when (siteRelationDto.relationType) {
-            OrchestratorRelationType.IsReplacedBy -> SiteRelationType.IsReplacedBy
+            OrchestratorRelationType.IsReplacedBy -> SiteRelationTypeV7.IsReplacedBy
             else -> throw BpdmValidationException("Unsupported site relation type: ${siteRelationDto.relationType}")
         }
 
@@ -104,8 +104,8 @@ class TaskSiteRelationsStepBuildService(
             reasonCode = reasonCode?.technicalKey
         )
 
-    private fun SiteRelationType.toTaskDto(): OrchestratorRelationType =
+    private fun SiteRelationTypeV7.toTaskDto(): OrchestratorRelationType =
         when (this) {
-            SiteRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
+            SiteRelationTypeV7.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
 }

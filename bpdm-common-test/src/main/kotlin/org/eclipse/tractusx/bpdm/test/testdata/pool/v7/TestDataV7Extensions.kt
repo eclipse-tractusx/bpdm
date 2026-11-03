@@ -19,329 +19,351 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 
 
-fun LegalEntityPartnerCreateRequest.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierDto>) =
+
+fun LegalEntityPartnerCreateV7Request.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierV7Dto>) =
     copy(legalEntity = legalEntity.withLegalIdentifiers(identifiers))
 
-fun LegalEntityPartnerCreateRequest.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierDto) =
+fun LegalEntityPartnerCreateV7Request.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierV7Dto) =
     withLegalIdentifiers(identifiers.toList())
 
-fun LegalEntityDto.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierDto>) =
+fun LegalEntityV7Dto.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierV7Dto>) =
     copy(header = header.copy(identifiers = identifiers))
 
-fun LegalEntityDto.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierDto) =
+fun LegalEntityV7Dto.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierV7Dto) =
     withLegalIdentifiers(identifiers.toList())
 
-fun LegalEntityDto.withConfidence(givenConfidence: GivenConfidence) =
+fun LegalEntityV7Dto.withConfidence(givenConfidence: GivenConfidence) =
     copy(header = header.withConfidence(givenConfidence), legalAddress = legalAddress.withConfidence(givenConfidence))
 
-fun LegalEntityPartnerCreateRequest.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun LegalEntityPartnerCreateV7Request.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(legalEntity = legalEntity.withLegalAddressIdentifiers(identifiers))
 
-fun LegalEntityPartnerCreateRequest.withLegalAddressIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun LegalEntityPartnerCreateV7Request.withLegalAddressIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withLegalAddressIdentifiers(identifiers.toList())
 
-fun LegalEntityDto.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun LegalEntityV7Dto.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(legalAddress = legalAddress.copy(identifiers = identifiers))
 
-fun LegalEntityDto.withLegalAddressIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun LegalEntityV7Dto.withLegalAddressIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withLegalAddressIdentifiers(identifiers.toList())
 
-fun LegalEntityPartnerCreateRequest.withLegalForm(legalForm: String) =
+fun LegalEntityPartnerCreateV7Request.withLegalForm(legalForm: String) =
     copy(legalEntity = legalEntity.withLegalForm(legalForm))
 
-fun LegalEntityDto.withLegalForm(legalForm: String) =
+fun LegalEntityV7Dto.withLegalForm(legalForm: String) =
     copy(header = header.copy(legalForm = legalForm))
 
-fun LegalEntityPartnerCreateRequest.withPhysicalAdminArea(code: String?) =
+fun LegalEntityPartnerCreateV7Request.withPhysicalAdminArea(code: String?) =
     copy(legalEntity = legalEntity.withPhysicalAdminArea(code))
 
-fun LegalEntityDto.withPhysicalAdminArea(code: String?) =
+fun LegalEntityV7Dto.withPhysicalAdminArea(code: String?) =
     copy(legalAddress = legalAddress.copy(physicalPostalAddress = legalAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = code)))
 
-fun LegalEntityPartnerCreateRequest.withAlternativeAdminArea(code: String?) =
+fun LegalEntityPartnerCreateV7Request.withAlternativeAdminArea(code: String?) =
     copy(legalEntity = legalEntity.withAlternativeAdminArea(code))
 
-fun LegalEntityDto.withAlternativeAdminArea(code: String?) =
+fun LegalEntityV7Dto.withAlternativeAdminArea(code: String?) =
     copy(legalAddress = legalAddress.copy(alternativePostalAddress = legalAddress.alternativePostalAddress?.copy(administrativeAreaLevel1 = code)))
 
-fun LegalEntityPartnerCreateRequest.withParticipantData(isParticipantData: Boolean) =
+fun LegalEntityPartnerCreateV7Request.withParticipantData(isParticipantData: Boolean) =
     copy(legalEntity = legalEntity.withParticipantData(isParticipantData))
 
-fun LegalEntityPartnerCreateRequest.withStates(vararg states: LegalEntityStateDto) =
+fun LegalEntityPartnerCreateV7Request.withStates(vararg states: LegalEntityStateV7Dto) =
     copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states.toList())))
 
-fun LegalEntityPartnerUpdateRequest.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierDto>) =
+fun LegalEntityPartnerUpdateV7Request.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierV7Dto>) =
     copy(legalEntity = legalEntity.withLegalIdentifiers(identifiers))
 
-fun LegalEntityPartnerUpdateRequest.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierDto) =
+fun LegalEntityPartnerUpdateV7Request.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierV7Dto) =
     withLegalIdentifiers(identifiers.toList())
 
-fun LegalEntityPartnerUpdateRequest.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun LegalEntityPartnerUpdateV7Request.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(legalEntity = legalEntity.withLegalAddressIdentifiers(identifiers))
 
-fun LegalEntityPartnerUpdateRequest.withLegalAddressIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun LegalEntityPartnerUpdateV7Request.withLegalAddressIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withLegalAddressIdentifiers(identifiers.toList())
 
-fun LegalEntityPartnerUpdateRequest.withLegalForm(legalForm: String) =
+fun LegalEntityPartnerUpdateV7Request.withLegalForm(legalForm: String) =
     copy(legalEntity = legalEntity.withLegalForm(legalForm))
 
-fun LegalEntityPartnerUpdateRequest.withPhysicalAdminArea(code: String?) =
+fun LegalEntityPartnerUpdateV7Request.withPhysicalAdminArea(code: String?) =
     copy(legalEntity = legalEntity.withPhysicalAdminArea(code))
 
-fun LegalEntityPartnerUpdateRequest.withAlternativeAdminArea(code: String?) =
+fun LegalEntityPartnerUpdateV7Request.withAlternativeAdminArea(code: String?) =
     copy(legalEntity = legalEntity.withAlternativeAdminArea(code))
 
-fun LegalEntityPartnerUpdateRequest.withParticipantData(isParticipantData: Boolean) =
+fun LegalEntityPartnerUpdateV7Request.withParticipantData(isParticipantData: Boolean) =
     copy(legalEntity = legalEntity.withParticipantData(isParticipantData))
 
-fun LegalEntityPartnerUpdateRequest.withOwnershipUltimate(ownershipUltimate: Boolean?) =
+fun LegalEntityPartnerUpdateV7Request.withOwnershipUltimate(ownershipUltimate: Boolean?) =
     copy(legalEntity = legalEntity.withOwnershipUltimate(ownershipUltimate))
 
-fun LegalEntityDto.withOwnershipUltimate(ownershipUltimate: Boolean?) =
+fun LegalEntityV7Dto.withOwnershipUltimate(ownershipUltimate: Boolean?) =
     copy(header = header.copy(ownershipUltimate = ownershipUltimate))
 
-fun LegalEntityPartnerCreateVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
+fun LegalEntityPartnerCreateVerboseV7Dto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
     copy(legalEntity = legalEntity.withUltimateOwner(ownershipUltimate, ultimateOwnerBpnl))
 
-fun LegalEntityWithLegalAddressVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
+fun LegalEntityWithLegalAddressVerboseV7Dto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
     copy(header = header.copy(ownershipUltimate = ownershipUltimate, ultimateOwnerBpnl = ultimateOwnerBpnl))
 
-fun LegalEntityPartnerCreateVerboseDto.withStates(vararg states: LegalEntityStateVerboseDto) =
+fun LegalEntityPartnerCreateVerboseV7Dto.withStates(vararg states: LegalEntityStateVerboseV7Dto) =
     copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(states = states.toList())))
 
-fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+fun LegalEntityPartnerCreateVerboseV7Dto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
     copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL))
 
-fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+fun LegalEntityWithLegalAddressVerboseV7Dto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
     copy(
         header = header.copy(
-            relations = header.relations + RelationVerboseDto(
-                type = LegalEntityRelationType.IsOwnedBy,
+            relations = header.relations + RelationVerboseV7Dto(
+                type = LegalEntityRelationTypeV7.IsOwnedBy,
                 businessPartnerSourceBpnl = ownedBpnL,
                 businessPartnerTargetBpnl = owningBpnL,
-                validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+                validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
                 reasonCode = null
             )
         )
     )
 
-fun LegalEntityDto.withParticipantData(isParticipantData: Boolean) =
+fun LegalEntityV7Dto.withParticipantData(isParticipantData: Boolean) =
     copy(header = header.withParticipantData(isParticipantData), legalAddress = legalAddress.withSharedByOwner(isParticipantData))
 
-fun LegalEntityHeaderDto.withParticipantData(isParticipantData: Boolean) =
+fun LegalEntityHeaderV7Dto.withParticipantData(isParticipantData: Boolean) =
     copy(isParticipantData = isParticipantData, confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isParticipantData))
 
-fun LegalEntityHeaderDto.withConfidence(givenConfidence: GivenConfidence) =
+fun LegalEntityHeaderV7Dto.withConfidence(givenConfidence: GivenConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(givenConfidence))
 
-fun LogisticAddressDto.withSharedByOwner(isSharedByOwner: Boolean)  =
+fun LogisticAddressV7Dto.withSharedByOwner(isSharedByOwner: Boolean)  =
     copy(confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isSharedByOwner))
 
-fun LogisticAddressDto.withConfidence(confidence: GivenConfidence) =
+fun LogisticAddressV7Dto.withConfidence(confidence: GivenConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
 
-fun AddressPartnerCreateRequest.withConfidence(givenConfidence: GivenConfidence) =
+fun AddressPartnerCreateV7Request.withConfidence(givenConfidence: GivenConfidence) =
     copy(address = address.withConfidence(givenConfidence))
 
-fun AddressPartnerUpdateRequest.withConfidence(givenConfidence: GivenConfidence) =
+fun AddressPartnerUpdateV7Request.withConfidence(givenConfidence: GivenConfidence) =
     copy(address = address.withConfidence(givenConfidence))
 
-fun LegalEntityPartnerCreateVerboseDto.withConfidence(confidence: CalculatedConfidence) =
+fun LegalEntityPartnerCreateVerboseV7Dto.withConfidence(confidence: CalculatedConfidence) =
     copy(legalEntity = legalEntity.withConfidence(confidence))
 
-fun LegalEntityWithLegalAddressVerboseDto.withConfidence(confidence: CalculatedConfidence) =
+fun LegalEntityWithLegalAddressVerboseV7Dto.withConfidence(confidence: CalculatedConfidence) =
     copy(header = header.withConfidence(confidence), legalAddress = legalAddress.withConfidence(confidence))
 
-fun LegalEntityHeaderVerboseDto.withConfidence(confidence: CalculatedConfidence) =
+fun LegalEntityHeaderVerboseV7Dto.withConfidence(confidence: CalculatedConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withCalculatedConfidence(confidence))
 
-fun LogisticAddressInvariantVerboseDto.withConfidence(confidence: CalculatedConfidence) =
+fun LogisticAddressInvariantVerboseV7Dto.withConfidence(confidence: CalculatedConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withCalculatedConfidence(confidence))
 
-fun LegalEntityWithLegalAddressVerboseDto.withConfidence(confidence: GivenConfidence) =
+fun LegalEntityWithLegalAddressVerboseV7Dto.withConfidence(confidence: GivenConfidence) =
     copy(header = header.withConfidence(confidence), legalAddress = legalAddress.withConfidence(confidence))
 
-fun LegalEntityHeaderVerboseDto.withConfidence(confidence: GivenConfidence) =
+fun LegalEntityHeaderVerboseV7Dto.withConfidence(confidence: GivenConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
 
-fun LogisticAddressInvariantVerboseDto.withConfidence(confidence: GivenConfidence) =
+fun LogisticAddressInvariantVerboseV7Dto.withConfidence(confidence: GivenConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
 
-fun ConfidenceCriteriaDto.withCalculatedConfidence(confidence: CalculatedConfidence): ConfidenceCriteriaDto {
+fun ConfidenceCriteriaV7Dto.withCalculatedConfidence(confidence: CalculatedConfidence): ConfidenceCriteriaV7Dto {
     return copy(
         numberOfSharingMembers = confidence.numberOfSharingMembers,
         confidenceLevel = confidence.confidenceLevel
     )
 }
 
-fun ConfidenceCriteriaDto.withGivenConfidence(confidence: GivenConfidence): ConfidenceCriteriaDto {
+fun ConfidenceCriteriaV7Dto.withGivenConfidence(confidence: GivenConfidence): ConfidenceCriteriaV7Dto {
     return copy(
         sharedByOwner = confidence.sharedByOwner,
         checkedByExternalDataSource = confidence.checkedByExternalDataSource
     )
 }
 
-fun SitePartnerCreateRequest.withMainAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun SitePartnerCreateV7Request.withMainAddressIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = identifiers)))
 
-fun SitePartnerCreateRequest.withMainAddressIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun SitePartnerCreateV7Request.withMainAddressIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withMainAddressIdentifiers(identifiers.toList())
 
-fun SitePartnerCreateRequest.withPhysicalAdminArea(code: String?) =
+fun SitePartnerCreateV7Request.withPhysicalAdminArea(code: String?) =
     copy(site = site.copy(mainAddress = site.mainAddress.copy(physicalPostalAddress = site.mainAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = code))))
 
-fun SitePartnerCreateRequest.withAlternativeAdminArea(code: String?) =
+fun SitePartnerCreateV7Request.withAlternativeAdminArea(code: String?) =
     copy(site = site.copy(mainAddress = site.mainAddress.copy(alternativePostalAddress = site.mainAddress.alternativePostalAddress?.copy(administrativeAreaLevel1 = code))))
 
-fun SitePartnerUpdateRequest.withMainAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun SitePartnerUpdateV7Request.withMainAddressIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = identifiers)))
 
-fun SitePartnerUpdateRequest.withMainAddressIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun SitePartnerUpdateV7Request.withMainAddressIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withMainAddressIdentifiers(identifiers.toList())
 
-fun SitePartnerUpdateRequest.withPhysicalAdminArea(code: String?) =
+fun SitePartnerUpdateV7Request.withPhysicalAdminArea(code: String?) =
     copy(site = site.copy(mainAddress = site.mainAddress.copy(physicalPostalAddress = site.mainAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = code))))
 
-fun SitePartnerUpdateRequest.withAlternativeAdminArea(code: String?) =
+fun SitePartnerUpdateV7Request.withAlternativeAdminArea(code: String?) =
     copy(site = site.copy(mainAddress = site.mainAddress.copy(alternativePostalAddress = site.mainAddress.alternativePostalAddress?.copy(administrativeAreaLevel1 = code))))
 
-fun AddressPartnerCreateRequest.withIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun AddressPartnerCreateV7Request.withIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(address = address.copy(identifiers = identifiers))
 
-fun AddressPartnerCreateRequest.withIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun AddressPartnerCreateV7Request.withIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withIdentifiers(identifiers.toList())
 
-fun AddressPartnerCreateRequest.withPhysicalAdminArea(code: String?) =
+fun AddressPartnerCreateV7Request.withPhysicalAdminArea(code: String?) =
     copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(administrativeAreaLevel1 = code)))
 
-fun AddressPartnerCreateRequest.withAlternativeAdminArea(code: String?) =
+fun AddressPartnerCreateV7Request.withAlternativeAdminArea(code: String?) =
     copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(administrativeAreaLevel1 = code)))
 
-fun AddressPartnerCreateRequest.withPhysicalCountry(country: String) =
+fun AddressPartnerCreateV7Request.withPhysicalCountry(country: String) =
     copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(country = country)))
 
-fun AddressPartnerCreateRequest.withAlternativeCountry(country: String) =
+fun AddressPartnerCreateV7Request.withAlternativeCountry(country: String) =
     copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(country = country)))
 
-fun AddressPartnerUpdateRequest.withIdentifiers(identifiers: List<AddressIdentifierDto>) =
+fun AddressPartnerUpdateV7Request.withIdentifiers(identifiers: List<AddressIdentifierV7Dto>) =
     copy(address = address.copy(identifiers = identifiers))
 
-fun AddressPartnerUpdateRequest.withIdentifiers(vararg identifiers: AddressIdentifierDto) =
+fun AddressPartnerUpdateV7Request.withIdentifiers(vararg identifiers: AddressIdentifierV7Dto) =
     withIdentifiers(identifiers.toList())
 
-fun AddressPartnerUpdateRequest.withPhysicalAdminArea(code: String?) =
+fun AddressPartnerUpdateV7Request.withPhysicalAdminArea(code: String?) =
     copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(administrativeAreaLevel1 = code)))
 
-fun AddressPartnerUpdateRequest.withAlternativeAdminArea(code: String?) =
+fun AddressPartnerUpdateV7Request.withAlternativeAdminArea(code: String?) =
     copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress?.copy(administrativeAreaLevel1 = code)))
 
-fun AddressPartnerCreateVerboseDto.withConfidence(confidence: CalculatedConfidence) =
+fun AddressPartnerCreateVerboseV7Dto.withConfidence(confidence: CalculatedConfidence) =
     copy(address = address.withConfidence(confidence))
 
-fun AddressPartnerUpdateVerboseDto.withConfidence(confidence: CalculatedConfidence) =
+fun AddressPartnerUpdateVerboseV7Dto.withConfidence(confidence: CalculatedConfidence) =
     copy(address = address.withConfidence(confidence))
 
-fun PostalAddressScriptVariantDto.withPhysicalCity(city: String) =
+fun PostalAddressScriptVariantV7Dto.withPhysicalCity(city: String) =
     copy(physicalAddress = physicalAddress.copy(city = city))
 
-fun PostalAddressScriptVariantDto.withAlternativeCity(city: String) =
-    copy(alternativeAddress = AlternativeAddressScriptVariantDto(city))
+fun PostalAddressScriptVariantV7Dto.withAlternativeCity(city: String) =
+    copy(alternativeAddress = AlternativeAddressScriptVariantV7Dto(city))
 
-fun LegalEntityPartnerCreateRequest.withScriptVariantLegalName(legalName: String) =
+fun LegalEntityPartnerCreateV7Request.withScriptVariantLegalName(legalName: String) =
     copy(legalEntity = legalEntity.withScriptVariantLegalName(legalName))
 
-fun LegalEntityPartnerUpdateRequest.withScriptVariantLegalName(legalName: String) =
+fun LegalEntityPartnerUpdateV7Request.withScriptVariantLegalName(legalName: String) =
     copy(legalEntity = legalEntity.withScriptVariantLegalName(legalName))
 
-fun LegalEntityDto.withScriptVariantLegalName(legalName: String) =
+fun LegalEntityV7Dto.withScriptVariantLegalName(legalName: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(legalName = legalName) })
 
-fun LegalEntityPartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
+fun LegalEntityPartnerCreateV7Request.withScriptVariantPhysicalCity(city: String) =
     copy(legalEntity = legalEntity.withScriptVariantPhysicalCity(city))
 
-fun LegalEntityPartnerUpdateRequest.withScriptVariantPhysicalCity(city: String) =
+fun LegalEntityPartnerUpdateV7Request.withScriptVariantPhysicalCity(city: String) =
     copy(legalEntity = legalEntity.withScriptVariantPhysicalCity(city))
 
-fun LegalEntityDto.withScriptVariantPhysicalCity(city: String) =
+fun LegalEntityV7Dto.withScriptVariantPhysicalCity(city: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(legalAddress = it.legalAddress.withPhysicalCity(city)) })
 
-fun LegalEntityPartnerCreateRequest.withDuplicateScriptVariants() =
+fun LegalEntityPartnerCreateV7Request.withDuplicateScriptVariants() =
     copy(legalEntity = legalEntity.withDuplicateScriptVariants())
 
-fun LegalEntityPartnerUpdateRequest.withDuplicateScriptVariants() =
+fun LegalEntityPartnerUpdateV7Request.withDuplicateScriptVariants() =
     copy(legalEntity = legalEntity.withDuplicateScriptVariants())
 
-fun LegalEntityDto.withDuplicateScriptVariants() =
+fun LegalEntityV7Dto.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
-fun SitePartnerCreateRequest.withScriptVariantName(name: String) =
+fun SitePartnerCreateV7Request.withScriptVariantName(name: String) =
     copy(site = site.withScriptVariantName(name))
 
-fun SitePartnerUpdateRequest.withScriptVariantName(name: String) =
+fun SitePartnerUpdateV7Request.withScriptVariantName(name: String) =
     copy(site = site.withScriptVariantName(name))
 
-fun SiteDto.withScriptVariantName(name: String) =
+fun SiteV7Dto.withScriptVariantName(name: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(name = name) })
 
-fun SitePartnerUpdateRequest.withScriptVariantScriptCode(scriptCode: String) =
+fun SitePartnerUpdateV7Request.withScriptVariantScriptCode(scriptCode: String) =
     copy(site = site.withScriptVariantScriptCode(scriptCode))
 
-fun SiteDto.withScriptVariantScriptCode(scriptCode: String) =
+fun SiteV7Dto.withScriptVariantScriptCode(scriptCode: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
 
-fun LegalEntityPartnerUpdateRequest.withScriptVariantScriptCode(scriptCode: String) =
+fun LegalEntityPartnerUpdateV7Request.withScriptVariantScriptCode(scriptCode: String) =
     copy(legalEntity = legalEntity.withScriptVariantScriptCode(scriptCode))
 
-fun LegalEntityDto.withScriptVariantScriptCode(scriptCode: String) =
+fun LegalEntityV7Dto.withScriptVariantScriptCode(scriptCode: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
 
-fun SitePartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
+fun SitePartnerCreateV7Request.withScriptVariantPhysicalCity(city: String) =
     copy(site = site.withScriptVariantPhysicalCity(city))
 
-fun SitePartnerUpdateRequest.withScriptVariantPhysicalCity(city: String) =
+fun SitePartnerUpdateV7Request.withScriptVariantPhysicalCity(city: String) =
     copy(site = site.withScriptVariantPhysicalCity(city))
 
-fun SiteDto.withScriptVariantPhysicalCity(city: String) =
+fun SiteV7Dto.withScriptVariantPhysicalCity(city: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(mainAddress = it.mainAddress.withPhysicalCity(city)) })
 
-fun SitePartnerCreateRequest.withDuplicateScriptVariants() =
+fun SitePartnerCreateV7Request.withDuplicateScriptVariants() =
     copy(site = site.withDuplicateScriptVariants())
 
-fun SitePartnerUpdateRequest.withDuplicateScriptVariants() =
+fun SitePartnerUpdateV7Request.withDuplicateScriptVariants() =
     copy(site = site.withDuplicateScriptVariants())
 
-fun SiteDto.withDuplicateScriptVariants() =
+fun SiteV7Dto.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
-fun SiteCreateRequestWithLegalAddressAsMain.withScriptVariantName(name: String) =
+fun SiteCreateWithLegalAddressAsMainV7Request.withScriptVariantName(name: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(name = name) })
 
-fun SiteCreateRequestWithLegalAddressAsMain.withDuplicateScriptVariants() =
+fun SiteCreateWithLegalAddressAsMainV7Request.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
-fun AddressPartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
+fun AddressPartnerCreateV7Request.withScriptVariantPhysicalCity(city: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withPhysicalCity(city)) })
 
-fun AddressPartnerUpdateRequest.withScriptVariantPhysicalCity(city: String) =
+fun AddressPartnerUpdateV7Request.withScriptVariantPhysicalCity(city: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withPhysicalCity(city)) })
 
-fun AddressPartnerCreateRequest.withScriptVariantAlternativeCity(city: String) =
+fun AddressPartnerCreateV7Request.withScriptVariantAlternativeCity(city: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withAlternativeCity(city)) })
 
-fun AddressPartnerUpdateRequest.withScriptVariantAlternativeCity(city: String) =
+fun AddressPartnerUpdateV7Request.withScriptVariantAlternativeCity(city: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withAlternativeCity(city)) })
 
-fun AddressPartnerCreateRequest.withDuplicateScriptVariants() =
+fun AddressPartnerCreateV7Request.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 
-fun AddressPartnerUpdateRequest.withDuplicateScriptVariants() =
+fun AddressPartnerUpdateV7Request.withDuplicateScriptVariants() =
     copy(scriptVariants = scriptVariants + scriptVariants)
 

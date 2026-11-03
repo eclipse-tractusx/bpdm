@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolBusinessPartnerApi
-import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.PoolBusinessPartnerV7Api
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchFilterTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchResultV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerSearchService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -51,14 +51,14 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class BusinessPartnerController(
     private val businessPartnerSearchService: BusinessPartnerSearchService
-): PoolBusinessPartnerApi {
+): PoolBusinessPartnerV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.Companion.READ_PARTNER})")
     override fun searchBusinessPartners(
-        searchRequest: LegalEntityPropertiesSearchRequest,
-        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
+        searchRequest: LegalEntityPropertiesSearchV7Request,
+        searchResultFilter: Set<BusinessPartnerSearchFilterTypeV7>?,
         paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerSearchResultDto> {
+    ): PageDto<BusinessPartnerSearchResultV7Dto> {
         return businessPartnerSearchService.searchBusinessPartner(searchRequest, searchResultFilter, paginationRequest);
     }
 

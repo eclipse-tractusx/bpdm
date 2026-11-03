@@ -21,7 +21,18 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
 import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
 import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
@@ -38,7 +49,7 @@ import java.time.ZoneOffset
 @Component
 class AddressDtoRequestMapper {
 
-    fun toContentRequest(address: LogisticAddressDto, scriptVariants: List<LogisticAddressScriptVariantDto>): LogisticAddressRequest =
+    fun toContentRequest(address: LogisticAddressV7Dto, scriptVariants: List<LogisticAddressScriptVariantV7Dto>): LogisticAddressRequest =
         LogisticAddressRequest(
             name = address.name,
             states = address.states.map { toStateRequest(it) },
@@ -52,7 +63,7 @@ class AddressDtoRequestMapper {
     fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): LogisticAddressRequest =
         toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
 
-    private fun toPhysicalRequest(physical: PhysicalPostalAddressDto): PhysicalPostalAddressRequest =
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressV7Dto): PhysicalPostalAddressRequest =
         PhysicalPostalAddressRequest(
             geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
             country = physical.country,
@@ -71,7 +82,7 @@ class AddressDtoRequestMapper {
             taxJurisdictionCode = physical.taxJurisdictionCode
         )
 
-    private fun toAlternativeRequest(alternative: AlternativePostalAddressDto): AlternativePostalAddressRequest =
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressV7Dto): AlternativePostalAddressRequest =
         AlternativePostalAddressRequest(
             geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
             country = alternative.country,
@@ -83,7 +94,7 @@ class AddressDtoRequestMapper {
             deliveryServiceNumber = alternative.deliveryServiceNumber
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDto): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
@@ -91,29 +102,29 @@ class AddressDtoRequestMapper {
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
         )
 
-    private fun toStateRequest(state: AddressStateDto): AddressStateRequest =
+    private fun toStateRequest(state: AddressStateV7Dto): AddressStateRequest =
         AddressStateRequest(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
 
-    private fun toIdentifierRequest(identifier: AddressIdentifierDto): AddressIdentifierRequest =
+    private fun toIdentifierRequest(identifier: AddressIdentifierV7Dto): AddressIdentifierRequest =
         AddressIdentifierRequest(value = identifier.value, type = identifier.type)
 
     private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRequest =
         GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toScriptVariant(variant: LogisticAddressScriptVariantDto): AddressScriptVariant =
+    private fun toScriptVariant(variant: LogisticAddressScriptVariantV7Dto): AddressScriptVariant =
         AddressScriptVariant(
             scriptCode = variant.scriptCode,
             address = toPostalScriptVariant(variant.address)
         )
 
-    private fun toPostalScriptVariant(variant: PostalAddressScriptVariantDto): PostalAddressScriptVariant =
+    private fun toPostalScriptVariant(variant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariant =
         PostalAddressScriptVariant(
             addressName = variant.addressName,
             physicalAddress = toPhysicalScriptVariant(variant.physicalAddress),
             alternativeAddress = variant.alternativeAddress?.let { toAlternativeScriptVariant(it) }
         )
 
-    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant =
+    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariant =
         PhysicalAddressScriptVariant(
             city = variant.city,
             district = variant.district,
@@ -124,12 +135,12 @@ class AddressDtoRequestMapper {
             door = variant.door
         )
 
-    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant =
+    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariant =
         AlternativeAddressScriptVariant(
             city = variant.city
         )
 
-    private fun toScriptVariantStreet(street: StreetScriptVariantDto): StreetScriptVariant =
+    private fun toScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariant =
         StreetScriptVariant(
             name = street.name,
             direction = street.direction,
@@ -139,7 +150,7 @@ class AddressDtoRequestMapper {
             additionalNameSuffix = street.additionalNameSuffix
         )
 
-    private fun toStreet(street: StreetDto): Street =
+    private fun toStreet(street: StreetV7Dto): Street =
         Street(
             name = street.name,
             houseNumber = street.houseNumber,

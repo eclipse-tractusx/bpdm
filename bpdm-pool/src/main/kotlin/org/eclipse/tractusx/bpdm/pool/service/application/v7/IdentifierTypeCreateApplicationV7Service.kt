@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.IdentifierTypeRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.IdentifierTypeResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.IdentifierTypeParseErrorMapper
@@ -28,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.IdentifierTypeC
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.IdentifierTypeCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 
 /**
  * The REST-API boundary for the V7 "create identifier type" operation.
@@ -45,7 +45,7 @@ class IdentifierTypeCreateApplicationV7Service(
      * Creates the given identifier type and returns it as stored.
      */
     @Transactional
-    fun createIdentifierType(identifierType: IdentifierTypeDto): IdentifierTypeDto =
+    fun createIdentifierType(identifierType: IdentifierTypeV7Dto): IdentifierTypeV7Dto =
         when (val parsed = identifierTypeCreateParser.parse(identifierTypeRequestMapper.toCreateRequest(identifierType))) {
             is ParseResult.Failure -> throw identifierTypeParseErrorMapper.toCreateException(parsed.errors)
             is ParseResult.Success -> identifierTypeResponseMapper.toIdentifierType(identifierTypeCreateService.create(parsed.parsed))

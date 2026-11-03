@@ -19,7 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.*
@@ -38,31 +43,31 @@ class GoldenRecordProcessMockConfig {
                 BusinessPartnerVerboseValues.legalForm2
             ),
             legalEntityIdentifierTypes = listOf(
-                IdentifierTypeDto("idType1", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType1", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("idType2", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType2", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("idType3", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType3", null, null, null, null, sortedSetOf(), emptyList())
+                IdentifierTypeV7Dto("idType1", IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, "idType1", null, null, null, null, sortedSetOf(), emptyList()),
+                IdentifierTypeV7Dto("idType2", IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, "idType2", null, null, null, null, sortedSetOf(), emptyList()),
+                IdentifierTypeV7Dto("idType3", IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, "idType3", null, null, null, null, sortedSetOf(), emptyList())
             ),
             addressIdentifierTypes = listOf(
-                IdentifierTypeDto("addressIdType1", IdentifierBusinessPartnerType.ADDRESS, "addressIdType1", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("addressIdType2", IdentifierBusinessPartnerType.ADDRESS, "addressIdType2", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("addressIdType3", IdentifierBusinessPartnerType.ADDRESS, "addressIdType3", null, null, null, null, sortedSetOf(), emptyList())
+                IdentifierTypeV7Dto("addressIdType1", IdentifierBusinessPartnerTypeV7.ADDRESS, "addressIdType1", null, null, null, null, sortedSetOf(), emptyList()),
+                IdentifierTypeV7Dto("addressIdType2", IdentifierBusinessPartnerTypeV7.ADDRESS, "addressIdType2", null, null, null, null, sortedSetOf(), emptyList()),
+                IdentifierTypeV7Dto("addressIdType3", IdentifierBusinessPartnerTypeV7.ADDRESS, "addressIdType3", null, null, null, null, sortedSetOf(), emptyList())
             ),
             adminAreas = listOf(
-                CountrySubdivisionDto("DE", "adminArea1", "adminArea1"),
-                CountrySubdivisionDto("US", "adminArea2", "adminArea2"),
-                CountrySubdivisionDto("CN", "adminArea3", "adminArea3"),
+                CountrySubdivisionV7Dto("DE", "adminArea1", "adminArea1"),
+                CountrySubdivisionV7Dto("US", "adminArea2", "adminArea2"),
+                CountrySubdivisionV7Dto("CN", "adminArea3", "adminArea3"),
             ),
             countries = listOf(
-                CountryDto("DE", "Germany", null),
-                CountryDto("US", "United States", null),
-                CountryDto("CN", "China", null),
+                CountryV7Dto("DE", "Germany", null),
+                CountryV7Dto("US", "United States", null),
+                CountryV7Dto("CN", "China", null),
             ),
             scriptCodes = listOf(
-                ScriptCodeDto("Test", "Test Description")
+                ScriptCodeV7Dto("Test", "Test Description")
             ),
             reasonCodes = listOf(
-                ReasonCodeDto("HEADQUARTER_RELOCATION", "Test Reason"),
-                ReasonCodeDto("OTHER", "Another Test Reason"),
+                ReasonCodeV7Dto("HEADQUARTER_RELOCATION", "Test Reason"),
+                ReasonCodeV7Dto("OTHER", "Another Test Reason"),
             )
         )
     }

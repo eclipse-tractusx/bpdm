@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalFormRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalFormParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalFormResponseMapperV6
@@ -29,6 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.LegalFormCreate
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.LegalFormCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 
 /**
  * The REST-API boundary for the legacy v6 "create legal form" operation, using the v6 request/response shapes.
@@ -46,7 +46,7 @@ class LegalFormCreateApplicationV6Service(
      * Creates the given legal form and returns it as stored.
      */
     @Transactional
-    fun createLegalForm(legalForm: LegalFormRequestV6): LegalFormDtoV6 =
+    fun createLegalForm(legalForm: LegalFormV6Request): LegalFormV6Dto =
         when (val parsed = legalFormCreateParser.parse(legalFormRequestMapperV6.toCreateRequest(legalForm))) {
             is ParseResult.Failure -> throw legalFormParseErrorMapperV6.toCreateException(parsed.errors)
             is ParseResult.Success -> legalFormResponseMapperV6.toLegalForm(legalFormCreateService.create(parsed.parsed))

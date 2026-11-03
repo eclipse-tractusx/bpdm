@@ -20,19 +20,19 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
 
 data class IdentifierTypeCreateParsed(
     val technicalKey: String,
-    val businessPartnerType: IdentifierBusinessPartnerType,
+    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
     val name: String,
     val abbreviation: String?,
     val transliteratedName: String?,
     val transliteratedAbbreviation: String?,
     val format: String?,
-    val categories: Set<IdentifierTypeCategory>,
+    val categories: Set<IdentifierTypeCategoryV7>,
     val details: List<IdentifierTypeDetailParsed>
 )
 

@@ -22,14 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolLegalEntityV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.*
 import org.springdoc.core.annotations.ParameterObject
@@ -48,22 +48,22 @@ class LegalEntityV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getLegalEntities(
-        @ParameterObject searchRequest: LegalEntitySearchRequestV6,
+        @ParameterObject searchRequest: LegalEntitySearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
+    ): PageDto<LegalEntityWithLegalAddressVerboseV6Dto> {
         return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDtoV6 {
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV6Dto {
         return legalEntityGetApplicationService.getLegalEntity(idValue, idType)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postLegalEntitySearch(
-        searchRequest: LegalEntitySearchRequestV6,
+        searchRequest: LegalEntitySearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
+    ): PageDto<LegalEntityWithLegalAddressVerboseV6Dto> {
         return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
     }
 
@@ -71,7 +71,7 @@ class LegalEntityV6Controller(
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteVerboseDtoV6> {
+    ): PageDto<SiteVerboseV6Dto> {
         return siteSearchApplicationService.searchLegalEntitySites(bpnl, paginationRequest)
     }
 
@@ -79,21 +79,21 @@ class LegalEntityV6Controller(
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDtoV6> {
+    ): PageDto<LogisticAddressVerboseV6Dto> {
         return addressSearchApplicationService.searchLegalEntityAddresses(bpnl, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createBusinessPartners(
-        businessPartners: Collection<LegalEntityPartnerCreateRequestV6>
-    ): LegalEntityPartnerCreateResponseWrapperV6 {
+        businessPartners: Collection<LegalEntityPartnerCreateV6Request>
+    ): LegalEntityPartnerCreateV6ResponseWrapper {
         return legalEntityCreateApplicationService.createLegalEntities(businessPartners)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateBusinessPartners(
-        businessPartners: Collection<LegalEntityPartnerUpdateRequestV6>
-    ): LegalEntityPartnerUpdateResponseWrapperV6 {
+        businessPartners: Collection<LegalEntityPartnerUpdateV6Request>
+    ): LegalEntityPartnerUpdateV6ResponseWrapper {
         return legalEntityUpdateApplicationService.updateLegalEntities(businessPartners)
     }
 }

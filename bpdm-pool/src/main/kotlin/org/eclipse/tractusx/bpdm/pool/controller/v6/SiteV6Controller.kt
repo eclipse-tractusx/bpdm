@@ -22,13 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolSiteV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteGetApplicationV6Service
@@ -48,44 +48,44 @@ class SiteV6Controller(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
-    ): SiteWithMainAddressVerboseDtoV6 {
+    ): SiteWithMainAddressVerboseV6Dto {
         return siteGetApplicationService.getSite(bpns)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postSiteSearch(
-        searchRequest: SiteSearchRequestV6,
+        searchRequest: SiteSearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDtoV6> {
+    ): PageDto<SiteWithMainAddressVerboseV6Dto> {
         return siteSearchApplicationService.searchSites(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSite(
-        requests: Collection<SitePartnerCreateRequestV6>
-    ): SitePartnerCreateResponseWrapperV6 {
+        requests: Collection<SitePartnerCreateV6Request>
+    ): SitePartnerCreateV6ResponseWrapper {
         return siteCreateApplicationService.createSitesWithMainAddress(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
-        requests: Collection<SitePartnerUpdateRequestV6>
-    ): SitePartnerUpdateResponseWrapperV6 {
+        requests: Collection<SitePartnerUpdateV6Request>
+    ): SitePartnerUpdateV6ResponseWrapper {
         return siteUpdateApplicationService.updateSites(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSites(
-        searchRequest: SiteSearchRequestV6,
+        searchRequest: SiteSearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDtoV6> {
+    ): PageDto<SiteWithMainAddressVerboseV6Dto> {
         return postSiteSearch(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSiteWithLegalReference(
-        request: Collection<SiteCreateRequestWithLegalAddressAsMainV6>
-    ): SitePartnerCreateResponseWrapperV6 {
+        request: Collection<SiteCreateWithLegalAddressAsMainV6Request>
+    ): SitePartnerCreateV6ResponseWrapper {
         return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
     }
 }

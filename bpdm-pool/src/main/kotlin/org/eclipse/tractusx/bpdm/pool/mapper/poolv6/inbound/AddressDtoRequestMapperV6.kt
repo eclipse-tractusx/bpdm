@@ -21,9 +21,15 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AlternativePostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
 import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
@@ -41,19 +47,19 @@ class AddressDtoRequestMapperV6 {
     /**
      * Returns the create request for the address a client sent, under the parent BPN it named.
      */
-    fun toCreateRequest(request: AddressPartnerCreateRequestV6): AddressCreateUntypedParentRequest =
+    fun toCreateRequest(request: AddressPartnerCreateV6Request): AddressCreateUntypedParentRequest =
         AddressCreateUntypedParentRequest(request.bpnParent, toContentRequest(request.address))
 
     /**
      * Returns the update request for the address a client sent, addressed by its BPN.
      */
-    fun toUpdateRequest(request: AddressPartnerUpdateRequestV6): AddressUpdateRequest =
+    fun toUpdateRequest(request: AddressPartnerUpdateV6Request): AddressUpdateRequest =
         AddressUpdateRequest(addressBpn = request.bpna, siteBpns = null, content = toContentRequest(request.address))
 
     /**
      * Returns the content of the given address as the shared loose request model.
      */
-    fun toContentRequest(address: LogisticAddressDtoV6): LogisticAddressRequest =
+    fun toContentRequest(address: LogisticAddressV6Dto): LogisticAddressRequest =
         LogisticAddressRequest(
             name = address.name,
             states = address.states.map { toStateRequest(it) },
@@ -66,7 +72,7 @@ class AddressDtoRequestMapperV6 {
             scriptVariants = emptyList()
         )
 
-    private fun toPhysicalRequest(physical: PhysicalPostalAddressDtoV6): PhysicalPostalAddressRequest =
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressV6Dto): PhysicalPostalAddressRequest =
         PhysicalPostalAddressRequest(
             geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
             country = physical.country,
@@ -85,7 +91,7 @@ class AddressDtoRequestMapperV6 {
             taxJurisdictionCode = physical.taxJurisdictionCode
         )
 
-    private fun toAlternativeRequest(alternative: AlternativePostalAddressDtoV6): AlternativePostalAddressRequest =
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressV6Dto): AlternativePostalAddressRequest =
         AlternativePostalAddressRequest(
             geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
             country = alternative.country,
@@ -97,7 +103,7 @@ class AddressDtoRequestMapperV6 {
             deliveryServiceNumber = alternative.deliveryServiceNumber
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
@@ -105,16 +111,16 @@ class AddressDtoRequestMapperV6 {
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
         )
 
-    private fun toStateRequest(state: AddressStateDtoV6): AddressStateRequest =
+    private fun toStateRequest(state: AddressStateV6Dto): AddressStateRequest =
         AddressStateRequest(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
 
-    private fun toIdentifierRequest(identifier: AddressIdentifierDtoV6): AddressIdentifierRequest =
+    private fun toIdentifierRequest(identifier: AddressIdentifierV6Dto): AddressIdentifierRequest =
         AddressIdentifierRequest(value = identifier.value, type = identifier.type)
 
     private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRequest =
         GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toStreet(street: StreetDtoV6): Street =
+    private fun toStreet(street: StreetV6Dto): Street =
         Street(
             name = street.name,
             houseNumber = street.houseNumber,

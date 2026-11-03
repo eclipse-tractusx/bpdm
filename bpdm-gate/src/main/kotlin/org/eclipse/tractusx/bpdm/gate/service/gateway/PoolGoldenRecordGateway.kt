@@ -23,11 +23,11 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordUpdateP
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.GoldenRecordsRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -36,7 +36,7 @@ import java.time.Instant
  */
 @Component
 class PoolGoldenRecordGateway(
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolV7Client,
     private val poolInboundMapper: PoolInboundMapper
 ) {
 
@@ -50,7 +50,7 @@ class PoolGoldenRecordGateway(
     }
 
     private fun fetchChanges(after: Instant, pageSize: Int): GoldenRecordChangePageRaw {
-        val entries = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(timestampAfter = after), PaginationRequest(0, pageSize))
+        val entries = poolClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(timestampAfter = after), PaginationRequest(0, pageSize))
         val changedBpnsByType = entries.content.groupBy({ it.businessPartnerType }, { it.bpn })
         return GoldenRecordChangePageRaw(
             changed = GoldenRecordBpnsRaw(
@@ -92,17 +92,17 @@ class PoolGoldenRecordGateway(
 
     private fun fetchLegalEntities(bpns: Set<String>): List<LegalEntityGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
-            poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(bpnLs = chunk), PaginationRequest(0, chunk.size)).content
+            poolClient.legalEntities.getLegalEntities(LegalEntitySearchV7Request(bpnLs = chunk), PaginationRequest(0, chunk.size)).content
         }.flatten().map(poolInboundMapper::toRequest)
 
     private fun fetchSites(bpns: Set<String>): List<SiteGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
-            poolClient.sites.getSites(SiteSearchRequest(siteBpns = chunk), PaginationRequest(0, chunk.size)).content
+            poolClient.sites.getSites(SiteSearchV7Request(siteBpns = chunk), PaginationRequest(0, chunk.size)).content
         }.flatten().map { poolInboundMapper.toRequest(it.site) }
 
     private fun fetchAddresses(bpns: Set<String>): List<AddressGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
-            poolClient.addresses.getAddresses(AddressSearchRequest(addressBpns = chunk), PaginationRequest(0, chunk.size)).content
+            poolClient.addresses.getAddresses(AddressSearchV7Request(addressBpns = chunk), PaginationRequest(0, chunk.size)).content
         }.flatten().map(poolInboundMapper::toRequest)
 
     companion object {

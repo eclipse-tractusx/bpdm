@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
@@ -36,22 +36,22 @@ class LegalEntityDtoRequestMapper(
     private val addressDtoRequestMapper: AddressDtoRequestMapper
 ) {
 
-    fun toCreateRequest(request: LegalEntityPartnerCreateRequest): LegalEntityCreateRequest =
+    fun toCreateRequest(request: LegalEntityPartnerCreateV7Request): LegalEntityCreateRequest =
         LegalEntityCreateRequest(content = toContentRequest(request.legalEntity))
 
-    fun toUpdateRequest(request: LegalEntityPartnerUpdateRequest): LegalEntityUpdateRequest =
+    fun toUpdateRequest(request: LegalEntityPartnerUpdateV7Request): LegalEntityUpdateRequest =
         LegalEntityUpdateRequest(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity))
 
-    private fun toContentRequest(legalEntity: LegalEntityDto): LegalEntityContentRequest =
+    private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
             legalAddress = addressDtoRequestMapper.toContentRequest(
                 legalEntity.legalAddress,
-                legalEntity.scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode, it.legalAddress) }
+                legalEntity.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, it.legalAddress) }
             )
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityDto): LegalEntityHeaderRequest {
+    private fun toHeaderRequest(legalEntity: LegalEntityV7Dto): LegalEntityHeaderRequest {
         val header = legalEntity.header
         return LegalEntityHeaderRequest(
             legalName = header.legalName,
@@ -66,7 +66,7 @@ class LegalEntityDtoRequestMapper(
         )
     }
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDto): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,

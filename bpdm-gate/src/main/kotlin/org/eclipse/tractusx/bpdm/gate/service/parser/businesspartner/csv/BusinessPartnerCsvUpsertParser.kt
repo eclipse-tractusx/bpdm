@@ -20,8 +20,8 @@ import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartn
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertBatchParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerCsvRowRaw
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.BusinessPartnerInputUpsertParser
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
 import org.springframework.stereotype.Service
 
 /**
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class BusinessPartnerCsvUpsertParser(
-    private val poolApiClient: PoolApiClient,
+    private val poolApiClient: PoolV7Client,
     private val rowParser: BusinessPartnerCsvRowParser,
     private val inputUpsertParser: BusinessPartnerInputUpsertParser
 ) {
@@ -60,7 +60,7 @@ class BusinessPartnerCsvUpsertParser(
             return ParseResult.ofSingleFailure(BusinessPartnerCsvUpsertError.InvalidTenantBpnl(tenantBpnl))
 
         val legalEntity = poolApiClient.legalEntities
-            .getLegalEntities(LegalEntitySearchRequest(listOf(tenantBpnl)), PaginationRequest(page = 0, size = 1))
+            .getLegalEntities(LegalEntitySearchV7Request(listOf(tenantBpnl)), PaginationRequest(page = 0, size = 1))
             .content.firstOrNull()
             ?: return ParseResult.ofSingleFailure(BusinessPartnerCsvUpsertError.TenantLegalEntityNotFound(tenantBpnl))
 

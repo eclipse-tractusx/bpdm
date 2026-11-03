@@ -24,8 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressSearchRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressResponseMapperV6
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
@@ -34,6 +32,8 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSearchParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityAddressSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
 
 /**
  * The REST-API boundary for the legacy v6 "search addresses" operation, using the v6 request/response shapes.
@@ -51,14 +51,14 @@ class AddressSearchApplicationV6Service(
      * Returns the requested page of addresses matching the given criteria.
      */
     @Transactional(readOnly = true)
-    fun searchAddresses(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> =
+    fun searchAddresses(searchRequest: AddressSearchV6Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV6Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toPageDto { addressResponseMapperV6.toAddress(it) }
 
     /**
      * Returns the requested page of addresses matching the given criteria, restricted to those of Catena-X members.
      */
     @Transactional(readOnly = true)
-    fun searchMemberAddresses(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> =
+    fun searchMemberAddresses(searchRequest: AddressSearchV6Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV6Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toPageDto { addressResponseMapperV6.toAddress(it) }
 
     /**
@@ -66,7 +66,7 @@ class AddressSearchApplicationV6Service(
      * its sites, and fails with a not-found error when no legal entity carries that BPN.
      */
     @Transactional(readOnly = true)
-    fun searchLegalEntityAddresses(bpnl: String, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> {
+    fun searchLegalEntityAddresses(bpnl: String, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV6Dto> {
         val criteria = when (val result = legalEntityAddressSearchParser.parse(addressSearchRequestMapperV6.toDirectAddressesRequest(bpnl))) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmNotFoundException("Business Partner", bpnl)
@@ -75,7 +75,7 @@ class AddressSearchApplicationV6Service(
         return addressSearchService.search(criteria, paginationRequest.toPageRequest()).toPageDto { addressResponseMapperV6.toAddress(it) }
     }
 
-    private fun search(searchRequest: AddressSearchRequestV6, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+    private fun search(searchRequest: AddressSearchV6Request, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         addressSearchService.search(
             addressSearchParser.parse(addressSearchRequestMapperV6.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()

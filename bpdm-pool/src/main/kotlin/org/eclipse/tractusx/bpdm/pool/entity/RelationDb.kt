@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 
 @Entity
 @Table(
@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 class RelationDb(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: LegalEntityRelationType,
+    val type: LegalEntityRelationTypeV7,
 
     @ManyToOne
     @JoinColumn(name = "start_node_id", nullable = false)

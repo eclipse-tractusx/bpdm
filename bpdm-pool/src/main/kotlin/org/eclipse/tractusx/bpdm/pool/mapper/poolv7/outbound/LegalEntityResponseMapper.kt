@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
@@ -47,9 +47,9 @@ class LegalEntityResponseMapper(
     /**
      * Returns the script-invariant part of the given legal entity as the API reports it.
      */
-    fun toHeader(legalEntity: LegalEntityDb): LegalEntityHeaderVerboseDto =
+    fun toHeader(legalEntity: LegalEntityDb): LegalEntityHeaderVerboseV7Dto =
         with(legalEntity) {
-            LegalEntityHeaderVerboseDto(
+            LegalEntityHeaderVerboseV7Dto(
                 bpnl = bpn,
                 legalName = legalName.value,
                 legalShortName = legalName.shortName,
@@ -70,8 +70,8 @@ class LegalEntityResponseMapper(
     /**
      * Returns the given legal entity together with its legal address as the API reports them.
      */
-    fun toLegalEntityWithLegalAddress(legalEntity: LegalEntityDb): LegalEntityWithLegalAddressVerboseDto =
-        LegalEntityWithLegalAddressVerboseDto(
+    fun toLegalEntityWithLegalAddress(legalEntity: LegalEntityDb): LegalEntityWithLegalAddressVerboseV7Dto =
+        LegalEntityWithLegalAddressVerboseV7Dto(
             legalAddress = addressResponseMapper.toInvariantAddress(legalEntity.legalAddress),
             header = toHeader(legalEntity),
             scriptVariants = toScriptVariants(legalEntity)
@@ -81,21 +81,21 @@ class LegalEntityResponseMapper(
      * Returns the given created or updated legal entity as the API reports it, tagged with the key of the request that
      * wrote it.
      */
-    fun toUpsertResponse(legalEntity: LegalEntityDb, entryId: String?): LegalEntityPartnerCreateVerboseDto =
-        LegalEntityPartnerCreateVerboseDto(
+    fun toUpsertResponse(legalEntity: LegalEntityDb, entryId: String?): LegalEntityPartnerCreateVerboseV7Dto =
+        LegalEntityPartnerCreateVerboseV7Dto(
             legalEntity = toLegalEntityWithLegalAddress(legalEntity),
             index = entryId
         )
 
-    private fun toIdentifier(identifier: LegalEntityIdentifierDb): LegalEntityIdentifierVerboseDto =
-        LegalEntityIdentifierVerboseDto(
+    private fun toIdentifier(identifier: LegalEntityIdentifierDb): LegalEntityIdentifierVerboseV7Dto =
+        LegalEntityIdentifierVerboseV7Dto(
             identifier.value,
             identifierTypeResponseMapper.toTypeKeyName(identifier.type),
             identifier.issuingBody
         )
 
-    private fun toState(state: LegalEntityStateDb): LegalEntityStateVerboseDto =
-        LegalEntityStateVerboseDto(
+    private fun toState(state: LegalEntityStateDb): LegalEntityStateVerboseV7Dto =
+        LegalEntityStateVerboseV7Dto(
             BusinessStateDates.reportValidFrom(state.validFrom),
             BusinessStateDates.reportValidTo(state.validTo),
             state.type.toDto()
@@ -103,14 +103,14 @@ class LegalEntityResponseMapper(
 
     // The legal address covers every script its legal entity is named in: the parsers reject a variant it does not
     // cover and ScriptVariantCoverageService prunes any the legal address stops covering.
-    private fun toScriptVariants(legalEntity: LegalEntityDb): List<LegalEntityScriptVariantDto> {
+    private fun toScriptVariants(legalEntity: LegalEntityDb): List<LegalEntityScriptVariantV7Dto> {
         val legalAddressVariantsByCode = legalEntity.legalAddress.scriptVariants.associateBy { it.scriptCode.technicalKey }
 
         return legalEntity.scriptVariants.map { variant ->
             val scriptCode = variant.scriptCode.technicalKey
             val legalAddressVariant = legalAddressVariantsByCode[scriptCode]
                 ?: throw IllegalStateException("Legal entity script variant of script code '$scriptCode' is not covered by the legal address.")
-            LegalEntityScriptVariantDto(
+            LegalEntityScriptVariantV7Dto(
                 scriptCode,
                 variant.legalName,
                 variant.shortName,

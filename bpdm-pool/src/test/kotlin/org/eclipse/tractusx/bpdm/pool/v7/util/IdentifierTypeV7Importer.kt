@@ -19,19 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.util
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 
 class IdentifierTypeV7Importer(
     private val identifierTypeEntryImporter: IdentifierTypeEntryImporter
 ) {
 
-    fun importFromResource(): List<IdentifierTypeDto> {
+    fun importFromResource(): List<IdentifierTypeV7Dto> {
         val entries = identifierTypeEntryImporter.importFromResource()
         return entries.map { entry ->
-            IdentifierTypeDto(
+            IdentifierTypeV7Dto(
                 technicalKey = entry.technicalKey?.takeIf { it.isNotBlank() }!!,
                 businessPartnerType = toBusinessPartnerType(entry.businessPartnerType!!),
                 name = entry.name?.takeIf { it.isNotBlank() }!!,
@@ -45,15 +45,15 @@ class IdentifierTypeV7Importer(
         }
     }
 
-    private fun toBusinessPartnerType(typeDescription: String): IdentifierBusinessPartnerType{
+    private fun toBusinessPartnerType(typeDescription: String): IdentifierBusinessPartnerTypeV7{
         return when(typeDescription){
-            "L" -> IdentifierBusinessPartnerType.LEGAL_ENTITY
-            "A" -> IdentifierBusinessPartnerType.ADDRESS
+            "L" -> IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY
+            "A" -> IdentifierBusinessPartnerTypeV7.ADDRESS
             else -> throw RuntimeException("Invalid business partner type '$typeDescription'")
         }
     }
 
-    private fun toCategory(categoryDescription: String): IdentifierTypeCategory{
-        return IdentifierTypeCategory.valueOf(categoryDescription.uppercase())
+    private fun toCategory(categoryDescription: String): IdentifierTypeCategoryV7{
+        return IdentifierTypeCategoryV7.valueOf(categoryDescription.uppercase())
     }
 }

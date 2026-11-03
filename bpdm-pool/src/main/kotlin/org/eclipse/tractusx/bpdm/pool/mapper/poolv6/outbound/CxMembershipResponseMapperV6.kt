@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.springframework.stereotype.Component
 
@@ -32,6 +32,6 @@ class CxMembershipResponseMapperV6 {
     /**
      * Returns the Catena-X membership the given legal entity holds.
      */
-    fun toMembership(legalEntity: LegalEntityDb): CxMembershipDtoV6 =
-        CxMembershipDtoV6(bpnL = legalEntity.bpn, isCatenaXMember = legalEntity.isDataSpaceParticipant)
+    fun toMembership(legalEntity: LegalEntityDb): CxMembershipV6Dto =
+        CxMembershipV6Dto(bpnL = legalEntity.bpn, isCatenaXMember = legalEntity.isDataSpaceParticipant)
 }

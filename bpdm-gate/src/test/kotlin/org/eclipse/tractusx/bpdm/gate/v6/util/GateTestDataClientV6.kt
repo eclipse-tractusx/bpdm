@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationPostV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.relation.input.RelationV6Dto
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
@@ -72,7 +72,7 @@ class GateTestDataClientV6 (
         return operatorClient.relations.post(RelationPostV6Request(externalId, relationType, sourceInput.externalId, targetInput.externalId))
     }
 
-    fun refineToLegalEntity(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
+    fun refineToLegalEntity(input: BusinessPartnerInputV6Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto{
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
@@ -137,9 +137,9 @@ class GateTestDataClientV6 (
 
     fun refineToAdditionalAddressOfSite(
         input: BusinessPartnerInputV6Dto,
-        legalEntityRequest: LegalEntityPartnerCreateRequest,
-        siteRequest: SitePartnerCreateRequest,
-        additionalAddressRequest: AddressPartnerCreateRequest,
+        legalEntityRequest: LegalEntityPartnerCreateV7Request,
+        siteRequest: SitePartnerCreateV7Request,
+        additionalAddressRequest: AddressPartnerCreateV7Request,
         seed: String = input.externalId
     ): PoolMockDataFactory.AdditionalAddressOfSiteResult{
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(legalEntityRequest, siteRequest, additionalAddressRequest, seed)

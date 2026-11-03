@@ -24,8 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressSearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
@@ -34,7 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSearchParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityAddressSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest as AddressSearchRequestDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 
 /**
  * The REST-API boundary for the V7 "search addresses" operation.
@@ -52,7 +52,7 @@ class AddressSearchApplicationV7Service(
      * Returns the requested page of addresses matching the given criteria.
      */
     @Transactional(readOnly = true)
-    fun searchAddresses(searchRequest: AddressSearchRequestDto, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> =
+    fun searchAddresses(searchRequest: AddressSearchV7Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = null).toPageDto { addressResponseMapper.toAddress(it) }
 
     /**
@@ -61,9 +61,9 @@ class AddressSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchMemberAddresses(
-        searchRequest: AddressSearchRequestDto,
+        searchRequest: AddressSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressInvariantVerboseDto> =
+    ): PageDto<LogisticAddressInvariantVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true).toPageDto { addressResponseMapper.toInvariantAddress(it) }
 
     /**
@@ -71,7 +71,7 @@ class AddressSearchApplicationV7Service(
      * its sites, and fails with a not-found error when no legal entity carries that BPN.
      */
     @Transactional(readOnly = true)
-    fun searchLegalEntityAddresses(bpnl: String, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
+    fun searchLegalEntityAddresses(bpnl: String, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV7Dto> {
         val criteria = when (val result = legalEntityAddressSearchParser.parse(addressSearchRequestMapper.toDirectAddressesRequest(bpnl))) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmNotFoundException("Business Partner", bpnl)
@@ -80,7 +80,7 @@ class AddressSearchApplicationV7Service(
         return addressSearchService.search(criteria, paginationRequest.toPageRequest()).toPageDto { addressResponseMapper.toAddress(it) }
     }
 
-    private fun search(searchRequest: AddressSearchRequestDto, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+    private fun search(searchRequest: AddressSearchV7Request, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         addressSearchService.search(
             addressSearchParser.parse(addressSearchRequestMapper.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()

@@ -20,15 +20,15 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.stereotype.Component
 
 @Component("poolHealth")
 class PoolHealthIndicator(
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolV7Client,
 ) : HealthIndicator {
 
     override fun health(): Health {
@@ -39,7 +39,7 @@ class PoolHealthIndicator(
             So, included changelog request to achieve the same for now and in future we can create separate REST api endpoint which will provide
             health of the service with readiness in authenticated way.
             */
-            val response = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(), PaginationRequest(page = 0, size = 1))
+            val response = poolClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(), PaginationRequest(page = 0, size = 1))
             if (response.contentSize >= 0) {
                 Health.up().withDetail("Pool Service", "Available").build()
             } else {

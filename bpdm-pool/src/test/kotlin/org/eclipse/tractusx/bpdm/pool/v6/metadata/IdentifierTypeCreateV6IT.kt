@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDetailDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeDetailV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -89,20 +89,20 @@ class IdentifierTypeCreateV6IT: UnscheduledPoolTestBaseV6() {
             .isInstanceOf(WebClientResponseException.Conflict::class.java)
     }
 
-    private fun createIdentifierTypeRequest(seed: String, type: IdentifierBusinessPartnerTypeV6): IdentifierTypeDtoV6 {
+    private fun createIdentifierTypeRequest(seed: String, type: IdentifierBusinessPartnerTypeV6): IdentifierTypeV6Dto {
        val random = Random(seed.hashCode())
 
-        return IdentifierTypeDtoV6(
+        return IdentifierTypeV6Dto(
             technicalKey = seed,
             businessPartnerType = type,
-            name = "$seed ${IdentifierTypeDtoV6::name.name}",
-            abbreviation = "$seed ${IdentifierTypeDtoV6::abbreviation.name}",
-            transliteratedName = "$seed ${IdentifierTypeDtoV6::transliteratedName.name}",
-            transliteratedAbbreviation = "$seed ${IdentifierTypeDtoV6::transliteratedAbbreviation.name}",
+            name = "$seed ${IdentifierTypeV6Dto::name.name}",
+            abbreviation = "$seed ${IdentifierTypeV6Dto::abbreviation.name}",
+            transliteratedName = "$seed ${IdentifierTypeV6Dto::transliteratedName.name}",
+            transliteratedAbbreviation = "$seed ${IdentifierTypeV6Dto::transliteratedAbbreviation.name}",
             details = (1..random.nextInt(3, 10))
                 .map { listOf("DE", "US", "FR", "CN", "PL").random(random) }
                 .toSet()
-                .map { IdentifierTypeDetailDtoV6(it, random.nextBoolean()) }
+                .map { IdentifierTypeDetailV6Dto(it, random.nextBoolean()) }
         )
     }
 }

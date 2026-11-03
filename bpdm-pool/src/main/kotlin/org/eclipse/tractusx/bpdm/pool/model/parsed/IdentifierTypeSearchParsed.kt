@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 
 data class IdentifierTypeSearchParsed(
-    val businessPartnerType: IdentifierBusinessPartnerType,
+    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
     val country: CountryDb?
 )

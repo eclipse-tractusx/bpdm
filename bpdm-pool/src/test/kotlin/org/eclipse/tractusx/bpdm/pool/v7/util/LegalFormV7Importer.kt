@@ -19,17 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.util
 
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
 
 class LegalFormV7Importer(
     private val legalFormEntryImporter: LegalFormEntryImporter
 ) {
 
-    fun importFromResource(): List<LegalFormDto>{
+    fun importFromResource(): List<LegalFormV7Dto>{
         val entries = legalFormEntryImporter.importFromResource()
         return entries.map {  entry ->
-            LegalFormDto(
+            LegalFormV7Dto(
                 technicalKey = entry.elfCode!!,
                 name = entry.name!!,
                 transliteratedName = entry.transliteratedName?.takeIf { it.isNotBlank() },

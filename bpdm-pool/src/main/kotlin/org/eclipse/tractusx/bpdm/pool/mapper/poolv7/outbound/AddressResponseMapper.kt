@@ -23,9 +23,21 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.stereotype.Component
 
@@ -42,8 +54,8 @@ class AddressResponseMapper(
     /**
      * Returns the given address as the API reports it.
      */
-    fun toAddress(address: LogisticAddressDb): LogisticAddressVerboseDto =
-        LogisticAddressVerboseDto(
+    fun toAddress(address: LogisticAddressDb): LogisticAddressVerboseV7Dto =
+        LogisticAddressVerboseV7Dto(
             address = toInvariantAddress(address),
             scriptVariants = toScriptVariants(address.scriptVariants)
         )
@@ -51,8 +63,8 @@ class AddressResponseMapper(
     /**
      * Returns the script-invariant part of the given address as the API reports it.
      */
-    fun toInvariantAddress(address: LogisticAddressDb): LogisticAddressInvariantVerboseDto =
-        LogisticAddressInvariantVerboseDto(
+    fun toInvariantAddress(address: LogisticAddressDb): LogisticAddressInvariantVerboseV7Dto =
+        LogisticAddressInvariantVerboseV7Dto(
             bpna = address.bpn,
             bpnLegalEntity = address.legalEntity?.bpn,
             bpnSite = address.mainSite?.bpn,
@@ -73,8 +85,8 @@ class AddressResponseMapper(
     /**
      * Returns the given newly created address as the API reports it, tagged with the index of the request that created it.
      */
-    fun toCreateResponse(address: LogisticAddressDb, index: String?): AddressPartnerCreateVerboseDto =
-        AddressPartnerCreateVerboseDto(
+    fun toCreateResponse(address: LogisticAddressDb, index: String?): AddressPartnerCreateVerboseV7Dto =
+        AddressPartnerCreateVerboseV7Dto(
             address = toInvariantAddress(address),
             scriptVariants = toScriptVariants(address.scriptVariants),
             index = index
@@ -83,8 +95,8 @@ class AddressResponseMapper(
     /**
      * Returns the given updated address as the API reports it.
      */
-    fun toUpdateResponse(address: LogisticAddressDb): AddressPartnerUpdateVerboseDto =
-        AddressPartnerUpdateVerboseDto(
+    fun toUpdateResponse(address: LogisticAddressDb): AddressPartnerUpdateVerboseV7Dto =
+        AddressPartnerUpdateVerboseV7Dto(
             address = toInvariantAddress(address),
             scriptVariants = toScriptVariants(address.scriptVariants)
         )
@@ -92,34 +104,34 @@ class AddressResponseMapper(
     /**
      * Returns the postal address of the given address script variant as the API reports it.
      */
-    fun toPostalAddressScriptVariant(scriptVariant: LogisticAddressScriptVariantDb): PostalAddressScriptVariantDto =
-        PostalAddressScriptVariantDto(
+    fun toPostalAddressScriptVariant(scriptVariant: LogisticAddressScriptVariantDb): PostalAddressScriptVariantV7Dto =
+        PostalAddressScriptVariantV7Dto(
             scriptVariant.name,
             toPhysicalAddressScriptVariant(scriptVariant.physicalAddress),
-            scriptVariant.alternativeAddress?.let { AlternativeAddressScriptVariantDto(it.city) }
+            scriptVariant.alternativeAddress?.let { AlternativeAddressScriptVariantV7Dto(it.city) }
         )
 
-    private fun toScriptVariants(scriptVariants: Collection<LogisticAddressScriptVariantDb>): List<LogisticAddressScriptVariantDto> =
-        scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode.technicalKey, toPostalAddressScriptVariant(it)) }
+    private fun toScriptVariants(scriptVariants: Collection<LogisticAddressScriptVariantDb>): List<LogisticAddressScriptVariantV7Dto> =
+        scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode.technicalKey, toPostalAddressScriptVariant(it)) }
 
-    private fun toState(state: AddressStateDb): AddressStateVerboseDto =
-        AddressStateVerboseDto(
+    private fun toState(state: AddressStateDb): AddressStateVerboseV7Dto =
+        AddressStateVerboseV7Dto(
             BusinessStateDates.reportValidFrom(state.validFrom),
             BusinessStateDates.reportValidTo(state.validTo),
             state.type.toDto()
         )
 
-    private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseDto =
-        AddressIdentifierVerboseDto(identifier.value, identifierTypeResponseMapper.toTypeKeyName(identifier.type))
+    private fun toIdentifier(identifier: AddressIdentifierDb): AddressIdentifierVerboseV7Dto =
+        AddressIdentifierVerboseV7Dto(identifier.value, identifierTypeResponseMapper.toTypeKeyName(identifier.type))
 
-    private fun toPhysicalPostalAddress(address: PhysicalPostalAddressDb): PhysicalPostalAddressVerboseDto =
+    private fun toPhysicalPostalAddress(address: PhysicalPostalAddressDb): PhysicalPostalAddressVerboseV7Dto =
         with(address) {
-            PhysicalPostalAddressVerboseDto(
+            PhysicalPostalAddressVerboseV7Dto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
                 countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 postalCode = postCode,
                 city = city,
-                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.country.countryCode, it.regionCode, it.regionName) },
+                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionV7Dto(it.country.countryCode, it.regionCode, it.regionName) },
                 administrativeAreaLevel2 = administrativeAreaLevel2,
                 administrativeAreaLevel3 = administrativeAreaLevel3,
                 district = districtLevel1,
@@ -133,14 +145,14 @@ class AddressResponseMapper(
             )
         }
 
-    private fun toAlternativePostalAddress(address: AlternativePostalAddressDb): AlternativePostalAddressVerboseDto =
+    private fun toAlternativePostalAddress(address: AlternativePostalAddressDb): AlternativePostalAddressVerboseV7Dto =
         with(address) {
-            AlternativePostalAddressVerboseDto(
+            AlternativePostalAddressVerboseV7Dto(
                 geographicCoordinates = geographicCoordinates?.let { toGeoCoordinate(it) },
                 countryVerbose = TypeKeyNameVerboseDto(country.countryCode, country.name),
                 postalCode = postCode,
                 city = city,
-                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.country.countryCode, it.regionCode, it.regionName) },
+                administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionV7Dto(it.country.countryCode, it.regionCode, it.regionName) },
                 deliveryServiceType = deliveryServiceType,
                 deliveryServiceNumber = deliveryServiceNumber,
                 deliveryServiceQualifier = deliveryServiceQualifier
@@ -150,9 +162,9 @@ class AddressResponseMapper(
     private fun toGeoCoordinate(coordinate: GeographicCoordinateDb): GeoCoordinateDto =
         GeoCoordinateDto(coordinate.longitude, coordinate.latitude, coordinate.altitude)
 
-    private fun toStreet(street: StreetDb): StreetDto =
+    private fun toStreet(street: StreetDb): StreetV7Dto =
         with(street) {
-            StreetDto(
+            StreetV7Dto(
                 name = name,
                 houseNumber = houseNumber,
                 houseNumberSupplement = houseNumberSupplement,
@@ -165,9 +177,9 @@ class AddressResponseMapper(
             )
         }
 
-    private fun toPhysicalAddressScriptVariant(address: PhysicalAddressScriptVariantDb): PhysicalAddressScriptVariantDto =
+    private fun toPhysicalAddressScriptVariant(address: PhysicalAddressScriptVariantDb): PhysicalAddressScriptVariantV7Dto =
         with(address) {
-            PhysicalAddressScriptVariantDto(
+            PhysicalAddressScriptVariantV7Dto(
                 city = city,
                 district = district,
                 street = street?.let { toStreetScriptVariant(it) },
@@ -178,9 +190,9 @@ class AddressResponseMapper(
             )
         }
 
-    private fun toStreetScriptVariant(street: StreetScriptVariantDb): StreetScriptVariantDto =
+    private fun toStreetScriptVariant(street: StreetScriptVariantDb): StreetScriptVariantV7Dto =
         with(street) {
-            StreetScriptVariantDto(
+            StreetScriptVariantV7Dto(
                 name = name,
                 direction = direction,
                 namePrefix = namePrefix,

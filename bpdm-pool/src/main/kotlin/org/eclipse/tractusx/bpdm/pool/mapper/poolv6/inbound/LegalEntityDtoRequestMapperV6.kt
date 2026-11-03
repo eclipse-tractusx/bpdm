@@ -20,17 +20,17 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
 
 /**
  * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRequest] / [LegalEntityUpdateRequest]. v6
@@ -45,22 +45,22 @@ class LegalEntityDtoRequestMapperV6(
     /**
      * Returns the create request for the legal entity and legal address a client sent.
      */
-    fun toCreateRequest(request: LegalEntityPartnerCreateRequestV6): LegalEntityCreateRequest =
+    fun toCreateRequest(request: LegalEntityPartnerCreateV6Request): LegalEntityCreateRequest =
         LegalEntityCreateRequest(content = toContentRequest(request.legalEntity, request.legalAddress))
 
     /**
      * Returns the update request for the legal entity a client sent, addressed by its BPN.
      */
-    fun toUpdateRequest(request: LegalEntityPartnerUpdateRequestV6): LegalEntityUpdateRequest =
+    fun toUpdateRequest(request: LegalEntityPartnerUpdateV6Request): LegalEntityUpdateRequest =
         LegalEntityUpdateRequest(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity, request.legalAddress))
 
-    private fun toContentRequest(legalEntity: LegalEntityDtoV6, legalAddress: LogisticAddressDtoV6): LegalEntityContentRequest =
+    private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
             legalAddress = addressDtoRequestMapperV6.toContentRequest(legalAddress)
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityDtoV6): LegalEntityHeaderRequest =
+    private fun toHeaderRequest(legalEntity: LegalEntityV6Dto): LegalEntityHeaderRequest =
         LegalEntityHeaderRequest(
             legalName = legalEntity.legalName,
             legalShortName = legalEntity.legalShortName,
@@ -74,10 +74,10 @@ class LegalEntityDtoRequestMapperV6(
             scriptVariants = emptyList()
         )
 
-    private fun toStateRequest(state: LegalEntityStateDtoV6): LegalEntityState =
+    private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityState =
         LegalEntityState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,

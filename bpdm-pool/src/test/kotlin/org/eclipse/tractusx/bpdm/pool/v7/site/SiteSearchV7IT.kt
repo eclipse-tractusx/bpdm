@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -44,8 +44,8 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
         val siteD = testDataClient.createSite(legalEntityB, "$testName D")
 
         //WHEN
-        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequest(), PaginationRequest())
-        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequest(), PaginationRequest())
+        val searchResponseGet = poolClient.sites.getSites(SiteSearchV7Request(), PaginationRequest())
+        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchV7Request(), PaginationRequest())
 
         //THEN
         val expectedSites = listOf(siteA, siteB, siteC, siteD).map { resultFactory.buildSiteSearchResponse(it) }
@@ -72,7 +72,7 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(legalEntityB, "$testName D")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(siteBpns = listOf(siteA.site.bpns, siteC.site.bpns))
+        val searchRequest = SiteSearchV7Request(siteBpns = listOf(siteA.site.bpns, siteC.site.bpns))
         val searchResponseGet = poolClient.sites.getSites(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.sites.postSiteSearch(searchRequest, PaginationRequest())
 
@@ -101,7 +101,7 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(legalEntityB, "$testName D")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(legalEntityBpns = listOf(siteA.site.bpnLegalEntity))
+        val searchRequest = SiteSearchV7Request(legalEntityBpns = listOf(siteA.site.bpnLegalEntity))
         val searchResponseGet = poolClient.sites.getSites(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.sites.postSiteSearch(searchRequest, PaginationRequest())
 
@@ -130,7 +130,7 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createSite(legalEntityB, "$testName D")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(name = siteA.site.name)
+        val searchRequest = SiteSearchV7Request(name = siteA.site.name)
         val searchResponseGet = poolClient.sites.getSites(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.sites.postSiteSearch(searchRequest, PaginationRequest())
 
@@ -160,8 +160,8 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val paginationRequest = PaginationRequest(0, 2)
-        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.sites.getSites(SiteSearchV7Request(), paginationRequest)
+        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchV7Request(), paginationRequest)
 
         //THEN
         val expectedSites = listOf(siteA, siteB).map { resultFactory.buildSiteSearchResponse(it) }
@@ -189,8 +189,8 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val paginationRequest = PaginationRequest(1, 2)
-        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.sites.getSites(SiteSearchV7Request(), paginationRequest)
+        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchV7Request(), paginationRequest)
 
         //THEN
         val expectedSites = listOf(siteC, siteD).map { resultFactory.buildSiteSearchResponse(it) }
@@ -217,8 +217,8 @@ class SiteSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val paginationRequest = PaginationRequest(1, 2)
-        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.sites.getSites(SiteSearchV7Request(), paginationRequest)
+        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchV7Request(), paginationRequest)
 
         //THEN
         val expectedSites = listOf(siteC).map { resultFactory.buildSiteSearchResponse(it) }

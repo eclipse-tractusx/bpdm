@@ -19,10 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+
 
 data class BpnIdentifierSearchRequest(
-    val businessPartnerType: IdentifierBusinessPartnerType,
+    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
     val identifierTypeKey: String,
     val identifierValues: List<String>
 )

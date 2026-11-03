@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteCreateErrorV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component

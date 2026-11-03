@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AdministrativeAreaResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.AdministrativeAreaSearchService
 import org.springframework.stereotype.Service
@@ -42,7 +42,7 @@ class AdministrativeAreaSearchApplicationV7Service(
      * Returns the requested page of all known administrative areas level 1.
      */
     @Transactional(readOnly = true)
-    fun searchAdministrativeAreas(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> =
+    fun searchAdministrativeAreas(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV7Dto> =
         administrativeAreaSearchService.search(paginationRequest.toPageRequest())
             .toPageDto { administrativeAreaResponseMapper.toCountrySubdivision(it) }
 }

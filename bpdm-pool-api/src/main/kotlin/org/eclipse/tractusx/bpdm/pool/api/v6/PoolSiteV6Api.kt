@@ -29,13 +29,13 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -59,7 +59,7 @@ interface PoolSiteV6Api {
     @GetMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/{bpns}"])
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
-    ): SiteWithMainAddressVerboseDtoV6
+    ): SiteWithMainAddressVerboseV6Dto
 
     @Operation(
         deprecated = true,
@@ -75,9 +75,9 @@ interface PoolSiteV6Api {
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
     @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/search"])
     fun postSiteSearch(
-        @RequestBody searchRequest: SiteSearchRequestV6,
+        @RequestBody searchRequest: SiteSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDtoV6>
+    ): PageDto<SiteWithMainAddressVerboseV6Dto>
 
     @Operation(
         deprecated = true,
@@ -96,8 +96,8 @@ interface PoolSiteV6Api {
     @PostMapping(value = [ApiCommons.SITE_BASE_PATH_V6])
     fun createSite(
         @RequestBody
-        requests: Collection<SitePartnerCreateRequestV6>
-    ): SitePartnerCreateResponseWrapperV6
+        requests: Collection<SitePartnerCreateV6Request>
+    ): SitePartnerCreateV6ResponseWrapper
 
     @Operation(
         deprecated = true,
@@ -115,8 +115,8 @@ interface PoolSiteV6Api {
     @PutMapping(value = [ApiCommons.SITE_BASE_PATH_V6])
     fun updateSite(
         @RequestBody
-        requests: Collection<SitePartnerUpdateRequestV6>
-    ): SitePartnerUpdateResponseWrapperV6
+        requests: Collection<SitePartnerUpdateV6Request>
+    ): SitePartnerUpdateV6ResponseWrapper
 
     @Operation(
         deprecated = true,
@@ -132,9 +132,9 @@ interface PoolSiteV6Api {
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
     @GetMapping(value = [ApiCommons.SITE_BASE_PATH_V6])
     fun getSites(
-        @ParameterObject searchRequest: SiteSearchRequestV6,
+        @ParameterObject searchRequest: SiteSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDtoV6>
+    ): PageDto<SiteWithMainAddressVerboseV6Dto>
 
     @Operation(
         deprecated = true,
@@ -151,6 +151,6 @@ interface PoolSiteV6Api {
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
     @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/legal-main-sites"])
     fun createSiteWithLegalReference(
-        @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMainV6>
-    ): SitePartnerCreateResponseWrapperV6
+        @RequestBody request: Collection<SiteCreateWithLegalAddressAsMainV6Request>
+    ): SitePartnerCreateV6ResponseWrapper
 }

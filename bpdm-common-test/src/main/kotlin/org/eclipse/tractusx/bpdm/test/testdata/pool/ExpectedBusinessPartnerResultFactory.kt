@@ -22,12 +22,35 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import java.time.Instant
 
@@ -37,14 +60,14 @@ import java.time.Instant
 class ExpectedBusinessPartnerResultFactory(
     expectedMetadata: TestMetadataV7
 ) {
-    private val expectedAdminAreasLevel1: Collection<CountrySubdivisionDto> = expectedMetadata.adminAreas
-    private val expectedLegalForms: Collection<LegalFormDto> = expectedMetadata.legalForms
-    private val expectedLegalEntityIdentifierTypes: Collection<IdentifierTypeDto> = expectedMetadata.legalEntityIdentifierTypes
-    private val expectedAddressIdentifierTypes: Collection<IdentifierTypeDto> = expectedMetadata.addressIdentifierTypes
-    private val expectedCountries: List<CountryDto> = expectedMetadata.countries
+    private val expectedAdminAreasLevel1: Collection<CountrySubdivisionV7Dto> = expectedMetadata.adminAreas
+    private val expectedLegalForms: Collection<LegalFormV7Dto> = expectedMetadata.legalForms
+    private val expectedLegalEntityIdentifierTypes: Collection<IdentifierTypeV7Dto> = expectedMetadata.legalEntityIdentifierTypes
+    private val expectedAddressIdentifierTypes: Collection<IdentifierTypeV7Dto> = expectedMetadata.addressIdentifierTypes
+    private val expectedCountries: List<CountryV7Dto> = expectedMetadata.countries
 
     fun mapToExpectedLegalEntity(
-        givenRequest: LegalEntityPartnerCreateRequest,
+        givenRequest: LegalEntityPartnerCreateV7Request,
         givenBpnL: String = StringIgnoreComparator.IGNORE_STRING,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         currentness: Instant = Instant.EPOCH,
@@ -53,10 +76,10 @@ class ExpectedBusinessPartnerResultFactory(
         addressCreatedAt: Instant = currentness,
         addressUpdatedAt: Instant = currentness,
         isMaintainConfidences: Boolean = false
-    ): LegalEntityWithLegalAddressVerboseDto {
-        return LegalEntityWithLegalAddressVerboseDto(
+    ): LegalEntityWithLegalAddressVerboseV7Dto {
+        return LegalEntityWithLegalAddressVerboseV7Dto(
             header = with(givenRequest.legalEntity.header) {
-                LegalEntityHeaderVerboseDto(
+                LegalEntityHeaderVerboseV7Dto(
                     bpnl = givenBpnL,
                     legalName = legalName,
                     legalShortName = legalShortName,
@@ -91,7 +114,7 @@ class ExpectedBusinessPartnerResultFactory(
     }
 
     fun mapToExpectedSite(
-        givenRequest: SitePartnerCreateRequest,
+        givenRequest: SitePartnerCreateV7Request,
         isCatenaXMemberData: Boolean,
         givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
@@ -100,10 +123,10 @@ class ExpectedBusinessPartnerResultFactory(
         addressCreatedAt: Instant = siteCreatedAt,
         addressUpdatedAt: Instant = siteCreatedAt,
         isMaintainConfidences: Boolean = false
-    ): SiteWithMainAddressVerboseDto {
-        return SiteWithMainAddressVerboseDto(
+    ): SiteWithMainAddressVerboseV7Dto {
+        return SiteWithMainAddressVerboseV7Dto(
             site = with(givenRequest.site) {
-                SiteVerboseDto(
+                SiteVerboseV7Dto(
                     bpns = givenBpnS,
                     name = name,
                     states = states.map { mapToExpectedResult(it) },
@@ -129,14 +152,14 @@ class ExpectedBusinessPartnerResultFactory(
     }
 
     fun mapToExpectedAdditionalAddress(
-        givenRequest: AddressPartnerCreateRequest,
+        givenRequest: AddressPartnerCreateV7Request,
         isCatenaXMemberData: Boolean,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         bpnLegalEntityOverwrite: String? = null,
         createdAt: Instant = Instant.EPOCH,
         updatedAt: Instant = createdAt,
         isMaintainConfidences: Boolean = false
-    ): LogisticAddressInvariantVerboseDto {
+    ): LogisticAddressInvariantVerboseV7Dto {
         return mapToExpectedResult(
             givenRequest = givenRequest.address,
             givenBpnA = givenBpnA,
@@ -151,7 +174,7 @@ class ExpectedBusinessPartnerResultFactory(
     }
 
     private fun mapToExpectedResult(
-        givenRequest: LogisticAddressDto,
+        givenRequest: LogisticAddressV7Dto,
         givenBpnA: String,
         bpnLegalEntity: String?,
         bpnSite: String?,
@@ -160,9 +183,9 @@ class ExpectedBusinessPartnerResultFactory(
         createdAt: Instant,
         updatedAt: Instant,
         isMaintainConfidences: Boolean = false
-    ): LogisticAddressInvariantVerboseDto {
+    ): LogisticAddressInvariantVerboseV7Dto {
         return with(givenRequest) {
-            LogisticAddressInvariantVerboseDto(
+            LogisticAddressInvariantVerboseV7Dto(
                 bpna = givenBpnA,
                 name = name,
                 states = states.map { mapToExpectedResult(it) },
@@ -180,46 +203,46 @@ class ExpectedBusinessPartnerResultFactory(
         }
     }
 
-    private fun mapToExpectedResult(givenRequest: LegalEntityIdentifierDto): LegalEntityIdentifierVerboseDto {
+    private fun mapToExpectedResult(givenRequest: LegalEntityIdentifierV7Dto): LegalEntityIdentifierVerboseV7Dto {
         val identifierType = expectedLegalEntityIdentifierTypes.find { givenRequest.type == it.technicalKey }
             ?: throw IllegalArgumentException("Legal Entity identifier with Key '${givenRequest.type}' is not expected")
-        return LegalEntityIdentifierVerboseDto(
+        return LegalEntityIdentifierVerboseV7Dto(
             value = givenRequest.value,
             typeVerbose = TypeKeyNameVerboseDto(identifierType.technicalKey, identifierType.name),
             issuingBody = givenRequest.issuingBody
         )
     }
 
-    private fun mapToExpectedResult(givenRequest: AddressIdentifierDto): AddressIdentifierVerboseDto {
+    private fun mapToExpectedResult(givenRequest: AddressIdentifierV7Dto): AddressIdentifierVerboseV7Dto {
         val identifierType = expectedAddressIdentifierTypes.find { givenRequest.type == it.technicalKey }
             ?: throw IllegalArgumentException("Address identifier with Key '${givenRequest.type}' is not expected")
-        return AddressIdentifierVerboseDto(
+        return AddressIdentifierVerboseV7Dto(
             value = givenRequest.value,
             typeVerbose = TypeKeyNameVerboseDto(identifierType.technicalKey, identifierType.name)
         )
     }
 
-    private fun mapToExpectedResult(givenRequest: LegalEntityStateDto): LegalEntityStateVerboseDto {
+    private fun mapToExpectedResult(givenRequest: LegalEntityStateV7Dto): LegalEntityStateVerboseV7Dto {
         return with(givenRequest) {
-            LegalEntityStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            LegalEntityStateVerboseV7Dto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
-    private fun mapToExpectedResult(givenRequest: AddressStateDto): AddressStateVerboseDto {
+    private fun mapToExpectedResult(givenRequest: AddressStateV7Dto): AddressStateVerboseV7Dto {
         return with(givenRequest) {
-            AddressStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            AddressStateVerboseV7Dto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
-    private fun mapToExpectedResult(givenRequest: SiteStateDto): SiteStateVerboseDto {
+    private fun mapToExpectedResult(givenRequest: SiteStateV7Dto): SiteStateVerboseV7Dto {
         return with(givenRequest) {
-            SiteStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            SiteStateVerboseV7Dto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
-    private fun mapToExpectedResult(givenRequest: PhysicalPostalAddressDto): PhysicalPostalAddressVerboseDto {
+    private fun mapToExpectedResult(givenRequest: PhysicalPostalAddressV7Dto): PhysicalPostalAddressVerboseV7Dto {
         return with(givenRequest) {
-            PhysicalPostalAddressVerboseDto(
+            PhysicalPostalAddressVerboseV7Dto(
                 geographicCoordinates = geographicCoordinates,
                 countryVerbose = expectedCountries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
@@ -239,9 +262,9 @@ class ExpectedBusinessPartnerResultFactory(
         }
     }
 
-    private fun mapToExpectedResult(givenRequest: AlternativePostalAddressDto): AlternativePostalAddressVerboseDto {
+    private fun mapToExpectedResult(givenRequest: AlternativePostalAddressV7Dto): AlternativePostalAddressVerboseV7Dto {
         return with(givenRequest) {
-            AlternativePostalAddressVerboseDto(
+            AlternativePostalAddressVerboseV7Dto(
                 geographicCoordinates = geographicCoordinates,
                 countryVerbose = expectedCountries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
@@ -250,13 +273,13 @@ class ExpectedBusinessPartnerResultFactory(
         }
     }
 
-    private fun mapToExpectedResult(givenAdminAreaCode: String): RegionDto {
+    private fun mapToExpectedResult(givenAdminAreaCode: String): RegionV7Dto {
         return with(expectedAdminAreasLevel1.find { it.code == givenAdminAreaCode }!!) {
-            RegionDto(countryCode, code, name)
+            RegionV7Dto(countryCode, code, name)
         }
     }
 
-    private fun mapToExpectedConfidence(confidenceCriteria: ConfidenceCriteriaDto, numberOfSharingMembers: Int = 0): ConfidenceCriteriaDto{
+    private fun mapToExpectedConfidence(confidenceCriteria: ConfidenceCriteriaV7Dto, numberOfSharingMembers: Int = 0): ConfidenceCriteriaV7Dto{
         return confidenceCriteria.copy(numberOfSharingMembers = numberOfSharingMembers)
     }
 }

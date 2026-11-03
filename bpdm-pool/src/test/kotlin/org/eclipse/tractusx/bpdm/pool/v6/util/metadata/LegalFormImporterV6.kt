@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
 
 class LegalFormImporterV6(
     private val legalFormEntryImporter: LegalFormEntryImporter
 ) {
-    fun importFromResource(): List<LegalFormDtoV6>{
+    fun importFromResource(): List<LegalFormV6Dto>{
         val uniqueRows = legalFormEntryImporter.importFromResource()
         val legalForms = uniqueRows.map { entry ->
-            LegalFormDtoV6(
+            LegalFormV6Dto(
                 technicalKey = entry.elfCode!!,
                 name = entry.name!!,
                 transliteratedName = entry.transliteratedName?.takeIf { it.isNotBlank() },
