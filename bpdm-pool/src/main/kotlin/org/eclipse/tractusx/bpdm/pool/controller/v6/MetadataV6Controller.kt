@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
@@ -88,7 +88,7 @@ class MetadataV6Controller(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryDto> {
+    override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryV6Dto> {
         return countrySearchApplicationV6Service.searchCountries(paginationRequest)
     }
 

@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.test.testdata.pool.toCountryVerbose
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import java.time.Instant
 

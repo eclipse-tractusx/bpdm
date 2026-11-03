@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.CountrySearchService
 import org.springframework.stereotype.Service
@@ -41,8 +41,8 @@ class CountrySearchApplicationV6Service(
      * Returns the requested page of all known countries.
      */
     @Transactional(readOnly = true)
-    fun searchCountries(paginationRequest: PaginationRequest): PageDto<CountryDto> =
+    fun searchCountries(paginationRequest: PaginationRequest): PageDto<CountryV6Dto> =
         countrySearchService.search(paginationRequest.toPageRequest(CountryRepository.DEFAULT_SORTING))
-            .toPageDto { CountryDto(countryCode = it.countryCode, name = it.name, description = it.description) }
+            .toPageDto { CountryV6Dto(countryCode = it.countryCode, name = it.name, description = it.description) }
 
 }

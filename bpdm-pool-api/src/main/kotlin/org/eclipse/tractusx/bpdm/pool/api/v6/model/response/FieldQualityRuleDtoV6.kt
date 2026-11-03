@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.QualityLevelV6
 
 @Schema(name = "FieldQualityRuleDtoV6", description = "Rule for the quality level of an entity field ", deprecated = true)
 data class FieldQualityRuleDtoV6(
@@ -35,5 +35,5 @@ data class FieldQualityRuleDtoV6(
     val country: String,
 
     @get:Schema(description = "Quality level of the field")
-    val qualityLevel: QualityLevel
+    val qualityLevel: QualityLevelV6
 )

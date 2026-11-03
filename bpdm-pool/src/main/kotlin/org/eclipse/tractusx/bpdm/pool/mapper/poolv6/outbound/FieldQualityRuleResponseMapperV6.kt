@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
+import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.QualityLevelV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.model.FieldQualityRule
 import org.springframework.stereotype.Component
@@ -37,6 +39,13 @@ class FieldQualityRuleResponseMapperV6 {
             fieldPath = rule.fieldPath,
             schemaName = rule.schemaName,
             country = rule.country,
-            qualityLevel = rule.qualityLevel
+            qualityLevel = toQualityLevel(rule.qualityLevel)
         )
+
+    private fun toQualityLevel(qualityLevel: QualityLevel): QualityLevelV6 =
+        when (qualityLevel) {
+            QualityLevel.MANDATORY -> QualityLevelV6.MANDATORY
+            QualityLevel.OPTIONAL -> QualityLevelV6.OPTIONAL
+            QualityLevel.FORBIDDEN -> QualityLevelV6.FORBIDDEN
+        }
 }

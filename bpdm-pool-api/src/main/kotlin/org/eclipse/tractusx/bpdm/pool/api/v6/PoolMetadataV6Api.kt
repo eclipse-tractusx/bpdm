@@ -28,8 +28,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
@@ -167,6 +167,6 @@ interface PoolMetadataV6Api {
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/countries"])
-    fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
+    fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryV6Dto>
 
 }

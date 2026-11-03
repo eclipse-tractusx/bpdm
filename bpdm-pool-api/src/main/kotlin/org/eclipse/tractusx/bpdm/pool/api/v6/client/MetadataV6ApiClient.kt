@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.api.v6.client
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
@@ -64,5 +64,5 @@ interface MetadataV6ApiClient: PoolMetadataV6Api {
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6>
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/countries")
-    override fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryDto>
+    override fun getCountries(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountryV6Dto>
 }

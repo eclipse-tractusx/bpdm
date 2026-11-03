@@ -23,10 +23,10 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.ObjectAssert
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
-import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.QualityLevelV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
@@ -40,7 +40,7 @@ import java.time.LocalDateTime
 class AssertRepositoryV6(
     private val localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
 ) {
-    fun assertCountryPage(actual: PageDto<CountryDto>, page: Int, pageSize: Int) {
+    fun assertCountryPage(actual: PageDto<CountryV6Dto>, page: Int, pageSize: Int) {
         Assertions.assertThat(actual.page).isEqualTo(page)
         Assertions.assertThat(actual.totalElements).isGreaterThan((page * pageSize).toLong())
         Assertions.assertThat(actual.totalPages).isEqualTo(((actual.totalElements + pageSize - 1) / pageSize).toInt())
@@ -50,7 +50,7 @@ class AssertRepositoryV6(
         Assertions.assertThat(actual.content.map { it.countryCode }).isSorted()
     }
 
-    fun assertCountryCatalog(actual: Collection<CountryDto>, expectedCountry: CountryDto) {
+    fun assertCountryCatalog(actual: Collection<CountryV6Dto>, expectedCountry: CountryV6Dto) {
         Assertions.assertThat(actual).contains(expectedCountry)
         Assertions.assertThat(actual).allSatisfy {
             Assertions.assertThat(it.countryCode).isNotBlank()
@@ -62,7 +62,7 @@ class AssertRepositoryV6(
         Assertions.assertThat(actual).isNotEmpty()
         Assertions.assertThat(actual).allSatisfy {
             Assertions.assertThat(it.country).isEqualTo(country)
-            Assertions.assertThat(it.qualityLevel).isNotEqualTo(QualityLevel.FORBIDDEN)
+            Assertions.assertThat(it.qualityLevel).isNotEqualTo(QualityLevelV6.FORBIDDEN)
         }
     }
 

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestMetadataV6
 
@@ -29,7 +29,7 @@ class TestMetadataV6FromResourceProvider(
     private val identifierTypeImporter: IdentifierTypeImporterV6
 ) {
 
-    fun createMetadata(countries: List<CountryDto> = emptyList()): TestMetadataV6 {
+    fun createMetadata(countries: List<CountryV6Dto> = emptyList()): TestMetadataV6 {
         val allIdentifierTypes = identifierTypeImporter.importFromResource()
 
         return TestMetadataV6(
