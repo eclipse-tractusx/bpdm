@@ -19,6 +19,7 @@ import java.time.Instant
 
 data class SiteGoldenRecordRaw(
     val bpn: String,
+    val mainAddressBpn: String,
     val name: String,
     val states: List<StateRaw>,
     val confidence: ConfidenceCriteriaRaw,

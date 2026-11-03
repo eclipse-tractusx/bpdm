@@ -8,6 +8,9 @@ The output's `address.addressType` describes the address's role towards the site
 in `site`, not towards any site in `additionalSites`. Pool synchronization uses
 that site's main address to determine the site-main role and preserves the
 address's legal-address role.
+If the address no longer belongs to the tracked site, synchronization still
+applies address changes and preserves the tracked site, but does not report
+the address as that site's main address.
 
 ## NOTICE
 

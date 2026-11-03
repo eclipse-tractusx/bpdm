@@ -13,6 +13,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service.parser.goldenrecord
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputContentParsed
@@ -52,11 +53,29 @@ class AddressAlignmentParser(
         if (siteBpnToAdopt != null && adoptedSite == null)
             return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.AdoptedSiteMissing(sharingState, siteBpnToAdopt))
 
+        val trackedSiteBpn = base.siteBpn ?: siteBpnToAdopt
+        val trackedSiteIsMember = trackedSiteBpn != null &&
+                (trackedSiteBpn == address.siteBpn || trackedSiteBpn in address.additionalSiteBpns)
+        val trackedSite = trackedSiteBpn?.let { goldenRecords.sites[it] }
+        if (trackedSiteBpn != null && trackedSiteIsMember && trackedSite == null)
+            return ParseResult.ofSingleFailure(GoldenRecordAlignmentError.GoldenRecordMissing(sharingState, trackedSiteBpn))
+
+        val poolType = address.addressType ?: base.addressType
+        val isLegalAddress = poolType == AddressType.LegalAddress || poolType == AddressType.LegalAndSiteMainAddress
+        // The Pool's site-main role is global; the output's role belongs only to its tracked site.
+        val isSiteMainAddress = trackedSiteIsMember && trackedSite?.mainAddressBpn == address.bpn
+        val addressType = when {
+            isLegalAddress && isSiteMainAddress -> AddressType.LegalAndSiteMainAddress
+            isLegalAddress -> AddressType.LegalAddress
+            isSiteMainAddress -> AddressType.SiteMainAddress
+            else -> AddressType.AdditionalAddress
+        }
+
         return ParseResult.Success(
             AddressAlignmentParsed(
                 address = address.copy(scriptVariants = address.scriptVariants.distinctBy { it.scriptCode }),
-                addressType = address.addressType ?: base.addressType,
-                additionalSites = additionalSitesOf(address, base.siteBpn ?: siteBpnToAdopt, goldenRecords),
+                addressType = addressType,
+                additionalSites = additionalSitesOf(address, trackedSiteBpn, goldenRecords),
                 adoptedSite = adoptedSite?.let(siteParser::normalize)
             )
         )
