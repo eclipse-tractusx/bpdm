@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
 import org.springframework.stereotype.Component
 
@@ -32,9 +32,9 @@ class ConfidenceCriteriaResponseMapperV6 {
     /**
      * Returns the given confidence criteria as the v6 API reports them.
      */
-    fun toConfidenceCriteria(confidenceCriteria: ConfidenceCriteriaDb): ConfidenceCriteriaDtoV6 =
+    fun toConfidenceCriteria(confidenceCriteria: ConfidenceCriteriaDb): ConfidenceCriteriaV6Dto =
         with(confidenceCriteria) {
-            ConfidenceCriteriaDtoV6(
+            ConfidenceCriteriaV6Dto(
                 sharedByOwner,
                 checkedByExternalDataSource,
                 numberOfSharingMembers,

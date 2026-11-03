@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnRequestIdentifierMappingDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnIdentifierMappingV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappingV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.model.BpnIdentifierMatch
 import org.springframework.stereotype.Component
@@ -34,12 +34,12 @@ class BpnSearchResponseMapperV6 {
     /**
      * Returns the identifier-to-BPN mappings the identifier search found.
      */
-    fun toIdentifierMappings(matches: Set<BpnIdentifierMatch>): Set<BpnIdentifierMappingDtoV6> =
-        matches.map { BpnIdentifierMappingDtoV6(idValue = it.identifierValue, bpn = it.bpn) }.toSet()
+    fun toIdentifierMappings(matches: Set<BpnIdentifierMatch>): Set<BpnIdentifierMappingV6Dto> =
+        matches.map { BpnIdentifierMappingV6Dto(idValue = it.identifierValue, bpn = it.bpn) }.toSet()
 
     /**
      * Returns the request-identifier-to-BPN mappings the request identifier search found.
      */
-    fun toRequestIdentifierMappings(mappings: Set<BpnRequestIdentifierMappingDb>): Set<BpnRequestIdentifierMappingDtoV6> =
-        mappings.map { BpnRequestIdentifierMappingDtoV6(requestedIdentifier = it.requestIdentifier, bpn = it.bpn) }.toSet()
+    fun toRequestIdentifierMappings(mappings: Set<BpnRequestIdentifierMappingDb>): Set<BpnRequestIdentifierMappingV6Dto> =
+        mappings.map { BpnRequestIdentifierMappingV6Dto(requestedIdentifier = it.requestIdentifier, bpn = it.bpn) }.toSet()
 }

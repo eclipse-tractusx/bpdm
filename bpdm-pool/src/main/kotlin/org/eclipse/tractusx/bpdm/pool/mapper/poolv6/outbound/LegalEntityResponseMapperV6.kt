@@ -22,19 +22,19 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityRelationTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.RelationVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityRelationTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityIdentifierVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.relation.RelationVerboseV6Dto
 
 /**
  * Maps stored legal entities to the v6 API legal entity DTOs.
@@ -49,9 +49,9 @@ class LegalEntityResponseMapperV6(
     /**
      * Returns the given legal entity as the v6 API reports it.
      */
-    fun toLegalEntity(legalEntity: LegalEntityDb): LegalEntityVerboseDtoV6 =
+    fun toLegalEntity(legalEntity: LegalEntityDb): LegalEntityVerboseV6Dto =
         with(legalEntity) {
-            LegalEntityVerboseDtoV6(
+            LegalEntityVerboseV6Dto(
                 bpnl = bpn,
                 legalName = legalName.value,
                 legalShortName = legalName.shortName,
@@ -70,8 +70,8 @@ class LegalEntityResponseMapperV6(
     /**
      * Returns the given legal entity together with its legal address as the v6 API reports them.
      */
-    fun toLegalEntityWithLegalAddress(legalEntity: LegalEntityDb): LegalEntityWithLegalAddressVerboseDtoV6 =
-        LegalEntityWithLegalAddressVerboseDtoV6(
+    fun toLegalEntityWithLegalAddress(legalEntity: LegalEntityDb): LegalEntityWithLegalAddressVerboseV6Dto =
+        LegalEntityWithLegalAddressVerboseV6Dto(
             legalEntity = toLegalEntity(legalEntity),
             legalAddress = addressResponseMapperV6.toAddress(legalEntity.legalAddress)
         )
@@ -80,22 +80,22 @@ class LegalEntityResponseMapperV6(
      * Returns the given created or updated legal entity as the v6 API reports it, tagged with the key of the request
      * that wrote it.
      */
-    fun toUpsertResponse(legalEntity: LegalEntityDb, entryId: String?): LegalEntityPartnerCreateVerboseDtoV6 =
-        LegalEntityPartnerCreateVerboseDtoV6(
+    fun toUpsertResponse(legalEntity: LegalEntityDb, entryId: String?): LegalEntityPartnerCreateVerboseV6Dto =
+        LegalEntityPartnerCreateVerboseV6Dto(
             legalEntity = toLegalEntity(legalEntity),
             legalAddress = addressResponseMapperV6.toAddress(legalEntity.legalAddress),
             index = entryId
         )
 
-    private fun toIdentifier(identifier: LegalEntityIdentifierDb): LegalEntityIdentifierVerboseDtoV6 =
-        LegalEntityIdentifierVerboseDtoV6(
+    private fun toIdentifier(identifier: LegalEntityIdentifierDb): LegalEntityIdentifierVerboseV6Dto =
+        LegalEntityIdentifierVerboseV6Dto(
             identifier.value,
             TypeKeyNameVerboseDto(identifier.type.technicalKey, identifier.type.name),
             identifier.issuingBody
         )
 
-    private fun toState(state: LegalEntityStateDb): LegalEntityStateVerboseDtoV6 =
-        LegalEntityStateVerboseDtoV6(
+    private fun toState(state: LegalEntityStateDb): LegalEntityStateVerboseV6Dto =
+        LegalEntityStateVerboseV6Dto(
             BusinessStateDates.reportValidFrom(state.validFrom),
             BusinessStateDates.reportValidTo(state.validTo),
             state.type.toDto()
@@ -103,9 +103,9 @@ class LegalEntityResponseMapperV6(
 
     // Relation types introduced after v6 was frozen are omitted from v6 responses rather than added to its enum,
     // which would change a deprecated contract. Mapping them exhaustively keeps a later type from silently reaching here.
-    private fun toRelation(relation: RelationDb): RelationVerboseDtoV6? =
+    private fun toRelation(relation: RelationDb): RelationVerboseV6Dto? =
         toRelationType(relation.type)?.let {
-            RelationVerboseDtoV6(
+            RelationVerboseV6Dto(
                 it,
                 relation.startNode.bpn,
                 relation.endNode.bpn

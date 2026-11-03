@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.api.v6.client
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
@@ -36,11 +36,11 @@ interface CxMembershipV6ApiClient {
 
     @GetExchange(value = ApiCommons.MEMBERSHIP_BASE_PATH_V6)
     fun get(
-        @ParameterObject searchRequest: CxMembershipSearchRequestV6,
+        @ParameterObject searchRequest: CxMembershipSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<CxMembershipDtoV6>
+    ): PageDto<CxMembershipV6Dto>
 
 
     @PutExchange(value = ApiCommons.MEMBERSHIP_BASE_PATH_V6)
-    fun put(@RequestBody updateRequest: CxMembershipUpdateRequestV6)
+    fun put(@RequestBody updateRequest: CxMembershipUpdateV6Request)
 }

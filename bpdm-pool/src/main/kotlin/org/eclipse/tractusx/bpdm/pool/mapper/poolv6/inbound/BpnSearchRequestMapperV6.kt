@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnRequestIdentifierSearchRequest
 import org.springframework.stereotype.Component
@@ -35,7 +35,7 @@ class BpnSearchRequestMapperV6 {
     /**
      * Returns the criteria to search BPNs by the identifiers the client sent.
      */
-    fun toIdentifierSearchRequest(searchRequest: IdentifiersSearchRequestV6): BpnIdentifierSearchRequest =
+    fun toIdentifierSearchRequest(searchRequest: IdentifiersSearchV6Request): BpnIdentifierSearchRequest =
         BpnIdentifierSearchRequest(
             businessPartnerType = IdentifierBusinessPartnerType.valueOf(searchRequest.businessPartnerType.name),
             identifierTypeKey = searchRequest.idType,
@@ -45,6 +45,6 @@ class BpnSearchRequestMapperV6 {
     /**
      * Returns the criteria to search BPNs by the request identifiers the client sent.
      */
-    fun toRequestIdentifierSearchRequest(searchRequest: BpnRequestIdentifierSearchRequestV6): BpnRequestIdentifierSearchRequest =
+    fun toRequestIdentifierSearchRequest(searchRequest: BpnRequestIdentifierSearchV6Request): BpnRequestIdentifierSearchRequest =
         BpnRequestIdentifierSearchRequest(requestedIdentifiers = searchRequest.requestedIdentifiers)
 }

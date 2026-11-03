@@ -22,13 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.FieldQualityRuleV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AdministrativeAreaSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.CountrySearchApplicationV6Service
@@ -54,7 +54,7 @@ class MetadataV6Controller(
 ) : PoolMetadataV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createIdentifierType(identifierType: IdentifierTypeDtoV6): IdentifierTypeDtoV6 {
+    override fun createIdentifierType(identifierType: IdentifierTypeV6Dto): IdentifierTypeV6Dto {
         return identifierTypeCreateApplicationV6Service.createIdentifierType(identifierType)
     }
 
@@ -63,27 +63,27 @@ class MetadataV6Controller(
         paginationRequest: PaginationRequest,
         businessPartnerType: IdentifierBusinessPartnerTypeV6,
         country: String?
-    ): PageDto<IdentifierTypeDtoV6> {
+    ): PageDto<IdentifierTypeV6Dto> {
         return identifierTypeSearchApplicationV6Service.searchIdentifierTypes(businessPartnerType, country, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createLegalForm(type: LegalFormRequestV6): LegalFormDtoV6 {
+    override fun createLegalForm(type: LegalFormV6Request): LegalFormV6Dto {
         return legalFormCreateApplicationV6Service.createLegalForm(type)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDtoV6> {
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormV6Dto> {
         return legalFormSearchApplicationV6Service.searchLegalForms(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>> {
+    override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleV6Dto>> {
         return ResponseEntity(fieldQualityRuleSearchApplicationV6Service.searchFieldQualityRules(country), HttpStatus.OK)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> {
+    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV6Dto> {
         return administrativeAreaSearchApplicationV6Service.searchAdministrativeAreas(paginationRequest)
     }
 

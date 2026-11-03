@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 

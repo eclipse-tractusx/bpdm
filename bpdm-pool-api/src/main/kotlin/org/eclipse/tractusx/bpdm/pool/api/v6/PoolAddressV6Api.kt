@@ -29,12 +29,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -59,9 +59,9 @@ interface PoolAddressV6Api {
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
     @GetMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6])
     fun getAddresses(
-        @ParameterObject addressSearchRequest: AddressSearchRequestV6,
+        @ParameterObject addressSearchRequest: AddressSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDtoV6>
+    ): PageDto<LogisticAddressVerboseV6Dto>
 
     @Operation(
         deprecated = true,
@@ -79,7 +79,7 @@ interface PoolAddressV6Api {
     @GetMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V6}/{bpna}"])
     fun getAddress(
         @Parameter(description = "BPNA value") @PathVariable bpna: String
-    ): LogisticAddressVerboseDtoV6
+    ): LogisticAddressVerboseV6Dto
 
     @Operation(
         deprecated = true,
@@ -95,9 +95,9 @@ interface PoolAddressV6Api {
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
     @PostMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}"])
     fun searchAddresses(
-        @RequestBody searchRequest: AddressSearchRequestV6,
+        @RequestBody searchRequest: AddressSearchV6Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDtoV6>
+    ): PageDto<LogisticAddressVerboseV6Dto>
 
     @Operation(
         deprecated = true,
@@ -117,8 +117,8 @@ interface PoolAddressV6Api {
     @PostMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6])
     fun createAddresses(
         @RequestBody
-        requests: Collection<AddressPartnerCreateRequestV6>
-    ): AddressPartnerCreateResponseWrapperV6
+        requests: Collection<AddressPartnerCreateV6Request>
+    ): AddressPartnerCreateV6ResponseWrapper
 
     @Operation(
         deprecated = true,
@@ -136,7 +136,7 @@ interface PoolAddressV6Api {
     @PutMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6])
     fun updateAddresses(
         @RequestBody
-        requests: Collection<AddressPartnerUpdateRequestV6>
-    ): AddressPartnerUpdateResponseWrapperV6
+        requests: Collection<AddressPartnerUpdateV6Request>
+    ): AddressPartnerUpdateV6ResponseWrapper
 
 }

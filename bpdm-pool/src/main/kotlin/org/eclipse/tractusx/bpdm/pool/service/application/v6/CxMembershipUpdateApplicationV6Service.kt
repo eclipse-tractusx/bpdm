@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.CxMembershipRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.DataSpaceParticipantParseErrorMapper
 import org.eclipse.tractusx.bpdm.common.model.parseAndExecuteAllOrNone
@@ -27,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceP
 import org.eclipse.tractusx.bpdm.pool.service.parser.participation.DataSpaceParticipantUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
 
 /**
  * The REST-API boundary for the legacy v6 "update Catena-X memberships" operation, using the v6 request shape.
@@ -44,7 +44,7 @@ class CxMembershipUpdateApplicationV6Service(
      * cannot be applied.
      */
     @Transactional
-    fun updateMemberships(updateRequest: CxMembershipUpdateRequestV6) {
+    fun updateMemberships(updateRequest: CxMembershipUpdateV6Request) {
         parseAndExecuteAllOrNone(
             cxMembershipRequestMapperV6.toUpdateRequests(updateRequest),
             dataSpaceParticipantUpdateParser::parse,

@@ -28,13 +28,13 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.FieldQualityRuleV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -67,7 +67,7 @@ interface PoolMetadataV6Api {
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/identifier-types"])
-    fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDtoV6): IdentifierTypeDtoV6
+    fun createIdentifierType(@RequestBody identifierType: IdentifierTypeV6Dto): IdentifierTypeV6Dto
 
     @Operation(
         deprecated = true,
@@ -87,7 +87,7 @@ interface PoolMetadataV6Api {
         @Parameter businessPartnerType: IdentifierBusinessPartnerTypeV6,
         @Parameter country: String?
     ):
-            PageDto<IdentifierTypeDtoV6>
+            PageDto<IdentifierTypeV6Dto>
 
 
     @Operation(
@@ -105,7 +105,7 @@ interface PoolMetadataV6Api {
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/legal-forms"])
-    fun createLegalForm(@RequestBody type: LegalFormRequestV6): LegalFormDtoV6
+    fun createLegalForm(@RequestBody type: LegalFormV6Request): LegalFormV6Dto
 
     @Operation(
         deprecated = true,
@@ -120,7 +120,7 @@ interface PoolMetadataV6Api {
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/legal-forms"])
-    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDtoV6>
+    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormV6Dto>
 
     @Operation(
         deprecated = true,
@@ -137,7 +137,7 @@ interface PoolMetadataV6Api {
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/field-quality-rules/"])
-    fun getFieldQualityRules(@Parameter(description = "Country code from the maintained country catalogue") @RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleDtoV6>>
+    fun getFieldQualityRules(@Parameter(description = "Country code from the maintained country catalogue") @RequestParam country: String): ResponseEntity<Collection<FieldQualityRuleV6Dto>>
 
     @Operation(
         deprecated = true,
@@ -152,7 +152,7 @@ interface PoolMetadataV6Api {
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/administrative-areas-level1"])
-    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6>
+    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV6Dto>
 
     @Operation(
         deprecated = true,

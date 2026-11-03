@@ -19,11 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
@@ -33,6 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityC
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
 
 /**
  * The REST-API boundary for the legacy v6 "create legal entities" operation, using the v6 request/response shapes.
@@ -51,11 +51,11 @@ class LegalEntityCreateApplicationV6Service(
      * entity or the errors that stopped it.
      */
     @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequestV6>): LegalEntityPartnerCreateResponseWrapperV6 {
+    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateV6Request>): LegalEntityPartnerCreateV6ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map { legalEntityDtoRequestMapperV6.toCreateRequest(it) }
 
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDtoV6>()
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseV6Dto>()
         val errors = mutableListOf<ErrorInfoV6<LegalEntityCreateErrorV6>>()
         requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
             when (result) {
@@ -64,6 +64,6 @@ class LegalEntityCreateApplicationV6Service(
             }
         }
 
-        return LegalEntityPartnerCreateResponseWrapperV6(responses, errors)
+        return LegalEntityPartnerCreateV6ResponseWrapper(responses, errors)
     }
 }

@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ApiClient
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6Client
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
@@ -55,7 +55,7 @@ class TestDataV6Configuration {
     }
 
     @Bean
-    fun testDataClientV6(poolApiClient: PoolV6ApiClient, testDataV6Factory: TestDataV6Factory): TestDataClientV6{
+    fun testDataClientV6(poolApiClient: PoolV6Client, testDataV6Factory: TestDataV6Factory): TestDataClientV6{
         return TestDataClientV6(testDataV6Factory.request, poolApiClient)
     }
 

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityGetRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityGetParser
@@ -42,7 +42,7 @@ class LegalEntityGetApplicationV6Service(
      * type, and fails with a not-found error when no legal entity carries it.
      */
     @Transactional(readOnly = true)
-    fun getLegalEntity(identifierValue: String, identifierType: String?): LegalEntityWithLegalAddressVerboseDtoV6 =
+    fun getLegalEntity(identifierValue: String, identifierType: String?): LegalEntityWithLegalAddressVerboseV6Dto =
         when (val result = legalEntityGetParser.parse(LegalEntityGetRequest(identifierValue, identifierType))) {
             is ParseResult.Success -> legalEntityResponseMapperV6.toLegalEntityWithLegalAddress(result.parsed)
             is ParseResult.Failure -> throw BpdmNotFoundException("Legal Entity", identifierValue)

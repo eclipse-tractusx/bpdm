@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntitySearchRequest
 import org.springframework.stereotype.Component
 
@@ -33,7 +33,7 @@ class LegalEntitySearchRequestMapperV6 {
      * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
      * imposes.
      */
-    fun toSearchRequest(searchRequest: LegalEntitySearchRequestV6, isDataSpaceParticipant: Boolean?): LegalEntitySearchRequest =
+    fun toSearchRequest(searchRequest: LegalEntitySearchV6Request, isDataSpaceParticipant: Boolean?): LegalEntitySearchRequest =
         LegalEntitySearchRequest(
             legalEntityBpns = searchRequest.bpnLs,
             legalName = searchRequest.legalName,

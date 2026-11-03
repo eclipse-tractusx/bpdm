@@ -19,18 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 
 class IdentifierTypeImporterV6(
     private val identifierTypeEntryImporter: IdentifierTypeEntryImporter
 ) {
 
-    fun importFromResource(): List<IdentifierTypeDtoV6>{
+    fun importFromResource(): List<IdentifierTypeV6Dto>{
         val uniqueRows = identifierTypeEntryImporter.importFromResource()
         val adminAreas = uniqueRows.map { entry ->
-            IdentifierTypeDtoV6(
+            IdentifierTypeV6Dto(
                 businessPartnerType = toBusinessPartnerType(entry.businessPartnerType!!),
                 technicalKey = entry.technicalKey?.takeIf { it.isNotBlank() }!!,
                 name = entry.name?.takeIf { it.isNotBlank() }!!,

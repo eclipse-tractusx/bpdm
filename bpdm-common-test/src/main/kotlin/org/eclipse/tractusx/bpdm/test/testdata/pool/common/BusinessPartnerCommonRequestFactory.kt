@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withSharedByOwner
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -46,7 +46,7 @@ abstract class BusinessPartnerCommonRequestFactory(
     protected val availableScriptCodes: Collection<String>
 ) {
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): SitePartnerCreateRequest {
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
@@ -80,7 +80,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
+    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
         return buildLegalAddressSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl, random)
     }
 
@@ -105,7 +105,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerCreateRequest {
         return buildAdditionalAddressCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
@@ -121,11 +121,11 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerUpdateRequest {
         return buildAddressUpdateRequest(seed, legalAddressToUpdate.legalAddress.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseV6Dto): AddressPartnerUpdateRequest {
         return buildAddressUpdateRequest(seed, addressToUpdate.address.bpna)
     }
 

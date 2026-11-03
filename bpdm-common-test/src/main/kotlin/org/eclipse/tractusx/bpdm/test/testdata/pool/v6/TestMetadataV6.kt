@@ -20,17 +20,17 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountryV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 
 
 data class TestMetadataV6(
-    val legalForms: List<LegalFormDtoV6>,
-    val legalEntityIdentifierTypes: List<IdentifierTypeDtoV6>,
-    val addressIdentifierTypes: List<IdentifierTypeDtoV6>,
-    val adminAreas: List<CountrySubdivisionDtoV6>,
+    val legalForms: List<LegalFormV6Dto>,
+    val legalEntityIdentifierTypes: List<IdentifierTypeV6Dto>,
+    val addressIdentifierTypes: List<IdentifierTypeV6Dto>,
+    val adminAreas: List<CountrySubdivisionV6Dto>,
     val countries: List<CountryV6Dto> = emptyList()
 )
 

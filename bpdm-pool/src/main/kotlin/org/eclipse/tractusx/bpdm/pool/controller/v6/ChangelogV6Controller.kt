@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolChangelogV6Api
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogEntryVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.ChangelogSearchApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
@@ -36,9 +36,9 @@ class ChangelogV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_CHANGELOG})")
     override fun getChangelogEntries(
-        changelogSearchRequest: ChangelogSearchRequestV6,
+        changelogSearchRequest: ChangelogSearchV6Request,
         paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDtoV6> {
+    ): PageDto<ChangelogEntryVerboseV6Dto> {
         return changelogSearchApplicationService.searchChangelogEntries(changelogSearchRequest, paginationRequest)
     }
 }

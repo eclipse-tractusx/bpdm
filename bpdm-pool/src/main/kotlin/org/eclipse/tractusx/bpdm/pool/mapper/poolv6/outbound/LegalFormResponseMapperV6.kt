@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.springframework.stereotype.Component
 
@@ -32,9 +32,9 @@ class LegalFormResponseMapperV6 {
     /**
      * Returns the given legal form as the v6 API reports it.
      */
-    fun toLegalForm(legalForm: LegalFormDb): LegalFormDtoV6 =
+    fun toLegalForm(legalForm: LegalFormDb): LegalFormV6Dto =
         with(legalForm) {
-            LegalFormDtoV6(
+            LegalFormV6Dto(
                 technicalKey = technicalKey,
                 name = name,
                 transliteratedName = transliteratedName,
