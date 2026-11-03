@@ -191,6 +191,7 @@ class PoolMockDataFactory(
     private fun mockSiteSearchResult(siteResult: SiteWithMainAddressVerboseV7Dto) = mockSiteSearchResult(listOf(siteResult))
 
     fun mockSiteSearchResult(siteResults: List<SiteWithMainAddressVerboseV7Dto>){
+        WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
 
         val mockedSitePage = PageDto(siteResults.size.toLong(), 1, 0, siteResults.size, siteResults)
         WireMock.stubFor(
@@ -203,6 +204,7 @@ class PoolMockDataFactory(
     fun mockAddressSearchResult(addressResult: LogisticAddressVerboseV7Dto) = mockAddressSearchResult(listOf(addressResult))
 
     private fun mockAddressSearchResult(addressResults: List<LogisticAddressVerboseV7Dto>){
+        WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
 
         val mockedAddressPage = PageDto(addressResults.size.toLong(), 1, 0, addressResults.size, addressResults)
         WireMock.stubFor(

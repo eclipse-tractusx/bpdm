@@ -55,7 +55,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val input = testDataClient.businessPartner.upsertInput(testName)
         val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(input)
         val address = records.additionalAddress.copy(
-            address = records.additionalAddress.address.copy(addressType = poolType, updatedAt = Instant.now())
+            address = records.additionalAddress.address.copy(name = "$testName changed", addressType = poolType, updatedAt = Instant.now())
         )
         val trackedSite = records.siteParent.let { if (trackedSiteMain) it.copy(mainAddress = address.address) else it }
         val otherSite = records.additionalSites.single().let {
@@ -68,6 +68,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         syncAddress(address.address.bpna)
 
         val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId)).content.single()
+        assertEquals(address.address.name, output.address.name)
         assertEquals(expectedType, output.address.addressType)
         assertEquals(trackedSite.site.bpns, output.site?.siteBpn)
         assertEquals(address.address.bpna, output.address.addressBpn)
@@ -118,9 +119,10 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     }
 
     @Test
-    fun `pool sync skips address update when the tracked site is missing`() {
+    fun `pool sync skips address update when a current member site is missing`() {
         val input = testDataClient.businessPartner.upsertInput(testName)
         val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(input)
+        assertEquals(listOf(records.siteParent.site.bpns), records.additionalAddress.address.additionalSites)
         val before = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId)).content.single()
         poolMockDataFactory.mockSiteSearchResult(records.additionalSites)
         poolMockDataFactory.mockAddressSearchResult(records.additionalAddress.copy(
