@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,30 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.ReasonCodeSearchService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the V7 "search reason codes" operation.
+ * Searches the reason codes a business partner relation may state, for every API version.
  */
 @Service
-class ReasonCodeSearchApplicationV7Service(
-    private val reasonCodeSearchService: ReasonCodeSearchService
+class ReasonCodeSearchApplicationService(
+    private val reasonCodeSearchService: ReasonCodeSearchService,
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
      * Returns the requested page of all known reason codes.
      */
     @Transactional(readOnly = true)
-    fun searchReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeV7Dto> =
-        reasonCodeSearchService.search(paginationRequest.toPageRequest())
-            .toPageDto { ReasonCodeV7Dto(technicalKey = it.technicalKey, description = it.description) }
+    fun search(pageable: Pageable): Page<ReasonCodeRecord> =
+        reasonCodeSearchService.search(pageable)
+            .map(dbToOutputMapper::toRecord)
 }
