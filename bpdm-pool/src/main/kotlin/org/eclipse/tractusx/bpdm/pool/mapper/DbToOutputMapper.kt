@@ -20,11 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.mapper
 
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.springframework.stereotype.Component
@@ -71,5 +73,21 @@ class DbToOutputMapper {
             countryCode = entity.country.countryCode,
             code = entity.regionCode,
             name = entity.regionName
+        )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: LegalFormDb): LegalFormRecord =
+        LegalFormRecord(
+            technicalKey = entity.technicalKey,
+            name = entity.name,
+            transliteratedName = entity.transliteratedName,
+            abbreviation = entity.abbreviation,
+            transliteratedAbbreviations = entity.transliteratedAbbreviations,
+            countryCode = entity.country?.countryCode,
+            languageCode = entity.languageCode,
+            administrativeAreaCode = entity.administrativeArea?.regionCode,
+            isActive = entity.isActive
         )
 }

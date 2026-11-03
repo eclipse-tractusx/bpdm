@@ -35,11 +35,11 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6MetadataMapper
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.FieldQualityRuleSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalFormCreateApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalFormSearchApplicationV6Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -50,7 +50,7 @@ class MetadataV6Controller(
     val identifierTypeCreateApplicationV6Service: IdentifierTypeCreateApplicationV6Service,
     val identifierTypeSearchApplicationV6Service: IdentifierTypeSearchApplicationV6Service,
     val legalFormCreateApplicationV6Service: LegalFormCreateApplicationV6Service,
-    val legalFormSearchApplicationV6Service: LegalFormSearchApplicationV6Service,
+    val legalFormSearchApplicationService: LegalFormSearchApplicationService,
     val fieldQualityRuleSearchApplicationV6Service: FieldQualityRuleSearchApplicationV6Service,
     val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
     val countrySearchApplicationService: CountrySearchApplicationService,
@@ -78,7 +78,8 @@ class MetadataV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormV6Dto> {
-        return legalFormSearchApplicationV6Service.searchLegalForms(paginationRequest)
+        return legalFormSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV6MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

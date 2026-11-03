@@ -21,8 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountrySubdivisionV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.CountryV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Dto
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.springframework.stereotype.Component
 
 /**
@@ -49,5 +51,21 @@ class ApiV6MetadataMapper {
             countryCode = record.countryCode,
             code = record.code,
             name = record.name
+        )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: LegalFormRecord): LegalFormV6Dto =
+        LegalFormV6Dto(
+            technicalKey = record.technicalKey,
+            name = record.name,
+            transliteratedName = record.transliteratedName,
+            abbreviation = record.abbreviation,
+            transliteratedAbbreviations = record.transliteratedAbbreviations,
+            country = record.countryCode,
+            language = record.languageCode,
+            administrativeAreaLevel1 = record.administrativeAreaCode,
+            isActive = record.isActive
         )
 }

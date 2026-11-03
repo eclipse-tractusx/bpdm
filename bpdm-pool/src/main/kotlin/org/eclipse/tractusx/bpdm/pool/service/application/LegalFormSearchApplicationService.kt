@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,31 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.service.toPageDto
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormResponseMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.LegalFormSearchService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the V7 "search legal forms" operation.
+ * Searches the legal forms a legal entity may be registered under, for every API version.
  */
 @Service
-class LegalFormSearchApplicationV7Service(
+class LegalFormSearchApplicationService(
     private val legalFormSearchService: LegalFormSearchService,
-    private val legalFormResponseMapper: LegalFormResponseMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
      * Returns the requested page of all known legal forms.
      */
     @Transactional(readOnly = true)
-    fun searchLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormV7Dto> =
-        legalFormSearchService.search(paginationRequest.toPageRequest()).toPageDto { legalFormResponseMapper.toLegalForm(it) }
+    fun search(pageable: Pageable): Page<LegalFormRecord> =
+        legalFormSearchService.search(pageable)
+            .map(dbToOutputMapper::toRecord)
 }

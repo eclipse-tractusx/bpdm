@@ -21,10 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.springframework.stereotype.Component
@@ -71,5 +73,21 @@ class ApiV7MetadataMapper {
             countryCode = record.countryCode,
             code = record.code,
             name = record.name
+        )
+
+    /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: LegalFormRecord): LegalFormV7Dto =
+        LegalFormV7Dto(
+            technicalKey = record.technicalKey,
+            name = record.name,
+            transliteratedName = record.transliteratedName,
+            abbreviations = record.abbreviation,
+            transliteratedAbbreviations = record.transliteratedAbbreviations,
+            country = record.countryCode,
+            language = record.languageCode,
+            administrativeAreaLevel1 = record.administrativeAreaCode,
+            isActive = record.isActive
         )
 }

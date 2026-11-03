@@ -37,13 +37,13 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormSearchApplicationV7Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -54,7 +54,7 @@ class MetadataController(
     val identifierTypeCreateApplicationV7Service: IdentifierTypeCreateApplicationV7Service,
     val identifierTypeSearchApplicationV7Service: IdentifierTypeSearchApplicationV7Service,
     val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
-    val legalFormSearchApplicationV7Service: LegalFormSearchApplicationV7Service,
+    val legalFormSearchApplicationService: LegalFormSearchApplicationService,
     val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
     val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
     val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
@@ -84,7 +84,8 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormV7Dto> {
-        return legalFormSearchApplicationV7Service.searchLegalForms(paginationRequest)
+        return legalFormSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
