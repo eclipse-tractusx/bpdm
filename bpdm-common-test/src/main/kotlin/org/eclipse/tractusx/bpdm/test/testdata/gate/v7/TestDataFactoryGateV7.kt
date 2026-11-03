@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.Busines
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 
 /**
@@ -83,33 +83,33 @@ class TestDataFactoryGateV7(
         inner class OutputFactory {
             fun fromLegalEntity(
                 input: BusinessPartnerInputV7Dto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromLegalEntity(input, legalEntity)
 
             fun fromLegalEntityOnSite(
                 input: BusinessPartnerInputV7Dto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                site: SiteWithMainAddressVerboseDto
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                site: SiteWithMainAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromLegalEntityOnSite(input, legalEntity, site)
 
             fun fromSite(
                 input: BusinessPartnerInputV7Dto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                site: SiteWithMainAddressVerboseDto
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                site: SiteWithMainAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromSite(input, legalEntity, site)
 
             fun fromAdditionalAddressOnSite(
                 input: BusinessPartnerInputV7Dto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                site: SiteWithMainAddressVerboseDto,
-                additionalAddress: LogisticAddressVerboseDto,
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                site: SiteWithMainAddressVerboseV7Dto,
+                additionalAddress: LogisticAddressVerboseV7Dto,
                 additionalSites: Collection<AdditionalSiteOutputV7Dto> = emptyList()
             ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress, additionalSites)
 
             fun fromAdditionalAddressOnLegalEntity(
                 input: BusinessPartnerInputV7Dto,
-                legalEntity: LegalEntityWithLegalAddressVerboseDto,
-                additionalAddress: LogisticAddressVerboseDto
+                legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
+                additionalAddress: LogisticAddressVerboseV7Dto
             ) = bpOutputDtoFactory.fromAdditionalAddressOnLegalEntity(input, legalEntity, additionalAddress)
         }
     }

@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteHeaderScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReferenceType
@@ -61,7 +61,7 @@ class ShareOwnCompanyDataTestDataGenerator(
     )
 
     data class LegalEntityResult(
-        val legalEntity: LegalEntityWithLegalAddressVerboseDto,
+        val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
         val taskData: BusinessPartner
     )
 
@@ -86,7 +86,7 @@ class ShareOwnCompanyDataTestDataGenerator(
 
         val siteCreate = with(poolRequestFactory.buildLegalSiteCreateRequest(scenarioId(id), legalEntity.header.bpnl)) {
             copy(scriptVariants = scriptVariants.zip(legalEntity.scriptVariants) { siteScript, leScript ->
-                SiteHeaderScriptVariantDto(leScript.scriptCode, siteScript.name)
+                SiteHeaderScriptVariantV7Dto(leScript.scriptCode, siteScript.name)
             })
         }.let { poolResponseFactory.buildLegalSiteCreate(it, legalEntity, "BPNS${context.runId(id)}") }
 
@@ -112,7 +112,7 @@ class ShareOwnCompanyDataTestDataGenerator(
      * that shared identity instead of the site's own seed: sites sharing one main address are all covered by that one
      * address, so they have to be named in the same scripts.
      */
-    fun buildSite(id: String, legalEntity: LegalEntityWithLegalAddressVerboseDto, sharedMainAddressId: String? = null): SiteResult {
+    fun buildSite(id: String, legalEntity: LegalEntityWithLegalAddressVerboseV7Dto, sharedMainAddressId: String? = null): SiteResult {
         val context = ScenarioContext.current()!!
         val legalEntityParent = legalEntity.copy(header = legalEntity.header.withConfidence(TestDataV7.SharedByOwnerConfidence))
 
@@ -164,7 +164,7 @@ class ShareOwnCompanyDataTestDataGenerator(
 
     fun buildAdditionalLegalEntityAddress(
         id: String,
-        legalEntity: LegalEntityWithLegalAddressVerboseDto,
+        legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
         givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
     ): AdditionalLegalEntityAddressResult {
         val context = ScenarioContext.current()!!
@@ -196,13 +196,13 @@ class ShareOwnCompanyDataTestDataGenerator(
      * inherits it. So a determined parent always carries NoConfidence (owner signal off, not externally
      * verified, confidence level 0).
      */
-    private fun LegalEntityWithLegalAddressVerboseDto.asDeterminedParent(): LegalEntityWithLegalAddressVerboseDto =
+    private fun LegalEntityWithLegalAddressVerboseV7Dto.asDeterminedParent(): LegalEntityWithLegalAddressVerboseV7Dto =
         withConfidence(TestDataV7.NotCheckedNotOwned).withConfidence(TestDataV7.NoConfidence)
 
     private fun scenarioId(id: String) = "$id${ScenarioContext.current()!!.scenarioSuffix}"
 
     /** Rewrites the site's script variants to the script code [sharedMainAddressId] seeds, leaving them alone when null. */
-    private fun SitePartnerCreateRequest.withScriptCodesOf(sharedMainAddressId: String?): SitePartnerCreateRequest {
+    private fun SitePartnerCreateV7Request.withScriptCodesOf(sharedMainAddressId: String?): SitePartnerCreateV7Request {
         val sharedScriptCode = sharedMainAddressId?.let { poolRequestFactory.scriptCodeFor(scenarioId(it)) } ?: return this
         return copy(site = site.copy(scriptVariants = site.scriptVariants.map { it.copy(scriptCode = sharedScriptCode) }))
     }
@@ -212,7 +212,7 @@ class ShareOwnCompanyDataTestDataGenerator(
         runUniqueId: String,
         legalAddressType: AddressType,
         givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
-    ): LegalEntityWithLegalAddressVerboseDto {
+    ): LegalEntityWithLegalAddressVerboseV7Dto {
         return with(
             poolRequestFactory.buildLegalEntity(scenarioUniqueId)
                 .withParticipantData(givenConfidence.sharedByOwner)
@@ -230,7 +230,7 @@ class ShareOwnCompanyDataTestDataGenerator(
         }.withConfidence(TestDataV7.SyncedSharedByOwnerConfidence)
     }
 
-    private fun LegalEntityDto.withRunUniqueIdentifiers(runUniqueId: String): LegalEntityDto =
+    private fun LegalEntityV7Dto.withRunUniqueIdentifiers(runUniqueId: String): LegalEntityV7Dto =
         copy(
             header = header.copy(
                 identifiers = header.identifiers.mapIndexed { index, it ->
@@ -244,7 +244,7 @@ class ShareOwnCompanyDataTestDataGenerator(
             )
         )
 
-    private fun AddressPartnerCreateRequest.withRunUniqueIdentifiers(runUniqueId: String): AddressPartnerCreateRequest =
+    private fun AddressPartnerCreateV7Request.withRunUniqueIdentifiers(runUniqueId: String): AddressPartnerCreateV7Request =
         copy(
             address = address.copy(
                 identifiers = address.identifiers.mapIndexed { index, it ->

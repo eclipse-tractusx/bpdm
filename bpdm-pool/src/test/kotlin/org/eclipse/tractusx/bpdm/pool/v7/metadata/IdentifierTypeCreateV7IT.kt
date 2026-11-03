@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeDetailV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -38,8 +38,8 @@ class IdentifierTypeCreateV7IT : UnscheduledPoolTestBaseV7() {
      * THEN created identifier type is returned
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `create new identifier type v7`(type: IdentifierBusinessPartnerType) {
+    @EnumSource(IdentifierBusinessPartnerTypeV7::class)
+    fun `create new identifier type v7`(type: IdentifierBusinessPartnerTypeV7) {
         //WHEN
         val request = createIdentifierTypeRequest(testName, type)
         val response = poolClient.metadata.createIdentifierType(request)
@@ -53,8 +53,8 @@ class IdentifierTypeCreateV7IT : UnscheduledPoolTestBaseV7() {
      * THEN operator can find new identifier type in available metadata
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `create new identifier type and find it v7`(type: IdentifierBusinessPartnerType) {
+    @EnumSource(IdentifierBusinessPartnerTypeV7::class)
+    fun `create new identifier type and find it v7`(type: IdentifierBusinessPartnerTypeV7) {
         //WHEN
         val request = createIdentifierTypeRequest(testName, type)
         poolClient.metadata.createIdentifierType(request)
@@ -85,15 +85,15 @@ class IdentifierTypeCreateV7IT : UnscheduledPoolTestBaseV7() {
      * THEN categories are persisted and returned
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `create new identifier type with categories v7`(type: IdentifierBusinessPartnerType) {
+    @EnumSource(IdentifierBusinessPartnerTypeV7::class)
+    fun `create new identifier type with categories v7`(type: IdentifierBusinessPartnerTypeV7) {
         //WHEN
         val request = createIdentifierTypeRequest(testName, type)
-            .copy(categories = sortedSetOf(IdentifierTypeCategory.VAT, IdentifierTypeCategory.TIN))
+            .copy(categories = sortedSetOf(IdentifierTypeCategoryV7.VAT, IdentifierTypeCategoryV7.TIN))
         val response = poolClient.metadata.createIdentifierType(request)
 
         //THEN
-        Assertions.assertThat(response.categories).containsExactlyInAnyOrder(IdentifierTypeCategory.VAT, IdentifierTypeCategory.TIN)
+        Assertions.assertThat(response.categories).containsExactlyInAnyOrder(IdentifierTypeCategoryV7.VAT, IdentifierTypeCategoryV7.TIN)
     }
 
     /**
@@ -101,8 +101,8 @@ class IdentifierTypeCreateV7IT : UnscheduledPoolTestBaseV7() {
      * THEN 409 CONFLICT returned
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `try create new identifier type with duplicate technical key v7`(type: IdentifierBusinessPartnerType) {
+    @EnumSource(IdentifierBusinessPartnerTypeV7::class)
+    fun `try create new identifier type with duplicate technical key v7`(type: IdentifierBusinessPartnerTypeV7) {
         //WHEN
         val request = createIdentifierTypeRequest(testName, type)
         poolClient.metadata.createIdentifierType(request)
@@ -112,22 +112,22 @@ class IdentifierTypeCreateV7IT : UnscheduledPoolTestBaseV7() {
             .isInstanceOf(WebClientResponseException.Conflict::class.java)
     }
 
-    private fun createIdentifierTypeRequest(seed: String, type: IdentifierBusinessPartnerType): IdentifierTypeDto {
+    private fun createIdentifierTypeRequest(seed: String, type: IdentifierBusinessPartnerTypeV7): IdentifierTypeV7Dto {
         val random = Random(seed.hashCode())
 
-        return IdentifierTypeDto(
+        return IdentifierTypeV7Dto(
             technicalKey = seed,
             businessPartnerType = type,
-            name = "$seed ${IdentifierTypeDto::name.name}",
-            abbreviation = "$seed ${IdentifierTypeDto::abbreviation.name}",
-            transliteratedName = "$seed ${IdentifierTypeDto::transliteratedName.name}",
-            transliteratedAbbreviation = "$seed ${IdentifierTypeDto::transliteratedAbbreviation.name}",
+            name = "$seed ${IdentifierTypeV7Dto::name.name}",
+            abbreviation = "$seed ${IdentifierTypeV7Dto::abbreviation.name}",
+            transliteratedName = "$seed ${IdentifierTypeV7Dto::transliteratedName.name}",
+            transliteratedAbbreviation = "$seed ${IdentifierTypeV7Dto::transliteratedAbbreviation.name}",
             format = "$seed-format",
-            categories = sortedSetOf(IdentifierTypeCategory.entries.random(random)),
+            categories = sortedSetOf(IdentifierTypeCategoryV7.entries.random(random)),
             details = (1..random.nextInt(3, 10))
                 .map { listOf("DE", "US", "FR", "CN", "PL").random(random) }
                 .toSet()
-                .map { IdentifierTypeDetailDto(it, random.nextBoolean()) }
+                .map { IdentifierTypeDetailV7Dto(it, random.nextBoolean()) }
         )
     }
 }

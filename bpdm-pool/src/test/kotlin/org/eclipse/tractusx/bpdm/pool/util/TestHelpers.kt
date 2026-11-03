@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureResponse
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureResponse
@@ -32,7 +32,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class TestHelpers(
-    private val poolClient: PoolApiClient
+    private val poolClient: PoolV7Client
 ) {
     /**
      * Creates legal entities, sites and addresses according to the given [partnerStructures]
@@ -86,7 +86,7 @@ class TestHelpers(
         }
     }
 
-    fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchRequest) {
+    fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchV7Request) {
         try {
             val result = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest)
 
@@ -96,7 +96,7 @@ class TestHelpers(
         }
     }
 
-    fun `find bpns by nonexistent identifier type`(identifiersSearchRequest: IdentifiersSearchRequest) {
+    fun `find bpns by nonexistent identifier type`(identifiersSearchRequest: IdentifiersSearchV7Request) {
         try {
             val result = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest)
             assertThrows<WebClientResponseException> { result }

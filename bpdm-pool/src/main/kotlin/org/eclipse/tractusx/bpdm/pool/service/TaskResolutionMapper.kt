@@ -19,8 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.ZoneOffset
@@ -28,11 +47,11 @@ import java.time.ZoneOffset
 @Service
 class TaskResolutionMapper {
 
-    fun toTaskResult(legalEntity: LegalEntityWithLegalAddressVerboseDto, hasChanged: Boolean?): LegalEntity{
+    fun toTaskResult(legalEntity: LegalEntityWithLegalAddressVerboseV7Dto, hasChanged: Boolean?): LegalEntity{
         return toTaskResult(legalEntity.header, legalEntity.legalAddress, hasChanged, legalEntity.scriptVariants)
     }
 
-    fun toTaskResult(legalEntity: LegalEntityHeaderVerboseDto, legalAddress: LogisticAddressInvariantVerboseDto, hasChanged: Boolean?, scriptVariants: List<LegalEntityScriptVariantDto>): LegalEntity{
+    fun toTaskResult(legalEntity: LegalEntityHeaderVerboseV7Dto, legalAddress: LogisticAddressInvariantVerboseV7Dto, hasChanged: Boolean?, scriptVariants: List<LegalEntityScriptVariantV7Dto>): LegalEntity{
         return with(legalEntity){
             LegalEntity(
                 bpnReference = BpnReference(bpnl, null, BpnReferenceType.Bpn),
@@ -56,7 +75,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(site: SiteVerboseDto, siteMainAddress: LogisticAddressInvariantVerboseDto, hasChanged: Boolean?): Site{
+    fun toTaskResult(site: SiteVerboseV7Dto, siteMainAddress: LogisticAddressInvariantVerboseV7Dto, hasChanged: Boolean?): Site{
         return with(site){
             Site(
                 bpnReference = BpnReference(bpns, null, BpnReferenceType.Bpn),
@@ -77,7 +96,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(confidenceCriteria: ConfidenceCriteriaDto): ConfidenceCriteria{
+    fun toTaskResult(confidenceCriteria: ConfidenceCriteriaV7Dto): ConfidenceCriteria{
         return with(confidenceCriteria){
             ConfidenceCriteria(
                 sharedByOwner = sharedByOwner,
@@ -90,11 +109,11 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(postalAddress: LogisticAddressInvariantVerboseDto, scriptVariants: List<LogisticAddressScriptVariantDto>, hasChanged: Boolean?): PostalAddressWithScriptVariants{
+    fun toTaskResult(postalAddress: LogisticAddressInvariantVerboseV7Dto, scriptVariants: List<LogisticAddressScriptVariantV7Dto>, hasChanged: Boolean?): PostalAddressWithScriptVariants{
         return PostalAddressWithScriptVariants(toTaskResult(postalAddress, hasChanged), scriptVariants.map { toTaskResult(it) })
     }
 
-    fun toTaskResult(postalAddress: LogisticAddressInvariantVerboseDto, hasChanged: Boolean?): PostalAddress{
+    fun toTaskResult(postalAddress: LogisticAddressInvariantVerboseV7Dto, hasChanged: Boolean?): PostalAddress{
         return with(postalAddress){
             PostalAddress(
                 bpnReference = BpnReference(bpna, null, BpnReferenceType.Bpn),
@@ -113,7 +132,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(physicalAddress: PhysicalPostalAddressVerboseDto): PhysicalAddress{
+    fun toTaskResult(physicalAddress: PhysicalPostalAddressVerboseV7Dto): PhysicalAddress{
         return with(physicalAddress){
             PhysicalAddress(
                 geographicCoordinates = geographicCoordinates?.let { with(it){ GeoCoordinate(longitude, latitude, altitude) } } ?: GeoCoordinate.empty,
@@ -136,7 +155,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativeAddress{
+    fun toTaskResult(alternativeAddress: AlternativePostalAddressVerboseV7Dto): AlternativeAddress{
         return with(alternativeAddress){
             AlternativeAddress(
                 geographicCoordinates = geographicCoordinates?.let { with(it){ GeoCoordinate(longitude, latitude, altitude) } } ?: GeoCoordinate.empty,
@@ -152,7 +171,7 @@ class TaskResolutionMapper {
     }
 
 
-    fun toTaskResult(street: StreetDto): Street{
+    fun toTaskResult(street: StreetV7Dto): Street{
         return with(street){
             Street(
                 name = name,
@@ -168,7 +187,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(legalEntityScriptVariant: LegalEntityScriptVariantDto): LegalEntityScriptVariant{
+    fun toTaskResult(legalEntityScriptVariant: LegalEntityScriptVariantV7Dto): LegalEntityScriptVariant{
         return with(legalEntityScriptVariant){
             LegalEntityScriptVariant(
                 scriptCode = scriptCode,
@@ -179,7 +198,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(siteScriptVariant: SiteScriptVariantDto): SiteScriptVariant{
+    fun toTaskResult(siteScriptVariant: SiteScriptVariantV7Dto): SiteScriptVariant{
         return with(siteScriptVariant){
             SiteScriptVariant(
                 scriptCode = scriptCode,
@@ -189,13 +208,13 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(addressScriptVariant: LogisticAddressScriptVariantDto): PostalAddressScriptVariantWithScriptCode{
+    fun toTaskResult(addressScriptVariant: LogisticAddressScriptVariantV7Dto): PostalAddressScriptVariantWithScriptCode{
         return with(addressScriptVariant){
             PostalAddressScriptVariantWithScriptCode(addressScriptVariant.scriptCode, toTaskResult(address))
         }
     }
 
-    fun toTaskResult(addressScriptVariant: PostalAddressScriptVariantDto): PostalAddressScriptVariant{
+    fun toTaskResult(addressScriptVariant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariant{
         return with(addressScriptVariant){
             PostalAddressScriptVariant(
                 addressName = addressName,
@@ -204,7 +223,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(physicalAddress: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
+    fun toTaskResult(physicalAddress: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariant{
         return with(physicalAddress){
             PhysicalAddressScriptVariant(
                 city = city,
@@ -217,7 +236,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
+    fun toTaskResult(alternativeAddressScriptVariant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariant{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
                 city = city
@@ -225,7 +244,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(street: StreetScriptVariantDto): StreetScriptVariant{
+    fun toTaskResult(street: StreetScriptVariantV7Dto): StreetScriptVariant{
         return with(street){
             StreetScriptVariant(
                 name = name,
@@ -238,33 +257,33 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(relation: RelationVerboseDto): LegalEntityGoldenRecordRelation{
+    fun toTaskResult(relation: RelationVerboseV7Dto): LegalEntityGoldenRecordRelation{
         return LegalEntityGoldenRecordRelation(
             relationType = when (relation.type) {
-                LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
-                LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
-                LegalEntityRelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
-                LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
+                LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                LegalEntityRelationTypeV7.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                LegalEntityRelationTypeV7.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationTypeV7.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = relation.businessPartnerSourceBpnl,
             targetBpn = relation.businessPartnerTargetBpnl
         )
     }
 
-    fun toTaskResult(relation: SiteRelationVerboseDto): SiteGoldenRecordRelation{
+    fun toTaskResult(relation: SiteRelationVerboseV7Dto): SiteGoldenRecordRelation{
         return SiteGoldenRecordRelation(
             relationType = when (relation.type) {
-                SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+                SiteRelationTypeV7.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = relation.businessPartnerSourceBpns,
             targetBpn = relation.businessPartnerTargetBpns
         )
     }
 
-    fun toTaskResult(relation: AddressRelationVerboseDto): AddressGoldenRecordRelation{
+    fun toTaskResult(relation: AddressRelationVerboseV7Dto): AddressGoldenRecordRelation{
         return AddressGoldenRecordRelation(
             relationType = when (relation.type) {
-                AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+                AddressRelationTypeV7.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = relation.businessPartnerSourceBpna,
             targetBpn = relation.businessPartnerTargetBpna

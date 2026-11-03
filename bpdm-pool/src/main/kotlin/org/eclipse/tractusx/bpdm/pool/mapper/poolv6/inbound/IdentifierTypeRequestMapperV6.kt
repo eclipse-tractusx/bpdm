@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeDetailRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
@@ -39,7 +39,7 @@ class IdentifierTypeRequestMapperV6 {
     fun toCreateRequest(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRequest =
         IdentifierTypeCreateRequest(
             technicalKey = identifierType.technicalKey,
-            businessPartnerType = IdentifierBusinessPartnerType.valueOf(identifierType.businessPartnerType.name),
+            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(identifierType.businessPartnerType.name),
             name = identifierType.name,
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
@@ -55,7 +55,7 @@ class IdentifierTypeRequestMapperV6 {
      */
     fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerTypeV6, country: String?): IdentifierTypeSearchRequest =
         IdentifierTypeSearchRequest(
-            businessPartnerType = IdentifierBusinessPartnerType.valueOf(businessPartnerType.name),
+            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(businessPartnerType.name),
             country = country
         )
 }

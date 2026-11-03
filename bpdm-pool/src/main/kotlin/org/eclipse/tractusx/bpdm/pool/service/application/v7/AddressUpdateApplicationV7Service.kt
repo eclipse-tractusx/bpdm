@@ -19,11 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
@@ -34,6 +29,11 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUp
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
 
 /**
  * The REST-API boundary for the V7 "update address" operation.
@@ -52,14 +52,14 @@ class AddressUpdateApplicationV7Service(
      * the errors that stopped it.
      */
     @Transactional
-    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
+    fun updateAddresses(requests: Collection<AddressPartnerUpdateV7Request>): AddressPartnerUpdateV7ResponseWrapper {
         val requestList = requests.toList()
         val updateRequests = requestList.map {
             AddressUpdateRequest(addressBpn = it.bpna, siteBpns = it.bpnSites, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
         }
 
-        val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
+        val responses = mutableListOf<AddressPartnerUpdateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<AddressUpdateErrorV7>>()
         requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(addressResponseMapper.toUpdateResponse(result.parsed.value))
@@ -67,6 +67,6 @@ class AddressUpdateApplicationV7Service(
             }
         }
 
-        return AddressPartnerUpdateResponseWrapper(responses, errors)
+        return AddressPartnerUpdateV7ResponseWrapper(responses, errors)
     }
 }

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.address
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -46,7 +46,7 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         val participantSiteAddress = testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchResponse = poolClient.members.searchAddresses(AddressSearchRequest(), PaginationRequest())
+        val searchResponse = poolClient.members.searchAddresses(AddressSearchV7Request(), PaginationRequest())
 
         //THEN
         val expectedAddresses = listOf(participant1.legalAddress, participant2.legalAddress, participantSite.mainAddress, participantAddress.address, participantSiteAddress.address)
@@ -73,7 +73,7 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(addressBpns = listOf(participantAddress.address.bpna))
+        val searchRequest = AddressSearchV7Request(addressBpns = listOf(participantAddress.address.bpna))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -101,7 +101,7 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(name = participantAddress.address.name)
+        val searchRequest = AddressSearchV7Request(name = participantAddress.address.name)
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -129,7 +129,7 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         val participantSiteAddress = testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(legalEntityBpns = listOf(participant1.header.bpnl))
+        val searchRequest = AddressSearchV7Request(legalEntityBpns = listOf(participant1.header.bpnl))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -157,7 +157,7 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         val participantSiteAddress = testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(siteBpns = listOf(participantSite.site.bpns))
+        val searchRequest = AddressSearchV7Request(siteBpns = listOf(participantSite.site.bpns))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
@@ -184,11 +184,11 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(siteBpns = listOf(nonParticipant.legalAddress.bpna))
+        val searchRequest = AddressSearchV7Request(siteBpns = listOf(nonParticipant.legalAddress.bpna))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressInvariantVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressInvariantVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertParticipantAddressSearch(searchResponse, expectedResponse)
     }
@@ -209,11 +209,11 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(name = nonParticipant.legalAddress.name)
+        val searchRequest = AddressSearchV7Request(name = nonParticipant.legalAddress.name)
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressInvariantVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressInvariantVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertParticipantAddressSearch(searchResponse, expectedResponse)
     }
@@ -234,11 +234,11 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(legalEntityBpns = listOf(nonParticipant.header.bpnl))
+        val searchRequest = AddressSearchV7Request(legalEntityBpns = listOf(nonParticipant.header.bpnl))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressInvariantVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressInvariantVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertParticipantAddressSearch(searchResponse, expectedResponse)
     }
@@ -262,11 +262,11 @@ class AddressParticipantSearchV7IT : UnscheduledPoolTestBaseV7() {
         testDataClient.createAdditionalAddress(participantSite, "$testName Participant Site Address")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(siteBpns = listOf(nonParticipantSite.site.bpns))
+        val searchRequest = AddressSearchV7Request(siteBpns = listOf(nonParticipantSite.site.bpns))
         val searchResponse = poolClient.members.searchAddresses(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedResponse = PageDto<LogisticAddressInvariantVerboseDto>(0, 0, 0, 0, emptyList())
+        val expectedResponse = PageDto<LogisticAddressInvariantVerboseV7Dto>(0, 0, 0, 0, emptyList())
 
         assertRepository.assertParticipantAddressSearch(searchResponse, expectedResponse)
     }

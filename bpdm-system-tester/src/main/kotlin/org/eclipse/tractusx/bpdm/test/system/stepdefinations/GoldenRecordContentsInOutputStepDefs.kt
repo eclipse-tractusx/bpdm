@@ -30,8 +30,8 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.Additio
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
@@ -42,7 +42,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 
 class GoldenRecordContentsInOutputStepDefs(
     private val sharingMemberGates: SharingMemberGates,
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolV7Client,
     private val shareActions: BusinessPartnerShareActions,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertRepository: GateAssertRepositoryV7,
@@ -686,7 +686,7 @@ class GoldenRecordContentsInOutputStepDefs(
             ?: error("record '$recordId' output has no site")
 
     /** The Pool golden record address [recordId]'s output references, fetched by its BPNA. */
-    private fun poolAddressOf(recordId: String): LogisticAddressVerboseDto {
+    private fun poolAddressOf(recordId: String): LogisticAddressVerboseV7Dto {
         val bpna = outputOf(recordId).address.addressBpn
         val poolAddress = poolClient.addresses.getAddress(bpna)
         apiCallEvidence.attach("GET", "/v7/addresses/$bpna", response = poolAddress)

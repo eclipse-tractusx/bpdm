@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
 
 @Entity
 @Table(
@@ -45,6 +45,6 @@ class FieldQualityRuleDb(
 
     @Column(name = "quality_level", nullable = false)
     @Enumerated(EnumType.STRING)
-    var qualityLevel: QualityLevel,
+    var qualityLevel: QualityLevelV7,
 
     ) : BaseEntityWithExplicitTimestamps()

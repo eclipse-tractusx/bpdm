@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
@@ -35,6 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityIdenti
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.relation.RelationVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 
 /**
  * Maps stored legal entities to the v6 API legal entity DTOs.
@@ -112,11 +112,11 @@ class LegalEntityResponseMapperV6(
             )
         }
 
-    private fun toRelationType(relationType: LegalEntityRelationType): LegalEntityRelationTypeV6? =
+    private fun toRelationType(relationType: LegalEntityRelationTypeV7): LegalEntityRelationTypeV6? =
         when (relationType) {
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV6.IsAlternativeHeadquarterFor
-            LegalEntityRelationType.IsManagedBy -> LegalEntityRelationTypeV6.IsManagedBy
-            LegalEntityRelationType.IsOwnedBy -> LegalEntityRelationTypeV6.IsOwnedBy
-            LegalEntityRelationType.IsReplacedBy -> null
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV6.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> LegalEntityRelationTypeV6.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> LegalEntityRelationTypeV6.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> null
         }
 }

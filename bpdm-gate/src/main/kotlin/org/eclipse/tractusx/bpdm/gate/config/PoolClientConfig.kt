@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.config
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.DefaultPoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
@@ -49,8 +49,8 @@ data class PoolClientConfigurationProperties(
 class PoolClientConfiguration{
 
     @Bean
-    fun poolClient(webClientProvider: BpdmWebClientProvider, properties: PoolClientConfigurationProperties): PoolApiClient{
-     return PoolClientImpl { webClientProvider.builder(properties).build() }
+    fun poolClient(webClientProvider: BpdmWebClientProvider, properties: PoolClientConfigurationProperties): PoolV7Client{
+     return DefaultPoolV7Client { webClientProvider.builder(properties).build() }
     }
 }
 

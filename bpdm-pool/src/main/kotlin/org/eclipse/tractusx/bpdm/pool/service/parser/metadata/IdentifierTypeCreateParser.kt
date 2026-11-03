@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError.TechnicalKeyAlreadyTaken
@@ -29,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
 
 /**
  * Validates an identifier type a client asks to create.
@@ -62,7 +62,7 @@ class IdentifierTypeCreateParser(
                 transliteratedName = request.transliteratedName,
                 transliteratedAbbreviation = request.transliteratedAbbreviation,
                 format = request.format,
-                categories = request.categories.ifEmpty { setOf(IdentifierTypeCategory.OTH) },
+                categories = request.categories.ifEmpty { setOf(IdentifierTypeCategoryV7.OTH) },
                 details = request.details.map { IdentifierTypeDetailParsed(it.country?.let(countries::getValue), it.mandatory) }
             )
         )

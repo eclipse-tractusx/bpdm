@@ -20,9 +20,22 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -30,7 +43,7 @@ import java.time.ZoneOffset
 class RefinementTestDataFactory {
 
     fun buildLegalEntityBusinessPartner(
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): BusinessPartner{
@@ -50,8 +63,8 @@ class RefinementTestDataFactory {
 
 
     fun buildLegalEntityOnSiteBusinessPartner(
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): BusinessPartner{
@@ -70,8 +83,8 @@ class RefinementTestDataFactory {
     }
 
     fun buildSiteBusinessPartner(
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteWithMainAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): BusinessPartner{
@@ -91,8 +104,8 @@ class RefinementTestDataFactory {
     }
 
     fun buildAdditionLegalEntityAddressBusinessPartner(
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        addressGoldenRecord: LogisticAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): BusinessPartner {
@@ -112,9 +125,9 @@ class RefinementTestDataFactory {
     }
 
     fun buildAdditionSiteAddressBusinessPartner(
-        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
-        siteGoldenRecord: SiteWithMainAddressVerboseDto,
-        addressGoldenRecord: LogisticAddressVerboseDto,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
+        siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
+        addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>
     ): BusinessPartner{
@@ -134,7 +147,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildLegalEntityComponent(goldenRecord: LegalEntityWithLegalAddressVerboseDto): LegalEntity{
+    private fun buildLegalEntityComponent(goldenRecord: LegalEntityWithLegalAddressVerboseV7Dto): LegalEntity{
         return LegalEntity(
             bpnReference = BpnReference(goldenRecord.header.bpnl, null, BpnReferenceType.Bpn),
             legalName = goldenRecord.header.legalName,
@@ -153,7 +166,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildSiteComponent(goldenRecord: SiteWithMainAddressVerboseDto): Site{
+    private fun buildSiteComponent(goldenRecord: SiteWithMainAddressVerboseV7Dto): Site{
         return Site(
             bpnReference = BpnReference(goldenRecord.site.bpns, null, BpnReferenceType.Bpn),
             siteName = goldenRecord.site.name,
@@ -166,7 +179,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildSiteWithLegalAddressAsMainComponent(goldenRecord: SiteVerboseDto): Site{
+    private fun buildSiteWithLegalAddressAsMainComponent(goldenRecord: SiteVerboseV7Dto): Site{
         return Site(
             bpnReference = BpnReference(goldenRecord.bpns, null, BpnReferenceType.Bpn),
             siteName = goldenRecord.name,
@@ -179,7 +192,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildConfidence(confidence: ConfidenceCriteriaDto): ConfidenceCriteria{
+    private fun buildConfidence(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteria{
         return ConfidenceCriteria(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
@@ -190,14 +203,14 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildPostalAddressWithScriptVariants(logisticAddress: LogisticAddressVerboseDto): PostalAddressWithScriptVariants{
+    private fun buildPostalAddressWithScriptVariants(logisticAddress: LogisticAddressVerboseV7Dto): PostalAddressWithScriptVariants{
         return PostalAddressWithScriptVariants(
             postalProperties = buildPostalAddress(logisticAddress.address),
             scriptVariants = logisticAddress.scriptVariants.map { buildPostalAddressScriptVariantWithScriptCode(it) }
         )
     }
 
-    private fun buildPostalAddress(logisticAddress: LogisticAddressInvariantVerboseDto): PostalAddress{
+    private fun buildPostalAddress(logisticAddress: LogisticAddressInvariantVerboseV7Dto): PostalAddress{
         return PostalAddress(
             bpnReference = BpnReference(logisticAddress.bpna, null, BpnReferenceType.Bpn),
             hasChanged = true,
@@ -211,7 +224,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildPhysicalAddress(physicalPostalAddress: PhysicalPostalAddressVerboseDto): PhysicalAddress{
+    private fun buildPhysicalAddress(physicalPostalAddress: PhysicalPostalAddressVerboseV7Dto): PhysicalAddress{
         return PhysicalAddress(
             geographicCoordinates = physicalPostalAddress.geographicCoordinates?.let { GeoCoordinate(it.longitude, it.latitude, it.altitude) } ?: GeoCoordinate.empty,
             country = physicalPostalAddress.country,
@@ -231,7 +244,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseDto): AlternativeAddress{
+    private fun buildAlternativeAddress(alternativeAddress: AlternativePostalAddressVerboseV7Dto): AlternativeAddress{
         return AlternativeAddress(
             geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeoCoordinate(it.longitude, it.latitude, it.altitude) } ?: GeoCoordinate.empty,
             country = alternativeAddress.country,
@@ -244,7 +257,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildStreet(street: StreetDto): Street{
+    private fun buildStreet(street: StreetV7Dto): Street{
         return Street(
             name = street.name,
             houseNumber = street.houseNumber,
@@ -258,7 +271,7 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildLegalEntityScriptVariant(legalEntityScriptVariantDto: LegalEntityScriptVariantDto): LegalEntityScriptVariant{
+    private fun buildLegalEntityScriptVariant(legalEntityScriptVariantDto: LegalEntityScriptVariantV7Dto): LegalEntityScriptVariant{
         return with(legalEntityScriptVariantDto){
             LegalEntityScriptVariant(
                 scriptCode = scriptCode,
@@ -269,7 +282,7 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildSiteScriptVariant(siteScriptVariant: SiteScriptVariantDto): SiteScriptVariant{
+    private fun buildSiteScriptVariant(siteScriptVariant: SiteScriptVariantV7Dto): SiteScriptVariant{
         return with(siteScriptVariant){
             SiteScriptVariant(
                 scriptCode = scriptCode,
@@ -279,13 +292,13 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildPostalAddressScriptVariantWithScriptCode(logisticAddressScriptVariant: LogisticAddressScriptVariantDto): PostalAddressScriptVariantWithScriptCode{
+    private fun buildPostalAddressScriptVariantWithScriptCode(logisticAddressScriptVariant: LogisticAddressScriptVariantV7Dto): PostalAddressScriptVariantWithScriptCode{
         return with(logisticAddressScriptVariant){
             PostalAddressScriptVariantWithScriptCode(scriptCode, buildPostalAddressScriptVariant(logisticAddressScriptVariant.address))
         }
     }
 
-    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariantDto): PostalAddressScriptVariant{
+    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariant{
         return with(postalAddressScriptVariant){
             PostalAddressScriptVariant(
                 addressName = addressName,
@@ -295,7 +308,7 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
+    private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariant{
         return with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariant(
                 city = city,
@@ -308,7 +321,7 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
+    private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariant{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
                 city = city
@@ -316,7 +329,7 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildScriptVariantStreet(street: StreetScriptVariantDto): StreetScriptVariant{
+    private fun buildScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariant{
         return with(street){
             StreetScriptVariant(
                 name = name,

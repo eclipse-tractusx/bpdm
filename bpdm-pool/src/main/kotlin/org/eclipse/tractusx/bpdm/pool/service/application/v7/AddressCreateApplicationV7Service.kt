@@ -19,11 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
@@ -34,6 +29,11 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateSer
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 
 /**
  * The REST-API boundary for the V7 "create additional address" operation.
@@ -52,14 +52,14 @@ class AddressCreateApplicationV7Service(
      * address or the errors that stopped it.
      */
     @Transactional
-    fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
+    fun createAddresses(requests: Collection<AddressPartnerCreateV7Request>): AddressPartnerCreateV7ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map {
             AddressCreateUntypedParentRequest(it.bpnParent, addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
         }
 
-        val responses = mutableListOf<AddressPartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
+        val responses = mutableListOf<AddressPartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<AddressCreateErrorV7>>()
         requestList.zip(parseAndExecute(createRequests, untypedParentAddressCreateParser::parse, addressCreateService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(addressResponseMapper.toCreateResponse(result.parsed, request.index))
@@ -67,6 +67,6 @@ class AddressCreateApplicationV7Service(
             }
         }
 
-        return AddressPartnerCreateResponseWrapper(responses, errors)
+        return AddressPartnerCreateV7ResponseWrapper(responses, errors)
     }
 }

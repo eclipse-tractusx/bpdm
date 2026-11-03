@@ -23,14 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntitySearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntitySearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntitySearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest as LegalEntitySearchRequestDto
 
 /**
  * The REST-API boundary for the V7 "search legal entities" operation.
@@ -48,9 +48,9 @@ class LegalEntitySearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchLegalEntities(
-        searchRequest: LegalEntitySearchRequestDto,
+        searchRequest: LegalEntitySearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDto> =
+    ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = null)
 
     /**
@@ -58,12 +58,12 @@ class LegalEntitySearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchMemberLegalEntities(
-        searchRequest: LegalEntitySearchRequestDto,
+        searchRequest: LegalEntitySearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityWithLegalAddressVerboseDto> =
+    ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> =
         search(searchRequest, paginationRequest, isDataSpaceParticipant = true)
 
-    private fun search(searchRequest: LegalEntitySearchRequestDto, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
+    private fun search(searchRequest: LegalEntitySearchV7Request, paginationRequest: PaginationRequest, isDataSpaceParticipant: Boolean?) =
         legalEntitySearchService.search(
             legalEntitySearchParser.parse(legalEntitySearchRequestMapper.toSearchRequest(searchRequest, isDataSpaceParticipant)),
             paginationRequest.toPageRequest()

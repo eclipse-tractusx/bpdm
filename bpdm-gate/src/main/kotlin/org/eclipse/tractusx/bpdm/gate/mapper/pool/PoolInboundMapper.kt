@@ -32,22 +32,22 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRe
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.LegalEntityGoldenRecordRelationType
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteRelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.springframework.stereotype.Component
 
 /**
@@ -59,7 +59,7 @@ class PoolInboundMapper {
     /**
      * Maps [dto] onto its legal entity golden record request.
      */
-    fun toRequest(dto: LegalEntityWithLegalAddressVerboseDto): LegalEntityGoldenRecordRaw {
+    fun toRequest(dto: LegalEntityWithLegalAddressVerboseV7Dto): LegalEntityGoldenRecordRaw {
         val header = dto.header
         return LegalEntityGoldenRecordRaw(
             bpn = header.bpnl,
@@ -80,7 +80,7 @@ class PoolInboundMapper {
     /**
      * Maps [dto] onto its site golden record request.
      */
-    fun toRequest(dto: SiteVerboseDto): SiteGoldenRecordRaw =
+    fun toRequest(dto: SiteVerboseV7Dto): SiteGoldenRecordRaw =
         SiteGoldenRecordRaw(
             bpn = dto.bpns,
             name = dto.name,
@@ -94,7 +94,7 @@ class PoolInboundMapper {
     /**
      * Maps [dto] onto its address golden record request.
      */
-    fun toRequest(dto: LogisticAddressVerboseDto): AddressGoldenRecordRaw {
+    fun toRequest(dto: LogisticAddressVerboseV7Dto): AddressGoldenRecordRaw {
         val address = dto.address
         return AddressGoldenRecordRaw(
             bpn = address.bpna,
@@ -121,7 +121,7 @@ class PoolInboundMapper {
             businessPartnerType = businessPartnerType
         )
 
-    private fun toConfidence(dto: ConfidenceCriteriaDto) =
+    private fun toConfidence(dto: ConfidenceCriteriaV7Dto) =
         ConfidenceCriteriaRaw(
             sharedByOwner = dto.sharedByOwner,
             checkedByExternalDataSource = dto.checkedByExternalDataSource,
@@ -131,37 +131,37 @@ class PoolInboundMapper {
             confidenceLevel = dto.confidenceLevel
         )
 
-    private fun toRelation(dto: RelationVerboseDto) =
+    private fun toRelation(dto: RelationVerboseV7Dto) =
         GoldenRecordRelationRaw(
             type = when (dto.type) {
-                LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
-                LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
-                LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
-                LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
+                LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                LegalEntityRelationTypeV7.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                LegalEntityRelationTypeV7.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationTypeV7.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = dto.businessPartnerSourceBpnl,
             targetBpn = dto.businessPartnerTargetBpnl
         )
 
-    private fun toRelation(dto: SiteRelationVerboseDto) =
+    private fun toRelation(dto: SiteRelationVerboseV7Dto) =
         GoldenRecordRelationRaw(
             type = when (dto.type) {
-                SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+                SiteRelationTypeV7.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = dto.businessPartnerSourceBpns,
             targetBpn = dto.businessPartnerTargetBpns
         )
 
-    private fun toRelation(dto: AddressRelationVerboseDto) =
+    private fun toRelation(dto: AddressRelationVerboseV7Dto) =
         GoldenRecordRelationRaw(
             type = when (dto.type) {
-                AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+                AddressRelationTypeV7.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
             },
             sourceBpn = dto.businessPartnerSourceBpna,
             targetBpn = dto.businessPartnerTargetBpna
         )
 
-    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressVerboseDto) =
+    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressVerboseV7Dto) =
         PhysicalPostalAddressRaw(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeoCoordinate),
             country = dto.country,
@@ -180,7 +180,7 @@ class PoolInboundMapper {
             taxJurisdictionCode = dto.taxJurisdictionCode
         )
 
-    private fun toAlternativeAddress(dto: AlternativePostalAddressVerboseDto) =
+    private fun toAlternativeAddress(dto: AlternativePostalAddressVerboseV7Dto) =
         AlternativeAddressRaw(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeoCoordinate),
             country = dto.country,
@@ -195,7 +195,7 @@ class PoolInboundMapper {
     private fun toGeoCoordinate(dto: GeoCoordinateDto) =
         GeoCoordinateRaw(longitude = dto.longitude, latitude = dto.latitude, altitude = dto.altitude)
 
-    private fun toStreet(dto: StreetDto) =
+    private fun toStreet(dto: StreetV7Dto) =
         StreetRaw(
             namePrefix = dto.namePrefix,
             additionalNamePrefix = dto.additionalNamePrefix,
@@ -208,7 +208,7 @@ class PoolInboundMapper {
             direction = dto.direction
         )
 
-    private fun toScriptVariant(dto: LogisticAddressScriptVariantDto) =
+    private fun toScriptVariant(dto: LogisticAddressScriptVariantV7Dto) =
         AddressGoldenRecordRaw.ScriptVariant(
             scriptCode = dto.scriptCode,
             name = dto.address.addressName,
@@ -216,18 +216,18 @@ class PoolInboundMapper {
             alternativeAddressCity = dto.address.alternativeAddress?.city
         )
 
-    private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariantDto) =
+    private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariantV7Dto) =
         BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
             city = dto.city,
             district = dto.district,
-            street = toStreetScriptVariant(dto.street ?: StreetScriptVariantDto()),
+            street = toStreetScriptVariant(dto.street ?: StreetScriptVariantV7Dto()),
             industrialZone = dto.industrialZone,
             building = dto.building,
             floor = dto.floor,
             door = dto.door
         )
 
-    private fun toStreetScriptVariant(dto: StreetScriptVariantDto) =
+    private fun toStreetScriptVariant(dto: StreetScriptVariantV7Dto) =
         BusinessPartnerValuesRaw.StreetScriptVariant(
             name = dto.name,
             direction = dto.direction,

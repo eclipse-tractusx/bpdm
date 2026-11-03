@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeDetailV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -38,10 +38,10 @@ class IdentifierTypeGetV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `find legal identifier types`() {
         //WHEN
-        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.LEGAL_ENTITY, null)
+        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, null)
 
         //THEN
-        fetchResponse.content.forEach { Assertions.assertThat(it.businessPartnerType).isEqualTo(IdentifierBusinessPartnerType.LEGAL_ENTITY) }
+        fetchResponse.content.forEach { Assertions.assertThat(it.businessPartnerType).isEqualTo(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY) }
     }
 
     /**
@@ -52,10 +52,10 @@ class IdentifierTypeGetV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `find address identifier types`() {
         //WHEN
-        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.ADDRESS, null)
+        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.ADDRESS, null)
 
         //THEN
-        fetchResponse.content.forEach { Assertions.assertThat(it.businessPartnerType).isEqualTo(IdentifierBusinessPartnerType.ADDRESS) }
+        fetchResponse.content.forEach { Assertions.assertThat(it.businessPartnerType).isEqualTo(IdentifierBusinessPartnerTypeV7.ADDRESS) }
     }
 
     /**
@@ -67,15 +67,15 @@ class IdentifierTypeGetV7IT : UnscheduledPoolTestBaseV7() {
     fun `find mandatory identifier types for country v7`() {
         //GIVEN
         val countryX = "DE"
-        val identifierType = IdentifierTypeDto(
-            testName, IdentifierBusinessPartnerType.LEGAL_ENTITY, testName, null, null, null, null,
-            sortedSetOf(IdentifierTypeCategory.OTH),
-            listOf(IdentifierTypeDetailDto(countryX, true))
+        val identifierType = IdentifierTypeV7Dto(
+            testName, IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, testName, null, null, null, null,
+            sortedSetOf(IdentifierTypeCategoryV7.OTH),
+            listOf(IdentifierTypeDetailV7Dto(countryX, true))
         )
         poolClient.metadata.createIdentifierType(identifierType)
 
         //WHEN
-        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.LEGAL_ENTITY, countryX)
+        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, countryX)
 
         //THEN
         Assertions.assertThat(fetchResponse.content).contains(identifierType)
@@ -90,15 +90,15 @@ class IdentifierTypeGetV7IT : UnscheduledPoolTestBaseV7() {
     fun `find optional identifier types for country v7`() {
         //GIVEN
         val countryX = "US"
-        val identifierType = IdentifierTypeDto(
-            testName, IdentifierBusinessPartnerType.LEGAL_ENTITY, testName, testName, testName, testName, testName,
-            sortedSetOf(IdentifierTypeCategory.OTH),
-            listOf(IdentifierTypeDetailDto(countryX, false))
+        val identifierType = IdentifierTypeV7Dto(
+            testName, IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, testName, testName, testName, testName, testName,
+            sortedSetOf(IdentifierTypeCategoryV7.OTH),
+            listOf(IdentifierTypeDetailV7Dto(countryX, false))
         )
         poolClient.metadata.createIdentifierType(identifierType)
 
         //WHEN
-        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.LEGAL_ENTITY, countryX)
+        val fetchResponse = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, countryX)
 
         //THEN
         Assertions.assertThat(fetchResponse.content).contains(identifierType)

@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
@@ -68,7 +68,7 @@ class LegalEntityCreateService(
         legalEntities.zip(stagedAddresses).forEach { (legalEntity, stagedAddress) -> legalEntity.legalAddress = stagedAddress.address }
 
         legalEntityRepository.saveAll(legalEntities)
-        changelogCreateService.record(legalEntities.map { ChangelogRecord(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
+        changelogCreateService.record(legalEntities.map { ChangelogRecord(it.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
 
         if (legalEntities.isNotEmpty())
             logger.info {

@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -53,7 +53,7 @@ import java.util.*
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
     val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService,
-    val poolClient: PoolApiClient,
+    val poolClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
 ) {
@@ -75,7 +75,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
-            relationType = LegalEntityRelationType.IsOwnedBy.toTaskDto(),
+            relationType = LegalEntityRelationTypeV7.IsOwnedBy.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
@@ -100,7 +100,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
-            relationType = LegalEntityRelationType.IsAlternativeHeadquarterFor.toTaskDto(),
+            relationType = LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
@@ -125,7 +125,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
-            relationType = LegalEntityRelationType.IsManagedBy.toTaskDto(),
+            relationType = LegalEntityRelationTypeV7.IsManagedBy.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
@@ -151,7 +151,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
-            relationType = LegalEntityRelationType.IsReplacedBy.toTaskDto(),
+            relationType = LegalEntityRelationTypeV7.IsReplacedBy.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
@@ -170,8 +170,8 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `route address relation to address relation service`(relationType: AddressRelationType) {
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `route address relation to address relation service`(relationType: AddressRelationTypeV7) {
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -195,12 +195,12 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         assertThat(result.errors.size).isEqualTo(0)
     }
 
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseV7Dto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
 
-    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto{
+    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseV7Dto): AddressPartnerCreateVerboseV7Dto{
         val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
@@ -219,18 +219,18 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
         )
     }
 
-    private fun LegalEntityRelationType.toTaskDto(): RelationType {
+    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
         return when(this){
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
-            LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
-            LegalEntityRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> RelationType.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> RelationType.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 
-    private fun AddressRelationType.toTaskDto(): RelationType {
+    private fun AddressRelationTypeV7.toTaskDto(): RelationType {
         return when(this){
-            AddressRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 

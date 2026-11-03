@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.CountryDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
 import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
@@ -50,13 +50,13 @@ class TestDataV7Configuration {
      * For more specialized environments you could also not autowire it and  instead create the [PoolDataHelper] in the test class itself
      */
     @Bean
-    fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
+    fun poolDataHelper(poolClient: PoolV7Client): PoolDataHelper {
         return PoolDataHelper(poolClient, listOf(
-            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
-            ReasonCodeDto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
-            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
-            ReasonCodeDto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
-            ReasonCodeDto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
+            ReasonCodeV7Dto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeV7Dto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
+            ReasonCodeV7Dto("MERGER", "Merger of two or more legal entities into a single successor entity"),
+            ReasonCodeV7Dto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
+            ReasonCodeV7Dto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
         ))
     }
 
@@ -75,23 +75,23 @@ class TestDataV7Configuration {
         val adminAreas = adminAreaLevel1V7Importer.importFromResource()
         val identifierTypes = identifierTypeV7Importer.importFromResource()
         val scriptCodes = listOf(
-            ScriptCodeDto("CHINESE_SIMPLIFIED", "Simplified Chinese characters"),
-            ScriptCodeDto("CHINESE_TRADITIONAL", "Traditional Chinese characters"),
-            ScriptCodeDto("KANJI", "Japanese Characters (Hiragana, Katakana and Kanji)")
+            ScriptCodeV7Dto("CHINESE_SIMPLIFIED", "Simplified Chinese characters"),
+            ScriptCodeV7Dto("CHINESE_TRADITIONAL", "Traditional Chinese characters"),
+            ScriptCodeV7Dto("KANJI", "Japanese Characters (Hiragana, Katakana and Kanji)")
         )
         val reasonCodes = listOf(
-            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
-            ReasonCodeDto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
-            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
-            ReasonCodeDto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
-            ReasonCodeDto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
+            ReasonCodeV7Dto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeV7Dto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
+            ReasonCodeV7Dto("MERGER", "Merger of two or more legal entities into a single successor entity"),
+            ReasonCodeV7Dto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
+            ReasonCodeV7Dto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
         )
-        val countries = countryRepository.findAll().map { CountryDto(countryCode = it.countryCode, name = it.name, description = it.description) }
+        val countries = countryRepository.findAll().map { CountryV7Dto(countryCode = it.countryCode, name = it.name, description = it.description) }
 
         return TestMetadataV7(
             legalForms = legalForms,
-            legalEntityIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.LEGAL_ENTITY },
-            addressIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.ADDRESS },
+            legalEntityIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY },
+            addressIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerTypeV7.ADDRESS },
             adminAreas = adminAreas,
             scriptCodes = scriptCodes,
             reasonCodes = reasonCodes,
@@ -111,7 +111,7 @@ class TestDataV7Configuration {
 
     @Bean
     fun testDataClientV7(
-        poolApiClient: PoolApiClient,
+        poolApiClient: PoolV7Client,
         requestFactory: PoolRequestFactoryV7,
         orchestratorMockDataFactory: OrchestratorMockDataFactory,
         taskBatchResolutionService: TaskBatchResolutionService,

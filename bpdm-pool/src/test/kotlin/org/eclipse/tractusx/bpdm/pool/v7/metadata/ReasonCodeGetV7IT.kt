@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.metadata
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -40,11 +40,11 @@ class ReasonCodeGetV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expected = PageDto(5L, 1, 0, 5, listOf(
-            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
-            ReasonCodeDto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
-            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
-            ReasonCodeDto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
-            ReasonCodeDto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
+            ReasonCodeV7Dto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeV7Dto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
+            ReasonCodeV7Dto("MERGER", "Merger of two or more legal entities into a single successor entity"),
+            ReasonCodeV7Dto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
+            ReasonCodeV7Dto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
         ))
         assertThat(response).isEqualTo(expected)
     }

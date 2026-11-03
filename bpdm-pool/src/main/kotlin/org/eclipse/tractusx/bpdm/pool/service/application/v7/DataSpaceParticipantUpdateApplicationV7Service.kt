@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceP
 import org.eclipse.tractusx.bpdm.pool.service.parser.participation.DataSpaceParticipantUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest as DataSpaceParticipantUpdateRequestDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
 
 /**
  * The REST-API boundary for the V7 "update data space participants" operation.
@@ -44,7 +44,7 @@ class DataSpaceParticipantUpdateApplicationV7Service(
      * entry cannot be applied.
      */
     @Transactional
-    fun updateParticipants(updateRequest: DataSpaceParticipantUpdateRequestDto) {
+    fun updateParticipants(updateRequest: DataSpaceParticipantUpdateV7Request) {
         parseAndExecuteAllOrNone(
             dataSpaceParticipantUpdateRequestMapper.toUpdateRequests(updateRequest),
             dataSpaceParticipantUpdateParser::parse,

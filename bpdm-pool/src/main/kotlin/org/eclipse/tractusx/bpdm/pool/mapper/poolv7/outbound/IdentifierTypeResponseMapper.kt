@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeDetailV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.springframework.stereotype.Component
 
@@ -34,8 +34,8 @@ class IdentifierTypeResponseMapper {
     /**
      * Returns the given identifier type as the API reports it.
      */
-    fun toIdentifierType(identifierType: IdentifierTypeDb): IdentifierTypeDto =
-        IdentifierTypeDto(
+    fun toIdentifierType(identifierType: IdentifierTypeDb): IdentifierTypeV7Dto =
+        IdentifierTypeV7Dto(
             technicalKey = identifierType.technicalKey,
             businessPartnerType = identifierType.businessPartnerType,
             name = identifierType.name,
@@ -44,7 +44,7 @@ class IdentifierTypeResponseMapper {
             transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
             format = identifierType.format,
             categories = identifierType.categories.toSortedSet(),
-            details = identifierType.details.map { IdentifierTypeDetailDto(it.country?.countryCode, it.mandatory) }
+            details = identifierType.details.map { IdentifierTypeDetailV7Dto(it.country?.countryCode, it.mandatory) }
         )
 
     /**

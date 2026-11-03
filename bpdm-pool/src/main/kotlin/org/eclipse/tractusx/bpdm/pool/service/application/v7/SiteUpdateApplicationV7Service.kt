@@ -19,11 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
@@ -33,6 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateSe
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
 
 /**
  * The REST-API boundary for the V7 "update sites" operation.
@@ -51,12 +51,12 @@ class SiteUpdateApplicationV7Service(
      * errors that stopped it.
      */
     @Transactional
-    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
+    fun updateSites(requests: Collection<SitePartnerUpdateV7Request>): SitePartnerUpdateV7ResponseWrapper {
         val requestList = requests.toList()
         val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it) }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<SiteUpdateError>>()
+        val responses = mutableListOf<SitePartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<SiteUpdateErrorV7>>()
         requestList.zip(parseAndExecute(updateRequests, siteUpdateParser::parse, sitePayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed.value, request.bpns))
@@ -64,6 +64,6 @@ class SiteUpdateApplicationV7Service(
             }
         }
 
-        return SitePartnerUpdateResponseWrapper(responses, errors)
+        return SitePartnerUpdateV7ResponseWrapper(responses, errors)
     }
 }

@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+
 
 sealed interface IdentifierTypeCreateParseError {
     data class CountryNotFound(val country: String) : IdentifierTypeCreateParseError
     data class TechnicalKeyAlreadyTaken(
         val technicalKey: String,
-        val businessPartnerType: IdentifierBusinessPartnerType
+        val businessPartnerType: IdentifierBusinessPartnerTypeV7
     ) : IdentifierTypeCreateParseError
 }
 

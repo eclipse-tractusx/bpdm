@@ -23,12 +23,47 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.toCountryVerbose
 import java.time.Instant
@@ -44,14 +79,14 @@ class PoolResponseFactoryV7(
         return PageDto(content.size.toLong(), 1, 0, content.size, content)
     }
 
-    fun buildLegalEntityCreate(withValuesFrom: LegalEntityPartnerCreateRequest): LegalEntityPartnerCreateVerboseDto{
-        return LegalEntityPartnerCreateVerboseDto(
+    fun buildLegalEntityCreate(withValuesFrom: LegalEntityPartnerCreateV7Request): LegalEntityPartnerCreateVerboseV7Dto{
+        return LegalEntityPartnerCreateVerboseV7Dto(
             buildLegalEntityWithLegalAddress(withValuesFrom.legalEntity),
             withValuesFrom.index
         )
     }
 
-    fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateRequest, bpnAFrom: LegalEntityWithLegalAddressVerboseDto): LegalEntityPartnerCreateVerboseDto{
+    fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateV7Request, bpnAFrom: LegalEntityWithLegalAddressVerboseV7Dto): LegalEntityPartnerCreateVerboseV7Dto{
         val expected = buildLegalEntityUpdate(withValuesFrom, bpnAFrom.legalAddress.bpna)
         return expected.copy(legalEntity = expected.legalEntity.copy(
             header = expected.legalEntity.header.copy(createdAt = bpnAFrom.header.createdAt, updatedAt = bpnAFrom.header.updatedAt),
@@ -59,15 +94,15 @@ class PoolResponseFactoryV7(
         ))
     }
 
-    fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateRequest, bpnA: String = anyStringValue): LegalEntityPartnerCreateVerboseDto{
-        return LegalEntityPartnerCreateVerboseDto(
+    fun buildLegalEntityUpdate(withValuesFrom: LegalEntityPartnerUpdateV7Request, bpnA: String = anyStringValue): LegalEntityPartnerCreateVerboseV7Dto{
+        return LegalEntityPartnerCreateVerboseV7Dto(
             buildLegalEntityWithLegalAddress(withValuesFrom.legalEntity, withValuesFrom.bpnl, bpnA),
             index = withValuesFrom.bpnl
         )
     }
 
-    fun buildLegalEntityWithLegalAddress(withValuesFrom: LegalEntityDto, bpnL: String = anyStringValue, bpnA: String = anyStringValue): LegalEntityWithLegalAddressVerboseDto{
-        return LegalEntityWithLegalAddressVerboseDto(
+    fun buildLegalEntityWithLegalAddress(withValuesFrom: LegalEntityV7Dto, bpnL: String = anyStringValue, bpnA: String = anyStringValue): LegalEntityWithLegalAddressVerboseV7Dto{
+        return LegalEntityWithLegalAddressVerboseV7Dto(
             header = buildLegalEntityHeader(withValuesFrom.header, bpnL),
             legalAddress = buildInvariantAddress(
                 withValuesFrom = withValuesFrom.legalAddress,
@@ -81,16 +116,16 @@ class PoolResponseFactoryV7(
     }
 
     fun buildLegalEntityHeader(
-        withValuesFrom: LegalEntityHeaderDto,
+        withValuesFrom: LegalEntityHeaderV7Dto,
         bpnL: String = anyStringValue,
         currentness: Instant = anyDate,
         createdAt: Instant = anyDate,
         updatedAt: Instant = anyDate,
         ownershipUltimate: Boolean? = false,
         ultimateOwnerBpnl: String? = null
-    ): LegalEntityHeaderVerboseDto{
+    ): LegalEntityHeaderVerboseV7Dto{
         return with(withValuesFrom){
-            LegalEntityHeaderVerboseDto(
+            LegalEntityHeaderVerboseV7Dto(
                 bpnl = bpnL,
                 legalName = legalName,
                 legalShortName = legalShortName,
@@ -109,15 +144,15 @@ class PoolResponseFactoryV7(
         }
     }
 
-    fun buildLegalForm(technicalKey: String?): LegalFormDto?{
+    fun buildLegalForm(technicalKey: String?): LegalFormV7Dto?{
         return technicalKey?.let { testMetadata.legalForms.find { it.technicalKey == technicalKey }!! }
     }
 
     fun buildSiteUpdate(
-        withValuesFrom: SitePartnerUpdateRequest,
-        existingSite: SitePartnerCreateVerboseDto
-    ): SitePartnerCreateVerboseDto {
-        return SitePartnerCreateVerboseDto(
+        withValuesFrom: SitePartnerUpdateV7Request,
+        existingSite: SitePartnerCreateVerboseV7Dto
+    ): SitePartnerCreateVerboseV7Dto {
+        return SitePartnerCreateVerboseV7Dto(
             site = buildSite(
                 withValuesFrom = withValuesFrom.site,
                 bpnS = existingSite.site.bpns,
@@ -139,19 +174,19 @@ class PoolResponseFactoryV7(
         )
     }
 
-    fun buildSiteSearchResponse(siteCreate: SitePartnerCreateVerboseDto): SiteWithMainAddressVerboseDto {
-        return SiteWithMainAddressVerboseDto(
+    fun buildSiteSearchResponse(siteCreate: SitePartnerCreateVerboseV7Dto): SiteWithMainAddressVerboseV7Dto {
+        return SiteWithMainAddressVerboseV7Dto(
             site = siteCreate.site,
             mainAddress = siteCreate.mainAddress
         )
     }
 
     fun buildSiteSiteCreate(
-        withValuesFrom: SitePartnerCreateRequest,
+        withValuesFrom: SitePartnerCreateV7Request,
         bpnS: String = anyStringValue,
         bpnA: String = anyStringValue
-    ): SitePartnerCreateVerboseDto{
-        return SitePartnerCreateVerboseDto(
+    ): SitePartnerCreateVerboseV7Dto{
+        return SitePartnerCreateVerboseV7Dto(
             site = buildSite(
                 withValuesFrom = withValuesFrom.site,
                 bpnS = bpnS,
@@ -172,16 +207,16 @@ class PoolResponseFactoryV7(
     }
 
     fun buildLegalSiteCreate(
-        withValuesFrom: SiteCreateRequestWithLegalAddressAsMain,
-        legalEntityParent: LegalEntityWithLegalAddressVerboseDto,
+        withValuesFrom: SiteCreateWithLegalAddressAsMainV7Request,
+        legalEntityParent: LegalEntityWithLegalAddressVerboseV7Dto,
         bpnS: String = anyStringValue
-    ): SitePartnerCreateVerboseDto{
-        return SitePartnerCreateVerboseDto(
+    ): SitePartnerCreateVerboseV7Dto{
+        return SitePartnerCreateVerboseV7Dto(
             site = buildSite(
                 name = withValuesFrom.name,
                 states = withValuesFrom.states,
                 confidenceCriteria = withValuesFrom.confidenceCriteria,
-                scriptVariants = withValuesFrom.scriptVariants.zip(legalEntityParent.scriptVariants){ siteVariant, leVariant -> SiteScriptVariantDto(siteVariant.scriptCode, siteVariant.name, leVariant.legalAddress) },
+                scriptVariants = withValuesFrom.scriptVariants.zip(legalEntityParent.scriptVariants){ siteVariant, leVariant -> SiteScriptVariantV7Dto(siteVariant.scriptCode, siteVariant.name, leVariant.legalAddress) },
                 bpnS = bpnS,
                 bpnLegalEntity = withValuesFrom.bpnLParent
             ),
@@ -194,12 +229,12 @@ class PoolResponseFactoryV7(
     }
 
     fun buildSite(
-        withValuesFrom: SiteDto,
+        withValuesFrom: SiteV7Dto,
         bpnS: String = anyStringValue,
         bpnLegalEntity: String = anyStringValue,
         createdAt: Instant = anyDate,
         updatedAt: Instant = anyDate
-    ): SiteVerboseDto{
+    ): SiteVerboseV7Dto{
         return with(withValuesFrom){
             buildSite(
                 bpnS = bpnS,
@@ -217,15 +252,15 @@ class PoolResponseFactoryV7(
 
     fun buildSite(
         name: String,
-        states: Collection<SiteStateDto>,
-        confidenceCriteria: ConfidenceCriteriaDto,
-        scriptVariants: List<SiteScriptVariantDto>,
+        states: Collection<SiteStateV7Dto>,
+        confidenceCriteria: ConfidenceCriteriaV7Dto,
+        scriptVariants: List<SiteScriptVariantV7Dto>,
         bpnS: String = anyStringValue,
         bpnLegalEntity: String = anyStringValue,
         createdAt: Instant = anyDate,
         updatedAt: Instant = anyDate
-    ): SiteVerboseDto{
-        return SiteVerboseDto(
+    ): SiteVerboseV7Dto{
+        return SiteVerboseV7Dto(
                 bpns = bpnS,
                 name = name,
                 states = states.map { buildSiteBusinessState(it) },
@@ -241,10 +276,10 @@ class PoolResponseFactoryV7(
     }
 
     fun buildAdditionalAddressCreate(
-        withValuesFrom: AddressPartnerCreateRequest,
-        legalEntity: LegalEntityWithLegalAddressVerboseDto,
+        withValuesFrom: AddressPartnerCreateV7Request,
+        legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
         bpnA: String = anyStringValue
-    ): AddressPartnerCreateVerboseDto {
+    ): AddressPartnerCreateVerboseV7Dto {
         val invariantAddress = buildInvariantAddress(
             withValuesFrom = withValuesFrom.address,
             addressType = AddressType.AdditionalAddress,
@@ -253,7 +288,7 @@ class PoolResponseFactoryV7(
             bpnLegalEntity = legalEntity.header.bpnl,
             bpnSite = null
         )
-        return AddressPartnerCreateVerboseDto(
+        return AddressPartnerCreateVerboseV7Dto(
             address = invariantAddress,
             scriptVariants = withValuesFrom.scriptVariants,
             index = withValuesFrom.index
@@ -261,10 +296,10 @@ class PoolResponseFactoryV7(
     }
 
     fun buildAdditionalAddressCreate(
-        withValuesFrom: AddressPartnerCreateRequest,
-        site: SitePartnerCreateVerboseDto,
+        withValuesFrom: AddressPartnerCreateV7Request,
+        site: SitePartnerCreateVerboseV7Dto,
         bpnA: String = anyStringValue
-    ): AddressPartnerCreateVerboseDto {
+    ): AddressPartnerCreateVerboseV7Dto {
         val invariantAddress = buildInvariantAddress(
             withValuesFrom = withValuesFrom.address,
             addressType = AddressType.AdditionalAddress,
@@ -273,7 +308,7 @@ class PoolResponseFactoryV7(
             bpnLegalEntity = site.site.bpnLegalEntity,
             bpnSite = site.site.bpns
         ).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        return AddressPartnerCreateVerboseDto(
+        return AddressPartnerCreateVerboseV7Dto(
             address = invariantAddress,
             scriptVariants = withValuesFrom.scriptVariants,
             index = withValuesFrom.index
@@ -281,9 +316,9 @@ class PoolResponseFactoryV7(
     }
 
     fun buildLegalAddressUpdate(
-        withValuesFrom: AddressPartnerUpdateRequest,
-        legalEntity: LegalEntityWithLegalAddressVerboseDto
-    ): AddressPartnerUpdateVerboseDto {
+        withValuesFrom: AddressPartnerUpdateV7Request,
+        legalEntity: LegalEntityWithLegalAddressVerboseV7Dto
+    ): AddressPartnerUpdateVerboseV7Dto {
         val invariantAddress = buildInvariantAddress(
             withValuesFrom = withValuesFrom.address,
             addressType = AddressType.LegalAddress,
@@ -294,16 +329,16 @@ class PoolResponseFactoryV7(
             createdAt = legalEntity.legalAddress.createdAt,
             updatedAt = legalEntity.legalAddress.updatedAt
         )
-        return AddressPartnerUpdateVerboseDto(
+        return AddressPartnerUpdateVerboseV7Dto(
             address = invariantAddress,
             scriptVariants = withValuesFrom.scriptVariants
         )
     }
 
     fun buildSiteMainAddressUpdate(
-        withValuesFrom: AddressPartnerUpdateRequest,
-        site: SitePartnerCreateVerboseDto
-    ): AddressPartnerUpdateVerboseDto {
+        withValuesFrom: AddressPartnerUpdateV7Request,
+        site: SitePartnerCreateVerboseV7Dto
+    ): AddressPartnerUpdateVerboseV7Dto {
         val invariantAddress = buildInvariantAddress(
             withValuesFrom = withValuesFrom.address,
             addressType = site.mainAddress.addressType ?: AddressType.SiteMainAddress,
@@ -314,16 +349,16 @@ class PoolResponseFactoryV7(
             createdAt = site.mainAddress.createdAt,
             updatedAt = site.mainAddress.updatedAt
         ).withConfidence(TestDataV7.SharedByOwnerConfidence)
-        return AddressPartnerUpdateVerboseDto(
+        return AddressPartnerUpdateVerboseV7Dto(
             address = invariantAddress,
             scriptVariants = withValuesFrom.scriptVariants
         )
     }
 
     fun buildAdditionalAddressUpdate(
-        withValuesFrom: AddressPartnerUpdateRequest,
-        existingAddress: AddressPartnerCreateVerboseDto
-    ): AddressPartnerUpdateVerboseDto {
+        withValuesFrom: AddressPartnerUpdateV7Request,
+        existingAddress: AddressPartnerCreateVerboseV7Dto
+    ): AddressPartnerUpdateVerboseV7Dto {
         val isParticipantData = existingAddress.address.isParticipantData
         val invariantAddress = buildInvariantAddress(
             withValuesFrom = withValuesFrom.address,
@@ -335,27 +370,27 @@ class PoolResponseFactoryV7(
             createdAt = existingAddress.address.createdAt,
             updatedAt = existingAddress.address.updatedAt
         )
-        return AddressPartnerUpdateVerboseDto(
+        return AddressPartnerUpdateVerboseV7Dto(
             address = invariantAddress,
             scriptVariants = withValuesFrom.scriptVariants
         )
     }
 
-    fun buildAddressSearchResponse(created: AddressPartnerCreateVerboseDto): LogisticAddressVerboseDto =
-        LogisticAddressVerboseDto(address = created.address, scriptVariants = created.scriptVariants)
+    fun buildAddressSearchResponse(created: AddressPartnerCreateVerboseV7Dto): LogisticAddressVerboseV7Dto =
+        LogisticAddressVerboseV7Dto(address = created.address, scriptVariants = created.scriptVariants)
 
-    fun buildAddressSearchResponse(site: SitePartnerCreateVerboseDto): LogisticAddressVerboseDto =
-        LogisticAddressVerboseDto(address = site.mainAddress, scriptVariants = site.site.scriptVariants.map { buildSiteMainAddressScriptVariant(it) })
+    fun buildAddressSearchResponse(site: SitePartnerCreateVerboseV7Dto): LogisticAddressVerboseV7Dto =
+        LogisticAddressVerboseV7Dto(address = site.mainAddress, scriptVariants = site.site.scriptVariants.map { buildSiteMainAddressScriptVariant(it) })
 
-    fun buildAddressSearchResponseFromLegalSite(site: SitePartnerCreateVerboseDto, legalEntity: LegalEntityWithLegalAddressVerboseDto): LogisticAddressVerboseDto =
-        LogisticAddressVerboseDto(address = site.mainAddress, scriptVariants = legalEntity.scriptVariants.map { buildLegalAddressScriptVariant(it) })
+    fun buildAddressSearchResponseFromLegalSite(site: SitePartnerCreateVerboseV7Dto, legalEntity: LegalEntityWithLegalAddressVerboseV7Dto): LogisticAddressVerboseV7Dto =
+        LogisticAddressVerboseV7Dto(address = site.mainAddress, scriptVariants = legalEntity.scriptVariants.map { buildLegalAddressScriptVariant(it) })
 
 
-    fun buildAddressSearchResponse(legalEntity: LegalEntityWithLegalAddressVerboseDto): LogisticAddressVerboseDto =
-        LogisticAddressVerboseDto(address = legalEntity.legalAddress, scriptVariants = legalEntity.scriptVariants.map { buildLegalAddressScriptVariant(it) })
+    fun buildAddressSearchResponse(legalEntity: LegalEntityWithLegalAddressVerboseV7Dto): LogisticAddressVerboseV7Dto =
+        LogisticAddressVerboseV7Dto(address = legalEntity.legalAddress, scriptVariants = legalEntity.scriptVariants.map { buildLegalAddressScriptVariant(it) })
 
     private fun buildInvariantAddress(
-        withValuesFrom: LogisticAddressDto,
+        withValuesFrom: LogisticAddressV7Dto,
         addressType: AddressType,
         isParticipantData: Boolean,
         givenBpnA: String = anyStringValue,
@@ -363,9 +398,9 @@ class PoolResponseFactoryV7(
         bpnSite: String? = anyStringValue,
         createdAt: Instant = anyDate,
         updatedAt: Instant = anyDate,
-    ): LogisticAddressInvariantVerboseDto {
+    ): LogisticAddressInvariantVerboseV7Dto {
         return with(withValuesFrom) {
-            LogisticAddressInvariantVerboseDto(
+            LogisticAddressInvariantVerboseV7Dto(
                 bpna = givenBpnA,
                 name = name,
                 states = states.map { buildAddressBusinessState(it) },
@@ -383,46 +418,46 @@ class PoolResponseFactoryV7(
         }
     }
 
-    private fun buildLegalIdentifier(withValuesFrom: LegalEntityIdentifierDto): LegalEntityIdentifierVerboseDto {
+    private fun buildLegalIdentifier(withValuesFrom: LegalEntityIdentifierV7Dto): LegalEntityIdentifierVerboseV7Dto {
         val identifierType = testMetadata.legalEntityIdentifierTypes.find { withValuesFrom.type == it.technicalKey }
             ?: throw IllegalArgumentException("Legal Entity identifier with Key '${withValuesFrom.type}' is not expected")
-        return LegalEntityIdentifierVerboseDto(
+        return LegalEntityIdentifierVerboseV7Dto(
             value = withValuesFrom.value,
             typeVerbose = TypeKeyNameVerboseDto(identifierType.technicalKey, identifierType.name),
             issuingBody = withValuesFrom.issuingBody
         )
     }
 
-    private fun buildAddressIdentifier(withValuesFrom: AddressIdentifierDto): AddressIdentifierVerboseDto {
+    private fun buildAddressIdentifier(withValuesFrom: AddressIdentifierV7Dto): AddressIdentifierVerboseV7Dto {
         val identifierType = testMetadata.addressIdentifierTypes.find { withValuesFrom.type == it.technicalKey }
             ?: throw IllegalArgumentException("Address identifier with Key '${withValuesFrom.type}' is not expected")
-        return AddressIdentifierVerboseDto(
+        return AddressIdentifierVerboseV7Dto(
             value = withValuesFrom.value,
             typeVerbose = TypeKeyNameVerboseDto(identifierType.technicalKey, identifierType.name)
         )
     }
 
-    private fun buildLegalBusinessState(withValuesFrom: LegalEntityStateDto): LegalEntityStateVerboseDto {
+    private fun buildLegalBusinessState(withValuesFrom: LegalEntityStateV7Dto): LegalEntityStateVerboseV7Dto {
         return with(withValuesFrom) {
-            LegalEntityStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            LegalEntityStateVerboseV7Dto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
-    private fun buildSiteBusinessState(withValuesFrom: SiteStateDto): SiteStateVerboseDto {
+    private fun buildSiteBusinessState(withValuesFrom: SiteStateV7Dto): SiteStateVerboseV7Dto {
         return with(withValuesFrom) {
-            SiteStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            SiteStateVerboseV7Dto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
-    private fun buildAddressBusinessState(withValuesFrom: AddressStateDto): AddressStateVerboseDto {
+    private fun buildAddressBusinessState(withValuesFrom: AddressStateV7Dto): AddressStateVerboseV7Dto {
         return with(withValuesFrom) {
-            AddressStateVerboseDto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
+            AddressStateVerboseV7Dto(validFrom = validFrom ?: BusinessStateDates.EARLIEST, validTo = validTo ?: BusinessStateDates.LATEST, typeVerbose = TypeKeyNameVerboseDto(type, type.getTypeName()))
         }
     }
 
-    private fun buildPhysicalAddress(withValuesFrom: PhysicalPostalAddressDto): PhysicalPostalAddressVerboseDto {
+    private fun buildPhysicalAddress(withValuesFrom: PhysicalPostalAddressV7Dto): PhysicalPostalAddressVerboseV7Dto {
         return with(withValuesFrom) {
-            PhysicalPostalAddressVerboseDto(
+            PhysicalPostalAddressVerboseV7Dto(
                 geographicCoordinates = geographicCoordinates,
                 countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { buildAdminArea(it) },
@@ -442,9 +477,9 @@ class PoolResponseFactoryV7(
         }
     }
 
-    private fun buildAlternativeAddress(withValuesFrom: AlternativePostalAddressDto): AlternativePostalAddressVerboseDto {
+    private fun buildAlternativeAddress(withValuesFrom: AlternativePostalAddressV7Dto): AlternativePostalAddressVerboseV7Dto {
         return with(withValuesFrom) {
-            AlternativePostalAddressVerboseDto(
+            AlternativePostalAddressVerboseV7Dto(
                 geographicCoordinates = geographicCoordinates,
                 countryVerbose = testMetadata.countries.toCountryVerbose(country),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { buildAdminArea(it) },
@@ -453,15 +488,15 @@ class PoolResponseFactoryV7(
         }
     }
 
-    private fun buildAdminArea(givenAdminAreaCode: String): RegionDto {
+    private fun buildAdminArea(givenAdminAreaCode: String): RegionV7Dto {
         return with(testMetadata.adminAreas.find { it.code == givenAdminAreaCode }!!) {
-            RegionDto(countryCode, code, name)
+            RegionV7Dto(countryCode, code, name)
         }
     }
 
-    private fun buildLegalAddressScriptVariant(legalEntityScriptVariant: LegalEntityScriptVariantDto) =
-        LogisticAddressScriptVariantDto(legalEntityScriptVariant.scriptCode, legalEntityScriptVariant.legalAddress)
+    private fun buildLegalAddressScriptVariant(legalEntityScriptVariant: LegalEntityScriptVariantV7Dto) =
+        LogisticAddressScriptVariantV7Dto(legalEntityScriptVariant.scriptCode, legalEntityScriptVariant.legalAddress)
 
-    private fun buildSiteMainAddressScriptVariant(siteScriptVariant: SiteScriptVariantDto) =
-        LogisticAddressScriptVariantDto(siteScriptVariant.scriptCode, siteScriptVariant.mainAddress)
+    private fun buildSiteMainAddressScriptVariant(siteScriptVariant: SiteScriptVariantV7Dto) =
+        LogisticAddressScriptVariantV7Dto(siteScriptVariant.scriptCode, siteScriptVariant.mainAddress)
 }

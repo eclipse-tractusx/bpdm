@@ -24,11 +24,11 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -55,7 +55,7 @@ import java.time.*
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationStateResolutionIT @Autowired constructor(
     val taskRelationsResolutionService: TaskRelationsResolutionService,
-    val poolClient: PoolApiClient,
+    val poolClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
 ) {
@@ -75,8 +75,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `create valid limited legal entity relation`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `create valid limited legal entity relation`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -101,8 +101,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create valid limited Address relation`(relationType: AddressRelationType){
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `create valid limited Address relation`(relationType: AddressRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -127,8 +127,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `create valid unlimited legal entity relation`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `create valid unlimited legal entity relation`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -153,8 +153,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create valid unlimited address relation`(relationType: AddressRelationType){
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `create valid unlimited address relation`(relationType: AddressRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -179,8 +179,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `create valid legal entity relation with inactivity`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `create valid legal entity relation with inactivity`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -209,8 +209,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create valid address relation with inactivity`(relationType: AddressRelationType){
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `create valid address relation with inactivity`(relationType: AddressRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -239,8 +239,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `create valid legal entity relation with unsorted states`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `create valid legal entity relation with unsorted states`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -273,8 +273,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create valid address relation with unsorted states`(relationType: AddressRelationType){
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `create valid address relation with unsorted states`(relationType: AddressRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -307,8 +307,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `try create legal entity relation without validity`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `try create legal entity relation without validity`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -328,8 +328,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `try create Address relation without validity`(relationType: AddressRelationType){
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `try create Address relation without validity`(relationType: AddressRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -349,8 +349,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `try create legal entity relation with overlap in states`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `try create legal entity relation with overlap in states`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -509,8 +509,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(LegalEntityRelationType::class)
-    fun `update legal entity relation with overwriting future validity`(relationType: LegalEntityRelationType){
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `update legal entity relation with overwriting future validity`(relationType: LegalEntityRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
@@ -612,8 +612,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `try create address relation with overlap in states`(relationType: AddressRelationType){
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `try create address relation with overlap in states`(relationType: AddressRelationTypeV7){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
@@ -645,7 +645,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         assertError(createdRelation)
     }
 
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto{
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseV7Dto{
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
@@ -680,23 +680,23 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         unmockkStatic(Clock::class)
     }
 
-    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
+    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseV7Dto): AddressPartnerCreateVerboseV7Dto {
         val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
-    private fun LegalEntityRelationType.toTaskDto(): RelationType {
+    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
         return when(this){
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
-            LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
-            LegalEntityRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> RelationType.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> RelationType.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 
-    private fun AddressRelationType.toTaskDto(): RelationType {
+    private fun AddressRelationTypeV7.toTaskDto(): RelationType {
         return when(this){
-            AddressRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
         }
     }
 

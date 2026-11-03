@@ -22,9 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.v7.metadata
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 

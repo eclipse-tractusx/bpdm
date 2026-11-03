@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.v7.util.PoolTestClientProviderV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
@@ -41,7 +41,7 @@ class PoolClientV7Configuration{
     }
 
     @Bean
-    fun poolClientV7(testClientProviderV7: PoolTestClientProviderV7): PoolApiClient {
+    fun poolClientV7(testClientProviderV7: PoolTestClientProviderV7): PoolV7Client {
         return testClientProviderV7.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
     }
 }

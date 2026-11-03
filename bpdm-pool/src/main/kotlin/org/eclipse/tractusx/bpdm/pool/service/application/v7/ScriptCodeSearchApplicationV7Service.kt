@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.ScriptCodeSearchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +40,7 @@ class ScriptCodeSearchApplicationV7Service(
      * Returns the requested page of all known script codes.
      */
     @Transactional(readOnly = true)
-    fun searchScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> =
+    fun searchScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeV7Dto> =
         scriptCodeSearchService.search(paginationRequest.toPageRequest())
-            .toPageDto { ScriptCodeDto(it.technicalKey, it.description) }
+            .toPageDto { ScriptCodeV7Dto(it.technicalKey, it.description) }
 }

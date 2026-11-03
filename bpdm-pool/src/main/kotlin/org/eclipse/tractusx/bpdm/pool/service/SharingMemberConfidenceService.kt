@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -100,7 +100,7 @@ class SharingMemberConfidenceService(
             address.confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
             address.updatedAt = DbTimestamp.now()
             logisticAddressRepository.save(address)
-            changelogCreateService.record(ChangelogRecord(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogRecord(address.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
             logger.debug { "Updated number of sharing members of address '${address.bpn}' to $newNumberOfSharingMembers" }
         }
 
@@ -111,7 +111,7 @@ class SharingMemberConfidenceService(
                 legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
                 legalEntity.updatedAt = DbTimestamp.now()
                 legalEntityRepository.save(legalEntity)
-                changelogCreateService.record(ChangelogRecord(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+                changelogCreateService.record(ChangelogRecord(legalEntity.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
                 logger.debug { "Updated number of sharing members of legal entity '${legalEntity.bpn}' to $newNumberOfSharingMembers" }
             }
         }

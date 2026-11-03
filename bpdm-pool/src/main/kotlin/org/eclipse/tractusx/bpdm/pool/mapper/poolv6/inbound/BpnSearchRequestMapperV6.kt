@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnRequestIdentifierSearchRequest
 import org.springframework.stereotype.Component
@@ -37,7 +37,7 @@ class BpnSearchRequestMapperV6 {
      */
     fun toIdentifierSearchRequest(searchRequest: IdentifiersSearchV6Request): BpnIdentifierSearchRequest =
         BpnIdentifierSearchRequest(
-            businessPartnerType = IdentifierBusinessPartnerType.valueOf(searchRequest.businessPartnerType.name),
+            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(searchRequest.businessPartnerType.name),
             identifierTypeKey = searchRequest.idType,
             identifierValues = searchRequest.idValues
         )

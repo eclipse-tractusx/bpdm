@@ -23,14 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.DataSpaceParticipantSearchRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.DataSpaceParticipantResponseMapper
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantSearchService
 import org.eclipse.tractusx.bpdm.pool.service.parser.participation.DataSpaceParticipantSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest as DataSpaceParticipantSearchRequestDto
 
 /**
  * The REST-API boundary for the V7 "search data space participants" operation.
@@ -48,9 +48,9 @@ class DataSpaceParticipantSearchApplicationV7Service(
      */
     @Transactional(readOnly = true)
     fun searchParticipants(
-        searchRequest: DataSpaceParticipantSearchRequestDto,
+        searchRequest: DataSpaceParticipantSearchV7Request,
         paginationRequest: PaginationRequest
-    ): PageDto<DataSpaceParticipantDto> {
+    ): PageDto<DataSpaceParticipantV7Dto> {
         val criteria = dataSpaceParticipantSearchParser.parse(dataSpaceParticipantSearchRequestMapper.toSearchRequest(searchRequest))
 
         return dataSpaceParticipantSearchService.search(criteria, paginationRequest.toPageRequest())

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.springframework.stereotype.Component
 
@@ -32,6 +32,6 @@ class ChangelogResponseMapper {
     /**
      * Returns the given changelog entry as the API reports it.
      */
-    fun toChangelogEntry(changelogEntry: PartnerChangelogEntryDb): ChangelogEntryVerboseDto =
-        with(changelogEntry) { ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt.instant, changelogType) }
+    fun toChangelogEntry(changelogEntry: PartnerChangelogEntryDb): ChangelogEntryVerboseV7Dto =
+        with(changelogEntry) { ChangelogEntryVerboseV7Dto(bpn, businessPartnerType, updatedAt.instant, changelogType) }
 }

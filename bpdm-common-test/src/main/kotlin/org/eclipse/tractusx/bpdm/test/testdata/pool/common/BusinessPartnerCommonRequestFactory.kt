@@ -23,13 +23,27 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withSharedByOwner
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -46,30 +60,30 @@ abstract class BusinessPartnerCommonRequestFactory(
     protected val availableScriptCodes: Collection<String>
 ) {
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): SitePartnerCreateV7Request {
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
-    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
-        return SitePartnerCreateRequest(
+    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateV7Request {
+        return SitePartnerCreateV7Request(
             bpnlParent = bpnlParent,
             index = seed,
             site = createSiteDto("Main Address $seed")
         )
     }
 
-    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDto {
+    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteV7Dto {
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteDto(
+        return SiteV7Dto(
             name = "Site Name $seed",
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
             scriptVariants = listOfNotNull(buildSiteScriptVariant(seed, random)),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -80,21 +94,21 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
+    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto, random: Random = Random(seed.hashCode().toLong())):SiteCreateWithLegalAddressAsMainV7Request {
         return buildLegalAddressSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl, random)
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
+    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateWithLegalAddressAsMainV7Request{
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
-        return SiteCreateRequestWithLegalAddressAsMain(
+        return SiteCreateWithLegalAddressAsMainV7Request(
             name = "Site Name $seed",
             bpnLParent = bpnL,
             states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 2,
@@ -105,15 +119,15 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerCreateV7Request {
         return buildAdditionalAddressCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateV7Request {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
-        return AddressPartnerCreateRequest(
+        return AddressPartnerCreateV7Request(
             bpnParent = bpnParent,
             index = seed,
             address = createAddressDto(seed, random),
@@ -121,28 +135,28 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseV6Dto): AddressPartnerUpdateV7Request {
         return buildAddressUpdateRequest(seed, legalAddressToUpdate.legalAddress.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseV6Dto): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseV6Dto): AddressPartnerUpdateV7Request {
         return buildAddressUpdateRequest(seed, addressToUpdate.address.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateRequest {
-        return AddressPartnerUpdateRequest(bpna, createAddressDto(seed, random), listOfNotNull(buildLogisticAddressScriptVariant(seed, random)))
+    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateV7Request {
+        return AddressPartnerUpdateV7Request(bpna, createAddressDto(seed, random), listOfNotNull(buildLogisticAddressScriptVariant(seed, random)))
     }
 
-    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDto {
+    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressV7Dto {
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, latestSeededStateSecond), random.nextInt(0, 999999999), ZoneOffset.UTC)
-        return LogisticAddressDto(
+        return LogisticAddressV7Dto(
             name = "Address Name $seed",
             states = listOf(
-                AddressStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                AddressStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+                AddressStateV7Dto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                AddressStateV7Dto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
-            physicalPostalAddress = PhysicalPostalAddressDto(
+            physicalPostalAddress = PhysicalPostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
@@ -151,7 +165,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 district = "District $seed",
-                street = StreetDto(
+                street = StreetV7Dto(
                     name = "Street Name $seed",
                     houseNumber = "House Number $seed",
                     houseNumberSupplement = "House Number Supplement $seed",
@@ -169,7 +183,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 door = "Door $seed",
                 taxJurisdictionCode = "Tax Jurisdiction Code $seed"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
+            alternativePostalAddress = AlternativePostalAddressV7Dto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = listOf("DE", "US", "FR", "CN", "PL").random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
@@ -179,7 +193,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 deliveryServiceType = DeliveryServiceType.entries.random(random),
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteriaV7Dto(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfSharingMembers = 0,
@@ -190,41 +204,41 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDto{
+    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierV7Dto{
         val idKey = availableAddressIdentifiers.random(random)
-        return AddressIdentifierDto("$idKey Value $seed $index", idKey)
+        return AddressIdentifierV7Dto("$idKey Value $seed $index", idKey)
     }
 
-    fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantDto?{
+    fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantV7Dto?{
         val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
-        return SiteScriptVariantDto(
+        return SiteScriptVariantV7Dto(
             scriptCode = scriptCode,
             name = buildScriptVariantStringValue("Site Name", seed, scriptCode),
             mainAddress = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
-    fun buildLogisticAddressScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressScriptVariantDto? {
+    fun buildLogisticAddressScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressScriptVariantV7Dto? {
         val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
-        return LogisticAddressScriptVariantDto(
+        return LogisticAddressScriptVariantV7Dto(
             scriptCode = scriptCode,
             address = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
-    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariantDto{
-        return PostalAddressScriptVariantDto(
+    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariantV7Dto{
+        return PostalAddressScriptVariantV7Dto(
             addressName = buildScriptVariantStringValue("Address Name", seed, scriptCode),
             physicalAddress = buildPhysicalAddressScriptVariant(scriptCode, seed),
             alternativeAddress = buildAlternativeAddressScriptVariant(scriptCode, seed)
         )
     }
 
-    fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDto{
-        return PhysicalAddressScriptVariantDto(
+    fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantV7Dto{
+        return PhysicalAddressScriptVariantV7Dto(
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
-            street = StreetScriptVariantDto(
+            street = StreetScriptVariantV7Dto(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
@@ -239,8 +253,8 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDto{
-        return AlternativeAddressScriptVariantDto(
+    fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantV7Dto{
+        return AlternativeAddressScriptVariantV7Dto(
             city = buildScriptVariantStringValue("City", seed, scriptCode)
         )
     }

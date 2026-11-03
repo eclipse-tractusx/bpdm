@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -65,7 +65,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     val cleaningStepService: TaskResolutionService,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val legalEntityRepository: LegalEntityRepository,
-    val poolClient: PoolApiClient,
+    val poolClient: PoolV7Client,
     val dbTestHelpers: DbTestHelpers,
     val poolDataHelper: PoolDataHelper,
     val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
@@ -1829,7 +1829,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(ultimateOwner).isNull()
     }
 
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseV7Dto {
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
@@ -1839,7 +1839,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
 
         val relation = org.eclipse.tractusx.bpdm.pool.entity.RelationDb(
-            type = LegalEntityRelationType.IsOwnedBy,
+            type = LegalEntityRelationTypeV7.IsOwnedBy,
             startNode = sourceEntity,
             endNode = targetEntity,
             validityPeriods = mutableListOf(currentValidityPeriod()),
@@ -1853,7 +1853,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
 
         val relation = org.eclipse.tractusx.bpdm.pool.entity.RelationDb(
-            type = LegalEntityRelationType.IsAlternativeHeadquarterFor,
+            type = LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor,
             startNode = sourceEntity,
             endNode = targetEntity,
             validityPeriods = mutableListOf(currentValidityPeriod()),
@@ -2194,7 +2194,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             RelationRepository.byRelation(
                 startNode = sourceAfter,
                 endNode = targetAfter,
-                type = LegalEntityRelationType.IsOwnedBy
+                type = LegalEntityRelationTypeV7.IsOwnedBy
             )
         ).singleOrNull()
 

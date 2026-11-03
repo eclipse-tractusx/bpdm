@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.model
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 
 data class ChangelogRecord(
     val bpn: String,
-    val changelogType: ChangelogType,
+    val changelogType: ChangelogTypeV7,
     val businessPartnerType: BusinessPartnerType
 )

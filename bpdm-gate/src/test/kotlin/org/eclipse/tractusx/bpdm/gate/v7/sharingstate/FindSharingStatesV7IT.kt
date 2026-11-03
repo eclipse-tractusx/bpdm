@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.exception.BusinessPartnerSharingErr
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -391,7 +391,7 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
     }
 
-    private fun goldenRecordLostSharingState(externalId: String, goldenRecord: LegalEntityWithLegalAddressVerboseDto) =
+    private fun goldenRecordLostSharingState(externalId: String, goldenRecord: LegalEntityWithLegalAddressVerboseV7Dto) =
         SharingStateV7Dto(
             externalId = externalId,
             sharingStateType = SharingStateTypeV7.Error,

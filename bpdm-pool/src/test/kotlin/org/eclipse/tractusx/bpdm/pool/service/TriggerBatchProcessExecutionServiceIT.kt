@@ -26,12 +26,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -65,7 +65,7 @@ import java.time.*
 class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     private val taskRelationsResolutionService: TaskRelationsResolutionService,
     private val triggerBatchProcessExecutionService: TriggerBatchProcessExecutionService,
-    private val poolApiClient: PoolApiClient,
+    private val poolApiClient: PoolV7Client,
     private val legalEntityRepository: LegalEntityRepository,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers,
@@ -205,13 +205,13 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
     }
 
     private fun buildExpectedRelocatedHeadquarterLegalEntity(
-        legalEntity: LegalEntityPartnerCreateVerboseDto,
-        newLegalAddress: AddressPartnerCreateVerboseDto,
+        legalEntity: LegalEntityPartnerCreateVerboseV7Dto,
+        newLegalAddress: AddressPartnerCreateVerboseV7Dto,
         replacedByRelation: BusinessPartnerRelations
-    ): LegalEntityWithLegalAddressVerboseDto{
+    ): LegalEntityWithLegalAddressVerboseV7Dto{
         val newReplacedRelation = buildAddressReplacedByRelation(replacedByRelation)
 
-        return LegalEntityWithLegalAddressVerboseDto(
+        return LegalEntityWithLegalAddressVerboseV7Dto(
             header = legalEntity.legalEntity.header,
             legalAddress = newLegalAddress.address.copy(addressType = AddressType.LegalAddress, relations = newLegalAddress.address.relations.plus(newReplacedRelation)),
             // The new legal address covers none of the old script codes, so the legal entity keeps no script variant.
@@ -219,12 +219,12 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         )
     }
 
-    private fun buildAddressReplacedByRelation(replacedByRelation: BusinessPartnerRelations): AddressRelationVerboseDto{
-        return AddressRelationVerboseDto(
-            type = AddressRelationType.IsReplacedBy,
+    private fun buildAddressReplacedByRelation(replacedByRelation: BusinessPartnerRelations): AddressRelationVerboseV7Dto{
+        return AddressRelationVerboseV7Dto(
+            type = AddressRelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpna = replacedByRelation.businessPartnerSourceBpn,
             businessPartnerTargetBpna = replacedByRelation.businessPartnerTargetBpn,
-            validityPeriods = replacedByRelation.validityPeriods.map { org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod(it.validFrom, it.validTo) },
+            validityPeriods = replacedByRelation.validityPeriods.map { org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationValidityPeriodV7Dto(it.validFrom, it.validTo) },
             reasonCode = replacedByRelation.reasonCode
         )
     }

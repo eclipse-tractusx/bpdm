@@ -19,13 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.ErrorCodeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes.
+ * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfoV7] codes.
  *
  * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
  * an internal error instead. The `when`s are exhaustive so a new error won't compile until it gets a code.
@@ -33,125 +40,125 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapper {
 
-    fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfo<AddressCreateError> =
+    fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
         when (error) {
             is InvalidParentBpn ->
-                ErrorInfo(AddressCreateError.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
+                ErrorInfoV7(AddressCreateErrorV7.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
             is UnresolvableLegalEntity ->
-                ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+                ErrorInfoV7(AddressCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is UnresolvableSite ->
-                ErrorInfo(AddressCreateError.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
+                ErrorInfoV7(AddressCreateErrorV7.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
             is SiteNotInAddressLegalEntity ->
-                ErrorInfo(
-                    AddressCreateError.SiteNotInLegalEntity,
+                ErrorInfoV7(
+                    AddressCreateErrorV7.SiteNotInLegalEntity,
                     "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
             is AddressContentParseError -> sharedErrorInfo(
                 error,
                 entityKey,
-                regionNotFound = AddressCreateError.RegionNotFound,
-                countryNotFound = AddressCreateError.CountryNotFound,
-                identifierNotFound = AddressCreateError.IdentifierNotFound,
-                duplicateIdentifier = AddressCreateError.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateError.IdentifiersTooMany,
-                scriptVariantCityMissing = AddressCreateError.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressCreateError.ScriptVariantDuplicateScriptCode
+                regionNotFound = AddressCreateErrorV7.RegionNotFound,
+                countryNotFound = AddressCreateErrorV7.CountryNotFound,
+                identifierNotFound = AddressCreateErrorV7.IdentifierNotFound,
+                duplicateIdentifier = AddressCreateErrorV7.AddressDuplicateIdentifier,
+                identifiersTooMany = AddressCreateErrorV7.IdentifiersTooMany,
+                scriptVariantCityMissing = AddressCreateErrorV7.ScriptVariantCityMissing,
+                scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
             )
         }
 
-    fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfo<AddressUpdateError> =
+    fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
         when (error) {
             is UnresolvableAddress ->
-                ErrorInfo(AddressUpdateError.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
+                ErrorInfoV7(AddressUpdateErrorV7.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> sharedErrorInfo(
                 error,
                 entityKey,
-                regionNotFound = AddressUpdateError.RegionNotFound,
-                countryNotFound = AddressUpdateError.CountryNotFound,
-                identifierNotFound = AddressUpdateError.IdentifierNotFound,
-                duplicateIdentifier = AddressUpdateError.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressUpdateError.IdentifiersTooMany,
-                scriptVariantCityMissing = AddressUpdateError.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressUpdateError.ScriptVariantDuplicateScriptCode
+                regionNotFound = AddressUpdateErrorV7.RegionNotFound,
+                countryNotFound = AddressUpdateErrorV7.CountryNotFound,
+                identifierNotFound = AddressUpdateErrorV7.IdentifierNotFound,
+                duplicateIdentifier = AddressUpdateErrorV7.AddressDuplicateIdentifier,
+                identifiersTooMany = AddressUpdateErrorV7.IdentifiersTooMany,
+                scriptVariantCityMissing = AddressUpdateErrorV7.ScriptVariantCityMissing,
+                scriptVariantDuplicateScriptCode = AddressUpdateErrorV7.ScriptVariantDuplicateScriptCode
             )
             is SiteNotInAddressLegalEntity ->
-                ErrorInfo(
-                    AddressUpdateError.SiteNotInLegalEntity,
+                ErrorInfoV7(
+                    AddressUpdateErrorV7.SiteNotInLegalEntity,
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
             is ScriptVariantCoverageStillNeeded ->
-                ErrorInfo(
-                    AddressUpdateError.ScriptVariantCoverageStillNeeded,
+                ErrorInfoV7(
+                    AddressUpdateErrorV7.ScriptVariantCoverageStillNeeded,
                     "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
                             "is named in that script",
                     entityKey
                 )
             is UnresolvableSite ->
-                ErrorInfo(AddressUpdateError.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
+                ErrorInfoV7(AddressUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
             is SiteMainAddressOmitted ->
-                ErrorInfo(
-                    AddressUpdateError.SiteMainAddressOmitted,
+                ErrorInfoV7(
+                    AddressUpdateErrorV7.SiteMainAddressOmitted,
                     "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
                     entityKey
                 )
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
-    fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
+    fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
-            regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
-            countryNotFound = LegalEntityCreateError.LegalAddressCountryNotFound,
-            identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
-            duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany,
-            scriptVariantCityMissing = LegalEntityCreateError.LegalAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode
+            regionNotFound = LegalEntityCreateErrorV7.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityCreateErrorV7.LegalAddressCountryNotFound,
+            identifierNotFound = LegalEntityCreateErrorV7.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityCreateErrorV7.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityCreateErrorV7.LegalAddressIdentifiersTooMany,
+            scriptVariantCityMissing = LegalEntityCreateErrorV7.LegalAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = LegalEntityCreateErrorV7.LegalAddressScriptVariantDuplicateScriptCode
         )
 
-    fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
+    fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<LegalEntityUpdateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
-            regionNotFound = LegalEntityUpdateError.LegalAddressRegionNotFound,
-            countryNotFound = LegalEntityUpdateError.LegalAddressCountryNotFound,
-            identifierNotFound = LegalEntityUpdateError.LegalAddressIdentifierNotFound,
-            duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany,
-            scriptVariantCityMissing = LegalEntityUpdateError.LegalAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode
+            regionNotFound = LegalEntityUpdateErrorV7.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityUpdateErrorV7.LegalAddressCountryNotFound,
+            identifierNotFound = LegalEntityUpdateErrorV7.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityUpdateErrorV7.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityUpdateErrorV7.LegalAddressIdentifiersTooMany,
+            scriptVariantCityMissing = LegalEntityUpdateErrorV7.LegalAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = LegalEntityUpdateErrorV7.LegalAddressScriptVariantDuplicateScriptCode
         )
 
-    fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
+    fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
-            regionNotFound = SiteCreateError.MainAddressRegionNotFound,
-            countryNotFound = SiteCreateError.MainAddressCountryNotFound,
-            identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
-            duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany,
-            scriptVariantCityMissing = SiteCreateError.MainAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = SiteCreateError.MainAddressScriptVariantDuplicateScriptCode
+            regionNotFound = SiteCreateErrorV7.MainAddressRegionNotFound,
+            countryNotFound = SiteCreateErrorV7.MainAddressCountryNotFound,
+            identifierNotFound = SiteCreateErrorV7.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteCreateErrorV7.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteCreateErrorV7.MainAddressIdentifiersTooMany,
+            scriptVariantCityMissing = SiteCreateErrorV7.MainAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = SiteCreateErrorV7.MainAddressScriptVariantDuplicateScriptCode
         )
 
-    fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
+    fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
-            regionNotFound = SiteUpdateError.MainAddressRegionNotFound,
-            countryNotFound = SiteUpdateError.MainAddressCountryNotFound,
-            identifierNotFound = SiteUpdateError.MainAddressIdentifierNotFound,
-            duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany,
-            scriptVariantCityMissing = SiteUpdateError.MainAddressScriptVariantCityMissing,
-            scriptVariantDuplicateScriptCode = SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode
+            regionNotFound = SiteUpdateErrorV7.MainAddressRegionNotFound,
+            countryNotFound = SiteUpdateErrorV7.MainAddressCountryNotFound,
+            identifierNotFound = SiteUpdateErrorV7.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteUpdateErrorV7.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteUpdateErrorV7.MainAddressIdentifiersTooMany,
+            scriptVariantCityMissing = SiteUpdateErrorV7.MainAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = SiteUpdateErrorV7.MainAddressScriptVariantDuplicateScriptCode
         )
 
-    private fun <E : ErrorCode> sharedErrorInfo(
+    private fun <E : ErrorCodeV7> sharedErrorInfo(
         error: AddressContentParseError,
         entityKey: String?,
         regionNotFound: E,
@@ -161,35 +168,35 @@ class AddressParseErrorMapper {
         identifiersTooMany: E,
         scriptVariantCityMissing: E,
         scriptVariantDuplicateScriptCode: E
-    ): ErrorInfo<E> =
+    ): ErrorInfoV7<E> =
         when (error) {
             is AddressFieldParseError -> throw internalError(error)
             is AddressMetadataParseError -> when (error) {
                 is AddressMetadataParseError.IdentifierTypeNotFound ->
-                    ErrorInfo(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
+                    ErrorInfoV7(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
                 is AddressMetadataParseError.PhysicalCountryNotFound ->
-                    ErrorInfo(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                    ErrorInfoV7(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
                 is AddressMetadataParseError.AlternativeCountryNotFound ->
-                    ErrorInfo(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                    ErrorInfoV7(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
                 is AddressMetadataParseError.PhysicalRegionNotFound ->
-                    ErrorInfo(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
+                    ErrorInfoV7(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
                 is AddressMetadataParseError.AlternativeRegionNotFound ->
-                    ErrorInfo(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
+                    ErrorInfoV7(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
                 is AddressMetadataParseError.ScriptCodeNotFound -> throw internalError(error)
             }
             is AddressConstraintParseError -> when (error) {
                 is AddressConstraintParseError.IdentifiersTooMany ->
-                    ErrorInfo(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
+                    ErrorInfoV7(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
                 is AddressConstraintParseError.DuplicateIdentifier ->
-                    ErrorInfo(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
+                    ErrorInfoV7(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             }
             is AddressScriptVariantParseError -> when (error) {
                 is AddressScriptVariantParseError.PhysicalCityMissing ->
-                    ErrorInfo(scriptVariantCityMissing, "Script variant ${error.index} has no city in its physical address", entityKey)
+                    ErrorInfoV7(scriptVariantCityMissing, "Script variant ${error.index} has no city in its physical address", entityKey)
                 is AddressScriptVariantParseError.AlternativeCityMissing ->
-                    ErrorInfo(scriptVariantCityMissing, "Script variant ${error.index} has no city in its alternative address", entityKey)
+                    ErrorInfoV7(scriptVariantCityMissing, "Script variant ${error.index} has no city in its alternative address", entityKey)
                 is AddressScriptVariantParseError.DuplicateScriptCode ->
-                    ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate address script variant for script code '${error.scriptCode}'", entityKey)
+                    ErrorInfoV7(scriptVariantDuplicateScriptCode, "Duplicate address script variant for script code '${error.scriptCode}'", entityKey)
             }
         }
 

@@ -13,8 +13,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.model.FieldQualityRuleDto
-import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.FieldQualityRuleV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -32,7 +32,7 @@ class FieldQualityRuleGetV7IT : UnscheduledPoolTestBaseV7() {
         //GIVEN
         val country = "DE"
         val expectedRules = germanAddressRules.map { (fieldPath, qualityLevel) ->
-            FieldQualityRuleDto(fieldPath, "address", country, qualityLevel)
+            FieldQualityRuleV7Dto(fieldPath, "address", country, qualityLevel)
         }
 
         //WHEN
@@ -62,27 +62,27 @@ class FieldQualityRuleGetV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     private val germanAddressRules = listOf(
-        "physicalPostalAddress.administrativeAreaLevel1" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.administrativeAreaLevel2" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.administrativeAreaLevel3" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.administrativeAreaLevel4" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.city" to QualityLevel.MANDATORY,
-        "physicalPostalAddress.country" to QualityLevel.MANDATORY,
-        "physicalPostalAddress.districtLevel2" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.postCode" to QualityLevel.MANDATORY,
-        "physicalPostalAddress.street.houseNumber" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.street.milestone" to QualityLevel.OPTIONAL,
-        "physicalPostalAddress.street.name" to QualityLevel.MANDATORY,
-        "alternativePostalAddress.administrativeAreaLevel1" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.administrativeAreaLevel2" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.administrativeAreaLevel3" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.administrativeAreaLevel4" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.city" to QualityLevel.MANDATORY,
-        "alternativePostalAddress.country" to QualityLevel.MANDATORY,
-        "alternativePostalAddress.districtLevel2" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.postCode" to QualityLevel.MANDATORY,
-        "alternativePostalAddress.street.houseNumber" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.street.milestone" to QualityLevel.OPTIONAL,
-        "alternativePostalAddress.street.name" to QualityLevel.MANDATORY
+        "physicalPostalAddress.administrativeAreaLevel1" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.administrativeAreaLevel2" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.administrativeAreaLevel3" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.administrativeAreaLevel4" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.city" to QualityLevelV7.MANDATORY,
+        "physicalPostalAddress.country" to QualityLevelV7.MANDATORY,
+        "physicalPostalAddress.districtLevel2" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.postCode" to QualityLevelV7.MANDATORY,
+        "physicalPostalAddress.street.houseNumber" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.street.milestone" to QualityLevelV7.OPTIONAL,
+        "physicalPostalAddress.street.name" to QualityLevelV7.MANDATORY,
+        "alternativePostalAddress.administrativeAreaLevel1" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.administrativeAreaLevel2" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.administrativeAreaLevel3" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.administrativeAreaLevel4" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.city" to QualityLevelV7.MANDATORY,
+        "alternativePostalAddress.country" to QualityLevelV7.MANDATORY,
+        "alternativePostalAddress.districtLevel2" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.postCode" to QualityLevelV7.MANDATORY,
+        "alternativePostalAddress.street.houseNumber" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.street.milestone" to QualityLevelV7.OPTIONAL,
+        "alternativePostalAddress.street.name" to QualityLevelV7.MANDATORY
     )
 }

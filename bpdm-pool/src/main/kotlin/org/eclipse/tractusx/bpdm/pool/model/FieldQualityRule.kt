@@ -19,11 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
-import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
+
 
 data class FieldQualityRule(
     val fieldPath: String,
     val schemaName: String,
     val country: String,
-    val qualityLevel: QualityLevel
+    val qualityLevel: QualityLevelV7
 )

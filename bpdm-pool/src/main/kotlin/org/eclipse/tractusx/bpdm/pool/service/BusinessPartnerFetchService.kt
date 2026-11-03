@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityResponseMapper
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -56,7 +56,7 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns] and map to dtos
      */
     @Transactional
-    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseDto> {
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseV7Dto> {
         logger.debug { "Executing fetchDtosByBpns() with parameters $bpns " }
         return fetchByBpns(bpns).map { legalEntityResponseMapper.toLegalEntityWithLegalAddress(it) }
     }

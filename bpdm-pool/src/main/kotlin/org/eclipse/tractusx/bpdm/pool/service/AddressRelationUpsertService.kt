@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -35,6 +33,8 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreat
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 
 /**
  * Writes succession between two addresses of one legal entity, in which the source address is replaced by the target address.
@@ -110,7 +110,7 @@ class AddressRelationUpsertService(
             AddressRelationRepository.byRelation(
                 startAddress = upsertRequest.source,
                 endAddress = upsertRequest.target,
-                type = AddressRelationType.IsReplacedBy
+                type = AddressRelationTypeV7.IsReplacedBy
             )
         ).singleOrNull()
 
@@ -138,7 +138,7 @@ class AddressRelationUpsertService(
         val predecessor = upsertRequest.source
         val successor = upsertRequest.target
 
-        val existingSuccessions = addressRelationRepository.findByTypeAndStartAddress(AddressRelationType.IsReplacedBy, predecessor)
+        val existingSuccessions = addressRelationRepository.findByTypeAndStartAddress(AddressRelationTypeV7.IsReplacedBy, predecessor)
 
         filterOverlappingRelations(upsertRequest, existingRelation, existingSuccessions).forEach { succession ->
             if (succession.endAddress.bpn != successor.bpn)
@@ -178,7 +178,7 @@ class AddressRelationUpsertService(
             if (!visitedBpns.add(currentSuccessor.bpn))
                 continue
 
-            val successionsOfCurrent = addressRelationRepository.findByTypeAndStartAddress(AddressRelationType.IsReplacedBy, currentSuccessor)
+            val successionsOfCurrent = addressRelationRepository.findByTypeAndStartAddress(AddressRelationTypeV7.IsReplacedBy, currentSuccessor)
             filterOverlappingRelations(upsertRequest, existingRelation, successionsOfCurrent)
                 .forEach { successorProcessingQueue.addFirst(it.endAddress) }
         }
@@ -214,7 +214,7 @@ class AddressRelationUpsertService(
         }.toMutableList()
 
         val newRelation = AddressRelationDb(
-            type = AddressRelationType.IsReplacedBy,
+            type = AddressRelationTypeV7.IsReplacedBy,
             startAddress = source,
             endAddress = target,
             validityPeriods = validityPeriods,
@@ -223,8 +223,8 @@ class AddressRelationUpsertService(
 
         addressRelationRepository.saveAndFlush(newRelation)
 
-        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
-        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
 
         return newRelation
     }

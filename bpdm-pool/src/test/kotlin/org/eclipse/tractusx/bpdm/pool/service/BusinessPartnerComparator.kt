@@ -22,9 +22,16 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.Instant
 import java.time.LocalDateTime
@@ -32,7 +39,7 @@ import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.function.BiPredicate
 
-fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntity?) {
+fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseV7Dto, legalEntity: LegalEntity?) {
 
     val verboseLegalEntity = verboseRequest.header
 
@@ -48,7 +55,7 @@ fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, le
     compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
 }
 
-fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: Site?) {
+fun compareSite(verboseRequest: SiteWithMainAddressVerboseV7Dto, site: Site?) {
 
     val verboseSite = verboseRequest.site
 
@@ -63,7 +70,7 @@ fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: Site?) {
     compareLogisticAddress(verboseMainAddress, mainAddress)
 }
 
-fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseDto, address: PostalAddress?) {
+fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseV7Dto, address: PostalAddress?) {
 
     assertThat(verboseAddress.name).isEqualTo(address?.addressName)
     compareAddressStates(verboseAddress.states, address?.states)
@@ -74,10 +81,10 @@ fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseDto, a
     val physicalAddress = address?.physicalAddress
     assertThat(verbosePhysicalAddress).usingRecursiveComparison()
         .ignoringFields(
-            PhysicalPostalAddressVerboseDto::countryVerbose.name,
-            PhysicalPostalAddressVerboseDto::administrativeAreaLevel1Verbose.name,
-            PhysicalPostalAddressVerboseDto::geographicCoordinates.name,
-            PhysicalPostalAddressVerboseDto::street.name
+            PhysicalPostalAddressVerboseV7Dto::countryVerbose.name,
+            PhysicalPostalAddressVerboseV7Dto::administrativeAreaLevel1Verbose.name,
+            PhysicalPostalAddressVerboseV7Dto::geographicCoordinates.name,
+            PhysicalPostalAddressVerboseV7Dto::street.name
         )
         .isEqualTo(physicalAddress)
 
@@ -99,13 +106,13 @@ fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseDto, a
     val verboseAlternAddress = verboseAddress.alternativePostalAddress
     val alternAddress = address?.alternativeAddress
     assertThat(verboseAlternAddress).usingRecursiveComparison()
-        .ignoringFields(AlternativePostalAddressVerboseDto::countryVerbose.name, AlternativePostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
+        .ignoringFields(AlternativePostalAddressVerboseV7Dto::countryVerbose.name, AlternativePostalAddressVerboseV7Dto::administrativeAreaLevel1Verbose.name)
         .isEqualTo(alternAddress)
     assertThat(verboseAlternAddress?.country).isEqualTo(alternAddress?.country)
     assertThat(verboseAlternAddress?.administrativeAreaLevel1).isEqualTo(alternAddress?.administrativeAreaLevel1)
 }
 
-fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseDto>, states: Collection<BusinessState>?) {
+fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseV7Dto>, states: Collection<BusinessState>?) {
 
     assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
     val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -113,13 +120,13 @@ fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseDto>, stat
     sortedVerboseStates.indices.forEach {
         assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates!![it].type?.name)
         assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-            .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validTo.name)
-            .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validFrom.name)
-            .ignoringFields(AddressStateVerboseDto::typeVerbose.name).isEqualTo(sortedStates[it])
+            .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseV7Dto::validTo.name)
+            .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseV7Dto::validFrom.name)
+            .ignoringFields(AddressStateVerboseV7Dto::typeVerbose.name).isEqualTo(sortedStates[it])
     }
 }
 
-fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseDto>, identifiers: Collection<Identifier>?) {
+fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseV7Dto>, identifiers: Collection<Identifier>?) {
 
     assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
     val sortedVerboseIdentifiers = identifiersVerbose.sortedWith( compareBy( {it.value}, {it.typeVerbose.name }) )
@@ -127,12 +134,12 @@ fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVe
     sortedVerboseIdentifiers.indices.forEach {
         assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
         assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-            .ignoringFields(AddressIdentifierVerboseDto::typeVerbose.name)
+            .ignoringFields(AddressIdentifierVerboseV7Dto::typeVerbose.name)
             .isEqualTo(sortedIdentifiers[it])
     }
 }
 
-fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>,  states: Collection<BusinessState>?) {
+fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseV7Dto>,  states: Collection<BusinessState>?) {
 
     assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
     val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -140,9 +147,9 @@ fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>,  states
     sortedVerboseStates.indices.forEach {
         assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type?.name)
         assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-            .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validTo.name )
-            .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validFrom.name)
-            .ignoringFields(LegalEntityStateVerboseDto::typeVerbose.name)
+            .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseV7Dto::validTo.name )
+            .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseV7Dto::validFrom.name)
+            .ignoringFields(LegalEntityStateVerboseV7Dto::typeVerbose.name)
             .isEqualTo(sortedStates[it])
     }
 }
@@ -158,7 +165,7 @@ fun isEqualToIgnoringMilliseconds(): BiPredicate<LocalDateTime?, Instant?> {
     }
 }
 
-fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseDto>, identifiers: Collection<Identifier>?) {
+fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseV7Dto>, identifiers: Collection<Identifier>?) {
 
     assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
 
@@ -167,11 +174,11 @@ fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerbo
     sortedVerboseIdentifiers.indices.forEach {
         assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
         assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-            .ignoringFields(LegalEntityIdentifierVerboseDto::typeVerbose.name).isEqualTo(sortedIdentifiers[it])
+            .ignoringFields(LegalEntityIdentifierVerboseV7Dto::typeVerbose.name).isEqualTo(sortedIdentifiers[it])
     }
 }
 
-fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Collection<BusinessState>?) {
+fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseV7Dto>, states: Collection<BusinessState>?) {
 
     Assertions.assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
     val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -179,9 +186,9 @@ fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Co
     sortedVerboseStates.indices.forEach {
         Assertions.assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type?.name)
         assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-            .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validTo.name)
-            .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validFrom.name)
-            .ignoringFields(SiteStateVerboseDto::typeVerbose.name)
+            .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseV7Dto::validTo.name)
+            .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseV7Dto::validFrom.name)
+            .ignoringFields(SiteStateVerboseV7Dto::typeVerbose.name)
             .isEqualTo(sortedStates[it])
     }
 }

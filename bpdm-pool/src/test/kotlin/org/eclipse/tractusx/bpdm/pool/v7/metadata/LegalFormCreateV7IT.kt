@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -120,13 +120,13 @@ class LegalFormCreateV7IT : UnscheduledPoolTestBaseV7() {
             .isInstanceOf(WebClientResponseException.Conflict::class.java)
     }
 
-    private fun createLegalFormRequest(seed: String): LegalFormRequest {
-        return LegalFormRequest(
+    private fun createLegalFormRequest(seed: String): LegalFormV7Request {
+        return LegalFormV7Request(
             technicalKey = seed,
-            name = "$seed ${LegalFormRequest::name.name}",
-            transliteratedName = "$seed ${LegalFormRequest::transliteratedName.name}",
-            abbreviations = "$seed ${LegalFormRequest::abbreviations.name}",
-            transliteratedAbbreviations = "$seed ${LegalFormRequest::transliteratedAbbreviations.name}",
+            name = "$seed ${LegalFormV7Request::name.name}",
+            transliteratedName = "$seed ${LegalFormV7Request::transliteratedName.name}",
+            abbreviations = "$seed ${LegalFormV7Request::abbreviations.name}",
+            transliteratedAbbreviations = "$seed ${LegalFormV7Request::transliteratedAbbreviations.name}",
             country = "DE",
             language = "de",
             administrativeAreaLevel1 = "DE-BW",
@@ -134,8 +134,8 @@ class LegalFormCreateV7IT : UnscheduledPoolTestBaseV7() {
         )
     }
 
-    private fun createExpectedLegalForm(request: LegalFormRequest): LegalFormDto {
-        return LegalFormDto(
+    private fun createExpectedLegalForm(request: LegalFormV7Request): LegalFormV7Dto {
+        return LegalFormV7Dto(
             technicalKey = request.technicalKey,
             name = request.name,
             transliteratedName = request.transliteratedName,

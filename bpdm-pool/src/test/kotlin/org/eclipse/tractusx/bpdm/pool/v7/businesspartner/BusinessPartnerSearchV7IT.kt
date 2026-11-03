@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.v7.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchFilterTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -38,11 +38,11 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `null search parameters return 400 bad request`() {
         //GIVEN
-        val request = LegalEntityPropertiesSearchRequest(null, null, null, null, null, null)
+        val request = LegalEntityPropertiesSearchV7Request(null, null, null, null, null, null)
 
         //WHEN / THEN
         Assertions.assertThatThrownBy {
-            poolClient.businessPartners.searchBusinessPartners(request, setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities), PaginationRequest(0, 100))
+            poolClient.businessPartners.searchBusinessPartners(request, setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities), PaginationRequest(0, 100))
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
@@ -54,11 +54,11 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `empty string search parameters return 400 bad request`() {
         //GIVEN
-        val request = LegalEntityPropertiesSearchRequest("", "", "", "", "", null)
+        val request = LegalEntityPropertiesSearchV7Request("", "", "", "", "", null)
 
         //WHEN / THEN
         Assertions.assertThatThrownBy {
-            poolClient.businessPartners.searchBusinessPartners(request, setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities), PaginationRequest(0, 100))
+            poolClient.businessPartners.searchBusinessPartners(request, setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities), PaginationRequest(0, 100))
         }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
@@ -76,8 +76,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -98,8 +98,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, "INVALIDBPN", null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(null, "INVALIDBPN", null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -121,8 +121,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(legalName, null, null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(legalName, null, null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -146,8 +146,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(legalName, bpnl, null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(legalName, bpnl, null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -170,8 +170,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, null, null, city, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, null, null, city, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -194,8 +194,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, streetName, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, streetName, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -219,8 +219,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeLegalEntities),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
             PaginationRequest(0, 100)
         )
 
@@ -247,8 +247,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeSites),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeSites),
             PaginationRequest(0, 100)
         )
 
@@ -275,8 +275,8 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, null, null, null, null),
-            setOf(BusinessPartnerSearchFilterType.IncludeAdditionalAddresses),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeAdditionalAddresses),
             PaginationRequest(0, 100)
         )
 
@@ -304,11 +304,11 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val searchResponse = poolClient.businessPartners.searchBusinessPartners(
-            LegalEntityPropertiesSearchRequest(null, bpnl, null, null, null, null),
+            LegalEntityPropertiesSearchV7Request(null, bpnl, null, null, null, null),
             setOf(
-                BusinessPartnerSearchFilterType.IncludeLegalEntities,
-                BusinessPartnerSearchFilterType.IncludeSites,
-                BusinessPartnerSearchFilterType.IncludeAdditionalAddresses
+                BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities,
+                BusinessPartnerSearchFilterTypeV7.IncludeSites,
+                BusinessPartnerSearchFilterTypeV7.IncludeAdditionalAddresses
             ),
             PaginationRequest(0, 100)
         )

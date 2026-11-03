@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteHeaderScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedSite = resultFactory.buildSiteUpdate(siteUpdateRequest, siteResponse)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(listOf(expectedSite), emptyList())
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(listOf(expectedSite), emptyList())
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -67,7 +67,7 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val updatedSiteResponse = testDataClient.updateSite(siteResponse, "Site Update $testName")
 
         //WHEN
-        val response = poolClient.sites.postSiteSearch(SiteSearchRequest(siteBpns = listOf(updatedSiteResponse.site.bpns)), PaginationRequest())
+        val response = poolClient.sites.postSiteSearch(SiteSearchV7Request(siteBpns = listOf(updatedSiteResponse.site.bpns)), PaginationRequest())
 
         //THEN
         val expectedSite = resultFactory.buildSiteSearchResponse(updatedSiteResponse)
@@ -87,8 +87,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(siteUpdateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.SiteNotFound, "IGNORED", "UNKNOWN")
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "IGNORED", "UNKNOWN")
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -108,12 +108,12 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val updateRequest = requestFactory.createSiteUpdateRequest("Site B Update $testName", siteResponseB)
-            .withMainAddressIdentifiers(AddressIdentifierDto(identifierX.value, identifierX.typeVerbose.technicalKey))
+            .withMainAddressIdentifiers(AddressIdentifierV7Dto(identifierX.value, identifierX.typeVerbose.technicalKey))
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressDuplicateIdentifier, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.MainAddressDuplicateIdentifier, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -131,12 +131,12 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
-            .withMainAddressIdentifiers(AddressIdentifierDto(value = "Any Value", type = "UNKNOWN"))
+            .withMainAddressIdentifiers(AddressIdentifierV7Dto(value = "Any Value", type = "UNKNOWN"))
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifierNotFound, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.MainAddressIdentifierNotFound, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -158,8 +158,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressRegionNotFound, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.MainAddressRegionNotFound, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -181,8 +181,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressRegionNotFound, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.MainAddressRegionNotFound, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -204,8 +204,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifiersTooMany, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.MainAddressIdentifiersTooMany, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -227,8 +227,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.ScriptVariantNameMissing, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantNameMissing, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -250,8 +250,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.MainAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -274,10 +274,10 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedErrors = listOf(
-            ErrorInfo(SiteUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns),
-            ErrorInfo(SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns)
+            ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns),
+            ErrorInfoV7(SiteUpdateErrorV7.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns)
         )
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
@@ -294,7 +294,7 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
         val coveredScriptCode = legalEntityResponse.scriptVariants.first().scriptCode
         val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", legalEntityResponse)
-            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(coveredScriptCode, "Site Name $testName"))) }
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantV7Dto(coveredScriptCode, "Site Name $testName"))) }
         val siteCreateResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
 
         //WHEN
@@ -303,8 +303,8 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }

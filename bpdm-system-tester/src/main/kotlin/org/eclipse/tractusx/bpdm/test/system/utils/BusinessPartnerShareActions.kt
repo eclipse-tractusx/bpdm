@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withUltimateOwner
@@ -103,7 +103,7 @@ class BusinessPartnerShareActions(
         masterDataSeed: String,
         legalEntityLabel: String,
         verified: Boolean = false
-    ): LegalEntityWithLegalAddressVerboseDto {
+    ): LegalEntityWithLegalAddressVerboseV7Dto {
         val state = context.records[recordId]!!
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified))
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
@@ -125,7 +125,7 @@ class BusinessPartnerShareActions(
         legalEntityLabel: String,
         verified: Boolean,
         scriptCode: String
-    ): LegalEntityWithLegalAddressVerboseDto {
+    ): LegalEntityWithLegalAddressVerboseV7Dto {
         val state = context.records[recordId]!!
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified)).let {
             it.copy(
@@ -150,7 +150,7 @@ class BusinessPartnerShareActions(
         recordId: String,
         masterDataSeed: String,
         legalEntityLabel: String
-    ): LegalEntityWithLegalAddressVerboseDto {
+    ): LegalEntityWithLegalAddressVerboseV7Dto {
         val state = context.records[recordId]!!
         // The Pool marks the ultimate owner itself by the flag alone and leaves its ultimateOwnerBpnl empty; only the
         // entities below it carry its BPNL (see UltimateOwnerRecalculationService).
@@ -187,7 +187,7 @@ class BusinessPartnerShareActions(
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, siteLabel = siteLabel))
         context.records[recordId] = state.copy(
             legalEntity = entityResult.siteBasedLegalEntity.legalEntity,
-            poolSite = SiteWithMainAddressVerboseDto(
+            poolSite = SiteWithMainAddressVerboseV7Dto(
                 entityResult.siteBasedLegalEntity.site,
                 entityResult.siteBasedLegalEntity.legalEntity.legalAddress
             )
@@ -429,10 +429,10 @@ class BusinessPartnerShareActions(
     // keeps them so.
     // -------------------------------------------------------------------------
 
-    private fun LegalEntityWithLegalAddressVerboseDto.withScriptCode(scriptCode: String): LegalEntityWithLegalAddressVerboseDto =
+    private fun LegalEntityWithLegalAddressVerboseV7Dto.withScriptCode(scriptCode: String): LegalEntityWithLegalAddressVerboseV7Dto =
         copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
 
-    private fun LogisticAddressVerboseDto.withScriptCode(scriptCode: String): LogisticAddressVerboseDto =
+    private fun LogisticAddressVerboseV7Dto.withScriptCode(scriptCode: String): LogisticAddressVerboseV7Dto =
         copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
 
     private fun BusinessPartner.withLegalEntityScriptCode(scriptCode: String): BusinessPartner =

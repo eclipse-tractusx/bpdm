@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
@@ -33,6 +31,8 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 
 @Service
 class RelationUpsertService(
@@ -103,8 +103,8 @@ class RelationUpsertService(
 
         relationRepository.save(newRelation)
 
-        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogRecord(source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogRecord(target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
 
         return newRelation
     }
@@ -142,7 +142,7 @@ class RelationUpsertService(
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val legalEntityRelationType: LegalEntityRelationType,
+        val legalEntityRelationType: LegalEntityRelationTypeV7,
         val validityPeriods: Collection<RelationValidityPeriodDb>,
         val existingRelation: RelationDb?,
         val reasonCode: ReasonCodeDb?

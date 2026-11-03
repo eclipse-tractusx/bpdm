@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.springframework.stereotype.Component
@@ -43,9 +43,9 @@ class SiteResponseMapper(
     /**
      * Returns the given site as the API reports it.
      */
-    fun toSite(site: SiteDb): SiteVerboseDto =
+    fun toSite(site: SiteDb): SiteVerboseV7Dto =
         with(site) {
-            SiteVerboseDto(
+            SiteVerboseV7Dto(
                 bpn,
                 name,
                 states = states.map { toState(it) },
@@ -62,8 +62,8 @@ class SiteResponseMapper(
     /**
      * Returns the given site together with its main address as the API reports them.
      */
-    fun toSiteWithMainAddress(site: SiteDb): SiteWithMainAddressVerboseDto =
-        SiteWithMainAddressVerboseDto(
+    fun toSiteWithMainAddress(site: SiteDb): SiteWithMainAddressVerboseV7Dto =
+        SiteWithMainAddressVerboseV7Dto(
             site = toSite(site),
             mainAddress = addressResponseMapper.toInvariantAddress(site.mainAddress)
         )
@@ -71,15 +71,15 @@ class SiteResponseMapper(
     /**
      * Returns the given created or updated site as the API reports it, tagged with the key of the request that wrote it.
      */
-    fun toUpsertResponse(site: SiteDb, entryId: String?): SitePartnerCreateVerboseDto =
-        SitePartnerCreateVerboseDto(
+    fun toUpsertResponse(site: SiteDb, entryId: String?): SitePartnerCreateVerboseV7Dto =
+        SitePartnerCreateVerboseV7Dto(
             site = toSite(site),
             mainAddress = addressResponseMapper.toInvariantAddress(site.mainAddress),
             index = entryId
         )
 
-    private fun toState(state: SiteStateDb): SiteStateVerboseDto =
-        SiteStateVerboseDto(
+    private fun toState(state: SiteStateDb): SiteStateVerboseV7Dto =
+        SiteStateVerboseV7Dto(
             BusinessStateDates.reportValidFrom(state.validFrom),
             BusinessStateDates.reportValidTo(state.validTo),
             state.type.toDto()
@@ -87,14 +87,14 @@ class SiteResponseMapper(
 
     // The main address covers every script its site is named in: the parsers reject a variant it does not cover and
     // ScriptVariantCoverageService prunes any the main address stops covering.
-    private fun toScriptVariants(site: SiteDb): List<SiteScriptVariantDto> {
+    private fun toScriptVariants(site: SiteDb): List<SiteScriptVariantV7Dto> {
         val mainAddressVariantsByCode = site.mainAddress.scriptVariants.associateBy { it.scriptCode.technicalKey }
 
         return site.scriptVariants.map { variant ->
             val scriptCode = variant.scriptCode.technicalKey
             val mainAddressVariant = mainAddressVariantsByCode[scriptCode]
                 ?: throw IllegalStateException("Site script variant of script code '$scriptCode' is not covered by the main address.")
-            SiteScriptVariantDto(scriptCode, variant.name, addressResponseMapper.toPostalAddressScriptVariant(mainAddressVariant))
+            SiteScriptVariantV7Dto(scriptCode, variant.name, addressResponseMapper.toPostalAddressScriptVariant(mainAddressVariant))
         }
     }
 }

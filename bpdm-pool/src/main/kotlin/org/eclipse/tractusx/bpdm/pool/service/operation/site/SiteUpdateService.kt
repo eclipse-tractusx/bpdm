@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -77,7 +77,7 @@ class SiteUpdateService(
 
         updatedSites.forEach { it.value.updatedAt = DbTimestamp.now() }
         siteRepository.saveAll(updatedSites.map { it.value })
-        changelogCreateService.record(updatedSites.map { ChangelogRecord(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
+        changelogCreateService.record(updatedSites.map { ChangelogRecord(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE) })
 
         if (updatedSites.isNotEmpty())
             logger.info {

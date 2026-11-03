@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadata
@@ -39,6 +38,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 
 /**
  * Validates the fields of an address against the metadata they reference — countries, regions, identifier types and
@@ -74,7 +74,7 @@ class AddressRequestParser(
         }.toSet()
         val scriptCodeKeys = scriptVariants.map { it.scriptCode }.toSet()
 
-        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
+        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerTypeV7.ADDRESS, idTypeKeys)
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
         val countries = countryRepository.findByCountryCodeIn(countryKeys)
         val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(scriptCodeKeys)

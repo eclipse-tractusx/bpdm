@@ -19,12 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application.v7
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
@@ -36,6 +30,12 @@ import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithLegalAddressAsMainParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
 
 /**
  * The REST-API boundary for the V7 "create sites" operations.
@@ -56,12 +56,12 @@ class SiteCreateApplicationV7Service(
      * site or the errors that stopped it.
      */
     @Transactional
-    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
+    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateV7Request>): SitePartnerCreateV7ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map { siteDtoRequestMapper.toCreateRequest(it) }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        val responses = mutableListOf<SitePartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<SiteCreateErrorV7>>()
         requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(siteResponseMapper.toUpsertResponse(result.parsed, request.index))
@@ -69,7 +69,7 @@ class SiteCreateApplicationV7Service(
             }
         }
 
-        return SitePartnerCreateResponseWrapper(responses, errors)
+        return SitePartnerCreateV7ResponseWrapper(responses, errors)
     }
 
     /**
@@ -77,12 +77,12 @@ class SiteCreateApplicationV7Service(
      * returns, per request, either the created site or the errors that stopped it.
      */
     @Transactional
-    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
+    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateWithLegalAddressAsMainV7Request>): SitePartnerCreateV7ResponseWrapper {
         val requestList = requests.toList()
         val createRequests = requestList.map { siteDtoRequestMapper.toCreateWithLegalAddressAsMainRequest(it) }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        val responses = mutableListOf<SitePartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<SiteCreateErrorV7>>()
         parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).forEachIndexed { index, result ->
             val entityKey = index.toString()
             when (result) {
@@ -91,6 +91,6 @@ class SiteCreateApplicationV7Service(
             }
         }
 
-        return SitePartnerCreateResponseWrapper(responses, errors)
+        return SitePartnerCreateV7ResponseWrapper(responses, errors)
     }
 }

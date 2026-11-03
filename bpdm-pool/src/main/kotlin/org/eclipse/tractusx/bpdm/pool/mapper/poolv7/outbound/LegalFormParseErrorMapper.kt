@@ -22,13 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError.TechnicalKeyAlreadyTaken
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError.UnresolvableAdministrativeArea
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest as LegalFormRequestDto
 
 private const val ADMINISTRATIVE_AREA_NOT_FOUND = "AdministrativeAreaNotFound"
 
@@ -52,11 +52,11 @@ class LegalFormParseErrorMapper {
                 is UnresolvableAdministrativeArea -> toValidationError(error)
                 is LegalFormCreateParseError.CountryNotFound -> ValidationError(
                     "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
-                    ValidationContext.fromRoot(LegalFormRequestDto::class, "request", LegalFormRequestDto::country)
+                    ValidationContext.fromRoot(LegalFormV7Request::class, "request", LegalFormV7Request::country)
                 )
                 is LegalFormCreateParseError.InvalidLanguage -> ValidationError(
                     "InvalidLanguage", "Language '${error.language}' is not an accepted ISO 639-1 code.", error.language,
-                    ValidationContext.fromRoot(LegalFormRequestDto::class, "request", LegalFormRequestDto::language)
+                    ValidationContext.fromRoot(LegalFormV7Request::class, "request", LegalFormV7Request::language)
                 )
                 is TechnicalKeyAlreadyTaken -> error("Technical key conflict must be handled first")
             }
@@ -68,6 +68,6 @@ class LegalFormParseErrorMapper {
             validationErrorCode = ADMINISTRATIVE_AREA_NOT_FOUND,
             errorDetails = "Administrative area '${error.regionCode}' not found in system.",
             erroneousValue = error.regionCode,
-            context = ValidationContext.fromRoot(LegalFormRequestDto::class, "request", LegalFormRequestDto::administrativeAreaLevel1)
+            context = ValidationContext.fromRoot(LegalFormV7Request::class, "request", LegalFormV7Request::administrativeAreaLevel1)
         )
 }
