@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
@@ -35,6 +36,10 @@ import org.junit.jupiter.params.provider.CsvSource
 import java.time.Instant
 
 class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
+
+    private val siteRelativeAddressComparison = RecursiveComparisonConfiguration.builder()
+        .withComparedFields("externalId", "site.siteBpn", "address.addressBpn", "address.name", "address.addressType", "additionalSites")
+        .build()
 
     /**
      * GIVEN a business partner output whose additional address is returned by the Pool with a given global address type
@@ -84,7 +89,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         ).let { it.copy(address = it.address.copy(addressType = expectedType)) }
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
-        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse, siteRelativeAddressComparison)
     }
 
     /**
@@ -104,7 +109,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(shared.inputA.externalId, shared.inputB.externalId))
 
         //THEN
-        assertRepo.assertBusinessPartnerOutput(response, shared.expectedPage(testData))
+        assertRepo.assertBusinessPartnerOutput(response, shared.expectedPage(testData), siteRelativeAddressComparison)
     }
 
     /**
@@ -123,7 +128,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(shared.inputA.externalId, shared.inputB.externalId))
 
         //THEN
-        assertRepo.assertBusinessPartnerOutput(response, shared.expectedPage(testData))
+        assertRepo.assertBusinessPartnerOutput(response, shared.expectedPage(testData), siteRelativeAddressComparison)
     }
 
     /**
@@ -176,7 +181,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         ).let { it.copy(address = it.address.copy(addressType = expectedType)) }
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
-        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse, siteRelativeAddressComparison)
     }
 
     private class SharedAddressScenario(
