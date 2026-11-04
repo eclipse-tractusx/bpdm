@@ -35,7 +35,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
@@ -55,7 +54,6 @@ class LegalEntityController(
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
-    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
     private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
 ) : PoolLegalEntityV7Api {
 
@@ -107,7 +105,7 @@ class LegalEntityController(
         businessPartners: Collection<LegalEntityPartnerCreateV7Request>
     ): LegalEntityPartnerCreateV7ResponseWrapper {
         val requests = businessPartners.toList()
-        val results = legalEntityCreateApplicationService.create(requests.map { legalEntityDtoRequestMapper.toCreateRaw(it) })
+        val results = legalEntityCreateApplicationService.create(requests.map { apiV7InboundMapper.toLegalEntityCreateRaw(it) })
         return apiV7LegalEntityMapper.toCreateResponse(requests, results)
     }
 
@@ -116,7 +114,7 @@ class LegalEntityController(
         businessPartners: Collection<LegalEntityPartnerUpdateV7Request>
     ): LegalEntityPartnerUpdateV7ResponseWrapper {
         val requests = businessPartners.toList()
-        val results = legalEntityUpdateApplicationService.update(requests.map { legalEntityDtoRequestMapper.toUpdateRaw(it) })
+        val results = legalEntityUpdateApplicationService.update(requests.map { apiV7InboundMapper.toLegalEntityUpdateRaw(it) })
         return apiV7LegalEntityMapper.toUpdateResponse(requests, results)
     }
 }

@@ -35,7 +35,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6LegalEntityMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
@@ -55,7 +54,6 @@ class LegalEntityV6Controller(
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationService,
     private val apiV6InboundMapper: ApiV6InboundMapper,
-    private val legalEntityDtoRequestMapperV6: LegalEntityDtoRequestMapperV6,
     private val apiV6LegalEntityMapper: ApiV6LegalEntityMapper
 ) : PoolLegalEntityV6Api {
 
@@ -107,7 +105,7 @@ class LegalEntityV6Controller(
         businessPartners: Collection<LegalEntityPartnerCreateV6Request>
     ): LegalEntityPartnerCreateV6ResponseWrapper {
         val requests = businessPartners.toList()
-        val results = legalEntityCreateApplicationService.create(requests.map { legalEntityDtoRequestMapperV6.toCreateRaw(it) })
+        val results = legalEntityCreateApplicationService.create(requests.map { apiV6InboundMapper.toLegalEntityCreateRaw(it) })
         return apiV6LegalEntityMapper.toCreateResponse(requests, results)
     }
 
@@ -116,7 +114,7 @@ class LegalEntityV6Controller(
         businessPartners: Collection<LegalEntityPartnerUpdateV6Request>
     ): LegalEntityPartnerUpdateV6ResponseWrapper {
         val requests = businessPartners.toList()
-        val results = legalEntityUpdateApplicationService.update(requests.map { legalEntityDtoRequestMapperV6.toUpdateRaw(it) })
+        val results = legalEntityUpdateApplicationService.update(requests.map { apiV6InboundMapper.toLegalEntityUpdateRaw(it) })
         return apiV6LegalEntityMapper.toUpdateResponse(requests, results)
     }
 }

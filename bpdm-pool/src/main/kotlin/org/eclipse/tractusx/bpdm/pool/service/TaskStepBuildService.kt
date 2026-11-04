@@ -276,7 +276,7 @@ class TaskStepBuildService(
     }
 
     private fun createLegalEntity(legalEntity: LegalEntity): LegalEntityDb {
-        val request = taskLegalEntityRequestMapper.toCreateRequest(legalEntity)
+        val request = taskLegalEntityRequestMapper.toCreateRaw(legalEntity)
         return when (val result = parseAndExecute(listOf(request), legalEntityCreateParser::parse, legalEntityCreateService::create).single()) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityCreateError(it) })
@@ -284,7 +284,7 @@ class TaskStepBuildService(
     }
 
     private fun updateLegalEntity(bpnL: String, legalEntity: LegalEntity): LegalEntityDb {
-        val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
+        val request = taskLegalEntityRequestMapper.toUpdateRaw(bpnL, legalEntity)
         return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parseWithoutCoverageCheck, legalEntityPayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderLegalEntityUpdateError(it) })

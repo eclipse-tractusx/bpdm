@@ -22,6 +22,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.ErrorCodeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
@@ -37,7 +38,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityVerbos
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.relation.RelationVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.LegalEntityParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityIdentifierRecord
@@ -56,7 +59,7 @@ class ApiV6LegalEntityMapper(
     private val apiV6AddressMapper: ApiV6AddressMapper,
     private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
     private val apiV6MetadataMapper: ApiV6MetadataMapper,
-    private val legalEntityParseErrorMapperV6: LegalEntityParseErrorMapperV6
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
     /**
@@ -88,7 +91,7 @@ class ApiV6LegalEntityMapper(
         requests.zip(results).forEach { (request, result) ->
             when (result) {
                 is LegalEntityCreateResult.Created -> entities.add(toCreateDto(result.legalEntity, request.index))
-                is LegalEntityCreateResult.Rejected -> errors.addAll(result.errors.map { legalEntityParseErrorMapperV6.toCreateErrorInfo(it, request.index) })
+                is LegalEntityCreateResult.Rejected -> errors.addAll(result.errors.map { toCreateErrorInfo(it, request.index) })
             }
         }
         return LegalEntityPartnerCreateV6ResponseWrapper(entities, errors)
@@ -106,7 +109,7 @@ class ApiV6LegalEntityMapper(
         requests.zip(results).forEach { (request, result) ->
             when (result) {
                 is LegalEntityUpdateResult.Updated -> entities.add(toCreateDto(result.legalEntity, request.bpnl))
-                is LegalEntityUpdateResult.Rejected -> errors.addAll(result.errors.map { legalEntityParseErrorMapperV6.toUpdateErrorInfo(it, request.bpnl) })
+                is LegalEntityUpdateResult.Rejected -> errors.addAll(result.errors.map { toUpdateErrorInfo(it, request.bpnl) })
             }
         }
         return LegalEntityPartnerUpdateV6ResponseWrapper(entities, errors)
@@ -157,4 +160,79 @@ class ApiV6LegalEntityMapper(
             LegalEntityRelationTypeV7.IsOwnedBy -> LegalEntityRelationTypeV6.IsOwnedBy
             LegalEntityRelationTypeV7.IsReplacedBy -> null
         }
+
+    private fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
+        when (error) {
+            is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityCreateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageParseError -> throw internalError(error)
+            is LegalEntityContentParseError -> toContentErrorInfo(
+                error,
+                entityKey,
+                legalFormNotFound = LegalEntityCreateErrorV6.LegalFormNotFound,
+                identifierNotFound = LegalEntityCreateErrorV6.LegalEntityIdentifierNotFound,
+                duplicateIdentifier = LegalEntityCreateErrorV6.LegalEntityDuplicateIdentifier,
+                identifiersTooMany = LegalEntityCreateErrorV6.LegalEntityIdentifiersTooMany
+            )
+        }
+
+    private fun toUpdateErrorInfo(error: LegalEntityUpdateParseError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
+        when (error) {
+            is UnresolvableLegalEntity ->
+                ErrorInfoV6(
+                    LegalEntityUpdateErrorV6.LegalEntityNotFound,
+                    "Legal entity '${error.bpn}' can't be updated as it doesn't exist",
+                    entityKey
+                )
+            is AddressContentParseError -> addressParseErrorMapperV6.toLegalEntityUpdateErrorInfo(error, entityKey)
+            // A v6 write never sets the ownership flag, so the uniqueness rule it guards cannot be broken from v6.
+            is MultipleUltimateOwnersInHierarchy -> throw internalError(error)
+            // A v6 write never sets the ownership flag on an alternative headquarter, so this cannot be broken from v6.
+            is AlternativeHeadquarterCannotOwnUltimately -> throw internalError(error)
+            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
+            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
+            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+            is LegalEntityContentParseError -> toContentErrorInfo(
+                error,
+                entityKey,
+                legalFormNotFound = LegalEntityUpdateErrorV6.LegalFormNotFound,
+                identifierNotFound = LegalEntityUpdateErrorV6.LegalEntityIdentifierNotFound,
+                duplicateIdentifier = LegalEntityUpdateErrorV6.LegalEntityDuplicateIdentifier,
+                identifiersTooMany = LegalEntityUpdateErrorV6.LegalEntityIdentifiersTooMany
+            )
+        }
+
+    private fun <E : ErrorCodeV6> toContentErrorInfo(
+        error: LegalEntityContentParseError,
+        entityKey: String?,
+        legalFormNotFound: E,
+        identifierNotFound: E,
+        duplicateIdentifier: E,
+        identifiersTooMany: E
+    ): ErrorInfoV6<E> =
+        when (error) {
+            is LegalEntityContentParseError.LegalFormNotFound ->
+                ErrorInfoV6(legalFormNotFound, "Legal form '${error.legalForm}' does not exist", entityKey)
+            is LegalEntityContentParseError.IdentifierTypeNotFound ->
+                ErrorInfoV6(identifierNotFound, "Legal Entity Identifier Type '${error.type}' does not exist", entityKey)
+            is LegalEntityContentParseError.DuplicateIdentifier ->
+                ErrorInfoV6(
+                    duplicateIdentifier,
+                    "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'",
+                    entityKey
+                )
+            is LegalEntityContentParseError.IdentifiersTooMany ->
+                ErrorInfoV6(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
+            is LegalEntityContentParseError.ScriptVariantLegalNameMissing,
+            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode,
+            is LegalEntityContentParseError.NameMissing,
+            is LegalEntityContentParseError.ConfidenceCriteriaMissing,
+            is LegalEntityContentParseError.IdentifierValueMissing,
+            is LegalEntityContentParseError.IdentifierTypeMissing,
+            is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
+        }
+
+    // The frozen v6 error enums predate script variants and ultimate ownership, so those errors get no public code.
+    private fun internalError(error: Any) =
+        BpdmValidationException("Unexpected legal entity parse error (no v6 client error code): $error")
 }

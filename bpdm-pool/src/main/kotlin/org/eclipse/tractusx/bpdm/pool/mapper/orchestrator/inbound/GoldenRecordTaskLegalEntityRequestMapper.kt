@@ -31,20 +31,23 @@ import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as TaskLegalEntit
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 
 /**
- * Maps a cleaning task's legal entity into the loose [LegalEntityCreateRaw] / [LegalEntityUpdateRaw]; the legal
- * address is delegated to [GoldenRecordTaskAddressRequestMapper]. Unlike the pass-through elsewhere, a missing
- * [LegalEntityState] type throws here — the loose request's type is non-null by contract (matches the task path's prior
- * behavior).
+ * Maps a cleaning task's legal entity into the raw legal entity create and update.
  */
 @Component
 class GoldenRecordTaskLegalEntityRequestMapper(
     private val addressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
-    fun toCreateRequest(legalEntity: TaskLegalEntity): LegalEntityCreateRaw =
+    /**
+     * Returns the raw create for the legal entity of a cleaning task.
+     */
+    fun toCreateRaw(legalEntity: TaskLegalEntity): LegalEntityCreateRaw =
         LegalEntityCreateRaw(content = toContentRequest(legalEntity))
 
-    fun toUpdateRequest(legalEntityBpn: String, legalEntity: TaskLegalEntity): LegalEntityUpdateRaw =
+    /**
+     * Returns the raw update of the legal entity [legalEntityBpn] from the legal entity of a cleaning task.
+     */
+    fun toUpdateRaw(legalEntityBpn: String, legalEntity: TaskLegalEntity): LegalEntityUpdateRaw =
         LegalEntityUpdateRaw(legalEntityBpn = legalEntityBpn, content = toContentRequest(legalEntity))
 
     private fun toContentRequest(legalEntity: TaskLegalEntity): LegalEntityContentRequest =
@@ -69,6 +72,7 @@ class GoldenRecordTaskLegalEntityRequestMapper(
             scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRequest(it.scriptCode, it.legalName, it.legalShortName) }
         )
 
+    // Throws on a missing state type instead of leaving it to the parser: the raw state's type is non-null.
     private fun toState(state: TaskBusinessState): LegalEntityState =
         LegalEntityState(
             validFrom = state.validFrom,
