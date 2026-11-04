@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,33 +16,32 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
-
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteGetResult
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
+import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the V7 "get site" operation.
+ * Fetches a single site by its BPN.
  */
 @Service
-class SiteGetApplicationV7Service(
-    private val siteBpnParser: SiteBpnParser,
-    private val siteResponseMapper: SiteResponseMapper
+class SiteGetApplicationService(
+    private val siteGetParser: SiteGetParser,
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
-     * Returns the site with the given BPN and fails with a not-found error when no site carries it.
+     * Returns the site carrying the BPN [request] names, or the reason no site could be found.
      */
     @Transactional(readOnly = true)
-    fun getSite(bpns: String): SiteWithMainAddressVerboseV7Dto =
-        when (val result = siteBpnParser.parse(listOf(bpns)).single()) {
-            is ParseResult.Success -> siteResponseMapper.toSiteWithMainAddress(result.parsed)
-            is ParseResult.Failure -> throw BpdmNotFoundException("Site", bpns)
+    fun get(request: SiteGetRaw): SiteGetResult =
+        when (val parseResult = siteGetParser.parse(request)) {
+            is ParseResult.Failure -> SiteGetResult.Rejected(parseResult.errors)
+            is ParseResult.Success -> SiteGetResult.Found(dbToOutputMapper.toRecord(parseResult.parsed))
         }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,10 +16,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 
-package org.eclipse.tractusx.bpdm.pool.model.request
-
-data class SiteCreateRequest(
-    val legalEntityBpn: String,
-    val content: SiteContentRequest
-)
+/**
+ * Reason a site fetch is rejected.
+ */
+sealed interface SiteGetError {
+    data class SiteNotFound(val bpn: String) : SiteGetError
+}

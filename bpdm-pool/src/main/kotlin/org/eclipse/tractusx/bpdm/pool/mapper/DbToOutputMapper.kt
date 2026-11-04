@@ -44,6 +44,9 @@ import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.StreetDb
 import org.eclipse.tractusx.bpdm.pool.entity.StreetScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressIdentifierRecord
@@ -76,6 +79,9 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRelationRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteScriptVariantRecord
 import org.springframework.stereotype.Component
 
 /**
@@ -224,6 +230,24 @@ class DbToOutputMapper {
         )
 
     /**
+     * Returns the output record for [entity], together with its main address.
+     */
+    fun toRecord(entity: SiteDb): SiteRecord =
+        SiteRecord(
+            bpn = entity.bpn,
+            name = entity.name,
+            states = entity.states.map { toStateRecord(it) },
+            relations = entity.startSiteRelations.plus(entity.endSiteRelations).map { toRelationRecord(it) },
+            legalEntityBpn = entity.legalEntity.bpn,
+            confidenceCriteria = toConfidenceCriteriaRecord(entity.confidenceCriteria),
+            isDataSpaceParticipant = entity.legalEntity.isDataSpaceParticipant,
+            createdAt = entity.createdAt.instant,
+            updatedAt = entity.updatedAt.instant,
+            mainAddress = toRecord(entity.mainAddress),
+            scriptVariants = toSiteScriptVariantRecords(entity)
+        )
+
+    /**
      * Returns the output record for [entity].
      */
     fun toRecord(entity: LogisticAddressDb): AddressRecord =
@@ -264,6 +288,9 @@ class DbToOutputMapper {
     private fun toStateRecord(state: LegalEntityStateDb): BusinessStateRecord =
         BusinessStateRecord(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
 
+    private fun toStateRecord(state: SiteStateDb): BusinessStateRecord =
+        BusinessStateRecord(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
+
     private fun toStateRecord(state: AddressStateDb): BusinessStateRecord =
         BusinessStateRecord(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
 
@@ -272,6 +299,15 @@ class DbToOutputMapper {
             type = relation.type,
             sourceBpnl = relation.startNode.bpn,
             targetBpnl = relation.endNode.bpn,
+            validityPeriods = toValidityPeriodRecords(relation.validityPeriods),
+            reasonCode = relation.reasonCode?.technicalKey
+        )
+
+    private fun toRelationRecord(relation: SiteRelationDb): SiteRelationRecord =
+        SiteRelationRecord(
+            type = relation.type,
+            sourceBpns = relation.startSite.bpn,
+            targetBpns = relation.endSite.bpn,
             validityPeriods = toValidityPeriodRecords(relation.validityPeriods),
             reasonCode = relation.reasonCode?.technicalKey
         )
@@ -313,6 +349,19 @@ class DbToOutputMapper {
                 shortName = variant.shortName,
                 legalAddress = toScriptVariantRecord(legalAddressVariant)
             )
+        }
+    }
+
+    // The main address covers every script its site is named in: the parsers reject a variant it does not cover and
+    // ScriptVariantCoverageService prunes any the main address stops covering.
+    private fun toSiteScriptVariantRecords(site: SiteDb): List<SiteScriptVariantRecord> {
+        val mainAddressVariantsByCode = site.mainAddress.scriptVariants.associateBy { it.scriptCode.technicalKey }
+
+        return site.scriptVariants.map { variant ->
+            val scriptCode = variant.scriptCode.technicalKey
+            val mainAddressVariant = mainAddressVariantsByCode[scriptCode]
+                ?: throw IllegalStateException("Site script variant of script code '$scriptCode' is not covered by the main address.")
+            SiteScriptVariantRecord(scriptCode = scriptCode, name = variant.name, mainAddress = toScriptVariantRecord(mainAddressVariant))
         }
     }
 

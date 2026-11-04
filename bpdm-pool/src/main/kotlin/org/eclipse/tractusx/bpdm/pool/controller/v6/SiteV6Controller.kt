@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolSiteV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
@@ -30,48 +32,63 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Respo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteCreateApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteGetApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteUpdateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6SiteMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateWithLegalAddressAsMainApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("SiteControllerLegacy")
 class SiteV6Controller(
-    private val siteGetApplicationService: SiteGetApplicationV6Service,
-    private val siteSearchApplicationService: SiteSearchApplicationV6Service,
-    private val siteCreateApplicationService: SiteCreateApplicationV6Service,
-    private val siteUpdateApplicationService: SiteUpdateApplicationV6Service
+    private val siteGetApplicationService: SiteGetApplicationService,
+    private val siteSearchApplicationService: SiteSearchApplicationService,
+    private val siteCreateApplicationService: SiteCreateApplicationService,
+    private val siteCreateWithLegalAddressAsMainApplicationService: SiteCreateWithLegalAddressAsMainApplicationService,
+    private val siteUpdateApplicationService: SiteUpdateApplicationService,
+    private val apiV6InboundMapper: ApiV6InboundMapper,
+    private val apiV6SiteMapper: ApiV6SiteMapper
 ) : PoolSiteV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
-    ): SiteWithMainAddressVerboseV6Dto {
-        return siteGetApplicationService.getSite(bpns)
-    }
+    ): SiteWithMainAddressVerboseV6Dto =
+        when (val result = siteGetApplicationService.get(apiV6InboundMapper.toSiteGetRaw(bpns))) {
+            is SiteGetResult.Found -> apiV6SiteMapper.toDto(result.site)
+            is SiteGetResult.Rejected -> throw apiV6SiteMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postSiteSearch(
         searchRequest: SiteSearchV6Request,
         paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseV6Dto> {
-        return siteSearchApplicationService.searchSites(searchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toSiteSearchRaw(searchRequest)
+        return siteSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV6SiteMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSite(
         requests: Collection<SitePartnerCreateV6Request>
     ): SitePartnerCreateV6ResponseWrapper {
-        return siteCreateApplicationService.createSitesWithMainAddress(requests)
+        val requestList = requests.toList()
+        val results = siteCreateApplicationService.create(requestList.map { apiV6InboundMapper.toSiteCreateRaw(it) })
+        return apiV6SiteMapper.toCreateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
         requests: Collection<SitePartnerUpdateV6Request>
     ): SitePartnerUpdateV6ResponseWrapper {
-        return siteUpdateApplicationService.updateSites(requests)
+        val requestList = requests.toList()
+        val results = siteUpdateApplicationService.update(requestList.map { apiV6InboundMapper.toSiteUpdateRaw(it) })
+        return apiV6SiteMapper.toUpdateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -86,6 +103,8 @@ class SiteV6Controller(
     override fun createSiteWithLegalReference(
         request: Collection<SiteCreateWithLegalAddressAsMainV6Request>
     ): SitePartnerCreateV6ResponseWrapper {
-        return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
+        val requestList = request.toList()
+        val results = siteCreateWithLegalAddressAsMainApplicationService.create(requestList.map { apiV6InboundMapper.toSiteCreateWithLegalAddressAsMainRaw(it) })
+        return apiV6SiteMapper.toLegalAddressAsMainCreateResponse(requestList, results)
     }
 }

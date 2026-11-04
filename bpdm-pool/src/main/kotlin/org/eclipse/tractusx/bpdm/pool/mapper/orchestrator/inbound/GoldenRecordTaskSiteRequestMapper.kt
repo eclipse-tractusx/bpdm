@@ -21,6 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant as SiteScriptVariantRequest
@@ -32,7 +35,7 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWit
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 
 /**
- * Maps a cleaning task's site into the loose [SiteCreateRequest] / [SiteUpdateRequest] /
+ * Maps a cleaning task's site into the loose [SiteCreateRaw] / [SiteUpdateRaw] /
  * [SiteCreateWithReferencedAddressAsMainRequest]; the main address is delegated to
  * [GoldenRecordTaskAddressRequestMapper] and resolved by the caller (the site's own address, or the legal address when
  * the site main is the legal address). Unlike the pass-through elsewhere, a missing [SiteState] type throws here — the
@@ -43,19 +46,19 @@ class GoldenRecordTaskSiteRequestMapper(
     private val addressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
-    fun toCreateRequest(legalEntityBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateRequest =
-        SiteCreateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(site, mainAddress))
+    fun toCreateRequest(legalEntityBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateRaw =
+        SiteCreateRaw(legalEntityBpn = legalEntityBpn, content = toContentRequest(site, mainAddress))
 
     fun toUpdateRequest(
         siteBpn: String,
         site: TaskSite,
         mainAddress: TaskPostalAddress,
         additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
-    ): SiteUpdateRequest =
-        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
+    ): SiteUpdateRaw =
+        SiteUpdateRaw(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
 
-    fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRequest =
-        SiteCreateWithLegalAddressAsMainRequest(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site))
+    fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRaw =
+        SiteCreateWithLegalAddressAsMainRaw(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site), exclusiveLegalAddress = false)
 
     fun toCreateWithReferencedAddressAsMainRequest(
         mainAddressBpn: String,

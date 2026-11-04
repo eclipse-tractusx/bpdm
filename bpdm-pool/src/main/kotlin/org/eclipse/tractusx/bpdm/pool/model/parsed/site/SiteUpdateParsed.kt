@@ -17,9 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 
-data class SiteCreateWithLegalAddressAsMainRequest(
-    val legalEntityBpn: String,
-    val header: SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
+
+data class SiteUpdateParsed(
+    val target: SiteDb,
+    val content: SiteContentParsed
 )

@@ -34,8 +34,14 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
@@ -50,11 +56,20 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.LegalEntitySiteSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -175,6 +190,51 @@ class ApiV7InboundMapper(
     fun toLegalEntityUpdateRaw(request: LegalEntityPartnerUpdateV7Request): LegalEntityUpdateRaw =
         LegalEntityUpdateRaw(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity))
 
+    /**
+     * Returns the raw site fetch for the site carrying [bpn].
+     */
+    fun toSiteGetRaw(bpn: String): SiteGetRaw =
+        SiteGetRaw(bpn = bpn)
+
+    /**
+     * Returns the raw site search holding [request].
+     */
+    fun toSiteSearchRaw(request: SiteSearchV7Request): SiteSearchRaw =
+        SiteSearchRaw(siteBpns = request.siteBpns, legalEntityBpns = request.legalEntityBpns, name = request.name)
+
+    /**
+     * Returns the raw search for the sites of the legal entity carrying [legalEntityBpn].
+     */
+    fun toLegalEntitySiteSearchRaw(legalEntityBpn: String): LegalEntitySiteSearchRaw =
+        LegalEntitySiteSearchRaw(legalEntityBpn = legalEntityBpn)
+
+    /**
+     * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.
+     */
+    fun toSiteCreateRaw(request: SitePartnerCreateV7Request): SiteCreateRaw =
+        SiteCreateRaw(legalEntityBpn = request.bpnlParent, content = toContentRequest(request.site))
+
+    /**
+     * Returns the raw create for the site a client sent that takes its parent's legal address as main address.
+     */
+    fun toSiteCreateWithLegalAddressAsMainRaw(request: SiteCreateWithLegalAddressAsMainV7Request): SiteCreateWithLegalAddressAsMainRaw =
+        SiteCreateWithLegalAddressAsMainRaw(
+            legalEntityBpn = request.bpnLParent,
+            header = SiteHeaderRequest(
+                name = request.name,
+                states = request.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+                confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
+                scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+            ),
+            exclusiveLegalAddress = false
+        )
+
+    /**
+     * Returns the raw update for the site and main address a client sent, addressed by the site's BPN.
+     */
+    fun toSiteUpdateRaw(request: SitePartnerUpdateV7Request): SiteUpdateRaw =
+        SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
+
     private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
@@ -198,6 +258,23 @@ class ApiV7InboundMapper(
             scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariant(it.scriptCode, it.legalName, it.shortName) }
         )
     }
+
+    private fun toContentRequest(site: SiteV7Dto): SiteContentRequest =
+        SiteContentRequest(
+            header = toHeaderRequest(site),
+            mainAddress = addressDtoRequestMapper.toContentRequest(
+                site.mainAddress,
+                site.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, it.mainAddress) }
+            )
+        )
+
+    private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRequest =
+        SiteHeaderRequest(
+            name = site.name,
+            states = site.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+            confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
+            scriptVariants = site.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+        )
 
     private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(

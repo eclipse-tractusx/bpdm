@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,13 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
+import org.springframework.data.domain.Page
 
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-
-data class SiteCreateWithReferencedAddressAsMainParsed(
-    val mainAddress: LogisticAddressDb,
-    val siteHeader: SiteHeaderParsed,
-    val mainAddressContent: LogisticAddressParsed?
-)
+/**
+ * Result of a search for the sites of a legal entity: either the requested page or every reason the search was rejected.
+ */
+sealed interface LegalEntitySiteSearchResult {
+    data class Found(val page: Page<SiteRecord>) : LegalEntitySiteSearchResult
+    data class Rejected(val errors: List<LegalEntitySiteSearchError>) : LegalEntitySiteSearchResult
+}

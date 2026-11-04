@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,12 +16,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 
-data class SiteSearchParsed(
-    val siteBpns: List<String>,
-    val legalEntityBpns: List<String>,
-    val name: String?,
-    val isDataSpaceParticipant: Boolean?
-)
+/**
+ * Result of updating one site of a batch: either the site as stored or every reason the entry was rejected.
+ */
+sealed interface SiteUpdateResult {
+    data class Updated(val site: SiteRecord) : SiteUpdateResult
+    data class Rejected(val errors: List<SiteUpdateParseError>) : SiteUpdateResult
+}

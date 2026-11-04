@@ -17,11 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-data class SiteSearchRequest(
-    val siteBpns: List<String>,
-    val legalEntityBpns: List<String>,
-    val name: String?,
-    val isDataSpaceParticipant: Boolean?
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
+
+data class SiteCreateRaw(
+    val legalEntityBpn: String,
+    val content: SiteContentRequest
 )

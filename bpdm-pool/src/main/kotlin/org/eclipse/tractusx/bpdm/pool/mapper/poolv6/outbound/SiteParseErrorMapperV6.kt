@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -37,23 +36,6 @@ import org.springframework.stereotype.Component
 class SiteParseErrorMapperV6(
     private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
-
-    fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
-        when (error) {
-            is UnresolvableLegalEntity ->
-                ErrorInfoV6(SiteCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is LegalAddressAlreadyMainAddress ->
-                ErrorInfoV6(
-                    SiteCreateErrorV6.MainAddressDuplicateIdentifier,
-                    "Legal address already belongs to site '${error.bpnSite}'",
-                    entityKey
-                )
-            is AddressContentParseError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
-            is ScriptVariantNotCoveredByAddress,
-            is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is SiteContentParseError -> throw internalError(error)
-        }
 
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         when (error) {

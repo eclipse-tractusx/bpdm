@@ -17,11 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 
-data class SiteUpdateParsed(
-    val target: SiteDb,
-    val content: SiteContentParsed
+data class SiteUpdateRaw(
+    val siteBpn: String,
+    val content: SiteContentRequest
 )

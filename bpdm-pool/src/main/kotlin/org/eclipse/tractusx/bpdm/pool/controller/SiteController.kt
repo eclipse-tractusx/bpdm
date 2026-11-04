@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolSiteV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
@@ -30,48 +32,63 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Respo
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteGetApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteUpdateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7SiteMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateWithLegalAddressAsMainApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SiteController(
-    private val siteGetApplicationService: SiteGetApplicationV7Service,
-    private val siteSearchApplicationService: SiteSearchApplicationV7Service,
-    private val siteCreateApplicationService: SiteCreateApplicationV7Service,
-    private val siteUpdateApplicationService: SiteUpdateApplicationV7Service
+    private val siteGetApplicationService: SiteGetApplicationService,
+    private val siteSearchApplicationService: SiteSearchApplicationService,
+    private val siteCreateApplicationService: SiteCreateApplicationService,
+    private val siteCreateWithLegalAddressAsMainApplicationService: SiteCreateWithLegalAddressAsMainApplicationService,
+    private val siteUpdateApplicationService: SiteUpdateApplicationService,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7SiteMapper: ApiV7SiteMapper
 ) : PoolSiteV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
-    ): SiteWithMainAddressVerboseV7Dto {
-        return siteGetApplicationService.getSite(bpns)
-    }
+    ): SiteWithMainAddressVerboseV7Dto =
+        when (val result = siteGetApplicationService.get(apiV7InboundMapper.toSiteGetRaw(bpns))) {
+            is SiteGetResult.Found -> apiV7SiteMapper.toDto(result.site)
+            is SiteGetResult.Rejected -> throw apiV7SiteMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postSiteSearch(
         searchRequest: SiteSearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseV7Dto> {
-        return siteSearchApplicationService.searchSites(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toSiteSearchRaw(searchRequest)
+        return siteSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7SiteMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSite(
         requests: Collection<SitePartnerCreateV7Request>
     ): SitePartnerCreateV7ResponseWrapper {
-        return siteCreateApplicationService.createSitesWithMainAddress(requests)
+        val requestList = requests.toList()
+        val results = siteCreateApplicationService.create(requestList.map { apiV7InboundMapper.toSiteCreateRaw(it) })
+        return apiV7SiteMapper.toCreateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
         requests: Collection<SitePartnerUpdateV7Request>
     ): SitePartnerUpdateV7ResponseWrapper {
-        return siteUpdateApplicationService.updateSites(requests)
+        val requestList = requests.toList()
+        val results = siteUpdateApplicationService.update(requestList.map { apiV7InboundMapper.toSiteUpdateRaw(it) })
+        return apiV7SiteMapper.toUpdateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -86,6 +103,8 @@ class SiteController(
     override fun createSiteWithLegalReference(
         request: Collection<SiteCreateWithLegalAddressAsMainV7Request>
     ): SitePartnerCreateV7ResponseWrapper {
-        return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
+        val requestList = request.toList()
+        val results = siteCreateWithLegalAddressAsMainApplicationService.create(requestList.map { apiV7InboundMapper.toSiteCreateWithLegalAddressAsMainRaw(it) })
+        return apiV7SiteMapper.toLegalAddressAsMainCreateResponse(requestList, results)
     }
 }

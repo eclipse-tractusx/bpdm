@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,10 +16,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-package org.eclipse.tractusx.bpdm.pool.model.request
-
-data class SiteUpdateRequest(
-    val siteBpn: String,
-    val content: SiteContentRequest
+data class LegalEntitySiteSearchRaw(
+    val legalEntityBpn: String
 )
