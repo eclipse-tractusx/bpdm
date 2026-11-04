@@ -23,15 +23,11 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.BpnSearchRequestMapp
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.BpnSearchResponseMapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.BpnSearchParseErrorMapper
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIdentifierSearchService
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnRequestIdentifierSearchService
-import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnIdentifierSearchParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnRequestIdentifierSearchParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappingV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnIdentifierMappingV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
 
 /**
@@ -39,26 +35,12 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearc
  */
 @Service
 class BpnSearchApplicationV6Service(
-    private val bpnIdentifierSearchParser: BpnIdentifierSearchParser,
     private val bpnRequestIdentifierSearchParser: BpnRequestIdentifierSearchParser,
-    private val bpnIdentifierSearchService: BpnIdentifierSearchService,
     private val bpnRequestIdentifierSearchService: BpnRequestIdentifierSearchService,
     private val bpnSearchRequestMapperV6: BpnSearchRequestMapperV6,
     private val bpnSearchResponseMapperV6: BpnSearchResponseMapperV6,
     private val bpnSearchParseErrorMapper: BpnSearchParseErrorMapper
 ) {
-
-    /**
-     * Returns the BPN of every business partner carrying one of the requested identifiers.
-     */
-    @Transactional(readOnly = true)
-    fun searchBpnsByIdentifiers(searchRequest: IdentifiersSearchV6Request): Set<BpnIdentifierMappingV6Dto> =
-        when (val criteria = bpnIdentifierSearchParser.parse(bpnSearchRequestMapperV6.toIdentifierSearchRequest(searchRequest))) {
-            is ParseResult.Failure -> throw bpnSearchParseErrorMapper.toIdentifierSearchException(criteria.errors)
-            is ParseResult.Success -> bpnSearchResponseMapperV6.toIdentifierMappings(bpnIdentifierSearchService.search(criteria.parsed))
-                .map { it }
-                .toSet()
-        }
 
     /**
      * Returns the BPN that was issued for every requested request identifier.

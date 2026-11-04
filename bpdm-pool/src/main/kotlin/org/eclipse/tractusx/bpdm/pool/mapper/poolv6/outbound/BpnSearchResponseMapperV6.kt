@@ -19,10 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnIdentifierMappingV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappingV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
-import org.eclipse.tractusx.bpdm.pool.model.BpnIdentifierMatch
 import org.springframework.stereotype.Component
 
 /**
@@ -30,12 +28,6 @@ import org.springframework.stereotype.Component
  */
 @Component
 class BpnSearchResponseMapperV6 {
-
-    /**
-     * Returns the identifier-to-BPN mappings the identifier search found.
-     */
-    fun toIdentifierMappings(matches: Set<BpnIdentifierMatch>): Set<BpnIdentifierMappingV6Dto> =
-        matches.map { BpnIdentifierMappingV6Dto(idValue = it.identifierValue, bpn = it.bpn) }.toSet()
 
     /**
      * Returns the request-identifier-to-BPN mappings the request identifier search found.

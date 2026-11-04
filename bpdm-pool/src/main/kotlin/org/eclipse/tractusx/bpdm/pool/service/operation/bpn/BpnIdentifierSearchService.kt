@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.bpn
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
-import org.eclipse.tractusx.bpdm.pool.model.BpnIdentifierMatch
-import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnIdentifierSearchParsed
+import org.eclipse.tractusx.bpdm.pool.entity.BpnIdentifierMatchDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.springframework.stereotype.Service
@@ -41,7 +41,7 @@ class BpnIdentifierSearchService(
      * business partner type, omitting the values no business partner carries.
      */
     @Transactional(readOnly = true)
-    fun search(criteria: BpnIdentifierSearchParsed): Set<BpnIdentifierMatch> =
+    fun search(criteria: BpnIdentifierSearchParsed): Set<BpnIdentifierMatchDb> =
         when (criteria.identifierType.businessPartnerType) {
             IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY ->
                 legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(criteria.identifierType, criteria.identifierValues)

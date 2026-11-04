@@ -17,9 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.parsed.bpn
 
-data class BpnIdentifierMatch(
-    val identifierValue: String,
-    val bpn: String
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+
+/**
+ * BPN-by-identifier search holding no more identifier values than the configured search request limit.
+ */
+data class BpnIdentifierSearchParsed(
+    val identifierType: IdentifierTypeDb,
+    val identifierValues: Set<String>
 )

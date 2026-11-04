@@ -19,10 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound
 
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.model.error.BpnIdentifierSearchParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.BpnRequestIdentifierSearchParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
 import org.springframework.stereotype.Component
@@ -32,17 +29,6 @@ import org.springframework.stereotype.Component
  */
 @Component
 class BpnSearchParseErrorMapper {
-
-    /**
-     * Returns the exception reporting a failed BPN-by-identifier search parse, surfacing the first error because the
-     * search fails as a whole rather than per identifier.
-     */
-    fun toIdentifierSearchException(errors: List<BpnIdentifierSearchParseError>): RuntimeException =
-        when (val error = errors.first()) {
-            is SearchValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
-            is BpnIdentifierSearchParseError.IdentifierTypeNotFound ->
-                BpdmNotFoundException(IdentifierTypeDb::class, "${error.typeKey}/${error.businessPartnerType}")
-        }
 
     /**
      * Returns the exception reporting a failed BPN-by-request-identifier search parse, surfacing the first error because

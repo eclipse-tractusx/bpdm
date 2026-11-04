@@ -25,6 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierMappi
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7BpnMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.BpnIdentifierSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.BpnSearchApplicationV7Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,12 +38,19 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class BpnController(
-    private val bpnSearchApplicationService: BpnSearchApplicationV7Service
+    private val bpnIdentifierSearchApplicationService: BpnIdentifierSearchApplicationService,
+    private val bpnSearchApplicationService: BpnSearchApplicationV7Service,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7BpnMapper: ApiV7BpnMapper
 ) : PoolBpnV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchV7Request): ResponseEntity<Set<BpnIdentifierMappingV7Dto>> {
-        return ResponseEntity(bpnSearchApplicationService.searchBpnsByIdentifiers(request), HttpStatus.OK)
+        val searchRequest = apiV7InboundMapper.toBpnIdentifierSearchRaw(request)
+        return when (val result = bpnIdentifierSearchApplicationService.search(searchRequest)) {
+            is BpnIdentifierSearchResult.Found -> ResponseEntity(result.matches.map(apiV7BpnMapper::toDto).toSet(), HttpStatus.OK)
+            is BpnIdentifierSearchResult.Rejected -> throw apiV7BpnMapper.toException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

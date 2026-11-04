@@ -25,5 +25,4 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  */
 data class SearchValuesTooMany(val count: Int, val maxCount: Int) :
     ChangelogSearchParseError,
-    BpnIdentifierSearchParseError,
     BpnRequestIdentifierSearchParseError

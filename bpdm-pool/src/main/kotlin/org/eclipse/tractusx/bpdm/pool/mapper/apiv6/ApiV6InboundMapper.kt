@@ -19,10 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
+import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
@@ -81,5 +83,15 @@ class ApiV6InboundMapper {
             language = legalForm.language,
             administrativeAreaLevel1 = legalForm.administrativeAreaLevel1,
             isActive = legalForm.isActive
+        )
+
+    /**
+     * Returns the raw BPN-by-identifier search holding [request].
+     */
+    fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV6Request): BpnIdentifierSearchRaw =
+        BpnIdentifierSearchRaw(
+            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(request.businessPartnerType.name),
+            identifierTypeKey = request.idType,
+            identifierValues = request.idValues
         )
 }

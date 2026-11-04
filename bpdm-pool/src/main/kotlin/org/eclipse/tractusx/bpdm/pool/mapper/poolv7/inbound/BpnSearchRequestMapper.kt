@@ -20,8 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
-import org.eclipse.tractusx.bpdm.pool.model.request.BpnIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.BpnRequestIdentifierSearchRequest
 import org.springframework.stereotype.Component
 
@@ -30,16 +28,6 @@ import org.springframework.stereotype.Component
  */
 @Component
 class BpnSearchRequestMapper {
-
-    /**
-     * Returns the criteria to search BPNs by the identifiers the client sent.
-     */
-    fun toIdentifierSearchRequest(searchRequest: IdentifiersSearchV7Request): BpnIdentifierSearchRequest =
-        BpnIdentifierSearchRequest(
-            businessPartnerType = searchRequest.businessPartnerType,
-            identifierTypeKey = searchRequest.idType,
-            identifierValues = searchRequest.idValues
-        )
 
     /**
      * Returns the criteria to search BPNs by the request identifiers the client sent.

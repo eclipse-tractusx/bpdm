@@ -25,6 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappi
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6BpnMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.BpnIdentifierSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.BpnSearchApplicationV6Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,12 +38,19 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("BpnControllerLegacy")
 class BpnV6Controller(
-    private val bpnSearchApplicationService: BpnSearchApplicationV6Service
+    private val bpnIdentifierSearchApplicationService: BpnIdentifierSearchApplicationService,
+    private val bpnSearchApplicationService: BpnSearchApplicationV6Service,
+    private val apiV6InboundMapper: ApiV6InboundMapper,
+    private val apiV6BpnMapper: ApiV6BpnMapper
 ) : PoolBpnV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchV6Request): ResponseEntity<Set<BpnIdentifierMappingV6Dto>> {
-        return ResponseEntity(bpnSearchApplicationService.searchBpnsByIdentifiers(request), HttpStatus.OK)
+        val searchRequest = apiV6InboundMapper.toBpnIdentifierSearchRaw(request)
+        return when (val result = bpnIdentifierSearchApplicationService.search(searchRequest)) {
+            is BpnIdentifierSearchResult.Found -> ResponseEntity(result.matches.map(apiV6BpnMapper::toDto).toSet(), HttpStatus.OK)
+            is BpnIdentifierSearchResult.Rejected -> throw apiV6BpnMapper.toException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

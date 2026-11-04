@@ -21,10 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.bpn
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.BpnIdentifierSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
-import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnIdentifierSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.BpnIdentifierSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.springframework.stereotype.Service
 
@@ -41,15 +40,15 @@ class BpnIdentifierSearchParser(
      * Resolves the requested identifier type and de-duplicates the identifier values, failing when the request holds
      * more values than the configured search request limit or names an unknown identifier type.
      */
-    fun parse(request: BpnIdentifierSearchRequest): ParseResult<BpnIdentifierSearchParsed, BpnIdentifierSearchParseError> {
-        val errors = mutableListOf<BpnIdentifierSearchParseError>()
+    fun parse(request: BpnIdentifierSearchRaw): ParseResult<BpnIdentifierSearchParsed, BpnIdentifierSearchError> {
+        val errors = mutableListOf<BpnIdentifierSearchError>()
 
         if (request.identifierValues.size > controllerConfigProperties.searchRequestLimit)
-            errors.add(SearchValuesTooMany(request.identifierValues.size, controllerConfigProperties.searchRequestLimit))
+            errors.add(BpnIdentifierSearchError.IdentifierValuesTooMany(request.identifierValues.size, controllerConfigProperties.searchRequestLimit))
 
         val identifierType = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(request.businessPartnerType, request.identifierTypeKey)
         if (identifierType == null)
-            errors.add(BpnIdentifierSearchParseError.IdentifierTypeNotFound(request.identifierTypeKey, request.businessPartnerType))
+            errors.add(BpnIdentifierSearchError.IdentifierTypeNotFound(request.identifierTypeKey, request.businessPartnerType))
 
         return if (identifierType != null && errors.isEmpty())
             ParseResult.Success(BpnIdentifierSearchParsed(identifierType, request.identifierValues.toSet()))
