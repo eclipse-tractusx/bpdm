@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,9 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.businesspartner
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+import java.time.LocalDateTime
 
-data class LegalEntityCreateRequest(
-    val content: LegalEntityContentRequest
+data class ConfidenceCriteriaRecord(
+    val sharedByOwner: Boolean,
+    val checkedByExternalDataSource: Boolean,
+    val numberOfSharingMembers: Int,
+    val lastConfidenceCheckAt: LocalDateTime,
+    val nextConfidenceCheckAt: LocalDateTime,
+    val confidenceLevel: Int
 )

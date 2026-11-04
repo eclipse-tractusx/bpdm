@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
@@ -56,7 +56,7 @@ class LegalEntityUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> =
+    fun parse(requests: List<LegalEntityUpdateRaw>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> =
         parseWithoutCoverageCheck(requests).map { result -> result.combine(scriptCodeCoverageErrors(result)) { it } }
 
     /**
@@ -64,7 +64,7 @@ class LegalEntityUpdateParser(
      * the legal address in one operation set and therefore decides coverage at its own scope.
      */
     @Transactional(readOnly = true)
-    fun parseWithoutCoverageCheck(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
+    fun parseWithoutCoverageCheck(requests: List<LegalEntityUpdateRaw>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         val headers = requests.map { it.content.header }

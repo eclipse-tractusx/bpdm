@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntitySearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntitySearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntitySearchRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnFilterParser
 import org.springframework.stereotype.Service
 
@@ -36,12 +36,13 @@ class LegalEntitySearchParser(
 ) {
 
     /**
-     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
+     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively, restricted to data
+     * space participants as [isDataSpaceParticipant] demands.
      */
-    fun parse(request: LegalEntitySearchRequest): LegalEntitySearchParsed =
+    fun parse(request: LegalEntitySearchRaw, isDataSpaceParticipant: Boolean?): LegalEntitySearchParsed =
         LegalEntitySearchParsed(
             legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
             legalName = request.legalName?.takeIf { it.isNotBlank() },
-            isDataSpaceParticipant = request.isDataSpaceParticipant
+            isDataSpaceParticipant = isDataSpaceParticipant
         )
 }

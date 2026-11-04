@@ -35,22 +35,24 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerbo
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7ChangelogMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntitySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MemberController(
-    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
+    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
-    private val apiV7ChangelogMapper: ApiV7ChangelogMapper
+    private val apiV7ChangelogMapper: ApiV7ChangelogMapper,
+    private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
 ): PoolMembersV7Api {
 
 
@@ -59,7 +61,9 @@ class MemberController(
         searchRequest: LegalEntitySearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> {
-        return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toLegalEntitySearchRaw(searchRequest)
+        return legalEntitySearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7LegalEntityMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

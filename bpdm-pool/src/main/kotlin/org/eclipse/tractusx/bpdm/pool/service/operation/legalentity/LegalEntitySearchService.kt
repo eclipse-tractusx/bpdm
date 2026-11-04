@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntitySearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntitySearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

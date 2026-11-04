@@ -35,10 +35,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerbo
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6ChangelogMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6LegalEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntitySearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -46,11 +47,12 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("MemberControllerLegacy")
 class MemberV6Controller(
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
-    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV6Service,
+    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationV6Service,
     private val addressSearchApplicationService: AddressSearchApplicationV6Service,
     private val apiV6InboundMapper: ApiV6InboundMapper,
-    private val apiV6ChangelogMapper: ApiV6ChangelogMapper
+    private val apiV6ChangelogMapper: ApiV6ChangelogMapper,
+    private val apiV6LegalEntityMapper: ApiV6LegalEntityMapper
 ): PoolMembersV6Api {
 
 
@@ -59,7 +61,9 @@ class MemberV6Controller(
         searchRequest: LegalEntitySearchV6Request,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseV6Dto> {
-        return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toLegalEntitySearchRaw(searchRequest)
+        return legalEntitySearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV6LegalEntityMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

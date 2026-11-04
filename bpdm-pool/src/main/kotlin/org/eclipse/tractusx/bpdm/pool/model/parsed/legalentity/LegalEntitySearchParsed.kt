@@ -17,26 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
-
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntitySearchRequest
-import org.springframework.stereotype.Component
+package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
 
 /**
- * Maps Pool API legal entity search criteria into the loose search request the parser takes.
+ * Legal entity search holding normalized legal entity BPNs and a non-blank legal name.
  */
-@Component
-class LegalEntitySearchRequestMapper {
-
-    /**
-     * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
-     * imposes.
-     */
-    fun toSearchRequest(searchRequest: LegalEntitySearchV7Request, isDataSpaceParticipant: Boolean?): LegalEntitySearchRequest =
-        LegalEntitySearchRequest(
-            legalEntityBpns = searchRequest.bpnLs,
-            legalName = searchRequest.legalName,
-            isDataSpaceParticipant = isDataSpaceParticipant
-        )
-}
+data class LegalEntitySearchParsed(
+    val legalEntityBpns: List<String>,
+    val legalName: String?,
+    val isDataSpaceParticipant: Boolean?
+)

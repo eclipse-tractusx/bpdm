@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,12 +16,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
-
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-
-data class LegalEntityUpdateParsed(
-    val target: LegalEntityDb,
-    val content: LegalEntityContentParsed
+data class LegalEntityGetRaw(
+    val identifierValue: String,
+    val identifierType: String?
 )

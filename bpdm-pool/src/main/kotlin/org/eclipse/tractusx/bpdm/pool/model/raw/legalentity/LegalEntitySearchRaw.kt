@@ -17,8 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
-data class LegalEntityCreateParsed(
-    val content: LegalEntityContentParsed
+data class LegalEntitySearchRaw(
+    val legalEntityBpns: List<String>,
+    val legalName: String?
 )

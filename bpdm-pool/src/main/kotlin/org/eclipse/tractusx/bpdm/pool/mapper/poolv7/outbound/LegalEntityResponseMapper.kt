@@ -23,7 +23,6 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
@@ -75,16 +74,6 @@ class LegalEntityResponseMapper(
             legalAddress = addressResponseMapper.toInvariantAddress(legalEntity.legalAddress),
             header = toHeader(legalEntity),
             scriptVariants = toScriptVariants(legalEntity)
-        )
-
-    /**
-     * Returns the given created or updated legal entity as the API reports it, tagged with the key of the request that
-     * wrote it.
-     */
-    fun toUpsertResponse(legalEntity: LegalEntityDb, entryId: String?): LegalEntityPartnerCreateVerboseV7Dto =
-        LegalEntityPartnerCreateVerboseV7Dto(
-            legalEntity = toLegalEntityWithLegalAddress(legalEntity),
-            index = entryId
         )
 
     private fun toIdentifier(identifier: LegalEntityIdentifierDb): LegalEntityIdentifierVerboseV7Dto =
