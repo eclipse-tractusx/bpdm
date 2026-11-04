@@ -45,6 +45,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
@@ -199,6 +200,12 @@ class ApiV6InboundMapper(
      */
     fun toSiteGetRaw(bpn: String): SiteGetRaw =
         SiteGetRaw(bpn = bpn)
+
+    /**
+     * Returns the raw address fetch for the address carrying [bpn].
+     */
+    fun toAddressGetRaw(bpn: String): AddressGetRaw =
+        AddressGetRaw(bpn = bpn)
 
     /**
      * Returns the raw site search holding [request].

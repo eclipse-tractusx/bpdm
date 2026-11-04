@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
@@ -28,6 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
@@ -46,15 +49,34 @@ import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError.AddressNotFound
 import org.springframework.stereotype.Component
 
 /**
- * Maps address records to their API v7 form.
+ * Maps address records and rejections to their API v7 form.
  */
 @Component
 class ApiV7AddressMapper(
     private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper
 ) {
+
+    /**
+     * Returns the API DTO for [record], together with its script variants.
+     */
+    fun toDto(record: AddressRecord): LogisticAddressVerboseV7Dto =
+        LogisticAddressVerboseV7Dto(
+            address = toInvariantDto(record),
+            scriptVariants = record.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, toPostalAddressDto(it)) }
+        )
+
+    /**
+     * Returns the exception the API reports a rejected address fetch with.
+     */
+    fun toGetException(errors: List<AddressGetError>): BpdmNotFoundException =
+        when (val error = errors.first()) {
+            is AddressNotFound -> BpdmNotFoundException("Address", error.bpn)
+        }
 
     /**
      * Returns the script-invariant part of [record] as the API reports it.

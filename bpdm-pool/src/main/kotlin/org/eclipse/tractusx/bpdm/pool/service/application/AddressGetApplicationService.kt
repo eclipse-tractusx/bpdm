@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,33 +16,32 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
-
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
+import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressGetParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the V7 "get address" operation.
+ * Fetches a single address by its BPN.
  */
 @Service
-class AddressGetApplicationV7Service(
-    private val addressBpnParser: AddressBpnParser,
-    private val addressResponseMapper: AddressResponseMapper
+class AddressGetApplicationService(
+    private val addressGetParser: AddressGetParser,
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
-     * Returns the address with the given BPN and fails with a not-found error when no address carries it.
+     * Returns the address carrying the BPN [request] names, or the reason no address could be found.
      */
     @Transactional(readOnly = true)
-    fun getAddress(bpna: String): LogisticAddressVerboseV7Dto =
-        when (val result = addressBpnParser.parse(listOf(bpna)).single()) {
-            is ParseResult.Success -> addressResponseMapper.toAddress(result.parsed)
-            is ParseResult.Failure -> throw BpdmNotFoundException("Address", bpna)
+    fun get(request: AddressGetRaw): AddressGetResult =
+        when (val parseResult = addressGetParser.parse(request)) {
+            is ParseResult.Failure -> AddressGetResult.Rejected(parseResult.errors)
+            is ParseResult.Success -> AddressGetResult.Found(dbToOutputMapper.toRecord(parseResult.parsed))
         }
 }

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateVerboseV6Dto
@@ -37,10 +38,12 @@ import org.eclipse.tractusx.bpdm.pool.model.output.address.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError.AddressNotFound
 import org.springframework.stereotype.Component
 
 /**
- * Maps address records to their API v6 form.
+ * Maps address records and rejections to their API v6 form.
  */
 @Component
 class ApiV6AddressMapper(
@@ -66,6 +69,14 @@ class ApiV6AddressMapper(
             isCatenaXMemberData = record.isDataSpaceParticipant,
             addressType = record.addressType
         )
+
+    /**
+     * Returns the exception the API reports a rejected address fetch with.
+     */
+    fun toGetException(errors: List<AddressGetError>): BpdmNotFoundException =
+        when (val error = errors.first()) {
+            is AddressNotFound -> BpdmNotFoundException("Address", error.bpn)
+        }
 
     private fun toStateDto(record: BusinessStateRecord): AddressStateVerboseV6Dto =
         AddressStateVerboseV6Dto(

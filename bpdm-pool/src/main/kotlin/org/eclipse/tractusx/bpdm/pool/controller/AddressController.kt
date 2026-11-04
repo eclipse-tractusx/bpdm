@@ -29,8 +29,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7AddressMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressGetApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
@@ -38,10 +41,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class AddressController(
-    private val addressGetApplicationService: AddressGetApplicationV7Service,
+    private val addressGetApplicationService: AddressGetApplicationService,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val addressCreateApplicationService: AddressCreateApplicationV7Service,
-    private val addressUpdateApplicationService: AddressUpdateApplicationV7Service
+    private val addressUpdateApplicationService: AddressUpdateApplicationV7Service,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7AddressMapper: ApiV7AddressMapper
 ) : PoolAddressV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -52,9 +57,11 @@ class AddressController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getAddress(
         bpna: String
-    ): LogisticAddressVerboseV7Dto {
-        return addressGetApplicationService.getAddress(bpna)
-    }
+    ): LogisticAddressVerboseV7Dto =
+        when (val result = addressGetApplicationService.get(apiV7InboundMapper.toAddressGetRaw(bpna))) {
+            is AddressGetResult.Found -> apiV7AddressMapper.toDto(result.address)
+            is AddressGetResult.Rejected -> throw apiV7AddressMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchAddresses(
