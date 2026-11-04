@@ -29,12 +29,10 @@ import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateAppl
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.Duration
 import java.time.Instant
 
 class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
@@ -169,7 +167,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         assertEquals(before.site, output.site)
         assertEquals(address.address.bpna, output.address.addressBpn)
         assertEquals(address.address.name, output.address.name)
-        assertTrue(Duration.between(address.address.updatedAt, output.address.updatedAt).abs() < Duration.ofNanos(1000))
+        assertEquals(address.address.updatedAt, output.address.updatedAt)
         assertEquals(expectedType, output.address.addressType)
         assertEquals(listOf(AdditionalSiteOutputV7Dto(otherSite.site.bpns, otherSite.site.name)), output.additionalSites)
     }
