@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
@@ -44,6 +43,7 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
 class BusinessPartnerTestDataClientV7(
@@ -88,65 +88,125 @@ class BusinessPartnerTestDataClientV7(
         return orchestratorMockDataFactory.getCreatedTaskBusinessPartners().single()
     }
 
-    fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputV7Dto {
-        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(externalId)))
+    fun goldenRecordCountedSyncedToOrchestrator(): List<SharingMemberRecordUpdateRequest> {
+        orchestratorMockDataFactory.mockSharingMemberRecordUpdates()
+        orchestratorMockDataFactory.resetRecordedRequests()
+        goldenRecordCountedSyncService.synchronizeGoldenRecordCounted()
+        return orchestratorMockDataFactory.getSharingMemberRecordUpdates()
+    }
+
+    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {
+        val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList())
+        setStateToReady(externalId)
         taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
-        return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
+        return refinement.taskState
     }
 
-    fun upsertAndShareBusinessPartner(seed: String): BusinessPartnerOutputV7Dto {
-        val input = upsertInput(seed)
-        return shareBusinessPartnerAndResolve(input.externalId)
-    }
-
-    fun upsertAndShareBusinessPartner(request: BusinessPartnerInputV7Request): BusinessPartnerOutputV7Dto {
-        val input = upsertInput(request)
-        return shareBusinessPartnerAndResolve(input.externalId)
-    }
-
-    fun createErrorSharing(externalId: String, seed: String = externalId, errorType: TaskErrorType, errorMessage: String) {
-        setStateToPending(externalId, seed)
-        orchestratorMockDataFactory.mockResolveTask(seed, errorType, errorMessage)
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {
+        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
+        setStateToReady(externalId)
+        taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
+        return errorTask
     }
 
-    fun createErrorSharingAndResolve(externalId: String, seed: String = externalId, errorType: TaskErrorType, errorMessage: String) {
+    fun setStateToResultWithoutCountry(externalId: String, seed: String = externalId): TaskClientStateDto {
+        val refinedTask = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList()).taskState
+        val refinedResult = refinedTask.businessPartnerResult
+        val additionalAddress = refinedResult.additionalAddress!!
+        val physicalAddressWithoutCountry = additionalAddress.postalProperties.physicalAddress.copy(country = null)
+        val resultWithoutCountry = refinedResult.copy(
+            additionalAddress = additionalAddress.copy(postalProperties = additionalAddress.postalProperties.copy(physicalAddress = physicalAddressWithoutCountry))
+        )
+        val incompleteTask = orchestratorMockDataFactory.mockTaskRefinedSuccessfully(refinedTask.taskId, resultWithoutCountry, seed)
+        setStateToReady(externalId)
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
+        return incompleteTask
+    }
+
+    fun setStateToTaskMissing(externalId: String, seed: String = externalId): TaskClientStateDto {
+        val createdTask = orchestratorMockDataFactory.mockMissingTask(seed)
+        setStateToReady(externalId)
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
+        return createdTask
+    }
+
+    fun setStateToPendingAfterHealthCheck(externalId: String, seed: String = externalId): TaskClientStateDto {
         val createdTask = setStateToPending(externalId, seed)
-        orchestratorMockDataFactory.mockResolveTask(createdTask.taskId, errorType, errorMessage)
-        taskResolutionService.resolveFinishedTasks()
+        orchestratorMockDataFactory.mockTasksPending()
+        taskHealthCheckService.checkPendingTasks()
+        return createdTask
     }
 
-    fun refineToPendingLegalEntity(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): Pair<SharingMemberRecordUpdateRequest, LegalEntityWithLegalAddressVerboseV7Dto> {
-        val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val refinement = goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)
-        return Pair(refinement.sharingMemberRecord, refinement.poolResult)
+    fun setStateToTaskLost(externalId: String, seed: String = externalId): TaskClientStateDto =
+        setStatesToTaskLost(listOf(externalId)).single()
+
+    fun setStatesToTaskLost(externalIds: List<String>): List<TaskClientStateDto> {
+        val createdTasks = externalIds.map { setStateToPending(it) }
+        orchestratorMockDataFactory.mockTasksLost()
+        taskHealthCheckService.checkPendingTasks()
+        return createdTasks
+    }
+
+    fun setStateToSuccessAfterConsistencyCheck(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseV7Dto {
+        val goldenRecord = refineToLegalEntity(input)
+        consistencyCheckService.checkSharedBusinessPartners()
+        return goldenRecord
+    }
+
+    fun setStateToGoldenRecordLost(input: BusinessPartnerInputV7Dto): LegalEntityWithLegalAddressVerboseV7Dto =
+        setStatesToGoldenRecordLost(listOf(input)).single()
+
+    fun setStatesToGoldenRecordLost(inputs: List<BusinessPartnerInputV7Dto>): List<LegalEntityWithLegalAddressVerboseV7Dto> {
+        val goldenRecords = inputs.map { refineToLegalEntity(it) }
+        goldenRecordMockFactory.mockGoldenRecordsDeletedInPool()
+        consistencyCheckService.checkSharedBusinessPartners()
+        return goldenRecords
+    }
+
+    fun createOutput(seed: String): BusinessPartnerOutputV7Dto {
+        val upsertedInput = upsertInput(seed)
+        return refineToSuccess(upsertedInput)
+    }
+
+    fun updateOutput(output: BusinessPartnerOutputV7Dto, newSeed: String): BusinessPartnerOutputV7Dto {
+        val upsertedInput = upsertInput(
+            testDataFactory.businessPartner.input.request.fromSeed(newSeed).copy(externalId = output.externalId)
+        )
+        return refineToSuccess(upsertedInput)
+    }
+
+    fun refineToSuccess(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): BusinessPartnerOutputV7Dto {
+        prepareLegalEntityRefinement(input, seed)
+        return shareBusinessPartnerAndResolve(input.externalId)
     }
 
     fun refineToLegalEntity(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
-        val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val poolMockResult = goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)
+        val poolMockResult = prepareLegalEntityRefinement(input)
         shareBusinessPartnerAndResolve(input.externalId)
         return poolMockResult
     }
 
     fun refineToLegalEntityChangedInPool(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val poolMockResult = goldenRecordMockFactory.mockLegalEntityChangedInPool(seed, owningCompany, input.nameParts)
+        val changedGoldenRecord = goldenRecordMockFactory.mockLegalEntityRefinementChangedInPool(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
-        return poolMockResult
+        return changedGoldenRecord
     }
 
     fun refineToLegalEntityOnSite(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val poolMockResult = goldenRecordMockFactory.mockSiteRefinement(seed, owningCompany, input.nameParts)
+        val poolMockResult = goldenRecordMockFactory.mockLegalEntityOnSiteRefinement(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
         return poolMockResult
     }
 
     fun refineToSite(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val poolMockResult = goldenRecordMockFactory.mockAdditionalSiteRefinement(seed, owningCompany, input.nameParts)
+        val poolMockResult = goldenRecordMockFactory.mockSiteRefinement(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
         return poolMockResult
     }
@@ -165,17 +225,16 @@ class BusinessPartnerTestDataClientV7(
         return refinement.poolResult
     }
 
-    /**
-     * Lets the Pool report [changedAddress] as updated and synchronizes that change into the Gate output,
-     * with the Pool returning [memberSites] as the sites the address belongs to.
-     */
-    fun syncAddressChangeFromPool(changedAddress: LogisticAddressVerboseV7Dto, memberSites: List<SiteWithMainAddressVerboseV7Dto>) {
-        poolMockDataFactory.mockSiteSearchResult(memberSites)
-        poolMockDataFactory.mockAddressSearchResult(changedAddress)
-        poolMockDataFactory.mockChangelogSearchResult(
-            listOf(ChangelogEntryVerboseV7Dto(changedAddress.address.bpna, BusinessPartnerType.ADDRESS, Instant.now(), ChangelogTypeV7.UPDATE))
-        )
-        goldenRecordUpdateService.updateFromPoolChanges()
+    private fun prepareLegalEntityRefinement(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
+        val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
+        return goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)
+    }
+
+    private fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputV7Dto {
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(externalId)))
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
+        return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
     }
 
     /**
