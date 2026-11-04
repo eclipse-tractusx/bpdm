@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,17 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
 
-data class LegalFormCreateRequest(
-    val technicalKey: String,
-    val name: String,
-    val transliteratedName: String?,
-    val abbreviations: String?,
-    val transliteratedAbbreviations: String?,
-    val country: String?,
-    val language: String?,
-    val administrativeAreaLevel1: String?,
-    val isActive: Boolean
-)
+/**
+ * Result of a legal form create: either the created legal form or every reason it was rejected.
+ */
+sealed interface LegalFormCreateResult {
+    data class Created(val legalForm: LegalFormRecord) : LegalFormCreateResult
+    data class Rejected(val errors: List<LegalFormCreateError>) : LegalFormCreateResult
+}

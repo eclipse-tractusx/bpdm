@@ -29,9 +29,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.FieldQualityRuleV7Dt
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeDetailV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
@@ -43,6 +45,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
 import org.springframework.stereotype.Component
 
 /**
@@ -167,4 +170,32 @@ class ApiV7MetadataMapper {
                     )
                 })
         }
+
+    /**
+     * Returns the exception the API reports [errors] with, reporting a technical key that is already taken ahead of
+     * every other error because a client has to free the key before the rest can be judged.
+     */
+    fun toLegalFormCreateException(errors: List<LegalFormCreateError>): RuntimeException {
+        val alreadyTaken = errors.filterIsInstance<LegalFormCreateError.TechnicalKeyAlreadyTaken>().firstOrNull()
+        if (alreadyTaken != null)
+            return BpdmAlreadyExists(LegalFormDb::class.simpleName!!, alreadyTaken.technicalKey)
+
+        return BpdmValidationErrorException(errors.map { error ->
+            when (error) {
+                is LegalFormCreateError.UnresolvableAdministrativeArea -> ValidationError(
+                    "AdministrativeAreaNotFound", "Administrative area '${error.regionCode}' not found in system.", error.regionCode,
+                    ValidationContext.fromRoot(LegalFormV7Request::class, "request", LegalFormV7Request::administrativeAreaLevel1)
+                )
+                is LegalFormCreateError.CountryNotFound -> ValidationError(
+                    "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
+                    ValidationContext.fromRoot(LegalFormV7Request::class, "request", LegalFormV7Request::country)
+                )
+                is LegalFormCreateError.InvalidLanguage -> ValidationError(
+                    "InvalidLanguage", "Language '${error.language}' is not an accepted ISO 639-1 code.", error.language,
+                    ValidationContext.fromRoot(LegalFormV7Request::class, "request", LegalFormV7Request::language)
+                )
+                is LegalFormCreateError.TechnicalKeyAlreadyTaken -> error("Technical key conflict must be handled first")
+            }
+        })
+    }
 }

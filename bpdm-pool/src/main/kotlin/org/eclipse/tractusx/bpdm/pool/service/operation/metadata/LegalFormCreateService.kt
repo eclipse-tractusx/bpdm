@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalFormCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -40,15 +40,16 @@ import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleSearchResult
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormCreateResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.FieldQualityRuleSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -58,7 +59,7 @@ import org.springframework.web.bind.annotation.RestController
 class MetadataController(
     val identifierTypeCreateApplicationService: IdentifierTypeCreateApplicationService,
     val identifierTypeSearchApplicationService: IdentifierTypeSearchApplicationService,
-    val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
+    val legalFormCreateApplicationService: LegalFormCreateApplicationService,
     val legalFormSearchApplicationService: LegalFormSearchApplicationService,
     val fieldQualityRuleSearchApplicationService: FieldQualityRuleSearchApplicationService,
     val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
@@ -93,7 +94,11 @@ class MetadataController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createLegalForm(type: LegalFormV7Request): LegalFormV7Dto {
-        return legalFormCreateApplicationV7Service.createLegalForm(type)
+        val request = apiV7InboundMapper.toLegalFormCreateRaw(type)
+        return when (val result = legalFormCreateApplicationService.create(request)) {
+            is LegalFormCreateResult.Created -> apiV7MetadataMapper.toDto(result.legalForm)
+            is LegalFormCreateResult.Rejected -> throw apiV7MetadataMapper.toLegalFormCreateException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")

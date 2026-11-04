@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,38 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v7
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalFormRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalFormResponseMapper
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormCreateResult
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.LegalFormCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.LegalFormCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 
 /**
- * The REST-API boundary for the V7 "create legal form" operation.
+ * Creates legal forms legal entities may be registered under, for every API version.
  */
 @Service
-class LegalFormCreateApplicationV7Service(
+class LegalFormCreateApplicationService(
     private val legalFormCreateParser: LegalFormCreateParser,
     private val legalFormCreateService: LegalFormCreateService,
-    private val legalFormRequestMapper: LegalFormRequestMapper,
-    private val legalFormParseErrorMapper: LegalFormParseErrorMapper,
-    private val legalFormResponseMapper: LegalFormResponseMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
-     * Creates the given legal form and returns it as stored.
+     * Creates the legal form of [request] and returns it as stored, or every reason it is rejected.
      */
     @Transactional
-    fun createLegalForm(legalForm: LegalFormV7Request): LegalFormV7Dto =
-        when (val parsed = legalFormCreateParser.parse(legalFormRequestMapper.toCreateRequest(legalForm))) {
-            is ParseResult.Failure -> throw legalFormParseErrorMapper.toCreateException(parsed.errors)
-            is ParseResult.Success -> legalFormResponseMapper.toLegalForm(legalFormCreateService.create(parsed.parsed))
+    fun create(request: LegalFormCreateRaw): LegalFormCreateResult =
+        when (val parseResult = legalFormCreateParser.parse(request)) {
+            is ParseResult.Failure -> LegalFormCreateResult.Rejected(parseResult.errors)
+            is ParseResult.Success -> LegalFormCreateResult.Created(
+                dbToOutputMapper.toRecord(legalFormCreateService.create(parseResult.parsed))
+            )
         }
 }

@@ -22,10 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -64,5 +66,21 @@ class ApiV6InboundMapper {
             format = null,
             categories = emptySet(),
             details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }
+        )
+
+    /**
+     * Returns the raw legal form create holding [legalForm].
+     */
+    fun toLegalFormCreateRaw(legalForm: LegalFormV6Request): LegalFormCreateRaw =
+        LegalFormCreateRaw(
+            technicalKey = legalForm.technicalKey,
+            name = legalForm.name,
+            transliteratedName = legalForm.transliteratedName,
+            abbreviations = legalForm.abbreviation,
+            transliteratedAbbreviations = legalForm.transliteratedAbbreviations,
+            country = legalForm.country,
+            language = legalForm.language,
+            administrativeAreaLevel1 = legalForm.administrativeAreaLevel1,
+            isActive = legalForm.isActive
         )
 }

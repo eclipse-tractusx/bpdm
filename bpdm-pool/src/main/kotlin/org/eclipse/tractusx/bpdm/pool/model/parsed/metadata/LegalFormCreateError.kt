@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,20 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
 
-import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
-
-import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-
-data class LegalFormCreateParsed(
-    val technicalKey: String,
-    val name: String,
-    val transliteratedName: String?,
-    val abbreviations: String?,
-    val transliteratedAbbreviations: String?,
-    val country: CountryDb?,
-    val language: String?,
-    val administrativeArea: RegionDb?,
-    val isActive: Boolean
-)
+/**
+ * Reason a legal form create is rejected.
+ */
+sealed interface LegalFormCreateError {
+    data class CountryNotFound(val country: String) : LegalFormCreateError
+    data class InvalidLanguage(val language: String) : LegalFormCreateError
+    data class TechnicalKeyAlreadyTaken(val technicalKey: String) : LegalFormCreateError
+    data class UnresolvableAdministrativeArea(val regionCode: String) : LegalFormCreateError
+}
