@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 
 /**
- * Resolves the country against the maintained catalogue before searching its field quality rules.
+ * Resolves the country of a field quality rule search against the maintained catalogue.
  */
 @Service
 class FieldQualityRuleSearchParser(private val countryRepository: CountryRepository) {

@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
 
 /**
@@ -40,17 +41,21 @@ class IdentifierTypeCreateParser(
 ) {
 
     /**
-     * Validates the request and reports either the validated identifier type or that its technical key is already taken
-     * for the business partner type it applies to. An identifier type named without a category falls under `OTH`.
+     * Validates the request and reports either the validated identifier type or every problem found: a technical key
+     * already taken for its business partner type and detail countries that do not exist. An identifier type named
+     * without a category falls under `OTH`.
      */
+    @Transactional(readOnly = true)
     fun parse(request: IdentifierTypeCreateRaw): ParseResult<IdentifierTypeCreateParsed, IdentifierTypeCreateError> {
-        val existing = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(request.businessPartnerType, request.technicalKey)
-        if (existing != null)
-            return ParseResult.ofSingleFailure(TechnicalKeyAlreadyTaken(request.technicalKey, request.businessPartnerType))
+        val errors = mutableListOf<IdentifierTypeCreateError>()
+
+        if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(request.businessPartnerType, request.technicalKey) != null)
+            errors.add(TechnicalKeyAlreadyTaken(request.technicalKey, request.businessPartnerType))
 
         val codes = request.details.mapNotNull { it.country }.toSet()
         val countries = countryRepository.findByCountryCodeIn(codes).associateBy { it.countryCode }
-        val errors = (codes - countries.keys).map { IdentifierTypeCreateError.CountryNotFound(it) }
+        (codes - countries.keys).mapTo(errors) { IdentifierTypeCreateError.CountryNotFound(it) }
+
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
         return ParseResult.Success(

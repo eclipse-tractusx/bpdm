@@ -62,7 +62,6 @@ class ApiV6InboundMapper {
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
             transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
-            // v6 knows neither format nor categories, so an identifier type created over v6 carries none.
             format = null,
             categories = emptySet(),
             details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }

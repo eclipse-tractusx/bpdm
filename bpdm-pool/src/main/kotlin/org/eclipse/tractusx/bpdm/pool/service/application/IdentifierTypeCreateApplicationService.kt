@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates identifier types business partners may be identified by, for every API version.
+ * Creates identifier types business partners may be identified by.
  */
 @Service
 class IdentifierTypeCreateApplicationService(

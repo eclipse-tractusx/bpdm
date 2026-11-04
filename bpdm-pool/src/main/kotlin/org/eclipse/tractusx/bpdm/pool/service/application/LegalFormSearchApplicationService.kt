@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the legal forms a legal entity may be registered under, for every API version.
+ * Searches the legal forms a legal entity may be registered under.
  */
 @Service
 class LegalFormSearchApplicationService(

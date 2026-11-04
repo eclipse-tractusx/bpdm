@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the quality rules that apply to the fields of a business partner in a country, for every API version.
+ * Searches the quality rules that apply to the fields of a business partner in a country.
  */
 @Service
 class FieldQualityRuleSearchApplicationService(

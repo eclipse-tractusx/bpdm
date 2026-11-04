@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the countries an address may name, for every API version.
+ * Searches the countries an address may name.
  */
 @Service
 class CountrySearchApplicationService(

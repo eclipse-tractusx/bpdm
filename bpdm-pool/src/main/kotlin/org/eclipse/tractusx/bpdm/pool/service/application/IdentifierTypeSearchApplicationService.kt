@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the identifier types business partners may be identified by, for every API version.
+ * Searches the identifier types business partners may be identified by.
  */
 @Service
 class IdentifierTypeSearchApplicationService(

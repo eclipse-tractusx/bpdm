@@ -155,21 +155,23 @@ class ApiV7MetadataMapper {
         }
 
     /**
-     * Returns the exception the API reports [errors] with, surfacing the first error's kind because a create covers a
-     * single identifier type.
+     * Returns the exception the API reports [errors] with, reporting a technical key that is already taken ahead of
+     * every other error because a client has to free the key before the rest can be judged.
      */
-    fun toException(errors: List<IdentifierTypeCreateError>): RuntimeException =
-        when (val error = errors.first()) {
-            is IdentifierTypeCreateError.TechnicalKeyAlreadyTaken ->
-                BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${error.technicalKey}/${error.businessPartnerType}")
-            is IdentifierTypeCreateError.CountryNotFound ->
-                BpdmValidationErrorException(errors.filterIsInstance<IdentifierTypeCreateError.CountryNotFound>().map {
-                    ValidationError(
-                        "CountryNotFound", "Country '${it.country}' not found in catalogue.", it.country,
-                        ValidationContext(classType = "", objectId = "request", propertyPath = listOf("details"))
-                    )
-                })
-        }
+    fun toException(errors: List<IdentifierTypeCreateError>): RuntimeException {
+        val alreadyTaken = errors.filterIsInstance<IdentifierTypeCreateError.TechnicalKeyAlreadyTaken>().firstOrNull()
+        if (alreadyTaken != null)
+            return BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${alreadyTaken.technicalKey}/${alreadyTaken.businessPartnerType}")
+        return BpdmValidationErrorException(errors.map { error ->
+            when (error) {
+                is IdentifierTypeCreateError.CountryNotFound -> ValidationError(
+                    "CountryNotFound", "Country '${error.country}' not found in catalogue.", error.country,
+                    ValidationContext.fromRoot(IdentifierTypeV7Dto::class, "request", IdentifierTypeV7Dto::details)
+                )
+                is IdentifierTypeCreateError.TechnicalKeyAlreadyTaken -> error("Technical key conflict must be handled first")
+            }
+        })
+    }
 
     /**
      * Returns the exception the API reports [errors] with, reporting a technical key that is already taken ahead of

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the administrative areas an address may name as its level 1 area, for every API version.
+ * Searches the administrative areas an address may name as its level 1 area.
  */
 @Service
 class AdministrativeAreaSearchApplicationService(

@@ -54,7 +54,7 @@ class LegalFormCreateParser(
 
     /**
      * Validates the request and reports either the validated legal form or every problem found: a technical key that is
-     * already taken and an administrative area that does not exist.
+     * already taken, a country or administrative area that does not exist, and a language that is not ISO 639-1.
      */
     @Transactional(readOnly = true)
     fun parse(request: LegalFormCreateRaw): ParseResult<LegalFormCreateParsed, LegalFormCreateError> {

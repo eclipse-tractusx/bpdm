@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the script codes a business partner's script variants may state, for every API version.
+ * Searches the script codes a business partner's script variants may state.
  */
 @Service
 class ScriptCodeSearchApplicationService(

@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates legal forms legal entities may be registered under, for every API version.
+ * Creates legal forms legal entities may be registered under.
  */
 @Service
 class LegalFormCreateApplicationService(

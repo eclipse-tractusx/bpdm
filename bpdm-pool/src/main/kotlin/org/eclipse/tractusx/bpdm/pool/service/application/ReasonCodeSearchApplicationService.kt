@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Searches the reason codes a business partner relation may state, for every API version.
+ * Searches the reason codes a business partner relation may state.
  */
 @Service
 class ReasonCodeSearchApplicationService(
