@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
@@ -190,7 +189,7 @@ class PoolMockDataFactory(
 
     private fun mockSiteSearchResult(siteResult: SiteWithMainAddressVerboseV7Dto) = mockSiteSearchResult(listOf(siteResult))
 
-    fun mockSiteSearchResult(siteResults: List<SiteWithMainAddressVerboseV7Dto>){
+    private fun mockSiteSearchResult(siteResults: List<SiteWithMainAddressVerboseV7Dto>){
 
         val mockedSitePage = PageDto(siteResults.size.toLong(), 1, 0, siteResults.size, siteResults)
         WireMock.stubFor(
@@ -200,7 +199,7 @@ class PoolMockDataFactory(
         )
     }
 
-    fun mockAddressSearchResult(addressResult: LogisticAddressVerboseV7Dto) = mockAddressSearchResult(listOf(addressResult))
+    private fun mockAddressSearchResult(addressResult: LogisticAddressVerboseV7Dto) = mockAddressSearchResult(listOf(addressResult))
 
     private fun mockAddressSearchResult(addressResults: List<LogisticAddressVerboseV7Dto>){
 
@@ -209,15 +208,6 @@ class PoolMockDataFactory(
             WireMock
                 .get(WireMock.urlPathEqualTo(ApiCommons.ADDRESS_BASE_PATH_V7))
                 .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedAddressPage)))
-        )
-    }
-
-    fun mockChangelogSearchResult(entries: List<ChangelogEntryVerboseV7Dto>) {
-        WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
-        val page = PageDto(entries.size.toLong(), 1, 0, entries.size, entries)
-        WireMock.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("${ApiCommons.CHANGELOG_BASE_PATH_V7}/search"))
-                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(page)))
         )
     }
 
