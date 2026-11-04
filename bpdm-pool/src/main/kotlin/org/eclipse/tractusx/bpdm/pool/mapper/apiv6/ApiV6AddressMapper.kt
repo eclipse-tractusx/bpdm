@@ -23,13 +23,26 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.AddressCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AlternativePostalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.RegionV6Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressIdentifierRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AlternativePostalAddressRecord
@@ -49,7 +62,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ApiV6AddressMapper(
-    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper
+    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
     /**
@@ -86,6 +100,38 @@ class ApiV6AddressMapper(
     fun toLegalEntityAddressSearchException(errors: List<LegalEntityAddressSearchError>): BpdmNotFoundException =
         when (val error = errors.first()) {
             is LegalEntityNotFound -> BpdmNotFoundException("Business Partner", error.bpn)
+        }
+
+    /**
+     * Returns the response for a create batch, each result reported under the index of the request at its position.
+     */
+    fun toCreateResponse(requests: List<AddressPartnerCreateV6Request>, results: List<AddressCreateResult>): AddressPartnerCreateV6ResponseWrapper {
+        val entities = mutableListOf<AddressPartnerCreateVerboseV6Dto>()
+        val errors = mutableListOf<ErrorInfoV6<AddressCreateErrorV6>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is AddressCreateResult.Created -> entities.add(AddressPartnerCreateVerboseV6Dto(address = toDto(result.address), index = request.index))
+                is AddressCreateResult.Rejected -> errors.addAll(result.errors.map { toCreateErrorInfo(it, request.index) })
+            }
+        }
+        return AddressPartnerCreateV6ResponseWrapper(entities, errors)
+    }
+
+    private fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
+        when (error) {
+            is InvalidParentBpn ->
+                ErrorInfoV6(AddressCreateErrorV6.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
+            is UnresolvableLegalEntity ->
+                ErrorInfoV6(AddressCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+            is UnresolvableSite ->
+                ErrorInfoV6(AddressCreateErrorV6.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
+            is SiteNotInAddressLegalEntity ->
+                ErrorInfoV6(
+                    AddressCreateErrorV6.SiteNotInLegalEntity,
+                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
+                    entityKey
+                )
+            is AddressContentParseError -> addressParseErrorMapperV6.toCreateErrorInfo(error, entityKey)
         }
 
     private fun toStateDto(record: BusinessStateRecord): AddressStateVerboseV6Dto =

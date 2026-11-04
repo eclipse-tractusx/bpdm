@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
@@ -43,6 +44,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
@@ -234,6 +236,12 @@ class ApiV7InboundMapper(
      */
     fun toLegalEntityAddressSearchRaw(legalEntityBpn: String): LegalEntityAddressSearchRaw =
         LegalEntityAddressSearchRaw(legalEntityBpn = legalEntityBpn)
+
+    /**
+     * Returns the raw create for the address a client sent, under the parent legal entity or site it named.
+     */
+    fun toAddressCreateRaw(request: AddressPartnerCreateV7Request): AddressCreateRaw =
+        AddressCreateRaw(parentBpn = request.bpnParent, content = addressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants))
 
     /**
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.

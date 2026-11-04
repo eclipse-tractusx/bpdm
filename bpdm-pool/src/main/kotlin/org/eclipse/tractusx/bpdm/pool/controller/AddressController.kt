@@ -34,9 +34,9 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7AddressMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController
 class AddressController(
     private val addressGetApplicationService: AddressGetApplicationService,
     private val addressSearchApplicationService: AddressSearchApplicationService,
-    private val addressCreateApplicationService: AddressCreateApplicationV7Service,
+    private val addressCreateApplicationService: AddressCreateApplicationService,
     private val addressUpdateApplicationService: AddressUpdateApplicationV7Service,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7AddressMapper: ApiV7AddressMapper
@@ -79,7 +79,9 @@ class AddressController(
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateV7Request>
     ): AddressPartnerCreateV7ResponseWrapper {
-        return addressCreateApplicationService.createAddresses(requests)
+        val requestList = requests.toList()
+        val results = addressCreateApplicationService.create(requestList.map { apiV7InboundMapper.toAddressCreateRaw(it) })
+        return apiV7AddressMapper.toCreateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

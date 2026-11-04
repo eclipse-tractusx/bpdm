@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIssueService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

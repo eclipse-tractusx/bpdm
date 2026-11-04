@@ -23,7 +23,11 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressCreateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
@@ -36,7 +40,16 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressIdentifierRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRelationRecord
@@ -60,7 +73,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ApiV7AddressMapper(
-    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
+    private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
     /**
@@ -69,7 +83,7 @@ class ApiV7AddressMapper(
     fun toDto(record: AddressRecord): LogisticAddressVerboseV7Dto =
         LogisticAddressVerboseV7Dto(
             address = toInvariantDto(record),
-            scriptVariants = record.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, toPostalAddressDto(it)) }
+            scriptVariants = toScriptVariantDtos(record)
         )
 
     /**
@@ -87,6 +101,21 @@ class ApiV7AddressMapper(
         when (val error = errors.first()) {
             is LegalEntityNotFound -> BpdmNotFoundException("Business Partner", error.bpn)
         }
+
+    /**
+     * Returns the response for a create batch, each result reported under the index of the request at its position.
+     */
+    fun toCreateResponse(requests: List<AddressPartnerCreateV7Request>, results: List<AddressCreateResult>): AddressPartnerCreateV7ResponseWrapper {
+        val entities = mutableListOf<AddressPartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<AddressCreateErrorV7>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is AddressCreateResult.Created -> entities.add(toCreateDto(result.address, request.index))
+                is AddressCreateResult.Rejected -> errors.addAll(result.errors.map { toCreateErrorInfo(it, request.index) })
+            }
+        }
+        return AddressPartnerCreateV7ResponseWrapper(entities, errors)
+    }
 
     /**
      * Returns the script-invariant part of [record] as the API reports it.
@@ -119,6 +148,33 @@ class ApiV7AddressMapper(
             physicalAddress = toDto(record.physicalAddress),
             alternativeAddress = record.alternativeAddress?.let { AlternativeAddressScriptVariantV7Dto(it.city) }
         )
+
+    private fun toCreateDto(record: AddressRecord, entityKey: String?): AddressPartnerCreateVerboseV7Dto =
+        AddressPartnerCreateVerboseV7Dto(
+            address = toInvariantDto(record),
+            scriptVariants = toScriptVariantDtos(record),
+            index = entityKey
+        )
+
+    private fun toScriptVariantDtos(record: AddressRecord): List<LogisticAddressScriptVariantV7Dto> =
+        record.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, toPostalAddressDto(it)) }
+
+    private fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
+        when (error) {
+            is InvalidParentBpn ->
+                ErrorInfoV7(AddressCreateErrorV7.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
+            is UnresolvableLegalEntity ->
+                ErrorInfoV7(AddressCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+            is UnresolvableSite ->
+                ErrorInfoV7(AddressCreateErrorV7.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
+            is SiteNotInAddressLegalEntity ->
+                ErrorInfoV7(
+                    AddressCreateErrorV7.SiteNotInLegalEntity,
+                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
+                    entityKey
+                )
+            is AddressContentParseError -> addressParseErrorMapper.toCreateErrorInfo(error, entityKey)
+        }
 
     private fun toStateDto(record: BusinessStateRecord): AddressStateVerboseV7Dto =
         AddressStateVerboseV7Dto(

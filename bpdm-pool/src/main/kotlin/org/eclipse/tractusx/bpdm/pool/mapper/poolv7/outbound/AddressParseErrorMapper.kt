@@ -40,32 +40,18 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapper {
 
-    fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
-        when (error) {
-            is InvalidParentBpn ->
-                ErrorInfoV7(AddressCreateErrorV7.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
-            is UnresolvableLegalEntity ->
-                ErrorInfoV7(AddressCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is UnresolvableSite ->
-                ErrorInfoV7(AddressCreateErrorV7.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
-            is SiteNotInAddressLegalEntity ->
-                ErrorInfoV7(
-                    AddressCreateErrorV7.SiteNotInLegalEntity,
-                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
-                    entityKey
-                )
-            is AddressContentParseError -> sharedErrorInfo(
-                error,
-                entityKey,
-                regionNotFound = AddressCreateErrorV7.RegionNotFound,
-                countryNotFound = AddressCreateErrorV7.CountryNotFound,
-                identifierNotFound = AddressCreateErrorV7.IdentifierNotFound,
-                duplicateIdentifier = AddressCreateErrorV7.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateErrorV7.IdentifiersTooMany,
-                scriptVariantCityMissing = AddressCreateErrorV7.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
-            )
-        }
+    fun toCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressCreateErrorV7.RegionNotFound,
+            countryNotFound = AddressCreateErrorV7.CountryNotFound,
+            identifierNotFound = AddressCreateErrorV7.IdentifierNotFound,
+            duplicateIdentifier = AddressCreateErrorV7.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressCreateErrorV7.IdentifiersTooMany,
+            scriptVariantCityMissing = AddressCreateErrorV7.ScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
+        )
 
     fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
         when (error) {

@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository

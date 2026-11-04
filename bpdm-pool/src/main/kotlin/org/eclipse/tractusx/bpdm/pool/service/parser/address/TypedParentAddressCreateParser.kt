@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser

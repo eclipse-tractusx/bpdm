@@ -40,30 +40,16 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapperV6 {
 
-    fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
-        when (error) {
-            is InvalidParentBpn ->
-                ErrorInfoV6(AddressCreateErrorV6.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
-            is UnresolvableLegalEntity ->
-                ErrorInfoV6(AddressCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is UnresolvableSite ->
-                ErrorInfoV6(AddressCreateErrorV6.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
-            is SiteNotInAddressLegalEntity ->
-                ErrorInfoV6(
-                    AddressCreateErrorV6.SiteNotInLegalEntity,
-                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
-                    entityKey
-                )
-            is AddressContentParseError -> sharedErrorInfo(
-                error,
-                entityKey,
-                regionNotFound = AddressCreateErrorV6.RegionNotFound,
-                countryNotFound = AddressCreateErrorV6.CountryNotFound,
-                identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
-                duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
-            )
-        }
+    fun toCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressCreateErrorV6.RegionNotFound,
+            countryNotFound = AddressCreateErrorV6.CountryNotFound,
+            identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
+            duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
+        )
 
     fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
         when (error) {

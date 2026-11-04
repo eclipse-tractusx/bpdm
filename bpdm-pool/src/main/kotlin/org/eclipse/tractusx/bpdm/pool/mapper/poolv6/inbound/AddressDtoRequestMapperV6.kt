@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AlternativePostalAddressV6Dto
@@ -43,12 +42,6 @@ import java.time.ZoneOffset
  */
 @Component
 class AddressDtoRequestMapperV6 {
-
-    /**
-     * Returns the create request for the address a client sent, under the parent BPN it named.
-     */
-    fun toCreateRequest(request: AddressPartnerCreateV6Request): AddressCreateUntypedParentRequest =
-        AddressCreateUntypedParentRequest(request.bpnParent, toContentRequest(request.address))
 
     /**
      * Returns the update request for the address a client sent, addressed by its BPN.
