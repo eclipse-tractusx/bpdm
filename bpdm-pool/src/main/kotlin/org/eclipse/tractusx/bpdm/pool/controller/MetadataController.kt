@@ -21,6 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolMetadataV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountryV7Dto
@@ -32,15 +35,21 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AdministrativeAreaSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.CountrySearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.FieldQualityRuleSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.IdentifierTypeSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalFormSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.ReasonCodeSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.ScriptCodeSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7MetadataMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeCreateResult
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormCreateResult
+import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.FieldQualityRuleSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.ReasonCodeSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.ScriptCodeSearchApplicationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -48,20 +57,26 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MetadataController(
-    val identifierTypeCreateApplicationV7Service: IdentifierTypeCreateApplicationV7Service,
-    val identifierTypeSearchApplicationV7Service: IdentifierTypeSearchApplicationV7Service,
-    val legalFormCreateApplicationV7Service: LegalFormCreateApplicationV7Service,
-    val legalFormSearchApplicationV7Service: LegalFormSearchApplicationV7Service,
-    val fieldQualityRuleSearchApplicationV7Service: FieldQualityRuleSearchApplicationV7Service,
-    val administrativeAreaSearchApplicationV7Service: AdministrativeAreaSearchApplicationV7Service,
-    val reasonCodeSearchApplicationV7Service: ReasonCodeSearchApplicationV7Service,
-    val scriptCodeSearchApplicationV7Service: ScriptCodeSearchApplicationV7Service,
-    val countrySearchApplicationV7Service: CountrySearchApplicationV7Service
+    val identifierTypeCreateApplicationService: IdentifierTypeCreateApplicationService,
+    val identifierTypeSearchApplicationService: IdentifierTypeSearchApplicationService,
+    val legalFormCreateApplicationService: LegalFormCreateApplicationService,
+    val legalFormSearchApplicationService: LegalFormSearchApplicationService,
+    val fieldQualityRuleSearchApplicationService: FieldQualityRuleSearchApplicationService,
+    val administrativeAreaSearchApplicationService: AdministrativeAreaSearchApplicationService,
+    val reasonCodeSearchApplicationService: ReasonCodeSearchApplicationService,
+    val scriptCodeSearchApplicationService: ScriptCodeSearchApplicationService,
+    val countrySearchApplicationService: CountrySearchApplicationService,
+    val apiV7MetadataMapper: ApiV7MetadataMapper,
+    val apiV7InboundMapper: ApiV7InboundMapper
 ) : PoolMetadataV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createIdentifierType(identifierType: IdentifierTypeV7Dto): IdentifierTypeV7Dto {
-        return identifierTypeCreateApplicationV7Service.createIdentifierType(identifierType)
+        val request = apiV7InboundMapper.toIdentifierTypeCreateRaw(identifierType)
+        return when (val result = identifierTypeCreateApplicationService.create(request)) {
+            is IdentifierTypeCreateResult.Created -> apiV7MetadataMapper.toDto(result.identifierType)
+            is IdentifierTypeCreateResult.Rejected -> throw apiV7MetadataMapper.toException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
@@ -70,42 +85,59 @@ class MetadataController(
         businessPartnerType: IdentifierBusinessPartnerTypeV7,
         country: String?
     ): PageDto<IdentifierTypeV7Dto> {
-        return identifierTypeSearchApplicationV7Service.searchIdentifierTypes(businessPartnerType, country, paginationRequest)
+        val request = apiV7InboundMapper.toIdentifierTypeSearchRaw(businessPartnerType, country)
+        return when (val result = identifierTypeSearchApplicationService.search(request, paginationRequest.toPageRequest())) {
+            is IdentifierTypeSearchResult.Found -> result.page.toPageDto(apiV7MetadataMapper::toDto)
+            is IdentifierTypeSearchResult.Rejected -> throw BpdmValidationErrorException(result.errors.map(apiV7MetadataMapper::toValidationError))
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createLegalForm(type: LegalFormV7Request): LegalFormV7Dto {
-        return legalFormCreateApplicationV7Service.createLegalForm(type)
+        val request = apiV7InboundMapper.toLegalFormCreateRaw(type)
+        return when (val result = legalFormCreateApplicationService.create(request)) {
+            is LegalFormCreateResult.Created -> apiV7MetadataMapper.toDto(result.legalForm)
+            is LegalFormCreateResult.Rejected -> throw apiV7MetadataMapper.toLegalFormCreateException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormV7Dto> {
-        return legalFormSearchApplicationV7Service.searchLegalForms(paginationRequest)
+        return legalFormSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getFieldQualityRules(country: String): ResponseEntity<Collection<FieldQualityRuleV7Dto>> {
-        return ResponseEntity(fieldQualityRuleSearchApplicationV7Service.searchFieldQualityRules(country), HttpStatus.OK)
+        val request = apiV7InboundMapper.toFieldQualityRuleSearchRaw(country)
+        return when (val result = fieldQualityRuleSearchApplicationService.search(request)) {
+            is FieldQualityRuleSearchResult.Found -> ResponseEntity(result.rules.map(apiV7MetadataMapper::toDto), HttpStatus.OK)
+            is FieldQualityRuleSearchResult.Rejected -> throw apiV7MetadataMapper.toException(result.errors.first())
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionV7Dto> {
-        return administrativeAreaSearchApplicationV7Service.searchAdministrativeAreas(paginationRequest)
+        return administrativeAreaSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeV7Dto> {
-        return reasonCodeSearchApplicationV7Service.searchReasonCodes(paginationRequest)
+        return reasonCodeSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeV7Dto> {
-        return scriptCodeSearchApplicationV7Service.searchScriptCodes(paginationRequest)
+        return scriptCodeSearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getCountries(paginationRequest: PaginationRequest): PageDto<CountryV7Dto> {
-        return countrySearchApplicationV7Service.searchCountries(paginationRequest)
+        return countrySearchApplicationService.search(paginationRequest.toPageRequest())
+            .toPageDto(apiV7MetadataMapper::toDto)
     }
 
 }

@@ -16,16 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityGetParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityGetRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityGetRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
@@ -45,16 +44,22 @@ class LegalEntityGetParser(
     /**
      * Resolves the requested identifier to its legal entity, failing when no legal entity carries it.
      */
-    fun parse(request: LegalEntityGetRequest): ParseResult<LegalEntityDb, LegalEntityGetParseError> {
+    fun parse(request: LegalEntityGetRaw): ParseResult<LegalEntityDb, LegalEntityGetError> {
         val identifierType = request.identifierType ?: bpnConfigProperties.id
 
         return when (identifierType) {
-            bpnConfigProperties.id -> legalEntityBpnParser.parse(listOf(request.identifierValue)).single()
+            bpnConfigProperties.id -> resolveByBpn(request.identifierValue)
             else -> resolveByIdentifier(identifierType, request.identifierValue)
         }
     }
 
-    private fun resolveByIdentifier(identifierTypeKey: String, identifierValue: String): ParseResult<LegalEntityDb, LegalEntityGetParseError> {
+    private fun resolveByBpn(bpn: String): ParseResult<LegalEntityDb, LegalEntityGetError> =
+        when (val result = legalEntityBpnParser.parse(listOf(bpn)).single()) {
+            is ParseResult.Success -> result
+            is ParseResult.Failure -> ParseResult.ofSingleFailure(LegalEntityNotFound(bpnConfigProperties.id, bpn))
+        }
+
+    private fun resolveByIdentifier(identifierTypeKey: String, identifierValue: String): ParseResult<LegalEntityDb, LegalEntityGetError> {
         val legalEntity = legalEntityRepository.findByIdentifierTypeKeyAndValueIgnoreCase(
             IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY,
             identifierTypeKey,
@@ -62,7 +67,7 @@ class LegalEntityGetParser(
         )
 
         return when (legalEntity) {
-            null -> ParseResult.ofSingleFailure(UnresolvableLegalEntityIdentifier(identifierTypeKey, identifierValue))
+            null -> ParseResult.ofSingleFailure(LegalEntityNotFound(identifierTypeKey, identifierValue))
             else -> ParseResult.Success(legalEntity)
         }
     }

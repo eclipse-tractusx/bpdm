@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,10 +36,13 @@ class CountrySearchService(
 ) {
 
     /**
-     * Returns the requested page of all known countries.
+     * Returns the requested page of all known countries, ordered by country code.
      */
     @Transactional(readOnly = true)
-    fun search(pageable: Pageable): Page<CountryDb> =
-        countryRepository.findAll(pageable)
+    fun search(pageable: Pageable): Page<CountryDb> {
+        val byCountryCode = PageRequest.of(pageable.pageNumber, pageable.pageSize, CountryRepository.DEFAULT_SORTING)
+
+        return countryRepository.findAll(byCountryCode)
+    }
 
 }

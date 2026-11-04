@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolLegalEntityV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
@@ -31,6 +33,13 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearch
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityUpdateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
@@ -40,10 +49,12 @@ import org.springframework.web.bind.annotation.RestController
 class LegalEntityController(
     val siteSearchApplicationService: SiteSearchApplicationV7Service,
     val addressSearchApplicationService: AddressSearchApplicationV7Service,
-    val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
-    val legalEntityGetApplicationService: LegalEntityGetApplicationV7Service,
-    val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
-    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service
+    val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
+    val legalEntityGetApplicationService: LegalEntityGetApplicationService,
+    val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
+    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationService,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
 ) : PoolLegalEntityV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -51,20 +62,26 @@ class LegalEntityController(
         @ParameterObject searchRequest: LegalEntitySearchV7Request,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> {
-        return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toLegalEntitySearchRaw(searchRequest)
+        return legalEntitySearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7LegalEntityMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV7Dto {
-        return legalEntityGetApplicationService.getLegalEntity(idValue, idType)
-    }
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV7Dto =
+        when (val result = legalEntityGetApplicationService.get(apiV7InboundMapper.toLegalEntityGetRaw(idValue, idType))) {
+            is LegalEntityGetResult.Found -> apiV7LegalEntityMapper.toDto(result.legalEntity)
+            is LegalEntityGetResult.Rejected -> throw apiV7LegalEntityMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postLegalEntitySearch(
         searchRequest: LegalEntitySearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> {
-        return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toLegalEntitySearchRaw(searchRequest)
+        return legalEntitySearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7LegalEntityMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -87,13 +104,17 @@ class LegalEntityController(
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateV7Request>
     ): LegalEntityPartnerCreateV7ResponseWrapper {
-        return legalEntityCreateApplicationService.createLegalEntities(businessPartners)
+        val requests = businessPartners.toList()
+        val results = legalEntityCreateApplicationService.create(requests.map { apiV7InboundMapper.toLegalEntityCreateRaw(it) })
+        return apiV7LegalEntityMapper.toCreateResponse(requests, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerUpdateV7Request>
     ): LegalEntityPartnerUpdateV7ResponseWrapper {
-        return legalEntityUpdateApplicationService.updateLegalEntities(businessPartners)
+        val requests = businessPartners.toList()
+        val results = legalEntityUpdateApplicationService.update(requests.map { apiV7InboundMapper.toLegalEntityUpdateRaw(it) })
+        return apiV7LegalEntityMapper.toUpdateResponse(requests, results)
     }
 }

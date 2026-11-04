@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError.TechnicalKeyAlreadyTaken
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalFormCreateParseError.UnresolvableAdministrativeArea
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalFormCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalFormCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError.TechnicalKeyAlreadyTaken
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError.UnresolvableAdministrativeArea
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
@@ -54,11 +54,11 @@ class LegalFormCreateParser(
 
     /**
      * Validates the request and reports either the validated legal form or every problem found: a technical key that is
-     * already taken and an administrative area that does not exist.
+     * already taken, a country or administrative area that does not exist, and a language that is not ISO 639-1.
      */
     @Transactional(readOnly = true)
-    fun parse(request: LegalFormCreateRequest): ParseResult<LegalFormCreateParsed, LegalFormCreateParseError> {
-        val errors = mutableListOf<LegalFormCreateParseError>()
+    fun parse(request: LegalFormCreateRaw): ParseResult<LegalFormCreateParsed, LegalFormCreateError> {
+        val errors = mutableListOf<LegalFormCreateError>()
 
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
             errors.add(TechnicalKeyAlreadyTaken(request.technicalKey))
@@ -66,10 +66,10 @@ class LegalFormCreateParser(
         val administrativeArea = parseAdministrativeArea(request.administrativeAreaLevel1, errors)
         val country = request.country?.let { code ->
             countryRepository.findByCountryCode(code)
-                ?: run { errors.add(LegalFormCreateParseError.CountryNotFound(code)); null }
+                ?: run { errors.add(LegalFormCreateError.CountryNotFound(code)); null }
         }
         if (request.language != null && request.language !in LANGUAGE_CODES)
-            errors.add(LegalFormCreateParseError.InvalidLanguage(request.language))
+            errors.add(LegalFormCreateError.InvalidLanguage(request.language))
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
@@ -88,7 +88,7 @@ class LegalFormCreateParser(
         )
     }
 
-    private fun parseAdministrativeArea(regionCode: String?, errors: MutableList<LegalFormCreateParseError>): RegionDb? {
+    private fun parseAdministrativeArea(regionCode: String?, errors: MutableList<LegalFormCreateError>): RegionDb? {
         if (regionCode == null) return null
 
         return regionRepository.findByRegionCodeIn(setOf(regionCode)).firstOrNull()

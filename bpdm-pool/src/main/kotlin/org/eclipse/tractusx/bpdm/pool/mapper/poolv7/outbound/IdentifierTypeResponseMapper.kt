@@ -20,32 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeDetailV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.springframework.stereotype.Component
 
 /**
- * Maps stored identifier types to the v7 API identifier type DTOs.
+ * Maps stored identifier types to the form v7 API identifiers reference their type by.
  */
 @Component
 class IdentifierTypeResponseMapper {
-
-    /**
-     * Returns the given identifier type as the API reports it.
-     */
-    fun toIdentifierType(identifierType: IdentifierTypeDb): IdentifierTypeV7Dto =
-        IdentifierTypeV7Dto(
-            technicalKey = identifierType.technicalKey,
-            businessPartnerType = identifierType.businessPartnerType,
-            name = identifierType.name,
-            abbreviation = identifierType.abbreviation,
-            transliteratedName = identifierType.transliteratedName,
-            transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
-            format = identifierType.format,
-            categories = identifierType.categories.toSortedSet(),
-            details = identifierType.details.map { IdentifierTypeDetailV7Dto(it.country?.countryCode, it.mandatory) }
-        )
 
     /**
      * Returns the given identifier type as the key/name pair by which identifiers reference their type.

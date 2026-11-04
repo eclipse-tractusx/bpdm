@@ -21,29 +21,42 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolCxMembershipV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.CxMembershipSearchApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.CxMembershipUpdateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6ParticipantMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantUpdateResult
+import org.eclipse.tractusx.bpdm.pool.service.application.DataSpaceParticipantSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.DataSpaceParticipantUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("CxMembershipControllerLegacy")
 class CxMembershipV6Controller(
-    private val cxMembershipSearchApplicationV6Service: CxMembershipSearchApplicationV6Service,
-    private val cxMembershipUpdateApplicationV6Service: CxMembershipUpdateApplicationV6Service
+    private val dataSpaceParticipantSearchApplicationService: DataSpaceParticipantSearchApplicationService,
+    private val dataSpaceParticipantUpdateApplicationService: DataSpaceParticipantUpdateApplicationService,
+    private val apiV6InboundMapper: ApiV6InboundMapper,
+    private val apiV6ParticipantMapper: ApiV6ParticipantMapper
 ): PoolCxMembershipV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun get(searchRequest: CxMembershipSearchV6Request, paginationRequest: PaginationRequest): PageDto<CxMembershipV6Dto> {
-       return cxMembershipSearchApplicationV6Service.searchMemberships(searchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toDataSpaceParticipantSearchRaw(searchRequest)
+        return dataSpaceParticipantSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV6ParticipantMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun put(updateRequest: CxMembershipUpdateV6Request) {
-        return cxMembershipUpdateApplicationV6Service.updateMemberships(updateRequest)
+        val requests = apiV6InboundMapper.toDataSpaceParticipantUpdateRaws(updateRequest)
+        when (val result = dataSpaceParticipantUpdateApplicationService.update(requests)) {
+            is DataSpaceParticipantUpdateResult.Updated -> Unit
+            is DataSpaceParticipantUpdateResult.Rejected -> throw apiV6ParticipantMapper.toUpdateException(result.errors)
+        }
     }
 }

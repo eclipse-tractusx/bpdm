@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolMembersV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
@@ -31,20 +33,27 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7ChangelogMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.ChangelogSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntitySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MemberController(
-    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
+    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
-    private val changelogSearchApplicationService: ChangelogSearchApplicationV7Service
-) : PoolMembersV7Api {
+    private val changelogSearchApplicationService: ChangelogSearchApplicationService,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7ChangelogMapper: ApiV7ChangelogMapper,
+    private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
+): PoolMembersV7Api {
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
@@ -52,7 +61,9 @@ class MemberController(
         searchRequest: LegalEntitySearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseV7Dto> {
-        return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toLegalEntitySearchRaw(searchRequest)
+        return legalEntitySearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7LegalEntityMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
@@ -70,7 +81,11 @@ class MemberController(
         changelogSearchRequest: ChangelogSearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseV7Dto> {
-        return changelogSearchApplicationService.searchMemberChangelogEntries(changelogSearchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toChangelogSearchRaw(changelogSearchRequest)
+        return when (val result = changelogSearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())) {
+            is ChangelogSearchResult.Found -> result.page.toPageDto(apiV7ChangelogMapper::toDto)
+            is ChangelogSearchResult.Rejected -> throw apiV7ChangelogMapper.toException(result.errors)
+        }
     }
 
 }

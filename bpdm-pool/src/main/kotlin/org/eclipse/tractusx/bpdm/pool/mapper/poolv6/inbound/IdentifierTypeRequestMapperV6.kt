@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
-import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeDetailRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -36,8 +36,8 @@ class IdentifierTypeRequestMapperV6 {
     /**
      * Returns the create request holding the identifier type a client sent.
      */
-    fun toCreateRequest(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRequest =
-        IdentifierTypeCreateRequest(
+    fun toCreateRequest(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRaw =
+        IdentifierTypeCreateRaw(
             technicalKey = identifierType.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(identifierType.businessPartnerType.name),
             name = identifierType.name,
@@ -47,14 +47,14 @@ class IdentifierTypeRequestMapperV6 {
             // v6 knows neither format nor categories, so an identifier type created over v6 carries none.
             format = null,
             categories = sortedSetOf(),
-            details = identifierType.details.map { IdentifierTypeDetailRequest(it.country, it.mandatory) }
+            details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }
         )
 
     /**
      * Returns the search request holding the criteria a client sent.
      */
-    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerTypeV6, country: String?): IdentifierTypeSearchRequest =
-        IdentifierTypeSearchRequest(
+    fun toSearchRequest(businessPartnerType: IdentifierBusinessPartnerTypeV6, country: String?): IdentifierTypeSearchRaw =
+        IdentifierTypeSearchRaw(
             businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(businessPartnerType.name),
             country = country
         )
