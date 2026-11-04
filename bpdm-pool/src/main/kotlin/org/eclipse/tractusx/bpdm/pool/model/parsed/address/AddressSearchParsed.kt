@@ -17,9 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
-data class AddressSearchRequest(
+/**
+ * Address search holding normalized address, site and legal entity BPNs and a non-blank name.
+ */
+data class AddressSearchParsed(
     val addressBpns: List<String>,
     val siteBpns: List<String>,
     val legalEntityBpns: List<String>,

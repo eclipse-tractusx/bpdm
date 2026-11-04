@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
@@ -46,6 +47,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMap
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
@@ -218,6 +221,23 @@ class ApiV6InboundMapper(
      */
     fun toLegalEntitySiteSearchRaw(legalEntityBpn: String): LegalEntitySiteSearchRaw =
         LegalEntitySiteSearchRaw(legalEntityBpn = legalEntityBpn)
+
+    /**
+     * Returns the raw address search holding [request].
+     */
+    fun toAddressSearchRaw(request: AddressSearchV6Request): AddressSearchRaw =
+        AddressSearchRaw(
+            addressBpns = request.addressBpns,
+            siteBpns = request.siteBpns,
+            legalEntityBpns = request.legalEntityBpns,
+            name = request.name
+        )
+
+    /**
+     * Returns the raw search for the addresses of the legal entity carrying [legalEntityBpn].
+     */
+    fun toLegalEntityAddressSearchRaw(legalEntityBpn: String): LegalEntityAddressSearchRaw =
+        LegalEntityAddressSearchRaw(legalEntityBpn = legalEntityBpn)
 
     /**
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.

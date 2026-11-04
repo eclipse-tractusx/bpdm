@@ -40,6 +40,8 @@ import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessState
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError.AddressNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError.LegalEntityNotFound
 import org.springframework.stereotype.Component
 
 /**
@@ -76,6 +78,14 @@ class ApiV6AddressMapper(
     fun toGetException(errors: List<AddressGetError>): BpdmNotFoundException =
         when (val error = errors.first()) {
             is AddressNotFound -> BpdmNotFoundException("Address", error.bpn)
+        }
+
+    /**
+     * Returns the exception the API reports a rejected search for the addresses of a legal entity with.
+     */
+    fun toLegalEntityAddressSearchException(errors: List<LegalEntityAddressSearchError>): BpdmNotFoundException =
+        when (val error = errors.first()) {
+            is LegalEntityNotFound -> BpdmNotFoundException("Business Partner", error.bpn)
         }
 
     private fun toStateDto(record: BusinessStateRecord): AddressStateVerboseV6Dto =

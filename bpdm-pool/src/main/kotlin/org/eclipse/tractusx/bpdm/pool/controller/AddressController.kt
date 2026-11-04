@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolAddressV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7ResponseWrapper
@@ -33,8 +35,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7AddressMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -42,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AddressController(
     private val addressGetApplicationService: AddressGetApplicationService,
-    private val addressSearchApplicationService: AddressSearchApplicationV7Service,
+    private val addressSearchApplicationService: AddressSearchApplicationService,
     private val addressCreateApplicationService: AddressCreateApplicationV7Service,
     private val addressUpdateApplicationService: AddressUpdateApplicationV7Service,
     private val apiV7InboundMapper: ApiV7InboundMapper,
@@ -68,7 +70,9 @@ class AddressController(
         searchRequest: AddressSearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseV7Dto> {
-        return addressSearchApplicationService.searchAddresses(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toAddressSearchRaw(searchRequest)
+        return addressSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7AddressMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

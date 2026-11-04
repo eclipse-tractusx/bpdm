@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolAddressV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6ResponseWrapper
@@ -33,8 +35,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6AddressMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressCreateApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -42,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("AddressControllerLegacy")
 class AddressV6Controller(
     private val addressGetApplicationService: AddressGetApplicationService,
-    private val addressSearchApplicationService: AddressSearchApplicationV6Service,
+    private val addressSearchApplicationService: AddressSearchApplicationService,
     private val addressCreateApplicationService: AddressCreateApplicationV6Service,
     private val addressUpdateApplicationService: AddressUpdateApplicationV6Service,
     private val apiV6InboundMapper: ApiV6InboundMapper,
@@ -68,7 +70,9 @@ class AddressV6Controller(
         searchRequest: AddressSearchV6Request,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseV6Dto> {
-        return addressSearchApplicationService.searchAddresses(searchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toAddressSearchRaw(searchRequest)
+        return addressSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV6AddressMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
