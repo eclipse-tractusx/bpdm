@@ -36,24 +36,26 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7ChangelogMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7SiteMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MemberController(
     private val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
-    private val siteSearchApplicationService: SiteSearchApplicationV7Service,
+    private val siteSearchApplicationService: SiteSearchApplicationService,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7ChangelogMapper: ApiV7ChangelogMapper,
-    private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
-): PoolMembersV7Api {
+    private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper,
+    private val apiV7SiteMapper: ApiV7SiteMapper
+):PoolMembersV7Api {
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
@@ -68,7 +70,9 @@ class MemberController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun postSiteSearch(searchRequest: SiteSearchV7Request, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseV7Dto> {
-        return siteSearchApplicationService.searchMemberSites(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toSiteSearchRaw(searchRequest)
+        return siteSearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7SiteMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

@@ -19,16 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnFilterParser
 import org.springframework.stereotype.Service
 
 /**
  * Turns loose site search criteria into the normalized form the search operation queries with.
- *
- * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
- * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
 @Service
 class SiteSearchParser(
@@ -36,13 +33,14 @@ class SiteSearchParser(
 ) {
 
     /**
-     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
+     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively, restricted to data
+     * space participants as [isDataSpaceParticipant] demands.
      */
-    fun parse(request: SiteSearchRequest): SiteSearchParsed =
+    fun parse(request: SiteSearchRaw, isDataSpaceParticipant: Boolean?): SiteSearchParsed =
         SiteSearchParsed(
             siteBpns = bpnFilterParser.parse(request.siteBpns),
             legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns),
             name = request.name?.takeIf { it.isNotBlank() },
-            isDataSpaceParticipant = request.isDataSpaceParticipant
+            isDataSpaceParticipant = isDataSpaceParticipant
         )
 }

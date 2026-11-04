@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.springframework.stereotype.Component
@@ -54,15 +53,6 @@ class SiteResponseMapperV6(
                 updatedAt = updatedAt.instant,
             )
         }
-
-    /**
-     * Returns the given site together with its main address as the v6 API reports them.
-     */
-    fun toSiteWithMainAddress(site: SiteDb): SiteWithMainAddressVerboseV6Dto =
-        SiteWithMainAddressVerboseV6Dto(
-            site = toSite(site),
-            mainAddress = addressResponseMapperV6.toAddress(site.mainAddress)
-        )
 
     /**
      * Returns the given created or updated site as the v6 API reports it, tagged with the key of the request that

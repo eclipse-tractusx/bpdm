@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessState
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteScriptVariantRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError.SiteNotFound
 import org.springframework.stereotype.Component
@@ -60,7 +62,18 @@ class ApiV7SiteMapper(
             is SiteNotFound -> BpdmNotFoundException("Site", error.bpn)
         }
 
-    private fun toSiteDto(record: SiteRecord): SiteVerboseV7Dto =
+    /**
+     * Returns the exception the API reports a rejected search for the sites of a legal entity with.
+     */
+    fun toLegalEntitySiteSearchException(errors: List<LegalEntitySiteSearchError>): BpdmNotFoundException =
+        when (val error = errors.first()) {
+            is LegalEntityNotFound -> BpdmNotFoundException("Business Partner", error.bpn)
+        }
+
+    /**
+     * Returns the API DTO for [record], without its main address.
+     */
+    fun toSiteDto(record: SiteRecord): SiteVerboseV7Dto =
         SiteVerboseV7Dto(
             bpns = record.bpn,
             name = record.name,

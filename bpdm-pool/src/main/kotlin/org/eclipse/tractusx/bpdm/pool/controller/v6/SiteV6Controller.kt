@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolSiteV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
@@ -34,8 +36,8 @@ import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6SiteMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteGetResult
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteCreateApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -43,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("SiteControllerLegacy")
 class SiteV6Controller(
     private val siteGetApplicationService: SiteGetApplicationService,
-    private val siteSearchApplicationService: SiteSearchApplicationV6Service,
+    private val siteSearchApplicationService: SiteSearchApplicationService,
     private val siteCreateApplicationService: SiteCreateApplicationV6Service,
     private val siteUpdateApplicationService: SiteUpdateApplicationV6Service,
     private val apiV6InboundMapper: ApiV6InboundMapper,
@@ -64,7 +66,9 @@ class SiteV6Controller(
         searchRequest: SiteSearchV6Request,
         paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseV6Dto> {
-        return siteSearchApplicationService.searchSites(searchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toSiteSearchRaw(searchRequest)
+        return siteSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV6SiteMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

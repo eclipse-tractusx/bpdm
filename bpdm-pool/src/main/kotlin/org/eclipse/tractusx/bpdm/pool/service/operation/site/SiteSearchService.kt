@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

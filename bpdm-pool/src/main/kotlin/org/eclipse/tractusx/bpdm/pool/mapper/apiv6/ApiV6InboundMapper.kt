@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
@@ -52,7 +53,9 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.LegalEntitySiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
@@ -185,6 +188,18 @@ class ApiV6InboundMapper(
      */
     fun toSiteGetRaw(bpn: String): SiteGetRaw =
         SiteGetRaw(bpn = bpn)
+
+    /**
+     * Returns the raw site search holding [request].
+     */
+    fun toSiteSearchRaw(request: SiteSearchV6Request): SiteSearchRaw =
+        SiteSearchRaw(siteBpns = request.siteBpns, legalEntityBpns = request.legalEntityBpns, name = request.name)
+
+    /**
+     * Returns the raw search for the sites of the legal entity carrying [legalEntityBpn].
+     */
+    fun toLegalEntitySiteSearchRaw(legalEntityBpn: String): LegalEntitySiteSearchRaw =
+        LegalEntitySiteSearchRaw(legalEntityBpn = legalEntityBpn)
 
     private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(

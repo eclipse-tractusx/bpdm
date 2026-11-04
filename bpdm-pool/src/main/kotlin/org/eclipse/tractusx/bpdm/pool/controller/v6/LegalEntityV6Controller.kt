@@ -35,10 +35,13 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6SiteMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
+import org.eclipse.tractusx.bpdm.pool.model.output.site.LegalEntitySiteSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySiteSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityUpdateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.*
 import org.springdoc.core.annotations.ParameterObject
@@ -47,14 +50,15 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("LegalEntityControllerLegacy")
 class LegalEntityV6Controller(
-    val siteSearchApplicationService: SiteSearchApplicationV6Service,
+    val legalEntitySiteSearchApplicationService: LegalEntitySiteSearchApplicationService,
     val addressSearchApplicationService: AddressSearchApplicationV6Service,
     val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     val legalEntityGetApplicationService: LegalEntityGetApplicationService,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationService,
     private val apiV6InboundMapper: ApiV6InboundMapper,
-    private val apiV6LegalEntityMapper: ApiV6LegalEntityMapper
+    private val apiV6LegalEntityMapper: ApiV6LegalEntityMapper,
+    private val apiV6SiteMapper: ApiV6SiteMapper
 ) : PoolLegalEntityV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -89,7 +93,11 @@ class LegalEntityV6Controller(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseV6Dto> {
-        return siteSearchApplicationService.searchLegalEntitySites(bpnl, paginationRequest)
+        val request = apiV6InboundMapper.toLegalEntitySiteSearchRaw(bpnl)
+        return when (val result = legalEntitySiteSearchApplicationService.search(request, paginationRequest.toPageRequest())) {
+            is LegalEntitySiteSearchResult.Found -> result.page.toPageDto(apiV6SiteMapper::toSiteDto)
+            is LegalEntitySiteSearchResult.Rejected -> throw apiV6SiteMapper.toLegalEntitySiteSearchException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
