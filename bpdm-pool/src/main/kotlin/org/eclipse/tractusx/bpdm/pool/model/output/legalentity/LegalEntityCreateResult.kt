@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,9 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.legalentity
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 
-data class LegalEntityCreateRequest(
-    val content: LegalEntityContentRequest
-)
+/**
+ * Result of creating one legal entity of a batch: either the legal entity as stored or every reason the entry was
+ * rejected.
+ */
+sealed interface LegalEntityCreateResult {
+    data class Created(val legalEntity: LegalEntityRecord) : LegalEntityCreateResult
+    data class Rejected(val errors: List<LegalEntityCreateParseError>) : LegalEntityCreateResult
+}

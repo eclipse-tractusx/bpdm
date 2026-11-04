@@ -22,13 +22,20 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityIdentifierRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRelationRecord
@@ -44,7 +51,8 @@ import org.springframework.stereotype.Component
 class ApiV7LegalEntityMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
     private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val apiV7MetadataMapper: ApiV7MetadataMapper
+    private val apiV7MetadataMapper: ApiV7MetadataMapper,
+    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
 ) {
 
     /**
@@ -64,6 +72,24 @@ class ApiV7LegalEntityMapper(
         when (val error = errors.first()) {
             is LegalEntityNotFound -> BpdmNotFoundException("Legal Entity", error.identifierValue)
         }
+
+    /**
+     * Returns the response for a create batch, each result reported under the index of the request at its position.
+     */
+    fun toCreateResponse(
+        requests: List<LegalEntityPartnerCreateV7Request>,
+        results: List<LegalEntityCreateResult>
+    ): LegalEntityPartnerCreateV7ResponseWrapper {
+        val entities = mutableListOf<LegalEntityPartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<LegalEntityCreateErrorV7>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is LegalEntityCreateResult.Created -> entities.add(LegalEntityPartnerCreateVerboseV7Dto(toDto(result.legalEntity), request.index))
+                is LegalEntityCreateResult.Rejected -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
+            }
+        }
+        return LegalEntityPartnerCreateV7ResponseWrapper(entities, errors)
+    }
 
     private fun toHeaderDto(record: LegalEntityRecord): LegalEntityHeaderVerboseV7Dto =
         LegalEntityHeaderVerboseV7Dto(

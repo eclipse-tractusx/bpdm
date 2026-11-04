@@ -35,7 +35,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.*
@@ -49,9 +51,10 @@ class LegalEntityController(
     val addressSearchApplicationService: AddressSearchApplicationV7Service,
     val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     val legalEntityGetApplicationService: LegalEntityGetApplicationService,
-    val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
+    val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service,
     private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
     private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
 ) : PoolLegalEntityV7Api {
 
@@ -102,7 +105,9 @@ class LegalEntityController(
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateV7Request>
     ): LegalEntityPartnerCreateV7ResponseWrapper {
-        return legalEntityCreateApplicationService.createLegalEntities(businessPartners)
+        val requests = businessPartners.toList()
+        val results = legalEntityCreateApplicationService.create(requests.map { legalEntityDtoRequestMapper.toCreateRaw(it) })
+        return apiV7LegalEntityMapper.toCreateResponse(requests, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

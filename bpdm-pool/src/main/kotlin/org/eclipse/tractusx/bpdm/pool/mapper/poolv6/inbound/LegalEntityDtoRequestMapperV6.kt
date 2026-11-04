@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -33,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
 
 /**
- * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRequest] / [LegalEntityUpdateRequest]. v6
+ * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRaw] / [LegalEntityUpdateRequest]. v6
  * differs from v7: the legal entity is flat (no `header` wrapper), the legal address is a sibling field (not nested),
  * there are no script variants, and membership is `isCatenaXMemberData` (→ domain `isDataSpaceParticipant`).
  */
@@ -43,10 +44,10 @@ class LegalEntityDtoRequestMapperV6(
 ) {
 
     /**
-     * Returns the create request for the legal entity and legal address a client sent.
+     * Returns the raw create for the legal entity and legal address a client sent.
      */
-    fun toCreateRequest(request: LegalEntityPartnerCreateV6Request): LegalEntityCreateRequest =
-        LegalEntityCreateRequest(content = toContentRequest(request.legalEntity, request.legalAddress))
+    fun toCreateRaw(request: LegalEntityPartnerCreateV6Request): LegalEntityCreateRaw =
+        LegalEntityCreateRaw(content = toContentRequest(request.legalEntity, request.legalAddress))
 
     /**
      * Returns the update request for the legal entity a client sent, addressed by its BPN.
