@@ -28,8 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7BpnMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnRequestIdentifierSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.BpnIdentifierSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.BpnSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.BpnRequestIdentifierSearchApplicationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class BpnController(
     private val bpnIdentifierSearchApplicationService: BpnIdentifierSearchApplicationService,
-    private val bpnSearchApplicationService: BpnSearchApplicationV7Service,
+    private val bpnRequestIdentifierSearchApplicationService: BpnRequestIdentifierSearchApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7BpnMapper: ApiV7BpnMapper
 ) : PoolBpnV7Api {
@@ -55,6 +56,10 @@ class BpnController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchV7Request): ResponseEntity<Set<BpnRequestIdentifierMappingV7Dto>> {
-        return ResponseEntity(bpnSearchApplicationService.searchBpnsByRequestedIdentifiers(request), HttpStatus.OK)
+        val searchRequest = apiV7InboundMapper.toBpnRequestIdentifierSearchRaw(request)
+        return when (val result = bpnRequestIdentifierSearchApplicationService.search(searchRequest)) {
+            is BpnRequestIdentifierSearchResult.Found -> ResponseEntity(result.matches.map(apiV7BpnMapper::toDto).toSet(), HttpStatus.OK)
+            is BpnRequestIdentifierSearchResult.Rejected -> throw apiV7BpnMapper.toRequestIdentifierSearchException(result.errors)
+        }
     }
 }

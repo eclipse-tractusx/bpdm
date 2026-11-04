@@ -21,10 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnIdentifierMappingV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappingV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierMatchRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnRequestIdentifierMatchRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchError
 import org.springframework.stereotype.Component
 
 /**
@@ -40,6 +43,12 @@ class ApiV6BpnMapper {
         BpnIdentifierMappingV6Dto(idValue = record.identifierValue, bpn = record.bpn)
 
     /**
+     * Returns the API DTO for [record].
+     */
+    fun toDto(record: BpnRequestIdentifierMatchRecord): BpnRequestIdentifierMappingV6Dto =
+        BpnRequestIdentifierMappingV6Dto(requestedIdentifier = record.requestIdentifier, bpn = record.bpn)
+
+    /**
      * Returns the exception the API reports [errors] with, surfacing only the first because the search fails as a
      * whole rather than per identifier.
      */
@@ -48,5 +57,14 @@ class ApiV6BpnMapper {
             is BpnIdentifierSearchError.IdentifierValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
             is BpnIdentifierSearchError.IdentifierTypeNotFound ->
                 BpdmNotFoundException(IdentifierTypeDb::class, "${error.typeKey}/${error.businessPartnerType}")
+        }
+
+    /**
+     * Returns the exception the API reports [errors] with, surfacing only the first because the search fails as a
+     * whole rather than per request identifier.
+     */
+    fun toRequestIdentifierSearchException(errors: List<BpnRequestIdentifierSearchError>): RuntimeException =
+        when (val error = errors.first()) {
+            is BpnRequestIdentifierSearchError.RequestIdentifiersTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
         }
 }

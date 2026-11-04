@@ -28,8 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6BpnMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnRequestIdentifierSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.BpnIdentifierSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.BpnSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.BpnRequestIdentifierSearchApplicationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("BpnControllerLegacy")
 class BpnV6Controller(
     private val bpnIdentifierSearchApplicationService: BpnIdentifierSearchApplicationService,
-    private val bpnSearchApplicationService: BpnSearchApplicationV6Service,
+    private val bpnRequestIdentifierSearchApplicationService: BpnRequestIdentifierSearchApplicationService,
     private val apiV6InboundMapper: ApiV6InboundMapper,
     private val apiV6BpnMapper: ApiV6BpnMapper
 ) : PoolBpnV6Api {
@@ -55,6 +56,10 @@ class BpnV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchV6Request): ResponseEntity<Set<BpnRequestIdentifierMappingV6Dto>> {
-        return ResponseEntity(bpnSearchApplicationService.searchBpnsByRequestedIdentifiers(request), HttpStatus.OK)
+        val searchRequest = apiV6InboundMapper.toBpnRequestIdentifierSearchRaw(request)
+        return when (val result = bpnRequestIdentifierSearchApplicationService.search(searchRequest)) {
+            is BpnRequestIdentifierSearchResult.Found -> ResponseEntity(result.matches.map(apiV6BpnMapper::toDto).toSet(), HttpStatus.OK)
+            is BpnRequestIdentifierSearchResult.Rejected -> throw apiV6BpnMapper.toRequestIdentifierSearchException(result.errors)
+        }
     }
 }

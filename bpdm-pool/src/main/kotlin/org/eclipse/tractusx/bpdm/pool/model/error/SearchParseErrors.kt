@@ -24,5 +24,4 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  * enforcing the limit so it surfaces as that operation's error directly.
  */
 data class SearchValuesTooMany(val count: Int, val maxCount: Int) :
-    ChangelogSearchParseError,
-    BpnRequestIdentifierSearchParseError
+    ChangelogSearchParseError

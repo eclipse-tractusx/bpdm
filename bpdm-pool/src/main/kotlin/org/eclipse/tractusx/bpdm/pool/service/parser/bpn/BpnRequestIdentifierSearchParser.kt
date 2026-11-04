@@ -21,10 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.bpn
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.BpnRequestIdentifierSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
-import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnRequestIdentifierSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.BpnRequestIdentifierSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -39,10 +38,10 @@ class BpnRequestIdentifierSearchParser(
      * Accepts the requested identifiers as they are, failing when the request holds more of them than the configured
      * search request limit.
      */
-    fun parse(request: BpnRequestIdentifierSearchRequest): ParseResult<BpnRequestIdentifierSearchParsed, BpnRequestIdentifierSearchParseError> {
+    fun parse(request: BpnRequestIdentifierSearchRaw): ParseResult<BpnRequestIdentifierSearchParsed, BpnRequestIdentifierSearchError> {
         if (request.requestedIdentifiers.size > controllerConfigProperties.searchRequestLimit)
             return ParseResult.ofSingleFailure(
-                SearchValuesTooMany(request.requestedIdentifiers.size, controllerConfigProperties.searchRequestLimit)
+                BpnRequestIdentifierSearchError.RequestIdentifiersTooMany(request.requestedIdentifiers.size, controllerConfigProperties.searchRequestLimit)
             )
 
         return ParseResult.Success(BpnRequestIdentifierSearchParsed(request.requestedIdentifiers))

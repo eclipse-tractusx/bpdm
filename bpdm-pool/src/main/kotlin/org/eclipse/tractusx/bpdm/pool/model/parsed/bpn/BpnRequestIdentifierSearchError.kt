@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,21 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
-
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
-import org.eclipse.tractusx.bpdm.pool.model.request.BpnRequestIdentifierSearchRequest
-import org.springframework.stereotype.Component
+package org.eclipse.tractusx.bpdm.pool.model.parsed.bpn
 
 /**
- * Creates BPN search requests from the v7 API BPN search DTOs.
+ * Reason a BPN-by-request-identifier search is rejected.
  */
-@Component
-class BpnSearchRequestMapper {
-
-    /**
-     * Returns the criteria to search BPNs by the request identifiers the client sent.
-     */
-    fun toRequestIdentifierSearchRequest(searchRequest: BpnRequestIdentifierSearchV7Request): BpnRequestIdentifierSearchRequest =
-        BpnRequestIdentifierSearchRequest(requestedIdentifiers = searchRequest.requestedIdentifiers)
+sealed interface BpnRequestIdentifierSearchError {
+    data class RequestIdentifiersTooMany(val count: Int, val maxCount: Int) : BpnRequestIdentifierSearchError
 }

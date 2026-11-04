@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,21 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
+package org.eclipse.tractusx.bpdm.pool.model.output.bpn
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierMappingV6Dto
-import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
-import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchError
 
 /**
- * Maps the results of the BPN search operations to the v6 API BPN mapping DTOs.
+ * Result of a BPN-by-request-identifier search: either the matches found or every reason the criteria were rejected.
  */
-@Component
-class BpnSearchResponseMapperV6 {
-
-    /**
-     * Returns the request-identifier-to-BPN mappings the request identifier search found.
-     */
-    fun toRequestIdentifierMappings(mappings: Set<BpnRequestIdentifierMappingDb>): Set<BpnRequestIdentifierMappingV6Dto> =
-        mappings.map { BpnRequestIdentifierMappingV6Dto(requestedIdentifier = it.requestIdentifier, bpn = it.bpn) }.toSet()
+sealed interface BpnRequestIdentifierSearchResult {
+    data class Found(val matches: Set<BpnRequestIdentifierMatchRecord>) : BpnRequestIdentifierSearchResult
+    data class Rejected(val errors: List<BpnRequestIdentifierSearchError>) : BpnRequestIdentifierSearchResult
 }

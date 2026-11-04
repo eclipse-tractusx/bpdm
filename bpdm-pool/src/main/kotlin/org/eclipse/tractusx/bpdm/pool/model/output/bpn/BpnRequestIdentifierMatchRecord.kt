@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,21 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
+package org.eclipse.tractusx.bpdm.pool.model.output.bpn
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierMappingV7Dto
-import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
-import org.springframework.stereotype.Component
-
-/**
- * Maps the results of the BPN search operations to the v7 API BPN mapping DTOs.
- */
-@Component
-class BpnSearchResponseMapper {
-
-    /**
-     * Returns the request-identifier-to-BPN mappings the request identifier search found.
-     */
-    fun toRequestIdentifierMappings(mappings: Set<BpnRequestIdentifierMappingDb>): Set<BpnRequestIdentifierMappingV7Dto> =
-        mappings.map { BpnRequestIdentifierMappingV7Dto(requestedIdentifier = it.requestIdentifier, bpn = it.bpn) }.toSet()
-}
+data class BpnRequestIdentifierMatchRecord(
+    val requestIdentifier: String,
+    val bpn: String
+)
