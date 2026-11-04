@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant as LegalEntityScriptVariantRequest
@@ -30,7 +31,7 @@ import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as TaskLegalEntit
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 
 /**
- * Maps a cleaning task's legal entity into the loose [LegalEntityCreateRaw] / [LegalEntityUpdateRequest]; the legal
+ * Maps a cleaning task's legal entity into the loose [LegalEntityCreateRaw] / [LegalEntityUpdateRaw]; the legal
  * address is delegated to [GoldenRecordTaskAddressRequestMapper]. Unlike the pass-through elsewhere, a missing
  * [LegalEntityState] type throws here — the loose request's type is non-null by contract (matches the task path's prior
  * behavior).
@@ -43,8 +44,8 @@ class GoldenRecordTaskLegalEntityRequestMapper(
     fun toCreateRequest(legalEntity: TaskLegalEntity): LegalEntityCreateRaw =
         LegalEntityCreateRaw(content = toContentRequest(legalEntity))
 
-    fun toUpdateRequest(legalEntityBpn: String, legalEntity: TaskLegalEntity): LegalEntityUpdateRequest =
-        LegalEntityUpdateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(legalEntity))
+    fun toUpdateRequest(legalEntityBpn: String, legalEntity: TaskLegalEntity): LegalEntityUpdateRaw =
+        LegalEntityUpdateRaw(legalEntityBpn = legalEntityBpn, content = toContentRequest(legalEntity))
 
     private fun toContentRequest(legalEntity: TaskLegalEntity): LegalEntityContentRequest =
         LegalEntityContentRequest(

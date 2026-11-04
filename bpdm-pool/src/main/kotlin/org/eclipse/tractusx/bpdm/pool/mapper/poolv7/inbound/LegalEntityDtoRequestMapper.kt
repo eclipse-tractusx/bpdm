@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -40,8 +41,8 @@ class LegalEntityDtoRequestMapper(
     fun toCreateRaw(request: LegalEntityPartnerCreateV7Request): LegalEntityCreateRaw =
         LegalEntityCreateRaw(content = toContentRequest(request.legalEntity))
 
-    fun toUpdateRequest(request: LegalEntityPartnerUpdateV7Request): LegalEntityUpdateRequest =
-        LegalEntityUpdateRequest(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity))
+    fun toUpdateRaw(request: LegalEntityPartnerUpdateV7Request): LegalEntityUpdateRaw =
+        LegalEntityUpdateRaw(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity))
 
     private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(

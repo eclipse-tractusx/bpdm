@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -34,7 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
 
 /**
- * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRaw] / [LegalEntityUpdateRequest]. v6
+ * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRaw] / [LegalEntityUpdateRaw]. v6
  * differs from v7: the legal entity is flat (no `header` wrapper), the legal address is a sibling field (not nested),
  * there are no script variants, and membership is `isCatenaXMemberData` (→ domain `isDataSpaceParticipant`).
  */
@@ -52,8 +53,8 @@ class LegalEntityDtoRequestMapperV6(
     /**
      * Returns the update request for the legal entity a client sent, addressed by its BPN.
      */
-    fun toUpdateRequest(request: LegalEntityPartnerUpdateV6Request): LegalEntityUpdateRequest =
-        LegalEntityUpdateRequest(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity, request.legalAddress))
+    fun toUpdateRaw(request: LegalEntityPartnerUpdateV6Request): LegalEntityUpdateRaw =
+        LegalEntityUpdateRaw(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity, request.legalAddress))
 
     private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(

@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityHeaderUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant

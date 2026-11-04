@@ -40,6 +40,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetRes
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityUpdateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
@@ -52,7 +53,7 @@ class LegalEntityController(
     val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     val legalEntityGetApplicationService: LegalEntityGetApplicationService,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
-    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service,
+    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
     private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
@@ -114,6 +115,8 @@ class LegalEntityController(
     override fun updateBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerUpdateV7Request>
     ): LegalEntityPartnerUpdateV7ResponseWrapper {
-        return legalEntityUpdateApplicationService.updateLegalEntities(businessPartners)
+        val requests = businessPartners.toList()
+        val results = legalEntityUpdateApplicationService.update(requests.map { legalEntityDtoRequestMapper.toUpdateRaw(it) })
+        return apiV7LegalEntityMapper.toUpdateResponse(requests, results)
     }
 }

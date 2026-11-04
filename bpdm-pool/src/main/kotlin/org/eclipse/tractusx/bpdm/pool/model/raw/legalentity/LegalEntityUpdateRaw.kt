@@ -17,11 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 
-data class LegalEntityUpdateParsed(
-    val target: LegalEntityDb,
-    val content: LegalEntityContentParsed
+data class LegalEntityUpdateRaw(
+    val legalEntityBpn: String,
+    val content: LegalEntityContentRequest
 )

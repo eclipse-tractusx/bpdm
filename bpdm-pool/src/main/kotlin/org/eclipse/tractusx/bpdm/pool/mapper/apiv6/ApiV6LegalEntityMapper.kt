@@ -23,11 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityIdentifierVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateV6ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerUpdateV6ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityRelationTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityVerboseV6Dto
@@ -40,6 +43,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreate
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityIdentifierRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRelationRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityUpdateResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError.LegalEntityNotFound
 import org.springframework.stereotype.Component
@@ -88,6 +92,24 @@ class ApiV6LegalEntityMapper(
             }
         }
         return LegalEntityPartnerCreateV6ResponseWrapper(entities, errors)
+    }
+
+    /**
+     * Returns the response for an update batch, each result reported under the BPNL of the request at its position.
+     */
+    fun toUpdateResponse(
+        requests: List<LegalEntityPartnerUpdateV6Request>,
+        results: List<LegalEntityUpdateResult>
+    ): LegalEntityPartnerUpdateV6ResponseWrapper {
+        val entities = mutableListOf<LegalEntityPartnerCreateVerboseV6Dto>()
+        val errors = mutableListOf<ErrorInfoV6<LegalEntityUpdateErrorV6>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is LegalEntityUpdateResult.Updated -> entities.add(toCreateDto(result.legalEntity, request.bpnl))
+                is LegalEntityUpdateResult.Rejected -> errors.addAll(result.errors.map { legalEntityParseErrorMapperV6.toUpdateErrorInfo(it, request.bpnl) })
+            }
+        }
+        return LegalEntityPartnerUpdateV6ResponseWrapper(entities, errors)
     }
 
     private fun toCreateDto(record: LegalEntityRecord, index: String?): LegalEntityPartnerCreateVerboseV6Dto =

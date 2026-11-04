@@ -23,12 +23,15 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityUpdateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityHeaderVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityIdentifierVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
@@ -40,6 +43,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityIdenti
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityScriptVariantRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityUpdateResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError.LegalEntityNotFound
 import org.springframework.stereotype.Component
@@ -89,6 +93,24 @@ class ApiV7LegalEntityMapper(
             }
         }
         return LegalEntityPartnerCreateV7ResponseWrapper(entities, errors)
+    }
+
+    /**
+     * Returns the response for an update batch, each result reported under the BPNL of the request at its position.
+     */
+    fun toUpdateResponse(
+        requests: List<LegalEntityPartnerUpdateV7Request>,
+        results: List<LegalEntityUpdateResult>
+    ): LegalEntityPartnerUpdateV7ResponseWrapper {
+        val entities = mutableListOf<LegalEntityPartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<LegalEntityUpdateErrorV7>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is LegalEntityUpdateResult.Updated -> entities.add(LegalEntityPartnerCreateVerboseV7Dto(toDto(result.legalEntity), request.bpnl))
+                is LegalEntityUpdateResult.Rejected -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
+            }
+        }
+        return LegalEntityPartnerUpdateV7ResponseWrapper(entities, errors)
     }
 
     private fun toHeaderDto(record: LegalEntityRecord): LegalEntityHeaderVerboseV7Dto =
