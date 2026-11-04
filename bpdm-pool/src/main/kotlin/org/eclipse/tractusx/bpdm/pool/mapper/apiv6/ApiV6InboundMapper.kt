@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
@@ -32,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityGetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntitySearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
@@ -139,4 +141,10 @@ class ApiV6InboundMapper {
      */
     fun toLegalEntityGetRaw(identifierValue: String, identifierType: String?): LegalEntityGetRaw =
         LegalEntityGetRaw(identifierValue = identifierValue, identifierType = identifierType)
+
+    /**
+     * Returns the raw legal entity search holding [request].
+     */
+    fun toLegalEntitySearchRaw(request: LegalEntitySearchV6Request): LegalEntitySearchRaw =
+        LegalEntitySearchRaw(legalEntityBpns = request.bpnLs, legalName = request.legalName)
 }

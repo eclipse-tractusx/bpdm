@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityIdentifierVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityPartnerCreateVerboseV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.relation.RelationVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 
@@ -66,15 +65,6 @@ class LegalEntityResponseMapperV6(
                 updatedAt = updatedAt.instant,
             )
         }
-
-    /**
-     * Returns the given legal entity together with its legal address as the v6 API reports them.
-     */
-    fun toLegalEntityWithLegalAddress(legalEntity: LegalEntityDb): LegalEntityWithLegalAddressVerboseV6Dto =
-        LegalEntityWithLegalAddressVerboseV6Dto(
-            legalEntity = toLegalEntity(legalEntity),
-            legalAddress = addressResponseMapperV6.toAddress(legalEntity.legalAddress)
-        )
 
     /**
      * Returns the given created or updated legal entity as the v6 API reports it, tagged with the key of the request
