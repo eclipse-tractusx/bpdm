@@ -17,14 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.parser
+package org.eclipse.tractusx.bpdm.pool.service.parser.changelog
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ChangelogSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnFilterParser
 import org.springframework.stereotype.Service
 
@@ -38,13 +37,14 @@ class ChangelogSearchParser(
 ) {
 
     /**
-     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively, failing when the BPN
-     * filter holds more values than the configured search request limit.
+     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively, restricted to data
+     * space participants as [isDataSpaceParticipant] demands, failing when the BPN filter holds more values than the
+     * configured search request limit.
      */
-    fun parse(request: ChangelogSearchRequest): ParseResult<ChangelogSearchParsed, ChangelogSearchParseError> {
+    fun parse(request: ChangelogSearchRaw, isDataSpaceParticipant: Boolean?): ParseResult<ChangelogSearchParsed, ChangelogSearchError> {
         val bpns = request.bpns.orEmpty()
         if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-            return ParseResult.ofSingleFailure(SearchValuesTooMany(bpns.size, controllerConfigProperties.searchRequestLimit))
+            return ParseResult.ofSingleFailure(ChangelogSearchError.BpnsTooMany(bpns.size, controllerConfigProperties.searchRequestLimit))
         }
 
         return ParseResult.Success(
@@ -52,7 +52,7 @@ class ChangelogSearchParser(
                 bpns = bpnFilterParser.parse(bpns).toSet(),
                 businessPartnerTypes = request.businessPartnerTypes.orEmpty(),
                 timestampAfter = request.timestampAfter,
-                isDataSpaceParticipant = request.isDataSpaceParticipant
+                isDataSpaceParticipant = isDataSpaceParticipant
             )
         )
     }

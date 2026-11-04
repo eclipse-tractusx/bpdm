@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,15 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.changelog
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchError
+import org.springframework.data.domain.Page
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import java.time.Instant
-
-data class ChangelogSearchRequest(
-    val bpns: Set<String>?,
-    val businessPartnerTypes: Set<BusinessPartnerType>?,
-    val timestampAfter: Instant?,
-    val isDataSpaceParticipant: Boolean?
-)
+/**
+ * Result of a changelog search: either the requested page or every reason the criteria were rejected.
+ */
+sealed interface ChangelogSearchResult {
+    data class Found(val page: Page<ChangelogEntryRecord>) : ChangelogSearchResult
+    data class Rejected(val errors: List<ChangelogSearchError>) : ChangelogSearchResult
+}

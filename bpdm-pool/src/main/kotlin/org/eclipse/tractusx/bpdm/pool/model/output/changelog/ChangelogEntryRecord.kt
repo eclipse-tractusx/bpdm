@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,15 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.output.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import java.time.Instant
 
-data class ChangelogSearchParsed(
-    val bpns: Set<String>,
-    val businessPartnerTypes: Set<BusinessPartnerType>,
-    val timestampAfter: Instant?,
-    val isDataSpaceParticipant: Boolean?
+data class ChangelogEntryRecord(
+    val bpn: String,
+    val businessPartnerType: BusinessPartnerType,
+    val timestamp: Instant,
+    val changelogType: ChangelogTypeV7
 )

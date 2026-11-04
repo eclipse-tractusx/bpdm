@@ -17,25 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound
-
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
-import org.springframework.stereotype.Component
+package org.eclipse.tractusx.bpdm.pool.model.parsed.changelog
 
 /**
- * Maps the changelog search parser's sealed parse errors to the errors the changelog endpoints report them with.
+ * Reason a changelog search is rejected.
  */
-@Component
-class ChangelogParseErrorMapper {
-
-    /**
-     * Returns the exception reporting a failed changelog search parse, surfacing the first error because the search
-     * fails as a whole rather than per entry.
-     */
-    fun toSearchException(errors: List<ChangelogSearchParseError>): RuntimeException =
-        when (val error = errors.first()) {
-            is SearchValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
-        }
+sealed interface ChangelogSearchError {
+    data class BpnsTooMany(val count: Int, val maxCount: Int) : ChangelogSearchError
 }

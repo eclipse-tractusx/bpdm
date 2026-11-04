@@ -17,21 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
+package org.eclipse.tractusx.bpdm.pool.model.raw.changelog
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
-import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import java.time.Instant
 
-/**
- * Maps stored changelog entries to the v7 API changelog DTOs.
- */
-@Component
-class ChangelogResponseMapper {
-
-    /**
-     * Returns the given changelog entry as the API reports it.
-     */
-    fun toChangelogEntry(changelogEntry: PartnerChangelogEntryDb): ChangelogEntryVerboseV7Dto =
-        with(changelogEntry) { ChangelogEntryVerboseV7Dto(bpn, businessPartnerType, updatedAt.instant, changelogType) }
-}
+data class ChangelogSearchRaw(
+    val bpns: Set<String>?,
+    val businessPartnerTypes: Set<BusinessPartnerType>?,
+    val timestampAfter: Instant?
+)

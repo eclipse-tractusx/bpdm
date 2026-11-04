@@ -21,17 +21,24 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolChangelogV6Api
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogEntryVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.ChangelogSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6ChangelogMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("ChangelogControllerLegacy")
 class ChangelogV6Controller(
-    private val changelogSearchApplicationService: ChangelogSearchApplicationV6Service
+    private val changelogSearchApplicationService: ChangelogSearchApplicationService,
+    private val apiV6InboundMapper: ApiV6InboundMapper,
+    private val apiV6ChangelogMapper: ApiV6ChangelogMapper
 ) : PoolChangelogV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_CHANGELOG})")
@@ -39,6 +46,10 @@ class ChangelogV6Controller(
         changelogSearchRequest: ChangelogSearchV6Request,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseV6Dto> {
-        return changelogSearchApplicationService.searchChangelogEntries(changelogSearchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toChangelogSearchRaw(changelogSearchRequest)
+        return when (val result = changelogSearchApplicationService.search(request, paginationRequest.toPageRequest())) {
+            is ChangelogSearchResult.Found -> result.page.toPageDto(apiV6ChangelogMapper::toDto)
+            is ChangelogSearchResult.Rejected -> throw apiV6ChangelogMapper.toException(result.errors)
+        }
     }
 }
