@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeSearchRequest
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeSearchParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
 
@@ -35,10 +35,10 @@ class IdentifierTypeSearchParser(private val countryRepository: CountryRepositor
     /**
      * Returns the criteria the search filters identifier types by.
      */
-    fun parse(request: IdentifierTypeSearchRequest): ParseResult<IdentifierTypeSearchParsed, IdentifierTypeSearchParseError> {
+    fun parse(request: IdentifierTypeSearchRaw): ParseResult<IdentifierTypeSearchParsed, IdentifierTypeSearchError> {
         val country = request.country?.let { code ->
             countryRepository.findByCountryCode(code)
-                ?: return ParseResult.ofSingleFailure(IdentifierTypeSearchParseError.CountryNotFound(code))
+                ?: return ParseResult.ofSingleFailure(IdentifierTypeSearchError.CountryNotFound(code))
         }
         return ParseResult.Success(IdentifierTypeSearchParsed(
             businessPartnerType = request.businessPartnerType,
