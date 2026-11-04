@@ -20,29 +20,25 @@
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
-import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.springframework.beans.factory.annotation.Autowired
 import java.time.Instant
 
 class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
 
-    @Autowired
-    lateinit var goldenRecordUpdateService: GoldenRecordUpdateApplicationService
-
     /**
      * GIVEN a business partner output whose additional address is returned by the Pool with a given global address type
-     * WHEN the Pool changelog synchronizes that address into the Gate
+     * WHEN the output consumer searches for that output
      * THEN the output reports the address type relative to its tracked site:
      *      the site-main role only applies if the tracked site's main address is this address,
      *      while the legal-address role is preserved regardless of the tracked site
@@ -60,99 +56,80 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     fun `pool sync determines address type towards the tracked site`(
         poolType: AddressType, trackedSiteMain: Boolean, expectedType: AddressType
     ) {
-        //GIVEN
+        //GIVEN an output tracking a site where the Pool reports the address with the given global type
         val input = testDataClient.businessPartner.upsertInput(testName)
         val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(input)
-        val changedName = "$testName changed"
-        val address = records.additionalAddress.copy(
-            address = records.additionalAddress.address.copy(name = changedName, addressType = poolType, updatedAt = Instant.now())
+        val changedAddress = records.additionalAddress.copy(
+            scriptVariants = emptyList(),
+            address = records.additionalAddress.address.copy(name = "$testName changed", addressType = poolType, updatedAt = Instant.now())
         )
-        val trackedSite = records.siteParent.let { if (trackedSiteMain) it.copy(mainAddress = address.address) else it }
-        // Another site keeps the Pool-global main-address role so the tracked-site comparison is what decides the output type
+        val trackedSite = records.siteParent.let { if (trackedSiteMain) it.copy(mainAddress = changedAddress.address) else it }
         val otherSite = records.additionalSites.single().let {
             if (poolType == AddressType.SiteMainAddress || poolType == AddressType.LegalAndSiteMainAddress)
-                it.copy(mainAddress = address.address)
+                it.copy(mainAddress = changedAddress.address)
             else it
         }
+        testDataClient.businessPartner.syncAddressChangeFromPool(changedAddress, listOf(trackedSite, otherSite))
 
         //WHEN
-        poolMockDataFactory.mockSiteSearchResult(listOf(trackedSite, otherSite))
-        poolMockDataFactory.mockAddressSearchResult(address)
-        syncAddress(address.address.bpna)
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId))
 
         //THEN
-        val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId)).content.single()
-        assertEquals(changedName, output.address.name)
-        assertEquals(expectedType, output.address.addressType)
-        assertEquals(address.address.bpna, output.address.addressBpn)
-        assertEquals(trackedSite.site.bpns, output.site?.siteBpn)
-        assertEquals(listOf(AdditionalSiteOutputV7Dto(otherSite.site.bpns, otherSite.site.name)), output.additionalSites.toList())
+        val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(
+            input,
+            records.legalEntityParent,
+            records.siteParent,
+            records.additionalAddress.copy(address = changedAddress.address),
+            listOf(AdditionalSiteOutputV7Dto(otherSite.site.bpns, otherSite.site.name))
+        ).let { it.copy(address = it.address.copy(addressType = expectedType)) }
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
     }
 
     /**
-     * GIVEN two business partner outputs sharing the same Pool address that is main address of site A but only an
-     *       additional address of site B
-     * WHEN the Pool changelog synchronizes a change of that shared address into the Gate
-     * THEN the address change reaches both outputs, each keeping its tracked site, further site memberships and its
-     *      own site-relative address type, and a repeated synchronization keeps those roles stable
+     * GIVEN two business partner outputs sharing the same Pool address that is the main address of site A but only
+     *       an additional address of site B, and a change of that shared address synchronized from the Pool
+     * WHEN the output consumer searches for both outputs
+     * THEN both outputs report the changed address, each keeping its tracked site, its further site membership and
+     *      its own site-relative address type
      *
      */
     @Test
-    fun `pool sync preserves different roles for two outputs sharing an address`() {
-        //GIVEN output B tracking the site where the shared address is only an additional address
-        val inputB = testDataClient.businessPartner.upsertInput("$testName B")
-        val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(inputB)
-        val siteA = records.additionalSites.single().copy(mainAddress = records.additionalAddress.address)
+    fun `pool sync keeps site-relative address types for two outputs sharing an address`() {
+        //GIVEN
+        val shared = givenOutputsSharingAnAddress()
 
-        //GIVEN the Pool agrees that the shared address is site A's main address
-        poolMockDataFactory.mockSiteSearchResult(listOf(siteA, records.siteParent))
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(shared.inputA.externalId, shared.inputB.externalId))
 
-        //GIVEN output A tracking site A where the shared address is the main address
-        val inputA = testDataClient.businessPartner.upsertInput("$testName A")
-        orchestratorMockDataFactory.mockRefineToSite(
-            inputA.externalId, records.legalEntityParent, siteA, null, inputA.nameParts
-        )
-        testDataClient.businessPartner.setStateToReady(inputA.externalId)
-        taskCreationService.createTasksForReadyBusinessPartners()
-        taskResolutionService.resolveFinishedTasks()
+        //THEN
+        assertRepo.assertBusinessPartnerOutput(response, shared.expectedPage(testData))
+    }
 
-        //GIVEN both outputs already show the shared address each in its site-relative role
-        assertSharedAddressOutputs(
-            inputA.externalId, inputB.externalId, records.additionalAddress.address.name, records.additionalAddress.address.bpna,
-            siteA.site.bpns, siteA.site.name, records.siteParent.site.bpns, records.siteParent.site.name
-        )
+    /**
+     * GIVEN two business partner outputs sharing the same Pool address whose change was synchronized twice
+     * WHEN the output consumer searches for both outputs
+     * THEN both outputs still report the same site-relative address types
+     *
+     */
+    @Test
+    fun `repeated pool sync keeps site-relative address types stable`() {
+        //GIVEN
+        val shared = givenOutputsSharingAnAddress()
+        testDataClient.businessPartner.syncAddressChangeFromPool(shared.changedAddress, listOf(shared.siteA, shared.records.siteParent))
 
-        //WHEN the Pool reports a change on the shared address
-        val changedName = "$testName changed"
-        val changedAddress = records.additionalAddress.copy(
-            address = records.additionalAddress.address.copy(
-                name = changedName, addressType = AddressType.SiteMainAddress, updatedAt = Instant.now()
-            )
-        )
-        poolMockDataFactory.mockSiteSearchResult(listOf(siteA, records.siteParent))
-        poolMockDataFactory.mockAddressSearchResult(changedAddress)
-        syncAddress(changedAddress.address.bpna)
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(shared.inputA.externalId, shared.inputB.externalId))
 
-        //THEN the change propagates to both outputs while each keeps its site-relative role and site relationships
-        assertSharedAddressOutputs(
-            inputA.externalId, inputB.externalId, changedName, changedAddress.address.bpna,
-            siteA.site.bpns, siteA.site.name, records.siteParent.site.bpns, records.siteParent.site.name
-        )
-
-        //WHEN the same change is synchronized again
-        syncAddress(changedAddress.address.bpna)
-
-        //THEN both outputs still report the same site-relative roles
-        assertSharedAddressOutputs(
-            inputA.externalId, inputB.externalId, changedName, changedAddress.address.bpna,
-            siteA.site.bpns, siteA.site.name, records.siteParent.site.bpns, records.siteParent.site.name
-        )
+        //THEN
+        assertRepo.assertBusinessPartnerOutput(response, shared.expectedPage(testData))
     }
 
     /**
      * GIVEN a business partner output whose tracked site no longer lists the address as a member,
      *       even though the Pool address type still claims a site-main role
-     * WHEN the Pool changelog synchronizes a change of that address into the Gate
+     * WHEN the output consumer searches for that output
      * THEN the address change is still applied and the tracked site is preserved,
      *      but the output does not report a site-main role for the removed membership;
      *      the legal-address role is preserved if present
@@ -168,73 +145,87 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     fun `pool sync applies address changes after tracked site membership is removed`(
         poolType: AddressType, expectedType: AddressType, trackedSiteReturned: Boolean
     ) {
-        //GIVEN
+        //GIVEN the Pool reports the address with a site-main type but without membership in the tracked site
         val input = testDataClient.businessPartner.upsertInput(testName)
         val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(input)
-        val before = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId)).content.single()
-
-        //GIVEN the Pool reports the address with a site-main type but without membership in the tracked site
-        val changedName = "$testName changed"
         val changedAddress = records.additionalAddress.copy(
+            scriptVariants = emptyList(),
             address = records.additionalAddress.address.copy(
-                name = changedName,
+                name = "$testName changed",
                 addressType = poolType,
                 additionalSites = emptyList(),
                 updatedAt = Instant.now()
             )
         )
         val otherSite = records.additionalSites.single().copy(mainAddress = changedAddress.address)
-        // Even a returned tracked site must not imply a main-address role after the membership was removed
         val trackedSite = records.siteParent.copy(mainAddress = changedAddress.address)
-        poolMockDataFactory.mockSiteSearchResult(
-            if (trackedSiteReturned) listOf(otherSite, trackedSite) else listOf(otherSite)
+        testDataClient.businessPartner.syncAddressChangeFromPool(
+            changedAddress, if (trackedSiteReturned) listOf(otherSite, trackedSite) else listOf(otherSite)
         )
-        poolMockDataFactory.mockAddressSearchResult(changedAddress)
 
         //WHEN
-        syncAddress(changedAddress.address.bpna)
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId))
 
         //THEN
-        val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId)).content.single()
-        assertEquals(before.site, output.site)
-        assertEquals(changedAddress.address.bpna, output.address.addressBpn)
-        assertEquals(changedName, output.address.name)
-        assertEquals(expectedType, output.address.addressType)
-        assertEquals(listOf(AdditionalSiteOutputV7Dto(otherSite.site.bpns, otherSite.site.name)), output.additionalSites.toList())
+        val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(
+            input,
+            records.legalEntityParent,
+            records.siteParent,
+            records.additionalAddress.copy(address = changedAddress.address),
+            listOf(AdditionalSiteOutputV7Dto(otherSite.site.bpns, otherSite.site.name))
+        ).let { it.copy(address = it.address.copy(addressType = expectedType)) }
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
     }
 
-    private fun syncAddress(bpna: String) {
-        poolMockDataFactory.mockChangelogSearchResult(
-            listOf(ChangelogEntryVerboseV7Dto(bpna, BusinessPartnerType.ADDRESS, Instant.now(), ChangelogTypeV7.UPDATE))
-        )
-        goldenRecordUpdateService.updateFromPoolChanges()
-    }
-
-    private fun assertSharedAddressOutputs(
-        externalIdA: String,
-        externalIdB: String,
-        expectedName: String?,
-        expectedBpna: String,
-        siteABpn: String,
-        siteAName: String?,
-        siteBBpn: String,
-        siteBName: String?
+    private class SharedAddressScenario(
+        val inputA: BusinessPartnerInputV7Dto,
+        val inputB: BusinessPartnerInputV7Dto,
+        val records: PoolMockDataFactory.AdditionalAddressWithAdditionalSitesResult,
+        val siteA: SiteWithMainAddressVerboseV7Dto,
+        val changedAddress: LogisticAddressVerboseV7Dto
     ) {
-        val outputs = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalIdA, externalIdB))
-            .content.associateBy { it.externalId }
-        val a = outputs.getValue(externalIdA)
-        val b = outputs.getValue(externalIdB)
+        fun expectedPage(testData: TestDataFactoryGateV7): PageDto<BusinessPartnerOutputV7Dto> {
+            val expectedA = testData.businessPartner.output.fromSite(inputA, records.legalEntityParent, siteA.copy(mainAddress = changedAddress.address))
+                .copy(additionalSites = listOf(AdditionalSiteOutputV7Dto(records.siteParent.site.bpns, records.siteParent.site.name)))
+            val expectedB = testData.businessPartner.output.fromAdditionalAddressOnSite(
+                inputB,
+                records.legalEntityParent,
+                records.siteParent,
+                records.additionalAddress.copy(address = changedAddress.address),
+                listOf(AdditionalSiteOutputV7Dto(siteA.site.bpns, siteA.site.name))
+            )
+            return PageDto(2, 1, 0, 2, listOf(expectedA, expectedB))
+        }
+    }
 
-        assertEquals(expectedBpna, a.address.addressBpn)
-        assertEquals(expectedBpna, b.address.addressBpn)
-        assertEquals(expectedName, a.address.name)
-        assertEquals(expectedName, b.address.name)
-        assertEquals(siteABpn, a.site?.siteBpn)
-        assertEquals(siteBBpn, b.site?.siteBpn)
-        assertEquals(AddressType.SiteMainAddress, a.address.addressType)
-        assertEquals(AddressType.AdditionalAddress, b.address.addressType)
-        assertEquals(listOf(AdditionalSiteOutputV7Dto(siteBBpn, siteBName)), a.additionalSites.toList())
-        assertEquals(listOf(AdditionalSiteOutputV7Dto(siteABpn, siteAName)), b.additionalSites.toList())
+    private fun givenOutputsSharingAnAddress(): SharedAddressScenario {
+        // output B tracks the site where the shared address is only an additional address
+        val inputB = testDataClient.businessPartner.upsertInput("$testName B")
+        val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(inputB)
+        val siteA = records.additionalSites.single().copy(mainAddress = records.additionalAddress.address)
+
+        // the Pool agrees that the shared address is site A's main address
+        poolMockDataFactory.mockSiteSearchResult(listOf(siteA, records.siteParent))
+
+        // output A tracks site A where the shared address is the main address
+        val inputA = testDataClient.businessPartner.upsertInput("$testName A")
+        orchestratorMockDataFactory.mockRefineToSite(inputA.externalId, records.legalEntityParent, siteA, null, inputA.nameParts)
+        testDataClient.businessPartner.setStateToReady(inputA.externalId)
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
+
+        // the Pool reports a change on the shared address
+        val changedAddress = records.additionalAddress.copy(
+            scriptVariants = emptyList(),
+            address = records.additionalAddress.address.copy(
+                name = "$testName changed", addressType = AddressType.SiteMainAddress, updatedAt = Instant.now()
+            )
+        )
+        testDataClient.businessPartner.syncAddressChangeFromPool(changedAddress, listOf(siteA, records.siteParent))
+
+        return SharedAddressScenario(inputA, inputB, records, siteA, changedAddress)
     }
 
     /**
@@ -405,7 +396,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId, "non-existing-external-id"))
 
         //THEN
-        val expectedOutput = testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
+        val expectedOutput =  testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)

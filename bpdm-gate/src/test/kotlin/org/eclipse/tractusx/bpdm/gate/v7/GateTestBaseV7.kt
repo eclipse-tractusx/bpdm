@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyn
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
@@ -62,6 +63,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService
     @Autowired
+    lateinit var goldenRecordUpdateService: GoldenRecordUpdateApplicationService
+    @Autowired
     lateinit var relationTaskResolutionService: RelationTaskResolutionApplicationService
     @Autowired
     lateinit var relationTaskCreationService: RelationTaskCreationApplicationService
@@ -94,6 +97,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
             relationTaskResolutionService,
             relationTaskCreationService,
             goldenRecordMockFactory,
+            poolMockDataFactory,
+            goldenRecordUpdateService,
             tenantBPNL
         )
     }

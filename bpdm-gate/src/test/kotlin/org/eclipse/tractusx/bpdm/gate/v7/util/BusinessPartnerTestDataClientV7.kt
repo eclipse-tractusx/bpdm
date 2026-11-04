@@ -29,7 +29,12 @@ import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyn
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
@@ -38,6 +43,8 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import java.time.Instant
 
 class BusinessPartnerTestDataClientV7(
     private val gateClient: GateV7Client,
@@ -49,6 +56,8 @@ class BusinessPartnerTestDataClientV7(
     private val consistencyCheckService: GoldenRecordConsistencyCheckApplicationService,
     private val goldenRecordCountedSyncService: GoldenRecordCountedSyncApplicationService,
     private val goldenRecordMockFactory: GoldenRecordMockFactory,
+    private val poolMockDataFactory: PoolMockDataFactory,
+    private val goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
     private val tenantBpnL: String,
 ) {
 
@@ -226,5 +235,18 @@ class BusinessPartnerTestDataClientV7(
         taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
+    }
+
+    /**
+     * Lets the Pool report [changedAddress] as updated and synchronizes that change into the Gate output,
+     * with the Pool returning [memberSites] as the sites the address belongs to.
+     */
+    fun syncAddressChangeFromPool(changedAddress: LogisticAddressVerboseV7Dto, memberSites: List<SiteWithMainAddressVerboseV7Dto>) {
+        poolMockDataFactory.mockSiteSearchResult(memberSites)
+        poolMockDataFactory.mockAddressSearchResult(changedAddress)
+        poolMockDataFactory.mockChangelogSearchResult(
+            listOf(ChangelogEntryVerboseV7Dto(changedAddress.address.bpna, BusinessPartnerType.ADDRESS, Instant.now(), ChangelogTypeV7.UPDATE))
+        )
+        goldenRecordUpdateService.updateFromPoolChanges()
     }
 }

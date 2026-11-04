@@ -25,11 +25,13 @@ import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordCountedSyn
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskHealthCheckApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.gate.service.application.GoldenRecordUpdateApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskCreationApplicationService
 import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 
 class GateTestDataClientV7(
     gateClient: GateV7Client,
@@ -43,6 +45,8 @@ class GateTestDataClientV7(
     relationTaskResolutionService: RelationTaskResolutionApplicationService,
     relationTaskCreationService: RelationTaskCreationApplicationService,
     goldenRecordMockFactory: GoldenRecordMockFactory,
+    poolMockDataFactory: PoolMockDataFactory,
+    goldenRecordUpdateService: GoldenRecordUpdateApplicationService,
     tenantBpnL: String,
 ) {
     val businessPartner = BusinessPartnerTestDataClientV7(
@@ -55,6 +59,8 @@ class GateTestDataClientV7(
         consistencyCheckService,
         goldenRecordCountedSyncService,
         goldenRecordMockFactory,
+        poolMockDataFactory,
+        goldenRecordUpdateService,
         tenantBpnL,
     )
 

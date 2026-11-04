@@ -12,7 +12,7 @@
  */
 
 package org.eclipse.tractusx.bpdm.gate.model.raw.goldenrecord
-   
+
 import java.time.Instant
 
 data class GoldenRecordChangePageRaw(
