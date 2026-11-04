@@ -30,8 +30,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Respo
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7SiteMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteGetApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteUpdateApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,18 +42,22 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SiteController(
-    private val siteGetApplicationService: SiteGetApplicationV7Service,
+    private val siteGetApplicationService: SiteGetApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val siteCreateApplicationService: SiteCreateApplicationV7Service,
-    private val siteUpdateApplicationService: SiteUpdateApplicationV7Service
+    private val siteUpdateApplicationService: SiteUpdateApplicationV7Service,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7SiteMapper: ApiV7SiteMapper
 ) : PoolSiteV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
-    ): SiteWithMainAddressVerboseV7Dto {
-        return siteGetApplicationService.getSite(bpns)
-    }
+    ): SiteWithMainAddressVerboseV7Dto =
+        when (val result = siteGetApplicationService.get(apiV7InboundMapper.toSiteGetRaw(bpns))) {
+            is SiteGetResult.Found -> apiV7SiteMapper.toDto(result.site)
+            is SiteGetResult.Rejected -> throw apiV7SiteMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postSiteSearch(

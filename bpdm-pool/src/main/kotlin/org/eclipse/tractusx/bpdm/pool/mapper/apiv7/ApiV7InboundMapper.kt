@@ -50,6 +50,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
@@ -174,6 +175,12 @@ class ApiV7InboundMapper(
      */
     fun toLegalEntityUpdateRaw(request: LegalEntityPartnerUpdateV7Request): LegalEntityUpdateRaw =
         LegalEntityUpdateRaw(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity))
+
+    /**
+     * Returns the raw site fetch for the site carrying [bpn].
+     */
+    fun toSiteGetRaw(bpn: String): SiteGetRaw =
+        SiteGetRaw(bpn = bpn)
 
     private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(
