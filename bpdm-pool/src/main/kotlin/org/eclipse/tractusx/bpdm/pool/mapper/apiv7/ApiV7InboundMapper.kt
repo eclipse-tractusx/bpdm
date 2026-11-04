@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.springframework.stereotype.Component
 
@@ -41,4 +44,20 @@ class ApiV7InboundMapper {
      */
     fun toFieldQualityRuleSearchRaw(country: String): FieldQualityRuleSearchRaw =
         FieldQualityRuleSearchRaw(country = country)
+
+    /**
+     * Returns the raw identifier type create holding [identifierType].
+     */
+    fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV7Dto): IdentifierTypeCreateRaw =
+        IdentifierTypeCreateRaw(
+            technicalKey = identifierType.technicalKey,
+            businessPartnerType = identifierType.businessPartnerType,
+            name = identifierType.name,
+            abbreviation = identifierType.abbreviation,
+            transliteratedName = identifierType.transliteratedName,
+            transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
+            format = identifierType.format,
+            categories = identifierType.categories,
+            details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }
+        )
 }

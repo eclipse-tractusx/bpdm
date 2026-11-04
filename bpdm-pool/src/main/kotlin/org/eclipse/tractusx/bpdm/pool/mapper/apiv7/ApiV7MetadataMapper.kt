@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.CountrySubdivisionV7Dto
@@ -30,6 +31,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleRecord
@@ -38,6 +41,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
 import org.springframework.stereotype.Component
 
@@ -145,5 +149,22 @@ class ApiV7MetadataMapper {
     fun toException(error: FieldQualityRuleSearchError): BpdmNotFoundException =
         when (error) {
             is FieldQualityRuleSearchError.CountryNotFound -> BpdmNotFoundException("Country", error.country)
+        }
+
+    /**
+     * Returns the exception the API reports [errors] with, surfacing the first error's kind because a create covers a
+     * single identifier type.
+     */
+    fun toException(errors: List<IdentifierTypeCreateError>): RuntimeException =
+        when (val error = errors.first()) {
+            is IdentifierTypeCreateError.TechnicalKeyAlreadyTaken ->
+                BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${error.technicalKey}/${error.businessPartnerType}")
+            is IdentifierTypeCreateError.CountryNotFound ->
+                BpdmValidationErrorException(errors.filterIsInstance<IdentifierTypeCreateError.CountryNotFound>().map {
+                    ValidationError(
+                        "CountryNotFound", "Country '${it.country}' not found in catalogue.", it.country,
+                        ValidationContext(classType = "", objectId = "request", propertyPath = listOf("details"))
+                    )
+                })
         }
 }

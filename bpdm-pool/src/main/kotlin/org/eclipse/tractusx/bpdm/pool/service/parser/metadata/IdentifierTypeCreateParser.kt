@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.IdentifierTypeCreateParseError.TechnicalKeyAlreadyTaken
-import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeDetailParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.IdentifierTypeCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError.TechnicalKeyAlreadyTaken
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeDetailParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
 import org.springframework.stereotype.Service
@@ -43,14 +43,14 @@ class IdentifierTypeCreateParser(
      * Validates the request and reports either the validated identifier type or that its technical key is already taken
      * for the business partner type it applies to. An identifier type named without a category falls under `OTH`.
      */
-    fun parse(request: IdentifierTypeCreateRequest): ParseResult<IdentifierTypeCreateParsed, IdentifierTypeCreateParseError> {
+    fun parse(request: IdentifierTypeCreateRaw): ParseResult<IdentifierTypeCreateParsed, IdentifierTypeCreateError> {
         val existing = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(request.businessPartnerType, request.technicalKey)
         if (existing != null)
             return ParseResult.ofSingleFailure(TechnicalKeyAlreadyTaken(request.technicalKey, request.businessPartnerType))
 
         val codes = request.details.mapNotNull { it.country }.toSet()
         val countries = countryRepository.findByCountryCodeIn(codes).associateBy { it.countryCode }
-        val errors = (codes - countries.keys).map { IdentifierTypeCreateParseError.CountryNotFound(it) }
+        val errors = (codes - countries.keys).map { IdentifierTypeCreateError.CountryNotFound(it) }
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
         return ParseResult.Success(

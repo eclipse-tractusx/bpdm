@@ -21,7 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.springframework.stereotype.Component
 
@@ -45,4 +48,21 @@ class ApiV6InboundMapper {
      */
     fun toFieldQualityRuleSearchRaw(country: String): FieldQualityRuleSearchRaw =
         FieldQualityRuleSearchRaw(country = country)
+
+    /**
+     * Returns the raw identifier type create holding [identifierType].
+     */
+    fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRaw =
+        IdentifierTypeCreateRaw(
+            technicalKey = identifierType.technicalKey,
+            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(identifierType.businessPartnerType.name),
+            name = identifierType.name,
+            abbreviation = identifierType.abbreviation,
+            transliteratedName = identifierType.transliteratedName,
+            transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
+            // v6 knows neither format nor categories, so an identifier type created over v6 carries none.
+            format = null,
+            categories = emptySet(),
+            details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }
+        )
 }

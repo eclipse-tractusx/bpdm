@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.IdentifierTypeCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

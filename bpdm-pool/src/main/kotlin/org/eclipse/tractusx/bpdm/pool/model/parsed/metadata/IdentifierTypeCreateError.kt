@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,26 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
 
-import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
 
-
-data class IdentifierTypeCreateParsed(
-    val technicalKey: String,
-    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
-    val name: String,
-    val abbreviation: String?,
-    val transliteratedName: String?,
-    val transliteratedAbbreviation: String?,
-    val format: String?,
-    val categories: Set<IdentifierTypeCategoryV7>,
-    val details: List<IdentifierTypeDetailParsed>
-)
-
-data class IdentifierTypeDetailParsed(
-    val country: CountryDb?,
-    val mandatory: Boolean
-)
+/**
+ * Reason an identifier type create is rejected.
+ */
+sealed interface IdentifierTypeCreateError {
+    data class CountryNotFound(val country: String) : IdentifierTypeCreateError
+    data class TechnicalKeyAlreadyTaken(
+        val technicalKey: String,
+        val businessPartnerType: IdentifierBusinessPartnerTypeV7
+    ) : IdentifierTypeCreateError
+}

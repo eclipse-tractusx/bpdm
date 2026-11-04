@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,37 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service.application.v6
+package org.eclipse.tractusx.bpdm.pool.service.application
 
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.IdentifierTypeRequestMapperV6
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.IdentifierTypeResponseMapperV6
-import org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound.IdentifierTypeParseErrorMapper
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeCreateResult
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.service.operation.metadata.IdentifierTypeCreateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.metadata.IdentifierTypeCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 
 /**
- * The REST-API boundary for the legacy v6 "create identifier type" operation, using the v6 request/response shapes.
+ * Creates identifier types business partners may be identified by, for every API version.
  */
 @Service
-class IdentifierTypeCreateApplicationV6Service(
+class IdentifierTypeCreateApplicationService(
     private val identifierTypeCreateParser: IdentifierTypeCreateParser,
     private val identifierTypeCreateService: IdentifierTypeCreateService,
-    private val identifierTypeRequestMapperV6: IdentifierTypeRequestMapperV6,
-    private val identifierTypeResponseMapperV6: IdentifierTypeResponseMapperV6,
-    private val identifierTypeParseErrorMapper: IdentifierTypeParseErrorMapper
+    private val dbToOutputMapper: DbToOutputMapper
 ) {
 
     /**
-     * Creates the given identifier type and returns it as stored.
+     * Creates the identifier type of [request] and returns it as stored, or every reason it is rejected.
      */
     @Transactional
-    fun createIdentifierType(identifierType: IdentifierTypeV6Dto): IdentifierTypeV6Dto =
-        when (val parsed = identifierTypeCreateParser.parse(identifierTypeRequestMapperV6.toCreateRequest(identifierType))) {
-            is ParseResult.Failure -> throw identifierTypeParseErrorMapper.toCreateException(parsed.errors)
-            is ParseResult.Success -> identifierTypeResponseMapperV6.toIdentifierType(identifierTypeCreateService.create(parsed.parsed))
+    fun create(request: IdentifierTypeCreateRaw): IdentifierTypeCreateResult =
+        when (val parseResult = identifierTypeCreateParser.parse(request)) {
+            is ParseResult.Failure -> IdentifierTypeCreateResult.Rejected(parseResult.errors)
+            is ParseResult.Success -> IdentifierTypeCreateResult.Created(
+                dbToOutputMapper.toRecord(identifierTypeCreateService.create(parseResult.parsed))
+            )
         }
 }

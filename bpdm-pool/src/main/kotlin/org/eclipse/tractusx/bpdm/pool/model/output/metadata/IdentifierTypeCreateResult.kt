@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,25 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
 
-
-data class IdentifierTypeCreateRequest(
-    val technicalKey: String,
-    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
-    val name: String,
-    val abbreviation: String?,
-    val transliteratedName: String?,
-    val transliteratedAbbreviation: String?,
-    val format: String?,
-    val categories: Set<IdentifierTypeCategoryV7>,
-    val details: List<IdentifierTypeDetailRequest>
-)
-
-data class IdentifierTypeDetailRequest(
-    val country: String?,
-    val mandatory: Boolean
-)
+/**
+ * Result of an identifier type create: either the created identifier type or every reason it was rejected.
+ */
+sealed interface IdentifierTypeCreateResult {
+    data class Created(val identifierType: IdentifierTypeRecord) : IdentifierTypeCreateResult
+    data class Rejected(val errors: List<IdentifierTypeCreateError>) : IdentifierTypeCreateResult
+}

@@ -36,13 +36,14 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6MetadataMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleSearchResult
+import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeSearchResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AdministrativeAreaSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.CountrySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.FieldQualityRuleSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.IdentifierTypeSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalFormSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.IdentifierTypeCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalFormCreateApplicationV6Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -51,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("MetadataControllerLegacy")
 class MetadataV6Controller(
-    val identifierTypeCreateApplicationV6Service: IdentifierTypeCreateApplicationV6Service,
+    val identifierTypeCreateApplicationService: IdentifierTypeCreateApplicationService,
     val identifierTypeSearchApplicationService: IdentifierTypeSearchApplicationService,
     val legalFormCreateApplicationV6Service: LegalFormCreateApplicationV6Service,
     val legalFormSearchApplicationService: LegalFormSearchApplicationService,
@@ -64,7 +65,11 @@ class MetadataV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createIdentifierType(identifierType: IdentifierTypeV6Dto): IdentifierTypeV6Dto {
-        return identifierTypeCreateApplicationV6Service.createIdentifierType(identifierType)
+        val request = apiV6InboundMapper.toIdentifierTypeCreateRaw(identifierType)
+        return when (val result = identifierTypeCreateApplicationService.create(request)) {
+            is IdentifierTypeCreateResult.Created -> apiV6MetadataMapper.toDto(result.identifierType)
+            is IdentifierTypeCreateResult.Rejected -> throw apiV6MetadataMapper.toException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
