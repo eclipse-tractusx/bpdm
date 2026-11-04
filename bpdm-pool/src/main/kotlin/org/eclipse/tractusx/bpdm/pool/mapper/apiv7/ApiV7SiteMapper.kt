@@ -22,11 +22,14 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
@@ -40,6 +43,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteScriptVariantRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteUpdateResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
@@ -96,6 +100,21 @@ class ApiV7SiteMapper(
         results: List<SiteCreateResult>
     ): SitePartnerCreateV7ResponseWrapper =
         toKeyedCreateResponse(requests.indices.map { it.toString() }, results)
+
+    /**
+     * Returns the response for an update batch, each result reported under the BPN of the request at its position.
+     */
+    fun toUpdateResponse(requests: List<SitePartnerUpdateV7Request>, results: List<SiteUpdateResult>): SitePartnerUpdateV7ResponseWrapper {
+        val entities = mutableListOf<SitePartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<SiteUpdateErrorV7>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is SiteUpdateResult.Updated -> entities.add(toCreateDto(result.site, request.bpns))
+                is SiteUpdateResult.Rejected -> errors.addAll(result.errors.map { toUpdateErrorInfo(it, request.bpns) })
+            }
+        }
+        return SitePartnerUpdateV7ResponseWrapper(entities, errors)
+    }
 
     /**
      * Returns the API DTO for [record], without its main address.
@@ -159,6 +178,32 @@ class ApiV7SiteMapper(
             is SiteContentParseError.ScriptCodeNotFound,
             is UnresolvableAddress,
             is ScriptVariantCoverageStillNeeded -> throw internalError(error)
+        }
+
+    private fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
+        when (error) {
+            is UnresolvableSite ->
+                ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
+            is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageStillNeeded ->
+                ErrorInfoV7(
+                    SiteUpdateErrorV7.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
+                            "'${error.requiredByBpn}' is named in that script",
+                    entityKey
+                )
+            is SiteContentParseError.ScriptVariantNameMissing ->
+                ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
+            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+                ErrorInfoV7(
+                    SiteUpdateErrorV7.ScriptVariantDuplicateScriptCode,
+                    "Duplicate site script variant for script code '${error.scriptCode}'",
+                    entityKey
+                )
+            is SiteContentParseError.NameMissing,
+            is SiteContentParseError.ConfidenceCriteriaMissing,
+            is SiteContentParseError.ScriptCodeNotFound,
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
     // An error the bounded DTO already rules out, or that this use case cannot reach, gets no public code.

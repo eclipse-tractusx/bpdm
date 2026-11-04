@@ -22,11 +22,14 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
@@ -36,6 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteUpdateResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
@@ -112,6 +116,21 @@ class ApiV6SiteMapper(
     }
 
     /**
+     * Returns the response for an update batch, each result reported under the BPN of the request at its position.
+     */
+    fun toUpdateResponse(requests: List<SitePartnerUpdateV6Request>, results: List<SiteUpdateResult>): SitePartnerUpdateV6ResponseWrapper {
+        val entities = mutableListOf<SitePartnerCreateVerboseV6Dto>()
+        val errors = mutableListOf<ErrorInfoV6<SiteUpdateErrorV6>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is SiteUpdateResult.Updated -> entities.add(toCreateDto(result.site, request.bpns))
+                is SiteUpdateResult.Rejected -> errors.addAll(result.errors.map { toUpdateErrorInfo(it, request.bpns) })
+            }
+        }
+        return SitePartnerUpdateV6ResponseWrapper(entities, errors)
+    }
+
+    /**
      * Returns the API DTO for [record], without its main address.
      */
     fun toSiteDto(record: SiteRecord): SiteVerboseV6Dto =
@@ -161,6 +180,18 @@ class ApiV6SiteMapper(
             is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
             is ScriptVariantCoverageStillNeeded,
+            is SiteContentParseError -> throw internalError(error)
+        }
+
+    private fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
+        when (error) {
+            is UnresolvableSite ->
+                ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
+            is AddressContentParseError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
+            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
+            // still needs.
+            is ScriptVariantCoverageStillNeeded,
+            is ScriptVariantNotCoveredByAddress,
             is SiteContentParseError -> throw internalError(error)
         }
 

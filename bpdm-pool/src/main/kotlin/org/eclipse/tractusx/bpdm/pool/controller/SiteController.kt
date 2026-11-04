@@ -39,7 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateApplicationS
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateWithLegalAddressAsMainApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteUpdateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -49,7 +49,7 @@ class SiteController(
     private val siteSearchApplicationService: SiteSearchApplicationService,
     private val siteCreateApplicationService: SiteCreateApplicationService,
     private val siteCreateWithLegalAddressAsMainApplicationService: SiteCreateWithLegalAddressAsMainApplicationService,
-    private val siteUpdateApplicationService: SiteUpdateApplicationV7Service,
+    private val siteUpdateApplicationService: SiteUpdateApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7SiteMapper: ApiV7SiteMapper
 ) : PoolSiteV7Api {
@@ -86,7 +86,9 @@ class SiteController(
     override fun updateSite(
         requests: Collection<SitePartnerUpdateV7Request>
     ): SitePartnerUpdateV7ResponseWrapper {
-        return siteUpdateApplicationService.updateSites(requests)
+        val requestList = requests.toList()
+        val results = siteUpdateApplicationService.update(requestList.map { apiV7InboundMapper.toSiteUpdateRaw(it) })
+        return apiV7SiteMapper.toUpdateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteHeaderUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

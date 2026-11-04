@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant as SiteScriptVariantRequest
@@ -34,7 +35,7 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWit
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 
 /**
- * Maps a cleaning task's site into the loose [SiteCreateRaw] / [SiteUpdateRequest] /
+ * Maps a cleaning task's site into the loose [SiteCreateRaw] / [SiteUpdateRaw] /
  * [SiteCreateWithReferencedAddressAsMainRequest]; the main address is delegated to
  * [GoldenRecordTaskAddressRequestMapper] and resolved by the caller (the site's own address, or the legal address when
  * the site main is the legal address). Unlike the pass-through elsewhere, a missing [SiteState] type throws here — the
@@ -53,8 +54,8 @@ class GoldenRecordTaskSiteRequestMapper(
         site: TaskSite,
         mainAddress: TaskPostalAddress,
         additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
-    ): SiteUpdateRequest =
-        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
+    ): SiteUpdateRaw =
+        SiteUpdateRaw(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
 
     fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRaw =
         SiteCreateWithLegalAddressAsMainRaw(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site), exclusiveLegalAddress = false)

@@ -38,6 +38,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearc
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
@@ -63,6 +64,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
@@ -214,13 +216,7 @@ class ApiV6InboundMapper(
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.
      */
     fun toSiteCreateRaw(request: SitePartnerCreateV6Request): SiteCreateRaw =
-        SiteCreateRaw(
-            legalEntityBpn = request.bpnlParent,
-            content = SiteContentRequest(
-                header = toHeaderRequest(request.site),
-                mainAddress = addressDtoRequestMapperV6.toContentRequest(request.site.mainAddress)
-            )
-        )
+        SiteCreateRaw(legalEntityBpn = request.bpnlParent, content = toContentRequest(request.site))
 
     /**
      * Returns the raw create for the site a client sent that takes its parent's legal address as main address.
@@ -236,6 +232,18 @@ class ApiV6InboundMapper(
             ),
             // V6 lets a legal address be the main address of one site at most; V7 dropped that rule.
             exclusiveLegalAddress = true
+        )
+
+    /**
+     * Returns the raw update for the site and main address a client sent, addressed by the site's BPN.
+     */
+    fun toSiteUpdateRaw(request: SitePartnerUpdateV6Request): SiteUpdateRaw =
+        SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
+
+    private fun toContentRequest(site: SiteV6Dto): SiteContentRequest =
+        SiteContentRequest(
+            header = toHeaderRequest(site),
+            mainAddress = addressDtoRequestMapperV6.toContentRequest(site.mainAddress)
         )
 
     private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =

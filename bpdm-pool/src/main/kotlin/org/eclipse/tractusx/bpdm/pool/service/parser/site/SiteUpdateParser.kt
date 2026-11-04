@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
@@ -51,7 +51,7 @@ class SiteUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> =
+    fun parse(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> =
         parseWithoutCoverageCheck(requests).map { result -> result.combine(scriptCodeCoverageErrors(result)) { it } }
 
     /**
@@ -59,7 +59,7 @@ class SiteUpdateParser(
      * the main address in one operation set and therefore decides coverage at its own scope.
      */
     @Transactional(readOnly = true)
-    fun parseWithoutCoverageCheck(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
+    fun parseWithoutCoverageCheck(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }

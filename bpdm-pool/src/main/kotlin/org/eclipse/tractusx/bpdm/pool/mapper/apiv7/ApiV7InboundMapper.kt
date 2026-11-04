@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticip
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
@@ -60,6 +61,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
@@ -226,6 +228,12 @@ class ApiV7InboundMapper(
             ),
             exclusiveLegalAddress = false
         )
+
+    /**
+     * Returns the raw update for the site and main address a client sent, addressed by the site's BPN.
+     */
+    fun toSiteUpdateRaw(request: SitePartnerUpdateV7Request): SiteUpdateRaw =
+        SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
 
     private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(

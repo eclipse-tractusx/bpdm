@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
@@ -66,16 +65,6 @@ class SiteResponseMapper(
         SiteWithMainAddressVerboseV7Dto(
             site = toSite(site),
             mainAddress = addressResponseMapper.toInvariantAddress(site.mainAddress)
-        )
-
-    /**
-     * Returns the given created or updated site as the API reports it, tagged with the key of the request that wrote it.
-     */
-    fun toUpsertResponse(site: SiteDb, entryId: String?): SitePartnerCreateVerboseV7Dto =
-        SitePartnerCreateVerboseV7Dto(
-            site = toSite(site),
-            mainAddress = addressResponseMapper.toInvariantAddress(site.mainAddress),
-            index = entryId
         )
 
     private fun toState(state: SiteStateDb): SiteStateVerboseV7Dto =
