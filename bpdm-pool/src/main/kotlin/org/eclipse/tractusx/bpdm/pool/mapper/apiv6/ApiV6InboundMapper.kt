@@ -36,9 +36,14 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
@@ -54,12 +59,16 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.LegalEntitySiteSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -201,6 +210,34 @@ class ApiV6InboundMapper(
     fun toLegalEntitySiteSearchRaw(legalEntityBpn: String): LegalEntitySiteSearchRaw =
         LegalEntitySiteSearchRaw(legalEntityBpn = legalEntityBpn)
 
+    /**
+     * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.
+     */
+    fun toSiteCreateRaw(request: SitePartnerCreateV6Request): SiteCreateRaw =
+        SiteCreateRaw(
+            legalEntityBpn = request.bpnlParent,
+            content = SiteContentRequest(
+                header = toHeaderRequest(request.site),
+                mainAddress = addressDtoRequestMapperV6.toContentRequest(request.site.mainAddress)
+            )
+        )
+
+    /**
+     * Returns the raw create for the site a client sent that takes its parent's legal address as main address.
+     */
+    fun toSiteCreateWithLegalAddressAsMainRaw(request: SiteCreateWithLegalAddressAsMainV6Request): SiteCreateWithLegalAddressAsMainRaw =
+        SiteCreateWithLegalAddressAsMainRaw(
+            legalEntityBpn = request.bpnLParent,
+            header = SiteHeaderRequest(
+                name = request.name,
+                states = request.states.map { toStateRequest(it) },
+                confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
+                scriptVariants = emptyList()
+            ),
+            // V6 lets a legal address be the main address of one site at most; V7 dropped that rule.
+            exclusiveLegalAddress = true
+        )
+
     private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
@@ -223,6 +260,17 @@ class ApiV6InboundMapper(
 
     private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityState =
         LegalEntityState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
+
+    private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRequest =
+        SiteHeaderRequest(
+            name = site.name,
+            states = site.states.map { toStateRequest(it) },
+            confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
+            scriptVariants = emptyList()
+        )
+
+    private fun toStateRequest(state: SiteStateV6Dto): SiteState =
+        SiteState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
     private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(

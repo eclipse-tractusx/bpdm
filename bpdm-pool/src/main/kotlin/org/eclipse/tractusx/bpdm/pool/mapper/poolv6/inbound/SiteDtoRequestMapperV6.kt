@@ -28,12 +28,10 @@ import java.time.ZoneOffset
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Request
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
 
 /**
- * Maps a **v6** site request into the shared loose site request models. v6 sites carry no script variants, so a site
+ * Maps a **v6** site update request into the shared loose site request models. v6 sites carry no script variants, so a site
  * written over v6 always sends none.
  */
 @Component
@@ -42,30 +40,10 @@ class SiteDtoRequestMapperV6(
 ) {
 
     /**
-     * Returns the create request for the site a client sent, under the parent legal entity it named.
-     */
-    fun toCreateRequest(request: SitePartnerCreateV6Request): SiteCreateRequest =
-        SiteCreateRequest(legalEntityBpn = request.bpnlParent, content = toContentRequest(request.site))
-
-    /**
      * Returns the update request for the site a client sent, addressed by its BPN.
      */
     fun toUpdateRequest(request: SitePartnerUpdateV6Request): SiteUpdateRequest =
         SiteUpdateRequest(siteBpn = request.bpns, content = toContentRequest(request.site))
-
-    /**
-     * Returns the create request for the site a client sent that takes its parent's legal address as main address.
-     */
-    fun toCreateWithLegalAddressAsMainRequest(request: SiteCreateWithLegalAddressAsMainV6Request): SiteCreateWithLegalAddressAsMainRequest =
-        SiteCreateWithLegalAddressAsMainRequest(
-            legalEntityBpn = request.bpnLParent,
-            header = SiteHeaderRequest(
-                name = request.name,
-                states = request.states.map { toStateRequest(it) },
-                confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
-                scriptVariants = emptyList()
-            )
-        )
 
     private fun toContentRequest(site: SiteV6Dto): SiteContentRequest =
         SiteContentRequest(

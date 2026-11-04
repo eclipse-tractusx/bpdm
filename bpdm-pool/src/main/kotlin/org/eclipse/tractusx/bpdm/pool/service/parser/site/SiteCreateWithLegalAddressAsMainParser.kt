@@ -20,19 +20,23 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 
 /**
- * Validates site-create requests that take the parent legal entity's legal address as the site main address.
+ * Validates site-create requests that take the parent legal entity's legal address as the site main address, and, where a
+ * request claims that address exclusively, that no site has it as main address yet.
  *
  * It yields the referenced-main-address model: this path is that case with the reference fixed to the parent's legal
  * address, so it needs no operation of its own.
@@ -49,10 +53,16 @@ class SiteCreateWithLegalAddressAsMainParser(
      * in that entry.
      */
     fun parse(
-        requests: List<SiteCreateWithLegalAddressAsMainRequest>
+        requests: List<SiteCreateWithLegalAddressAsMainRaw>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
-        val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
+        val legalEntityResults: List<ParseResult<LegalEntityDb, SiteCreateParseError>> =
+            legalEntityBpnParser.parse(requests.map { it.legalEntityBpn }).zip(requests) { legalEntityResult, request ->
+                if (legalEntityResult is ParseResult.Success && request.exclusiveLegalAddress)
+                    legalEntityResult.combine(legalAddressClaimErrors(legalEntityResult.parsed)) { it }
+                else
+                    legalEntityResult
+            }
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(legalEntityResults, headerResults) { legalEntity, header ->
                 scriptVariantCoverageValidator.check(
@@ -65,4 +75,7 @@ class SiteCreateWithLegalAddressAsMainParser(
             SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header, mainAddressContent = null)
         }
     }
+
+    private fun legalAddressClaimErrors(legalEntity: LegalEntityDb): List<SiteCreateParseError> =
+        listOfNotNull(legalEntity.legalAddress.sites.firstOrNull()?.let { LegalAddressAlreadyMainAddress(it.bpn) })
 }

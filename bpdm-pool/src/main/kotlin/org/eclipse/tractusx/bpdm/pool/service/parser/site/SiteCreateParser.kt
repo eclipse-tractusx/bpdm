@@ -25,9 +25,9 @@ import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
@@ -49,7 +49,7 @@ class SiteCreateParser(
      * Validates each request and reports either the validated site with its resolved parent or every problem found in
      * that entry.
      */
-    fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
+    fun parse(requests: List<SiteCreateRaw>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val mainAddresses = requests.map { it.content.mainAddress }

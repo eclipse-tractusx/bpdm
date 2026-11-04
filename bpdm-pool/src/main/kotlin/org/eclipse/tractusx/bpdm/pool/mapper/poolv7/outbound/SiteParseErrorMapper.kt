@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.ErrorCodeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -39,29 +38,6 @@ import org.springframework.stereotype.Component
 class SiteParseErrorMapper(
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
-
-    fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
-        when (error) {
-            is UnresolvableLegalEntity ->
-                ErrorInfoV7(SiteCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is LegalAddressAlreadyMainAddress ->
-                ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
-            is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
-            is ScriptVariantNotCoveredByAddress ->
-                ErrorInfoV7(
-                    SiteCreateErrorV7.ScriptVariantNotCoveredByMainAddress,
-                    "Script code '${error.scriptCode}' is not covered by the site's main address",
-                    entityKey
-                )
-            is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is SiteContentParseError -> contentErrorInfo(
-                error,
-                entityKey,
-                scriptVariantNameMissing = SiteCreateErrorV7.ScriptVariantNameMissing,
-                scriptVariantDuplicateScriptCode = SiteCreateErrorV7.ScriptVariantDuplicateScriptCode
-            )
-        }
 
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
         when (error) {

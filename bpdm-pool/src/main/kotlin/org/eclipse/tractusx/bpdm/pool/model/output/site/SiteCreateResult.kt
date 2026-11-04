@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,10 +16,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 
-data class SiteCreateWithLegalAddressAsMainRequest(
-    val legalEntityBpn: String,
-    val header: SiteHeaderRequest
-)
+/**
+ * Result of creating one site of a batch: either the site as stored or every reason the entry was rejected.
+ */
+sealed interface SiteCreateResult {
+    data class Created(val site: SiteRecord) : SiteCreateResult
+    data class Rejected(val errors: List<SiteCreateParseError>) : SiteCreateResult
+}

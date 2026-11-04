@@ -35,9 +35,10 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6SiteMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.SiteCreateWithLegalAddressAsMainApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -46,7 +47,8 @@ import org.springframework.web.bind.annotation.RestController
 class SiteV6Controller(
     private val siteGetApplicationService: SiteGetApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationService,
-    private val siteCreateApplicationService: SiteCreateApplicationV6Service,
+    private val siteCreateApplicationService: SiteCreateApplicationService,
+    private val siteCreateWithLegalAddressAsMainApplicationService: SiteCreateWithLegalAddressAsMainApplicationService,
     private val siteUpdateApplicationService: SiteUpdateApplicationV6Service,
     private val apiV6InboundMapper: ApiV6InboundMapper,
     private val apiV6SiteMapper: ApiV6SiteMapper
@@ -75,7 +77,9 @@ class SiteV6Controller(
     override fun createSite(
         requests: Collection<SitePartnerCreateV6Request>
     ): SitePartnerCreateV6ResponseWrapper {
-        return siteCreateApplicationService.createSitesWithMainAddress(requests)
+        val requestList = requests.toList()
+        val results = siteCreateApplicationService.create(requestList.map { apiV6InboundMapper.toSiteCreateRaw(it) })
+        return apiV6SiteMapper.toCreateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
@@ -97,6 +101,8 @@ class SiteV6Controller(
     override fun createSiteWithLegalReference(
         request: Collection<SiteCreateWithLegalAddressAsMainV6Request>
     ): SitePartnerCreateV6ResponseWrapper {
-        return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
+        val requestList = request.toList()
+        val results = siteCreateWithLegalAddressAsMainApplicationService.create(requestList.map { apiV6InboundMapper.toSiteCreateWithLegalAddressAsMainRaw(it) })
+        return apiV6SiteMapper.toLegalAddressAsMainCreateResponse(requestList, results)
     }
 }

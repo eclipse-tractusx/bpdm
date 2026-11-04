@@ -21,10 +21,20 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteCreateWithLegalAddressAsMainV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateV6ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerCreateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
@@ -38,7 +48,8 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV6SiteMapper(
     private val apiV6AddressMapper: ApiV6AddressMapper,
-    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper
+    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
+    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
     /**
@@ -67,6 +78,40 @@ class ApiV6SiteMapper(
         }
 
     /**
+     * Returns the response for a create batch, each result reported under the index of the request at its position.
+     */
+    fun toCreateResponse(requests: List<SitePartnerCreateV6Request>, results: List<SiteCreateResult>): SitePartnerCreateV6ResponseWrapper {
+        val entities = mutableListOf<SitePartnerCreateVerboseV6Dto>()
+        val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is SiteCreateResult.Created -> entities.add(toCreateDto(result.site, request.index))
+                is SiteCreateResult.Rejected -> errors.addAll(result.errors.map { toCreateErrorInfo(it, request.index) })
+            }
+        }
+        return SitePartnerCreateV6ResponseWrapper(entities, errors)
+    }
+
+    /**
+     * Returns the response for a batch of sites created on their legal addresses, each created site reported under its
+     * position in the batch and each rejection under the request value it concerns.
+     */
+    fun toLegalAddressAsMainCreateResponse(
+        requests: List<SiteCreateWithLegalAddressAsMainV6Request>,
+        results: List<SiteCreateResult>
+    ): SitePartnerCreateV6ResponseWrapper {
+        val entities = mutableListOf<SitePartnerCreateVerboseV6Dto>()
+        val errors = mutableListOf<ErrorInfoV6<SiteCreateErrorV6>>()
+        requests.zip(results).forEachIndexed { position, (request, result) ->
+            when (result) {
+                is SiteCreateResult.Created -> entities.add(toCreateDto(result.site, position.toString()))
+                is SiteCreateResult.Rejected -> errors.addAll(result.errors.map { toLegalAddressAsMainCreateErrorInfo(it, request, position) })
+            }
+        }
+        return SitePartnerCreateV6ResponseWrapper(entities, errors)
+    }
+
+    /**
      * Returns the API DTO for [record], without its main address.
      */
     fun toSiteDto(record: SiteRecord): SiteVerboseV6Dto =
@@ -80,6 +125,48 @@ class ApiV6SiteMapper(
             createdAt = record.createdAt,
             updatedAt = record.updatedAt
         )
+
+    private fun toCreateDto(record: SiteRecord, entityKey: String?): SitePartnerCreateVerboseV6Dto =
+        SitePartnerCreateVerboseV6Dto(
+            site = toSiteDto(record),
+            mainAddress = apiV6AddressMapper.toDto(record.mainAddress),
+            index = entityKey
+        )
+
+    private fun toLegalAddressAsMainCreateErrorInfo(
+        error: SiteCreateParseError,
+        request: SiteCreateWithLegalAddressAsMainV6Request,
+        position: Int
+    ): ErrorInfoV6<SiteCreateErrorV6> =
+        when (error) {
+            is UnresolvableLegalEntity ->
+                ErrorInfoV6(SiteCreateErrorV6.LegalEntityNotFound, "Parent ${error.bpn} not found for site to create", request.bpnLParent)
+            is LegalAddressAlreadyMainAddress ->
+                ErrorInfoV6(
+                    SiteCreateErrorV6.MainAddressDuplicateIdentifier,
+                    "Can't create site for legal entity ${request.bpnLParent} with legal address as site main address: " +
+                            "Legal address already belongs to site ${error.bpnSite}",
+                    request.name
+                )
+            else -> toCreateErrorInfo(error, position.toString())
+        }
+
+    private fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
+        when (error) {
+            is UnresolvableLegalEntity ->
+                ErrorInfoV6(SiteCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+            is LegalAddressAlreadyMainAddress ->
+                ErrorInfoV6(SiteCreateErrorV6.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
+            is AddressContentParseError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
+            is ScriptVariantNotCoveredByAddress,
+            is UnresolvableAddress,
+            is ScriptVariantCoverageStillNeeded,
+            is SiteContentParseError -> throw internalError(error)
+        }
+
+    // The frozen v6 error enums predate script variants, so those errors get no public code.
+    private fun internalError(error: SiteCreateParseError) =
+        BpdmValidationException("Unexpected site parse error (no v6 client error code): $error")
 
     private fun toStateDto(record: BusinessStateRecord): SiteStateVerboseV6Dto =
         SiteStateVerboseV6Dto(

@@ -21,12 +21,22 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteCreateWithLegalAddressAsMainV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteScriptVariantRecord
@@ -42,7 +52,8 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV7SiteMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
-    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
+    private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
     /**
@@ -71,6 +82,22 @@ class ApiV7SiteMapper(
         }
 
     /**
+     * Returns the response for a create batch, each result reported under the index of the request at its position.
+     */
+    fun toCreateResponse(requests: List<SitePartnerCreateV7Request>, results: List<SiteCreateResult>): SitePartnerCreateV7ResponseWrapper =
+        toKeyedCreateResponse(requests.map { it.index }, results)
+
+    /**
+     * Returns the response for a batch of sites created on their legal addresses, each result reported under its
+     * position in the batch.
+     */
+    fun toLegalAddressAsMainCreateResponse(
+        requests: List<SiteCreateWithLegalAddressAsMainV7Request>,
+        results: List<SiteCreateResult>
+    ): SitePartnerCreateV7ResponseWrapper =
+        toKeyedCreateResponse(requests.indices.map { it.toString() }, results)
+
+    /**
      * Returns the API DTO for [record], without its main address.
      */
     fun toSiteDto(record: SiteRecord): SiteVerboseV7Dto =
@@ -86,6 +113,57 @@ class ApiV7SiteMapper(
             updatedAt = record.updatedAt,
             relations = record.relations.map { toDto(it) }
         )
+
+    private fun toKeyedCreateResponse(entityKeys: List<String?>, results: List<SiteCreateResult>): SitePartnerCreateV7ResponseWrapper {
+        val entities = mutableListOf<SitePartnerCreateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<SiteCreateErrorV7>>()
+        entityKeys.zip(results).forEach { (entityKey, result) ->
+            when (result) {
+                is SiteCreateResult.Created -> entities.add(toCreateDto(result.site, entityKey))
+                is SiteCreateResult.Rejected -> errors.addAll(result.errors.map { toCreateErrorInfo(it, entityKey) })
+            }
+        }
+        return SitePartnerCreateV7ResponseWrapper(entities, errors)
+    }
+
+    private fun toCreateDto(record: SiteRecord, entityKey: String?): SitePartnerCreateVerboseV7Dto =
+        SitePartnerCreateVerboseV7Dto(
+            site = toSiteDto(record),
+            mainAddress = apiV7AddressMapper.toInvariantDto(record.mainAddress),
+            index = entityKey
+        )
+
+    private fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
+        when (error) {
+            is UnresolvableLegalEntity ->
+                ErrorInfoV7(SiteCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+            is LegalAddressAlreadyMainAddress ->
+                ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
+            is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
+            is ScriptVariantNotCoveredByAddress ->
+                ErrorInfoV7(
+                    SiteCreateErrorV7.ScriptVariantNotCoveredByMainAddress,
+                    "Script code '${error.scriptCode}' is not covered by the site's main address",
+                    entityKey
+                )
+            is SiteContentParseError.ScriptVariantNameMissing ->
+                ErrorInfoV7(SiteCreateErrorV7.ScriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
+            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+                ErrorInfoV7(
+                    SiteCreateErrorV7.ScriptVariantDuplicateScriptCode,
+                    "Duplicate site script variant for script code '${error.scriptCode}'",
+                    entityKey
+                )
+            is SiteContentParseError.NameMissing,
+            is SiteContentParseError.ConfidenceCriteriaMissing,
+            is SiteContentParseError.ScriptCodeNotFound,
+            is UnresolvableAddress,
+            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
+        }
+
+    // An error the bounded DTO already rules out, or that this use case cannot reach, gets no public code.
+    private fun internalError(error: SiteCreateParseError) =
+        BpdmValidationException("Unexpected site parse error (no public error code): $error")
 
     private fun toStateDto(record: BusinessStateRecord): SiteStateVerboseV7Dto =
         SiteStateVerboseV7Dto(
