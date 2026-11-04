@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.changelog
 
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ChangelogSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBusinessPartnerTypesIn

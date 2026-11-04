@@ -19,13 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper
 
+import org.eclipse.tractusx.bpdm.pool.entity.BpnIdentifierMatchDb
+import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
+import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierMatchRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnRequestIdentifierMatchRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogEntryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleRecord
@@ -34,6 +41,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantRecord
 import org.springframework.stereotype.Component
 
 /**
@@ -122,4 +130,39 @@ class DbToOutputMapper {
             countryCode = country.countryCode,
             qualityLevel = entity.qualityLevel
         )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: BpnIdentifierMatchDb): BpnIdentifierMatchRecord =
+        BpnIdentifierMatchRecord(
+            identifierValue = entity.identifierValue,
+            bpn = entity.bpn
+        )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: BpnRequestIdentifierMappingDb): BpnRequestIdentifierMatchRecord =
+        BpnRequestIdentifierMatchRecord(
+            requestIdentifier = entity.requestIdentifier,
+            bpn = entity.bpn
+        )
+
+    /**
+     * Returns the output record for [entity].
+     */
+    fun toRecord(entity: PartnerChangelogEntryDb): ChangelogEntryRecord =
+        ChangelogEntryRecord(
+            bpn = entity.bpn,
+            businessPartnerType = entity.businessPartnerType,
+            timestamp = entity.updatedAt.instant,
+            changelogType = entity.changelogType
+        )
+
+    /**
+     * Returns the data space participation [entity] holds.
+     */
+    fun toParticipantRecord(entity: LegalEntityDb): DataSpaceParticipantRecord =
+        DataSpaceParticipantRecord(legalEntityBpn = entity.bpn, isDataSpaceParticipant = entity.isDataSpaceParticipant)
 }

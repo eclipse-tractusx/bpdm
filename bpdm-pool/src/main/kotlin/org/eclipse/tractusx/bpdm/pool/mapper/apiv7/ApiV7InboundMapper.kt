@@ -19,14 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -78,4 +88,44 @@ class ApiV7InboundMapper {
             administrativeAreaLevel1 = legalForm.administrativeAreaLevel1,
             isActive = legalForm.isActive
         )
+
+    /**
+     * Returns the raw BPN-by-identifier search holding [request].
+     */
+    fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV7Request): BpnIdentifierSearchRaw =
+        BpnIdentifierSearchRaw(
+            businessPartnerType = request.businessPartnerType,
+            identifierTypeKey = request.idType,
+            identifierValues = request.idValues
+        )
+
+    /**
+     * Returns the raw BPN-by-request-identifier search holding [request].
+     */
+    fun toBpnRequestIdentifierSearchRaw(request: BpnRequestIdentifierSearchV7Request): BpnRequestIdentifierSearchRaw =
+        BpnRequestIdentifierSearchRaw(requestedIdentifiers = request.requestedIdentifiers)
+
+    /**
+     * Returns the raw changelog search holding [request].
+     */
+    fun toChangelogSearchRaw(request: ChangelogSearchV7Request): ChangelogSearchRaw =
+        ChangelogSearchRaw(
+            bpns = request.bpns,
+            businessPartnerTypes = request.businessPartnerTypes,
+            timestampAfter = request.timestampAfter
+        )
+
+    /**
+     * Returns the raw data space participant search holding [request].
+     */
+    fun toDataSpaceParticipantSearchRaw(request: DataSpaceParticipantSearchV7Request): DataSpaceParticipantSearchRaw =
+        DataSpaceParticipantSearchRaw(legalEntityBpns = request.bpnLs, isDataSpaceParticipant = request.isDataSpaceParticipant)
+
+    /**
+     * Returns one raw participation update per participation in [request], in the order they were sent.
+     */
+    fun toDataSpaceParticipantUpdateRaws(request: DataSpaceParticipantUpdateV7Request): List<DataSpaceParticipantUpdateRaw> =
+        request.participants.map {
+            DataSpaceParticipantUpdateRaw(legalEntityBpn = it.bpnL, isDataSpaceParticipant = it.isDataSpaceParticipant)
+        }
 }

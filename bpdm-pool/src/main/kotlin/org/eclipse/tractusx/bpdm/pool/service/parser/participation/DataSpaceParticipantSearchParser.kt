@@ -19,16 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.participation
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnFilterParser
 import org.springframework.stereotype.Service
 
 /**
  * Turns loose data space participant search criteria into the normalized form the search operation queries with.
- *
- * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
- * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
 @Service
 class DataSpaceParticipantSearchParser(
@@ -38,7 +35,7 @@ class DataSpaceParticipantSearchParser(
     /**
      * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively.
      */
-    fun parse(request: DataSpaceParticipantSearchRequest): DataSpaceParticipantSearchParsed =
+    fun parse(request: DataSpaceParticipantSearchRaw): DataSpaceParticipantSearchParsed =
         DataSpaceParticipantSearchParsed(
             legalEntityBpns = bpnFilterParser.parse(request.legalEntityBpns.orEmpty()),
             isDataSpaceParticipant = request.isDataSpaceParticipant

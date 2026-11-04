@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.bpn
 
 import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnRequestIdentifierSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

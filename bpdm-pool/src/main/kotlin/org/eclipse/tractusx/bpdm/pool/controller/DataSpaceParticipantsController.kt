@@ -21,29 +21,42 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolDataSpaceParticipantsV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.DataSpaceParticipantSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.DataSpaceParticipantUpdateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7ParticipantMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantUpdateResult
+import org.eclipse.tractusx.bpdm.pool.service.application.DataSpaceParticipantSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.DataSpaceParticipantUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class DataSpaceParticipantsController(
-    private val dataSpaceParticipantSearchApplicationV7Service: DataSpaceParticipantSearchApplicationV7Service,
-    private val dataSpaceParticipantUpdateApplicationV7Service: DataSpaceParticipantUpdateApplicationV7Service
+    private val dataSpaceParticipantSearchApplicationService: DataSpaceParticipantSearchApplicationService,
+    private val dataSpaceParticipantUpdateApplicationService: DataSpaceParticipantUpdateApplicationService,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7ParticipantMapper: ApiV7ParticipantMapper
 ): PoolDataSpaceParticipantsV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun get(searchRequest: DataSpaceParticipantSearchV7Request, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantV7Dto> {
-       return dataSpaceParticipantSearchApplicationV7Service.searchParticipants(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toDataSpaceParticipantSearchRaw(searchRequest)
+        return dataSpaceParticipantSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7ParticipantMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun put(updateRequest: DataSpaceParticipantUpdateV7Request) {
-        return dataSpaceParticipantUpdateApplicationV7Service.updateParticipants(updateRequest)
+        val requests = apiV7InboundMapper.toDataSpaceParticipantUpdateRaws(updateRequest)
+        when (val result = dataSpaceParticipantUpdateApplicationService.update(requests)) {
+            is DataSpaceParticipantUpdateResult.Updated -> Unit
+            is DataSpaceParticipantUpdateResult.Rejected -> throw apiV7ParticipantMapper.toUpdateException(result.errors)
+        }
     }
 }
