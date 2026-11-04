@@ -31,6 +31,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearch
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
@@ -41,9 +45,11 @@ class LegalEntityV6Controller(
     val siteSearchApplicationService: SiteSearchApplicationV6Service,
     val addressSearchApplicationService: AddressSearchApplicationV6Service,
     val legalEntitySearchApplicationService: LegalEntitySearchApplicationV6Service,
-    val legalEntityGetApplicationService: LegalEntityGetApplicationV6Service,
+    val legalEntityGetApplicationService: LegalEntityGetApplicationService,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV6Service,
-    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV6Service
+    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV6Service,
+    private val apiV6InboundMapper: ApiV6InboundMapper,
+    private val apiV6LegalEntityMapper: ApiV6LegalEntityMapper
 ) : PoolLegalEntityV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -55,9 +61,11 @@ class LegalEntityV6Controller(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV6Dto {
-        return legalEntityGetApplicationService.getLegalEntity(idValue, idType)
-    }
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV6Dto =
+        when (val result = legalEntityGetApplicationService.get(apiV6InboundMapper.toLegalEntityGetRaw(idValue, idType))) {
+            is LegalEntityGetResult.Found -> apiV6LegalEntityMapper.toDto(result.legalEntity)
+            is LegalEntityGetResult.Rejected -> throw apiV6LegalEntityMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postLegalEntitySearch(

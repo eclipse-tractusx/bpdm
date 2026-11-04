@@ -31,6 +31,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearch
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
@@ -41,9 +45,11 @@ class LegalEntityController(
     val siteSearchApplicationService: SiteSearchApplicationV7Service,
     val addressSearchApplicationService: AddressSearchApplicationV7Service,
     val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
-    val legalEntityGetApplicationService: LegalEntityGetApplicationV7Service,
+    val legalEntityGetApplicationService: LegalEntityGetApplicationService,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
-    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service
+    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper
 ) : PoolLegalEntityV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -55,9 +61,11 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV7Dto {
-        return legalEntityGetApplicationService.getLegalEntity(idValue, idType)
-    }
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseV7Dto =
+        when (val result = legalEntityGetApplicationService.get(apiV7InboundMapper.toLegalEntityGetRaw(idValue, idType))) {
+            is LegalEntityGetResult.Found -> apiV7LegalEntityMapper.toDto(result.legalEntity)
+            is LegalEntityGetResult.Rejected -> throw apiV7LegalEntityMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun postLegalEntitySearch(

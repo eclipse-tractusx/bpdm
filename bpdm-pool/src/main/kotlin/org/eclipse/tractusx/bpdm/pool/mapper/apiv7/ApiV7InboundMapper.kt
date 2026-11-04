@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticip
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
@@ -128,4 +129,10 @@ class ApiV7InboundMapper {
         request.participants.map {
             DataSpaceParticipantUpdateRaw(legalEntityBpn = it.bpnL, isDataSpaceParticipant = it.isDataSpaceParticipant)
         }
+
+    /**
+     * Returns the raw legal entity fetch for the legal entity carrying [identifierValue] of [identifierType].
+     */
+    fun toLegalEntityGetRaw(identifierValue: String, identifierType: String?): LegalEntityGetRaw =
+        LegalEntityGetRaw(identifierValue = identifierValue, identifierType = identifierType)
 }
