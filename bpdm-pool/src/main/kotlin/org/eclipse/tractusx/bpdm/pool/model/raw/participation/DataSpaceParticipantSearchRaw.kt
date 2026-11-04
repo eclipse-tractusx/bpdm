@@ -17,24 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
+package org.eclipse.tractusx.bpdm.pool.model.raw.participation
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
-import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantSearchRequest
-import org.springframework.stereotype.Component
-
-/**
- * Creates data space participant search requests from the v7 API participant search DTO.
- */
-@Component
-class DataSpaceParticipantSearchRequestMapper {
-
-    /**
-     * Returns the search request holding the criteria a client sent.
-     */
-    fun toSearchRequest(searchRequest: DataSpaceParticipantSearchV7Request): DataSpaceParticipantSearchRequest =
-        DataSpaceParticipantSearchRequest(
-            legalEntityBpns = searchRequest.bpnLs,
-            isDataSpaceParticipant = searchRequest.isDataSpaceParticipant
-        )
-}
+data class DataSpaceParticipantSearchRaw(
+    val legalEntityBpns: List<String>?,
+    val isDataSpaceParticipant: Boolean?
+)

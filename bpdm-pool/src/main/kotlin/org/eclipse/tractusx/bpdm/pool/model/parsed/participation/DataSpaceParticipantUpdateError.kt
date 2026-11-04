@@ -17,21 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
-
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantV7Dto
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.springframework.stereotype.Component
+package org.eclipse.tractusx.bpdm.pool.model.parsed.participation
 
 /**
- * Maps the results of the data space participant search to the v7 API participant DTOs.
+ * Reason a data space participation update entry is rejected.
  */
-@Component
-class DataSpaceParticipantResponseMapper {
-
-    /**
-     * Returns the data space participation the given legal entity holds.
-     */
-    fun toParticipant(legalEntity: LegalEntityDb): DataSpaceParticipantV7Dto =
-        DataSpaceParticipantV7Dto(bpnL = legalEntity.bpn, isDataSpaceParticipant = legalEntity.isDataSpaceParticipant)
+sealed interface DataSpaceParticipantUpdateError {
+    data class DuplicateParticipantEntry(val legalEntityBpn: String) : DataSpaceParticipantUpdateError
+    data class LegalEntityNotFound(val legalEntityBpn: String) : DataSpaceParticipantUpdateError
 }

@@ -17,21 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
+package org.eclipse.tractusx.bpdm.pool.model.parsed.participation
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.springframework.stereotype.Component
 
 /**
- * Maps the results of the data space participant search to the v6 API Catena-X membership DTOs.
+ * Data space participation to set on a legal entity no other entry of the same update addresses.
  */
-@Component
-class CxMembershipResponseMapperV6 {
-
-    /**
-     * Returns the Catena-X membership the given legal entity holds.
-     */
-    fun toMembership(legalEntity: LegalEntityDb): CxMembershipV6Dto =
-        CxMembershipV6Dto(bpnL = legalEntity.bpn, isCatenaXMember = legalEntity.isDataSpaceParticipant)
-}
+data class DataSpaceParticipantUpdateParsed(
+    val target: LegalEntityDb,
+    val isDataSpaceParticipant: Boolean
+)

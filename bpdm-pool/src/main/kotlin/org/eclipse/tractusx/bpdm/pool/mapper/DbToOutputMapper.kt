@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
@@ -40,6 +41,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantRecord
 import org.springframework.stereotype.Component
 
 /**
@@ -157,4 +159,10 @@ class DbToOutputMapper {
             timestamp = entity.updatedAt.instant,
             changelogType = entity.changelogType
         )
+
+    /**
+     * Returns the data space participation [entity] holds.
+     */
+    fun toParticipantRecord(entity: LegalEntityDb): DataSpaceParticipantRecord =
+        DataSpaceParticipantRecord(legalEntityBpn = entity.bpn, isDataSpaceParticipant = entity.isDataSpaceParticipant)
 }

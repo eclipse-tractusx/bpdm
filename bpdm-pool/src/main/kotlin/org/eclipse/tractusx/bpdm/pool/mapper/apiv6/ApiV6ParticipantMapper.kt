@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,36 +17,44 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.shared.outbound
+package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipV6Dto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmDuplicateRequestEntriesException
-import org.eclipse.tractusx.bpdm.pool.model.error.DataSpaceParticipantUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.DataSpaceParticipantUpdateParseError.DuplicateParticipantEntry
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.DuplicateParticipantEntry
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.LegalEntityNotFound
 import org.springframework.stereotype.Component
 
 private const val LEGAL_ENTITIES = "Legal Entities"
 
 /**
- * Maps the participation update parser's sealed parse errors to the errors the participation endpoints report them with.
+ * Maps data space participation records and rejections to their API v6 Catena-X membership form.
  */
 @Component
-class DataSpaceParticipantParseErrorMapper {
+class ApiV6ParticipantMapper {
 
     /**
-     * Returns the exception reporting a failed participation update parse, naming every legal entity the reported error
-     * applies to because the update applies as a whole rather than per entry, and reporting a malformed request ahead of
-     * an unresolvable legal entity.
+     * Returns the API DTO for [record].
      */
-    fun toUpdateException(errors: List<DataSpaceParticipantUpdateParseError>): RuntimeException {
+    fun toDto(record: DataSpaceParticipantRecord): CxMembershipV6Dto =
+        CxMembershipV6Dto(bpnL = record.legalEntityBpn, isCatenaXMember = record.isDataSpaceParticipant)
+
+    /**
+     * Returns the exception the API reports a rejected participation update with, naming every legal entity the reported
+     * error applies to because the update applies as a whole, and reporting a malformed request ahead of an unresolvable
+     * legal entity.
+     */
+    fun toUpdateException(errors: List<DataSpaceParticipantUpdateError>): RuntimeException {
         val duplicated = mutableListOf<String>()
         val unresolvable = mutableListOf<String>()
 
         errors.forEach { error ->
             when (error) {
                 is DuplicateParticipantEntry -> duplicated.add(error.legalEntityBpn)
-                is UnresolvableLegalEntity -> unresolvable.add(error.bpn)
+                is LegalEntityNotFound -> unresolvable.add(error.legalEntityBpn)
             }
         }
 

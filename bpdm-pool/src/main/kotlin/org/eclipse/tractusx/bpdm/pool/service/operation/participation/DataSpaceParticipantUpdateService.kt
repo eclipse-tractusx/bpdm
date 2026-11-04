@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.participation
 
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate

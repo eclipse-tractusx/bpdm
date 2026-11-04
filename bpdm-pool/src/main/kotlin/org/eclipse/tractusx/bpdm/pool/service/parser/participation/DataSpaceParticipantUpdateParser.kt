@@ -22,10 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.participation
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
-import org.eclipse.tractusx.bpdm.pool.model.error.DataSpaceParticipantUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.DataSpaceParticipantUpdateParseError.DuplicateParticipantEntry
-import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.DuplicateParticipantEntry
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 
@@ -42,8 +45,8 @@ class DataSpaceParticipantUpdateParser(
      * Validates each request and reports either the resolved legal entity with the participation to set on it, or every
      * problem found in that entry.
      */
-    fun parse(requests: List<DataSpaceParticipantUpdateRequest>): List<ParseResult<DataSpaceParticipantUpdateParsed, DataSpaceParticipantUpdateParseError>> {
-        val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
+    fun parse(requests: List<DataSpaceParticipantUpdateRaw>): List<ParseResult<DataSpaceParticipantUpdateParsed, DataSpaceParticipantUpdateError>> {
+        val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn }).map(::toTargetResult)
         val duplicateErrors = duplicateErrors(requests)
 
         return requests.indices.map { index ->
@@ -52,7 +55,13 @@ class DataSpaceParticipantUpdateParser(
         }
     }
 
-    private fun duplicateErrors(requests: List<DataSpaceParticipantUpdateRequest>): List<List<DataSpaceParticipantUpdateParseError>> {
+    private fun toTargetResult(result: ParseResult<LegalEntityDb, UnresolvableLegalEntity>): ParseResult<LegalEntityDb, DataSpaceParticipantUpdateError> =
+        when (result) {
+            is ParseResult.Success -> result
+            is ParseResult.Failure -> ParseResult.Failure(result.errors.map { LegalEntityNotFound(it.bpn) })
+        }
+
+    private fun duplicateErrors(requests: List<DataSpaceParticipantUpdateRaw>): List<List<DataSpaceParticipantUpdateError>> {
         val duplicatedBpns = requests.map { it.legalEntityBpn }.findDuplicates()
 
         return requests.map { request ->

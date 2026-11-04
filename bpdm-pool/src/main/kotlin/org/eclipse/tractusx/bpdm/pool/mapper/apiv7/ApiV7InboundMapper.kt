@@ -25,6 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Re
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.LegalFormV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
@@ -33,6 +35,8 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeDetailRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
 import org.springframework.stereotype.Component
 
 /**
@@ -110,4 +114,18 @@ class ApiV7InboundMapper {
             businessPartnerTypes = request.businessPartnerTypes,
             timestampAfter = request.timestampAfter
         )
+
+    /**
+     * Returns the raw data space participant search holding [request].
+     */
+    fun toDataSpaceParticipantSearchRaw(request: DataSpaceParticipantSearchV7Request): DataSpaceParticipantSearchRaw =
+        DataSpaceParticipantSearchRaw(legalEntityBpns = request.bpnLs, isDataSpaceParticipant = request.isDataSpaceParticipant)
+
+    /**
+     * Returns one raw participation update per participation in [request], in the order they were sent.
+     */
+    fun toDataSpaceParticipantUpdateRaws(request: DataSpaceParticipantUpdateV7Request): List<DataSpaceParticipantUpdateRaw> =
+        request.participants.map {
+            DataSpaceParticipantUpdateRaw(legalEntityBpn = it.bpnL, isDataSpaceParticipant = it.isDataSpaceParticipant)
+        }
 }

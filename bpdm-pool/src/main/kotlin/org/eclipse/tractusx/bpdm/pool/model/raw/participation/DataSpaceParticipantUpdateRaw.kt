@@ -17,23 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
+package org.eclipse.tractusx.bpdm.pool.model.raw.participation
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticipantUpdateV7Request
-import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantUpdateRequest
-import org.springframework.stereotype.Component
-
-/**
- * Creates data space participant update requests from the v7 API participant update DTO.
- */
-@Component
-class DataSpaceParticipantUpdateRequestMapper {
-
-    /**
-     * Returns one update request per participation a client sent, in the order they were sent.
-     */
-    fun toUpdateRequests(updateRequest: DataSpaceParticipantUpdateV7Request): List<DataSpaceParticipantUpdateRequest> =
-        updateRequest.participants.map {
-            DataSpaceParticipantUpdateRequest(legalEntityBpn = it.bpnL, isDataSpaceParticipant = it.isDataSpaceParticipant)
-        }
-}
+data class DataSpaceParticipantUpdateRaw(
+    val legalEntityBpn: String,
+    val isDataSpaceParticipant: Boolean
+)

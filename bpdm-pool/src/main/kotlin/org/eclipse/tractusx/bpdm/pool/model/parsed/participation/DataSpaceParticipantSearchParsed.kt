@@ -17,8 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.pool.model.parsed.participation
 
-sealed interface DataSpaceParticipantUpdateParseError {
-    data class DuplicateParticipantEntry(val legalEntityBpn: String) : DataSpaceParticipantUpdateParseError
-}
+/**
+ * Data space participant search holding non-blank, normalized legal entity BPNs.
+ */
+data class DataSpaceParticipantSearchParsed(
+    val legalEntityBpns: List<String>,
+    val isDataSpaceParticipant: Boolean?
+)
