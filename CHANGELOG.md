@@ -33,6 +33,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Fixed
 
 - BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error.
+- BPDM Gate: The output address type now always describes the address's role towards the output's site. [#1886](https://github.com/eclipse-tractusx/bpdm/issues/1886)
 - BPDM Gate: The CSV upload reports a malformed or incomplete geographic coordinate as an error instead of storing it as `0.0`.
 - BPDM Gate: Upserting input relations through the V7 API rejects a request that names the same external ID more than once instead of letting the later entry win.
 - BPDM Gate: Creating or updating an input relation through the V6 API stores it without a reason code instead of an empty one, so the V7 API returns `null` as its reason code.

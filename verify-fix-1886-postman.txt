@@ -1,0 +1,221 @@
+Issue #1886: Postman verification of the Gate address-type fix
+
+Result
+The fresh manual test on 2026-11-04 confirmed the correct address types
+after Pool synchronization:
+- Address X is SiteMainAddress for Site A.
+- The same address X is AdditionalAddress for Site B.
+- Each output lists the other site in additionalSites.
+
+Prerequisites
+Restart Gate with the updated code.
+Pool, Gate, Orchestrator and cleaning-service-dummy must be running.
+Use the required authorization if security is enabled.
+For each request, select Body -> raw -> JSON in Postman.
+Content-Type: application/json
+
+These are the exact IDs and BPNs used in the successful test.
+For another fresh run, change the external IDs, company/site/address names,
+and use the newly returned BPNs instead of the recorded BPNs below.
+
+STEP 1: Create Site A with main address X
+
+PUT http://localhost:8081/v7/input/business-partners
+
+[
+  {
+    "externalId": "fix-1886-site-a-01",
+    "legalEntity": {
+      "legalName": "Address Role Fix Test 1886 GmbH",
+      "legalForm": "60MF",
+      "ownershipUltimate": false
+    },
+    "site": {
+      "name": "Fix 1886 Site A 01"
+    },
+    "address": {
+      "name": "Fix 1886 Address X 01",
+      "addressType": "SiteMainAddress",
+      "physicalPostalAddress": {
+        "country": "DE",
+        "city": "Berlin"
+      }
+    },
+    "isOwnCompanyData": false
+  }
+]
+
+Wait for sharingStateType = Success:
+GET http://localhost:8081/v7/business-partners/sharing-state?externalIds=fix-1886-site-a-01
+
+Read the output:
+POST http://localhost:8081/v7/output/business-partners/search
+
+["fix-1886-site-a-01"]
+
+Recorded output values:
+legalEntity.legalEntityBpn = BPNL00000000024R
+site.siteBpn = BPNS0000000002V9
+address.addressBpn = BPNA00000000056F
+address.addressType = SiteMainAddress
+
+STEP 2: Create Site B with a different main address Y
+
+PUT http://localhost:8081/v7/input/business-partners
+
+[
+  {
+    "externalId": "fix-1886-site-b-main-01",
+    "legalEntity": {
+      "legalEntityBpn": "BPNL00000000024R",
+      "legalName": "Address Role Fix Test 1886 GmbH",
+      "legalForm": "60MF",
+      "ownershipUltimate": false
+    },
+    "site": {
+      "name": "Fix 1886 Site B 01"
+    },
+    "address": {
+      "name": "Fix 1886 Address Y 01",
+      "addressType": "SiteMainAddress",
+      "physicalPostalAddress": {
+        "country": "DE",
+        "city": "Munich"
+      }
+    },
+    "isOwnCompanyData": false
+  }
+]
+
+Wait for sharingStateType = Success:
+GET http://localhost:8081/v7/business-partners/sharing-state?externalIds=fix-1886-site-b-main-01
+
+Read the output:
+POST http://localhost:8081/v7/output/business-partners/search
+
+["fix-1886-site-b-main-01"]
+
+Recorded output values:
+site.siteBpn = BPNS0000000003UK
+address.addressBpn = BPNA00000000065Q
+address.addressType = SiteMainAddress
+
+Site B differs from Site A, and main address Y differs from address X.
+
+STEP 3: Share X as an additional address of Site B
+
+PUT http://localhost:8081/v7/input/business-partners
+
+[
+  {
+    "externalId": "fix-1886-site-b-additional-01",
+    "legalEntity": {
+      "legalEntityBpn": "BPNL00000000024R",
+      "legalName": "Address Role Fix Test 1886 GmbH",
+      "legalForm": "60MF",
+      "ownershipUltimate": false
+    },
+    "site": {
+      "siteBpn": "BPNS0000000003UK",
+      "name": "Fix 1886 Site B 01"
+    },
+    "address": {
+      "addressBpn": "BPNA00000000056F",
+      "name": "Fix 1886 Address X 01",
+      "addressType": "AdditionalAddress",
+      "physicalPostalAddress": {
+        "country": "DE",
+        "city": "Berlin"
+      }
+    },
+    "additionalSites": [
+      {
+        "siteBpn": "BPNS0000000002V9",
+        "name": "Fix 1886 Site A 01"
+      }
+    ],
+    "isOwnCompanyData": false
+  }
+]
+
+Keep Site A in additionalSites to preserve the address's membership in both sites.
+
+Wait for sharingStateType = Success:
+GET http://localhost:8081/v7/business-partners/sharing-state?externalIds=fix-1886-site-b-additional-01
+
+Then wait approximately 30-60 seconds for the Gate to apply Pool synchronization.
+
+STEP 4: Verify both outputs after synchronization
+
+POST http://localhost:8081/v7/output/business-partners/search
+
+[
+  "fix-1886-site-a-01",
+  "fix-1886-site-b-additional-01"
+]
+
+Expected and observed result:
+
+Site A output:
+externalId = fix-1886-site-a-01
+site.siteBpn = BPNS0000000002V9
+address.addressBpn = BPNA00000000056F
+address.addressType = SiteMainAddress
+additionalSites contains BPNS0000000003UK (Site B)
+
+Site B additional-address output:
+externalId = fix-1886-site-b-additional-01
+site.siteBpn = BPNS0000000003UK
+address.addressBpn = BPNA00000000056F
+address.addressType = AdditionalAddress
+additionalSites contains BPNS0000000002V9 (Site A)
+
+Evidence that Pool synchronization ran:
+Both outputs show address.updatedAt = 2026-10-31T16:28:10.439829Z.
+Site A's output updatedAt advanced to 2026-10-31T16:28:20.346095Z.
+Site A's previously empty additionalSites now includes Site B.
+Site B's address type remains AdditionalAddress in this synchronized result.
+
+Postman assertions
+Paste into Scripts -> Post-response (or Tests) for the Step 4 request:
+
+pm.test("Output search succeeds", () => {
+    pm.response.to.have.status(200);
+});
+
+const outputs = pm.response.json().content;
+const a = outputs.find(x => x.externalId === "fix-1886-site-a-01");
+const b = outputs.find(x => x.externalId === "fix-1886-site-b-additional-01");
+
+pm.test("Both requested outputs exist", () => {
+    pm.expect(outputs).to.have.lengthOf(2);
+    pm.expect(a).to.be.an("object");
+    pm.expect(b).to.be.an("object");
+});
+
+pm.test("X is Site A's main address", () => {
+    pm.expect(a.site.siteBpn).to.eql("BPNS0000000002V9");
+    pm.expect(a.address.addressBpn).to.eql("BPNA00000000056F");
+    pm.expect(a.address.addressType).to.eql("SiteMainAddress");
+});
+
+pm.test("X is an additional address of Site B", () => {
+    pm.expect(b.site.siteBpn).to.eql("BPNS0000000003UK");
+    pm.expect(b.address.addressBpn).to.eql("BPNA00000000056F");
+    pm.expect(b.address.addressType).to.eql("AdditionalAddress");
+});
+
+pm.test("Pool membership has synchronized into both outputs", () => {
+    pm.expect(a.additionalSites.map(x => x.siteBpn))
+        .to.include("BPNS0000000003UK");
+    pm.expect(b.additionalSites.map(x => x.siteBpn))
+        .to.include("BPNS0000000002V9");
+    pm.expect(a.address.updatedAt).to.eql(b.address.updatedAt);
+});
+
+Conclusion
+The original reproduction returned SiteMainAddress for the output following
+Site B, even though Site B had a different main address.
+The fresh test with the fix returned AdditionalAddress for Site B while
+preserving SiteMainAddress for Site A after Pool synchronization.
+This confirms the fix for the reported scenario.
