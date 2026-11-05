@@ -164,7 +164,7 @@ class ApiV7LegalEntityMapper(
     private fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageParseError -> throw internalError(error)
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentParseError -> toContentErrorInfo(
                 error,
                 entityKey,
@@ -193,13 +193,6 @@ class ApiV7LegalEntityMapper(
                 entityKey
             )
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    LegalEntityUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the legal address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentParseError -> toContentErrorInfo(
                 error,

@@ -4367,7 +4367,6 @@ components:
             - IdentifiersTooMany
             - ScriptVariantCityMissing
             - ScriptVariantDuplicateScriptCode
-            - ScriptVariantCoverageStillNeeded
         message:
           type: string
         entityKey:
@@ -4427,7 +4426,6 @@ components:
             - ScriptVariantDuplicateScriptCode
             - LegalAddressScriptVariantCityMissing
             - LegalAddressScriptVariantDuplicateScriptCode
-            - ScriptVariantCoverageStillNeeded
         message:
           type: string
         entityKey:
@@ -4479,7 +4477,6 @@ components:
             - ScriptVariantDuplicateScriptCode
             - MainAddressScriptVariantCityMissing
             - MainAddressScriptVariantDuplicateScriptCode
-            - ScriptVariantCoverageStillNeeded
         message:
           type: string
         entityKey:

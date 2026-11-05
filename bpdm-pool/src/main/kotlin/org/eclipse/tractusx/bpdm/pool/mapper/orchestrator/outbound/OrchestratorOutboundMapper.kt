@@ -375,7 +375,6 @@ class OrchestratorOutboundMapper {
             is GoldenRecordTaskError.AdditionalSiteCreateInvalid -> describeSiteContentError(error.error)
             is GoldenRecordTaskError.AdditionalSiteInvalid -> describeAddressSiteMembershipError(error.error)
             is GoldenRecordTaskError.AdditionalSiteOfOtherLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity of this business partner"
-            is GoldenRecordTaskError.CoverageStillNeeded -> describeScriptVariantCoverageError(error.error)
         }
 
     // Each description is named after the error type it takes rather than overloading one name: the content and coverage
@@ -391,7 +390,6 @@ class OrchestratorOutboundMapper {
 
     private fun describeAddressUpdateError(error: AddressUpdateParseError): String =
         when (error) {
-            is ScriptVariantCoverageParseError -> describeScriptVariantCoverageError(error)
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
             is AddressContentParseError -> describeAddressContentError(error)
@@ -446,7 +444,7 @@ class OrchestratorOutboundMapper {
 
     private fun describeLegalEntityCreateError(error: LegalEntityCreateParseError): String =
         when (error) {
-            is ScriptVariantCoverageParseError -> describeLegalAddressCoverageError(error)
+            is ScriptVariantNotCoveredByAddress -> describeLegalAddressNotCovered(error)
             is LegalEntityContentParseError -> describeLegalEntityContentError(error)
             is AddressContentParseError -> describeAddressContentError(error)
         }
@@ -459,7 +457,7 @@ class OrchestratorOutboundMapper {
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
             is AlternativeHeadquarterCannotOwnUltimately ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
-            is ScriptVariantCoverageParseError -> describeLegalAddressCoverageError(error)
+            is ScriptVariantNotCoveredByAddress -> describeLegalAddressNotCovered(error)
             is LegalEntityContentParseError -> describeLegalEntityContentError(error)
             is AddressContentParseError -> describeAddressContentError(error)
         }
@@ -485,7 +483,7 @@ class OrchestratorOutboundMapper {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
-            is ScriptVariantCoverageParseError -> describeMainAddressCoverageError(error)
+            is ScriptVariantNotCoveredByAddress -> describeMainAddressNotCovered(error)
             is SiteContentParseError -> describeSiteContentError(error)
             is AddressContentParseError -> describeAddressContentError(error)
         }
@@ -493,29 +491,16 @@ class OrchestratorOutboundMapper {
     private fun describeSiteUpdateError(error: SiteUpdateParseError): String =
         when (error) {
             is UnresolvableSite -> "Site ${error.bpn} not found"
-            is ScriptVariantCoverageParseError -> describeMainAddressCoverageError(error)
+            is ScriptVariantNotCoveredByAddress -> describeMainAddressNotCovered(error)
             is SiteContentParseError -> describeSiteContentError(error)
             is AddressContentParseError -> describeAddressContentError(error)
         }
 
-    private fun describeScriptVariantCoverageError(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"
-            is ScriptVariantCoverageStillNeeded ->
-                "Script code '${error.scriptCode}' must stay covered: business partner ${error.requiredByBpn} is named in that script"
-        }
+    private fun describeLegalAddressNotCovered(error: ScriptVariantNotCoveredByAddress): String =
+        "Script code '${error.scriptCode}' is not covered by the legal address"
 
-    private fun describeLegalAddressCoverageError(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the legal address"
-            is ScriptVariantCoverageStillNeeded -> describeScriptVariantCoverageError(error)
-        }
-
-    private fun describeMainAddressCoverageError(error: ScriptVariantCoverageParseError): String =
-        when (error) {
-            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
-            is ScriptVariantCoverageStillNeeded -> describeScriptVariantCoverageError(error)
-        }
+    private fun describeMainAddressNotCovered(error: ScriptVariantNotCoveredByAddress): String =
+        "Script code '${error.scriptCode}' is not covered by the site main address"
 
     private fun describeSiteContentError(error: SiteContentParseError): String =
         when (error) {

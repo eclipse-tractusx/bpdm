@@ -376,8 +376,8 @@ class DbToOutputMapper {
             confidenceLevel = confidenceCriteria.confidenceLevel
         )
 
-    // The legal address covers every script its legal entity is named in: the parsers reject a variant it does not
-    // cover and ScriptVariantCoverageService prunes any the legal address stops covering.
+    // Every writer keeps the legal address covering the scripts its legal entity is named in, so a variant missing here
+    // is a Pool bug.
     private fun toLegalEntityScriptVariantRecords(legalEntity: LegalEntityDb): List<LegalEntityScriptVariantRecord> {
         val legalAddressVariantsByCode = legalEntity.legalAddress.scriptVariants.associateBy { it.scriptCode.technicalKey }
 
@@ -394,8 +394,8 @@ class DbToOutputMapper {
         }
     }
 
-    // The main address covers every script its site is named in: the parsers reject a variant it does not cover and
-    // ScriptVariantCoverageService prunes any the main address stops covering.
+    // Every writer keeps the main address covering the scripts its site is named in, so a variant missing here is a Pool
+    // bug.
     private fun toSiteScriptVariantRecords(site: SiteDb): List<SiteScriptVariantRecord> {
         val mainAddressVariantsByCode = site.mainAddress.scriptVariants.associateBy { it.scriptCode.technicalKey }
 

@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressSiteMembershipParseErro
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
@@ -65,6 +64,4 @@ sealed interface GoldenRecordTaskError {
     data class AdditionalSiteInvalid(val error: AddressSiteMembershipParseError) : GoldenRecordTaskError
 
     data class AdditionalSiteOfOtherLegalEntity(val siteBpn: String) : GoldenRecordTaskError
-
-    data class CoverageStillNeeded(val error: ScriptVariantCoverageParseError) : GoldenRecordTaskError
 }

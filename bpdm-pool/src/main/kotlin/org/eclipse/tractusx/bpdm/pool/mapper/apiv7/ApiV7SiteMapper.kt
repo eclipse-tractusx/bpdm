@@ -176,8 +176,7 @@ class ApiV7SiteMapper(
             is SiteContentParseError.NameMissing,
             is SiteContentParseError.ConfidenceCriteriaMissing,
             is SiteContentParseError.ScriptCodeNotFound,
-            is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
+            is UnresolvableAddress -> throw internalError(error)
         }
 
     private fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
@@ -185,13 +184,6 @@ class ApiV7SiteMapper(
             is UnresolvableSite ->
                 ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    SiteUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
             is SiteContentParseError.ScriptVariantNameMissing ->
                 ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
             is SiteContentParseError.ScriptVariantDuplicateScriptCode ->

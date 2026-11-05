@@ -25,11 +25,13 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.update.orKeep
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,7 +39,9 @@ import org.springframework.transaction.annotation.Transactional
  * The single authority for updating logistic addresses: applies each requested change to its address — a caller
  * describes *what* to change, this service decides *how* — detects whether the address actually changed,
  * and persists and emits an UPDATE changelog only for those that did. The change vocabulary has no field for an
- * address's identity, parent, or relations, so no update can re-identify or re-parent an address.
+ * address's identity, parent, or relations, so no update can re-identify or re-parent an address. Stated script variants
+ * replace the address's own, except that a variant left out stays as long as a business partner built on the address is
+ * still named in its script.
  */
 @Service
 class AddressUpdateService(
@@ -114,7 +118,7 @@ class AddressUpdateService(
             if (stateKeys(addressEntityMapper.toStates(it)) != stateKeys(target.states)) return true
         }
         update.scriptVariants.ifSet {
-            if (scriptVariantKeys(addressEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+            if (scriptVariantKeys(scriptVariantsAfter(target, update, it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
         update.sites.ifSet { if (siteKeys(it) != siteKeys(target.sites)) return true }
 
@@ -158,6 +162,30 @@ class AddressUpdateService(
     private fun siteKeys(sites: Collection<SiteDb>): Set<Any?> =
         sites.map { it.bpn }.toSet()
 
+    private fun scriptVariantsAfter(
+        target: LogisticAddressDb,
+        update: AddressContentUpdate,
+        stated: List<AddressScriptVariantParsed>
+    ): List<LogisticAddressScriptVariantDb> {
+        val statedVariants = addressEntityMapper.toScriptVariants(stated)
+        val statedScriptCodes = statedVariants.map { it.scriptCode.technicalKey }.toSet()
+        val namedScriptCodes = partnerScriptCodes(target, update.sites.orKeep(target.sites))
+        val retainedVariants = target.scriptVariants.filter {
+            it.scriptCode.technicalKey !in statedScriptCodes && it.scriptCode.technicalKey in namedScriptCodes
+        }
+
+        return statedVariants + retainedVariants
+    }
+
+    // Partners are matched by BPN: navigating to an address yields a lazy proxy, which is never reference-equal to the
+    // address being written.
+    private fun partnerScriptCodes(target: LogisticAddressDb, sites: Collection<SiteDb>): Set<String> {
+        val legalEntity = target.legalEntity?.takeIf { it.legalAddress.bpn == target.bpn }
+        val mainAddressSites = sites.filter { it.mainAddress.bpn == target.bpn }
+
+        return (legalEntity?.scriptCodes().orEmpty() + mainAddressSites.flatMap { it.scriptCodes() }).toSet()
+    }
+
     private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
@@ -167,7 +195,7 @@ class AddressUpdateService(
         update.confidenceCriteria.ifSet { target.confidenceCriteria = addressEntityMapper.toConfidence(it, numberOfSharingMembers) }
         update.identifiers.ifSet { target.identifiers.replace(addressEntityMapper.toIdentifiers(it).onEach { id -> id.address = target }) }
         update.states.ifSet { target.states.replace(addressEntityMapper.toStates(it).onEach { state -> state.address = target }) }
-        update.scriptVariants.ifSet { target.scriptVariants.replace(addressEntityMapper.toScriptVariants(it)) }
+        update.scriptVariants.ifSet { target.scriptVariants.replace(scriptVariantsAfter(target, update, it)) }
         update.sites.ifSet { target.sites.replace(it) }
     }
 }

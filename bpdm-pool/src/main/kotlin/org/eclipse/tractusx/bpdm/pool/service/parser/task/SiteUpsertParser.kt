@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.model.orRecord
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
@@ -40,12 +39,10 @@ import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateWithReferencedAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteHeaderParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteUpdateParser
 import org.springframework.stereotype.Service
 
@@ -57,11 +54,9 @@ import org.springframework.stereotype.Service
 class SiteUpsertParser(
     private val siteBpnParser: SiteBpnParser,
     private val addressBpnParser: AddressBpnParser,
-    private val siteHeaderParser: SiteHeaderParser,
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
-    private val siteUpdateParser: SiteUpdateParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator
+    private val siteUpdateParser: SiteUpdateParser
 ) {
 
     /**
@@ -97,11 +92,13 @@ class SiteUpsertParser(
         val header = toHeaderRequest(site.header, errors) ?: return null
 
         return when (site) {
-            is SiteUpsertRaw.WithLegalAddressAsMain ->
+            is SiteUpsertRaw.WithLegalAddressAsMain -> {
+                val content = SiteContentRequest(header, sharedLegalAddress(site, legalEntity))
                 if (existingBpn != null)
-                    parseUpdate(existingBpn, reference, BpnReferenceParsed.Unstated, SiteContentRequest(header, sharedLegalAddress(site, legalEntity)), errors)
+                    parseUpdate(existingBpn, reference, BpnReferenceParsed.Unstated, content, errors)
                 else
-                    parseCreateOnLegalAddress(reference, header, legalEntityPlan, errors)
+                    parseCreateOnLegalAddress(reference, content, legalEntityPlan, errors)
+            }
 
             is SiteUpsertRaw.WithOwnMainAddress -> {
                 val mainAddressReference = references.resolve(site.mainAddress.reference)
@@ -147,7 +144,7 @@ class SiteUpsertParser(
         content: SiteContentRequest,
         errors: MutableList<GoldenRecordTaskError>
     ): SiteUpsertParsed? =
-        siteUpdateParser.parseWithoutCoverageCheck(listOf(SiteUpdateRaw(siteBpn, content))).single()
+        siteUpdateParser.parse(listOf(SiteUpdateRaw(siteBpn, content))).single()
             .orRecord(errors) { GoldenRecordTaskError.SiteUpdateInvalid(it) }
             ?.let { SiteUpsertParsed.Update(reference, mainAddressReference, it) }
 
@@ -163,40 +160,26 @@ class SiteUpsertParser(
             .orRecord(errors) { GoldenRecordTaskError.SiteCreateInvalid(it) }
             ?.let { SiteUpsertParsed.CreateOnExistingAddress(reference, mainAddressReference, it) }
 
-    // Coverage is judged against the legal address as the task leaves it, and only once the legal entity parsed: otherwise
-    // the task is rejected for the legal entity anyway.
     private fun parseCreateOnLegalAddress(
         reference: BpnReferenceParsed,
-        header: SiteHeaderRequest,
+        content: SiteContentRequest,
         legalEntityPlan: LegalEntityUpsertParsed?,
         errors: MutableList<GoldenRecordTaskError>
     ): SiteUpsertParsed? {
-        val parsedHeader = siteHeaderParser.parse(listOf(header)).single().orRecord(errors) { GoldenRecordTaskError.SiteCreateInvalid(it) } ?: return null
-        val legalAddressScriptCodes = legalEntityPlan?.let { legalAddressScriptCodesAfter(it) }
-            ?: return SiteUpsertParsed.CreateOnLegalAddress(reference, parsedHeader)
+        val legalAddressBpn = legalEntityPlan?.existingLegalEntity?.legalAddress?.bpn
 
-        val coverageErrors = scriptVariantCoverageValidator.check(legalAddressScriptCodes, listOf(PartnerScriptCodes(bpn = null, parsedHeader.scriptCodes())))
-        errors += coverageErrors.map { GoldenRecordTaskError.SiteCreateInvalid(it) }
-
-        return SiteUpsertParsed.CreateOnLegalAddress(reference, parsedHeader)
+        return siteCreateParser.parseContent(listOf(content), listOf(legalAddressBpn)).single()
+            .orRecord(errors) { GoldenRecordTaskError.SiteCreateInvalid(it) }
+            ?.let { SiteUpsertParsed.CreateOnLegalAddress(reference, it) }
     }
 
-    private fun legalAddressScriptCodesAfter(legalEntity: LegalEntityUpsertParsed): List<String> =
-        when (legalEntity) {
-            is LegalEntityUpsertParsed.Unchanged -> legalEntity.legalEntity.legalAddress.scriptCodes()
-            is LegalEntityUpsertParsed.Create -> legalEntity.create.content.legalAddress.scriptCodes()
-            is LegalEntityUpsertParsed.Update -> legalEntity.update.content.legalAddress.scriptCodes()
-        }
-
-    // The site writes the legal address as its main address, so that address keeps the legal entity's script variants:
-    // the legal entity's variant wins for a script both state, and a script only the legal entity states stays covered.
+    // The site writes the legal address as its main address, so the legal entity's variant wins for a script both state;
+    // a script only the legal entity is named in stays on the address because the legal entity still needs it.
     private fun sharedLegalAddress(site: SiteUpsertRaw.WithLegalAddressAsMain, legalEntity: LegalEntityUpsertRaw): LogisticAddressRequest {
         val legalAddress = legalEntity.legalAddress.content
         val legalAddressVariantsByCode = legalAddress.scriptVariants.associateBy { it.scriptCode }
-        val siteVariants = site.mainAddressScriptVariants.map { legalAddressVariantsByCode[it.scriptCode] ?: it }
-        val siteScriptCodes = siteVariants.map { it.scriptCode }.toSet()
 
-        return legalAddress.copy(scriptVariants = siteVariants + legalAddress.scriptVariants.filterNot { it.scriptCode in siteScriptCodes })
+        return legalAddress.copy(scriptVariants = site.mainAddressScriptVariants.map { legalAddressVariantsByCode[it.scriptCode] ?: it })
     }
 
     private fun toHeaderRequest(header: SiteHeaderRaw, errors: MutableList<GoldenRecordTaskError>): SiteHeaderRequest? {

@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
@@ -65,10 +64,7 @@ class SiteCreateWithLegalAddressAsMainParser(
             }
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(legalEntityResults, headerResults) { legalEntity, header ->
-                scriptVariantCoverageValidator.check(
-                    legalEntity.legalAddress.scriptCodes(),
-                    listOf(PartnerScriptCodes(bpn = null, header.scriptCodes()))
-                )
+                scriptVariantCoverageValidator.check(legalEntity.legalAddress.scriptCodes(), header.scriptCodes())
             }
 
         return zipParseResults(legalEntityResults, coveredHeaderResults) { legalEntity, header ->

@@ -43,7 +43,6 @@ class GoldenRecordTaskParser(
     private val additionalAddressUpsertParser: AdditionalAddressUpsertParser,
     private val additionalSitesParser: AdditionalSitesParser,
     private val parentValidator: GoldenRecordTaskParentValidator,
-    private val coverageValidator: GoldenRecordTaskCoverageValidator,
     private val identifierDistinctnessValidator: GoldenRecordTaskIdentifierDistinctnessValidator,
     private val membershipValidator: GoldenRecordTaskMembershipValidator
 ) {
@@ -57,7 +56,6 @@ class GoldenRecordTaskParser(
         val references = referenceParser.parse(goldenRecord)
 
         val parentErrors = parentValidator.validate(goldenRecord, references)
-        val coverageErrors = coverageValidator.validate(goldenRecord, references).map { GoldenRecordTaskError.CoverageStillNeeded(it) }
 
         val legalEntity = legalEntityUpsertParser.parse(goldenRecord.legalEntity, references)
         val site = goldenRecord.site?.let { siteUpsertParser.parse(it, goldenRecord.legalEntity, legalEntity.parsedOrNull(), references) }
@@ -76,7 +74,7 @@ class GoldenRecordTaskParser(
         else
             emptyList()
 
-        val errors = parentErrors + coverageErrors + legalEntity.errorsOrEmpty() + site?.errorsOrEmpty().orEmpty() +
+        val errors = parentErrors + legalEntity.errorsOrEmpty() + site?.errorsOrEmpty().orEmpty() +
                 additionalAddress?.errorsOrEmpty().orEmpty() + distinctnessErrors + additionalSites?.errorsOrEmpty().orEmpty() + membershipErrors
 
         val plan = legalEntityPlan?.let { GoldenRecordTaskParsed(task.sharingMemberRecordId, it, sitePlan, additionalAddressPlan, additionalSitesPlan) }

@@ -44,8 +44,6 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageStillNeeded
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressOmitted
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
@@ -170,12 +168,8 @@ class ApiV6AddressMapper(
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
             is UnresolvableSite,
-            is SiteMainAddressOmitted,
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+            is SiteMainAddressOmitted -> throw internalError(error)
         }
 
     // An error the frozen v6 enum has no code for, or that this use case cannot reach, gets no public code.

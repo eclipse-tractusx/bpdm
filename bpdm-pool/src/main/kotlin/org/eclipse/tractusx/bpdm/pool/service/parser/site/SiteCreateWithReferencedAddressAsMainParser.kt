@@ -20,12 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
+import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
@@ -35,11 +33,7 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates site-create requests whose main address is an existing address referenced by BPN, taking the stated address
- * content as the new content of that address — which is therefore what has to cover the site's script codes.
- *
- * It does *not* judge the coverage the referenced address's other business partners need. Only the golden record task
- * path states such a request, and it writes several partners of that address in one transaction, so it decides coverage
- * at task scope. An API endpoint built on this parser would have to add that check itself.
+ * content as the new content of that address, and that the address covers every script code the site's header names.
  */
 @Service
 class SiteCreateWithReferencedAddressAsMainParser(
@@ -62,13 +56,17 @@ class SiteCreateWithReferencedAddressAsMainParser(
         val ownerBpns = mainAddressTargetResults.map { (it as? ParseResult.Success)?.parsed?.bpn }
         val mainAddressResults = addressContentParser.parse(requests.map { it.mainAddress }, ownerBpns)
 
-        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
-            crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
-                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
-            }
-
-        return zipParseResults(coveredHeaderResults, mainAddressTargetResults, mainAddressResults) { header, target, mainAddress ->
+        return zipParseResults(headerResults, mainAddressTargetResults, mainAddressResults) { header, target, mainAddress ->
             SiteCreateWithReferencedAddressAsMainParsed(target, header, mainAddress)
-        }
+        }.map { result -> result.combine(coverageErrors(result)) { it } }
+    }
+
+    // The address keeps an existing variant the new site is named in, so the variants it carries today cover the header as
+    // well as the stated ones.
+    private fun coverageErrors(result: ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>): List<SiteCreateParseError> {
+        val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
+        val coveredScriptCodes = parsed.mainAddressContent?.scriptCodes().orEmpty() + parsed.mainAddress.scriptCodes()
+
+        return scriptVariantCoverageValidator.check(coveredScriptCodes, parsed.siteHeader.scriptCodes())
     }
 }
