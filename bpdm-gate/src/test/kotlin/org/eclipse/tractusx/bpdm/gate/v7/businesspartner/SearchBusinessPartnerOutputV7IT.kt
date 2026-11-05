@@ -19,13 +19,51 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
+
+    /**
+     * GIVEN an output for site B whose address is the main address of another site A
+     *       and a Pool change to that address has been synchronized
+     * WHEN the output consumer searches for site B's output
+     * THEN its address remains an additional address of site B
+     *
+     */
+    @Test
+    fun `pool sync keeps address additional for the tracked site`() {
+        //GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val records = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(input)
+        val siteA = records.additionalSites.single().copy(mainAddress = records.additionalAddress.address)
+        val changedAddress = records.additionalAddress.copy(
+            address = records.additionalAddress.address.copy(
+                name = "$testName changed", addressType = AddressType.SiteMainAddress, updatedAt = Instant.now()
+            )
+        )
+        testDataClient.businessPartner.syncAddressChangeFromPool(changedAddress, listOf(siteA, records.siteParent))
+
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId))
+
+        //THEN
+        val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(
+            input,
+            records.legalEntityParent,
+            records.siteParent,
+            records.additionalAddress.copy(address = changedAddress.address),
+            listOf(AdditionalSiteOutputV7Dto(siteA.site.bpns, siteA.site.name))
+        ).copy(nameParts = emptyList())
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+    }
 
     /**
      * GIVEN business partner output based on legal entity
