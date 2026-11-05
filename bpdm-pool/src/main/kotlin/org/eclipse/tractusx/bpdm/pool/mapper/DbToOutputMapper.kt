@@ -62,6 +62,10 @@ import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierMatchRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnRequestIdentifierMatchRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessPartnerSearchAddressRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessPartnerSearchLegalEntityRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessPartnerSearchRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessPartnerSearchSiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.ConfidenceCriteriaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.RelationValidityPeriodRecord
@@ -269,6 +273,44 @@ class DbToOutputMapper {
             addressType = entity.addressType,
             scriptVariants = entity.scriptVariants.map { toScriptVariantRecord(it) }
         )
+
+    /**
+     * Returns the business partner search record [entity] represents, together with its legal entity and main site.
+     */
+    fun toBusinessPartnerSearchRecord(entity: LogisticAddressDb): BusinessPartnerSearchRecord {
+        val legalEntity = checkNotNull(entity.legalEntity) { "Business partner search matched address ${entity.bpn} without a legal entity." }
+
+        return BusinessPartnerSearchRecord(
+            legalEntity = BusinessPartnerSearchLegalEntityRecord(
+                bpn = legalEntity.bpn,
+                legalName = legalEntity.legalName.value,
+                legalShortName = legalEntity.legalName.shortName,
+                legalFormTechnicalKey = legalEntity.legalForm?.technicalKey,
+                identifiers = legalEntity.identifiers.map { toIdentifierRecord(it) },
+                states = legalEntity.states.map { toStateRecord(it) },
+                confidenceCriteria = toConfidenceCriteriaRecord(legalEntity.confidenceCriteria),
+                isDataSpaceParticipant = legalEntity.isDataSpaceParticipant
+            ),
+            site = entity.mainSite?.let { site ->
+                BusinessPartnerSearchSiteRecord(
+                    bpn = site.bpn,
+                    name = site.name,
+                    states = site.states.map { toStateRecord(it) },
+                    confidenceCriteria = toConfidenceCriteriaRecord(site.confidenceCriteria)
+                )
+            },
+            address = BusinessPartnerSearchAddressRecord(
+                bpn = entity.bpn,
+                name = entity.name,
+                addressType = entity.addressType,
+                identifiers = entity.identifiers.map { toIdentifierRecord(it) },
+                states = entity.states.map { toStateRecord(it) },
+                physicalPostalAddress = toPhysicalPostalAddressRecord(entity.physicalPostalAddress),
+                alternativePostalAddress = entity.alternativePostalAddress?.let { toAlternativePostalAddressRecord(it) },
+                confidenceCriteria = toConfidenceCriteriaRecord(entity.confidenceCriteria)
+            )
+        )
+    }
 
     private fun toIdentifierRecord(identifier: LegalEntityIdentifierDb): LegalEntityIdentifierRecord =
         LegalEntityIdentifierRecord(

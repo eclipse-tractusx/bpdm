@@ -19,7 +19,6 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -43,7 +42,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScript
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -66,10 +64,8 @@ import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AlternativePostalAddressRecord
-import org.eclipse.tractusx.bpdm.pool.model.output.address.GeoCoordinateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.PhysicalAddressScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.PhysicalPostalAddressRecord
-import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
@@ -262,7 +258,7 @@ class ApiV7AddressMapper(
 
     private fun toDto(record: PhysicalPostalAddressRecord): PhysicalPostalAddressVerboseV7Dto =
         PhysicalPostalAddressVerboseV7Dto(
-            geographicCoordinates = record.geographicCoordinates?.let { toDto(it) },
+            geographicCoordinates = record.geographicCoordinates?.let { apiV7BusinessPartnerMapper.toDto(it) },
             countryVerbose = TypeKeyNameVerboseDto(record.country.countryCode, record.country.name),
             postalCode = record.postalCode,
             city = record.city,
@@ -275,13 +271,13 @@ class ApiV7AddressMapper(
             building = record.building,
             floor = record.floor,
             door = record.door,
-            street = record.street?.let { toDto(it) },
+            street = record.street?.let { apiV7BusinessPartnerMapper.toDto(it) },
             taxJurisdictionCode = record.taxJurisdictionCode
         )
 
     private fun toDto(record: AlternativePostalAddressRecord): AlternativePostalAddressVerboseV7Dto =
         AlternativePostalAddressVerboseV7Dto(
-            geographicCoordinates = record.geographicCoordinates?.let { toDto(it) },
+            geographicCoordinates = record.geographicCoordinates?.let { apiV7BusinessPartnerMapper.toDto(it) },
             countryVerbose = TypeKeyNameVerboseDto(record.country.countryCode, record.country.name),
             postalCode = record.postalCode,
             city = record.city,
@@ -293,22 +289,6 @@ class ApiV7AddressMapper(
 
     private fun toDto(record: AdministrativeAreaRecord): RegionV7Dto =
         RegionV7Dto(record.countryCode, record.code, record.name)
-
-    private fun toDto(record: GeoCoordinateRecord): GeoCoordinateDto =
-        GeoCoordinateDto(record.longitude, record.latitude, record.altitude)
-
-    private fun toDto(record: StreetRecord): StreetV7Dto =
-        StreetV7Dto(
-            name = record.name,
-            houseNumber = record.houseNumber,
-            houseNumberSupplement = record.houseNumberSupplement,
-            milestone = record.milestone,
-            direction = record.direction,
-            namePrefix = record.namePrefix,
-            additionalNamePrefix = record.additionalNamePrefix,
-            nameSuffix = record.nameSuffix,
-            additionalNameSuffix = record.additionalNameSuffix
-        )
 
     private fun toDto(record: PhysicalAddressScriptVariantRecord): PhysicalAddressScriptVariantV7Dto =
         PhysicalAddressScriptVariantV7Dto(

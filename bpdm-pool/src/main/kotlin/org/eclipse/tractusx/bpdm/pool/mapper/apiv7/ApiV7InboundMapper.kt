@@ -26,10 +26,12 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Reques
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.IdentifiersSearchV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.BusinessPartnerSearchFilterTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
@@ -52,6 +54,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityGetRaw
@@ -238,6 +241,26 @@ class ApiV7InboundMapper(
      */
     fun toLegalEntityAddressSearchRaw(legalEntityBpn: String): LegalEntityAddressSearchRaw =
         LegalEntityAddressSearchRaw(legalEntityBpn = legalEntityBpn)
+
+    /**
+     * Returns the raw business partner search holding [request], including the kinds of business partner
+     * [resultFilter] names.
+     */
+    fun toBusinessPartnerSearchRaw(
+        request: LegalEntityPropertiesSearchV7Request,
+        resultFilter: Set<BusinessPartnerSearchFilterTypeV7>?
+    ): BusinessPartnerSearchRaw =
+        BusinessPartnerSearchRaw(
+            bpn = request.bpn,
+            legalName = request.legalName,
+            streetName = request.streetName,
+            postalCode = request.postalCode,
+            city = request.city,
+            country = request.country,
+            includesLegalEntities = resultFilter.orEmpty().contains(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
+            includesSites = resultFilter.orEmpty().contains(BusinessPartnerSearchFilterTypeV7.IncludeSites),
+            includesAdditionalAddresses = resultFilter.orEmpty().contains(BusinessPartnerSearchFilterTypeV7.IncludeAdditionalAddresses)
+        )
 
     /**
      * Returns the raw create for the address a client sent, under the parent legal entity or site it named.
