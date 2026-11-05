@@ -23,12 +23,12 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
-import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordTaskUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.output.task.AdditionalSiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.task.UpsertedGoldenRecordParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.pool.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordTaskTrackingService
@@ -96,7 +96,7 @@ class GoldenRecordTaskResolutionApplicationService(
             is ParseResult.Failure -> GoldenRecordTaskResultRecord.Rejected(task.taskId, parseResult.errors)
         }
 
-    private fun toResolved(task: GoldenRecordTaskRaw, plan: GoldenRecordTaskParsed, upserted: GoldenRecordTaskUpsertResult) =
+    private fun toResolved(task: GoldenRecordTaskRaw, plan: GoldenRecordTaskParsed, upserted: UpsertedGoldenRecordParsed) =
         GoldenRecordTaskResultRecord.Resolved(
             taskId = task.taskId,
             legalEntity = outputMapper.toRecord(upserted.legalEntity),

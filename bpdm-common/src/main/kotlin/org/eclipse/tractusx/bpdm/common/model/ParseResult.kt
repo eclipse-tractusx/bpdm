@@ -229,10 +229,14 @@ fun <T, E, R> ParseResult<T, E>.orRecord(errors: MutableList<R>, toError: (E) ->
     }
 
 /**
- * Returns [parsed] as a success when no error was collected, or else a failure carrying the collected [errors].
+ * Returns [parsed] as a success when no error was collected, or else a failure carrying the collected [errors]; throws
+ * when [parsed] is missing without any error to explain it.
  */
-fun <T, E> parseResultOf(parsed: T?, errors: List<E>): ParseResult<T, E> =
-    if (parsed != null && errors.isEmpty()) ParseResult.Success(parsed) else ParseResult.Failure(errors)
+fun <T, E> parseResultOf(parsed: T?, errors: List<E>): ParseResult<T, E> {
+    if (parsed != null && errors.isEmpty()) return ParseResult.Success(parsed)
+    check(errors.isNotEmpty()) { "A parse that produced no result must report at least one error" }
+    return ParseResult.Failure(errors)
+}
 
 private fun <E> failureErrors(vararg results: ParseResult<*, E>): List<E> =
     results.filterIsInstance<ParseResult.Failure<E>>().flatMap { it.errors }

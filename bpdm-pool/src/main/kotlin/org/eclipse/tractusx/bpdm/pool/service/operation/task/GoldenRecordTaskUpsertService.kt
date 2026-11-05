@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.task
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordTaskUpsertResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
@@ -33,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.task.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.task.UpsertedGoldenRecordParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
@@ -69,7 +69,7 @@ class GoldenRecordTaskUpsertService(
     /**
      * Writes what [task] decided and returns its business partners as they stand afterwards.
      */
-    fun upsert(task: GoldenRecordTaskParsed): GoldenRecordTaskUpsertResult {
+    fun upsert(task: GoldenRecordTaskParsed): UpsertedGoldenRecordParsed {
         val issuedBpns = IssuedBpns()
 
         val legalEntity = upsertLegalEntity(task.legalEntity, issuedBpns)
@@ -86,7 +86,7 @@ class GoldenRecordTaskUpsertService(
         sharingMemberConfidenceService.updateAddress(task.sharingMemberRecordId, recordAddress.bpn)
         bpnRequestIdentifierMappingCreateService.create(issuedBpns.byRequestIdentifier)
 
-        return GoldenRecordTaskUpsertResult(legalEntity, site, additionalAddress, additionalSites)
+        return UpsertedGoldenRecordParsed(legalEntity, site, additionalAddress, additionalSites)
     }
 
     private fun upsertLegalEntity(legalEntity: LegalEntityUpsertParsed, issuedBpns: IssuedBpns): LegalEntityDb {

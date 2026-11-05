@@ -365,6 +365,7 @@ class OrchestratorOutboundMapper {
             is GoldenRecordTaskError.LegalEntityUpdateInvalid -> describeLegalEntityUpdateError(error.error)
             is GoldenRecordTaskError.UnchangedSiteNotFound -> "Main address is null"
             GoldenRecordTaskError.SiteNotInLegalEntity -> "The legal entity is not the parent of the site"
+            GoldenRecordTaskError.SiteMainAddressNotInLegalEntity -> "The legal entity is not the parent of the site main address"
             GoldenRecordTaskError.SiteMainAddressIsLegalAddress -> "The site main address is the legal address and must not be stated separately"
             is GoldenRecordTaskError.SiteCreateInvalid -> describeSiteCreateError(error.error)
             is GoldenRecordTaskError.SiteUpdateInvalid -> describeSiteUpdateError(error.error)

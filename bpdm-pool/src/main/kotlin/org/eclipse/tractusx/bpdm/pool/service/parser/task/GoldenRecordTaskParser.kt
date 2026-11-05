@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.errorsOrEmpty
+import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskParsed
@@ -78,9 +79,7 @@ class GoldenRecordTaskParser(
         val errors = parentErrors + coverageErrors + legalEntity.errorsOrEmpty() + site?.errorsOrEmpty().orEmpty() +
                 additionalAddress?.errorsOrEmpty().orEmpty() + distinctnessErrors + additionalSites?.errorsOrEmpty().orEmpty() + membershipErrors
 
-        return if (errors.isEmpty() && legalEntityPlan != null)
-            ParseResult.Success(GoldenRecordTaskParsed(task.sharingMemberRecordId, legalEntityPlan, sitePlan, additionalAddressPlan, additionalSitesPlan))
-        else
-            ParseResult.Failure(errors)
+        val plan = legalEntityPlan?.let { GoldenRecordTaskParsed(task.sharingMemberRecordId, it, sitePlan, additionalAddressPlan, additionalSitesPlan) }
+        return parseResultOf(plan, errors)
     }
 }

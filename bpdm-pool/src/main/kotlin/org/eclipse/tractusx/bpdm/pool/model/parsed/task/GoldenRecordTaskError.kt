@@ -46,6 +46,8 @@ sealed interface GoldenRecordTaskError {
 
     data object SiteNotInLegalEntity : GoldenRecordTaskError
 
+    data object SiteMainAddressNotInLegalEntity : GoldenRecordTaskError
+
     data object SiteMainAddressIsLegalAddress : GoldenRecordTaskError
 
     data class SiteCreateInvalid(val error: SiteCreateParseError) : GoldenRecordTaskError

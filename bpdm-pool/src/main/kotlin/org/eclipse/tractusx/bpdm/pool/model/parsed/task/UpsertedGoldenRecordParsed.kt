@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.parsed.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -25,8 +25,11 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 /**
  * The business partners of a golden record task as they stand once the task is carried out.
+ *
+ * The additional address belongs to the legal entity, and the additional sites are the sites of the task's record
+ * address other than its own site, oldest first.
  */
-data class GoldenRecordTaskUpsertResult(
+data class UpsertedGoldenRecordParsed(
     val legalEntity: LegalEntityDb,
     val site: SiteDb?,
     val additionalAddress: LogisticAddressDb?,

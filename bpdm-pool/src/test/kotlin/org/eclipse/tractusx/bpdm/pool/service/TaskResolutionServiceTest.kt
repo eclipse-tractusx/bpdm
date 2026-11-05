@@ -1389,6 +1389,30 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
     }
 
+    @Test
+    fun `try create site sharing an existing site main address of another legal entity`() {
+        val sharedMainAddressRef = "shared-foreign-addr"
+
+        val createSiteA = orchTestDataFactory.createFullBusinessPartner("siteA")
+            .withLegalReferences("le-foreign-owner".toBpnRequest(), "le-addr-foreign-owner".toBpnRequest())
+            .withSiteReferences("site-a-foreign".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+        val resultA = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteA)
+        val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
+        val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
+
+        val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
+            .withLegalReferences("le-foreign-other".toBpnRequest(), "le-addr-foreign-other".toBpnRequest())
+            .withSiteReferences("site-b-foreign".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+
+        val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
+
+        assertThat(resultB.single().errors.map { it.description })
+            .contains("The legal entity is not the parent of the site main address")
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
+    }
+
     private fun scriptCodeOtherThan(scriptCode: String): String =
         orchTestDataFactory.metadata!!.scriptCodes.first { it != scriptCode }
 

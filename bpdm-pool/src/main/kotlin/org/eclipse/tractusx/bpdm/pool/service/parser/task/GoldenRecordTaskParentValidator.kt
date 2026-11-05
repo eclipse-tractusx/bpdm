@@ -23,13 +23,14 @@ import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.springframework.stereotype.Service
 
 /**
- * Reports an existing site or additional address of a golden record task that belongs to another legal entity than the
- * task's.
+ * Reports an existing site, additional address or adopted site main address of a golden record task that belongs to
+ * another legal entity than the task's.
  */
 @Service
 class GoldenRecordTaskParentValidator(
@@ -42,15 +43,21 @@ class GoldenRecordTaskParentValidator(
      */
     fun validate(goldenRecord: GoldenRecordRaw, references: GoldenRecordTaskReferencesParsed): List<GoldenRecordTaskError> {
         val legalEntityBpn = references.bpnOf(goldenRecord.legalEntity.reference)
-        val site = goldenRecord.site
-            ?.let { references.bpnOf(it.reference) }
-            ?.let { siteBpnParser.parse(listOf(it)).single().parsedOrNull() }
+        val siteBpn = goldenRecord.site?.let { references.bpnOf(it.reference) }
+        val site = siteBpn?.let { siteBpnParser.parse(listOf(it)).single().parsedOrNull() }
+        // A new site whose main address already exists adopts that address and, with it, the address's legal entity.
+        val adoptedMainAddress = (goldenRecord.site as? SiteUpsertRaw.WithOwnMainAddress)
+            ?.takeIf { siteBpn == null }
+            ?.let { references.bpnOf(it.mainAddress.reference) }
+            ?.let { addressBpnParser.parse(listOf(it)).single().parsedOrNull() }
         val additionalAddress = goldenRecord.additionalAddress
             ?.let { references.bpnOf(it.reference) }
             ?.let { addressBpnParser.parse(listOf(it)).single().parsedOrNull() }
 
         return listOfNotNull(
             GoldenRecordTaskError.SiteNotInLegalEntity.takeIf { site != null && site.legalEntity.bpn != legalEntityBpn },
+            GoldenRecordTaskError.SiteMainAddressNotInLegalEntity
+                .takeIf { adoptedMainAddress != null && adoptedMainAddress.legalEntity?.bpn != legalEntityBpn },
             GoldenRecordTaskError.AdditionalAddressNotInLegalEntity
                 .takeIf { additionalAddress != null && additionalAddress.legalEntity?.bpn != legalEntityBpn }
         )
