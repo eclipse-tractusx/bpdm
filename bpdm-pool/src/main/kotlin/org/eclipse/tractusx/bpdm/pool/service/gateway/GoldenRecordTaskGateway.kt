@@ -70,8 +70,4 @@ class GoldenRecordTaskGateway(
 
     private fun withAcceptedErrorLength(result: TaskStepResultEntryDto) =
         result.copy(errors = result.errors.map { it.copy(description = it.description.take(MAX_ERROR_DESCRIPTION_LENGTH)) })
-
-    companion object {
-        private const val MAX_ERROR_DESCRIPTION_LENGTH = 250
-    }
 }
