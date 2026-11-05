@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,9 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed.task
 
-data class SiteCreateOnAddressRequest(
-    val mainAddressBpn: String,
-    val header: SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+
+/**
+ * The business partners of a golden record task as they stand once the task is carried out.
+ *
+ * The additional address belongs to the legal entity, and the additional sites are the sites of the task's record
+ * address other than its own site, oldest first.
+ */
+data class UpsertedGoldenRecordParsed(
+    val legalEntity: LegalEntityDb,
+    val site: SiteDb?,
+    val additionalAddress: LogisticAddressDb?,
+    val additionalSites: List<SiteDb>
 )

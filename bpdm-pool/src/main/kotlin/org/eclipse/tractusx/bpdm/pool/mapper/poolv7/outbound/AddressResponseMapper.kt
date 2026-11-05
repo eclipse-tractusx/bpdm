@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScr
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressInvariantVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
@@ -50,15 +49,6 @@ class AddressResponseMapper(
     private val identifierTypeResponseMapper: IdentifierTypeResponseMapper,
     private val relationResponseMapper: RelationResponseMapper
 ) {
-
-    /**
-     * Returns the given address as the API reports it.
-     */
-    fun toAddress(address: LogisticAddressDb): LogisticAddressVerboseV7Dto =
-        LogisticAddressVerboseV7Dto(
-            address = toInvariantAddress(address),
-            scriptVariants = toScriptVariants(address.scriptVariants)
-        )
 
     /**
      * Returns the script-invariant part of the given address as the API reports it.

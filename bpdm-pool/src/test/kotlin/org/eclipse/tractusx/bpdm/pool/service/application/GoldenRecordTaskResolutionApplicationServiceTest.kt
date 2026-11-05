@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.application
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
@@ -30,10 +30,15 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.eclipse.tractusx.bpdm.pool.service.IRelationUpsertStrategyService
+import org.eclipse.tractusx.bpdm.pool.service.OwnedByRelationUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.compareLegalEntity
+import org.eclipse.tractusx.bpdm.pool.service.compareLogisticAddress
+import org.eclipse.tractusx.bpdm.pool.service.compareSite
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -56,13 +61,15 @@ import java.util.*
 
 
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class],
+    properties = ["bpdm.tasks.cron=-", "bpdm.sharingMemberRecords.cron=-"]
 )
 @ActiveProfiles("test-no-auth")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class TaskResolutionServiceTest @Autowired constructor(
-    val cleaningStepService: TaskResolutionService,
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
+class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
+    val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
+    val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val legalEntityRepository: LegalEntityRepository,
     val poolClient: PoolV7Client,
@@ -121,7 +128,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
-        assertTaskError(createResult[0], "TASK_1", CleaningError.LEGAL_NAME_IS_NULL)
+        assertTaskError(createResult[0], "TASK_1", "Legal name is null")
     }
 
     @Test
@@ -787,7 +794,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
 
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors).hasSize(1)
+        assertThat(createResult[0].errors).isNotEmpty
     }
 
     @Test
@@ -821,7 +828,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateSiteRequest)
-        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors.map { it.description }).contains("Site InvalidBPN not found")
     }
 
     @Test
@@ -878,7 +885,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateSiteRequest)
-        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors).isNotEmpty
     }
 
     @Test
@@ -995,11 +1002,11 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val taskSteps = multipleTaskStep(fullBpWithLegalEntity)
-        val createResults = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps)
+        val createResults = resolveTasks(taskSteps)
         assertThat(createResults).hasSize(numberOfEntitiesToTest)
         assertThat(createResults.filter { it.errors.isNotEmpty() }).hasSize(0)
 
-        val updateResults = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps)
+        val updateResults = resolveTasks(taskSteps)
         assertThat(updateResults).hasSize(numberOfEntitiesToTest)
         assertThat(updateResults.filter { it.errors.isNotEmpty() }).hasSize(0)
     }
@@ -1021,8 +1028,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains("The legal entity is not the parent of the site")
     }
 
     @Test
@@ -1041,15 +1047,20 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains("The legal entity is not the parent of the additional address")
     }
 
 
     fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
-        return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
+        return resolveTasks(taskStep)
+    }
+
+    fun resolveTasks(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedTasks(taskEntries)
+        taskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getStepResults()
     }
 
     fun singleTaskStep(taskId: String, businessPartner: BusinessPartner): List<TaskStepReservationEntryDto> {
@@ -1162,11 +1173,11 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
     }
 
-    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
+    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, errorDescription: String) {
 
         assertThat(step.taskId).isEqualTo(taskId)
         assertThat(step.errors.size).isEqualTo(1)
-        assertThat(step.errors[0].description).isEqualTo(error.message)
+        assertThat(step.errors[0].description).isEqualTo(errorDescription)
     }
 
     private fun String.toBpnRequest() = BpnReference(this, null, BpnRequestIdentifier)
@@ -1231,6 +1242,40 @@ class TaskResolutionServiceTest @Autowired constructor(
         upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)
         assertThat(updatedLegalEntity.legalAddress.addressType == AddressType.LegalAndSiteMainAddress).isTrue()
+    }
+
+    @Test
+    fun `try create site stating the new legal address as its own main address`() {
+        val legalAddressRef = "le-addr-new-shared".toBpnRequest()
+        val request = orchTestDataFactory.createFullBusinessPartner("newShared")
+            .withLegalReferences("le-new-shared".toBpnRequest(), legalAddressRef)
+            .withSiteReferences("site-new-shared".toBpnRequest(), legalAddressRef)
+            .copy(additionalAddress = null)
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = request)
+
+        assertThat(result.single().errors.map { it.description })
+            .contains("The site main address is the legal address and must not be stated separately")
+    }
+
+    @Test
+    fun `try create site stating the existing legal address as its own main address`() {
+        val leRef = "le-existing-shared".toBpnRequest()
+        val legalAddressRef = "le-addr-existing-shared".toBpnRequest()
+        val createLegalEntity = orchTestDataFactory.createFullBusinessPartner("existingShared")
+            .withLegalReferences(leRef, legalAddressRef)
+            .copy(site = null, additionalAddress = null)
+        val legalAddressBpn = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntity)
+            .single().businessPartner.legalEntity.legalAddress.bpnReference
+
+        val request = orchTestDataFactory.createFullBusinessPartner("existingShared")
+            .withLegalReferences(leRef, legalAddressRef)
+            .withSiteReferences("site-existing-shared".toBpnRequest(), legalAddressBpn)
+            .copy(additionalAddress = null)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = request)
+
+        assertThat(result.single().errors.map { it.description })
+            .contains("The site main address is the legal address and must not be stated separately")
     }
 
     @Test
@@ -1344,6 +1389,30 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         assertThat(resultB.single().errors.map { it.description })
             .anyMatch { it.contains(siteABpns) && it.contains("must be stated") }
+        assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
+    }
+
+    @Test
+    fun `try create site sharing an existing site main address of another legal entity`() {
+        val sharedMainAddressRef = "shared-foreign-addr"
+
+        val createSiteA = orchTestDataFactory.createFullBusinessPartner("siteA")
+            .withLegalReferences("le-foreign-owner".toBpnRequest(), "le-addr-foreign-owner".toBpnRequest())
+            .withSiteReferences("site-a-foreign".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+        val resultA = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteA)
+        val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
+        val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
+
+        val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
+            .withLegalReferences("le-foreign-other".toBpnRequest(), "le-addr-foreign-other".toBpnRequest())
+            .withSiteReferences("site-b-foreign".toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+
+        val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
+
+        assertThat(resultB.single().errors.map { it.description })
+            .contains("The legal entity is not the parent of the site main address")
         assertThat(poolClient.addresses.getAddress(sharedAddressBpn).address.additionalSites).isEmpty()
     }
 

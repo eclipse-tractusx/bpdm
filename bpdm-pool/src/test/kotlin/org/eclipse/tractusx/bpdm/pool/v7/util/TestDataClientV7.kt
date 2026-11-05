@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
+import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskScheduler
 import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
@@ -45,7 +45,7 @@ class TestDataClientV7(
     private val poolClient: PoolV7Client,
     private val requestFactory: PoolRequestFactoryV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    private val taskBatchResolutionService: TaskBatchResolutionService,
+    private val goldenRecordTaskScheduler: GoldenRecordTaskScheduler,
     private val taskRelationsResolutionService: TaskRelationsResolutionService
 ) {
 
@@ -144,7 +144,7 @@ class TestDataClientV7(
 
         orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
 
-        taskBatchResolutionService.processTasks()
+        goldenRecordTaskScheduler.processTasks()
         val businessPartnerResult = orchestratorMockDataFactory.getBusinessPartnerResolution()
         return businessPartnerResult
     }
@@ -154,7 +154,7 @@ class TestDataClientV7(
 
         orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
 
-        taskBatchResolutionService.processTasks()
+        goldenRecordTaskScheduler.processTasks()
         return orchestratorMockDataFactory.getBusinessPartnerResolutionErrors()
     }
 }

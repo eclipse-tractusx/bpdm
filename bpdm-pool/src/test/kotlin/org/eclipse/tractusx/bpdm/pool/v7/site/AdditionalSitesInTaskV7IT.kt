@@ -207,6 +207,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         val onLegalAddress = testDataClient.processTask(
             "Site $testName",
             orchestratorRequestFactory.buildLegalAddressSiteBusinessPartner("Site $testName").copyWithBpnRequests()
+                .let { it.copy(site = it.site!!.copy(scriptVariants = emptyList())) }
         )
         val legalEntityBpn = onLegalAddress.legalEntity.bpnReference.referenceValue!!
 
