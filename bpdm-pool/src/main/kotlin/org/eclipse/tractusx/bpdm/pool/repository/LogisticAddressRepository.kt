@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPropertiesSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -111,63 +110,63 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
             JOIN la.legalEntity le
             WHERE
                 (
-                    CAST(:#{#searchRequest.legalName} AS text) IS NULL
+                    CAST(:legalName AS text) IS NULL
                     OR concat(function('bpdm.normalize_name', CAST(la.legalEntity.legalName.value AS text)), '')
-                    Like concat('%', concat(function('bpdm.normalize_name', CAST(:#{#searchRequest.legalName} AS text)), ''), '%')
+                    Like concat('%', concat(function('bpdm.normalize_name', CAST(:legalName AS text)), ''), '%')
                     OR function(
                        'regexp_match',
                        concat(CAST(la.legalEntity.legalName.value AS text), ''),
-                       concat('.*', function('regexp_replace', CAST(:#{#searchRequest.legalName} AS text), '_', '.', 'g'), '.*')
+                       concat('.*', function('regexp_replace', CAST(:legalName AS text), '_', '.', 'g'), '.*')
                     ) IS NOT NULL
                 )
                 AND (
-                    CAST(:#{#searchRequest.bpn} AS text) IS NULL 
-                    OR le.bpn = CAST(:#{#searchRequest.bpn} AS text)
+                    CAST(:bpn AS text) IS NULL 
+                    OR le.bpn = CAST(:bpn AS text)
                     OR EXISTS (
                       SELECT 1 FROM SiteDb s2
                       WHERE s2.mainAddress = la
-                        AND s2.bpn = CAST(:#{#searchRequest.bpn} AS text)
+                        AND s2.bpn = CAST(:bpn AS text)
                   )
                 )
                 AND (
-                    CAST(:#{#searchRequest.streetName} AS text) IS NULL
+                    CAST(:streetName AS text) IS NULL
                     OR concat(function('bpdm.normalize_name', cast(la.physicalPostalAddress.street.name as text)),'') 
-                    LIKE concat('%', concat(function('bpdm.normalize_name', CAST(:#{#searchRequest.streetName} AS text)), ''),'%')
+                    LIKE concat('%', concat(function('bpdm.normalize_name', CAST(:streetName AS text)), ''),'%')
                     OR function(
                        'regexp_match',
                        concat(CAST(la.physicalPostalAddress.street.name AS text), ''),
-                       concat('.*', function('regexp_replace', CAST(:#{#searchRequest.streetName} AS text), '_', '.', 'g'), '.*')
+                       concat('.*', function('regexp_replace', CAST(:streetName AS text), '_', '.', 'g'), '.*')
                     ) IS NOT NULL
                 )
                 AND ( 
-                    :#{#searchRequest.postalCode} IS NULL 
-                    OR la.physicalPostalAddress.postCode = :#{#searchRequest.postalCode} 
+                    :postalCode IS NULL 
+                    OR la.physicalPostalAddress.postCode = :postalCode 
                 )
                 AND (
-                    CAST(:#{#searchRequest.city} AS text) IS NULL
+                    CAST(:city AS text) IS NULL
                     OR concat(function('bpdm.normalize_name',CAST(la.physicalPostalAddress.city AS text)),'') 
-                    Like concat('%',concat(function('bpdm.normalize_name',CAST(:#{#searchRequest.city} AS text)),''), '%')
+                    Like concat('%',concat(function('bpdm.normalize_name',CAST(:city AS text)),''), '%')
                     OR function(
                        'regexp_match',
                        concat(CAST(la.physicalPostalAddress.city AS text), ''),
-                       concat('.*', function('regexp_replace', CAST(:#{#searchRequest.city} AS text), '_', '.', 'g'), '.*')
+                       concat('.*', function('regexp_replace', CAST(:city AS text), '_', '.', 'g'), '.*')
                     ) IS NOT NULL
                 )
                 AND (
-                    CAST(:#{#searchRequest.country} AS text) IS NULL
-                    OR la.physicalPostalAddress.country.countryCode = CAST(:#{#searchRequest.country} AS text)
+                    CAST(:country AS text) IS NULL
+                    OR la.physicalPostalAddress.country.countryCode = CAST(:country AS text)
                 )
                 AND (
                        (
-                            CAST(:#{#isLegalEntity} AS boolean) = true
+                            CAST(:includesLegalEntities AS boolean) = true
                             AND le.legalAddress = la
                        )
                     OR (
-                            CAST(:#{#isSite} AS boolean) = true
+                            CAST(:includesSites AS boolean) = true
                             AND EXISTS (SELECT 1 FROM SiteDb s WHERE s.mainAddress = la)
                        )
                     OR (
-                            CAST(:#{#isAdditionalAddress} AS boolean) = true
+                            CAST(:includesAdditionalAddresses AS boolean) = true
                             AND le.legalAddress <> la
                             AND NOT EXISTS (SELECT 1 FROM SiteDb s WHERE s.mainAddress = la)
                        )
@@ -175,9 +174,15 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
             """
     )
     fun searchBusinessPartner(
-        searchRequest: LegalEntityPropertiesSearchV7Request,
-        isLegalEntity: Boolean,
-        isSite: Boolean,
-        isAdditionalAddress: Boolean,
-        pageable: Pageable): Page<LogisticAddressDb>
+        bpn: String?,
+        legalName: String?,
+        streetName: String?,
+        postalCode: String?,
+        city: String?,
+        country: String?,
+        includesLegalEntities: Boolean,
+        includesSites: Boolean,
+        includesAdditionalAddresses: Boolean,
+        pageable: Pageable
+    ): Page<LogisticAddressDb>
 }

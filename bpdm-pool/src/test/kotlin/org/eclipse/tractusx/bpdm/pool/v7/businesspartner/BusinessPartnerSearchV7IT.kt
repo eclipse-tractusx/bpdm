@@ -133,6 +133,30 @@ class BusinessPartnerSearchV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
+     * WHEN sharing member searches by legal name with an empty BPNL
+     * THEN sharing member finds the matching legal entity
+     */
+    @Test
+    fun `search by legal name with empty BPNL returns matching legal entity`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        testDataClient.createLegalEntity("Other $testName")
+        val legalName = legalEntityResponse.header.legalName
+
+        //WHEN
+        val searchResponse = poolClient.businessPartners.searchBusinessPartners(
+            LegalEntityPropertiesSearchV7Request(legalName, "", null, null, null, null),
+            setOf(BusinessPartnerSearchFilterTypeV7.IncludeLegalEntities),
+            PaginationRequest(0, 100)
+        )
+
+        //THEN
+        Assertions.assertThat(searchResponse.totalElements).isEqualTo(1)
+        Assertions.assertThat(searchResponse.content.single().legalEntity.legalEntityBpn).isEqualTo(legalEntityResponse.header.bpnl)
+    }
+
+    /**
+     * GIVEN legal entity
      * WHEN sharing member searches by BPNL combined with legal name
      * THEN sharing member finds the legal entity matching both
      */
