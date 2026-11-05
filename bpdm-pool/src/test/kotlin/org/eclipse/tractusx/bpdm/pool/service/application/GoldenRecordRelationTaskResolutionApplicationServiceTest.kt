@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.application
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
-import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
@@ -58,7 +57,7 @@ import java.util.*
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
-class TaskRelationsResolutionServiceTest @Autowired constructor(
+class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constructor(
     val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
     val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val poolClient: PoolV7Client,
