@@ -108,7 +108,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
+        assertThat(result[0].errors.map { it.description }).containsExactlyInAnyOrder(
+            "Source legal entity with specified BPNL : ${BusinessPartnerVerboseValues.firstBpnL} not found",
+            "Target legal entity with specified BPNL : ${BusinessPartnerVerboseValues.secondBpnL} not found"
+        )
     }
 
     /*
@@ -351,7 +354,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         //Step4: Assert error
         assertThat(resultDataspaceParticipantViolation.size).isEqualTo(1)
         val violationResult = resultDataspaceParticipantViolation.first()
-        assertThat(violationResult.errors.size).isEqualTo(1)
+        assertThat(violationResult.errors.map { it.description }).anyMatch { it.contains("is not a dataspace participant") }
     }
 
     /**
@@ -974,8 +977,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool("TASK_UNKNOWN_SITES", unknownSiteRelation).single()
 
         //THEN
-        assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Source site BPNS BPNS0000000000XY not found")
+        assertThat(result.errors.map { it.description }).containsExactlyInAnyOrder(
+            "Source site BPNS BPNS0000000000XY not found",
+            "Target site BPNS BPNS0000000000ZY not found"
+        )
     }
 
     /**

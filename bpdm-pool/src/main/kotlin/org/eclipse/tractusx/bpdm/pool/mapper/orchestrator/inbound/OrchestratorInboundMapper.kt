@@ -27,6 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.task.BusinessStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordPassThroughRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRelationTaskRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.NamePartKind
@@ -65,6 +69,7 @@ import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVaria
 import org.eclipse.tractusx.orchestrator.api.model.BpnReference
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.BusinessState
 import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria
 import org.eclipse.tractusx.orchestrator.api.model.GeoCoordinate
@@ -80,7 +85,9 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVarian
 import org.eclipse.tractusx.orchestrator.api.model.Site
 import org.eclipse.tractusx.orchestrator.api.model.Street
 import org.eclipse.tractusx.orchestrator.api.model.StreetScriptVariant
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.Street as PoolStreet
 import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant as PoolStreetScriptVariant
@@ -89,7 +96,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.PhysicalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.PostalAddressScriptVariant as PoolPostalAddressScriptVariant
 
 /**
- * Translates the golden record tasks the Orchestrator hands to the Pool into the Pool's raw model.
+ * Translates the golden record and golden record relation tasks the Orchestrator hands to the Pool into the Pool's raw model.
  */
 @Component
 class OrchestratorInboundMapper {
@@ -104,6 +111,32 @@ class OrchestratorInboundMapper {
             goldenRecord = toGoldenRecord(task.businessPartner),
             passThrough = toPassThrough(task.businessPartner)
         )
+
+    /**
+     * Returns the raw golden record relation task [task] carries.
+     */
+    fun toRaw(task: TaskRelationsStepReservationEntryDto): GoldenRecordRelationTaskRaw =
+        GoldenRecordRelationTaskRaw(
+            taskId = task.taskId,
+            relation = toRelation(task.businessPartnerRelations)
+        )
+
+    private fun toRelation(relation: BusinessPartnerRelations): RelationRaw =
+        RelationRaw(
+            type = toRelationType(relation.relationType),
+            sourceBpn = relation.businessPartnerSourceBpn,
+            targetBpn = relation.businessPartnerTargetBpn,
+            validityPeriods = relation.validityPeriods.map { RelationValidityPeriodRaw(validFrom = it.validFrom, validTo = it.validTo) },
+            reasonCode = relation.reasonCode
+        )
+
+    private fun toRelationType(type: OrchestratorRelationType): RelationType =
+        when (type) {
+            OrchestratorRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            OrchestratorRelationType.IsManagedBy -> RelationType.IsManagedBy
+            OrchestratorRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+            OrchestratorRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+        }
 
     private fun toGoldenRecord(businessPartner: BusinessPartner): GoldenRecordRaw =
         GoldenRecordRaw(

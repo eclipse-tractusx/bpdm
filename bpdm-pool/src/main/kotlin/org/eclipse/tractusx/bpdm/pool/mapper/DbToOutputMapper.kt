@@ -336,7 +336,10 @@ class DbToOutputMapper {
     private fun toStateRecord(state: AddressStateDb): BusinessStateRecord =
         BusinessStateRecord(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
 
-    private fun toRelationRecord(relation: RelationDb): LegalEntityRelationRecord =
+    /**
+     * Returns the output record for [relation].
+     */
+    fun toRelationRecord(relation: RelationDb): LegalEntityRelationRecord =
         LegalEntityRelationRecord(
             type = relation.type,
             sourceBpnl = relation.startNode.bpn,
@@ -345,7 +348,10 @@ class DbToOutputMapper {
             reasonCode = relation.reasonCode?.technicalKey
         )
 
-    private fun toRelationRecord(relation: SiteRelationDb): SiteRelationRecord =
+    /**
+     * Returns the output record for [relation].
+     */
+    fun toRelationRecord(relation: SiteRelationDb): SiteRelationRecord =
         SiteRelationRecord(
             type = relation.type,
             sourceBpns = relation.startSite.bpn,
@@ -354,7 +360,10 @@ class DbToOutputMapper {
             reasonCode = relation.reasonCode?.technicalKey
         )
 
-    private fun toRelationRecord(relation: AddressRelationDb): AddressRelationRecord =
+    /**
+     * Returns the output record for [relation].
+     */
+    fun toRelationRecord(relation: AddressRelationDb): AddressRelationRecord =
         AddressRelationRecord(
             type = relation.type,
             sourceBpna = relation.startAddress.bpn,

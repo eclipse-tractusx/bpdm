@@ -1,0 +1,157 @@
+/*******************************************************************************
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.service.operation.relation
+
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
+import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.LegalEntityRelationUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantUpdateService
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+
+/**
+ * Writes relations between two legal entities and keeps the state that depends on them current.
+ */
+@Service
+class LegalEntityRelationUpsertService(
+    private val relationRepository: RelationRepository,
+    private val changelogCreateService: ChangelogCreateService,
+    private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
+    private val eventTriggerRepository: LegalEntityRelationEventTriggerRepository,
+    private val dataSpaceParticipantUpdateService: DataSpaceParticipantUpdateService
+) {
+
+    private val logger = KotlinLogging.logger { }
+
+    /**
+     * Persists [relation] and returns it as stored; an ownership or alternative headquarter relation also recalculates
+     * the ultimate owners and reschedules its validity boundary triggers, a management relation makes the managed legal
+     * entity a data space participant.
+     */
+    @Transactional
+    fun upsert(relation: LegalEntityRelationUpsertParsed): RelationDb {
+        val written = write(relation).value
+
+        when (relation.type) {
+            LegalEntityRelationTypeV7.IsOwnedBy -> {
+                ultimateOwnerRecalculationService.recalculate(listOf(relation.source))
+                rescheduleValidityBoundaryTriggers(written, TriggerEventType.OwnershipValidityBoundary)
+            }
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> {
+                ultimateOwnerRecalculationService.recalculate(listOf(relation.source))
+                rescheduleValidityBoundaryTriggers(written, TriggerEventType.AlternativeHeadquarterValidityBoundary)
+            }
+            LegalEntityRelationTypeV7.IsManagedBy -> makeParticipant(relation.source)
+            LegalEntityRelationTypeV7.IsReplacedBy -> Unit
+        }
+
+        return written
+    }
+
+    private fun write(relation: LegalEntityRelationUpsertParsed): UpsertResult<RelationDb> {
+        val validityPeriods = relation.validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }
+        val existingRelation = relation.existingRelation
+
+        val upsertResult = when {
+            existingRelation == null -> UpsertResult(create(relation, validityPeriods), UpsertType.Created)
+            validityPeriodsDiffer(existingRelation.validityPeriods, validityPeriods) -> {
+                existingRelation.validityPeriods.clear()
+                existingRelation.validityPeriods.addAll(validityPeriods)
+                existingRelation.updatedAt = DbTimestamp.now()
+                relationRepository.save(existingRelation)
+                UpsertResult(existingRelation, UpsertType.Updated)
+            }
+            else -> UpsertResult(existingRelation, UpsertType.NoChange)
+        }
+
+        if (upsertResult.upsertType != UpsertType.NoChange) {
+            val updatedAt = DbTimestamp.now()
+            relation.source.updatedAt = updatedAt
+            relation.target.updatedAt = updatedAt
+        }
+
+        val description = "${relation.type} relation from legal entity '${relation.source.bpn}' to '${relation.target.bpn}'"
+        when (upsertResult.upsertType) {
+            UpsertType.Created -> logger.info { "Created $description" }
+            UpsertType.Updated -> logger.info { "Updated validity periods of $description" }
+            UpsertType.NoChange -> logger.debug { "Left $description unchanged" }
+        }
+
+        return upsertResult
+    }
+
+    private fun create(relation: LegalEntityRelationUpsertParsed, validityPeriods: List<RelationValidityPeriodDb>): RelationDb {
+        val newRelation = RelationDb(
+            type = relation.type,
+            startNode = relation.source,
+            endNode = relation.target,
+            validityPeriods = validityPeriods.toMutableList(),
+            reasonCode = relation.reasonCode
+        )
+        relationRepository.save(newRelation)
+
+        changelogCreateService.record(ChangelogRecord(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogRecord(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+
+        return newRelation
+    }
+
+    // Only the difference is applied: Hibernate flushes inserts before deletes, so deleting and reinserting a trigger with an
+    // unchanged date would collide on the (relation_id, event_type, trigger_date) unique constraint.
+    private fun rescheduleValidityBoundaryTriggers(relation: RelationDb, eventType: TriggerEventType) {
+        val today = LocalDate.now()
+        val startDates = relation.validityPeriods.map { it.validFrom }.filter { it > today }
+        val expiryDates = relation.validityPeriods.mapNotNull { it.validTo }.map { it.plusDays(1) }.filter { it > today }
+        val desiredTriggerDates = (startDates + expiryDates).toSet()
+
+        val unprocessedTriggers = eventTriggerRepository.findByRelationAndEventType(relation, eventType).filterNot { it.isProcessed }
+        val scheduledTriggerDates = unprocessedTriggers.map { it.triggerDate }.toSet()
+
+        eventTriggerRepository.deleteAll(unprocessedTriggers.filterNot { it.triggerDate in desiredTriggerDates })
+        eventTriggerRepository.saveAll((desiredTriggerDates - scheduledTriggerDates).map { LegalEntityRelationEventTriggerDb(it, false, eventType, relation) })
+    }
+
+    private fun makeParticipant(legalEntity: LegalEntityDb) {
+        if (!legalEntity.isDataSpaceParticipant)
+            dataSpaceParticipantUpdateService.update(listOf(DataSpaceParticipantUpdateParsed(legalEntity, isDataSpaceParticipant = true)))
+    }
+
+    private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
+        if (existingValidityPeriods.size != newValidityPeriods.size) return true
+        return existingValidityPeriods.zip(newValidityPeriods).any { (existing, new) -> existing.validFrom != new.validFrom || existing.validTo != new.validTo }
+    }
+}

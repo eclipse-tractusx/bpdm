@@ -61,7 +61,7 @@ class OrchestratorOutboundMapper {
         when (result) {
             is GoldenRecordTaskResultRecord.Resolved -> TaskStepResultEntryDto(result.taskId, toBusinessPartner(result))
             is GoldenRecordTaskResultRecord.Rejected -> toErrorEntry(result.taskId, result.errors.map { toDescription(it) })
-            is GoldenRecordTaskResultRecord.Failed -> toErrorEntry(result.taskId, listOf("An unexpected error occurred during Pool update"))
+            is GoldenRecordTaskResultRecord.Failed -> toErrorEntry(result.taskId, listOf(UNEXPECTED_TASK_ERROR))
         }
 
     /**
@@ -69,16 +69,6 @@ class OrchestratorOutboundMapper {
      */
     fun toErrorReportEntry(taskId: String): TaskStepResultEntryDto =
         toErrorEntry(taskId, listOf(UNREPORTED_TASK_ERROR))
-
-    /**
-     * Returns the task step result that reports the golden record relation task with [taskId] as failed without a known cause.
-     */
-    fun toRelationsErrorReportEntry(taskId: String): TaskRelationsStepResultEntryDto =
-        TaskRelationsStepResultEntryDto(
-            taskId = taskId,
-            businessPartnerRelations = BusinessPartnerRelations.empty,
-            errors = listOf(TaskRelationsErrorDto(type = TaskRelationsErrorType.Unspecified, description = UNREPORTED_TASK_ERROR))
-        )
 
     private fun toErrorEntry(taskId: String, descriptions: List<String>) =
         TaskStepResultEntryDto(
@@ -528,6 +518,7 @@ class OrchestratorOutboundMapper {
         }
 
     companion object {
-        private const val UNREPORTED_TASK_ERROR = "Unknown golden record process error during Pool communication"
+        internal const val UNREPORTED_TASK_ERROR = "Unknown golden record process error during Pool communication"
+        internal const val UNEXPECTED_TASK_ERROR = "An unexpected error occurred during Pool update"
     }
 }

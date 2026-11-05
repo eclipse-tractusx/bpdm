@@ -26,7 +26,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
@@ -48,11 +51,12 @@ import java.util.*
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
-@ActiveProfiles("test-no-auth")
+@ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
-    val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService,
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
+class TaskRelationsRoutingIT @Autowired constructor(
+    val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
+    val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val poolClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
@@ -207,7 +211,9 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
 
     private fun upsertBusinessPartnerRelations(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto {
         val taskEntry = singleTaskStep(taskId, businessPartnerRelations)
-        return taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskEntry)
+        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(taskEntry))
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults().single()
     }
 
     private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelations): TaskRelationsStepReservationEntryDto {

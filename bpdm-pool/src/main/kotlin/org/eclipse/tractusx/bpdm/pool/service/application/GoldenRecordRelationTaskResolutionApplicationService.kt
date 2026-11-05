@@ -20,16 +20,22 @@
 package org.eclipse.tractusx.bpdm.pool.service.application
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskKind
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsStepBuildDispatcherService
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordRelationTaskResultRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.AddressRelationUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.LegalEntityRelationUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.SiteRelationUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRelationTaskRaw
 import org.eclipse.tractusx.bpdm.pool.service.gateway.GoldenRecordRelationTaskGateway
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.AddressRelationUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.LegalEntityRelationUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.operation.relation.SiteRelationUpsertService
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordTaskTrackingService
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordRelationTaskParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -40,8 +46,12 @@ import org.springframework.transaction.support.TransactionTemplate
 @Service
 class GoldenRecordRelationTaskResolutionApplicationService(
     private val taskGateway: GoldenRecordRelationTaskGateway,
-    private val stepBuildDispatcherService: TaskRelationsStepBuildDispatcherService,
+    private val taskParser: GoldenRecordRelationTaskParser,
+    private val legalEntityRelationUpsertService: LegalEntityRelationUpsertService,
+    private val siteRelationUpsertService: SiteRelationUpsertService,
+    private val addressRelationUpsertService: AddressRelationUpsertService,
     private val trackingService: GoldenRecordTaskTrackingService,
+    private val outputMapper: DbToOutputMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties,
     transactionManager: PlatformTransactionManager
 ) {
@@ -67,7 +77,7 @@ class GoldenRecordRelationTaskResolutionApplicationService(
         logger.debug { "Processed $totalTasksProcessed golden record relation tasks" }
     }
 
-    private fun resolveReservation(reservedTasks: List<TaskRelationsStepReservationEntryDto>) {
+    private fun resolveReservation(reservedTasks: List<GoldenRecordRelationTaskRaw>) {
         try {
             taskGateway.resolveTasks(reservedTasks.map(::resolve))
         } catch (ex: Throwable) {
@@ -76,20 +86,30 @@ class GoldenRecordRelationTaskResolutionApplicationService(
         }
     }
 
-    private fun resolve(task: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto =
+    private fun resolve(task: GoldenRecordRelationTaskRaw): GoldenRecordRelationTaskResultRecord =
         try {
-            entryTransaction.execute { stepBuildDispatcherService.upsertBusinessPartnerRelations(task) }!!
-        } catch (ex: BpdmValidationException) {
-            toErrorResult(task, ex.message ?: "")
+            entryTransaction.execute { parseAndUpsert(task) }!!
         } catch (ex: Throwable) {
             logger.error(ex) { "An unexpected error occurred during golden record task processing" }
-            toErrorResult(task, "An unexpected error occurred during Pool update")
+            GoldenRecordRelationTaskResultRecord.Failed(task.taskId, task.relation)
         }
 
-    private fun toErrorResult(task: TaskRelationsStepReservationEntryDto, description: String) =
-        TaskRelationsStepResultEntryDto(
-            taskId = task.taskId,
-            errors = listOf(TaskRelationsErrorDto(type = TaskRelationsErrorType.Unspecified, description = description)),
-            businessPartnerRelations = task.businessPartnerRelations
-        )
+    private fun parseAndUpsert(task: GoldenRecordRelationTaskRaw): GoldenRecordRelationTaskResultRecord =
+        when (val parseResult = taskParser.parse(task)) {
+            is ParseResult.Success -> upsert(task.taskId, parseResult.parsed)
+            is ParseResult.Failure -> GoldenRecordRelationTaskResultRecord.Rejected(task.taskId, task.relation, parseResult.errors)
+        }
+
+    private fun upsert(taskId: String, relation: RelationUpsertParsed): GoldenRecordRelationTaskResultRecord =
+        when (relation) {
+            is LegalEntityRelationUpsertParsed -> GoldenRecordRelationTaskResultRecord.LegalEntityRelationResolved(
+                taskId, outputMapper.toRelationRecord(legalEntityRelationUpsertService.upsert(relation))
+            )
+            is SiteRelationUpsertParsed -> GoldenRecordRelationTaskResultRecord.SiteRelationResolved(
+                taskId, outputMapper.toRelationRecord(siteRelationUpsertService.upsert(relation))
+            )
+            is AddressRelationUpsertParsed -> GoldenRecordRelationTaskResultRecord.AddressRelationResolved(
+                taskId, outputMapper.toRelationRecord(addressRelationUpsertService.upsert(relation))
+            )
+        }
 }
