@@ -325,27 +325,69 @@ class OrchestratorMockDataFactory(
     fun mockReservedTasks(reservedTasks: List<TaskStepReservationEntryDto>): List<TaskStepReservationEntryDto>{
         configureWireMock()
 
-        val reservation = TaskStepReservationResponse(reservedTasks, Instant.now().plus(Duration.ofSeconds(60)))
-        val emptyReservation = TaskStepReservationResponse(emptyList(), Instant.now().plus(Duration.ofSeconds(60)))
+        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationResponse(reservedTasks, reservationTimeout()), TaskStepReservationResponse(emptyList(), reservationTimeout()))
+        mockStepResultsResponse(200)
+        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()), TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()))
+
+        return reservedTasks
+    }
+
+    fun mockReservedRelationTasks(reservedTasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepReservationEntryDto>{
+        configureWireMock()
+
+        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationResponse(reservedTasks, reservationTimeout()), TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()))
+        mockRelationStepResultsResponse(200)
+        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationResponse(emptyList(), reservationTimeout()), TaskStepReservationResponse(emptyList(), reservationTimeout()))
+
+        return reservedTasks
+    }
+
+    private fun mockStepReservations(basePath: String, reservation: Any, emptyReservation: Any){
+        val scenario = "$basePath/step-reservations"
 
         WireMock.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
-                .inScenario("step-reservations")
+            WireMock.post(WireMock.urlPathEqualTo("$basePath/step-reservations"))
+                .inScenario(scenario)
                 .whenScenarioStateIs(com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED)
                 .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(reservation)))
                 .willSetStateTo("empty")
         )
         WireMock.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
-                .inScenario("step-reservations")
+            WireMock.post(WireMock.urlPathEqualTo("$basePath/step-reservations"))
+                .inScenario(scenario)
                 .whenScenarioStateIs("empty")
                 .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(emptyReservation)))
         )
+    }
+
+    private fun reservationTimeout() = Instant.now().plus(Duration.ofSeconds(60))
+
+    fun mockStepReservationsResponse(status: Int){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
+            .willReturn(WireMock.status(status)))
+    }
+
+    fun mockStepResultsResponse(status: Int){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"))
-            .willReturn(WireMock.ok()))
+            .willReturn(WireMock.status(status)))
+    }
 
-        return reservedTasks
+    fun mockRelationStepResultsResponse(status: Int){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/step-results"))
+            .willReturn(WireMock.status(status)))
+    }
+
+    fun getRelationStepResults(): List<TaskRelationsStepResultEntryDto>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/step-results")))
+            .flatMap { jsonMapper.readValue(it.body, TaskRelationsStepResultRequest::class.java).results }
     }
 
     fun getStepResults(): List<TaskStepResultEntryDto>{

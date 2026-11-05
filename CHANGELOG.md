@@ -33,6 +33,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Fixed
 
+- BPDM Pool: A golden record or relation task whose result could not be delivered to the Orchestrator is reported to it as an error afterwards, instead of staying reserved until the Orchestrator's pending timeout turns it into a timeout error.
 - BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error.
 - BPDM Gate: The output address type now always describes the address's role towards the output's site. [#1886](https://github.com/eclipse-tractusx/bpdm/issues/1886)
 - BPDM Gate: The CSV upload reports a malformed or incomplete geographic coordinate as an error instead of storing it as `0.0`.

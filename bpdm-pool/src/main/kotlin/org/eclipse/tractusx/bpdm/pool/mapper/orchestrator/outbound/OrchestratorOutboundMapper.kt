@@ -64,6 +64,22 @@ class OrchestratorOutboundMapper {
             is GoldenRecordTaskResultRecord.Failed -> toErrorEntry(result.taskId, listOf("An unexpected error occurred during Pool update"))
         }
 
+    /**
+     * Returns the task step result that reports the golden record task with [taskId] as failed without a known cause.
+     */
+    fun toErrorReportEntry(taskId: String): TaskStepResultEntryDto =
+        toErrorEntry(taskId, listOf(UNREPORTED_TASK_ERROR))
+
+    /**
+     * Returns the task step result that reports the golden record relation task with [taskId] as failed without a known cause.
+     */
+    fun toRelationsErrorReportEntry(taskId: String): TaskRelationsStepResultEntryDto =
+        TaskRelationsStepResultEntryDto(
+            taskId = taskId,
+            businessPartnerRelations = BusinessPartnerRelations.empty,
+            errors = listOf(TaskRelationsErrorDto(type = TaskRelationsErrorType.Unspecified, description = UNREPORTED_TASK_ERROR))
+        )
+
     private fun toErrorEntry(taskId: String, descriptions: List<String>) =
         TaskStepResultEntryDto(
             taskId = taskId,
@@ -510,4 +526,8 @@ class OrchestratorOutboundMapper {
             is SiteContentParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
             is SiteContentParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
         }
+
+    companion object {
+        private const val UNREPORTED_TASK_ERROR = "Unknown golden record process error during Pool communication"
+    }
 }
