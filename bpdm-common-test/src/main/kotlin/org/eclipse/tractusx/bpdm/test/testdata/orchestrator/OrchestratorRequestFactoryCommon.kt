@@ -33,11 +33,13 @@ class OrchestratorRequestFactoryCommon(
     private val countries: List<String> = metadata?.countries ?: emptyList()
 ) {
     fun buildUncategorizedProperties(seed: String, random: Random = createRandomFromSeed(seed)): UncategorizedProperties{
+        val address = buildPostalAddressWithScripVariants(seed, null)
         return UncategorizedProperties(
             nameParts = 1.rangeTo(random.nextInt(2, 5)).map { index -> "$seed Uncategorized Name Part $index" },
             identifiers = 1.rangeTo(random.nextInt(2, 5)).map { index -> buildIdentifier(seed, index, null)  },
             states = buildStates(random),
-            address = buildPostalAddressWithScripVariants(seed, null)
+            address = address,
+            scriptVariants = address.scriptVariants.map { UncategorizedScriptVariant(it.scriptCode, listOf("$seed Uncategorized Name Part Variant ${it.scriptCode}")) }
         )
     }
 

@@ -60,13 +60,14 @@ class OrchestratorMockDataFactory(
         seed: String,
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): TaskClientStateDto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
 
-        val refinementTaskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntityGoldenRecord, owningCompany, nameParts)
+        val refinementTaskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntityGoldenRecord, owningCompany, nameParts, scriptVariants)
         val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
 
         return mockedRefinedTask
@@ -77,7 +78,8 @@ class OrchestratorMockDataFactory(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         siteGoldenRecord: SiteVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): TaskClientStateDto{
         configureWireMock()
 
@@ -87,7 +89,8 @@ class OrchestratorMockDataFactory(
             legalEntityGoldenRecord,
             siteGoldenRecord,
             owningCompany,
-            nameParts
+            nameParts,
+            scriptVariants
         )
         val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
 
@@ -99,13 +102,14 @@ class OrchestratorMockDataFactory(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): TaskClientStateDto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
 
-        val refinementTaskData = refinementTestDataFactory.buildSiteBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, owningCompany, nameParts)
+        val refinementTaskData = refinementTestDataFactory.buildSiteBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, owningCompany, nameParts, scriptVariants)
         val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
 
         return mockedRefinedTask
@@ -117,13 +121,14 @@ class OrchestratorMockDataFactory(
         siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): TaskClientStateDto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
 
-        val refinementTaskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, addressGoldenRecord, owningCompany, nameParts)
+        val refinementTaskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, addressGoldenRecord, owningCompany, nameParts, scriptVariants)
         val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
 
         return mockedRefinedTask

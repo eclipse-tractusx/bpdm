@@ -253,13 +253,14 @@ class OrchestratorInboundMapper {
             AddressType.SiteMainAddress -> siteVariantsByCode.mapValues { it.value.mainAddress }
             AddressType.AdditionalAddress -> businessPartner.additionalAddress?.scriptVariants.orEmpty().associate { it.scriptCode to it.postalProperties }
         }
+        val uncategorizedVariantsByCode = businessPartner.uncategorized.scriptVariants.associateBy { it.scriptCode }
 
-        val scriptCodes = addressVariantsByCode.keys + legalEntityVariantsByCode.keys + siteVariantsByCode.keys
+        val scriptCodes = addressVariantsByCode.keys + legalEntityVariantsByCode.keys + siteVariantsByCode.keys + uncategorizedVariantsByCode.keys
         return scriptCodes.map { scriptCode ->
             val addressVariant = addressVariantsByCode[scriptCode]
             BusinessPartnerValuesRaw.ScriptVariant(
                 scriptCode = scriptCode,
-                nameParts = emptyList(),
+                nameParts = uncategorizedVariantsByCode[scriptCode]?.nameParts.orEmpty(),
                 legalName = legalEntityVariantsByCode[scriptCode]?.legalName,
                 shortName = legalEntityVariantsByCode[scriptCode]?.legalShortName,
                 siteName = siteVariantsByCode[scriptCode]?.siteName,

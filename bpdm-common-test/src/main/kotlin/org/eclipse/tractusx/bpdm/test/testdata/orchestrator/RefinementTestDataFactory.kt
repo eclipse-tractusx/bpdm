@@ -45,7 +45,8 @@ class RefinementTestDataFactory {
     fun buildLegalEntityBusinessPartner(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
@@ -54,7 +55,7 @@ class RefinementTestDataFactory {
                 legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
             ),
             owningCompany = owningCompany,
-            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts, scriptVariants = scriptVariants),
             legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
             site = null,
             additionalAddress = null
@@ -66,7 +67,8 @@ class RefinementTestDataFactory {
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         siteGoldenRecord: SiteVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
@@ -75,7 +77,7 @@ class RefinementTestDataFactory {
                 legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
             ),
             owningCompany = owningCompany,
-            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts, scriptVariants = scriptVariants),
             legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
             site = buildSiteWithLegalAddressAsMainComponent(siteGoldenRecord),
             additionalAddress = null
@@ -86,7 +88,8 @@ class RefinementTestDataFactory {
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
@@ -96,7 +99,7 @@ class RefinementTestDataFactory {
                 siteGoldenRecord.site.name.let { NamePart(it, NamePartType.SiteName) },
             ),
             owningCompany = owningCompany,
-            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts, scriptVariants = scriptVariants),
             legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
             site = buildSiteComponent(siteGoldenRecord),
             additionalAddress = null
@@ -107,7 +110,8 @@ class RefinementTestDataFactory {
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): BusinessPartner {
         return BusinessPartner(
             nameParts = listOfNotNull(
@@ -117,7 +121,7 @@ class RefinementTestDataFactory {
                 addressGoldenRecord.address.name?.let { NamePart(it, NamePartType.AddressName) }
             ),
             owningCompany = owningCompany,
-            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts, scriptVariants = scriptVariants),
             legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
             site = null,
             additionalAddress = buildPostalAddressWithScriptVariants(addressGoldenRecord)
@@ -129,7 +133,8 @@ class RefinementTestDataFactory {
         siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
-        nameParts: List<String>
+        nameParts: List<String>,
+        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
@@ -140,7 +145,7 @@ class RefinementTestDataFactory {
                 addressGoldenRecord.address.name?.let { NamePart(it, NamePartType.AddressName) }
             ),
             owningCompany = owningCompany,
-            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts, scriptVariants = scriptVariants),
             legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
             site = buildSiteComponent(siteGoldenRecord),
             additionalAddress = buildPostalAddressWithScriptVariants(addressGoldenRecord)

@@ -169,7 +169,13 @@ data class UncategorizedPropertiesRequest(
     val nameParts: List<String>,
     val identifiers: List<IdentifierRequest>,
     val states: List<BusinessStateRequest>,
-    val address: PostalAddressWithScriptVariantsRequest?
+    val address: PostalAddressWithScriptVariantsRequest?,
+    val scriptVariants: List<UncategorizedScriptVariantRequest> = emptyList()
+)
+
+data class UncategorizedScriptVariantRequest(
+    val scriptCode: String,
+    val nameParts: List<String>
 )
 
 data class LegalEntityScriptVariantRequest(

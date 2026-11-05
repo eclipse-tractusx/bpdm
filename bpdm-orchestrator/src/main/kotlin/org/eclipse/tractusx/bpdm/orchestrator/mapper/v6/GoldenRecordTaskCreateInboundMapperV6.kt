@@ -130,7 +130,8 @@ class GoldenRecordTaskCreateInboundMapperV6 {
                     postalProperties = toPostalAddressRequest(it),
                     scriptVariants = emptyList()
                 )
-            }
+            },
+            scriptVariants = emptyList()
         )
 
     private fun toSiteRequest(site: SiteV6) =
