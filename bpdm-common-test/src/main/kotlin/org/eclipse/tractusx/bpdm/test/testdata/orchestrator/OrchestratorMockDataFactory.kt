@@ -319,16 +319,20 @@ class OrchestratorMockDataFactory(
     }
 
     fun mockReservedBusinessPartner(seed: String, businessPartner: BusinessPartner): TaskStepReservationEntryDto{
-        WireMock.configureFor("localhost", orchestratorMockServer.port())
+        return mockReservedTasks(buildReservedTasks(seed, businessPartner).reservedTasks).single()
+    }
 
-        val mockedReservedTasks = buildReservedTasks(seed, businessPartner)
+    fun mockReservedTasks(reservedTasks: List<TaskStepReservationEntryDto>): List<TaskStepReservationEntryDto>{
+        configureWireMock()
+
+        val reservation = TaskStepReservationResponse(reservedTasks, Instant.now().plus(Duration.ofSeconds(60)))
         val emptyReservation = TaskStepReservationResponse(emptyList(), Instant.now().plus(Duration.ofSeconds(60)))
 
         WireMock.stubFor(
             WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
                 .inScenario("step-reservations")
                 .whenScenarioStateIs(com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED)
-                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedReservedTasks)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(reservation)))
                 .willSetStateTo("empty")
         )
         WireMock.stubFor(
@@ -341,7 +345,14 @@ class OrchestratorMockDataFactory(
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"))
             .willReturn(WireMock.ok()))
 
-        return mockedReservedTasks.reservedTasks.single()
+        return reservedTasks
+    }
+
+    fun getStepResults(): List<TaskStepResultEntryDto>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")))
+            .flatMap { jsonMapper.readValue(it.body, TaskStepResultRequest::class.java).results }
     }
 
     fun getBusinessPartnerResolution(): BusinessPartner{

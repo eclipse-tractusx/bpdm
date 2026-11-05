@@ -31,9 +31,11 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -56,13 +58,15 @@ import java.util.*
 
 
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class],
+    properties = ["bpdm.tasks.cron=-", "bpdm.sharingMemberRecords.cron=-"]
 )
 @ActiveProfiles("test-no-auth")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
 class TaskResolutionServiceTest @Autowired constructor(
-    val cleaningStepService: TaskResolutionService,
+    val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
+    val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val legalEntityRepository: LegalEntityRepository,
     val poolClient: PoolV7Client,
@@ -995,11 +999,11 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val taskSteps = multipleTaskStep(fullBpWithLegalEntity)
-        val createResults = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps)
+        val createResults = resolveTasks(taskSteps)
         assertThat(createResults).hasSize(numberOfEntitiesToTest)
         assertThat(createResults.filter { it.errors.isNotEmpty() }).hasSize(0)
 
-        val updateResults = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps)
+        val updateResults = resolveTasks(taskSteps)
         assertThat(updateResults).hasSize(numberOfEntitiesToTest)
         assertThat(updateResults.filter { it.errors.isNotEmpty() }).hasSize(0)
     }
@@ -1049,7 +1053,13 @@ class TaskResolutionServiceTest @Autowired constructor(
     fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
-        return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
+        return resolveTasks(taskStep)
+    }
+
+    fun resolveTasks(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedTasks(taskEntries)
+        taskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getStepResults()
     }
 
     fun singleTaskStep(taskId: String, businessPartner: BusinessPartner): List<TaskStepReservationEntryDto> {
