@@ -24,10 +24,14 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.AddressUpdateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7ResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7ResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
@@ -42,14 +46,21 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageStillNeeded
+import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressOmitted
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressCreateResult
+import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressUpdateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressIdentifierRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRelationRecord
@@ -118,6 +129,21 @@ class ApiV7AddressMapper(
     }
 
     /**
+     * Returns the response for an update batch, each result reported under the BPN of the request at its position.
+     */
+    fun toUpdateResponse(requests: List<AddressPartnerUpdateV7Request>, results: List<AddressUpdateResult>): AddressPartnerUpdateV7ResponseWrapper {
+        val entities = mutableListOf<AddressPartnerUpdateVerboseV7Dto>()
+        val errors = mutableListOf<ErrorInfoV7<AddressUpdateErrorV7>>()
+        requests.zip(results).forEach { (request, result) ->
+            when (result) {
+                is AddressUpdateResult.Updated -> entities.add(toUpdateDto(result.address))
+                is AddressUpdateResult.Rejected -> errors.addAll(result.errors.map { toUpdateErrorInfo(it, request.bpna) })
+            }
+        }
+        return AddressPartnerUpdateV7ResponseWrapper(entities, errors)
+    }
+
+    /**
      * Returns the script-invariant part of [record] as the API reports it.
      */
     fun toInvariantDto(record: AddressRecord): LogisticAddressInvariantVerboseV7Dto =
@@ -156,6 +182,12 @@ class ApiV7AddressMapper(
             index = entityKey
         )
 
+    private fun toUpdateDto(record: AddressRecord): AddressPartnerUpdateVerboseV7Dto =
+        AddressPartnerUpdateVerboseV7Dto(
+            address = toInvariantDto(record),
+            scriptVariants = toScriptVariantDtos(record)
+        )
+
     private fun toScriptVariantDtos(record: AddressRecord): List<LogisticAddressScriptVariantV7Dto> =
         record.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, toPostalAddressDto(it)) }
 
@@ -175,6 +207,39 @@ class ApiV7AddressMapper(
                 )
             is AddressContentParseError -> addressParseErrorMapper.toCreateErrorInfo(error, entityKey)
         }
+
+    private fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
+        when (error) {
+            is UnresolvableAddress ->
+                ErrorInfoV7(AddressUpdateErrorV7.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
+            is AddressContentParseError -> addressParseErrorMapper.toUpdateErrorInfo(error, entityKey)
+            is SiteNotInAddressLegalEntity ->
+                ErrorInfoV7(
+                    AddressUpdateErrorV7.SiteNotInLegalEntity,
+                    "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
+                    entityKey
+                )
+            is ScriptVariantCoverageStillNeeded ->
+                ErrorInfoV7(
+                    AddressUpdateErrorV7.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
+                            "is named in that script",
+                    entityKey
+                )
+            is UnresolvableSite ->
+                ErrorInfoV7(AddressUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
+            is SiteMainAddressOmitted ->
+                ErrorInfoV7(
+                    AddressUpdateErrorV7.SiteMainAddressOmitted,
+                    "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
+                    entityKey
+                )
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+        }
+
+    // An error that this use case cannot reach gets no public code.
+    private fun internalError(error: AddressUpdateParseError) =
+        BpdmValidationException("Unexpected address parse error (no public error code): $error")
 
     private fun toStateDto(record: BusinessStateRecord): AddressStateVerboseV7Dto =
         AddressStateVerboseV7Dto(

@@ -37,7 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -46,7 +46,7 @@ class AddressController(
     private val addressGetApplicationService: AddressGetApplicationService,
     private val addressSearchApplicationService: AddressSearchApplicationService,
     private val addressCreateApplicationService: AddressCreateApplicationService,
-    private val addressUpdateApplicationService: AddressUpdateApplicationV7Service,
+    private val addressUpdateApplicationService: AddressUpdateApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7AddressMapper: ApiV7AddressMapper
 ) : PoolAddressV7Api {
@@ -88,6 +88,8 @@ class AddressController(
     override fun updateAddresses(
         requests: Collection<AddressPartnerUpdateV7Request>
     ): AddressPartnerUpdateV7ResponseWrapper {
-        return addressUpdateApplicationService.updateAddresses(requests)
+        val requestList = requests.toList()
+        val results = addressUpdateApplicationService.update(requestList.map { apiV7InboundMapper.toAddressUpdateRaw(it) })
+        return apiV7AddressMapper.toUpdateResponse(requestList, results)
     }
 }

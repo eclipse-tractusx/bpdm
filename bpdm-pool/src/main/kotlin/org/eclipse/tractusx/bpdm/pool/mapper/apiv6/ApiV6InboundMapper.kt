@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
@@ -50,6 +51,7 @@ import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
@@ -246,6 +248,12 @@ class ApiV6InboundMapper(
      */
     fun toAddressCreateRaw(request: AddressPartnerCreateV6Request): AddressCreateRaw =
         AddressCreateRaw(parentBpn = request.bpnParent, content = addressDtoRequestMapperV6.toContentRequest(request.address))
+
+    /**
+     * Returns the raw update for the address a client sent, addressed by its BPN and leaving its site membership as it is.
+     */
+    fun toAddressUpdateRaw(request: AddressPartnerUpdateV6Request): AddressUpdateRaw =
+        AddressUpdateRaw(addressBpn = request.bpna, siteBpns = null, content = addressDtoRequestMapperV6.toContentRequest(request.address))
 
     /**
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.

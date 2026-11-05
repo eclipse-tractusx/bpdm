@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.bpn.BpnRequestIdentifierSearchV7Request
@@ -47,6 +48,7 @@ import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
@@ -242,6 +244,17 @@ class ApiV7InboundMapper(
      */
     fun toAddressCreateRaw(request: AddressPartnerCreateV7Request): AddressCreateRaw =
         AddressCreateRaw(parentBpn = request.bpnParent, content = addressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants))
+
+    /**
+     * Returns the raw update for the address a client sent, addressed by its BPN, with the complete set of sites it
+     * belongs to.
+     */
+    fun toAddressUpdateRaw(request: AddressPartnerUpdateV7Request): AddressUpdateRaw =
+        AddressUpdateRaw(
+            addressBpn = request.bpna,
+            siteBpns = request.bpnSites,
+            content = addressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants)
+        )
 
     /**
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.
