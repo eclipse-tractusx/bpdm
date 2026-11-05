@@ -656,6 +656,35 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         assertThat(result.errors.single().type).isEqualTo(TaskRelationsErrorType.Unspecified)
     }
 
+    /**
+     * GIVEN a relation golden record task whose later validity period ends before it starts
+     * WHEN trying to refine relation task
+     * THEN inverted validity period error returned
+     */
+    @Test
+    fun `reject relation with inverted later validity period`() {
+        //GIVEN
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val relation = buildRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
+            validityPeriods = listOf(
+                RelationValidityPeriod(validFrom = LocalDate.of(2020, 1, 1), validTo = LocalDate.of(2020, 12, 31)),
+                RelationValidityPeriod(validFrom = LocalDate.of(2025, 5, 1), validTo = LocalDate.of(2025, 1, 1))
+            )
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_INVERTED_PERIOD", relation).single()
+
+        //THEN
+        assertThat(result.errors.map { it.description })
+            .containsExactly("Relation validity period validFrom '2025-05-01' cannot be after validTo '2025-01-01'.")
+    }
+
     @ParameterizedTest
     @EnumSource(value = LegalEntityRelationTypeV7::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
     fun `reject unsupported address relation type`(relationType: LegalEntityRelationTypeV7) {
@@ -926,7 +955,9 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).contains("Invalid 'IsReplacedBy' relation:")
+        assertThat(result[0].errors[0].description)
+            .startsWith("Invalid 'IsReplacedBy' relation:")
+            .contains("Both addresses must")
     }
 
     /**

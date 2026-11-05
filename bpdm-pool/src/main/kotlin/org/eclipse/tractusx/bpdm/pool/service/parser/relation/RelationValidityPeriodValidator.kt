@@ -31,15 +31,17 @@ import org.springframework.stereotype.Service
 class RelationValidityPeriodValidator {
 
     /**
-     * Reports [validityPeriods] that are empty, whose earliest period ends before it starts, or of which two overlap.
+     * Reports [validityPeriods] that are empty, of which one ends before it starts, or of which two overlap.
      */
     fun validate(validityPeriods: List<RelationValidityPeriodRaw>): List<RelationUpsertError> {
+        if (validityPeriods.isEmpty()) return listOf(RelationUpsertError.ValidityPeriodsEmpty)
         val orderedValidityPeriods = validityPeriods.sortedBy { it.validFrom }
-        val firstPeriod = orderedValidityPeriods.firstOrNull() ?: return listOf(RelationUpsertError.ValidityPeriodsEmpty)
 
-        val inverted = firstPeriod.validTo
-            ?.takeIf { firstPeriod.validFrom.isAfter(it) }
-            ?.let { RelationUpsertError.ValidityPeriodInverted(firstPeriod.validFrom, it) }
+        val inverted = orderedValidityPeriods.firstNotNullOfOrNull { period ->
+            period.validTo
+                ?.takeIf { period.validFrom.isAfter(it) }
+                ?.let { RelationUpsertError.ValidityPeriodInverted(period.validFrom, it) }
+        }
 
         val orderedTimePeriods = orderedValidityPeriods.map { RelationTimePeriod.fromUnlimited(it.validFrom, it.validTo) }
         val overlap = RelationUpsertError.ValidityPeriodsOverlap

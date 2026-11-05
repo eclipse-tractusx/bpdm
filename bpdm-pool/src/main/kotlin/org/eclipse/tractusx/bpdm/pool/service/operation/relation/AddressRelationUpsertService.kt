@@ -34,6 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.AddressRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.service.HeadquarterSyncService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
@@ -46,6 +47,7 @@ import java.time.LocalDate
 @Service
 class AddressRelationUpsertService(
     private val addressRelationRepository: AddressRelationRepository,
+    private val addressRepository: LogisticAddressRepository,
     private val changelogCreateService: ChangelogCreateService,
     private val headquarterSyncService: HeadquarterSyncService,
     private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
@@ -65,6 +67,7 @@ class AddressRelationUpsertService(
             val updatedAt = DbTimestamp.now()
             relation.source.updatedAt = updatedAt
             relation.target.updatedAt = updatedAt
+            addressRepository.saveAll(listOf(relation.source, relation.target))
         }
         logOutcome(upsertResult.upsertType, relation)
 
@@ -139,10 +142,5 @@ class AddressRelationUpsertService(
             .filter { it.validFrom > today }
             .map { AddressRelationEventTriggerDb(it.validFrom, false, TriggerEventType.ReplacedAddress, relation) }
         addressRelationEventTriggerRepository.saveAll(futureEventTriggers)
-    }
-
-    private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
-        if (existingValidityPeriods.size != newValidityPeriods.size) return true
-        return existingValidityPeriods.zip(newValidityPeriods).any { (existing, new) -> existing.validFrom != new.validFrom || existing.validTo != new.validTo }
     }
 }

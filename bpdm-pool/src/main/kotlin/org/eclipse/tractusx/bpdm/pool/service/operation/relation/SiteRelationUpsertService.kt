@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.SiteRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRelationRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteRelationUpsertService(
     private val siteRelationRepository: SiteRelationRepository,
+    private val siteRepository: SiteRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
 
@@ -57,6 +59,7 @@ class SiteRelationUpsertService(
             val updatedAt = DbTimestamp.now()
             relation.source.updatedAt = updatedAt
             relation.target.updatedAt = updatedAt
+            siteRepository.saveAll(listOf(relation.source, relation.target))
         }
         logOutcome(upsertResult.upsertType, relation)
 
@@ -103,10 +106,5 @@ class SiteRelationUpsertService(
         changelogCreateService.record(ChangelogRecord(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
 
         return newRelation
-    }
-
-    private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
-        if (existingValidityPeriods.size != newValidityPeriods.size) return true
-        return existingValidityPeriods.zip(newValidityPeriods).any { (existing, new) -> existing.validFrom != new.validFrom || existing.validTo != new.validTo }
     }
 }

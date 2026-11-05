@@ -219,14 +219,14 @@ class OrchestratorRelationOutboundMapper {
         }
 
     private fun describeSuccessionAcrossLegalEntities(error: RelationUpsertError.SuccessionAcrossLegalEntities): String {
-        val (partner, bpnType) = when (error.subject) {
-            RelationSubject.LegalEntity -> "legal entity" to "BPNL"
-            RelationSubject.Site -> "site" to "BPNS"
-            RelationSubject.Address -> "address" to "BPNA"
+        val (partner, partners, bpnType) = when (error.subject) {
+            RelationSubject.LegalEntity -> Triple("legal entity", "legal entities", "BPNL")
+            RelationSubject.Site -> Triple("site", "sites", "BPNS")
+            RelationSubject.Address -> Triple("address", "addresses", "BPNA")
         }
         return "Invalid 'IsReplacedBy' relation: The source $partner with $bpnType '${error.predecessorBpn}' and target $partner with $bpnType " +
                 "'${error.successorBpn}' do not belong to the same Legal Entity (BPNL '${error.predecessorLegalEntityBpn}' and " +
-                "'${error.successorLegalEntityBpn}'). Both ${partner}s must belong to the same Legal Entity to create an " +
+                "'${error.successorLegalEntityBpn}'). Both $partners must belong to the same Legal Entity to create an " +
                 "'IsReplacedBy' relation."
     }
 

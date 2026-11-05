@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.LegalEntityRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
@@ -49,6 +50,7 @@ import java.time.LocalDate
 @Service
 class LegalEntityRelationUpsertService(
     private val relationRepository: RelationRepository,
+    private val legalEntityRepository: LegalEntityRepository,
     private val changelogCreateService: ChangelogCreateService,
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
     private val eventTriggerRepository: LegalEntityRelationEventTriggerRepository,
@@ -64,7 +66,16 @@ class LegalEntityRelationUpsertService(
      */
     @Transactional
     fun upsert(relation: LegalEntityRelationUpsertParsed): RelationDb {
-        val written = write(relation).value
+        val upsertResult = write(relation)
+        val written = upsertResult.value
+
+        if (upsertResult.upsertType != UpsertType.NoChange) {
+            val updatedAt = DbTimestamp.now()
+            relation.source.updatedAt = updatedAt
+            relation.target.updatedAt = updatedAt
+            legalEntityRepository.saveAll(listOf(relation.source, relation.target))
+        }
+        logOutcome(upsertResult.upsertType, relation)
 
         when (relation.type) {
             LegalEntityRelationTypeV7.IsOwnedBy -> {
@@ -85,33 +96,27 @@ class LegalEntityRelationUpsertService(
     private fun write(relation: LegalEntityRelationUpsertParsed): UpsertResult<RelationDb> {
         val validityPeriods = relation.validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }
         val existingRelation = relation.existingRelation
+            ?: return UpsertResult(create(relation, validityPeriods), UpsertType.Created)
 
-        val upsertResult = when {
-            existingRelation == null -> UpsertResult(create(relation, validityPeriods), UpsertType.Created)
-            validityPeriodsDiffer(existingRelation.validityPeriods, validityPeriods) -> {
-                existingRelation.validityPeriods.clear()
-                existingRelation.validityPeriods.addAll(validityPeriods)
-                existingRelation.updatedAt = DbTimestamp.now()
-                relationRepository.save(existingRelation)
-                UpsertResult(existingRelation, UpsertType.Updated)
-            }
-            else -> UpsertResult(existingRelation, UpsertType.NoChange)
+        if (!validityPeriodsDiffer(existingRelation.validityPeriods, validityPeriods)) {
+            return UpsertResult(existingRelation, UpsertType.NoChange)
         }
 
-        if (upsertResult.upsertType != UpsertType.NoChange) {
-            val updatedAt = DbTimestamp.now()
-            relation.source.updatedAt = updatedAt
-            relation.target.updatedAt = updatedAt
-        }
+        existingRelation.validityPeriods.clear()
+        existingRelation.validityPeriods.addAll(validityPeriods)
+        existingRelation.updatedAt = DbTimestamp.now()
+        relationRepository.save(existingRelation)
 
+        return UpsertResult(existingRelation, UpsertType.Updated)
+    }
+
+    private fun logOutcome(upsertType: UpsertType, relation: LegalEntityRelationUpsertParsed) {
         val description = "${relation.type} relation from legal entity '${relation.source.bpn}' to '${relation.target.bpn}'"
-        when (upsertResult.upsertType) {
+        when (upsertType) {
             UpsertType.Created -> logger.info { "Created $description" }
             UpsertType.Updated -> logger.info { "Updated validity periods of $description" }
             UpsertType.NoChange -> logger.debug { "Left $description unchanged" }
         }
-
-        return upsertResult
     }
 
     private fun create(relation: LegalEntityRelationUpsertParsed, validityPeriods: List<RelationValidityPeriodDb>): RelationDb {
@@ -148,10 +153,5 @@ class LegalEntityRelationUpsertService(
     private fun makeParticipant(legalEntity: LegalEntityDb) {
         if (!legalEntity.isDataSpaceParticipant)
             dataSpaceParticipantUpdateService.update(listOf(DataSpaceParticipantUpdateParsed(legalEntity, isDataSpaceParticipant = true)))
-    }
-
-    private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
-        if (existingValidityPeriods.size != newValidityPeriods.size) return true
-        return existingValidityPeriods.zip(newValidityPeriods).any { (existing, new) -> existing.validFrom != new.validFrom || existing.validTo != new.validTo }
     }
 }
