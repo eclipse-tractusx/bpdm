@@ -85,7 +85,7 @@ class LegalEntityUpsertParser(
                 .orRecord(errors) { GoldenRecordTaskError.LegalEntityCreateInvalid(it) }
                 ?.let { LegalEntityUpsertParsed.Create(reference, legalAddressReference, it) }
         else
-            legalEntityUpdateParser.parseWithoutCoverageCheck(listOf(LegalEntityUpdateRaw(existingBpn, content))).single()
+            legalEntityUpdateParser.parse(listOf(LegalEntityUpdateRaw(existingBpn, content))).single()
                 .orRecord(errors) { GoldenRecordTaskError.LegalEntityUpdateInvalid(it) }
                 ?.let { LegalEntityUpsertParsed.Update(reference, legalAddressReference, it) }
     }

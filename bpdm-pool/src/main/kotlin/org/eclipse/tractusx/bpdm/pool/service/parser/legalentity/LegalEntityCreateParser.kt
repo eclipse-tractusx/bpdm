@@ -23,7 +23,6 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
@@ -58,7 +57,7 @@ class LegalEntityCreateParser(
         val legalAddressResults = addressContentParser.parse(legalAddresses, legalAddresses.map { null })
         val coveredHeaderResults: List<ParseResult<LegalEntityHeaderParsed, LegalEntityCreateParseError>> =
             crossValidateParseResults(legalAddressResults, mergedHeaderResults) { legalAddress, header ->
-                scriptVariantCoverageValidator.check(legalAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
+                scriptVariantCoverageValidator.check(legalAddress.scriptCodes(), header.scriptCodes())
             }
 
         return zipParseResults(coveredHeaderResults, legalAddressResults) { header, legalAddress ->

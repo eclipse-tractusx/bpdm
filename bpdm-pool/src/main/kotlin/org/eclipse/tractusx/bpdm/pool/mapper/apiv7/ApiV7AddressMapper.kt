@@ -44,14 +44,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVa
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageStillNeeded
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressOmitted
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
@@ -215,13 +212,6 @@ class ApiV7AddressMapper(
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    AddressUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
-                            "is named in that script",
-                    entityKey
-                )
             is UnresolvableSite ->
                 ErrorInfoV7(AddressUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
             is SiteMainAddressOmitted ->
@@ -230,12 +220,7 @@ class ApiV7AddressMapper(
                     "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
                     entityKey
                 )
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
-
-    // An error that this use case cannot reach gets no public code.
-    private fun internalError(error: AddressUpdateParseError) =
-        BpdmValidationException("Unexpected address parse error (no public error code): $error")
 
     private fun toStateDto(record: BusinessStateRecord): AddressStateVerboseV7Dto =
         AddressStateVerboseV7Dto(

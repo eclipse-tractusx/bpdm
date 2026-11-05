@@ -68,13 +68,15 @@ class SiteCreateWithReferencedAddressAsMainService(
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
         // Several sites may name the same main address, so the address is staged once for all of them: staging it per
-        // site would write and log that one address several times over.
+        // site would write and log that one address several times over. The sites are linked first, because the address
+        // keeps the script variants of the sites built on it and has to see the new ones.
         val stagedAddressUpdates = parsed.zip(sites)
             .groupBy { (entry, _) -> entry.mainAddress.bpn }
             .mapValues { (_, ofOneAddress) ->
-                addressUpdateService.stageUpdate(AddressUpdate(ofOneAddress.first().first.mainAddress, mainAddressUpdate(ofOneAddress)))
+                val mainAddress = ofOneAddress.first().first.mainAddress
+                ofOneAddress.forEach { (_, site) -> site.mainAddress = mainAddress }
+                addressUpdateService.stageUpdate(AddressUpdate(mainAddress, mainAddressUpdate(ofOneAddress)))
             }
-        parsed.zip(sites).forEach { (entry, site) -> site.mainAddress = stagedAddressUpdates.getValue(entry.mainAddress.bpn).address }
 
         siteRepository.saveAll(sites)
         changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.SITE) })

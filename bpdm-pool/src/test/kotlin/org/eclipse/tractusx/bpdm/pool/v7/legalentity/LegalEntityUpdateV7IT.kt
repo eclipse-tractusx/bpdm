@@ -573,32 +573,50 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
-     * WHEN operator tries to update the legal entity with a script variant of another script code
-     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the site is still named in the script the
-     * update would stop covering on their shared address
+     * WHEN operator updates the legal entity into another script
+     * THEN their shared legal address carries both scripts, because the site is still named in the old one
      */
     @Test
-    fun `update legal entity into a script its site does not cover`(){
+    fun `update legal entity into a script its site does not state`(){
         //GIVEN
         val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
-        val coveredScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
+        val siteScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
         val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", givenLegalEntity)
-            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantV7Dto(coveredScriptCode, "Site Name $testName"))) }
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantV7Dto(siteScriptCode, "Site Name $testName"))) }
         val givenSite = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
+
+        //WHEN
+        val newScriptCode = scriptCodeOtherThan(setOf(siteScriptCode))
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantScriptCode(newScriptCode)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        assertThat(response.errors).isEmpty()
+        assertThat(scriptCodesOfAddress(givenSite.mainAddress.bpna)).containsExactlyInAnyOrder(siteScriptCode, newScriptCode)
+        assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode }).containsExactly(siteScriptCode)
+    }
+
+    /**
+     * GIVEN participant legal entity named in one script
+     * WHEN operator updates it to be named in no script
+     * THEN its legal address drops that script variant, because no business partner is named in it any more
+     */
+    @Test
+    fun `update legal entity out of its only script`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
             .withLegalForm(anyKnownLegalForm())
-            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+            .let { it.copy(legalEntity = it.legalEntity.copy(scriptVariants = emptyList())) }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfoV7(LegalEntityUpdateErrorV7.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
-        val expectedResponse = LegalEntityPartnerUpdateV7ResponseWrapper(emptyList(), listOf(expectedError))
-
-        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
-        assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode })
-            .containsExactly(coveredScriptCode)
+        assertThat(response.errors).isEmpty()
+        assertThat(scriptCodesOfAddress(givenLegalEntity.legalAddress.bpna)).isEmpty()
     }
 
     /**
@@ -629,4 +647,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
     // inserts, so a seeded pick can land on a legal form the Pool does not know. Take one the Pool actually has.
     private fun anyKnownLegalForm(): String =
         poolClient.metadata.getLegalForms(PaginationRequest()).content.first().technicalKey
+
+    private fun scriptCodesOfAddress(addressBpn: String): List<String> =
+        poolClient.addresses.getAddress(addressBpn).scriptVariants.map { it.scriptCode }
 }

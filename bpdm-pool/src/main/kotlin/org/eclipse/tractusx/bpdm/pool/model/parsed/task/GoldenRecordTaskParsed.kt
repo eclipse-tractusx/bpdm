@@ -106,7 +106,7 @@ sealed interface SiteUpsertParsed {
 
     data class CreateOnLegalAddress(
         override val reference: BpnReferenceParsed,
-        val header: SiteHeaderParsed
+        val content: SiteContentParsed
     ) : SiteUpsertParsed
 
     data class CreateOnExistingAddress(

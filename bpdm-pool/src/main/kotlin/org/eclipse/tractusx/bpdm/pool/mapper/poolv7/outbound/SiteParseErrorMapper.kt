@@ -44,13 +44,6 @@ class SiteParseErrorMapper(
             is UnresolvableSite ->
                 ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    SiteUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is SiteContentParseError -> contentErrorInfo(
                 error,

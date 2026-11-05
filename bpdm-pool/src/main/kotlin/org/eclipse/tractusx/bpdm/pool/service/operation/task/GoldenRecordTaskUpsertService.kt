@@ -109,7 +109,7 @@ class GoldenRecordTaskUpsertService(
                     .also { issuedBpns.record(site.mainAddressReference, it.mainAddress.bpn) }
             is SiteUpsertParsed.CreateOnLegalAddress ->
                 siteCreateWithReferencedAddressAsMainService
-                    .create(listOf(SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, site.header, mainAddressContent = null))).single()
+                    .create(listOf(SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, site.content.header, site.content.mainAddress))).single()
             is SiteUpsertParsed.CreateOnExistingAddress ->
                 siteCreateWithReferencedAddressAsMainService.create(listOf(site.create)).single()
                     .also { issuedBpns.record(site.mainAddressReference, it.mainAddress.bpn) }

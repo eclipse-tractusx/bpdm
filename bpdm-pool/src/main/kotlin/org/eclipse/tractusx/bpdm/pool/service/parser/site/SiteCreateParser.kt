@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
@@ -59,15 +58,18 @@ class SiteCreateParser(
 
     /**
      * Validates the content of each new site apart from its parent and reports either the validated content or every
-     * problem found in that entry.
+     * problem found in that entry; [mainAddressBpns] names the main address an entry states new content for, or null for
+     * a main address that does not exist yet.
      */
-    fun parseContent(contents: List<SiteContentRequest>): List<ParseResult<SiteContentParsed, SiteCreateParseError>> {
+    fun parseContent(
+        contents: List<SiteContentRequest>,
+        mainAddressBpns: List<String?> = contents.map { null }
+    ): List<ParseResult<SiteContentParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(contents.map { it.header })
-        val mainAddresses = contents.map { it.mainAddress }
-        val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
+        val mainAddressResults = addressContentParser.parse(contents.map { it.mainAddress }, mainAddressBpns)
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
-                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
+                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), header.scriptCodes())
             }
 
         return zipParseResults(coveredHeaderResults, mainAddressResults) { header, mainAddress -> SiteContentParsed(header, mainAddress) }

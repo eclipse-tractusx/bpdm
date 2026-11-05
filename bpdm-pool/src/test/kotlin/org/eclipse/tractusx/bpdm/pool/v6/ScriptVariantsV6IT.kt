@@ -19,12 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 /**
  * The v6 API has no script variants: they postdate its contract. Since a write replaces a business partner's full
- * content, a v6 write necessarily drops the script variants the business partner gained through v7 or the task path.
- * These tests hold that accepted data loss in place so it is not mistaken for a defect.
+ * content, a v6 write necessarily drops the script variants the business partner gained through v7 or the task path,
+ * except the address variants another business partner is still named in. These tests hold that accepted data loss in
+ * place so it is not mistaken for a defect.
  */
 class ScriptVariantsV6IT: UnscheduledPoolTestBaseV6AndV7() {
 
@@ -46,6 +48,26 @@ class ScriptVariantsV6IT: UnscheduledPoolTestBaseV6AndV7() {
         //THEN
         val updatedAddress = poolClientV7.addresses.getAddress(createdAddress.address.bpna)
         assertRepositoryV7.assertAddressScriptVariantsCleared(updatedAddress, createdAddress.scriptVariants)
+    }
+
+    /**
+     * GIVEN legal entity named in a script
+     * WHEN operator updates its legal address over the v6 API
+     * THEN the legal address keeps the script variant the legal entity is named in
+     */
+    @Test
+    fun `update legal address over v6 keeps the script variants its legal entity is named in`() {
+        //GIVEN
+        val legalEntity = testDataClientV7.createLegalEntity(testName)
+
+        //WHEN
+        val updateRequest = testDataFactory.request.buildAddressUpdateRequest("Updated $testName", legalEntity.legalAddress.bpna)
+        poolClient.addresses.updateAddresses(listOf(updateRequest))
+
+        //THEN
+        val updatedAddress = poolClientV7.addresses.getAddress(legalEntity.legalAddress.bpna)
+        assertThat(updatedAddress.scriptVariants.map { it.scriptCode })
+            .containsExactlyInAnyOrderElementsOf(legalEntity.scriptVariants.map { it.scriptCode })
     }
 
     /**

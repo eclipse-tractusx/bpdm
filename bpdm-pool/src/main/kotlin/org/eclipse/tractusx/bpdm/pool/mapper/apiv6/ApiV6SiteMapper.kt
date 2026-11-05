@@ -179,7 +179,6 @@ class ApiV6SiteMapper(
             is AddressContentParseError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded,
             is SiteContentParseError -> throw internalError(error)
         }
 
@@ -188,9 +187,6 @@ class ApiV6SiteMapper(
             is UnresolvableSite ->
                 ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs.
-            is ScriptVariantCoverageStillNeeded,
             is ScriptVariantNotCoveredByAddress,
             is SiteContentParseError -> throw internalError(error)
         }
