@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.application
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
@@ -30,8 +30,11 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordTaskResolutionApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.IRelationUpsertStrategyService
+import org.eclipse.tractusx.bpdm.pool.service.OwnedByRelationUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.compareLegalEntity
+import org.eclipse.tractusx.bpdm.pool.service.compareLogisticAddress
+import org.eclipse.tractusx.bpdm.pool.service.compareSite
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwnerResolutionService
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
@@ -64,7 +67,7 @@ import java.util.*
 @ActiveProfiles("test-no-auth")
 @Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
-class TaskResolutionServiceTest @Autowired constructor(
+class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
     val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
@@ -125,7 +128,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
-        assertTaskError(createResult[0], "TASK_1", CleaningError.LEGAL_NAME_IS_NULL)
+        assertTaskError(createResult[0], "TASK_1", "Legal name is null")
     }
 
     @Test
@@ -1025,7 +1028,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains("The legal entity is not the parent of the site")
     }
 
     @Test
@@ -1044,7 +1047,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains("The legal entity is not the parent of the additional address")
     }
 
 
@@ -1170,11 +1173,11 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
     }
 
-    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
+    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, errorDescription: String) {
 
         assertThat(step.taskId).isEqualTo(taskId)
         assertThat(step.errors.size).isEqualTo(1)
-        assertThat(step.errors[0].description).isEqualTo(error.message)
+        assertThat(step.errors[0].description).isEqualTo(errorDescription)
     }
 
     private fun String.toBpnRequest() = BpnReference(this, null, BpnRequestIdentifier)
