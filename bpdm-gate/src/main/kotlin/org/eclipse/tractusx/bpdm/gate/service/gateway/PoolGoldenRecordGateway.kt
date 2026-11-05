@@ -98,7 +98,7 @@ class PoolGoldenRecordGateway(
     private fun fetchSites(bpns: Set<String>): List<SiteGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->
             poolClient.sites.getSites(SiteSearchV7Request(siteBpns = chunk), PaginationRequest(0, chunk.size)).content
-        }.flatten().map { poolInboundMapper.toRequest(it.site) }
+        }.flatten().map(poolInboundMapper::toRequest)
 
     private fun fetchAddresses(bpns: Set<String>): List<AddressGoldenRecordRaw> =
         bpns.chunked(MAX_PAGE_SIZE) { chunk ->

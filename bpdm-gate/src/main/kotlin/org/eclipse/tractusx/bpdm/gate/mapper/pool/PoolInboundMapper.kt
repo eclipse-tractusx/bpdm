@@ -47,7 +47,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.springframework.stereotype.Component
 
 /**
@@ -80,15 +80,16 @@ class PoolInboundMapper {
     /**
      * Maps [dto] onto its site golden record request.
      */
-    fun toRequest(dto: SiteVerboseV7Dto): SiteGoldenRecordRaw =
+    fun toRequest(dto: SiteWithMainAddressVerboseV7Dto): SiteGoldenRecordRaw =
         SiteGoldenRecordRaw(
-            bpn = dto.bpns,
-            name = dto.name,
-            states = dto.states.map { toState(it, BusinessPartnerType.SITE) },
-            confidence = toConfidence(dto.confidenceCriteria),
-            relations = dto.relations.map(::toRelation),
-            scriptVariants = dto.scriptVariants.map { SiteGoldenRecordRaw.ScriptVariant(it.scriptCode, it.name) },
-            updatedAt = dto.updatedAt
+            bpn = dto.site.bpns,
+            mainAddressBpn = dto.mainAddress.bpna,
+            name = dto.site.name,
+            states = dto.site.states.map { toState(it, BusinessPartnerType.SITE) },
+            confidence = toConfidence(dto.site.confidenceCriteria),
+            relations = dto.site.relations.map(::toRelation),
+            scriptVariants = dto.site.scriptVariants.map { SiteGoldenRecordRaw.ScriptVariant(it.scriptCode, it.name) },
+            updatedAt = dto.site.updatedAt
         )
 
     /**

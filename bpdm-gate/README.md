@@ -4,6 +4,7 @@ The BPDM Gate is a core service with a standardized API used within data spaces 
 
 The BPDM Gate offers an [API](../bpdm-gate-api) to query and share business partners.
 
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
