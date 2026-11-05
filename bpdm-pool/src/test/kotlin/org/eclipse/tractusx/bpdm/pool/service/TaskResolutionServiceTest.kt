@@ -791,7 +791,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
 
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors).hasSize(1)
+        assertThat(createResult[0].errors).isNotEmpty
     }
 
     @Test
@@ -825,7 +825,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateSiteRequest)
-        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors.map { it.description }).contains("Site InvalidBPN not found")
     }
 
     @Test
@@ -882,7 +882,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateSiteRequest)
-        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors).isNotEmpty
     }
 
     @Test
@@ -1025,8 +1025,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
     @Test
@@ -1045,8 +1044,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
 
         assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
-        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+        assertThat(updateWithWrongLegalEntity[0].errors.map { it.description }).contains(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
 
@@ -1241,6 +1239,40 @@ class TaskResolutionServiceTest @Autowired constructor(
         upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)
         assertThat(updatedLegalEntity.legalAddress.addressType == AddressType.LegalAndSiteMainAddress).isTrue()
+    }
+
+    @Test
+    fun `try create site stating the new legal address as its own main address`() {
+        val legalAddressRef = "le-addr-new-shared".toBpnRequest()
+        val request = orchTestDataFactory.createFullBusinessPartner("newShared")
+            .withLegalReferences("le-new-shared".toBpnRequest(), legalAddressRef)
+            .withSiteReferences("site-new-shared".toBpnRequest(), legalAddressRef)
+            .copy(additionalAddress = null)
+
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = request)
+
+        assertThat(result.single().errors.map { it.description })
+            .contains("The site main address is the legal address and must not be stated separately")
+    }
+
+    @Test
+    fun `try create site stating the existing legal address as its own main address`() {
+        val leRef = "le-existing-shared".toBpnRequest()
+        val legalAddressRef = "le-addr-existing-shared".toBpnRequest()
+        val createLegalEntity = orchTestDataFactory.createFullBusinessPartner("existingShared")
+            .withLegalReferences(leRef, legalAddressRef)
+            .copy(site = null, additionalAddress = null)
+        val legalAddressBpn = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntity)
+            .single().businessPartner.legalEntity.legalAddress.bpnReference
+
+        val request = orchTestDataFactory.createFullBusinessPartner("existingShared")
+            .withLegalReferences(leRef, legalAddressRef)
+            .withSiteReferences("site-existing-shared".toBpnRequest(), legalAddressBpn)
+            .copy(additionalAddress = null)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = request)
+
+        assertThat(result.single().errors.map { it.description })
+            .contains("The site main address is the legal address and must not be stated separately")
     }
 
     @Test

@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
@@ -50,17 +51,25 @@ class SiteCreateParser(
      * that entry.
      */
     fun parse(requests: List<SiteCreateRaw>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-        val mainAddresses = requests.map { it.content.mainAddress }
+        val contentResults = parseContent(requests.map { it.content })
+
+        return zipParseResults(contentResults, legalEntityResults) { content, legalEntity -> SiteCreateParsed(legalEntity, content) }
+    }
+
+    /**
+     * Validates the content of each new site apart from its parent and reports either the validated content or every
+     * problem found in that entry.
+     */
+    fun parseContent(contents: List<SiteContentRequest>): List<ParseResult<SiteContentParsed, SiteCreateParseError>> {
+        val headerResults = siteHeaderParser.parse(contents.map { it.header })
+        val mainAddresses = contents.map { it.mainAddress }
         val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
         val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
                 scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
             }
 
-        return zipParseResults(coveredHeaderResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
-            SiteCreateParsed(legalEntity, SiteContentParsed(header, mainAddress))
-        }
+        return zipParseResults(coveredHeaderResults, mainAddressResults) { header, mainAddress -> SiteContentParsed(header, mainAddress) }
     }
 }

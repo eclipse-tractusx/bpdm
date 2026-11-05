@@ -109,7 +109,7 @@ class GoldenRecordTaskAddressRequestMapper {
     private fun toGeoRequest(geo: TaskGeoCoordinate): GeoCoordinateRequest =
         GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toScriptVariant(variant: TaskScriptVariant): AddressScriptVariant =
+    fun toScriptVariant(variant: TaskScriptVariant): AddressScriptVariant =
         AddressScriptVariant(
             scriptCode = variant.scriptCode,
             address = toPostalScriptVariant(variant.postalProperties)

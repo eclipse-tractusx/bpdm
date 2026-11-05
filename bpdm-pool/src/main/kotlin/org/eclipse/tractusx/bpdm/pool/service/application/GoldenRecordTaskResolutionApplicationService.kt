@@ -20,16 +20,20 @@
 package org.eclipse.tractusx.bpdm.pool.service.application
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService
+import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
+import org.eclipse.tractusx.bpdm.pool.model.GoldenRecordTaskUpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.output.task.AdditionalSiteRecord
+import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.pool.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordTaskTrackingService
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordTaskUpsertService
+import org.eclipse.tractusx.bpdm.pool.service.parser.task.GoldenRecordTaskParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -40,8 +44,10 @@ import org.springframework.transaction.support.TransactionTemplate
 @Service
 class GoldenRecordTaskResolutionApplicationService(
     private val taskGateway: GoldenRecordTaskGateway,
-    private val taskStepBuildService: TaskStepBuildService,
+    private val taskParser: GoldenRecordTaskParser,
+    private val upsertService: GoldenRecordTaskUpsertService,
     private val trackingService: GoldenRecordTaskTrackingService,
+    private val outputMapper: DbToOutputMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties,
     transactionManager: PlatformTransactionManager
 ) {
@@ -67,7 +73,7 @@ class GoldenRecordTaskResolutionApplicationService(
         logger.debug { "Processed $totalTasksProcessed golden record tasks" }
     }
 
-    private fun resolveReservation(reservedTasks: List<TaskStepReservationEntryDto>) {
+    private fun resolveReservation(reservedTasks: List<GoldenRecordTaskRaw>) {
         try {
             taskGateway.resolveTasks(reservedTasks.map(::resolve))
         } catch (ex: Throwable) {
@@ -76,22 +82,29 @@ class GoldenRecordTaskResolutionApplicationService(
         }
     }
 
-    private fun resolve(task: TaskStepReservationEntryDto): TaskStepResultEntryDto =
+    private fun resolve(task: GoldenRecordTaskRaw): GoldenRecordTaskResultRecord =
         try {
-            entryTransaction.execute { taskStepBuildService.upsertBusinessPartner(task) }!!
-        } catch (ex: BpdmValidationException) {
-            toRejected(task, listOf(ex.message ?: ""))
-        } catch (ex: BpdmMultiValidationException) {
-            toRejected(task, ex.validationErrors)
+            entryTransaction.execute { parseAndUpsert(task) }!!
         } catch (ex: Throwable) {
             logger.error(ex) { "An unexpected error occurred during golden record task processing" }
-            toRejected(task, listOf("An unexpected error occurred during Pool update"))
+            GoldenRecordTaskResultRecord.Failed(task.taskId)
         }
 
-    private fun toRejected(task: TaskStepReservationEntryDto, errorDescriptions: List<String>) =
-        TaskStepResultEntryDto(
+    private fun parseAndUpsert(task: GoldenRecordTaskRaw): GoldenRecordTaskResultRecord =
+        when (val parseResult = taskParser.parse(task)) {
+            is ParseResult.Success -> toResolved(task, parseResult.parsed, upsertService.upsert(parseResult.parsed))
+            is ParseResult.Failure -> GoldenRecordTaskResultRecord.Rejected(task.taskId, parseResult.errors)
+        }
+
+    private fun toResolved(task: GoldenRecordTaskRaw, plan: GoldenRecordTaskParsed, upserted: GoldenRecordTaskUpsertResult) =
+        GoldenRecordTaskResultRecord.Resolved(
             taskId = task.taskId,
-            businessPartner = task.businessPartner,
-            errors = errorDescriptions.map { TaskErrorDto(type = TaskErrorType.Unspecified, description = it) }
+            legalEntity = outputMapper.toRecord(upserted.legalEntity),
+            isLegalEntityWritten = plan.legalEntity !is LegalEntityUpsertParsed.Unchanged,
+            site = upserted.site?.let { outputMapper.toRecord(it) },
+            isSiteWritten = plan.site != null && plan.site !is SiteUpsertParsed.Unchanged,
+            additionalAddress = upserted.additionalAddress?.let { outputMapper.toRecord(it) },
+            additionalSites = upserted.additionalSites.map { AdditionalSiteRecord(it.bpn, it.name) },
+            passThrough = task.passThrough
         )
 }

@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.service.gateway
 
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.OrchestratorInboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorOutboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
@@ -33,22 +36,26 @@ import org.springframework.stereotype.Component
 @Component
 class GoldenRecordTaskGateway(
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val taskProperties: GoldenRecordTaskConfigProperties
+    private val taskProperties: GoldenRecordTaskConfigProperties,
+    private val inboundMapper: OrchestratorInboundMapper,
+    private val outboundMapper: OrchestratorOutboundMapper
 ) {
 
     /**
      * Reserves up to [amount] golden record tasks waiting for the Pool and returns them, or none when no task waits.
      */
-    fun reserveTasks(amount: Int): List<TaskStepReservationEntryDto> =
+    fun reserveTasks(amount: Int): List<GoldenRecordTaskRaw> =
         orchestrationApiClient.goldenRecordTasks
             .reserveTasksForStep(TaskStepReservationRequest(step = taskProperties.step, amount = amount))
             .reservedTasks
+            .map { inboundMapper.toRaw(it) }
 
     /**
      * Reports [results] of reserved golden record tasks to the Orchestrator.
      */
-    fun resolveTasks(results: List<TaskStepResultEntryDto>) {
-        orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = taskProperties.step, results = results.map(::withAcceptedErrorLength)))
+    fun resolveTasks(results: List<GoldenRecordTaskResultRecord>) {
+        val resultEntries = results.map { withAcceptedErrorLength(outboundMapper.toResultEntry(it)) }
+        orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = taskProperties.step, results = resultEntries))
     }
 
     private fun withAcceptedErrorLength(result: TaskStepResultEntryDto) =

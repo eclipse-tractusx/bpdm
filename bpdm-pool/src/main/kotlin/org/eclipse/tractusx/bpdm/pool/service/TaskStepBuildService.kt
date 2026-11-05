@@ -45,6 +45,7 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressPayloadUp
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityPayloadUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.site.SitePayloadUpdateService
