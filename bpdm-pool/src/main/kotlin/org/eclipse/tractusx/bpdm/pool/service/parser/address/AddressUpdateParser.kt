@@ -25,9 +25,9 @@ import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
@@ -55,7 +55,7 @@ class AddressUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
+    fun parse(requests: List<AddressUpdateRaw>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
         val siteResults = parseWherePresent(requests.map { it.siteBpns }, siteBpnParser::parseAll)

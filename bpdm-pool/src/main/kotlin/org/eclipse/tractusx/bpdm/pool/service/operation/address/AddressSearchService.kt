@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

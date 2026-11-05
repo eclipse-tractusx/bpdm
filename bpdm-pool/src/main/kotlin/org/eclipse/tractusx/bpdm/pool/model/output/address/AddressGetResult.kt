@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,14 +16,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.output.address
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
 
-data class AddressSearchParsed(
-    val addressBpns: List<String>,
-    val siteBpns: List<String>,
-    val legalEntityBpns: List<String>,
-    val name: String?,
-    val isDataSpaceParticipant: Boolean?,
-    val excludesSiteAddresses: Boolean
-)
+/**
+ * Result of an address fetch: either the address found or every reason the fetch was rejected.
+ */
+sealed interface AddressGetResult {
+    data class Found(val address: AddressRecord) : AddressGetResult
+    data class Rejected(val errors: List<AddressGetError>) : AddressGetResult
+}

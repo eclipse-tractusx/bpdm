@@ -40,57 +40,27 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapperV6 {
 
-    fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
-        when (error) {
-            is InvalidParentBpn ->
-                ErrorInfoV6(AddressCreateErrorV6.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
-            is UnresolvableLegalEntity ->
-                ErrorInfoV6(AddressCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is UnresolvableSite ->
-                ErrorInfoV6(AddressCreateErrorV6.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
-            is SiteNotInAddressLegalEntity ->
-                ErrorInfoV6(
-                    AddressCreateErrorV6.SiteNotInLegalEntity,
-                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
-                    entityKey
-                )
-            is AddressContentParseError -> sharedErrorInfo(
-                error,
-                entityKey,
-                regionNotFound = AddressCreateErrorV6.RegionNotFound,
-                countryNotFound = AddressCreateErrorV6.CountryNotFound,
-                identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
-                duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
-            )
-        }
+    fun toCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressCreateErrorV6.RegionNotFound,
+            countryNotFound = AddressCreateErrorV6.CountryNotFound,
+            identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
+            duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
+        )
 
-    fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
-        when (error) {
-            is UnresolvableAddress ->
-                ErrorInfoV6(AddressUpdateErrorV6.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> sharedErrorInfo(
-                error,
-                entityKey,
-                regionNotFound = AddressUpdateErrorV6.RegionNotFound,
-                countryNotFound = AddressUpdateErrorV6.CountryNotFound,
-                identifierNotFound = AddressUpdateErrorV6.IdentifierNotFound,
-                duplicateIdentifier = AddressUpdateErrorV6.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
-            )
-            is SiteNotInAddressLegalEntity ->
-                ErrorInfoV6(
-                    AddressUpdateErrorV6.SiteNotInLegalEntity,
-                    "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
-                    entityKey
-                )
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs. The frozen v6 enum has no code for it, so the client gets an internal error.
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
-            is UnresolvableSite,
-            is SiteMainAddressOmitted,
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-        }
+    fun toUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressUpdateErrorV6.RegionNotFound,
+            countryNotFound = AddressUpdateErrorV6.CountryNotFound,
+            identifierNotFound = AddressUpdateErrorV6.IdentifierNotFound,
+            duplicateIdentifier = AddressUpdateErrorV6.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
+        )
 
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         sharedErrorInfo(

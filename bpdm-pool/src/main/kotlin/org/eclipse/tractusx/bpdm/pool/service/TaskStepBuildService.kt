@@ -34,9 +34,9 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTa
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressResponseMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteResponseMapper
 import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressSiteMembershipRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -519,7 +519,7 @@ class TaskStepBuildService(
         additionalAddress: PostalAddressWithScriptVariants
     ): String {
         // Site membership is stated once for the whole record, by processAdditionalSites, so this update leaves it alone.
-        val request = AddressUpdateRequest(
+        val request = AddressUpdateRaw(
             addressBpn = bpnA,
             siteBpns = null,
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)

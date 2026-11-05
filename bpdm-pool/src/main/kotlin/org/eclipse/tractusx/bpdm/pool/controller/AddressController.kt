@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.PoolAddressV7Api
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7ResponseWrapper
@@ -29,19 +31,24 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressGetApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7AddressMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressGetResult
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressCreateApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressGetApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressUpdateApplicationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class AddressController(
-    private val addressGetApplicationService: AddressGetApplicationV7Service,
-    private val addressSearchApplicationService: AddressSearchApplicationV7Service,
-    private val addressCreateApplicationService: AddressCreateApplicationV7Service,
-    private val addressUpdateApplicationService: AddressUpdateApplicationV7Service
+    private val addressGetApplicationService: AddressGetApplicationService,
+    private val addressSearchApplicationService: AddressSearchApplicationService,
+    private val addressCreateApplicationService: AddressCreateApplicationService,
+    private val addressUpdateApplicationService: AddressUpdateApplicationService,
+    private val apiV7InboundMapper: ApiV7InboundMapper,
+    private val apiV7AddressMapper: ApiV7AddressMapper
 ) : PoolAddressV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -52,29 +59,37 @@ class AddressController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getAddress(
         bpna: String
-    ): LogisticAddressVerboseV7Dto {
-        return addressGetApplicationService.getAddress(bpna)
-    }
+    ): LogisticAddressVerboseV7Dto =
+        when (val result = addressGetApplicationService.get(apiV7InboundMapper.toAddressGetRaw(bpna))) {
+            is AddressGetResult.Found -> apiV7AddressMapper.toDto(result.address)
+            is AddressGetResult.Rejected -> throw apiV7AddressMapper.toGetException(result.errors)
+        }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchAddresses(
         searchRequest: AddressSearchV7Request,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseV7Dto> {
-        return addressSearchApplicationService.searchAddresses(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toAddressSearchRaw(searchRequest)
+        return addressSearchApplicationService.search(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7AddressMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateV7Request>
     ): AddressPartnerCreateV7ResponseWrapper {
-        return addressCreateApplicationService.createAddresses(requests)
+        val requestList = requests.toList()
+        val results = addressCreateApplicationService.create(requestList.map { apiV7InboundMapper.toAddressCreateRaw(it) })
+        return apiV7AddressMapper.toCreateResponse(requestList, results)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateAddresses(
         requests: Collection<AddressPartnerUpdateV7Request>
     ): AddressPartnerUpdateV7ResponseWrapper {
-        return addressUpdateApplicationService.updateAddresses(requests)
+        val requestList = requests.toList()
+        val results = addressUpdateApplicationService.update(requestList.map { apiV7InboundMapper.toAddressUpdateRaw(it) })
+        return apiV7AddressMapper.toUpdateResponse(requestList, results)
     }
 }

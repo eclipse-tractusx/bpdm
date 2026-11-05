@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

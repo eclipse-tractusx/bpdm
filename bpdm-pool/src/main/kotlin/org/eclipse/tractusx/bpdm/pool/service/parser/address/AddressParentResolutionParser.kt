@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnTypeResolver
@@ -49,16 +49,16 @@ class AddressParentResolutionParser(
      * BPN names neither a known legal entity nor a known site.
      */
     fun parse(
-        requests: List<AddressCreateUntypedParentRequest>
+        requests: List<AddressCreateRaw>
     ): List<ParseResult<AddressCreateTypedParentsRequest, AddressCreateParseError>> {
-        val typeByBpn = requests.map { it.bpnParent }.associateWith { bpnTypeResolver.resolveType(it) }
+        val typeByBpn = requests.map { it.parentBpn }.associateWith { bpnTypeResolver.resolveType(it) }
         val legalEntityParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.LEGAL_ENTITY }.keys
         val siteParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.SITE }.keys
         val existingLegalEntityBpns = legalEntityRepository.findDistinctByBpnIn(legalEntityParentBpns).map { it.bpn }.toSet()
         val sitesByBpn = siteRepository.findDistinctByBpnIn(siteParentBpns).associateBy { it.bpn }
 
         return requests.map { request ->
-            val parent = request.bpnParent
+            val parent = request.parentBpn
             when (typeByBpn[parent]) {
                 BusinessPartnerType.LEGAL_ENTITY ->
                     if (parent in existingLegalEntityBpns)

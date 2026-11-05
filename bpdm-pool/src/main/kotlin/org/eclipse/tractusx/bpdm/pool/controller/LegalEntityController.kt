@@ -33,17 +33,19 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntitySearch
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7AddressMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7SiteMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.address.LegalEntityAddressSearchResult
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityGetResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.LegalEntitySiteSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityAddressSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityCreateApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityGetApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySiteSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntityUpdateApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -51,14 +53,15 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class LegalEntityController(
     val legalEntitySiteSearchApplicationService: LegalEntitySiteSearchApplicationService,
-    val addressSearchApplicationService: AddressSearchApplicationV7Service,
+    val legalEntityAddressSearchApplicationService: LegalEntityAddressSearchApplicationService,
     val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     val legalEntityGetApplicationService: LegalEntityGetApplicationService,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationService,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper,
-    private val apiV7SiteMapper: ApiV7SiteMapper
+    private val apiV7SiteMapper: ApiV7SiteMapper,
+    private val apiV7AddressMapper: ApiV7AddressMapper
 ) : PoolLegalEntityV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -105,7 +108,11 @@ class LegalEntityController(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseV7Dto> {
-        return addressSearchApplicationService.searchLegalEntityAddresses(bpnl, paginationRequest)
+        val request = apiV7InboundMapper.toLegalEntityAddressSearchRaw(bpnl)
+        return when (val result = legalEntityAddressSearchApplicationService.search(request, paginationRequest.toPageRequest())) {
+            is LegalEntityAddressSearchResult.Found -> result.page.toPageDto(apiV7AddressMapper::toDto)
+            is LegalEntityAddressSearchResult.Rejected -> throw apiV7AddressMapper.toLegalEntityAddressSearchException(result.errors)
+        }
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

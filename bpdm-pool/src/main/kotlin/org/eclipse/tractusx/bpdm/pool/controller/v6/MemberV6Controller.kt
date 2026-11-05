@@ -33,15 +33,16 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6AddressMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6ChangelogMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6LegalEntityMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv6.ApiV6SiteMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -50,11 +51,12 @@ class MemberV6Controller(
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
     private val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationService,
-    private val addressSearchApplicationService: AddressSearchApplicationV6Service,
+    private val addressSearchApplicationService: AddressSearchApplicationService,
     private val apiV6InboundMapper: ApiV6InboundMapper,
     private val apiV6ChangelogMapper: ApiV6ChangelogMapper,
     private val apiV6LegalEntityMapper: ApiV6LegalEntityMapper,
-    private val apiV6SiteMapper: ApiV6SiteMapper
+    private val apiV6SiteMapper: ApiV6SiteMapper,
+    private val apiV6AddressMapper: ApiV6AddressMapper
 ):PoolMembersV6Api {
 
 
@@ -77,7 +79,9 @@ class MemberV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchAddresses(searchRequest: AddressSearchV6Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseV6Dto> {
-        return addressSearchApplicationService.searchMemberAddresses(searchRequest, paginationRequest)
+        val request = apiV6InboundMapper.toAddressSearchRaw(searchRequest)
+        return addressSearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV6AddressMapper::toDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")

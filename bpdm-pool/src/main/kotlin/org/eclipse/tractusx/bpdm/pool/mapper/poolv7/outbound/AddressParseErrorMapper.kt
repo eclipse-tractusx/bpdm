@@ -40,71 +40,31 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapper {
 
-    fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
-        when (error) {
-            is InvalidParentBpn ->
-                ErrorInfoV7(AddressCreateErrorV7.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
-            is UnresolvableLegalEntity ->
-                ErrorInfoV7(AddressCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is UnresolvableSite ->
-                ErrorInfoV7(AddressCreateErrorV7.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
-            is SiteNotInAddressLegalEntity ->
-                ErrorInfoV7(
-                    AddressCreateErrorV7.SiteNotInLegalEntity,
-                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
-                    entityKey
-                )
-            is AddressContentParseError -> sharedErrorInfo(
-                error,
-                entityKey,
-                regionNotFound = AddressCreateErrorV7.RegionNotFound,
-                countryNotFound = AddressCreateErrorV7.CountryNotFound,
-                identifierNotFound = AddressCreateErrorV7.IdentifierNotFound,
-                duplicateIdentifier = AddressCreateErrorV7.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateErrorV7.IdentifiersTooMany,
-                scriptVariantCityMissing = AddressCreateErrorV7.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
-            )
-        }
+    fun toCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressCreateErrorV7.RegionNotFound,
+            countryNotFound = AddressCreateErrorV7.CountryNotFound,
+            identifierNotFound = AddressCreateErrorV7.IdentifierNotFound,
+            duplicateIdentifier = AddressCreateErrorV7.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressCreateErrorV7.IdentifiersTooMany,
+            scriptVariantCityMissing = AddressCreateErrorV7.ScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
+        )
 
-    fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
-        when (error) {
-            is UnresolvableAddress ->
-                ErrorInfoV7(AddressUpdateErrorV7.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> sharedErrorInfo(
-                error,
-                entityKey,
-                regionNotFound = AddressUpdateErrorV7.RegionNotFound,
-                countryNotFound = AddressUpdateErrorV7.CountryNotFound,
-                identifierNotFound = AddressUpdateErrorV7.IdentifierNotFound,
-                duplicateIdentifier = AddressUpdateErrorV7.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressUpdateErrorV7.IdentifiersTooMany,
-                scriptVariantCityMissing = AddressUpdateErrorV7.ScriptVariantCityMissing,
-                scriptVariantDuplicateScriptCode = AddressUpdateErrorV7.ScriptVariantDuplicateScriptCode
-            )
-            is SiteNotInAddressLegalEntity ->
-                ErrorInfoV7(
-                    AddressUpdateErrorV7.SiteNotInLegalEntity,
-                    "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
-                    entityKey
-                )
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    AddressUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
-                            "is named in that script",
-                    entityKey
-                )
-            is UnresolvableSite ->
-                ErrorInfoV7(AddressUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' not found", entityKey)
-            is SiteMainAddressOmitted ->
-                ErrorInfoV7(
-                    AddressUpdateErrorV7.SiteMainAddressOmitted,
-                    "Site '${error.siteBpn}' has this address as its main address and must stay among its sites",
-                    entityKey
-                )
-            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-        }
+    fun toUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressUpdateErrorV7.RegionNotFound,
+            countryNotFound = AddressUpdateErrorV7.CountryNotFound,
+            identifierNotFound = AddressUpdateErrorV7.IdentifierNotFound,
+            duplicateIdentifier = AddressUpdateErrorV7.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressUpdateErrorV7.IdentifiersTooMany,
+            scriptVariantCityMissing = AddressUpdateErrorV7.ScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = AddressUpdateErrorV7.ScriptVariantDuplicateScriptCode
+        )
 
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         sharedErrorInfo(

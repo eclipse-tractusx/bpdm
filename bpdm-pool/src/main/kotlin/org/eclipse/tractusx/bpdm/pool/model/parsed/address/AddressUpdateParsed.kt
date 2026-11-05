@@ -17,10 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
-data class AddressUpdateRequest(
-    val addressBpn: String,
-    val siteBpns: List<String>?,
-    val content: LogisticAddressRequest
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
+
+data class AddressUpdateParsed(
+    val target: LogisticAddressDb,
+    val sites: List<SiteDb>?,
+    val address: LogisticAddressParsed
 )

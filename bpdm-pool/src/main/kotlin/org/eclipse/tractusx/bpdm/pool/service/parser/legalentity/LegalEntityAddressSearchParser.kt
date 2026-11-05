@@ -20,33 +20,38 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressSearchParser
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates address search criteria that name the legal entity whose addresses are being listed.
+ * Resolves the legal entity whose addresses are being listed into the criteria the address search operation queries
+ * with.
  */
 @Service
 class LegalEntityAddressSearchParser(
-    private val addressSearchParser: AddressSearchParser,
     private val legalEntityBpnParser: LegalEntityBpnParser
 ) {
 
     /**
-     * Normalizes the criteria and fails them when a legal entity they filter by does not exist, so that listing the
-     * addresses of an unknown legal entity is distinguishable from a legal entity that has none.
+     * Returns criteria matching every address of the requested legal entity that belongs to none of its sites, failing
+     * when no legal entity carries its BPN so that an unknown legal entity is distinguishable from one without such
+     * addresses.
      */
-    @Transactional(readOnly = true)
-    fun parse(request: AddressSearchRequest): ParseResult<AddressSearchParsed, UnresolvableLegalEntity> {
-        val criteria = addressSearchParser.parse(request)
-        val unresolvedLegalEntities = legalEntityBpnParser.parse(criteria.legalEntityBpns)
-            .filterIsInstance<ParseResult.Failure<UnresolvableLegalEntity>>()
-            .flatMap { it.errors }
-
-        return if (unresolvedLegalEntities.isEmpty()) ParseResult.Success(criteria) else ParseResult.Failure(unresolvedLegalEntities)
-    }
+    fun parse(request: LegalEntityAddressSearchRaw): ParseResult<AddressSearchParsed, LegalEntityAddressSearchError> =
+        when (val result = legalEntityBpnParser.parse(listOf(request.legalEntityBpn)).single()) {
+            is ParseResult.Failure -> ParseResult.ofSingleFailure(LegalEntityNotFound(request.legalEntityBpn))
+            is ParseResult.Success -> ParseResult.Success(
+                AddressSearchParsed(
+                    addressBpns = emptyList(),
+                    siteBpns = emptyList(),
+                    legalEntityBpns = listOf(result.parsed.bpn),
+                    name = null,
+                    isDataSpaceParticipant = null,
+                    excludesSiteAddresses = true
+                )
+            )
+        }
 }

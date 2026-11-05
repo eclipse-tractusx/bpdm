@@ -33,15 +33,16 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7AddressMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7ChangelogMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7LegalEntityMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.apiv7.ApiV7SiteMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogSearchResult
+import org.eclipse.tractusx.bpdm.pool.service.application.AddressSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.ChangelogSearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.LegalEntitySearchApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.SiteSearchApplicationService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -49,12 +50,13 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController(
     private val legalEntitySearchApplicationService: LegalEntitySearchApplicationService,
     private val siteSearchApplicationService: SiteSearchApplicationService,
-    private val addressSearchApplicationService: AddressSearchApplicationV7Service,
+    private val addressSearchApplicationService: AddressSearchApplicationService,
     private val changelogSearchApplicationService: ChangelogSearchApplicationService,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val apiV7ChangelogMapper: ApiV7ChangelogMapper,
     private val apiV7LegalEntityMapper: ApiV7LegalEntityMapper,
-    private val apiV7SiteMapper: ApiV7SiteMapper
+    private val apiV7SiteMapper: ApiV7SiteMapper,
+    private val apiV7AddressMapper: ApiV7AddressMapper
 ):PoolMembersV7Api {
 
 
@@ -77,7 +79,9 @@ class MemberController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchAddresses(searchRequest: AddressSearchV7Request, paginationRequest: PaginationRequest): PageDto<LogisticAddressInvariantVerboseV7Dto> {
-        return addressSearchApplicationService.searchMemberAddresses(searchRequest, paginationRequest)
+        val request = apiV7InboundMapper.toAddressSearchRaw(searchRequest)
+        return addressSearchApplicationService.searchMembers(request, paginationRequest.toPageRequest())
+            .toPageDto(apiV7AddressMapper::toInvariantDto)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")

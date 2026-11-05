@@ -20,6 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.BpnRequestIdentifierSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.bpn.IdentifiersSearchV6Request
@@ -45,6 +48,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
@@ -201,6 +209,12 @@ class ApiV6InboundMapper(
         SiteGetRaw(bpn = bpn)
 
     /**
+     * Returns the raw address fetch for the address carrying [bpn].
+     */
+    fun toAddressGetRaw(bpn: String): AddressGetRaw =
+        AddressGetRaw(bpn = bpn)
+
+    /**
      * Returns the raw site search holding [request].
      */
     fun toSiteSearchRaw(request: SiteSearchV6Request): SiteSearchRaw =
@@ -211,6 +225,35 @@ class ApiV6InboundMapper(
      */
     fun toLegalEntitySiteSearchRaw(legalEntityBpn: String): LegalEntitySiteSearchRaw =
         LegalEntitySiteSearchRaw(legalEntityBpn = legalEntityBpn)
+
+    /**
+     * Returns the raw address search holding [request].
+     */
+    fun toAddressSearchRaw(request: AddressSearchV6Request): AddressSearchRaw =
+        AddressSearchRaw(
+            addressBpns = request.addressBpns,
+            siteBpns = request.siteBpns,
+            legalEntityBpns = request.legalEntityBpns,
+            name = request.name
+        )
+
+    /**
+     * Returns the raw search for the addresses of the legal entity carrying [legalEntityBpn].
+     */
+    fun toLegalEntityAddressSearchRaw(legalEntityBpn: String): LegalEntityAddressSearchRaw =
+        LegalEntityAddressSearchRaw(legalEntityBpn = legalEntityBpn)
+
+    /**
+     * Returns the raw create for the address a client sent, under the parent legal entity or site it named.
+     */
+    fun toAddressCreateRaw(request: AddressPartnerCreateV6Request): AddressCreateRaw =
+        AddressCreateRaw(parentBpn = request.bpnParent, content = addressDtoRequestMapperV6.toContentRequest(request.address))
+
+    /**
+     * Returns the raw update for the address a client sent, addressed by its BPN and leaving its site membership as it is.
+     */
+    fun toAddressUpdateRaw(request: AddressPartnerUpdateV6Request): AddressUpdateRaw =
+        AddressUpdateRaw(addressBpn = request.bpna, siteBpns = null, content = addressDtoRequestMapperV6.toContentRequest(request.address))
 
     /**
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.
