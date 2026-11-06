@@ -17,11 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
+
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 
 /**
- * Reason an identifier type search is rejected.
+ * Reason a BPN-by-identifier search is rejected.
  */
-sealed interface IdentifierTypeSearchError {
-    data class CountryNotFound(val country: String) : IdentifierTypeSearchError
+sealed interface BpnIdentifierSearchError {
+    data class IdentifierValuesTooMany(val count: Int, val maxCount: Int) : BpnIdentifierSearchError
+    data class IdentifierTypeNotFound(val typeKey: String, val businessPartnerType: IdentifierBusinessPartnerTypeV7) : BpnIdentifierSearchError
 }

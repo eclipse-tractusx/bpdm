@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.participation
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.GoldenRecordCountedUpdateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.GoldenRecordCountedUpdateError.SharingMemberRecordNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordCountedUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordCountedUpdateError.SharingMemberRecordNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.GoldenRecordCountedUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.SharingMemberRecordRaw
 import org.eclipse.tractusx.bpdm.pool.repository.SharingMemberRecordRepository

@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.address
 
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressUpdateError
 
 /**
  * Result of updating one address of a batch: either the address as stored or every reason the entry was rejected.
  */
 sealed interface AddressUpdateResult {
     data class Updated(val address: AddressRecord) : AddressUpdateResult
-    data class Rejected(val errors: List<AddressUpdateParseError>) : AddressUpdateResult
+    data class Rejected(val errors: List<AddressUpdateError>) : AddressUpdateResult
 }

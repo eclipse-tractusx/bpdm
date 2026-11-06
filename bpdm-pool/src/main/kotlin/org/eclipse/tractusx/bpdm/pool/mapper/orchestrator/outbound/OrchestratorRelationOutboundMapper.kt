@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelati
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.RelationValidityPeriodRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordRelationTaskResultRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationSubject
-import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationUpsertError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations

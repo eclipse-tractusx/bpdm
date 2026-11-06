@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,11 +16,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
+
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a legal entity fetch is rejected.
+ * Reason a data space participation update entry is rejected.
  */
-sealed interface LegalEntityGetError {
-    data class LegalEntityNotFound(val identifierType: String, val identifierValue: String) : LegalEntityGetError
+sealed interface DataSpaceParticipantUpdateError {
+    data class DuplicateParticipantEntry(val legalEntityBpn: String) : DataSpaceParticipantUpdateError
+    data class LegalEntityNotFound(val legalEntityBpn: String) : DataSpaceParticipantUpdateError
 }

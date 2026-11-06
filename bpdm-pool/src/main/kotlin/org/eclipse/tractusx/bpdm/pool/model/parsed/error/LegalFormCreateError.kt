@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,11 +16,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-package org.eclipse.tractusx.bpdm.pool.model.parsed.site
+
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a search for the sites of a legal entity is rejected.
+ * Reason a legal form create is rejected.
  */
-sealed interface LegalEntitySiteSearchError {
-    data class LegalEntityNotFound(val bpn: String) : LegalEntitySiteSearchError
+sealed interface LegalFormCreateError {
+    data class CountryNotFound(val country: String) : LegalFormCreateError
+    data class InvalidLanguage(val language: String) : LegalFormCreateError
+    data class TechnicalKeyAlreadyTaken(val technicalKey: String) : LegalFormCreateError
+    data class UnresolvableAdministrativeArea(val regionCode: String) : LegalFormCreateError
 }

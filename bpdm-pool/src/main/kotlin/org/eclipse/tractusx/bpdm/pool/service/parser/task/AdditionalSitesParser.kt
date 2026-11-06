@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.AdditionalSiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.AdditionalSitesParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.BpnReferenceParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw

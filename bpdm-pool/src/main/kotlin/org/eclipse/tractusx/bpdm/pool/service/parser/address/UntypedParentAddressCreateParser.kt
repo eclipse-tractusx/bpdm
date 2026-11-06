@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.chainParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.springframework.stereotype.Service
@@ -40,6 +40,6 @@ class UntypedParentAddressCreateParser(
      * Validates each request and reports either the validated address with its resolved parents or every problem found in
      * that entry.
      */
-    fun parse(requests: List<AddressCreateRaw>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> =
+    fun parse(requests: List<AddressCreateRaw>): List<ParseResult<AddressCreateParsed, AddressCreateError>> =
         chainParseResults(addressParentResolutionParser.parse(requests)) { typed -> typedParentAddressCreateParser.parse(typed) }
 }

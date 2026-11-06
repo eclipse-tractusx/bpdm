@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.ScriptVariantNotCoveredByAddress
 import org.springframework.stereotype.Service
 
 /**

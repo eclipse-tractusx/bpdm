@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityUpdateError
 
 /**
  * Result of updating one legal entity of a batch: either the legal entity as stored or every reason the entry was
@@ -26,5 +26,5 @@ import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
  */
 sealed interface LegalEntityUpdateResult {
     data class Updated(val legalEntity: LegalEntityRecord) : LegalEntityUpdateResult
-    data class Rejected(val errors: List<LegalEntityUpdateParseError>) : LegalEntityUpdateResult
+    data class Rejected(val errors: List<LegalEntityUpdateError>) : LegalEntityUpdateResult
 }

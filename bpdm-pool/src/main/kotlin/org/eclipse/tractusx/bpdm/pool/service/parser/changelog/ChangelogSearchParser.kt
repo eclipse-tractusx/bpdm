@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.changelog
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.ChangelogSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogSearchRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnFilterParser

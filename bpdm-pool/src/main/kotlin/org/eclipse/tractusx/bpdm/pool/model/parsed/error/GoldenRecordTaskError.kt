@@ -17,16 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.task
-
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressSiteMembershipParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
  * A reason a golden record task cannot be carried out, named after the business partner of the task it concerns.
@@ -37,9 +28,9 @@ sealed interface GoldenRecordTaskError {
 
     data class UnchangedLegalEntityNotFound(val bpn: String) : GoldenRecordTaskError
 
-    data class LegalEntityCreateInvalid(val error: LegalEntityCreateParseError) : GoldenRecordTaskError
+    data class LegalEntityCreateInvalid(val error: LegalEntityCreateError) : GoldenRecordTaskError
 
-    data class LegalEntityUpdateInvalid(val error: LegalEntityUpdateParseError) : GoldenRecordTaskError
+    data class LegalEntityUpdateInvalid(val error: LegalEntityUpdateError) : GoldenRecordTaskError
 
     data class UnchangedSiteNotFound(val bpn: String) : GoldenRecordTaskError
 
@@ -49,19 +40,19 @@ sealed interface GoldenRecordTaskError {
 
     data object SiteMainAddressIsLegalAddress : GoldenRecordTaskError
 
-    data class SiteCreateInvalid(val error: SiteCreateParseError) : GoldenRecordTaskError
+    data class SiteCreateInvalid(val error: SiteCreateError) : GoldenRecordTaskError
 
-    data class SiteUpdateInvalid(val error: SiteUpdateParseError) : GoldenRecordTaskError
+    data class SiteUpdateInvalid(val error: SiteUpdateError) : GoldenRecordTaskError
 
     data object AdditionalAddressNotInLegalEntity : GoldenRecordTaskError
 
-    data class AdditionalAddressCreateInvalid(val error: AddressContentParseError) : GoldenRecordTaskError
+    data class AdditionalAddressCreateInvalid(val error: AddressContentError) : GoldenRecordTaskError
 
-    data class AdditionalAddressUpdateInvalid(val error: AddressUpdateParseError) : GoldenRecordTaskError
+    data class AdditionalAddressUpdateInvalid(val error: AddressUpdateError) : GoldenRecordTaskError
 
-    data class AdditionalSiteCreateInvalid(val error: SiteContentParseError) : GoldenRecordTaskError
+    data class AdditionalSiteCreateInvalid(val error: SiteContentError) : GoldenRecordTaskError
 
-    data class AdditionalSiteInvalid(val error: AddressSiteMembershipParseError) : GoldenRecordTaskError
+    data class AdditionalSiteInvalid(val error: AddressSiteMembershipError) : GoldenRecordTaskError
 
     data class AdditionalSiteOfOtherLegalEntity(val siteBpn: String) : GoldenRecordTaskError
 }

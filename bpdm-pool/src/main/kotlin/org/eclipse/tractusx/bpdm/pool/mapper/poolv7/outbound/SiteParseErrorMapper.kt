@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.exception.ErrorCodeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.springframework.stereotype.Component
 
 /**
@@ -39,13 +39,13 @@ class SiteParseErrorMapper(
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
-    fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
+    fun toUpdateErrorInfo(error: SiteUpdateError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is SiteContentParseError -> contentErrorInfo(
+            is SiteContentError -> contentErrorInfo(
                 error,
                 entityKey,
                 scriptVariantNameMissing = SiteUpdateErrorV7.ScriptVariantNameMissing,
@@ -54,21 +54,21 @@ class SiteParseErrorMapper(
         }
 
     private fun <E : ErrorCodeV7> contentErrorInfo(
-        error: SiteContentParseError,
+        error: SiteContentError,
         entityKey: String?,
         scriptVariantNameMissing: E,
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfoV7<E> =
         when (error) {
-            is SiteContentParseError.ScriptVariantNameMissing ->
+            is SiteContentError.ScriptVariantNameMissing ->
                 ErrorInfoV7(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+            is SiteContentError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfoV7(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
-            is SiteContentParseError.NameMissing,
-            is SiteContentParseError.ConfidenceCriteriaMissing,
-            is SiteContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is SiteContentError.NameMissing,
+            is SiteContentError.ConfidenceCriteriaMissing,
+            is SiteContentError.ScriptCodeNotFound -> throw internalError(error)
         }
 
-    private fun internalError(error: SiteCreateParseError) =
+    private fun internalError(error: SiteCreateError) =
         BpdmValidationException("Unexpected site parse error (no public error code): $error")
 }

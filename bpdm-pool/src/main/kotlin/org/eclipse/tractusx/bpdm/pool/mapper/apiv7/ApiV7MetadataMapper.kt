@@ -42,10 +42,10 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ReasonCodeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.ScriptCodeRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.FieldQualityRuleSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalFormCreateError
 import org.springframework.stereotype.Component
 
 /**

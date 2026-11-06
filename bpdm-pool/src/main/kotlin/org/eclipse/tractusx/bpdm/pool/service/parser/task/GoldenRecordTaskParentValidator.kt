@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw

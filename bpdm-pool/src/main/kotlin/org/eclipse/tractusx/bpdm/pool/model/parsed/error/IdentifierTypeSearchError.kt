@@ -16,11 +16,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-package org.eclipse.tractusx.bpdm.pool.model.parsed.address
+
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason an address fetch is rejected.
+ * Reason an identifier type search is rejected.
  */
-sealed interface AddressGetError {
-    data class AddressNotFound(val bpn: String) : AddressGetError
+sealed interface IdentifierTypeSearchError {
+    data class CountryNotFound(val country: String) : IdentifierTypeSearchError
 }

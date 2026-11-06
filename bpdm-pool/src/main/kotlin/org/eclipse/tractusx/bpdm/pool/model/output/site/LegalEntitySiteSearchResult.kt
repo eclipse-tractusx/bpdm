@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError
 import org.springframework.data.domain.Page
 
 /**

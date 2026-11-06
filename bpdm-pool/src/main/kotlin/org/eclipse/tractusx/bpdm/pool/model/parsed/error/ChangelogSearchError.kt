@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,14 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a legal form create is rejected.
+ * Reason a changelog search is rejected.
  */
-sealed interface LegalFormCreateError {
-    data class CountryNotFound(val country: String) : LegalFormCreateError
-    data class InvalidLanguage(val language: String) : LegalFormCreateError
-    data class TechnicalKeyAlreadyTaken(val technicalKey: String) : LegalFormCreateError
-    data class UnresolvableAdministrativeArea(val regionCode: String) : LegalFormCreateError
+sealed interface ChangelogSearchError {
+    data class BpnsTooMany(val count: Int, val maxCount: Int) : ChangelogSearchError
 }

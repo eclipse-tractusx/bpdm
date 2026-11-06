@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelati
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
-import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationUpsertError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationValidityPeriodRaw
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service

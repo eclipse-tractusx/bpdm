@@ -17,39 +17,39 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
-sealed interface LegalEntityCreateParseError
+sealed interface LegalEntityCreateError
 
-sealed interface LegalEntityUpdateParseError
+sealed interface LegalEntityUpdateError
 
 /**
  * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
  * being created has no ownership relations yet, so its tree is itself.
  */
-data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateParseError
+data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateError
 
 /**
  * An alternative headquarter cannot carry the ultimate-owner flag. Update-only: setting the flag on an alternative is rejected,
  * but clearing it stays allowed.
  */
-data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateParseError
+data class AlternativeHeadquarterCannotOwnUltimately(val bpnl: String) : LegalEntityUpdateError
 
 /**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
  * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
- * [AddressContentParseError] directly.
+ * [AddressContentError] directly.
  */
-sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, LegalEntityUpdateParseError {
-    data object NameMissing : LegalEntityContentParseError
-    data object ConfidenceCriteriaMissing : LegalEntityContentParseError
-    data class LegalFormNotFound(val legalForm: String) : LegalEntityContentParseError
-    data class IdentifierValueMissing(val index: Int) : LegalEntityContentParseError
-    data class IdentifierTypeMissing(val index: Int) : LegalEntityContentParseError
-    data class IdentifierTypeNotFound(val index: Int, val type: String) : LegalEntityContentParseError
-    data class IdentifiersTooMany(val count: Int) : LegalEntityContentParseError
-    data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : LegalEntityContentParseError
-    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : LegalEntityContentParseError
-    data class ScriptVariantLegalNameMissing(val index: Int) : LegalEntityContentParseError
-    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : LegalEntityContentParseError
+sealed interface LegalEntityContentError : LegalEntityCreateError, LegalEntityUpdateError {
+    data object NameMissing : LegalEntityContentError
+    data object ConfidenceCriteriaMissing : LegalEntityContentError
+    data class LegalFormNotFound(val legalForm: String) : LegalEntityContentError
+    data class IdentifierValueMissing(val index: Int) : LegalEntityContentError
+    data class IdentifierTypeMissing(val index: Int) : LegalEntityContentError
+    data class IdentifierTypeNotFound(val index: Int, val type: String) : LegalEntityContentError
+    data class IdentifiersTooMany(val count: Int) : LegalEntityContentError
+    data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : LegalEntityContentError
+    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : LegalEntityContentError
+    data class ScriptVariantLegalNameMissing(val index: Int) : LegalEntityContentError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : LegalEntityContentError
 }

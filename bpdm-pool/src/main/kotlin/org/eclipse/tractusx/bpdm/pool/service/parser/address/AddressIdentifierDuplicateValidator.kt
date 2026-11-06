@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressConstraintError
 import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.springframework.stereotype.Service
@@ -41,7 +41,7 @@ class AddressIdentifierDuplicateValidator(
      * [contents] — null for a create, the address's own BPN for an update — and an identifier owned by the entry's own
      * BPN is not a duplicate.
      */
-    fun validate(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<List<AddressConstraintParseError>> {
+    fun validate(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<List<AddressConstraintError>> {
         require(contents.size == ownerBpns.size) { "contents and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(contents)
         return contents.mapIndexed { i, content -> duplicateErrorsFor(content, ownerBpns[i], candidates) }
@@ -51,7 +51,7 @@ class AddressIdentifierDuplicateValidator(
         content: LogisticAddressRequest,
         ownerBpn: String?,
         candidates: Map<Key, Candidate>
-    ): List<AddressConstraintParseError> =
+    ): List<AddressConstraintError> =
         content.identifiers.mapIndexedNotNull { index, identifier ->
             val type = identifier.type
             val value = identifier.value
@@ -59,7 +59,7 @@ class AddressIdentifierDuplicateValidator(
 
             val candidate = candidates[Key(type, value)]
             if (candidate != null && (candidate.bpn == null || candidate.bpn != ownerBpn))
-                AddressConstraintParseError.DuplicateIdentifier(index, type, value)
+                AddressConstraintError.DuplicateIdentifier(index, type, value)
             else
                 null
         }

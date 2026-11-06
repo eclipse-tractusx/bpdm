@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.errorsOrEmpty
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
 import org.springframework.stereotype.Service

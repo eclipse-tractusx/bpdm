@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.address
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityAddressSearchError
 import org.springframework.data.domain.Page
 
 /**

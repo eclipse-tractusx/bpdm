@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.businesspartner
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.BusinessPartnerSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BusinessPartnerSearchError
 import org.springframework.data.domain.Page
 
 /**

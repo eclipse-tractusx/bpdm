@@ -17,14 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.bpn
-
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a BPN-by-identifier search is rejected.
+ * Reason a golden record counted update of a sharing member record is rejected.
  */
-sealed interface BpnIdentifierSearchError {
-    data class IdentifierValuesTooMany(val count: Int, val maxCount: Int) : BpnIdentifierSearchError
-    data class IdentifierTypeNotFound(val typeKey: String, val businessPartnerType: IdentifierBusinessPartnerTypeV7) : BpnIdentifierSearchError
+sealed interface GoldenRecordCountedUpdateError {
+    data class SharingMemberRecordNotFound(val recordId: String) : GoldenRecordCountedUpdateError
 }

@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -50,7 +50,7 @@ class AddressParentResolutionParser(
      */
     fun parse(
         requests: List<AddressCreateRaw>
-    ): List<ParseResult<AddressCreateTypedParentsRequest, AddressCreateParseError>> {
+    ): List<ParseResult<AddressCreateTypedParentsRequest, AddressCreateError>> {
         val typeByBpn = requests.map { it.parentBpn }.associateWith { bpnTypeResolver.resolveType(it) }
         val legalEntityParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.LEGAL_ENTITY }.keys
         val siteParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.SITE }.keys

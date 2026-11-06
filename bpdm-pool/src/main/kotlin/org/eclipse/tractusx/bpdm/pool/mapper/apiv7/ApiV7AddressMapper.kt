@@ -45,15 +45,15 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressOmitted
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressContentError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteMainAddressOmitted
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteNotInAddressLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableAddress
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressUpdateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressIdentifierRecord
@@ -66,10 +66,10 @@ import org.eclipse.tractusx.bpdm.pool.model.output.address.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.pool.model.output.address.StreetScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.AdministrativeAreaRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError.AddressNotFound
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressGetError.AddressNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityAddressSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityAddressSearchError.LegalEntityNotFound
 import org.springframework.stereotype.Component
 
 /**
@@ -184,7 +184,7 @@ class ApiV7AddressMapper(
     private fun toScriptVariantDtos(record: AddressRecord): List<LogisticAddressScriptVariantV7Dto> =
         record.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, toPostalAddressDto(it)) }
 
-    private fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
+    private fun toCreateErrorInfo(error: AddressCreateError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
         when (error) {
             is InvalidParentBpn ->
                 ErrorInfoV7(AddressCreateErrorV7.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
@@ -198,14 +198,14 @@ class ApiV7AddressMapper(
                     "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is AddressContentParseError -> addressParseErrorMapper.toCreateErrorInfo(error, entityKey)
+            is AddressContentError -> addressParseErrorMapper.toCreateErrorInfo(error, entityKey)
         }
 
-    private fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
+    private fun toUpdateErrorInfo(error: AddressUpdateError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
         when (error) {
             is UnresolvableAddress ->
                 ErrorInfoV7(AddressUpdateErrorV7.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> addressParseErrorMapper.toUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> addressParseErrorMapper.toUpdateErrorInfo(error, entityKey)
             is SiteNotInAddressLegalEntity ->
                 ErrorInfoV7(
                     AddressUpdateErrorV7.SiteNotInLegalEntity,

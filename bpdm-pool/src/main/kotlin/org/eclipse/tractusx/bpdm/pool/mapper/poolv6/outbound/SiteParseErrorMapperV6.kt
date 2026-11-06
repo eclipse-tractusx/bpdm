@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.springframework.stereotype.Component
 
 /**
@@ -37,15 +37,15 @@ class SiteParseErrorMapperV6(
     private val addressParseErrorMapperV6: AddressParseErrorMapperV6
 ) {
 
-    fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
+    fun toUpdateErrorInfo(error: SiteUpdateError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is SiteContentParseError -> throw internalError(error)
+            is SiteContentError -> throw internalError(error)
         }
 
-    private fun internalError(error: SiteCreateParseError) =
+    private fun internalError(error: SiteCreateError) =
         BpdmValidationException("Unexpected site parse error (no v6 client error code): $error")
 }

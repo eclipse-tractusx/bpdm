@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressConstraintError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.AdditionalAddressUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRaw
@@ -77,7 +77,7 @@ class GoldenRecordTaskIdentifierDistinctnessValidator {
 
     private data class WrittenAddress(val target: String?, val content: LogisticAddressRequest) {
 
-        fun collisionsWith(earlier: List<WrittenAddress>): List<AddressConstraintParseError.DuplicateIdentifier> {
+        fun collisionsWith(earlier: List<WrittenAddress>): List<AddressConstraintError.DuplicateIdentifier> {
             val takenIdentifiers = earlier
                 .filter { it.target == null || it.target != target }
                 .flatMap { it.content.identifiers }
@@ -87,7 +87,7 @@ class GoldenRecordTaskIdentifierDistinctnessValidator {
             return content.identifiers.mapIndexedNotNull { index, identifier ->
                 val type = identifier.type ?: return@mapIndexedNotNull null
                 val value = identifier.value ?: return@mapIndexedNotNull null
-                AddressConstraintParseError.DuplicateIdentifier(index, type, value).takeIf { (type to value) in takenIdentifiers }
+                AddressConstraintError.DuplicateIdentifier(index, type, value).takeIf { (type to value) in takenIdentifiers }
             }
         }
     }

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.model.output.task
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordPassThroughRaw
 
 /**

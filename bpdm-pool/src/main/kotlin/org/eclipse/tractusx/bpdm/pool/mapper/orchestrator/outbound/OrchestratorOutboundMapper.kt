@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AlternativePostalAddressRecord
@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.ConfidenceCri
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.BpnReferenceKind
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.BusinessStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordPassThroughRaw
@@ -386,7 +386,7 @@ class OrchestratorOutboundMapper {
     // Each description is named after the error type it takes rather than overloading one name: the content and coverage
     // errors subtype several node error interfaces each, so overloads would resolve on static type alone and a branch
     // delegating to the wrong one would still compile, silently emitting another node's wording.
-    private fun describeAddressSiteMembershipError(error: AddressSiteMembershipParseError): String =
+    private fun describeAddressSiteMembershipError(error: AddressSiteMembershipError): String =
         when (error) {
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
@@ -394,68 +394,68 @@ class OrchestratorOutboundMapper {
             is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
         }
 
-    private fun describeAddressUpdateError(error: AddressUpdateParseError): String =
+    private fun describeAddressUpdateError(error: AddressUpdateError): String =
         when (error) {
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is SiteMainAddressOmitted -> "Site ${error.siteBpn} has this address as its main address and must be stated"
-            is AddressContentParseError -> describeAddressContentError(error)
+            is AddressContentError -> describeAddressContentError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
             is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
         }
 
-    private fun describeAddressContentError(error: AddressContentParseError): String =
+    private fun describeAddressContentError(error: AddressContentError): String =
         when (error) {
-            is AddressFieldParseError -> describeAddressFieldError(error)
-            is AddressMetadataParseError -> describeAddressMetadataError(error)
-            is AddressConstraintParseError -> describeAddressConstraintError(error)
-            is AddressScriptVariantParseError -> describeAddressScriptVariantError(error)
+            is AddressFieldError -> describeAddressFieldError(error)
+            is AddressMetadataError -> describeAddressMetadataError(error)
+            is AddressConstraintError -> describeAddressConstraintError(error)
+            is AddressScriptVariantError -> describeAddressScriptVariantError(error)
         }
 
-    private fun describeAddressFieldError(error: AddressFieldParseError): String =
+    private fun describeAddressFieldError(error: AddressFieldError): String =
         when (error) {
-            AddressFieldParseError.PhysicalCountryMissing -> "Physical Address has no country"
-            AddressFieldParseError.PhysicalCityMissing -> "Physical Address has no city"
-            AddressFieldParseError.AlternativeCountryMissing -> "Alternative Address has no country"
-            AddressFieldParseError.AlternativeCityMissing -> "Alternative Address has no city"
-            AddressFieldParseError.AlternativeDeliveryServiceTypeMissing -> "Alternative Address has no delivery service type"
-            AddressFieldParseError.AlternativeDeliveryServiceNumberMissing -> "Alternative Address has no delivery service number"
-            AddressFieldParseError.ConfidenceCriteriaMissing -> "Logistic address is missing confidence criteria"
-            is AddressFieldParseError.IdentifierValueMissing -> "Identifier value is null"
-            is AddressFieldParseError.IdentifierTypeMissing -> "Identifier type is null"
-            is AddressFieldParseError.StateTypeMissing -> "Business Partner state type is null"
+            AddressFieldError.PhysicalCountryMissing -> "Physical Address has no country"
+            AddressFieldError.PhysicalCityMissing -> "Physical Address has no city"
+            AddressFieldError.AlternativeCountryMissing -> "Alternative Address has no country"
+            AddressFieldError.AlternativeCityMissing -> "Alternative Address has no city"
+            AddressFieldError.AlternativeDeliveryServiceTypeMissing -> "Alternative Address has no delivery service type"
+            AddressFieldError.AlternativeDeliveryServiceNumberMissing -> "Alternative Address has no delivery service number"
+            AddressFieldError.ConfidenceCriteriaMissing -> "Logistic address is missing confidence criteria"
+            is AddressFieldError.IdentifierValueMissing -> "Identifier value is null"
+            is AddressFieldError.IdentifierTypeMissing -> "Identifier type is null"
+            is AddressFieldError.StateTypeMissing -> "Business Partner state type is null"
         }
 
-    private fun describeAddressMetadataError(error: AddressMetadataParseError): String =
+    private fun describeAddressMetadataError(error: AddressMetadataError): String =
         when (error) {
-            is AddressMetadataParseError.IdentifierTypeNotFound -> "Address identifier type '${error.type}' is not known"
-            is AddressMetadataParseError.PhysicalCountryNotFound -> "Country '${error.country}' in physical address is not known"
-            is AddressMetadataParseError.AlternativeCountryNotFound -> "Country '${error.country}' in alternative address is not known"
-            is AddressMetadataParseError.PhysicalRegionNotFound -> "Region '${error.regionCode}' in physical address is not known"
-            is AddressMetadataParseError.AlternativeRegionNotFound -> "Region '${error.regionCode}' in alternative address is not known"
-            is AddressMetadataParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is AddressMetadataError.IdentifierTypeNotFound -> "Address identifier type '${error.type}' is not known"
+            is AddressMetadataError.PhysicalCountryNotFound -> "Country '${error.country}' in physical address is not known"
+            is AddressMetadataError.AlternativeCountryNotFound -> "Country '${error.country}' in alternative address is not known"
+            is AddressMetadataError.PhysicalRegionNotFound -> "Region '${error.regionCode}' in physical address is not known"
+            is AddressMetadataError.AlternativeRegionNotFound -> "Region '${error.regionCode}' in alternative address is not known"
+            is AddressMetadataError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
         }
 
-    private fun describeAddressConstraintError(error: AddressConstraintParseError): String =
+    private fun describeAddressConstraintError(error: AddressConstraintError): String =
         when (error) {
-            is AddressConstraintParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
-            is AddressConstraintParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
+            is AddressConstraintError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
+            is AddressConstraintError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
         }
 
-    private fun describeAddressScriptVariantError(error: AddressScriptVariantParseError): String =
+    private fun describeAddressScriptVariantError(error: AddressScriptVariantError): String =
         when (error) {
-            is AddressScriptVariantParseError.PhysicalCityMissing -> "Script variant ${error.index} has no city in its physical address"
-            is AddressScriptVariantParseError.AlternativeCityMissing -> "Script variant ${error.index} has no city in its alternative address"
-            is AddressScriptVariantParseError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
+            is AddressScriptVariantError.PhysicalCityMissing -> "Script variant ${error.index} has no city in its physical address"
+            is AddressScriptVariantError.AlternativeCityMissing -> "Script variant ${error.index} has no city in its alternative address"
+            is AddressScriptVariantError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
         }
 
-    private fun describeLegalEntityCreateError(error: LegalEntityCreateParseError): String =
+    private fun describeLegalEntityCreateError(error: LegalEntityCreateError): String =
         when (error) {
             is ScriptVariantNotCoveredByAddress -> describeLegalAddressNotCovered(error)
-            is LegalEntityContentParseError -> describeLegalEntityContentError(error)
-            is AddressContentParseError -> describeAddressContentError(error)
+            is LegalEntityContentError -> describeLegalEntityContentError(error)
+            is AddressContentError -> describeAddressContentError(error)
         }
 
-    private fun describeLegalEntityUpdateError(error: LegalEntityUpdateParseError): String =
+    private fun describeLegalEntityUpdateError(error: LegalEntityUpdateError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is MultipleUltimateOwnersInHierarchy ->
@@ -464,42 +464,42 @@ class OrchestratorOutboundMapper {
             is AlternativeHeadquarterCannotOwnUltimately ->
                 "Legal entity ${error.bpnl} cannot carry the ultimate-owner flag because it is an alternative headquarter"
             is ScriptVariantNotCoveredByAddress -> describeLegalAddressNotCovered(error)
-            is LegalEntityContentParseError -> describeLegalEntityContentError(error)
-            is AddressContentParseError -> describeAddressContentError(error)
+            is LegalEntityContentError -> describeLegalEntityContentError(error)
+            is AddressContentError -> describeAddressContentError(error)
         }
 
-    private fun describeLegalEntityContentError(error: LegalEntityContentParseError): String =
+    private fun describeLegalEntityContentError(error: LegalEntityContentError): String =
         when (error) {
-            LegalEntityContentParseError.NameMissing -> "Legal name is null"
-            LegalEntityContentParseError.ConfidenceCriteriaMissing -> "Legal Entity has no confidence criteria"
-            is LegalEntityContentParseError.LegalFormNotFound -> "Legal form '${error.legalForm}' is not known"
-            is LegalEntityContentParseError.IdentifierValueMissing -> "Identifier value is null"
-            is LegalEntityContentParseError.IdentifierTypeMissing -> "Identifier type is null"
-            is LegalEntityContentParseError.IdentifierTypeNotFound -> "Legal entity identifier type '${error.type}' is not known"
-            is LegalEntityContentParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
-            is LegalEntityContentParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
-            is LegalEntityContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing -> "Script variant ${error.index} has no legal name"
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+            LegalEntityContentError.NameMissing -> "Legal name is null"
+            LegalEntityContentError.ConfidenceCriteriaMissing -> "Legal Entity has no confidence criteria"
+            is LegalEntityContentError.LegalFormNotFound -> "Legal form '${error.legalForm}' is not known"
+            is LegalEntityContentError.IdentifierValueMissing -> "Identifier value is null"
+            is LegalEntityContentError.IdentifierTypeMissing -> "Identifier type is null"
+            is LegalEntityContentError.IdentifierTypeNotFound -> "Legal entity identifier type '${error.type}' is not known"
+            is LegalEntityContentError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
+            is LegalEntityContentError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
+            is LegalEntityContentError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is LegalEntityContentError.ScriptVariantLegalNameMissing -> "Script variant ${error.index} has no legal name"
+            is LegalEntityContentError.ScriptVariantDuplicateScriptCode ->
                 "Duplicate legal entity script variant for script code '${error.scriptCode}'"
         }
 
-    private fun describeSiteCreateError(error: SiteCreateParseError): String =
+    private fun describeSiteCreateError(error: SiteCreateError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
             is ScriptVariantNotCoveredByAddress -> describeMainAddressNotCovered(error)
-            is SiteContentParseError -> describeSiteContentError(error)
-            is AddressContentParseError -> describeAddressContentError(error)
+            is SiteContentError -> describeSiteContentError(error)
+            is AddressContentError -> describeAddressContentError(error)
         }
 
-    private fun describeSiteUpdateError(error: SiteUpdateParseError): String =
+    private fun describeSiteUpdateError(error: SiteUpdateError): String =
         when (error) {
             is UnresolvableSite -> "Site ${error.bpn} not found"
             is ScriptVariantNotCoveredByAddress -> describeMainAddressNotCovered(error)
-            is SiteContentParseError -> describeSiteContentError(error)
-            is AddressContentParseError -> describeAddressContentError(error)
+            is SiteContentError -> describeSiteContentError(error)
+            is AddressContentError -> describeAddressContentError(error)
         }
 
     private fun describeLegalAddressNotCovered(error: ScriptVariantNotCoveredByAddress): String =
@@ -508,13 +508,13 @@ class OrchestratorOutboundMapper {
     private fun describeMainAddressNotCovered(error: ScriptVariantNotCoveredByAddress): String =
         "Script code '${error.scriptCode}' is not covered by the site main address"
 
-    private fun describeSiteContentError(error: SiteContentParseError): String =
+    private fun describeSiteContentError(error: SiteContentError): String =
         when (error) {
-            SiteContentParseError.NameMissing -> "Site has no name"
-            SiteContentParseError.ConfidenceCriteriaMissing -> "Site is missing confidence criteria"
-            is SiteContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
-            is SiteContentParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
+            SiteContentError.NameMissing -> "Site has no name"
+            SiteContentError.ConfidenceCriteriaMissing -> "Site is missing confidence criteria"
+            is SiteContentError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is SiteContentError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
+            is SiteContentError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
         }
 
     companion object {

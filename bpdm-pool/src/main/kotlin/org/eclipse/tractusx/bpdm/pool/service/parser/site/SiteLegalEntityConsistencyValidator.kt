@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteNotInAddressLegalEntity
 import org.springframework.stereotype.Service
 
 /**

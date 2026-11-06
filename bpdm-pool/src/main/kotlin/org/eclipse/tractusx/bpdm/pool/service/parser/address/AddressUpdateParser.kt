@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
@@ -51,11 +51,11 @@ class AddressUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<AddressUpdateRaw>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
+    fun parse(requests: List<AddressUpdateRaw>): List<ParseResult<AddressUpdateParsed, AddressUpdateError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
         val siteResults = parseWherePresent(requests.map { it.siteBpns }, siteBpnParser::parseAll)
-        val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateParseError>> =
+        val consistentSiteResults: List<ParseResult<List<SiteDb>?, AddressUpdateError>> =
             crossValidateParseResults(targetResults, siteResults) { target, sites ->
                 when (sites) {
                     // A request that states no membership asks for none of it to be judged.

@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.task
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressSiteMembershipParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressSiteMembershipError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.AdditionalAddressUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.AdditionalSitesParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteLegalEntityConsistencyValidator
@@ -54,7 +54,7 @@ class GoldenRecordTaskMembershipValidator(
         val recordAddress = if (additionalAddress != null) additionalAddress.existingAddress else existingMainAddress(site, legalEntity)
 
         if (recordAddress != null) {
-            val membershipErrors: List<AddressSiteMembershipParseError> =
+            val membershipErrors: List<AddressSiteMembershipError> =
                 statedSites.flatMap { siteLegalEntityConsistencyValidator.check(recordAddress.legalEntity, it) } +
                         siteMainAddressConsistencyValidator.check(recordAddress, statedSites)
             return membershipErrors.map { GoldenRecordTaskError.AdditionalSiteInvalid(it) }

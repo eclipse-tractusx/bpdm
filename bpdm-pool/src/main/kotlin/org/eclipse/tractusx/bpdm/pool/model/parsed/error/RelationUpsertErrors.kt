@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.relation
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationType
 import java.time.LocalDate

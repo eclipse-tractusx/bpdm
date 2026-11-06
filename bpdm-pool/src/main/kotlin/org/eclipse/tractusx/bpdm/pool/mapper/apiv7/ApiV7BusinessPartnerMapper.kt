@@ -45,7 +45,7 @@ import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessPartn
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.ConfidenceCriteriaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.RelationValidityPeriodRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.BusinessPartnerSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BusinessPartnerSearchError
 import org.springframework.stereotype.Component
 
 /**

@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityCreateParsed
@@ -47,7 +47,7 @@ class LegalEntityCreateParser(
     /**
      * Validates each request and reports either the validated legal entity or every problem found in that entry.
      */
-    fun parse(requests: List<LegalEntityCreateRaw>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> {
+    fun parse(requests: List<LegalEntityCreateRaw>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateError>> {
         val headers = requests.map { it.content.header }
         val headerResults = legalEntityHeaderParser.parse(headers)
         val duplicateErrors = duplicateValidator.validate(headers, headers.map { null })
@@ -55,7 +55,7 @@ class LegalEntityCreateParser(
 
         val legalAddresses = requests.map { it.content.legalAddress }
         val legalAddressResults = addressContentParser.parse(legalAddresses, legalAddresses.map { null })
-        val coveredHeaderResults: List<ParseResult<LegalEntityHeaderParsed, LegalEntityCreateParseError>> =
+        val coveredHeaderResults: List<ParseResult<LegalEntityHeaderParsed, LegalEntityCreateError>> =
             crossValidateParseResults(legalAddressResults, mergedHeaderResults) { legalAddress, header ->
                 scriptVariantCoverageValidator.check(legalAddress.scriptCodes(), header.scriptCodes())
             }

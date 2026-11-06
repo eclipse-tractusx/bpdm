@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationSubject
-import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationUpsertError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.SiteRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
 import org.eclipse.tractusx.bpdm.pool.repository.ReasonCodeRepository

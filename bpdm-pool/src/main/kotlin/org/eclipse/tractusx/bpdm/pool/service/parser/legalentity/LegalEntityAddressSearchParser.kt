@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LegalEntityAddressSearchError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityAddressSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityAddressSearchError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LegalEntityAddressSearchRaw
 import org.springframework.stereotype.Service
 

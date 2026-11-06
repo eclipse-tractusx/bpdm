@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityUpdateRaw
@@ -52,7 +52,7 @@ class LegalEntityUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<LegalEntityUpdateRaw>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
+    fun parse(requests: List<LegalEntityUpdateRaw>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         val headers = requests.map { it.content.header }
@@ -82,7 +82,7 @@ class LegalEntityUpdateParser(
 
     // The legal address keeps an existing variant its legal entity is still named in, so the variants it carries today
     // cover the header as well as the stated ones.
-    private fun coverageErrors(result: ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>): List<LegalEntityUpdateParseError> {
+    private fun coverageErrors(result: ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateError>): List<LegalEntityUpdateError> {
         val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
         val coveredScriptCodes = parsed.content.legalAddress.scriptCodes() + parsed.target.legalAddress.scriptCodes()
 

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
@@ -49,7 +49,7 @@ class SiteCreateParser(
      * Validates each request and reports either the validated site with its resolved parent or every problem found in
      * that entry.
      */
-    fun parse(requests: List<SiteCreateRaw>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
+    fun parse(requests: List<SiteCreateRaw>): List<ParseResult<SiteCreateParsed, SiteCreateError>> {
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val contentResults = parseContent(requests.map { it.content })
 
@@ -64,10 +64,10 @@ class SiteCreateParser(
     fun parseContent(
         contents: List<SiteContentRequest>,
         mainAddressBpns: List<String?> = contents.map { null }
-    ): List<ParseResult<SiteContentParsed, SiteCreateParseError>> {
+    ): List<ParseResult<SiteContentParsed, SiteCreateError>> {
         val headerResults = siteHeaderParser.parse(contents.map { it.header })
         val mainAddressResults = addressContentParser.parse(contents.map { it.mainAddress }, mainAddressBpns)
-        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateError>> =
             crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
                 scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), header.scriptCodes())
             }

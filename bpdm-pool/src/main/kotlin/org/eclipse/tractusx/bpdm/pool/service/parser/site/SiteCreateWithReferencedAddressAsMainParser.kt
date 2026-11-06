@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
@@ -50,7 +50,7 @@ class SiteCreateWithReferencedAddressAsMainParser(
     @Transactional(readOnly = true)
     fun parse(
         requests: List<SiteCreateWithReferencedAddressAsMainRequest>
-    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
+    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val mainAddressTargetResults = addressBpnParser.parse(requests.map { it.mainAddressBpn })
         val ownerBpns = mainAddressTargetResults.map { (it as? ParseResult.Success)?.parsed?.bpn }
@@ -63,7 +63,7 @@ class SiteCreateWithReferencedAddressAsMainParser(
 
     // The address keeps an existing variant the new site is named in, so the variants it carries today cover the header as
     // well as the stated ones.
-    private fun coverageErrors(result: ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>): List<SiteCreateParseError> {
+    private fun coverageErrors(result: ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateError>): List<SiteCreateError> {
         val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
         val coveredScriptCodes = parsed.mainAddressContent?.scriptCodes().orEmpty() + parsed.mainAddress.scriptCodes()
 

@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.BpnReferenceParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed

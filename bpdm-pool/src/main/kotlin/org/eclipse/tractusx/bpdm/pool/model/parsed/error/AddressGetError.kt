@@ -16,11 +16,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-package org.eclipse.tractusx.bpdm.pool.model.parsed.site
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a site fetch is rejected.
+ * Reason an address fetch is rejected.
  */
-sealed interface SiteGetError {
-    data class SiteNotFound(val bpn: String) : SiteGetError
+sealed interface AddressGetError {
+    data class AddressNotFound(val bpn: String) : AddressGetError
 }

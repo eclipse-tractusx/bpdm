@@ -17,11 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.participation
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a golden record counted update of a sharing member record is rejected.
+ * Reason a business partner search is rejected.
  */
-sealed interface GoldenRecordCountedUpdateError {
-    data class SharingMemberRecordNotFound(val recordId: String) : GoldenRecordCountedUpdateError
+sealed interface BusinessPartnerSearchError {
+    data object BpnAndLegalNameMissing : BusinessPartnerSearchError
+    data object NoBusinessPartnerKindIncluded : BusinessPartnerSearchError
+    data object LeadingWhitespace : BusinessPartnerSearchError
+    data class LegalNameTooShort(val minLength: Int) : BusinessPartnerSearchError
 }

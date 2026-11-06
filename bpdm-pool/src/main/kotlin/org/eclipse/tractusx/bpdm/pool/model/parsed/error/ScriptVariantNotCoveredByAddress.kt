@@ -17,10 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 data class ScriptVariantNotCoveredByAddress(val scriptCode: String) :
-    LegalEntityCreateParseError,
-    LegalEntityUpdateParseError,
-    SiteCreateParseError,
-    SiteUpdateParseError
+    LegalEntityCreateError,
+    LegalEntityUpdateError,
+    SiteCreateError,
+    SiteUpdateError

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteMainAddressOmitted
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteMainAddressOmitted
 import org.springframework.stereotype.Service
 
 /**
