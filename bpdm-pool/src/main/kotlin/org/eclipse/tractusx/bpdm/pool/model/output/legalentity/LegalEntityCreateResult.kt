@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityCreateError
 
 /**
  * Result of creating one legal entity of a batch: either the legal entity as stored or every reason the entry was
@@ -26,5 +26,5 @@ import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
  */
 sealed interface LegalEntityCreateResult {
     data class Created(val legalEntity: LegalEntityRecord) : LegalEntityCreateResult
-    data class Rejected(val errors: List<LegalEntityCreateParseError>) : LegalEntityCreateResult
+    data class Rejected(val errors: List<LegalEntityCreateError>) : LegalEntityCreateResult
 }

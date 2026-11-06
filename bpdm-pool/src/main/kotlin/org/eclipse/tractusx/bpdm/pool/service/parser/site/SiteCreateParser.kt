@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
@@ -49,18 +49,29 @@ class SiteCreateParser(
      * Validates each request and reports either the validated site with its resolved parent or every problem found in
      * that entry.
      */
-    fun parse(requests: List<SiteCreateRaw>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
+    fun parse(requests: List<SiteCreateRaw>): List<ParseResult<SiteCreateParsed, SiteCreateError>> {
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-        val mainAddresses = requests.map { it.content.mainAddress }
-        val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
-        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+        val contentResults = parseContent(requests.map { it.content })
+
+        return zipParseResults(contentResults, legalEntityResults) { content, legalEntity -> SiteCreateParsed(legalEntity, content) }
+    }
+
+    /**
+     * Validates the content of each new site apart from its parent and reports either the validated content or every
+     * problem found in that entry; [mainAddressBpns] names the main address an entry states new content for, or null for
+     * a main address that does not exist yet.
+     */
+    fun parseContent(
+        contents: List<SiteContentRaw>,
+        mainAddressBpns: List<String?> = contents.map { null }
+    ): List<ParseResult<SiteContentParsed, SiteCreateError>> {
+        val headerResults = siteHeaderParser.parse(contents.map { it.header })
+        val mainAddressResults = addressContentParser.parse(contents.map { it.mainAddress }, mainAddressBpns)
+        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateError>> =
             crossValidateParseResults(mainAddressResults, headerResults) { mainAddress, header ->
-                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
+                scriptVariantCoverageValidator.check(mainAddress.scriptCodes(), header.scriptCodes())
             }
 
-        return zipParseResults(coveredHeaderResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
-            SiteCreateParsed(legalEntity, SiteContentParsed(header, mainAddress))
-        }
+        return zipParseResults(coveredHeaderResults, mainAddressResults) { header, mainAddress -> SiteContentParsed(header, mainAddress) }
     }
 }

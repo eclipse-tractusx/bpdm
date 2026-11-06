@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.LegalEntitySiteSearchRaw
 import org.springframework.stereotype.Service

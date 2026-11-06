@@ -234,6 +234,9 @@ permitted, not expected.*
   resolved against shared context (e.g. one tenant); then it gets its own `…BatchParsed`.
 - **MDL.6** Parse errors MUST be sealed hierarchies in the Parsed layer, mapped exhaustively to API error codes by each
   API version's mapper.
+- **MDL.7** Parse errors SHOULD live in one `model/parsed/error` package instead of their domain package. Kotlin requires
+  the direct subtypes of a sealed type to share its package, so only errors in the same package can share an error
+  across hierarchies.
 
 ## 2.8 Mappers (`MAP`)
 

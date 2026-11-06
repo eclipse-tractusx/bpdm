@@ -21,9 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Table
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import java.time.Instant
 
 
 @Entity
@@ -33,8 +34,7 @@ import java.time.Instant
 class GoldenRecordTaskDb(
     @Column(name = "task_id", nullable = false, updatable = false)
     val taskId: String,
-    @Column(name = "is_resolved", nullable = false)
-    var isResolved: Boolean,
-    @Column(name = "last_checked", nullable = false)
-    var lastChecked: Instant
+    @Enumerated(EnumType.STRING)
+    @Column(name = "task_kind", nullable = false, updatable = false)
+    val kind: GoldenRecordTaskKind
 ): BaseEntityWithExplicitTimestamps()

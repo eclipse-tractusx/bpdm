@@ -19,6 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativePostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressStateV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AlternativePostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerCreateV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressPartnerUpdateV6Request
@@ -34,7 +48,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearch
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
@@ -45,9 +58,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SitePartnerUpdateV6Reque
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
@@ -73,12 +85,12 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressA
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -87,16 +99,14 @@ import java.time.ZoneOffset
  * Maps API v6 requests to their raw model.
  */
 @Component
-class ApiV6InboundMapper(
-    private val addressDtoRequestMapperV6: AddressDtoRequestMapperV6
-) {
+class ApiV6InboundMapper {
 
     /**
      * Returns the raw identifier type search criteria a client sent.
      */
     fun toIdentifierTypeSearchRaw(businessPartnerType: IdentifierBusinessPartnerTypeV6, country: String?): IdentifierTypeSearchRaw =
         IdentifierTypeSearchRaw(
-            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(businessPartnerType.name),
+            businessPartnerType = toModel(businessPartnerType),
             country = country
         )
 
@@ -112,7 +122,7 @@ class ApiV6InboundMapper(
     fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRaw =
         IdentifierTypeCreateRaw(
             technicalKey = identifierType.technicalKey,
-            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(identifierType.businessPartnerType.name),
+            businessPartnerType = toModel(identifierType.businessPartnerType),
             name = identifierType.name,
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
@@ -143,7 +153,7 @@ class ApiV6InboundMapper(
      */
     fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV6Request): BpnIdentifierSearchRaw =
         BpnIdentifierSearchRaw(
-            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(request.businessPartnerType.name),
+            businessPartnerType = toModel(request.businessPartnerType),
             identifierTypeKey = request.idType,
             identifierValues = request.idValues
         )
@@ -247,13 +257,13 @@ class ApiV6InboundMapper(
      * Returns the raw create for the address a client sent, under the parent legal entity or site it named.
      */
     fun toAddressCreateRaw(request: AddressPartnerCreateV6Request): AddressCreateRaw =
-        AddressCreateRaw(parentBpn = request.bpnParent, content = addressDtoRequestMapperV6.toContentRequest(request.address))
+        AddressCreateRaw(parentBpn = request.bpnParent, content = toAddressContentRaw(request.address))
 
     /**
      * Returns the raw update for the address a client sent, addressed by its BPN and leaving its site membership as it is.
      */
     fun toAddressUpdateRaw(request: AddressPartnerUpdateV6Request): AddressUpdateRaw =
-        AddressUpdateRaw(addressBpn = request.bpna, siteBpns = null, content = addressDtoRequestMapperV6.toContentRequest(request.address))
+        AddressUpdateRaw(addressBpn = request.bpna, siteBpns = null, content = toAddressContentRaw(request.address))
 
     /**
      * Returns the raw create for the site and main address a client sent, under the parent legal entity it named.
@@ -267,7 +277,7 @@ class ApiV6InboundMapper(
     fun toSiteCreateWithLegalAddressAsMainRaw(request: SiteCreateWithLegalAddressAsMainV6Request): SiteCreateWithLegalAddressAsMainRaw =
         SiteCreateWithLegalAddressAsMainRaw(
             legalEntityBpn = request.bpnLParent,
-            header = SiteHeaderRequest(
+            header = SiteHeaderRaw(
                 name = request.name,
                 states = request.states.map { toStateRequest(it) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
@@ -283,24 +293,24 @@ class ApiV6InboundMapper(
     fun toSiteUpdateRaw(request: SitePartnerUpdateV6Request): SiteUpdateRaw =
         SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
 
-    private fun toContentRequest(site: SiteV6Dto): SiteContentRequest =
-        SiteContentRequest(
+    private fun toContentRequest(site: SiteV6Dto): SiteContentRaw =
+        SiteContentRaw(
             header = toHeaderRequest(site),
-            mainAddress = addressDtoRequestMapperV6.toContentRequest(site.mainAddress)
+            mainAddress = toAddressContentRaw(site.mainAddress)
         )
 
-    private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =
-        LegalEntityContentRequest(
+    private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRaw =
+        LegalEntityContentRaw(
             header = toHeaderRequest(legalEntity),
-            legalAddress = addressDtoRequestMapperV6.toContentRequest(legalAddress)
+            legalAddress = toAddressContentRaw(legalAddress)
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityV6Dto): LegalEntityHeaderRequest =
-        LegalEntityHeaderRequest(
+    private fun toHeaderRequest(legalEntity: LegalEntityV6Dto): LegalEntityHeaderRaw =
+        LegalEntityHeaderRaw(
             legalName = legalEntity.legalName,
             legalShortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
-            identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
+            identifiers = legalEntity.identifiers.map { LegalEntityIdentifierRaw(it.value, it.type, it.issuingBody) },
             states = legalEntity.states.map { toStateRequest(it) },
             confidenceCriteria = toConfidenceRequest(legalEntity.confidenceCriteria),
             isDataSpaceParticipant = legalEntity.isCatenaXMemberData,
@@ -309,26 +319,92 @@ class ApiV6InboundMapper(
             scriptVariants = emptyList()
         )
 
-    private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityState =
-        LegalEntityState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
+    private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityStateRaw =
+        LegalEntityStateRaw(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
-    private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRequest =
-        SiteHeaderRequest(
+    private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRaw =
+        SiteHeaderRaw(
             name = site.name,
             states = site.states.map { toStateRequest(it) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
             scriptVariants = emptyList()
         )
 
-    private fun toStateRequest(state: SiteStateV6Dto): SiteState =
-        SiteState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
+    private fun toStateRequest(state: SiteStateV6Dto): SiteStateRaw =
+        SiteStateRaw(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
+        )
+
+    private fun toAddressContentRaw(address: LogisticAddressV6Dto): LogisticAddressRaw =
+        LogisticAddressRaw(
+            name = address.name,
+            states = address.states.map { toStateRequest(it) },
+            identifiers = address.identifiers.map { toIdentifierRequest(it) },
+            physicalPostalAddress = toPhysicalRequest(address.physicalPostalAddress),
+            alternativePostalAddress = address.alternativePostalAddress?.let { toAlternativeRequest(it) },
+            confidenceCriteria = toConfidenceRequest(address.confidenceCriteria),
+            // v6 has no script variants and an upsert replaces the full list, so a v6 write drops the script
+            // variants the business partner may have gained through v7 or the task path.
+            scriptVariants = emptyList()
+        )
+
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressV6Dto): PhysicalPostalAddressRaw =
+        PhysicalPostalAddressRaw(
+            geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
+            country = physical.country,
+            administrativeAreaLevel1 = physical.administrativeAreaLevel1,
+            administrativeAreaLevel2 = physical.administrativeAreaLevel2,
+            administrativeAreaLevel3 = physical.administrativeAreaLevel3,
+            postalCode = physical.postalCode,
+            city = physical.city,
+            district = physical.district,
+            street = physical.street?.let { toStreet(it) },
+            companyPostalCode = physical.companyPostalCode,
+            industrialZone = physical.industrialZone,
+            building = physical.building,
+            floor = physical.floor,
+            door = physical.door,
+            taxJurisdictionCode = physical.taxJurisdictionCode
+        )
+
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressV6Dto): AlternativePostalAddressRaw =
+        AlternativePostalAddressRaw(
+            geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
+            country = alternative.country,
+            administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
+            postalCode = alternative.postalCode,
+            city = alternative.city,
+            deliveryServiceType = alternative.deliveryServiceType,
+            deliveryServiceQualifier = alternative.deliveryServiceQualifier,
+            deliveryServiceNumber = alternative.deliveryServiceNumber
+        )
+
+    private fun toStateRequest(state: AddressStateV6Dto): AddressStateRaw =
+        AddressStateRaw(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
+
+    private fun toIdentifierRequest(identifier: AddressIdentifierV6Dto): AddressIdentifierRaw =
+        AddressIdentifierRaw(value = identifier.value, type = identifier.type)
+
+    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRaw =
+        GeoCoordinateRaw(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
+
+    private fun toStreet(street: StreetV6Dto): StreetRaw =
+        StreetRaw(
+            name = street.name,
+            houseNumber = street.houseNumber,
+            houseNumberSupplement = street.houseNumberSupplement,
+            milestone = street.milestone,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
         )
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
@@ -336,4 +412,10 @@ class ApiV6InboundMapper(
     private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
 
     private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
+
+    private fun toModel(businessPartnerType: IdentifierBusinessPartnerTypeV6): IdentifierBusinessPartnerType =
+        when (businessPartnerType) {
+            IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY -> IdentifierBusinessPartnerType.LEGAL_ENTITY
+            IdentifierBusinessPartnerTypeV6.ADDRESS -> IdentifierBusinessPartnerType.ADDRESS
+        }
 }

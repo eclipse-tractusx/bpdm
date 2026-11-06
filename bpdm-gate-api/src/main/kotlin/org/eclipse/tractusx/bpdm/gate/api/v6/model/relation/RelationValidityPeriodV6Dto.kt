@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityP
 import java.time.LocalDate
 
 data class RelationValidityPeriodV6Dto(
-    @Schema(description = RelationValidityPeriodDescription.validFrom)
+    @get:Schema(description = RelationValidityPeriodDescription.validFrom)
     val validFrom: LocalDate,
 
-    @Schema(description = RelationValidityPeriodDescription.validTo)
+    @get:Schema(description = RelationValidityPeriodDescription.validTo)
     val validTo: LocalDate?
 )

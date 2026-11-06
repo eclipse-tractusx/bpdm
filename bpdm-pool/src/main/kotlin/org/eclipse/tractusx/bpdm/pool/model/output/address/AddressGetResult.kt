@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.address
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressGetError
 
 /**
  * Result of an address fetch: either the address found or every reason the fetch was rejected.

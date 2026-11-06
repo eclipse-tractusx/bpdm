@@ -18,6 +18,8 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -36,18 +38,17 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteUpdateResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError.SiteNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError.SiteNotFound
 import org.springframework.stereotype.Component
 
 /**
@@ -56,8 +57,7 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV7SiteMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
-    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper
 ) {
 
     /**
@@ -152,62 +152,54 @@ class ApiV7SiteMapper(
             index = entityKey
         )
 
-    private fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
+    private fun toCreateErrorInfo(error: SiteCreateError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
         when (error) {
             is UnresolvableLegalEntity ->
                 ErrorInfoV7(SiteCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
-            is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toMainAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress ->
                 ErrorInfoV7(
                     SiteCreateErrorV7.ScriptVariantNotCoveredByMainAddress,
                     "Script code '${error.scriptCode}' is not covered by the site's main address",
                     entityKey
                 )
-            is SiteContentParseError.ScriptVariantNameMissing ->
+            is SiteContentError.ScriptVariantNameMissing ->
                 ErrorInfoV7(SiteCreateErrorV7.ScriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+            is SiteContentError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfoV7(
                     SiteCreateErrorV7.ScriptVariantDuplicateScriptCode,
                     "Duplicate site script variant for script code '${error.scriptCode}'",
                     entityKey
                 )
-            is SiteContentParseError.NameMissing,
-            is SiteContentParseError.ConfidenceCriteriaMissing,
-            is SiteContentParseError.ScriptCodeNotFound,
-            is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
+            is SiteContentError.NameMissing,
+            is SiteContentError.ConfidenceCriteriaMissing,
+            is SiteContentError.ScriptCodeNotFound,
+            is UnresolvableAddress -> throw internalError(error)
         }
 
-    private fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
+    private fun toUpdateErrorInfo(error: SiteUpdateError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    SiteUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
-            is SiteContentParseError.ScriptVariantNameMissing ->
+            is AddressContentError -> apiV7AddressMapper.toMainAddressUpdateErrorInfo(error, entityKey)
+            is SiteContentError.ScriptVariantNameMissing ->
                 ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
-            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+            is SiteContentError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfoV7(
                     SiteUpdateErrorV7.ScriptVariantDuplicateScriptCode,
                     "Duplicate site script variant for script code '${error.scriptCode}'",
                     entityKey
                 )
-            is SiteContentParseError.NameMissing,
-            is SiteContentParseError.ConfidenceCriteriaMissing,
-            is SiteContentParseError.ScriptCodeNotFound,
+            is SiteContentError.NameMissing,
+            is SiteContentError.ConfidenceCriteriaMissing,
+            is SiteContentError.ScriptCodeNotFound,
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
     // An error the bounded DTO already rules out, or that this use case cannot reach, gets no public code.
-    private fun internalError(error: SiteCreateParseError) =
+    private fun internalError(error: SiteCreateError) =
         BpdmValidationException("Unexpected site parse error (no public error code): $error")
 
     private fun toStateDto(record: BusinessStateRecord): SiteStateVerboseV7Dto =
@@ -219,7 +211,7 @@ class ApiV7SiteMapper(
 
     private fun toDto(record: SiteRelationRecord): SiteRelationVerboseV7Dto =
         SiteRelationVerboseV7Dto(
-            type = record.type,
+            type = toDto(record.type),
             businessPartnerSourceBpns = record.sourceBpns,
             businessPartnerTargetBpns = record.targetBpns,
             validityPeriods = record.validityPeriods.map { apiV7BusinessPartnerMapper.toDto(it) },
@@ -228,4 +220,9 @@ class ApiV7SiteMapper(
 
     private fun toDto(record: SiteScriptVariantRecord): SiteScriptVariantV7Dto =
         SiteScriptVariantV7Dto(record.scriptCode, record.name, apiV7AddressMapper.toPostalAddressDto(record.mainAddress))
+
+    private fun toDto(relationType: SiteRelationType): SiteRelationTypeV7 =
+        when (relationType) {
+            SiteRelationType.IsReplacedBy -> SiteRelationTypeV7.IsReplacedBy
+        }
 }

@@ -346,11 +346,11 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN participant legal entity with a script variant
-     * WHEN operator tries to update its legal address without the script variant the legal entity is named in
-     * THEN operator sees ScriptVariantCoverageStillNeeded error
+     * WHEN operator updates its legal address without the script variant the legal entity is named in
+     * THEN the address keeps that script variant
      */
     @Test
-    fun `try update legal address dropping a script variant its legal entity is named in`() {
+    fun `update legal address omitting a script variant its legal entity is named in`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
@@ -359,11 +359,32 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedErrors = legalEntityResponse.scriptVariants
-            .map { ErrorInfoV7(AddressUpdateErrorV7.ScriptVariantCoverageStillNeeded, "IGNORED", addressRequest.bpna) }
-        val expectedResponse = AddressPartnerUpdateV7ResponseWrapper(emptyList(), expectedErrors)
+        assertThat(addressResponse.errors).isEmpty()
+        assertThat(scriptCodesOf(addressRequest.bpna)).containsExactlyInAnyOrderElementsOf(legalEntityResponse.scriptVariants.map { it.scriptCode })
+    }
 
-        assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    /**
+     * GIVEN participant legal entity whose legal address also carries a script variant no business partner is named in
+     * WHEN operator updates that address stating no script variants
+     * THEN only the script variant the legal entity is named in remains
+     */
+    @Test
+    fun `update legal address dropping a script variant no business partner is named in`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val namedScriptCode = legalEntityResponse.scriptVariants.single().scriptCode
+        val unnamedScriptCode = scriptCodeOtherThan(setOf(namedScriptCode))
+        val unnamedVariantRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse)
+            .let { it.copy(scriptVariants = it.scriptVariants.map { variant -> variant.copy(scriptCode = unnamedScriptCode) }) }
+        poolClient.addresses.updateAddresses(listOf(unnamedVariantRequest))
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).copy(scriptVariants = emptyList())
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        assertThat(addressResponse.errors).isEmpty()
+        assertThat(scriptCodesOf(addressRequest.bpna)).containsExactly(namedScriptCode)
     }
 
     /**
@@ -528,4 +549,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val address = poolClient.addresses.getAddress(addressBpn).address
         return listOfNotNull(address.bpnSite) + address.additionalSites
     }
+
+    private fun scriptCodesOf(addressBpn: String): List<String> =
+        poolClient.addresses.getAddress(addressBpn).scriptVariants.map { it.scriptCode }
 }

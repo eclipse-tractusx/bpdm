@@ -19,13 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,24 +37,24 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressPayloadUpdateService(
     private val addressStagedUpdateService: AddressUpdateService,
-    private val addressUpdateMapper: AddressUpdateMapper
+    private val parsedToDbMapper: ParsedToDbMapper
 ) {
 
     /**
      * Applies the given payloads in full and reports for each address whether it actually changed.
      */
     @Transactional
-    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
+    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         commit(stageUpdate(parsed))
 
     /**
      * Applies the payloads in memory without persisting, so a caller can see which addresses changed before handing them
      * to [commit].
      */
-    fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
+    fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWriteParsed> =
         parsed.map { entry ->
             addressStagedUpdateService.stageUpdate(
-                AddressUpdate(entry.target, addressUpdateMapper.toFullUpdate(entry.address, entry.sites.toFieldUpdate()))
+                AddressChangeParsed(entry.target, parsedToDbMapper.toAddressFullChange(entry.address, entry.sites.toFieldUpdate()))
             )
         }
 
@@ -62,9 +62,9 @@ class AddressPayloadUpdateService(
      * Persists the staged addresses that changed and emits their UPDATE changelog.
      */
     @Transactional
-    fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
+    fun commit(staged: List<PendingAddressWriteParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         addressStagedUpdateService.commit(staged)
 
-    private fun List<SiteDb>?.toFieldUpdate(): FieldUpdate<List<SiteDb>> =
-        this?.let { FieldUpdate.Set(it) } ?: FieldUpdate.NoOp
+    private fun List<SiteDb>?.toFieldUpdate(): FieldUpdateRaw<List<SiteDb>> =
+        this?.let { FieldUpdateRaw.Set(it) } ?: FieldUpdateRaw.NoOp
 }

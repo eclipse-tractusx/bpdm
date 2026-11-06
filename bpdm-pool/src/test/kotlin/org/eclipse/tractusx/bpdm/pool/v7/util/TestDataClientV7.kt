@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
-import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
+import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskScheduler
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
@@ -39,14 +39,15 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import java.util.UUID
 
 class TestDataClientV7(
     private val poolClient: PoolV7Client,
     private val requestFactory: PoolRequestFactoryV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    private val taskBatchResolutionService: TaskBatchResolutionService,
-    private val taskRelationsResolutionService: TaskRelationsResolutionService
+    private val goldenRecordTaskScheduler: GoldenRecordTaskScheduler,
+    private val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService
 ) {
 
 
@@ -88,7 +89,7 @@ class TestDataClientV7(
             businessPartnerRelations = relations
         )
 
-        val errors = taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskEntry)).flatMap { it.errors }
+        val errors = resolveRelationTask(taskEntry).flatMap { it.errors }
         check(errors.isEmpty()) { "Could not make '$ownedBpnL' owned by '$owningBpnL': $errors" }
     }
 
@@ -110,8 +111,14 @@ class TestDataClientV7(
             businessPartnerRelations = relations
         )
 
-        val errors = taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskEntry)).flatMap { it.errors }
+        val errors = resolveRelationTask(taskEntry).flatMap { it.errors }
         check(errors.isEmpty()) { "Could not make '$alternativeBpnL' alternative headquarter of '$mainBpnL': $errors" }
+    }
+
+    private fun resolveRelationTask(taskEntry: TaskRelationsStepReservationEntryDto): List<TaskRelationsStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(taskEntry))
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults()
     }
 
     fun createSite(legalEntity: LegalEntityWithLegalAddressVerboseV7Dto, seed: String): SitePartnerCreateVerboseV7Dto {
@@ -144,7 +151,7 @@ class TestDataClientV7(
 
         orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
 
-        taskBatchResolutionService.processTasks()
+        goldenRecordTaskScheduler.processTasks()
         val businessPartnerResult = orchestratorMockDataFactory.getBusinessPartnerResolution()
         return businessPartnerResult
     }
@@ -154,7 +161,7 @@ class TestDataClientV7(
 
         orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
 
-        taskBatchResolutionService.processTasks()
+        goldenRecordTaskScheduler.processTasks()
         return orchestratorMockDataFactory.getBusinessPartnerResolutionErrors()
     }
 }

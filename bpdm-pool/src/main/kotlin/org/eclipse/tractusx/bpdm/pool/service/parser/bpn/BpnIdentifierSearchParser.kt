@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.bpn
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BpnIdentifierSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnIdentifierSearchRaw
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository

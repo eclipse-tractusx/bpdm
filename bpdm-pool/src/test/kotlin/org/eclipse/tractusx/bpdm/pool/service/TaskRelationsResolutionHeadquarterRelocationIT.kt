@@ -35,6 +35,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
@@ -63,9 +67,10 @@ import java.time.LocalDate
 )
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
 class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
-    private val taskRelationsResolutionService: TaskRelationsResolutionService,
+    private val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
+    private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val poolApiClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers,
@@ -108,7 +113,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeNow, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
-        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        resolveRelationTasks(listOf(taskToResolve))
         val updateEndTime = Instant.now()
 
         //THEN
@@ -138,7 +143,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
             RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdSite.mainAddress.bpna, activeNow, anyReasonCode()
         )
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
-        val results = taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        val results = resolveRelationTasks(listOf(taskToResolve))
 
         //THEN
         assertThat(results.single().errors).isEmpty()
@@ -146,6 +151,34 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         assertThat(actualLegalEntity.legalAddress.bpna).isEqualTo(createdSite.mainAddress.bpna)
         assertThat(actualLegalEntity.legalAddress.addressType).isEqualTo(AddressType.LegalAndSiteMainAddress)
+    }
+
+    /**
+     * GIVEN a legal entity and an additional address
+     * WHEN additional address replaces legal address for a period ending today
+     * THEN user sees the additional address as new legal address, as the relocation still holds on its end date
+     */
+    @Test
+    fun `legal address replaced until today changes headquarter`(){
+        //GIVEN
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
+
+        //WHEN
+        val today = LocalDate.now()
+        val activeUntilToday = listOf(RelationValidityPeriod(today.minusDays(1), today))
+        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeUntilToday, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        val results = resolveRelationTasks(listOf(taskToResolve))
+
+        //THEN
+        assertThat(results.single().errors).isEmpty()
+
+        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
+        assertThat(actualLegalEntity.legalAddress.bpna).isEqualTo(createdAddAddress.address.bpna)
     }
 
     /**
@@ -167,7 +200,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
-        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        resolveRelationTasks(listOf(taskToResolve))
         val updateEndTime = Instant.now()
 
         //THEN
@@ -201,7 +234,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeNow, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
-        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        resolveRelationTasks(listOf(taskToResolve))
 
         //THEN
         val searchResponse = poolApiClient.changelogs.getChangelogEntries(ChangelogSearchV7Request(timestampAfter = beforeRelocation), PaginationRequest(0, 20))
@@ -246,5 +279,11 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
             validityPeriods = replacedByRelation.validityPeriods.map { org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationValidityPeriodV7Dto(it.validFrom, it.validTo) },
             reasonCode = replacedByRelation.reasonCode
         )
+    }
+
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults()
     }
 }

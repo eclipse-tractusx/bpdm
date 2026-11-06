@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import jakarta.persistence.criteria.Predicate
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
 import org.springframework.data.jpa.domain.Specification
@@ -30,7 +30,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 interface SiteRelationRepository : JpaRepository<SiteRelationDb, Long>, JpaSpecificationExecutor<SiteRelationDb> {
 
     companion object {
-        fun byRelation(startSite: SiteDb?, endSite: SiteDb?, type: SiteRelationTypeV7?) =
+        fun byRelation(startSite: SiteDb?, endSite: SiteDb?, type: SiteRelationType?) =
             Specification<SiteRelationDb> { root, _, builder ->
                 val predicates = mutableListOf<Predicate>()
 
@@ -43,12 +43,12 @@ interface SiteRelationRepository : JpaRepository<SiteRelationDb, Long>, JpaSpeci
                 }
 
                 type?.let {
-                    predicates.add(builder.equal(root.get<SiteRelationTypeV7>(SiteRelationDb::type.name), it))
+                    predicates.add(builder.equal(root.get<SiteRelationType>(SiteRelationDb::type.name), it))
                 }
 
                 builder.and(*predicates.toTypedArray())
             }
     }
 
-    fun findByTypeAndStartSite(type: SiteRelationTypeV7, site: SiteDb): Set<SiteRelationDb>
+    fun findByTypeAndStartSite(type: SiteRelationType, site: SiteDb): Set<SiteRelationDb>
 }

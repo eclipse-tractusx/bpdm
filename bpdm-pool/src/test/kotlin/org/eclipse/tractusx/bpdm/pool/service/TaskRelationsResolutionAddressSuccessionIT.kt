@@ -26,6 +26,10 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -55,9 +59,10 @@ import java.time.LocalDate
 )
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
 class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
-    private val taskRelationsResolutionService: TaskRelationsResolutionService,
+    private val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
+    private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val poolApiClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
@@ -139,7 +144,7 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
         val succession = BusinessPartnerRelations(RelationType.IsReplacedBy, predecessorBpna, successorBpna, activeNow, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", succession)
 
-        val results = taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        val results = resolveRelationTasks(listOf(taskToResolve))
 
         assertThat(results.single().errors).isEmpty()
     }
@@ -151,5 +156,11 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
 
     private fun anyReasonCode(): String {
         return poolApiClient.metadata.getReasonCodes(PaginationRequest()).content.first().technicalKey
+    }
+
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults()
     }
 }

@@ -20,8 +20,8 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressGetError.AddressNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressGetError.AddressNotFound
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.springframework.stereotype.Service
 

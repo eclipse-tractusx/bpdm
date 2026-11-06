@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 
 data class SiteUpdateParsed(
     val target: SiteDb,

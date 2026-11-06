@@ -19,6 +19,32 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCategory
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativeAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativePostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PostalAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressStateV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AlternativePostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PhysicalPostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetScriptVariantRaw
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerCreateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressPartnerUpdateV7Request
@@ -44,9 +70,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Reque
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
@@ -73,14 +98,14 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressA
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteScriptVariantRaw
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -89,15 +114,13 @@ import java.time.ZoneOffset
  * Maps API v7 requests to their raw model.
  */
 @Component
-class ApiV7InboundMapper(
-    private val addressDtoRequestMapper: AddressDtoRequestMapper
-) {
+class ApiV7InboundMapper {
 
     /**
      * Returns the raw identifier type search criteria a client sent.
      */
     fun toIdentifierTypeSearchRaw(businessPartnerType: IdentifierBusinessPartnerTypeV7, country: String?): IdentifierTypeSearchRaw =
-        IdentifierTypeSearchRaw(businessPartnerType = businessPartnerType, country = country)
+        IdentifierTypeSearchRaw(businessPartnerType = toModel(businessPartnerType), country = country)
 
     /**
      * Returns the raw field quality rule search for [country].
@@ -111,13 +134,13 @@ class ApiV7InboundMapper(
     fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV7Dto): IdentifierTypeCreateRaw =
         IdentifierTypeCreateRaw(
             technicalKey = identifierType.technicalKey,
-            businessPartnerType = identifierType.businessPartnerType,
+            businessPartnerType = toModel(identifierType.businessPartnerType),
             name = identifierType.name,
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
             transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
             format = identifierType.format,
-            categories = identifierType.categories,
+            categories = identifierType.categories.map { toModel(it) }.toSet(),
             details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }
         )
 
@@ -142,7 +165,7 @@ class ApiV7InboundMapper(
      */
     fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV7Request): BpnIdentifierSearchRaw =
         BpnIdentifierSearchRaw(
-            businessPartnerType = request.businessPartnerType,
+            businessPartnerType = toModel(request.businessPartnerType),
             identifierTypeKey = request.idType,
             identifierValues = request.idValues
         )
@@ -266,7 +289,7 @@ class ApiV7InboundMapper(
      * Returns the raw create for the address a client sent, under the parent legal entity or site it named.
      */
     fun toAddressCreateRaw(request: AddressPartnerCreateV7Request): AddressCreateRaw =
-        AddressCreateRaw(parentBpn = request.bpnParent, content = addressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants))
+        AddressCreateRaw(parentBpn = request.bpnParent, content = toAddressContentRaw(request.address, request.scriptVariants))
 
     /**
      * Returns the raw update for the address a client sent, addressed by its BPN, with the complete set of sites it
@@ -276,7 +299,7 @@ class ApiV7InboundMapper(
         AddressUpdateRaw(
             addressBpn = request.bpna,
             siteBpns = request.bpnSites,
-            content = addressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants)
+            content = toAddressContentRaw(request.address, request.scriptVariants)
         )
 
     /**
@@ -291,11 +314,11 @@ class ApiV7InboundMapper(
     fun toSiteCreateWithLegalAddressAsMainRaw(request: SiteCreateWithLegalAddressAsMainV7Request): SiteCreateWithLegalAddressAsMainRaw =
         SiteCreateWithLegalAddressAsMainRaw(
             legalEntityBpn = request.bpnLParent,
-            header = SiteHeaderRequest(
+            header = SiteHeaderRaw(
                 name = request.name,
-                states = request.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+                states = request.states.map { SiteStateRaw(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
-                scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+                scriptVariants = request.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.name) }
             ),
             exclusiveLegalAddress = false
         )
@@ -306,54 +329,172 @@ class ApiV7InboundMapper(
     fun toSiteUpdateRaw(request: SitePartnerUpdateV7Request): SiteUpdateRaw =
         SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
 
-    private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
-        LegalEntityContentRequest(
+    private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRaw =
+        LegalEntityContentRaw(
             header = toHeaderRequest(legalEntity),
-            legalAddress = addressDtoRequestMapper.toContentRequest(
+            legalAddress = toAddressContentRaw(
                 legalEntity.legalAddress,
                 legalEntity.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, it.legalAddress) }
             )
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityV7Dto): LegalEntityHeaderRequest {
+    private fun toHeaderRequest(legalEntity: LegalEntityV7Dto): LegalEntityHeaderRaw {
         val header = legalEntity.header
-        return LegalEntityHeaderRequest(
+        return LegalEntityHeaderRaw(
             legalName = header.legalName,
             legalShortName = header.legalShortName,
             legalForm = header.legalForm,
-            identifiers = header.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
-            states = header.states.map { LegalEntityState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+            identifiers = header.identifiers.map { LegalEntityIdentifierRaw(it.value, it.type, it.issuingBody) },
+            states = header.states.map { LegalEntityStateRaw(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(header.confidenceCriteria),
             isDataSpaceParticipant = header.isParticipantData,
             ownershipUltimate = header.ownershipUltimate,
-            scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariant(it.scriptCode, it.legalName, it.shortName) }
+            scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRaw(it.scriptCode, it.legalName, it.shortName) }
         )
     }
 
-    private fun toContentRequest(site: SiteV7Dto): SiteContentRequest =
-        SiteContentRequest(
+    private fun toContentRequest(site: SiteV7Dto): SiteContentRaw =
+        SiteContentRaw(
             header = toHeaderRequest(site),
-            mainAddress = addressDtoRequestMapper.toContentRequest(
+            mainAddress = toAddressContentRaw(
                 site.mainAddress,
                 site.scriptVariants.map { LogisticAddressScriptVariantV7Dto(it.scriptCode, it.mainAddress) }
             )
         )
 
-    private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRequest =
-        SiteHeaderRequest(
+    private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRaw =
+        SiteHeaderRaw(
             name = site.name,
-            states = site.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+            states = site.states.map { SiteStateRaw(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
-            scriptVariants = site.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+            scriptVariants = site.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.name) }
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
         )
+
+    private fun toAddressContentRaw(address: LogisticAddressV7Dto, scriptVariants: List<LogisticAddressScriptVariantV7Dto>): LogisticAddressRaw =
+        LogisticAddressRaw(
+            name = address.name,
+            states = address.states.map { toStateRequest(it) },
+            identifiers = address.identifiers.map { toIdentifierRequest(it) },
+            physicalPostalAddress = toPhysicalRequest(address.physicalPostalAddress),
+            alternativePostalAddress = address.alternativePostalAddress?.let { toAlternativeRequest(it) },
+            confidenceCriteria = toConfidenceRequest(address.confidenceCriteria),
+            scriptVariants = scriptVariants.map { toScriptVariant(it) }
+        )
+
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressV7Dto): PhysicalPostalAddressRaw =
+        PhysicalPostalAddressRaw(
+            geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
+            country = physical.country,
+            administrativeAreaLevel1 = physical.administrativeAreaLevel1,
+            administrativeAreaLevel2 = physical.administrativeAreaLevel2,
+            administrativeAreaLevel3 = physical.administrativeAreaLevel3,
+            postalCode = physical.postalCode,
+            city = physical.city,
+            district = physical.district,
+            street = physical.street?.let { toStreet(it) },
+            companyPostalCode = physical.companyPostalCode,
+            industrialZone = physical.industrialZone,
+            building = physical.building,
+            floor = physical.floor,
+            door = physical.door,
+            taxJurisdictionCode = physical.taxJurisdictionCode
+        )
+
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressV7Dto): AlternativePostalAddressRaw =
+        AlternativePostalAddressRaw(
+            geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
+            country = alternative.country,
+            administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
+            postalCode = alternative.postalCode,
+            city = alternative.city,
+            deliveryServiceType = alternative.deliveryServiceType,
+            deliveryServiceQualifier = alternative.deliveryServiceQualifier,
+            deliveryServiceNumber = alternative.deliveryServiceNumber
+        )
+
+    private fun toStateRequest(state: AddressStateV7Dto): AddressStateRaw =
+        AddressStateRaw(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
+
+    private fun toIdentifierRequest(identifier: AddressIdentifierV7Dto): AddressIdentifierRaw =
+        AddressIdentifierRaw(value = identifier.value, type = identifier.type)
+
+    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRaw =
+        GeoCoordinateRaw(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
+
+    private fun toScriptVariant(variant: LogisticAddressScriptVariantV7Dto): AddressScriptVariantRaw =
+        AddressScriptVariantRaw(
+            scriptCode = variant.scriptCode,
+            address = toPostalScriptVariant(variant.address)
+        )
+
+    private fun toPostalScriptVariant(variant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariantRaw =
+        PostalAddressScriptVariantRaw(
+            addressName = variant.addressName,
+            physicalAddress = toPhysicalScriptVariant(variant.physicalAddress),
+            alternativeAddress = variant.alternativeAddress?.let { toAlternativeScriptVariant(it) }
+        )
+
+    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariantRaw =
+        PhysicalAddressScriptVariantRaw(
+            city = variant.city,
+            district = variant.district,
+            street = variant.street?.let { toScriptVariantStreet(it) },
+            industrialZone = variant.industrialZone,
+            building = variant.building,
+            floor = variant.floor,
+            door = variant.door
+        )
+
+    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariantRaw =
+        AlternativeAddressScriptVariantRaw(
+            city = variant.city
+        )
+
+    private fun toScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariantRaw =
+        StreetScriptVariantRaw(
+            name = street.name,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
+        )
+
+    private fun toStreet(street: StreetV7Dto): StreetRaw =
+        StreetRaw(
+            name = street.name,
+            houseNumber = street.houseNumber,
+            houseNumberSupplement = street.houseNumberSupplement,
+            milestone = street.milestone,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
+        )
+
+    private fun toModel(businessPartnerType: IdentifierBusinessPartnerTypeV7): IdentifierBusinessPartnerType =
+        when (businessPartnerType) {
+            IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY -> IdentifierBusinessPartnerType.LEGAL_ENTITY
+            IdentifierBusinessPartnerTypeV7.ADDRESS -> IdentifierBusinessPartnerType.ADDRESS
+        }
+
+    private fun toModel(category: IdentifierTypeCategoryV7): IdentifierTypeCategory =
+        when (category) {
+            IdentifierTypeCategoryV7.VAT -> IdentifierTypeCategory.VAT
+            IdentifierTypeCategoryV7.TIN -> IdentifierTypeCategory.TIN
+            IdentifierTypeCategoryV7.NBR -> IdentifierTypeCategory.NBR
+            IdentifierTypeCategoryV7.IBR -> IdentifierTypeCategory.IBR
+            IdentifierTypeCategoryV7.OTH -> IdentifierTypeCategory.OTH
+        }
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
 

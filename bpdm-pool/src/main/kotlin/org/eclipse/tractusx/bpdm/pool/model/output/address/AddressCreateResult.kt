@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.address
 
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
 
 /**
  * Result of creating one address of a batch: either the address as stored or every reason the entry was rejected.
  */
 sealed interface AddressCreateResult {
     data class Created(val address: AddressRecord) : AddressCreateResult
-    data class Rejected(val errors: List<AddressCreateParseError>) : AddressCreateResult
+    data class Rejected(val errors: List<AddressCreateError>) : AddressCreateResult
 }

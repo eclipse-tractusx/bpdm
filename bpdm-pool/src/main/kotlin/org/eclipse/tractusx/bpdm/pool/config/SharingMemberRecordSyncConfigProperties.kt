@@ -29,9 +29,5 @@ data class SharingMemberRecordSyncConfigProperties(
 ){
     companion object{
         const val PREFIX = "bpdm.sharing-member-records"
-        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties"
-        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
-
-        const val GET_CRON = "@$BEAN_QUALIFIER.getCron()"
     }
 }

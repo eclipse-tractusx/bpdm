@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 object RelationValidityPeriodDescription {
     const val header = "A relation validity describes a timeframe in which a relation is active."
 
-    const val validFrom = "The date from which the relation is valid."
+    const val validFrom = "The first date on which the relation is valid (inclusive)."
 
-    const val validTo = "The date until which the relation is valid."
+    const val validTo = "The last date on which the relation is valid (inclusive)."
 }

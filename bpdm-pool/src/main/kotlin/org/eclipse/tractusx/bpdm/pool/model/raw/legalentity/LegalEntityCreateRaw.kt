@@ -19,8 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
 
 data class LegalEntityCreateRaw(
-    val content: LegalEntityContentRequest
+    val content: LegalEntityContentRaw
 )

@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
-import org.eclipse.tractusx.bpdm.pool.model.error.AlternativeHeadquarterCannotOwnUltimately
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AlternativeHeadquarterCannotOwnUltimately
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,7 +49,7 @@ class AlternativeHeadquarterValidator(
         }
 
         val today = LocalDate.now()
-        val alternativeRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, target)
+        val alternativeRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, target)
         val validToday = alternativeRelations.any { it.isValidOn(today) }
 
         return if (validToday) {

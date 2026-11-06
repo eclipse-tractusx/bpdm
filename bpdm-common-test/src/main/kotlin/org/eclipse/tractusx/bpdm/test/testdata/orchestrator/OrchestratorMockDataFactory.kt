@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
@@ -186,6 +187,23 @@ class OrchestratorMockDataFactory(
         )
     }
 
+    fun mockSharingMemberRecords(records: List<SharingMemberRecord>){
+        configureWireMock()
+
+        WireMock.stubFor(
+            WireMock
+                .get(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(PageDto(records.size.toLong(), 1, 0, records.size, records))))
+        )
+    }
+
+    fun getSharingMemberRecordQueryTimestamps(): List<Instant>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.getRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS)))
+            .map { Instant.parse(it.queryParameter("timestampAfter").firstValue()) }
+    }
+
     fun getSharingMemberRecordUpdates(): List<SharingMemberRecordUpdateRequest>{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
@@ -324,29 +342,82 @@ class OrchestratorMockDataFactory(
     }
 
     fun mockReservedBusinessPartner(seed: String, businessPartner: BusinessPartner): TaskStepReservationEntryDto{
-        WireMock.configureFor("localhost", orchestratorMockServer.port())
+        return mockReservedTasks(buildReservedTasks(seed, businessPartner).reservedTasks).single()
+    }
 
-        val mockedReservedTasks = buildReservedTasks(seed, businessPartner)
-        val emptyReservation = TaskStepReservationResponse(emptyList(), Instant.now().plus(Duration.ofSeconds(60)))
+    fun mockReservedTasks(reservedTasks: List<TaskStepReservationEntryDto>): List<TaskStepReservationEntryDto>{
+        configureWireMock()
+
+        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationResponse(reservedTasks, reservationTimeout()), TaskStepReservationResponse(emptyList(), reservationTimeout()))
+        mockStepResultsResponse(200)
+        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()), TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()))
+
+        return reservedTasks
+    }
+
+    fun mockReservedRelationTasks(reservedTasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepReservationEntryDto>{
+        configureWireMock()
+
+        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationResponse(reservedTasks, reservationTimeout()), TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()))
+        mockRelationStepResultsResponse(200)
+        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationResponse(emptyList(), reservationTimeout()), TaskStepReservationResponse(emptyList(), reservationTimeout()))
+
+        return reservedTasks
+    }
+
+    private fun mockStepReservations(basePath: String, reservation: Any, emptyReservation: Any){
+        val scenario = "$basePath/step-reservations"
 
         WireMock.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
-                .inScenario("step-reservations")
+            WireMock.post(WireMock.urlPathEqualTo("$basePath/step-reservations"))
+                .inScenario(scenario)
                 .whenScenarioStateIs(com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED)
-                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedReservedTasks)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(reservation)))
                 .willSetStateTo("empty")
         )
         WireMock.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
-                .inScenario("step-reservations")
+            WireMock.post(WireMock.urlPathEqualTo("$basePath/step-reservations"))
+                .inScenario(scenario)
                 .whenScenarioStateIs("empty")
                 .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(emptyReservation)))
         )
+    }
+
+    private fun reservationTimeout() = Instant.now().plus(Duration.ofSeconds(60))
+
+    fun mockStepReservationsResponse(status: Int){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
+            .willReturn(WireMock.status(status)))
+    }
+
+    fun mockStepResultsResponse(status: Int){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"))
-            .willReturn(WireMock.ok()))
+            .willReturn(WireMock.status(status)))
+    }
 
-        return mockedReservedTasks.reservedTasks.single()
+    fun mockRelationStepResultsResponse(status: Int){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/step-results"))
+            .willReturn(WireMock.status(status)))
+    }
+
+    fun getRelationStepResults(): List<TaskRelationsStepResultEntryDto>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/step-results")))
+            .flatMap { jsonMapper.readValue(it.body, TaskRelationsStepResultRequest::class.java).results }
+    }
+
+    fun getStepResults(): List<TaskStepResultEntryDto>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")))
+            .flatMap { jsonMapper.readValue(it.body, TaskStepResultRequest::class.java).results }
     }
 
     fun getBusinessPartnerResolution(): BusinessPartner{

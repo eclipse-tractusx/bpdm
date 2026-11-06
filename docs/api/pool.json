@@ -5100,7 +5100,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressUpdateErrorV7",
-            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "CountryNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "AddressNotFound", "SiteNotFound", "SiteNotInLegalEntity", "SiteMainAddressOmitted", "RegionNotFound", "CountryNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany", "ScriptVariantCityMissing", "ScriptVariantDuplicateScriptCode" ]
           },
           "message" : {
             "type" : "string"
@@ -5136,7 +5136,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "LegalEntityUpdateErrorV7",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressCountryNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressCountryNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany", "MultipleUltimateOwnersInHierarchy", "AlternativeHeadquarterCannotOwnUltimately", "ScriptVariantLegalNameMissing", "ScriptVariantDuplicateScriptCode", "LegalAddressScriptVariantCityMissing", "LegalAddressScriptVariantDuplicateScriptCode" ]
           },
           "message" : {
             "type" : "string"
@@ -5172,7 +5172,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "SiteUpdateErrorV7",
-            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressCountryNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode", "ScriptVariantCoverageStillNeeded" ]
+            "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressCountryNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany", "ScriptVariantNameMissing", "ScriptVariantDuplicateScriptCode", "MainAddressScriptVariantCityMissing", "MainAddressScriptVariantDuplicateScriptCode" ]
           },
           "message" : {
             "type" : "string"
@@ -7911,12 +7911,12 @@
           "validFrom" : {
             "type" : "string",
             "format" : "date",
-            "description" : "The date from which the relation is valid."
+            "description" : "The first date on which the relation is valid (inclusive)."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date",
-            "description" : "The date until which the relation is valid."
+            "description" : "The last date on which the relation is valid (inclusive)."
           }
         }
       },

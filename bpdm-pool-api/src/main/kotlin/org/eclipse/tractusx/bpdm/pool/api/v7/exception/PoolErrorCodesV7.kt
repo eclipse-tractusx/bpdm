@@ -61,8 +61,7 @@ enum class LegalEntityUpdateErrorV7 : ErrorCodeV7 {
     ScriptVariantLegalNameMissing,
     ScriptVariantDuplicateScriptCode,
     LegalAddressScriptVariantCityMissing,
-    LegalAddressScriptVariantDuplicateScriptCode,
-    ScriptVariantCoverageStillNeeded
+    LegalAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "SiteCreateErrorV7")
@@ -91,8 +90,7 @@ enum class SiteUpdateErrorV7 : ErrorCodeV7 {
     ScriptVariantNameMissing,
     ScriptVariantDuplicateScriptCode,
     MainAddressScriptVariantCityMissing,
-    MainAddressScriptVariantDuplicateScriptCode,
-    ScriptVariantCoverageStillNeeded
+    MainAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "AddressCreateErrorV7")
@@ -122,6 +120,5 @@ enum class AddressUpdateErrorV7 : ErrorCodeV7 {
     AddressDuplicateIdentifier,
     IdentifiersTooMany,
     ScriptVariantCityMissing,
-    ScriptVariantDuplicateScriptCode,
-    ScriptVariantCoverageStillNeeded
+    ScriptVariantDuplicateScriptCode
 }

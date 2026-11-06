@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
@@ -40,10 +42,10 @@ import org.eclipse.tractusx.bpdm.pool.model.output.metadata.CountryRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.FieldQualityRuleRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.IdentifierTypeRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.metadata.LegalFormRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.FieldQualityRuleSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalFormCreateError
 import org.springframework.stereotype.Component
 
 /**
@@ -94,7 +96,7 @@ class ApiV6MetadataMapper {
     fun toDto(record: IdentifierTypeRecord): IdentifierTypeV6Dto =
         IdentifierTypeV6Dto(
             technicalKey = record.technicalKey,
-            businessPartnerType = IdentifierBusinessPartnerTypeV6.valueOf(record.businessPartnerType.name),
+            businessPartnerType = toDto(record.businessPartnerType),
             name = record.name,
             abbreviation = record.abbreviation,
             transliteratedName = record.transliteratedName,
@@ -110,7 +112,7 @@ class ApiV6MetadataMapper {
             fieldPath = record.fieldPath,
             schemaName = record.schemaName,
             country = record.countryCode,
-            qualityLevel = QualityLevelV6.valueOf(record.qualityLevel.name)
+            qualityLevel = toDto(record.qualityLevel)
         )
 
     /**
@@ -178,4 +180,17 @@ class ApiV6MetadataMapper {
             }
         })
     }
+
+    private fun toDto(businessPartnerType: IdentifierBusinessPartnerType): IdentifierBusinessPartnerTypeV6 =
+        when (businessPartnerType) {
+            IdentifierBusinessPartnerType.LEGAL_ENTITY -> IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY
+            IdentifierBusinessPartnerType.ADDRESS -> IdentifierBusinessPartnerTypeV6.ADDRESS
+        }
+
+    private fun toDto(qualityLevel: QualityLevel): QualityLevelV6 =
+        when (qualityLevel) {
+            QualityLevel.MANDATORY -> QualityLevelV6.MANDATORY
+            QualityLevel.OPTIONAL -> QualityLevelV6.OPTIONAL
+            QualityLevel.FORBIDDEN -> QualityLevelV6.FORBIDDEN
+        }
 }

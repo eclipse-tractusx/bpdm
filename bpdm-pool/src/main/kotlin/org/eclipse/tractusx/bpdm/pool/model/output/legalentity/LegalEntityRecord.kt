@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
@@ -54,7 +54,7 @@ data class LegalEntityIdentifierRecord(
 )
 
 data class LegalEntityRelationRecord(
-    val type: LegalEntityRelationTypeV7,
+    val type: LegalEntityRelationType,
     val sourceBpnl: String,
     val targetBpnl: String,
     val validityPeriods: List<RelationValidityPeriodRecord>,

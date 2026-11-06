@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateTypedParentsRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.parser.bpn.BpnTypeResolver
@@ -50,7 +50,7 @@ class AddressParentResolutionParser(
      */
     fun parse(
         requests: List<AddressCreateRaw>
-    ): List<ParseResult<AddressCreateTypedParentsRequest, AddressCreateParseError>> {
+    ): List<ParseResult<AddressCreateTypedParentsRaw, AddressCreateError>> {
         val typeByBpn = requests.map { it.parentBpn }.associateWith { bpnTypeResolver.resolveType(it) }
         val legalEntityParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.LEGAL_ENTITY }.keys
         val siteParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.SITE }.keys
@@ -62,11 +62,11 @@ class AddressParentResolutionParser(
             when (typeByBpn[parent]) {
                 BusinessPartnerType.LEGAL_ENTITY ->
                     if (parent in existingLegalEntityBpns)
-                        ParseResult.Success(AddressCreateTypedParentsRequest(legalEntityBpn = parent, siteBpn = null, content = request.content))
+                        ParseResult.Success(AddressCreateTypedParentsRaw(legalEntityBpn = parent, siteBpn = null, content = request.content))
                     else ParseResult.ofSingleFailure(UnresolvableLegalEntity(parent))
                 BusinessPartnerType.SITE ->
                     sitesByBpn[parent]?.let {
-                        ParseResult.Success(AddressCreateTypedParentsRequest(legalEntityBpn = it.legalEntity.bpn, siteBpn = parent, content = request.content))
+                        ParseResult.Success(AddressCreateTypedParentsRaw(legalEntityBpn = it.legalEntity.bpn, siteBpn = parent, content = request.content))
                     } ?: ParseResult.ofSingleFailure(UnresolvableSite(parent))
                 else -> ParseResult.ofSingleFailure(InvalidParentBpn(parent))
             }

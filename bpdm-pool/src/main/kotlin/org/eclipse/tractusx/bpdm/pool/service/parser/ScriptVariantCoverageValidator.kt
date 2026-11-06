@@ -19,30 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantCoverageStillNeeded
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantNotCoveredByAddress
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.ScriptVariantNotCoveredByAddress
 import org.springframework.stereotype.Service
 
 /**
- * The rule that a business partner may only be named in a script its address is also written in, decided on the state
- * the write leaves behind.
+ * The rule that a business partner may only be named in a script its address is also written in.
  */
 @Service
 class ScriptVariantCoverageValidator {
 
     /**
-     * Reports one violation per script code a partner in [partners] is named in that [addressScriptCodes] does not cover.
+     * Reports one violation per script code in [partnerScriptCodes] that [addressScriptCodes] does not cover.
      */
-    fun check(addressScriptCodes: Collection<String>, partners: List<PartnerScriptCodes>): List<ScriptVariantCoverageParseError> {
+    fun check(addressScriptCodes: Collection<String>, partnerScriptCodes: Collection<String>): List<ScriptVariantNotCoveredByAddress> {
         val covered = addressScriptCodes.toSet()
-
-        return partners.flatMap { partner ->
-            partner.scriptCodes.filterNot { it in covered }.distinct().map { scriptCode ->
-                if (partner.bpn == null) ScriptVariantNotCoveredByAddress(scriptCode)
-                else ScriptVariantCoverageStillNeeded(scriptCode, partner.bpn)
-            }
-        }.distinct()
+        return partnerScriptCodes.filterNot { it in covered }.distinct().map { ScriptVariantNotCoveredByAddress(it) }
     }
 }

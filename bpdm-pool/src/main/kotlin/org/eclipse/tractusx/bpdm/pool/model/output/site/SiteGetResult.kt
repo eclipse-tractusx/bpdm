@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError
 
 /**
  * Result of a site fetch: either the site found or every reason the fetch was rejected.

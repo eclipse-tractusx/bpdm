@@ -42,8 +42,8 @@ Everything else is noise. The default for any given line is **no comment**: ever
 
 ## 3. Types that are not services
 
-- A type that represents a **concept** — an outcome, a staged intermediate, a verdict — MUST state in one sentence what it represents. `ParseResult`, `PendingAddressWrite` and `UpsertResult` are concepts.
-- A type that is a **record** MUST NOT be documented. `…Request` and `…Parsed` models and JPA entities are records. The test: if the type's name and its fields already tell you what it is, it is a record.
+- A type that represents a **concept** — an outcome, a staged intermediate, a verdict — MUST state in one sentence what it represents. `ParseResult`, `PendingAddressWriteParsed` and `UpsertResultParsed` are concepts.
+- A type that is a **record** MUST NOT be documented. `…Raw` and `…Parsed` models and JPA entities are records. The test: if the type's name and its fields already tell you what it is, it is a record.
 - An entity field MUST NOT document a business rule such as being derived or service-maintained. That rule is decided above the entity and MUST be documented there, normally as part of the contract of the operation that maintains it.
 - API DTOs MUST be documented through their OpenAPI `@Schema` descriptions and MUST NOT carry KDoc as well; a second copy will drift from the first.
 

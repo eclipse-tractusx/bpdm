@@ -1758,11 +1758,13 @@
         "properties" : {
           "validFrom" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "description" : "The first date on which the relation is valid (inclusive)."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
-            "format" : "date"
+            "format" : "date",
+            "description" : "The last date on which the relation is valid (inclusive)."
           }
         }
       },

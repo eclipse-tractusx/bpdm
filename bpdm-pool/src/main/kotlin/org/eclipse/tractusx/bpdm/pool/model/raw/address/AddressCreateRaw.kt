@@ -19,9 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.address
 
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 
 data class AddressCreateRaw(
     val parentBpn: String,
-    val content: LogisticAddressRequest
+    val content: LogisticAddressRaw
 )

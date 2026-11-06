@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityGetError
 
 /**
  * Result of a legal entity fetch: either the legal entity found or every reason the fetch was rejected.

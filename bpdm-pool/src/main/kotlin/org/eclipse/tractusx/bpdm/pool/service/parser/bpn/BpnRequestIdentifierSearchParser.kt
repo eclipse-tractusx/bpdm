@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.bpn
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BpnRequestIdentifierSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.bpn.BpnRequestIdentifierSearchRaw
 import org.springframework.stereotype.Service

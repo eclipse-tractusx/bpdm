@@ -19,13 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.participation
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.LegalEntityUpdateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,13 +42,13 @@ class DataSpaceParticipantUpdateService(
      * Applies the given participations and reports for each legal entity whether it actually changed.
      */
     @Transactional
-    fun update(parsed: List<DataSpaceParticipantUpdateParsed>): List<UpsertResult<LegalEntityDb>> =
+    fun update(parsed: List<DataSpaceParticipantUpdateParsed>): List<UpsertResultParsed<LegalEntityDb>> =
         legalEntityUpdateService.update(
             parsed.map {
-                LegalEntityUpdate(
+                LegalEntityChangeParsed(
                     legalEntity = it.target,
-                    header = LegalEntityHeaderUpdate.NoOp.copy(isDataSpaceParticipant = FieldUpdate.Set(it.isDataSpaceParticipant)),
-                    legalAddress = AddressContentUpdate.NoOp
+                    header = LegalEntityHeaderChangeParsed.NoOp.copy(isDataSpaceParticipant = FieldUpdateRaw.Set(it.isDataSpaceParticipant)),
+                    legalAddress = AddressContentChangeParsed.NoOp
                 )
             }
         )

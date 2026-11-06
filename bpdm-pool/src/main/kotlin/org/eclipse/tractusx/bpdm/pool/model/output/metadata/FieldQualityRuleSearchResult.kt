@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.FieldQualityRuleSearchError
 
 /**
  * Result of a field quality rule search: either the rules that apply or every reason the criteria were rejected.

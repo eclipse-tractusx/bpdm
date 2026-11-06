@@ -11,6 +11,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Breaking
 
 - BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
+- BPDM Pool and Gate: A relation's `validTo` is now inclusive: a relation still holds on its end date, so two validity periods meeting on one date overlap and are rejected, and a period following another starts the day after the other ends. The Gate accepts a validity period that starts and ends on the same date [#1892](https://github.com/eclipse-tractusx/bpdm/issues/1892)
 
 ### Added
 
@@ -22,6 +23,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Legal forms and identifier types in V6 and V7 now accept countries from the Pool country catalogue, including when filtering identifier-type searches. Legal-form languages are represented as strings.
 - BPDM Gate: Address country codes in the V6 and V7 input and output schemas are strings instead of an enumeration. Sharing members can submit provider-maintained countries through the API or CSV upload; generated API clients must be regenerated.
 - BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
+- BPDM Pool: An address now keeps the script variants its legal entity and sites are still named in and drops the rest, so a write no longer has to restate another business partner's scripts to keep it readable and the `ScriptVariantCoverageStillNeeded` error is gone. A golden record task creating a site on the legal address in a script the legal address lacks now adds that script instead of being rejected [#1869](https://github.com/eclipse-tractusx/bpdm/issues/1869)
 - BPDM Pool: Address countries are validated against the provider-maintained country catalogue at request time. The address country schema is now a string instead of an enumeration, so generated API clients must be regenerated.
 - BPDM Pool: Stored address countries now reference the maintained country catalogue through foreign keys. There is no API change.
 - BPDM Pool: Regions, subdivisions and field quality rules use plain country codes validated against the provider-maintained country catalogue instead of the compiled enum. Unknown countries are rejected with an error naming the code.
@@ -33,6 +35,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Fixed
 
+- BPDM Pool: A golden record or relation task whose result could not be delivered to the Orchestrator is reported to it as an error afterwards, instead of staying reserved until the Orchestrator's pending timeout turns it into a timeout error.
 - BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error.
 - BPDM Gate: The output address type now always describes the address's role towards the output's site. [#1886](https://github.com/eclipse-tractusx/bpdm/issues/1886)
 - BPDM Gate: The CSV upload reports a malformed or incomplete geographic coordinate as an error instead of storing it as `0.0`.

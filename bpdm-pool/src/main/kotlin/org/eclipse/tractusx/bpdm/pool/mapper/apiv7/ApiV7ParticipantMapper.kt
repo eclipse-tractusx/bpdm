@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.participant.DataSpaceParticip
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmDuplicateRequestEntriesException
 import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.DuplicateParticipantEntry
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError.DuplicateParticipantEntry
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError.LegalEntityNotFound
 import org.springframework.stereotype.Component
 
 private const val LEGAL_ENTITIES = "Legal Entities"

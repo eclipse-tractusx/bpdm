@@ -75,7 +75,7 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 - A batch MUST produce one INFO line for the batch, not one per entry. Per-entry detail belongs at DEBUG. `PersistedChangeLogger` does this by itself: it logs once per transaction.
 - A run that changed nothing MUST NOT log at INFO. Zero counts, empty poll results and `UpsertType.NoChange` are DEBUG.
 - A rejected request MUST NOT log at INFO. It persisted nothing and the caller was already told; its parse errors are DEBUG.
-- A line SHOULD name the aspect that changed when the write is partial and the `FieldUpdate` masks make it available — `LEGAL_ENTITY UPDATE (participation)`.
+- A line SHOULD name the aspect that changed when the write is partial and the `FieldUpdateRaw` masks make it available — `LEGAL_ENTITY UPDATE (participation)`.
 - Where an operational number matters continuously (throughput, rejection rate), it SHOULD be a metric rather than an INFO line. Actuator is configured in every service.
 
 ## 2.2 DEBUG
@@ -125,10 +125,10 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 *Accepted, not oversights. Each is a candidate for a later contribution.*
 
 - **Inline lines can lie on rollback.** Persisted-change lines still written inline are emitted inside the transaction, so a rollback leaves a line claiming a change that did not happen; there is always an ERROR alongside it. Lines logged through `PersistedChangeLogger` are exact; the remaining writers move over one by one.
-- **Aspects are not reported for Pool business partner writes.** The write services hold the `FieldUpdate` masks but report subject and change type only, so the aspect rule in [2.1](#21-info) is unmet there.
+- **Aspects are barely reported for Pool business partner writes.** The write services hold the `FieldUpdateRaw` masks but report subject and change type only; the one exception is a legal address relocation. The aspect rule in [2.1](#21-info) is otherwise unmet there.
 - **A request id stops at the service boundary.** `RequestLoggingFilter` ignores any inbound header and the BPDM clients send none, so one golden record flow appears under a different id in each service.
 - **Derived sharing member counts are DEBUG.** `SharingMemberConfidenceService` recalculates one address and its legal entity per call, so an INFO line there would be one per entry; the scheduled sync reports the records it changed instead.
-- **Not every write reports a count.** The Pool trigger batch plumbing returns no number of changes, so its runs stay silent at DEBUG rather than reporting an outcome.
+- **Not every write reports a count.** Pool's relation trigger execution returns no number of changes, so its runs stay silent at DEBUG rather than reporting an outcome.
 - **The Orchestrator's v6 task lines are duplicated.** `GoldenRecordTaskLegacyServiceMapper` re-implements task creation and step success instead of delegating to the state machine, so those two lines exist twice.
 - **A batch line names at most twenty subjects.** `joinIdentifiersForLog` counts the remainder rather than listing it, so a large batch names a sample of its identifiers; only subjects with a changelog recover the rest at DEBUG.
 

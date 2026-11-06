@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnIdentifierMatchRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.bpn.BpnRequestIdentifierMatchRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BpnIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BpnRequestIdentifierSearchError
 import org.springframework.stereotype.Component
 
 /**

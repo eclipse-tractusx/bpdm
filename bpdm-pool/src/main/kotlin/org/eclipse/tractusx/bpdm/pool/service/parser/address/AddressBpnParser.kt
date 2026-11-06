@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 

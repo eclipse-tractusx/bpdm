@@ -23,10 +23,10 @@ import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.DuplicateParticipantEntry
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError.DuplicateParticipantEntry
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser

@@ -30,6 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
@@ -50,11 +53,12 @@ import java.time.*
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
-@ActiveProfiles("test-no-auth")
+@ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
 class TaskRelationStateResolutionIT @Autowired constructor(
-    val taskRelationsResolutionService: TaskRelationsResolutionService,
+    val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
+    val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val poolClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
@@ -253,7 +257,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(1),
-                    validTo = futureDate.plusYears(2)
+                    validTo = futureDate.plusYears(2).minusDays(1)
                 ),
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(2),
@@ -261,7 +265,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                 ),
                 RelationValidityPeriod(
                     validFrom = futureDate,
-                    validTo = futureDate.plusYears(1)
+                    validTo = futureDate.plusYears(1).minusDays(1)
                 ),
             ),
             getAnyReasonCode()
@@ -287,7 +291,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2026, 1),
-                    validTo = LocalDate.ofYearDay(2027, 1)
+                    validTo = LocalDate.of(2026, 12, 31)
                 ),
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2027, 1),
@@ -295,7 +299,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                 ),
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2025, 1),
-                    validTo = LocalDate.ofYearDay(2026, 1)
+                    validTo = LocalDate.of(2025, 12, 31)
                 ),
             ),
             getAnyReasonCode()
@@ -645,6 +649,66 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         assertError(createdRelation)
     }
 
+    @ParameterizedTest
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `try create legal entity relation with validity periods meeting on one date`(relationType: LegalEntityRelationTypeV7){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = futureDate.plusYears(1),
+                    validTo = futureDate.plusYears(2)
+                )
+            ),
+            getAnyReasonCode()
+        )
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
+    @ParameterizedTest
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `try create address relation with validity periods meeting on one date`(relationType: AddressRelationTypeV7){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalEntity.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo = LocalDate.ofYearDay(2026, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2026, 1),
+                    validTo = LocalDate.ofYearDay(2027, 1)
+                )
+            ),
+            getAnyReasonCode()
+        )
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseV7Dto{
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
@@ -652,7 +716,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
     private fun createRelation(relation: BusinessPartnerRelations): TaskRelationsStepResultEntryDto{
         val entry =   TaskRelationsStepReservationEntryDto("any", "any", relation)
-        return taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(entry)).single()
+        return resolveRelationTasks(listOf(entry)).single()
     }
 
     private fun assertSuccess(actual: TaskRelationsStepResultEntryDto, expectedContent: BusinessPartnerRelations){
@@ -702,5 +766,11 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
     private fun getAnyReasonCode(): String{
         return testDataEnvironment.metadata.reasonCodes.first().technicalKey
+    }
+
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults()
     }
 }

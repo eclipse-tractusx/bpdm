@@ -19,9 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 
 data class IdentifierTypeSearchRaw(
-    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
+    val businessPartnerType: IdentifierBusinessPartnerType,
     val country: String?
 )

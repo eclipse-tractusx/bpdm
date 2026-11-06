@@ -133,7 +133,7 @@ class RelationInputUpsertParser(
     private fun validateValidityPeriods(request: RelationInputUpsertRaw): ParseResult<List<RelationValidityPeriodRaw>, RelationInputUpsertError> {
         val errors = request.validityPeriods.mapNotNull { period ->
             period.validTo
-                ?.takeIf { !period.validFrom.isBefore(it) }
+                ?.takeIf { period.validFrom.isAfter(it) }
                 ?.let { InvalidValidityPeriod(request.externalId, period.validFrom, it) }
         }
         return if (errors.isEmpty()) ParseResult.Success(request.validityPeriods) else ParseResult.Failure(errors)

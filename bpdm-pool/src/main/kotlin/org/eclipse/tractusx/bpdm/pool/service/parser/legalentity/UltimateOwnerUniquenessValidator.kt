@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
-import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -92,10 +92,10 @@ class UltimateOwnerUniquenessValidator(
             val current = pending.removeFirst()
             if (collected.put(current.bpn, current) != null) continue
 
-            relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsOwnedBy, current)
+            relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, current)
                 .filter { it.isValidOn(today) }
                 .forEach { pending.add(it.endNode) }
-            relationRepository.findByTypeAndEndNode(LegalEntityRelationTypeV7.IsOwnedBy, current)
+            relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, current)
                 .filter { it.isValidOn(today) }
                 .forEach { pending.add(it.startNode) }
         }

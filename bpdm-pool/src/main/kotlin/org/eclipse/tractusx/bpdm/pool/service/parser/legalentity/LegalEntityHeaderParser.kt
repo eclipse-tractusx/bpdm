@@ -19,24 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderMetadataParsed
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityContentError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 
 /**
  * Validates the fields of a legal-entity header against the metadata they reference — legal forms, identifier types and
@@ -53,28 +53,28 @@ class LegalEntityHeaderParser(
     /**
      * Validates each header and reports either the validated header or every problem found in that entry.
      */
-    fun parse(headers: List<LegalEntityHeaderRequest>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityContentParseError>> {
+    fun parse(headers: List<LegalEntityHeaderRaw>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityContentError>> {
         val metadata = fetchMetadata(headers)
         return headers.map { parseEntry(it, metadata) }
     }
 
-    private fun fetchMetadata(headers: List<LegalEntityHeaderRequest>): LegalEntityHeaderMetadata {
+    private fun fetchMetadata(headers: List<LegalEntityHeaderRaw>): LegalEntityHeaderMetadataParsed {
         val legalFormKeys = headers.mapNotNull { it.legalForm }.toSet()
         val idTypeKeys = headers.flatMap { it.identifiers }.mapNotNull { it.type }.toSet()
         val scriptCodeKeys = headers.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet()
 
-        return LegalEntityHeaderMetadata(
+        return LegalEntityHeaderMetadataParsed(
             legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys).associateBy { it.technicalKey },
-            idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, idTypeKeys)
+            idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
                 .associateBy { it.technicalKey },
             scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(scriptCodeKeys).associateBy { it.technicalKey }
         )
     }
 
-    private fun parseEntry(header: LegalEntityHeaderRequest, metadata: LegalEntityHeaderMetadata): ParseResult<LegalEntityHeaderParsed, LegalEntityContentParseError> {
-        val errors = mutableListOf<LegalEntityContentParseError>()
+    private fun parseEntry(header: LegalEntityHeaderRaw, metadata: LegalEntityHeaderMetadataParsed): ParseResult<LegalEntityHeaderParsed, LegalEntityContentError> {
+        val errors = mutableListOf<LegalEntityContentError>()
 
-        val legalName = header.legalName ?: run { errors.add(LegalEntityContentParseError.NameMissing); null }
+        val legalName = header.legalName ?: run { errors.add(LegalEntityContentError.NameMissing); null }
         val legalForm = parseLegalForm(header.legalForm, metadata, errors)
         val confidence = parseConfidence(header.confidenceCriteria, errors)
         val identifiers = parseIdentifiers(header.identifiers, metadata, errors)
@@ -100,16 +100,16 @@ class LegalEntityHeaderParser(
 
     private fun parseLegalForm(
         legalForm: String?,
-        metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        metadata: LegalEntityHeaderMetadataParsed,
+        errors: MutableList<LegalEntityContentError>
     ): LegalFormDb? {
         if (legalForm == null) return null
-        return metadata.legalForms[legalForm] ?: run { errors.add(LegalEntityContentParseError.LegalFormNotFound(legalForm)); null }
+        return metadata.legalForms[legalForm] ?: run { errors.add(LegalEntityContentError.LegalFormNotFound(legalForm)); null }
     }
 
     private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
-        errors: MutableList<LegalEntityContentParseError>
+        request: ConfidenceCriteriaRaw,
+        errors: MutableList<LegalEntityContentError>
     ): ConfidenceCriteriaParsed? {
         val sharedByOwner = request.sharedByOwner
         val checkedByExternalDataSource = request.checkedByExternalDataSource
@@ -119,7 +119,7 @@ class LegalEntityHeaderParser(
         if (sharedByOwner == null || checkedByExternalDataSource == null ||
             lastConfidenceCheckAt == null || nextConfidenceCheckAt == null
         ) {
-            errors.add(LegalEntityContentParseError.ConfidenceCriteriaMissing)
+            errors.add(LegalEntityContentError.ConfidenceCriteriaMissing)
             return null
         }
 
@@ -127,33 +127,33 @@ class LegalEntityHeaderParser(
     }
 
     private fun parseIdentifiers(
-        requests: List<LegalEntityIdentifier>,
-        metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        requests: List<LegalEntityIdentifierRaw>,
+        metadata: LegalEntityHeaderMetadataParsed,
+        errors: MutableList<LegalEntityContentError>
     ): List<LegalEntityIdentifierParsed> {
         if (requests.size > ValidationLimits.IDENTIFIER_AMOUNT_LIMIT) {
-            errors.add(LegalEntityContentParseError.IdentifiersTooMany(requests.size))
+            errors.add(LegalEntityContentError.IdentifiersTooMany(requests.size))
         }
         return requests.mapIndexedNotNull { index, request ->
-            val value = request.value ?: run { errors.add(LegalEntityContentParseError.IdentifierValueMissing(index)); null }
+            val value = request.value ?: run { errors.add(LegalEntityContentError.IdentifierValueMissing(index)); null }
             val type = request.type
             val typeEntity = when {
-                type == null -> { errors.add(LegalEntityContentParseError.IdentifierTypeMissing(index)); null }
-                else -> metadata.idTypes[type] ?: run { errors.add(LegalEntityContentParseError.IdentifierTypeNotFound(index, type)); null }
+                type == null -> { errors.add(LegalEntityContentError.IdentifierTypeMissing(index)); null }
+                else -> metadata.idTypes[type] ?: run { errors.add(LegalEntityContentError.IdentifierTypeNotFound(index, type)); null }
             }
             if (value == null || typeEntity == null) null else LegalEntityIdentifierParsed(value, typeEntity, request.issuingBody)
         }
     }
 
     private fun parseScriptVariants(
-        requests: List<LegalEntityScriptVariant>,
-        metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        requests: List<LegalEntityScriptVariantRaw>,
+        metadata: LegalEntityHeaderMetadataParsed,
+        errors: MutableList<LegalEntityContentError>
     ): List<LegalEntityScriptVariantParsed> {
         val claimedScriptCodes = mutableSetOf<String>()
         return requests.mapIndexedNotNull { index, variant ->
             if (!claimedScriptCodes.add(variant.scriptCode)) {
-                errors.add(LegalEntityContentParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
+                errors.add(LegalEntityContentError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
                 null
             } else {
                 parseScriptVariant(index, variant, metadata, errors)
@@ -163,14 +163,14 @@ class LegalEntityHeaderParser(
 
     private fun parseScriptVariant(
         index: Int,
-        variant: LegalEntityScriptVariant,
-        metadata: LegalEntityHeaderMetadata,
-        errors: MutableList<LegalEntityContentParseError>
+        variant: LegalEntityScriptVariantRaw,
+        metadata: LegalEntityHeaderMetadataParsed,
+        errors: MutableList<LegalEntityContentError>
     ): LegalEntityScriptVariantParsed? {
         val scriptCode = metadata.scriptCodes[variant.scriptCode]
-            ?: run { errors.add(LegalEntityContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
+            ?: run { errors.add(LegalEntityContentError.ScriptCodeNotFound(index, variant.scriptCode)); null }
         val legalName = variant.legalName?.takeIf { it.isNotBlank() }
-            ?: run { errors.add(LegalEntityContentParseError.ScriptVariantLegalNameMissing(index)); null }
+            ?: run { errors.add(LegalEntityContentError.ScriptVariantLegalNameMissing(index)); null }
 
         if (scriptCode == null || legalName == null) return null
 

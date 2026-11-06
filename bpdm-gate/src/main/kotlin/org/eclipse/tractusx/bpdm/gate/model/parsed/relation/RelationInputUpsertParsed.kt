@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationValidityPeriodR
  * Guarantees:
  * - [existing] is the input-stage relation of the tenant with [externalId], or null if the tenant has none.
  * - [source] and [target] are different business partners of the tenant.
- * - Every validity period ending at a `validTo` starts before it.
+ * - Every validity period ending at a `validTo` starts on or before it.
  */
 data class RelationInputUpsertParsed(
     val externalId: String?,

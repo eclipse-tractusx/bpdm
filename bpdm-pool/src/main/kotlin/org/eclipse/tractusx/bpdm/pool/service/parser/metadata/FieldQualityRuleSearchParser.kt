@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.FieldQualityRuleSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.FieldQualityRuleSearchRaw
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository

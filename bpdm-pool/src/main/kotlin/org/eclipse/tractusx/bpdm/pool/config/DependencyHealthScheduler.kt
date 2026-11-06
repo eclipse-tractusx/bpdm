@@ -21,43 +21,73 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.service.DependencyHealthService
+import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.boot.health.contributor.HealthIndicator
+import org.springframework.boot.health.contributor.Status
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.event.EventListener
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
+import java.time.ZoneOffset
 
+/**
+ * Guards the Pool against an unreachable Orchestrator, at startup and on the golden record task schedule.
+ */
 @Configuration
 class DependencyHealthScheduler(
-    private val dependencyHealthService: DependencyHealthService,
+    orchestratorHealthIndicator: OrchestratorHealthIndicator,
     private val taskScheduler: TaskScheduler,
     private val configProperties: GoldenRecordTaskConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
 
+    private val dependencies: Map<String, HealthIndicator> = mapOf(
+        "Orchestrator Service" to orchestratorHealthIndicator
+    )
+
+    /**
+     * Fails the application startup when any dependency is unreachable.
+     */
+    @EventListener(ApplicationReadyEvent::class)
+    fun checkDependenciesOnStartup() {
+        val unavailableDependencies = findUnavailableDependencies()
+        check(unavailableDependencies.isEmpty()) { "Dependencies not ready: ${unavailableDependencies.joinToString()}" }
+
+        logger.info { "All dependencies are healthy on startup: ${dependencies.keys.joinToString()}" }
+    }
+
+    /**
+     * Schedules the recurring dependency check unless its cron is disabled.
+     */
     @PostConstruct
-    fun scheduleHealthChecks() {
-        taskScheduler.scheduleIfEnabled(
-            { performHealthCheck() },
-            configProperties.cron
-        )
+    fun scheduleDependencyCheck() {
+        if (configProperties.cron == CRON_DISABLED) {
+            logger.info { "Dependency health check schedule is disabled" }
+            return
+        }
+
+        logger.info { "Dependency health check scheduled with cron '${configProperties.cron}'" }
+        taskScheduler.schedule(::checkDependencies, CronTrigger(configProperties.cron, ZoneOffset.UTC))
     }
 
-    private fun performHealthCheck() {
-        val healthStatus = dependencyHealthService.checkAllDependencies()
-        val unhealthyDependencies = healthStatus.filter { it.value == "Down" }
-
-        if (unhealthyDependencies.isNotEmpty()) {
-            logger.error("Dependencies not ready: ${unhealthyDependencies.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
+    private fun checkDependencies() {
+        val unavailableDependencies = findUnavailableDependencies()
+        if (unavailableDependencies.isNotEmpty()) {
+            logger.error { "Dependencies not ready: ${unavailableDependencies.joinToString()}" }
         } else {
-            logger.debug("All dependencies are healthy: ${healthStatus.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
+            logger.debug { "All dependencies are healthy: ${dependencies.keys.joinToString()}" }
         }
     }
 
-    private fun TaskScheduler.scheduleIfEnabled(task: Runnable, cronExpression: String) {
-        if (cronExpression != "-") {
-            schedule(task, CronTrigger(cronExpression))
+    private fun findUnavailableDependencies(): List<String> =
+        dependencies.mapNotNull { (name, indicator) ->
+            val health = indicator.health()
+            if (health?.status == Status.UP) null
+            else "$name (${health?.details?.values?.joinToString() ?: "no health reported"})"
         }
-    }
 
+    companion object {
+        private const val CRON_DISABLED = "-"
+    }
 }

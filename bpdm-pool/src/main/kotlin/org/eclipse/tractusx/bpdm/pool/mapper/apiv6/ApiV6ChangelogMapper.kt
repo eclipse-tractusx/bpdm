@@ -19,11 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogEntryVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogTypeV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogEntryRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.ChangelogSearchError
 import org.springframework.stereotype.Component
 
 /**
@@ -40,7 +41,7 @@ class ApiV6ChangelogMapper {
             bpn = record.bpn,
             businessPartnerType = record.businessPartnerType,
             timestamp = record.timestamp,
-            changelogType = ChangelogTypeV6.valueOf(record.changelogType.name)
+            changelogType = toDto(record.changelogType)
         )
 
     /**
@@ -50,5 +51,11 @@ class ApiV6ChangelogMapper {
     fun toException(errors: List<ChangelogSearchError>): RuntimeException =
         when (val error = errors.first()) {
             is ChangelogSearchError.BpnsTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
+        }
+
+    private fun toDto(changelogType: ChangelogType): ChangelogTypeV6 =
+        when (changelogType) {
+            ChangelogType.CREATE -> ChangelogTypeV6.CREATE
+            ChangelogType.UPDATE -> ChangelogTypeV6.UPDATE
         }
 }

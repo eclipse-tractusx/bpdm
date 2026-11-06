@@ -25,8 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPa
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ReasonCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.ScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository
-import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
-import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
@@ -114,10 +113,10 @@ class TestDataV7Configuration {
         poolApiClient: PoolV7Client,
         requestFactory: PoolRequestFactoryV7,
         orchestratorMockDataFactory: OrchestratorMockDataFactory,
-        taskBatchResolutionService: TaskBatchResolutionService,
-        taskRelationsResolutionService: TaskRelationsResolutionService
+        goldenRecordTaskScheduler: GoldenRecordTaskScheduler,
+        relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService
     ): TestDataClientV7{
-        return TestDataClientV7(poolApiClient, requestFactory, orchestratorMockDataFactory, taskBatchResolutionService, taskRelationsResolutionService)
+        return TestDataClientV7(poolApiClient, requestFactory, orchestratorMockDataFactory, goldenRecordTaskScheduler, relationTaskResolutionService)
     }
 
 }

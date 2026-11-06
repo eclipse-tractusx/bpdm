@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.participation
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError
 
 /**
  * Result of a data space participation update: either every participation as stored or every reason the update was

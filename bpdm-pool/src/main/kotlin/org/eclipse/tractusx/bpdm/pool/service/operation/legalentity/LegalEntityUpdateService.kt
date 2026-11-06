@@ -19,19 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
-import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.orKeep
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.common.util.countForLog
-import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.BusinessPartnerChangeRaw
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressWriteCommitService
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.model.update.*
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
@@ -48,49 +55,70 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val legalEntityEntityMapper: LegalEntityEntityMapper,
+    private val addressWriteCommitService: AddressWriteCommitService,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val repository: LegalEntityRepository,
-    private val changelogCreateService: ChangelogCreateService
+    private val changelogCreateService: ChangelogCreateService,
+    private val changeLogger: PersistedChangeLogger
 ) {
-
-    private val logger = KotlinLogging.logger { }
 
     /**
      * Applies the given changes and reports for each legal entity whether the aggregate — its header or its legal
-     * address — actually changed.
+     * address — actually changed. Relocating a legal address also updates the address it replaces.
      */
     @Transactional
-    fun update(requests: List<LegalEntityUpdate>): List<UpsertResult<LegalEntityDb>> {
+    fun update(requests: List<LegalEntityChangeParsed>): List<UpsertResultParsed<LegalEntityDb>> {
+        val previousLegalAddresses = requests.map { it.legalEntity.legalAddress }
+        // Before the address: the address keeps the script variants its partners are named in, so it has to see the legal
+        // entity's new scripts to let go of one it is dropping.
         val headerUpdates = requests.map { updateHeader(it) }
-        val legalAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.legalEntity.legalAddress, it.legalAddress) })
+        val legalAddressUpdates = addressUpdateService.update(requests.map { AddressChangeParsed(it.legalEntity.legalAddress, it.legalAddress) })
 
         val legalEntityChangeResults = headerUpdates.zip(legalAddressUpdates) { headerResult, legalAddressResult ->
             val hasChanged = headerResult.upsertType != UpsertType.NoChange || legalAddressResult.upsertType != UpsertType.NoChange
-            UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
+            UpsertResultParsed(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
 
         val updatedLegalEntities = legalEntityChangeResults.filter { it.upsertType == UpsertType.Updated }
 
         updatedLegalEntities.forEach { it.value.updatedAt = DbTimestamp.now() }
         repository.saveAll(updatedLegalEntities.map { it.value })
-        changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+        changelogCreateService.record(updatedLegalEntities.map { ChangelogEntryRaw(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+        updatedLegalEntities.forEach {
+            changeLogger.log(BusinessPartnerChangeRaw(PersistedChangeType.Updated, BusinessPartnerChangeRaw.Kind.LegalEntity, it.value.bpn))
+        }
 
-        if (updatedLegalEntities.isNotEmpty())
-            logger.info {
-                "Updated ${countForLog(updatedLegalEntities.size, "legal entity", "legal entities")}: " +
-                        updatedLegalEntities.map { it.value.bpn }.joinIdentifiersForLog()
-            }
+        commitRelocations(requests.map { it.legalEntity }.zip(previousLegalAddresses), legalAddressUpdates)
 
         return legalEntityChangeResults
     }
 
-    private fun updateHeader(request: LegalEntityUpdate): UpsertResult<LegalEntityDb> {
+    private fun commitRelocations(
+        legalEntitiesWithPreviousLegalAddress: List<Pair<LegalEntityDb, LogisticAddressDb>>,
+        legalAddressUpdates: List<UpsertResultParsed<LogisticAddressDb>>
+    ) {
+        val relocated = legalEntitiesWithPreviousLegalAddress.filter { (legalEntity, previous) -> legalEntity.legalAddress.bpn != previous.bpn }
+        relocated.forEach { (legalEntity, _) ->
+            changeLogger.log(
+                BusinessPartnerChangeRaw(PersistedChangeType.Updated, BusinessPartnerChangeRaw.Kind.LegalEntity, legalEntity.bpn, BusinessPartnerChangeRaw.Aspect.LegalAddress)
+            )
+        }
+
+        val alreadyUpdatedBpns = legalAddressUpdates.filter { it.upsertType == UpsertType.Updated }.map { it.value.bpn }.toSet()
+        val addressesChangingRole = relocated
+            .flatMap { (legalEntity, previous) -> listOf(previous, legalEntity.legalAddress) }
+            .filterNot { it.bpn in alreadyUpdatedBpns }
+            .distinctBy { it.bpn }
+        addressWriteCommitService.commit(addressesChangingRole.map { PendingAddressWriteParsed(it, UpsertType.Updated) })
+    }
+
+    private fun updateHeader(request: LegalEntityChangeParsed): UpsertResultParsed<LegalEntityDb> {
         // The verdict is taken before the change is applied, but the change is applied either way: `currentness` does
         // not count towards the verdict yet must still be restamped.
         val changed = willChange(request.legalEntity, request.header)
         applyHeader(request.legalEntity, request.header)
 
-        return UpsertResult(request.legalEntity, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        return UpsertResultParsed(request.legalEntity, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
     /**
@@ -105,24 +133,25 @@ class LegalEntityUpdateService(
      * `currentness` is deliberately absent: the Pool restamps it on every task resolution, so counting it would emit a
      * changelog for every touch and keep the golden record process rediscovering its own writes.
      */
-    private fun willChange(target: LegalEntityDb, header: LegalEntityHeaderUpdate): Boolean {
+    private fun willChange(target: LegalEntityDb, header: LegalEntityHeaderChangeParsed): Boolean {
         header.legalName.ifSet { if (it != target.legalName.value) return true }
         header.legalShortName.ifSet { if (it != target.legalName.shortName) return true }
         header.legalForm.ifSet { if (it?.technicalKey != target.legalForm?.technicalKey) return true }
         header.confidenceCriteria.ifSet {
-            if (legalEntityEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+            if (parsedToDbMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
         }
         header.isDataSpaceParticipant.ifSet { if (it != target.isDataSpaceParticipant) return true }
         header.ownershipUltimate.ifSet { if (it != target.ownershipUltimate) return true }
         header.ultimateOwnerBpnl.ifSet { if (it != target.ultimateOwnerBpnl) return true }
+        header.relocatedLegalAddress.ifSet { if (it.bpn != target.legalAddress.bpn) return true }
         header.identifiers.ifSet {
-            if (identifierKeys(legalEntityEntityMapper.toIdentifiers(it, target)) != identifierKeys(target.identifiers)) return true
+            if (identifierKeys(parsedToDbMapper.toLegalEntityIdentifiers(it, target)) != identifierKeys(target.identifiers)) return true
         }
         header.states.ifSet {
-            if (stateKeys(legalEntityEntityMapper.toStates(it, target)) != stateKeys(target.states)) return true
+            if (stateKeys(parsedToDbMapper.toLegalEntityStates(it, target)) != stateKeys(target.states)) return true
         }
         header.scriptVariants.ifSet {
-            if (scriptVariantKeys(legalEntityEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+            if (scriptVariantKeys(parsedToDbMapper.toLegalEntityScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
 
         return false
@@ -137,25 +166,26 @@ class LegalEntityUpdateService(
     private fun scriptVariantKeys(variants: Collection<LegalEntityScriptVariantDb>): Set<Any?> =
         variants.map { listOf(it.scriptCode.technicalKey, it.legalName, it.shortName) }.toSet()
 
-    private fun applyHeader(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
+    private fun applyHeader(target: LegalEntityDb, header: LegalEntityHeaderChangeParsed) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         applyLegalName(target, header)
         header.legalForm.ifSet { target.legalForm = it }
-        header.confidenceCriteria.ifSet { target.confidenceCriteria = legalEntityEntityMapper.toConfidence(it, numberOfSharingMembers) }
+        header.confidenceCriteria.ifSet { target.confidenceCriteria = parsedToDbMapper.toConfidence(it, numberOfSharingMembers) }
         header.isDataSpaceParticipant.ifSet { target.isDataSpaceParticipant = it }
         header.ownershipUltimate.ifSet { target.ownershipUltimate = it }
         header.ultimateOwnerBpnl.ifSet { target.ultimateOwnerBpnl = it }
         header.currentness.ifSet { target.currentness = it }
-        header.identifiers.ifSet { target.identifiers.replace(legalEntityEntityMapper.toIdentifiers(it, target)) }
-        header.states.ifSet { target.states.replace(legalEntityEntityMapper.toStates(it, target)) }
-        header.scriptVariants.ifSet { target.scriptVariants.replace(legalEntityEntityMapper.toScriptVariants(it)) }
+        header.identifiers.ifSet { target.identifiers.replace(parsedToDbMapper.toLegalEntityIdentifiers(it, target)) }
+        header.states.ifSet { target.states.replace(parsedToDbMapper.toLegalEntityStates(it, target)) }
+        header.scriptVariants.ifSet { target.scriptVariants.replace(parsedToDbMapper.toLegalEntityScriptVariants(it)) }
+        header.relocatedLegalAddress.ifSet { target.legalAddress = it }
     }
 
     // Legal name and short name are separate update fields but one embedded entity value, so setting either rebuilds the
     // pair and carries the untouched half forward.
-    private fun applyLegalName(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
-        if (header.legalName is FieldUpdate.NoOp && header.legalShortName is FieldUpdate.NoOp) return
+    private fun applyLegalName(target: LegalEntityDb, header: LegalEntityHeaderChangeParsed) {
+        if (header.legalName is FieldUpdateRaw.NoOp && header.legalShortName is FieldUpdateRaw.NoOp) return
 
         target.legalName = NameDb(
             value = header.legalName.orKeep(target.legalName.value),

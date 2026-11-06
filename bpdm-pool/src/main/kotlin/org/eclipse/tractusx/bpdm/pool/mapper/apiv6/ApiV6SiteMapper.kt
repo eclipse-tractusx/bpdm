@@ -34,16 +34,15 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteUpdateResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.LegalEntitySiteSearchError.LegalEntityNotFound
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError.SiteNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntitySiteSearchError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError.SiteNotFound
 import org.springframework.stereotype.Component
 
 /**
@@ -52,8 +51,7 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV6SiteMapper(
     private val apiV6AddressMapper: ApiV6AddressMapper,
-    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
-    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
+    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper
 ) {
 
     /**
@@ -153,7 +151,7 @@ class ApiV6SiteMapper(
         )
 
     private fun toLegalAddressAsMainCreateErrorInfo(
-        error: SiteCreateParseError,
+        error: SiteCreateError,
         request: SiteCreateWithLegalAddressAsMainV6Request,
         position: Int
     ): ErrorInfoV6<SiteCreateErrorV6> =
@@ -170,33 +168,29 @@ class ApiV6SiteMapper(
             else -> toCreateErrorInfo(error, position.toString())
         }
 
-    private fun toCreateErrorInfo(error: SiteCreateParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
+    private fun toCreateErrorInfo(error: SiteCreateError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
         when (error) {
             is UnresolvableLegalEntity ->
                 ErrorInfoV6(SiteCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfoV6(SiteCreateErrorV6.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
-            is AddressContentParseError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV6AddressMapper.toMainAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
-            is ScriptVariantCoverageStillNeeded,
-            is SiteContentParseError -> throw internalError(error)
+            is SiteContentError -> throw internalError(error)
         }
 
-    private fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
+    private fun toUpdateErrorInfo(error: SiteUpdateError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentParseError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
-            // Reachable over v6: a v6 write sends no script variants, so it can drop coverage another business partner
-            // still needs.
-            is ScriptVariantCoverageStillNeeded,
+            is AddressContentError -> apiV6AddressMapper.toMainAddressUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress,
-            is SiteContentParseError -> throw internalError(error)
+            is SiteContentError -> throw internalError(error)
         }
 
     // The frozen v6 error enums predate script variants, so those errors get no public code.
-    private fun internalError(error: SiteCreateParseError) =
+    private fun internalError(error: SiteCreateError) =
         BpdmValidationException("Unexpected site parse error (no v6 client error code): $error")
 
     private fun toStateDto(record: BusinessStateRecord): SiteStateVerboseV6Dto =

@@ -22,28 +22,25 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressPartnerScriptCodeReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Validates site-update requests: the target site, the new header content, the new main address, and that the new main
- * address still covers every script code the header and the address's other partners name.
+ * Validates site-update requests: the target site, the new header content, the new main address, and that the main
+ * address covers every script code the header names.
  */
 @Service
 class SiteUpdateParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val siteBpnParser: SiteBpnParser,
     private val addressContentParser: AddressContentParser,
-    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
-    private val partnerReader: AddressPartnerScriptCodeReader
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator
 ) {
 
     /**
@@ -51,15 +48,7 @@ class SiteUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> =
-        parseWithoutCoverageCheck(requests).map { result -> result.combine(scriptCodeCoverageErrors(result)) { it } }
-
-    /**
-     * Validates each request without judging script variant coverage — for a caller that rewrites several partners of
-     * the main address in one operation set and therefore decides coverage at its own scope.
-     */
-    @Transactional(readOnly = true)
-    fun parseWithoutCoverageCheck(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
+    fun parse(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
@@ -67,16 +56,15 @@ class SiteUpdateParser(
 
         return zipParseResults(headerResults, targetResults, mainAddressResults) { header, target, mainAddress ->
             SiteUpdateParsed(target, SiteContentParsed(header, mainAddress))
-        }
+        }.map { result -> result.combine(coverageErrors(result)) { it } }
     }
 
-    private fun scriptCodeCoverageErrors(result: ParseResult<SiteUpdateParsed, SiteUpdateParseError>): List<SiteUpdateParseError> {
+    // The main address keeps an existing variant its site is still named in, so the variants it carries today cover the
+    // header as well as the stated ones.
+    private fun coverageErrors(result: ParseResult<SiteUpdateParsed, SiteUpdateError>): List<SiteUpdateError> {
         val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
-        val otherPartners = partnerReader.storedPartners(parsed.target.mainAddress, rewrittenBpns = setOf(parsed.target.bpn))
+        val coveredScriptCodes = parsed.content.mainAddress.scriptCodes() + parsed.target.mainAddress.scriptCodes()
 
-        return scriptVariantCoverageValidator.check(
-            parsed.content.mainAddress.scriptCodes(),
-            listOf(PartnerScriptCodes(bpn = null, parsed.content.header.scriptCodes())).plus(otherPartners)
-        )
+        return scriptVariantCoverageValidator.check(coveredScriptCodes, parsed.content.header.scriptCodes())
     }
 }

@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError.TechnicalKeyAlreadyTaken
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError.UnresolvableAdministrativeArea
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalFormCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalFormCreateError.TechnicalKeyAlreadyTaken
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalFormCreateError.UnresolvableAdministrativeArea
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.LegalFormCreateRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository

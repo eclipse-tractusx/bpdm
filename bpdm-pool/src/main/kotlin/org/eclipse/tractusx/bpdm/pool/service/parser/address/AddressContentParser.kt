@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressContentError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LogisticAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -41,7 +41,7 @@ class AddressContentParser(
      * every problem found in that entry. [ownerBpns] is positional with [contents]: null for a create, the address's own
      * BPN for an update, so an update may re-submit its own existing identifiers.
      */
-    fun parse(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<ParseResult<LogisticAddressParsed, AddressContentParseError>> {
+    fun parse(contents: List<LogisticAddressRaw>, ownerBpns: List<String?>): List<ParseResult<LogisticAddressParsed, AddressContentError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns)
         return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }

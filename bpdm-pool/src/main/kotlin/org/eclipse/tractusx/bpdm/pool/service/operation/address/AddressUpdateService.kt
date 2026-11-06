@@ -19,17 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSiteMembershipParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.orKeep
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,24 +39,26 @@ import org.springframework.transaction.annotation.Transactional
  * The single authority for updating logistic addresses: applies each requested change to its address — a caller
  * describes *what* to change, this service decides *how* — detects whether the address actually changed,
  * and persists and emits an UPDATE changelog only for those that did. The change vocabulary has no field for an
- * address's identity, parent, or relations, so no update can re-identify or re-parent an address.
+ * address's identity, parent, or relations, so no update can re-identify or re-parent an address. Stated script variants
+ * replace the address's own, except that a variant left out stays as long as a business partner built on the address is
+ * still named in its script.
  */
 @Service
 class AddressUpdateService(
-    private val addressEntityMapper: AddressEntityMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
     /**
      * Applies the given changes and reports for each address whether it actually changed.
      */
     @Transactional
-    fun update(requests: List<AddressUpdate>): List<UpsertResult<LogisticAddressDb>> =
+    fun update(requests: List<AddressChangeParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         commit(requests.map { stageUpdate(it) })
 
     /**
      * Applies the given change to a single address and reports whether it actually changed.
      */
-    fun update(request: AddressUpdate): UpsertResult<LogisticAddressDb> =
+    fun update(request: AddressChangeParsed): UpsertResultParsed<LogisticAddressDb> =
         update(listOf(request)).single()
 
     /**
@@ -62,14 +66,14 @@ class AddressUpdateService(
      * address whether it actually changed.
      */
     @Transactional
-    fun setSites(memberships: List<AddressSiteMembershipParsed>): List<UpsertResult<LogisticAddressDb>> =
-        update(memberships.map { AddressUpdate(it.address, AddressContentUpdate.NoOp.copy(sites = FieldUpdate.Set(it.sites))) })
+    fun setSites(memberships: List<AddressSiteMembershipParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
+        update(memberships.map { AddressChangeParsed(it.address, AddressContentChangeParsed.NoOp.copy(sites = FieldUpdateRaw.Set(it.sites))) })
 
     /**
      * Applies one change in memory without persisting, so a caller can see whether the address changed — and wire it into
      * a not-yet-persisted parent — before handing it to [commit].
      */
-    fun stageUpdate(request: AddressUpdate): PendingAddressWrite {
+    fun stageUpdate(request: AddressChangeParsed): PendingAddressWriteParsed {
         val target = request.address
 
         // The verdict is taken before the change is applied, but the change is applied either way: a field that does
@@ -77,14 +81,14 @@ class AddressUpdateService(
         val changed = willChange(target, request.content)
         apply(target, request.content)
 
-        return PendingAddressWrite(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        return PendingAddressWriteParsed(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
     /**
      * Persists the staged addresses that changed and emits their UPDATE changelog.
      */
     @Transactional
-    fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
+    fun commit(staged: List<PendingAddressWriteParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         addressWriteCommitService.commit(staged)
 
     /**
@@ -95,26 +99,26 @@ class AddressUpdateService(
      * technical key rather than by reference: navigating to one can yield a lazy proxy while the parsed value holds the
      * initialised instance, and those two are never reference-equal.
      */
-    private fun willChange(target: LogisticAddressDb, update: AddressContentUpdate): Boolean {
+    private fun willChange(target: LogisticAddressDb, update: AddressContentChangeParsed): Boolean {
         update.name.ifSet { if (it != target.name) return true }
         update.physicalPostalAddress.ifSet {
-            if (physicalKey(addressEntityMapper.toPhysical(it)) != physicalKey(target.physicalPostalAddress)) return true
+            if (physicalKey(parsedToDbMapper.toPhysicalPostalAddress(it)) != physicalKey(target.physicalPostalAddress)) return true
         }
         update.alternativePostalAddress.ifSet { alternative ->
-            val updated = alternative?.let { alternativeKey(addressEntityMapper.toAlternative(it)) }
+            val updated = alternative?.let { alternativeKey(parsedToDbMapper.toAlternativePostalAddress(it)) }
             if (updated != target.alternativePostalAddress?.let { alternativeKey(it) }) return true
         }
         update.confidenceCriteria.ifSet {
-            if (addressEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+            if (parsedToDbMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
         }
         update.identifiers.ifSet {
-            if (identifierKeys(addressEntityMapper.toIdentifiers(it)) != identifierKeys(target.identifiers)) return true
+            if (identifierKeys(parsedToDbMapper.toAddressIdentifiers(it)) != identifierKeys(target.identifiers)) return true
         }
         update.states.ifSet {
-            if (stateKeys(addressEntityMapper.toStates(it)) != stateKeys(target.states)) return true
+            if (stateKeys(parsedToDbMapper.toAddressStates(it)) != stateKeys(target.states)) return true
         }
         update.scriptVariants.ifSet {
-            if (scriptVariantKeys(addressEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+            if (scriptVariantKeys(scriptVariantsAfter(target, update, it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
         update.sites.ifSet { if (siteKeys(it) != siteKeys(target.sites)) return true }
 
@@ -158,16 +162,40 @@ class AddressUpdateService(
     private fun siteKeys(sites: Collection<SiteDb>): Set<Any?> =
         sites.map { it.bpn }.toSet()
 
-    private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
+    private fun scriptVariantsAfter(
+        target: LogisticAddressDb,
+        update: AddressContentChangeParsed,
+        stated: List<AddressScriptVariantParsed>
+    ): List<LogisticAddressScriptVariantDb> {
+        val statedVariants = parsedToDbMapper.toAddressScriptVariants(stated)
+        val statedScriptCodes = statedVariants.map { it.scriptCode.technicalKey }.toSet()
+        val namedScriptCodes = partnerScriptCodes(target, update.sites.orKeep(target.sites))
+        val retainedVariants = target.scriptVariants.filter {
+            it.scriptCode.technicalKey !in statedScriptCodes && it.scriptCode.technicalKey in namedScriptCodes
+        }
+
+        return statedVariants + retainedVariants
+    }
+
+    // Partners are matched by BPN: navigating to an address yields a lazy proxy, which is never reference-equal to the
+    // address being written.
+    private fun partnerScriptCodes(target: LogisticAddressDb, sites: Collection<SiteDb>): Set<String> {
+        val legalEntity = target.legalEntity?.takeIf { it.legalAddress.bpn == target.bpn }
+        val mainAddressSites = sites.filter { it.mainAddress.bpn == target.bpn }
+
+        return (legalEntity?.scriptCodes().orEmpty() + mainAddressSites.flatMap { it.scriptCodes() }).toSet()
+    }
+
+    private fun apply(target: LogisticAddressDb, update: AddressContentChangeParsed) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         update.name.ifSet { target.name = it }
-        update.physicalPostalAddress.ifSet { target.physicalPostalAddress = addressEntityMapper.toPhysical(it) }
-        update.alternativePostalAddress.ifSet { target.alternativePostalAddress = it?.let { alt -> addressEntityMapper.toAlternative(alt) } }
-        update.confidenceCriteria.ifSet { target.confidenceCriteria = addressEntityMapper.toConfidence(it, numberOfSharingMembers) }
-        update.identifiers.ifSet { target.identifiers.replace(addressEntityMapper.toIdentifiers(it).onEach { id -> id.address = target }) }
-        update.states.ifSet { target.states.replace(addressEntityMapper.toStates(it).onEach { state -> state.address = target }) }
-        update.scriptVariants.ifSet { target.scriptVariants.replace(addressEntityMapper.toScriptVariants(it)) }
+        update.physicalPostalAddress.ifSet { target.physicalPostalAddress = parsedToDbMapper.toPhysicalPostalAddress(it) }
+        update.alternativePostalAddress.ifSet { target.alternativePostalAddress = it?.let { alt -> parsedToDbMapper.toAlternativePostalAddress(alt) } }
+        update.confidenceCriteria.ifSet { target.confidenceCriteria = parsedToDbMapper.toConfidence(it, numberOfSharingMembers) }
+        update.identifiers.ifSet { target.identifiers.replace(parsedToDbMapper.toAddressIdentifiers(it).onEach { id -> id.address = target }) }
+        update.states.ifSet { target.states.replace(parsedToDbMapper.toAddressStates(it).onEach { state -> state.address = target }) }
+        update.scriptVariants.ifSet { target.scriptVariants.replace(scriptVariantsAfter(target, update, it)) }
         update.sites.ifSet { target.sites.replace(it) }
     }
 }

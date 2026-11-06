@@ -18,6 +18,8 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -38,8 +40,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreateResult
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityIdentifierRecord
@@ -47,8 +48,8 @@ import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityUpdateResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityGetError.LegalEntityNotFound
 import org.springframework.stereotype.Component
 
 /**
@@ -58,8 +59,7 @@ import org.springframework.stereotype.Component
 class ApiV7LegalEntityMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
     private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val apiV7MetadataMapper: ApiV7MetadataMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val apiV7MetadataMapper: ApiV7MetadataMapper
 ) {
 
     /**
@@ -146,7 +146,7 @@ class ApiV7LegalEntityMapper(
 
     private fun toDto(record: LegalEntityRelationRecord): RelationVerboseV7Dto =
         RelationVerboseV7Dto(
-            type = record.type,
+            type = toDto(record.type),
             businessPartnerSourceBpnl = record.sourceBpnl,
             businessPartnerTargetBpnl = record.targetBpnl,
             validityPeriods = record.validityPeriods.map { apiV7BusinessPartnerMapper.toDto(it) },
@@ -161,11 +161,11 @@ class ApiV7LegalEntityMapper(
             apiV7AddressMapper.toPostalAddressDto(record.legalAddress)
         )
 
-    private fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
+    private fun toCreateErrorInfo(error: LegalEntityCreateError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         when (error) {
-            is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageParseError -> throw internalError(error)
-            is LegalEntityContentParseError -> toContentErrorInfo(
+            is AddressContentError -> apiV7AddressMapper.toLegalAddressCreateErrorInfo(error, entityKey)
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
+            is LegalEntityContentError -> toContentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityCreateErrorV7.LegalFormNotFound,
@@ -177,7 +177,7 @@ class ApiV7LegalEntityMapper(
             )
         }
 
-    private fun toUpdateErrorInfo(error: LegalEntityUpdateParseError, entityKey: String?): ErrorInfoV7<LegalEntityUpdateErrorV7> =
+    private fun toUpdateErrorInfo(error: LegalEntityUpdateError, entityKey: String?): ErrorInfoV7<LegalEntityUpdateErrorV7> =
         when (error) {
             is UnresolvableLegalEntity ->
                 ErrorInfoV7(LegalEntityUpdateErrorV7.LegalEntityNotFound, "Legal entity '${error.bpn}' can't be updated as it doesn't exist", entityKey)
@@ -192,16 +192,9 @@ class ApiV7LegalEntityMapper(
                 "Legal entity '${error.bpnl}' cannot carry the ultimate-owner flag because it is an alternative headquarter",
                 entityKey
             )
-            is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
-            is ScriptVariantCoverageStillNeeded ->
-                ErrorInfoV7(
-                    LegalEntityUpdateErrorV7.ScriptVariantCoverageStillNeeded,
-                    "Script code '${error.scriptCode}' must stay covered by the legal address: business partner " +
-                            "'${error.requiredByBpn}' is named in that script",
-                    entityKey
-                )
+            is AddressContentError -> apiV7AddressMapper.toLegalAddressUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
-            is LegalEntityContentParseError -> toContentErrorInfo(
+            is LegalEntityContentError -> toContentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityUpdateErrorV7.LegalFormNotFound,
@@ -214,7 +207,7 @@ class ApiV7LegalEntityMapper(
         }
 
     private fun <E : ErrorCodeV7> toContentErrorInfo(
-        error: LegalEntityContentParseError,
+        error: LegalEntityContentError,
         entityKey: String?,
         legalFormNotFound: E,
         identifierNotFound: E,
@@ -224,26 +217,34 @@ class ApiV7LegalEntityMapper(
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfoV7<E> =
         when (error) {
-            is LegalEntityContentParseError.LegalFormNotFound ->
+            is LegalEntityContentError.LegalFormNotFound ->
                 ErrorInfoV7(legalFormNotFound, "Legal form '${error.legalForm}' does not exist", entityKey)
-            is LegalEntityContentParseError.IdentifierTypeNotFound ->
+            is LegalEntityContentError.IdentifierTypeNotFound ->
                 ErrorInfoV7(identifierNotFound, "Legal Entity Identifier Type '${error.type}' does not exist", entityKey)
-            is LegalEntityContentParseError.DuplicateIdentifier ->
+            is LegalEntityContentError.DuplicateIdentifier ->
                 ErrorInfoV7(duplicateIdentifier, "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
-            is LegalEntityContentParseError.IdentifiersTooMany ->
+            is LegalEntityContentError.IdentifiersTooMany ->
                 ErrorInfoV7(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-            is LegalEntityContentParseError.ScriptVariantLegalNameMissing ->
+            is LegalEntityContentError.ScriptVariantLegalNameMissing ->
                 ErrorInfoV7(scriptVariantLegalNameMissing, "Script variant ${error.index} has no legal name", entityKey)
-            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+            is LegalEntityContentError.ScriptVariantDuplicateScriptCode ->
                 ErrorInfoV7(scriptVariantDuplicateScriptCode, "Duplicate legal entity script variant for script code '${error.scriptCode}'", entityKey)
-            is LegalEntityContentParseError.NameMissing,
-            is LegalEntityContentParseError.ConfidenceCriteriaMissing,
-            is LegalEntityContentParseError.IdentifierValueMissing,
-            is LegalEntityContentParseError.IdentifierTypeMissing,
-            is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
+            is LegalEntityContentError.NameMissing,
+            is LegalEntityContentError.ConfidenceCriteriaMissing,
+            is LegalEntityContentError.IdentifierValueMissing,
+            is LegalEntityContentError.IdentifierTypeMissing,
+            is LegalEntityContentError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     // An error the bounded DTO already rules out, or that this use case cannot reach, gets no public code.
-    private fun internalError(error: LegalEntityCreateParseError) =
+    private fun internalError(error: LegalEntityCreateError) =
         BpdmValidationException("Unexpected legal entity parse error (no public error code): $error")
+
+    private fun toDto(relationType: LegalEntityRelationType): LegalEntityRelationTypeV7 =
+        when (relationType) {
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityRelationTypeV7.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityRelationTypeV7.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> LegalEntityRelationTypeV7.IsReplacedBy
+        }
 }

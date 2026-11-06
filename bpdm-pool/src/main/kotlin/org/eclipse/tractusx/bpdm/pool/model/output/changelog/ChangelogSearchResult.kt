@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.changelog
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.ChangelogSearchError
 import org.springframework.data.domain.Page
 
 /**
