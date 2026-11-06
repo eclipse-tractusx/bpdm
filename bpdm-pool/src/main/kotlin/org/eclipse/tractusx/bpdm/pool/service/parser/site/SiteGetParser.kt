@@ -20,8 +20,8 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteGetError.SiteNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteGetError.SiteNotFound
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.springframework.stereotype.Service
 

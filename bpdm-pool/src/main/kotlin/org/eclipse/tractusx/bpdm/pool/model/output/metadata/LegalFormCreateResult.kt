@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.LegalFormCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalFormCreateError
 
 /**
  * Result of a legal form create: either the created legal form or every reason it was rejected.

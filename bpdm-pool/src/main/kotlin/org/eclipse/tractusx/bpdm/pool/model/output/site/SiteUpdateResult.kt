@@ -18,12 +18,12 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteUpdateError
 
 /**
  * Result of updating one site of a batch: either the site as stored or every reason the entry was rejected.
  */
 sealed interface SiteUpdateResult {
     data class Updated(val site: SiteRecord) : SiteUpdateResult
-    data class Rejected(val errors: List<SiteUpdateParseError>) : SiteUpdateResult
+    data class Rejected(val errors: List<SiteUpdateError>) : SiteUpdateResult
 }

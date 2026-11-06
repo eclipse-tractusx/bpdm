@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,19 +16,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
-package org.eclipse.tractusx.bpdm.pool.model.error
-
-sealed interface SiteCreateParseError
-
-sealed interface SiteUpdateParseError
-
-data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateParseError
-
-sealed interface SiteContentParseError : SiteCreateParseError, SiteUpdateParseError {
-    data object NameMissing : SiteContentParseError
-    data object ConfidenceCriteriaMissing : SiteContentParseError
-    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteContentParseError
-    data class ScriptVariantNameMissing(val index: Int) : SiteContentParseError
-    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteContentParseError
+/**
+ * Reason a legal entity fetch is rejected.
+ */
+sealed interface LegalEntityGetError {
+    data class LegalEntityNotFound(val identifierType: String, val identifierValue: String) : LegalEntityGetError
 }

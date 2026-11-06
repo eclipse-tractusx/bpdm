@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.BusinessPartnerSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BusinessPartnerSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.BusinessPartnerSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.BusinessPartnerSearchRaw
 import org.springframework.stereotype.Service

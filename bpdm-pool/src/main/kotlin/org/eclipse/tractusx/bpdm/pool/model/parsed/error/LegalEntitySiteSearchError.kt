@@ -16,12 +16,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-
-package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a field quality rule search is rejected.
+ * Reason a search for the sites of a legal entity is rejected.
  */
-sealed interface FieldQualityRuleSearchError {
-    data class CountryNotFound(val country: String) : FieldQualityRuleSearchError
+sealed interface LegalEntitySiteSearchError {
+    data class LegalEntityNotFound(val bpn: String) : LegalEntitySiteSearchError
 }

@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalAddressAlreadyMainAddress
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressAsMainRaw
@@ -53,16 +53,16 @@ class SiteCreateWithLegalAddressAsMainParser(
      */
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRaw>
-    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
+    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
-        val legalEntityResults: List<ParseResult<LegalEntityDb, SiteCreateParseError>> =
+        val legalEntityResults: List<ParseResult<LegalEntityDb, SiteCreateError>> =
             legalEntityBpnParser.parse(requests.map { it.legalEntityBpn }).zip(requests) { legalEntityResult, request ->
                 if (legalEntityResult is ParseResult.Success && request.exclusiveLegalAddress)
                     legalEntityResult.combine(legalAddressClaimErrors(legalEntityResult.parsed)) { it }
                 else
                     legalEntityResult
             }
-        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateError>> =
             crossValidateParseResults(legalEntityResults, headerResults) { legalEntity, header ->
                 scriptVariantCoverageValidator.check(legalEntity.legalAddress.scriptCodes(), header.scriptCodes())
             }
@@ -72,6 +72,6 @@ class SiteCreateWithLegalAddressAsMainParser(
         }
     }
 
-    private fun legalAddressClaimErrors(legalEntity: LegalEntityDb): List<SiteCreateParseError> =
+    private fun legalAddressClaimErrors(legalEntity: LegalEntityDb): List<SiteCreateError> =
         listOfNotNull(legalEntity.legalAddress.sites.firstOrNull()?.let { LegalAddressAlreadyMainAddress(it.bpn) })
 }

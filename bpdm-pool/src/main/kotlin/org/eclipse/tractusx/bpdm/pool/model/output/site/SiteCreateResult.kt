@@ -18,12 +18,12 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
 
 /**
  * Result of creating one site of a batch: either the site as stored or every reason the entry was rejected.
  */
 sealed interface SiteCreateResult {
     data class Created(val site: SiteRecord) : SiteCreateResult
-    data class Rejected(val errors: List<SiteCreateParseError>) : SiteCreateResult
+    data class Rejected(val errors: List<SiteCreateError>) : SiteCreateResult
 }

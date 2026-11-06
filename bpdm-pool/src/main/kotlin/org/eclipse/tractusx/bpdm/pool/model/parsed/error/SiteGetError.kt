@@ -16,15 +16,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-
-package org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a business partner search is rejected.
+ * Reason a site fetch is rejected.
  */
-sealed interface BusinessPartnerSearchError {
-    data object BpnAndLegalNameMissing : BusinessPartnerSearchError
-    data object NoBusinessPartnerKindIncluded : BusinessPartnerSearchError
-    data object LeadingWhitespace : BusinessPartnerSearchError
-    data class LegalNameTooShort(val minLength: Int) : BusinessPartnerSearchError
+sealed interface SiteGetError {
+    data class SiteNotFound(val bpn: String) : SiteGetError
 }

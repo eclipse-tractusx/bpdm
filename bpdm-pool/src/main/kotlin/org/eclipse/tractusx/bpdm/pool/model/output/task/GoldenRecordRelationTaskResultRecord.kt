@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.model.output.task
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityRelationRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteRelationRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.RelationUpsertError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
 
 /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,11 +16,19 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
-/**
- * Reason a search for the addresses of a legal entity is rejected.
- */
-sealed interface LegalEntityAddressSearchError {
-    data class LegalEntityNotFound(val bpn: String) : LegalEntityAddressSearchError
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
+
+sealed interface SiteCreateError
+
+sealed interface SiteUpdateError
+
+data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateError
+
+sealed interface SiteContentError : SiteCreateError, SiteUpdateError {
+    data object NameMissing : SiteContentError
+    data object ConfidenceCriteriaMissing : SiteContentError
+    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteContentError
+    data class ScriptVariantNameMissing(val index: Int) : SiteContentError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteContentError
 }

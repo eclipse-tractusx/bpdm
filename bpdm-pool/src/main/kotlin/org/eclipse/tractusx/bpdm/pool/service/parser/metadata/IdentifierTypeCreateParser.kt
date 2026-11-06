@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError.TechnicalKeyAlreadyTaken
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeCreateError.TechnicalKeyAlreadyTaken
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeDetailParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCreateRaw

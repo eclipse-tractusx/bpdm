@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.bpn
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnRequestIdentifierSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.BpnRequestIdentifierSearchError
 
 /**
  * Result of a BPN-by-request-identifier search: either the matches found or every reason the criteria were rejected.

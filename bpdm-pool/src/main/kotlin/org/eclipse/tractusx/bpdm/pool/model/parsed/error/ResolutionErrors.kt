@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
  * A referenced BPN of this entity type did not resolve. Keyed by entity type, not role (parent vs. target) — the role is
@@ -27,12 +27,12 @@ package org.eclipse.tractusx.bpdm.pool.model.error
  * distinction there if one ever does.
  */
 data class UnresolvableLegalEntity(val bpn: String) :
-    AddressCreateParseError,
-    SiteCreateParseError,
-    LegalEntityUpdateParseError
+    AddressCreateError,
+    SiteCreateError,
+    LegalEntityUpdateError
 data class UnresolvableSite(val bpn: String) :
-    AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError, AddressSiteMembershipParseError
+    AddressCreateError, SiteUpdateError, AddressUpdateError, AddressSiteMembershipError
 data class UnresolvableAddress(val bpn: String) :
-    AddressUpdateParseError, SiteCreateParseError, AddressSiteMembershipParseError
+    AddressUpdateError, SiteCreateError, AddressSiteMembershipError
 
-data class InvalidParentBpn(val bpn: String) : AddressCreateParseError
+data class InvalidParentBpn(val bpn: String) : AddressCreateError

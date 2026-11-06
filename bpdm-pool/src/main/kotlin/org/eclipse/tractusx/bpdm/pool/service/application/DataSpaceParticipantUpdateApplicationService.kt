@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.participation.DataSpaceParticipantUpdateResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.DataSpaceParticipantUpdateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.DataSpaceParticipantUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantUpdateService

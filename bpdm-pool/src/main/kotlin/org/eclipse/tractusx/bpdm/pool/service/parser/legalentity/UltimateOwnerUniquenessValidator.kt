@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
-import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

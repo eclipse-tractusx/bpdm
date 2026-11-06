@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser.metadata
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeSearchError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeSearchRaw
 import org.eclipse.tractusx.bpdm.pool.repository.CountryRepository

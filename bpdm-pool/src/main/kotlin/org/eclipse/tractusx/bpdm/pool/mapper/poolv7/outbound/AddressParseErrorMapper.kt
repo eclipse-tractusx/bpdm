@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.springframework.stereotype.Component
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapper {
 
-    fun toCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
+    fun toCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -53,7 +53,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
         )
 
-    fun toUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
+    fun toUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -66,7 +66,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = AddressUpdateErrorV7.ScriptVariantDuplicateScriptCode
         )
 
-    fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
+    fun toLegalEntityCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -79,7 +79,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = LegalEntityCreateErrorV7.LegalAddressScriptVariantDuplicateScriptCode
         )
 
-    fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<LegalEntityUpdateErrorV7> =
+    fun toLegalEntityUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<LegalEntityUpdateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -92,7 +92,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = LegalEntityUpdateErrorV7.LegalAddressScriptVariantDuplicateScriptCode
         )
 
-    fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
+    fun toSiteCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -105,7 +105,7 @@ class AddressParseErrorMapper {
             scriptVariantDuplicateScriptCode = SiteCreateErrorV7.MainAddressScriptVariantDuplicateScriptCode
         )
 
-    fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
+    fun toSiteUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -119,7 +119,7 @@ class AddressParseErrorMapper {
         )
 
     private fun <E : ErrorCodeV7> sharedErrorInfo(
-        error: AddressContentParseError,
+        error: AddressContentError,
         entityKey: String?,
         regionNotFound: E,
         countryNotFound: E,
@@ -130,32 +130,32 @@ class AddressParseErrorMapper {
         scriptVariantDuplicateScriptCode: E
     ): ErrorInfoV7<E> =
         when (error) {
-            is AddressFieldParseError -> throw internalError(error)
-            is AddressMetadataParseError -> when (error) {
-                is AddressMetadataParseError.IdentifierTypeNotFound ->
+            is AddressFieldError -> throw internalError(error)
+            is AddressMetadataError -> when (error) {
+                is AddressMetadataError.IdentifierTypeNotFound ->
                     ErrorInfoV7(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
-                is AddressMetadataParseError.PhysicalCountryNotFound ->
+                is AddressMetadataError.PhysicalCountryNotFound ->
                     ErrorInfoV7(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
-                is AddressMetadataParseError.AlternativeCountryNotFound ->
+                is AddressMetadataError.AlternativeCountryNotFound ->
                     ErrorInfoV7(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
-                is AddressMetadataParseError.PhysicalRegionNotFound ->
+                is AddressMetadataError.PhysicalRegionNotFound ->
                     ErrorInfoV7(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
-                is AddressMetadataParseError.AlternativeRegionNotFound ->
+                is AddressMetadataError.AlternativeRegionNotFound ->
                     ErrorInfoV7(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
-                is AddressMetadataParseError.ScriptCodeNotFound -> throw internalError(error)
+                is AddressMetadataError.ScriptCodeNotFound -> throw internalError(error)
             }
-            is AddressConstraintParseError -> when (error) {
-                is AddressConstraintParseError.IdentifiersTooMany ->
+            is AddressConstraintError -> when (error) {
+                is AddressConstraintError.IdentifiersTooMany ->
                     ErrorInfoV7(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-                is AddressConstraintParseError.DuplicateIdentifier ->
+                is AddressConstraintError.DuplicateIdentifier ->
                     ErrorInfoV7(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             }
-            is AddressScriptVariantParseError -> when (error) {
-                is AddressScriptVariantParseError.PhysicalCityMissing ->
+            is AddressScriptVariantError -> when (error) {
+                is AddressScriptVariantError.PhysicalCityMissing ->
                     ErrorInfoV7(scriptVariantCityMissing, "Script variant ${error.index} has no city in its physical address", entityKey)
-                is AddressScriptVariantParseError.AlternativeCityMissing ->
+                is AddressScriptVariantError.AlternativeCityMissing ->
                     ErrorInfoV7(scriptVariantCityMissing, "Script variant ${error.index} has no city in its alternative address", entityKey)
-                is AddressScriptVariantParseError.DuplicateScriptCode ->
+                is AddressScriptVariantError.DuplicateScriptCode ->
                     ErrorInfoV7(scriptVariantDuplicateScriptCode, "Duplicate address script variant for script code '${error.scriptCode}'", entityKey)
             }
         }

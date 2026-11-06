@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.output.metadata
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.IdentifierTypeCreateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.IdentifierTypeCreateError
 
 /**
  * Result of an identifier type create: either the created identifier type or every reason it was rejected.

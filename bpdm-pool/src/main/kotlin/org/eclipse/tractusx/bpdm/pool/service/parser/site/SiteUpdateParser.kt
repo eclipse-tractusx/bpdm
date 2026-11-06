@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
@@ -48,7 +48,7 @@ class SiteUpdateParser(
      * that entry.
      */
     @Transactional(readOnly = true)
-    fun parse(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
+    fun parse(requests: List<SiteUpdateRaw>): List<ParseResult<SiteUpdateParsed, SiteUpdateError>> {
         val targetResults = siteBpnParser.parse(requests.map { it.siteBpn })
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
@@ -61,7 +61,7 @@ class SiteUpdateParser(
 
     // The main address keeps an existing variant its site is still named in, so the variants it carries today cover the
     // header as well as the stated ones.
-    private fun coverageErrors(result: ParseResult<SiteUpdateParsed, SiteUpdateParseError>): List<SiteUpdateParseError> {
+    private fun coverageErrors(result: ParseResult<SiteUpdateParsed, SiteUpdateError>): List<SiteUpdateError> {
         val parsed = (result as? ParseResult.Success)?.parsed ?: return emptyList()
         val coveredScriptCodes = parsed.content.mainAddress.scriptCodes() + parsed.target.mainAddress.scriptCodes()
 

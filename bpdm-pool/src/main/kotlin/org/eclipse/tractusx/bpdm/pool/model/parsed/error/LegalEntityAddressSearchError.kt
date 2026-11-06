@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,12 +16,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-
-package org.eclipse.tractusx.bpdm.pool.model.parsed.changelog
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason a changelog search is rejected.
+ * Reason a search for the addresses of a legal entity is rejected.
  */
-sealed interface ChangelogSearchError {
-    data class BpnsTooMany(val count: Int, val maxCount: Int) : ChangelogSearchError
+sealed interface LegalEntityAddressSearchError {
+    data class LegalEntityNotFound(val bpn: String) : LegalEntityAddressSearchError
 }

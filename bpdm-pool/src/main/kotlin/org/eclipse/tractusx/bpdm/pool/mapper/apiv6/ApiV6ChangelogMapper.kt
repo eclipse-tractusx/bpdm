@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogEntryVerbo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.changelog.ChangelogTypeV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogEntryRecord
-import org.eclipse.tractusx.bpdm.pool.model.parsed.changelog.ChangelogSearchError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.ChangelogSearchError
 import org.springframework.stereotype.Component
 
 /**

@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.SyncTypeDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.GoldenRecordCountedUpdateError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordCountedUpdateError
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.SharingMemberRecordPageRaw
 import org.eclipse.tractusx.bpdm.pool.service.gateway.SharingMemberRecordGateway
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.SharingMemberConfidenceService

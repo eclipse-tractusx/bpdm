@@ -22,8 +22,8 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityGetError.LegalEntityNotFound
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityGetError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityGetError.LegalEntityNotFound
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityGetRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service

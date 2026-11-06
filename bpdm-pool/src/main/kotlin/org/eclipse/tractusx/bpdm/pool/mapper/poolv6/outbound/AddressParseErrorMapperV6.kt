@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.error.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.springframework.stereotype.Component
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component
 @Component
 class AddressParseErrorMapperV6 {
 
-    fun toCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
+    fun toCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -51,7 +51,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
         )
 
-    fun toUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
+    fun toUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -62,7 +62,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
         )
 
-    fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
+    fun toLegalEntityCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -73,7 +73,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany
         )
 
-    fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
+    fun toLegalEntityUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -84,7 +84,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany
         )
 
-    fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
+    fun toSiteCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -95,7 +95,7 @@ class AddressParseErrorMapperV6 {
             identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany
         )
 
-    fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
+    fun toSiteUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -107,7 +107,7 @@ class AddressParseErrorMapperV6 {
         )
 
     private fun <E : ErrorCodeV6> sharedErrorInfo(
-        error: AddressContentParseError,
+        error: AddressContentError,
         entityKey: String?,
         regionNotFound: E,
         countryNotFound: E,
@@ -116,27 +116,27 @@ class AddressParseErrorMapperV6 {
         identifiersTooMany: E
     ): ErrorInfoV6<E> =
         when (error) {
-            is AddressFieldParseError -> throw internalError(error)
-            is AddressMetadataParseError -> when (error) {
-                is AddressMetadataParseError.IdentifierTypeNotFound ->
+            is AddressFieldError -> throw internalError(error)
+            is AddressMetadataError -> when (error) {
+                is AddressMetadataError.IdentifierTypeNotFound ->
                     ErrorInfoV6(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
-                is AddressMetadataParseError.PhysicalCountryNotFound ->
+                is AddressMetadataError.PhysicalCountryNotFound ->
                     ErrorInfoV6(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
-                is AddressMetadataParseError.AlternativeCountryNotFound ->
+                is AddressMetadataError.AlternativeCountryNotFound ->
                     ErrorInfoV6(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
-                is AddressMetadataParseError.PhysicalRegionNotFound ->
+                is AddressMetadataError.PhysicalRegionNotFound ->
                     ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
-                is AddressMetadataParseError.AlternativeRegionNotFound ->
+                is AddressMetadataError.AlternativeRegionNotFound ->
                     ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
-                is AddressMetadataParseError.ScriptCodeNotFound -> throw internalError(error)
+                is AddressMetadataError.ScriptCodeNotFound -> throw internalError(error)
             }
-            is AddressConstraintParseError -> when (error) {
-                is AddressConstraintParseError.IdentifiersTooMany ->
+            is AddressConstraintError -> when (error) {
+                is AddressConstraintError.IdentifiersTooMany ->
                     ErrorInfoV6(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
-                is AddressConstraintParseError.DuplicateIdentifier ->
+                is AddressConstraintError.DuplicateIdentifier ->
                     ErrorInfoV6(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             }
-            is AddressScriptVariantParseError -> throw internalError(error)
+            is AddressScriptVariantError -> throw internalError(error)
         }
 
     private fun internalError(error: Any) =

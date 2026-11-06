@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2026 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,17 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed.metadata
-
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
 /**
- * Reason an identifier type create is rejected.
+ * Reason a BPN-by-request-identifier search is rejected.
  */
-sealed interface IdentifierTypeCreateError {
-    data class CountryNotFound(val country: String) : IdentifierTypeCreateError
-    data class TechnicalKeyAlreadyTaken(
-        val technicalKey: String,
-        val businessPartnerType: IdentifierBusinessPartnerTypeV7
-    ) : IdentifierTypeCreateError
+sealed interface BpnRequestIdentifierSearchError {
+    data class RequestIdentifiersTooMany(val count: Int, val maxCount: Int) : BpnRequestIdentifierSearchError
 }

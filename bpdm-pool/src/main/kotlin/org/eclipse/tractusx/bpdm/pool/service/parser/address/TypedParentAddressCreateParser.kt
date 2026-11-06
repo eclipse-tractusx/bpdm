@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.parseWherePresent
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
@@ -48,11 +48,11 @@ class TypedParentAddressCreateParser(
      * Validates each request and reports either the validated address with its resolved parents or every problem found in
      * that entry.
      */
-    fun parse(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
+    fun parse(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<AddressCreateParsed, AddressCreateError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val siteResults = parseWherePresent(requests.map { it.siteBpn }, siteBpnParser::parse)
-        val consistentSiteResults: List<ParseResult<SiteDb?, AddressCreateParseError>> =
+        val consistentSiteResults: List<ParseResult<SiteDb?, AddressCreateError>> =
             crossValidateParseResults(legalEntityResults, siteResults) { legalEntity, site ->
                 siteLegalEntityConsistencyValidator.check(legalEntity, site)
             }
