@@ -17,15 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.util
+package org.eclipse.tractusx.bpdm.pool.config
 
-import org.eclipse.tractusx.bpdm.pool.config.OrchestratorClientConfigProperties
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 
+/**
+ * Reports the Orchestrator as up when its actuator health endpoint answers successfully.
+ */
 @Component("orchestratorHealth")
 class OrchestratorHealthIndicator(
     private val orchestratorConfigProperties: OrchestratorClientConfigProperties,
