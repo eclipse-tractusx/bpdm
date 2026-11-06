@@ -21,14 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.participation
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.GoldenRecordCountedUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.SharingMemberRecordChangeRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SharingMemberRecordRepository
@@ -41,26 +43,32 @@ class SharingMemberConfidenceService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogCreateService: ChangelogCreateService,
+    private val changeLogger: PersistedChangeLogger
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Applies whether the sharing member record counts towards its address's confidence and reports whether that
-     * changed the record; an unknown record id yields null.
+     * Sets whether each sharing member record counts towards the number of sharing members of its address and that
+     * address's legal entity, and returns the records that changed.
      */
-    fun updateGoldenRecordCounted(recordId: String, isGoldenRecordCounted: Boolean?): UpsertResult<SharingMemberRecordDb>?{
-        val foundSharingMemberRecord = sharingMemberRecordRepository.findByRecordId(recordId) ?: return null
+    fun updateGoldenRecordCounted(updates: List<GoldenRecordCountedUpdateParsed>): List<SharingMemberRecordDb> {
+        val changedRecords = updates
+            .filter { it.record.isGoldenRecordCounted != it.isGoldenRecordCounted }
+            .map { update ->
+                update.record.apply {
+                    isGoldenRecordCounted = update.isGoldenRecordCounted
+                    updatedAt = DbTimestamp.now()
+                }
+            }
 
-        val hasChanges = foundSharingMemberRecord.isGoldenRecordCounted != isGoldenRecordCounted
-        if(hasChanges){
-            foundSharingMemberRecord.isGoldenRecordCounted = isGoldenRecordCounted
-            foundSharingMemberRecord.updatedAt = DbTimestamp.now()
-            sharingMemberRecordRepository.save(foundSharingMemberRecord)
-            updateNumberOfSharingMembers(foundSharingMemberRecord.address)
+        sharingMemberRecordRepository.saveAll(changedRecords)
+        changedRecords.map { it.address }.distinctBy { it.bpn }.forEach(::updateNumberOfSharingMembers)
+        changedRecords.forEach {
+            changeLogger.log(SharingMemberRecordChangeRaw(PersistedChangeType.Updated, it.recordId, it.address.bpn, SharingMemberRecordChangeRaw.Aspect.GoldenRecordCounted))
         }
 
-        return UpsertResult(foundSharingMemberRecord, if(hasChanges) UpsertType.Updated else UpsertType.NoChange)
+        return changedRecords
     }
 
     fun updateAddress(recordId: String, addressBpn: String): Result{
