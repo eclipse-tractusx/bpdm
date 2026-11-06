@@ -210,7 +210,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     fun `search output does not restore dropped script variant name parts`(){
         //GIVEN
         val firstInput = testDataClient.businessPartner.upsertInput(testName)
-        val goldenRecord = testDataClient.businessPartner.refineToLegalEntity(firstInput)
+        testDataClient.businessPartner.refineToLegalEntity(firstInput)
 
         //WHEN
         val resubmittedInput = testDataClient.businessPartner.upsertInput(
@@ -219,7 +219,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
                 scriptVariants = firstInput.scriptVariants.map { it.copy(nameParts = emptyList()) }
             )
         )
-        testDataClient.businessPartner.refineToLegalEntity(resubmittedInput)
+        val goldenRecord = testDataClient.businessPartner.refineToLegalEntity(resubmittedInput)
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(firstInput.externalId))
 
         //THEN
