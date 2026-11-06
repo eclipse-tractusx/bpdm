@@ -331,7 +331,7 @@ class ApiV6AddressMapper(
         identifiersTooMany: E
     ): ErrorInfoV6<E> =
         when (error) {
-            is AddressFieldError -> throw contentInternalError(error)
+            is AddressFieldError -> throw internalError(error)
             is AddressMetadataError -> when (error) {
                 is AddressMetadataError.IdentifierTypeNotFound ->
                     ErrorInfoV6(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
@@ -343,7 +343,7 @@ class ApiV6AddressMapper(
                     ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
                 is AddressMetadataError.AlternativeRegionNotFound ->
                     ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
-                is AddressMetadataError.ScriptCodeNotFound -> throw contentInternalError(error)
+                is AddressMetadataError.ScriptCodeNotFound -> throw internalError(error)
             }
             is AddressConstraintError -> when (error) {
                 is AddressConstraintError.IdentifiersTooMany ->
@@ -351,9 +351,6 @@ class ApiV6AddressMapper(
                 is AddressConstraintError.DuplicateIdentifier ->
                     ErrorInfoV6(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             }
-            is AddressScriptVariantError -> throw contentInternalError(error)
+            is AddressScriptVariantError -> throw internalError(error)
         }
-
-    private fun contentInternalError(error: Any) =
-        BpdmValidationException("Unexpected address validation error that has no v6 client error code: $error")
 }

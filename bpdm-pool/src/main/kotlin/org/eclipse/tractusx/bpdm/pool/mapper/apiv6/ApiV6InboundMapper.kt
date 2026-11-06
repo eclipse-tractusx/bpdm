@@ -106,7 +106,7 @@ class ApiV6InboundMapper {
      */
     fun toIdentifierTypeSearchRaw(businessPartnerType: IdentifierBusinessPartnerTypeV6, country: String?): IdentifierTypeSearchRaw =
         IdentifierTypeSearchRaw(
-            businessPartnerType = IdentifierBusinessPartnerType.valueOf(businessPartnerType.name),
+            businessPartnerType = toModel(businessPartnerType),
             country = country
         )
 
@@ -122,7 +122,7 @@ class ApiV6InboundMapper {
     fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRaw =
         IdentifierTypeCreateRaw(
             technicalKey = identifierType.technicalKey,
-            businessPartnerType = IdentifierBusinessPartnerType.valueOf(identifierType.businessPartnerType.name),
+            businessPartnerType = toModel(identifierType.businessPartnerType),
             name = identifierType.name,
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
@@ -153,7 +153,7 @@ class ApiV6InboundMapper {
      */
     fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV6Request): BpnIdentifierSearchRaw =
         BpnIdentifierSearchRaw(
-            businessPartnerType = IdentifierBusinessPartnerType.valueOf(request.businessPartnerType.name),
+            businessPartnerType = toModel(request.businessPartnerType),
             identifierTypeKey = request.idType,
             identifierValues = request.idValues
         )
@@ -412,4 +412,10 @@ class ApiV6InboundMapper {
     private fun LocalDateTime?.toValidFromInstant() = BusinessStateDates.receiveValidFrom(this)?.toUtcInstant()
 
     private fun LocalDateTime?.toValidToInstant() = BusinessStateDates.receiveValidTo(this)?.toUtcInstant()
+
+    private fun toModel(businessPartnerType: IdentifierBusinessPartnerTypeV6): IdentifierBusinessPartnerType =
+        when (businessPartnerType) {
+            IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY -> IdentifierBusinessPartnerType.LEGAL_ENTITY
+            IdentifierBusinessPartnerTypeV6.ADDRESS -> IdentifierBusinessPartnerType.ADDRESS
+        }
 }
