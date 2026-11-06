@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithReferencedAddressAsMainRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
@@ -49,7 +49,7 @@ class SiteCreateWithReferencedAddressAsMainParser(
      */
     @Transactional(readOnly = true)
     fun parse(
-        requests: List<SiteCreateWithReferencedAddressAsMainRequest>
+        requests: List<SiteCreateWithReferencedAddressAsMainRaw>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val mainAddressTargetResults = addressBpnParser.parse(requests.map { it.mainAddressBpn })

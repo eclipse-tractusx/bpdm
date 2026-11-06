@@ -18,9 +18,9 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.address
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.ConfidenceCriteriaRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.RelationValidityPeriodRecord
@@ -54,7 +54,7 @@ data class AddressIdentifierRecord(
 )
 
 data class AddressRelationRecord(
-    val type: AddressRelationTypeV7,
+    val type: AddressRelationType,
     val sourceBpna: String,
     val targetBpna: String,
     val validityPeriods: List<RelationValidityPeriodRecord>,

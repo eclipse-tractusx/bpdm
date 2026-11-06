@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.gateway
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcome
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcomeRaw
 import org.springframework.web.reactive.function.client.WebClientException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -34,16 +34,16 @@ internal const val MAX_ERROR_DESCRIPTION_LENGTH = 250
 /**
  * Reports each task with [taskIds] through [report] and returns how the Orchestrator answered each.
  */
-internal fun reportTaskErrors(taskIds: List<String>, report: (String) -> Unit): List<TaskErrorReportOutcome> =
+internal fun reportTaskErrors(taskIds: List<String>, report: (String) -> Unit): List<TaskErrorReportOutcomeRaw> =
     // One call per task: the Orchestrator rejects a whole result batch when it does not know one of its tasks.
     taskIds.map { taskId ->
         try {
             report(taskId)
-            TaskErrorReportOutcome.Reported
+            TaskErrorReportOutcomeRaw.Reported
         } catch (_: WebClientResponseException.BadRequest) {
-            TaskErrorReportOutcome.TaskUnknown
+            TaskErrorReportOutcomeRaw.TaskUnknown
         } catch (e: WebClientException) {
             logger.debug(e) { "Could not report task '$taskId' as an error" }
-            TaskErrorReportOutcome.Failed(e.message ?: e::class.simpleName.orEmpty())
+            TaskErrorReportOutcomeRaw.Failed(e.message ?: e::class.simpleName.orEmpty())
         }
     }

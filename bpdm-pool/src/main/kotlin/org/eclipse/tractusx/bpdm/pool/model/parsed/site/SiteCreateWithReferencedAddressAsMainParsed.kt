@@ -20,8 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LogisticAddressParsed
 
 data class SiteCreateWithReferencedAddressAsMainParsed(
     val mainAddress: LogisticAddressDb,

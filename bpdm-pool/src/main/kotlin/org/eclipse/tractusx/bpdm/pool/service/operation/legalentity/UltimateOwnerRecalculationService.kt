@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -53,10 +53,10 @@ class UltimateOwnerRecalculationService(
 
         val updates = ultimateOwnerResolutionService.resolveForEntitiesAndDescendants(legalEntities)
             .map { (legalEntity, ultimateOwnerBpnl) ->
-                LegalEntityUpdate(
+                LegalEntityChangeParsed(
                     legalEntity,
-                    LegalEntityHeaderUpdate.NoOp.copy(ultimateOwnerBpnl = FieldUpdate.Set(storedValueOf(ultimateOwnerBpnl, legalEntity))),
-                    AddressContentUpdate.NoOp
+                    LegalEntityHeaderChangeParsed.NoOp.copy(ultimateOwnerBpnl = FieldUpdateRaw.Set(storedValueOf(ultimateOwnerBpnl, legalEntity))),
+                    AddressContentChangeParsed.NoOp
                 )
             }
 

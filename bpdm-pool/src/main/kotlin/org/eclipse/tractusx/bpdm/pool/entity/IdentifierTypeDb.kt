@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCategory
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
 
 @Entity
 @Table(
@@ -38,7 +38,7 @@ class IdentifierTypeDb(
 
     @Column(name = "business_partner_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
+    val businessPartnerType: IdentifierBusinessPartnerType,
 
     @Column(name = "name", nullable = false)
     val name: String,
@@ -63,7 +63,7 @@ class IdentifierTypeDb(
         uniqueConstraints = [UniqueConstraint(name = "uc_identifier_categories", columnNames = ["identifier_type_id", "category"])],
     )
     @Column(name = "category")
-    val categories: MutableSet<IdentifierTypeCategoryV7> = mutableSetOf()
+    val categories: MutableSet<IdentifierTypeCategory> = mutableSetOf()
 
     ) : BaseEntityWithExplicitTimestamps() {
     @OneToMany(mappedBy = "identifierType", cascade = [CascadeType.ALL], orphanRemoval = true)

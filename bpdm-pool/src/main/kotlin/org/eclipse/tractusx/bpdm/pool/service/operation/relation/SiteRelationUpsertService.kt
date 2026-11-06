@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteRelationDb
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.SiteRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -66,13 +66,13 @@ class SiteRelationUpsertService(
         return upsertResult.value
     }
 
-    private fun write(relation: SiteRelationUpsertParsed): UpsertResult<SiteRelationDb> {
+    private fun write(relation: SiteRelationUpsertParsed): UpsertResultParsed<SiteRelationDb> {
         val validityPeriods = relation.validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }
         val existingRelation = relation.existingRelation
-            ?: return UpsertResult(create(relation, validityPeriods), UpsertType.Created)
+            ?: return UpsertResultParsed(create(relation, validityPeriods), UpsertType.Created)
 
         if (!validityPeriodsDiffer(existingRelation.validityPeriods, validityPeriods)) {
-            return UpsertResult(existingRelation, UpsertType.NoChange)
+            return UpsertResultParsed(existingRelation, UpsertType.NoChange)
         }
 
         existingRelation.validityPeriods.clear()
@@ -80,7 +80,7 @@ class SiteRelationUpsertService(
         existingRelation.updatedAt = DbTimestamp.now()
         siteRelationRepository.save(existingRelation)
 
-        return UpsertResult(existingRelation, UpsertType.Updated)
+        return UpsertResultParsed(existingRelation, UpsertType.Updated)
     }
 
     private fun logOutcome(upsertType: UpsertType, relation: SiteRelationUpsertParsed) {
@@ -94,7 +94,7 @@ class SiteRelationUpsertService(
 
     private fun create(relation: SiteRelationUpsertParsed, validityPeriods: List<RelationValidityPeriodDb>): SiteRelationDb {
         val newRelation = SiteRelationDb(
-            type = SiteRelationTypeV7.IsReplacedBy,
+            type = SiteRelationType.IsReplacedBy,
             startSite = relation.source,
             endSite = relation.target,
             validityPeriods = validityPeriods.toMutableList(),
@@ -102,8 +102,8 @@ class SiteRelationUpsertService(
         )
         siteRelationRepository.save(newRelation)
 
-        changelogCreateService.record(ChangelogRecord(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
-        changelogCreateService.record(ChangelogRecord(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
+        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE))
+        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE))
 
         return newRelation
     }

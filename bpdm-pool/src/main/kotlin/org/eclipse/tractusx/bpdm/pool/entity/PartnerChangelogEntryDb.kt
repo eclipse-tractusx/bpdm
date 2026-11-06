@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 
 @Entity
 @Table(name = "partner_changelog_entries")
@@ -37,6 +37,6 @@ class PartnerChangelogEntryDb(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "changelog_type", nullable = false, updatable = false)
-    val changelogType: ChangelogTypeV7
+    val changelogType: ChangelogType
 
 ) : BaseEntityWithExplicitTimestamps()

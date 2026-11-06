@@ -18,6 +18,8 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -38,7 +40,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreateResult
@@ -58,8 +59,7 @@ import org.springframework.stereotype.Component
 class ApiV7LegalEntityMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
     private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val apiV7MetadataMapper: ApiV7MetadataMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val apiV7MetadataMapper: ApiV7MetadataMapper
 ) {
 
     /**
@@ -146,7 +146,7 @@ class ApiV7LegalEntityMapper(
 
     private fun toDto(record: LegalEntityRelationRecord): RelationVerboseV7Dto =
         RelationVerboseV7Dto(
-            type = record.type,
+            type = toDto(record.type),
             businessPartnerSourceBpnl = record.sourceBpnl,
             businessPartnerTargetBpnl = record.targetBpnl,
             validityPeriods = record.validityPeriods.map { apiV7BusinessPartnerMapper.toDto(it) },
@@ -163,7 +163,7 @@ class ApiV7LegalEntityMapper(
 
     private fun toCreateErrorInfo(error: LegalEntityCreateError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         when (error) {
-            is AddressContentError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toLegalAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentError -> toContentErrorInfo(
                 error,
@@ -192,7 +192,7 @@ class ApiV7LegalEntityMapper(
                 "Legal entity '${error.bpnl}' cannot carry the ultimate-owner flag because it is an alternative headquarter",
                 entityKey
             )
-            is AddressContentError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toLegalAddressUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentError -> toContentErrorInfo(
                 error,
@@ -239,4 +239,12 @@ class ApiV7LegalEntityMapper(
     // An error the bounded DTO already rules out, or that this use case cannot reach, gets no public code.
     private fun internalError(error: LegalEntityCreateError) =
         BpdmValidationException("Unexpected legal entity parse error (no public error code): $error")
+
+    private fun toDto(relationType: LegalEntityRelationType): LegalEntityRelationTypeV7 =
+        when (relationType) {
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityRelationTypeV7.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityRelationTypeV7.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> LegalEntityRelationTypeV7.IsReplacedBy
+        }
 }

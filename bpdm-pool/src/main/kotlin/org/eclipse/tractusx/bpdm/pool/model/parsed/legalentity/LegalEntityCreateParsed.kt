@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 
 data class LegalEntityCreateParsed(
     val content: LegalEntityContentParsed

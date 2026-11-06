@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.RelationValidityPeriodRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordRelationTaskResultRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
@@ -112,22 +112,22 @@ class OrchestratorRelationOutboundMapper {
             RelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
 
-    private fun toRelationType(type: LegalEntityRelationTypeV7): OrchestratorRelationType =
+    private fun toRelationType(type: LegalEntityRelationType): OrchestratorRelationType =
         when (type) {
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationTypeV7.IsManagedBy -> OrchestratorRelationType.IsManagedBy
-            LegalEntityRelationTypeV7.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
-            LegalEntityRelationTypeV7.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
 
-    private fun toRelationType(type: SiteRelationTypeV7): OrchestratorRelationType =
+    private fun toRelationType(type: SiteRelationType): OrchestratorRelationType =
         when (type) {
-            SiteRelationTypeV7.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
+            SiteRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
 
-    private fun toRelationType(type: AddressRelationTypeV7): OrchestratorRelationType =
+    private fun toRelationType(type: AddressRelationType): OrchestratorRelationType =
         when (type) {
-            AddressRelationTypeV7.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
+            AddressRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
 
     private fun toDescription(error: RelationUpsertError): String =

@@ -19,6 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCategory
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.QualityLevel
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
@@ -114,13 +120,13 @@ class ApiV7MetadataMapper {
     fun toDto(record: IdentifierTypeRecord): IdentifierTypeV7Dto =
         IdentifierTypeV7Dto(
             technicalKey = record.technicalKey,
-            businessPartnerType = record.businessPartnerType,
+            businessPartnerType = toDto(record.businessPartnerType),
             name = record.name,
             abbreviation = record.abbreviation,
             transliteratedName = record.transliteratedName,
             transliteratedAbbreviation = record.transliteratedAbbreviation,
             format = record.format,
-            categories = record.categories.toSortedSet(),
+            categories = record.categories.map { toDto(it) }.toSortedSet(),
             details = record.details.map { IdentifierTypeDetailV7Dto(country = it.countryCode, mandatory = it.mandatory) }
         )
 
@@ -132,7 +138,7 @@ class ApiV7MetadataMapper {
             fieldPath = record.fieldPath,
             schemaName = record.schemaName,
             country = record.countryCode,
-            qualityLevel = record.qualityLevel
+            qualityLevel = toDto(record.qualityLevel)
         )
 
     /**
@@ -200,4 +206,26 @@ class ApiV7MetadataMapper {
             }
         })
     }
+
+    private fun toDto(businessPartnerType: IdentifierBusinessPartnerType): IdentifierBusinessPartnerTypeV7 =
+        when (businessPartnerType) {
+            IdentifierBusinessPartnerType.LEGAL_ENTITY -> IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY
+            IdentifierBusinessPartnerType.ADDRESS -> IdentifierBusinessPartnerTypeV7.ADDRESS
+        }
+
+    private fun toDto(category: IdentifierTypeCategory): IdentifierTypeCategoryV7 =
+        when (category) {
+            IdentifierTypeCategory.VAT -> IdentifierTypeCategoryV7.VAT
+            IdentifierTypeCategory.TIN -> IdentifierTypeCategoryV7.TIN
+            IdentifierTypeCategory.NBR -> IdentifierTypeCategoryV7.NBR
+            IdentifierTypeCategory.IBR -> IdentifierTypeCategoryV7.IBR
+            IdentifierTypeCategory.OTH -> IdentifierTypeCategoryV7.OTH
+        }
+
+    private fun toDto(qualityLevel: QualityLevel): QualityLevelV7 =
+        when (qualityLevel) {
+            QualityLevel.MANDATORY -> QualityLevelV7.MANDATORY
+            QualityLevel.OPTIONAL -> QualityLevelV7.OPTIONAL
+            QualityLevel.FORBIDDEN -> QualityLevelV7.FORBIDDEN
+        }
 }

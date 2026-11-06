@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 
 @Entity
 @Table(
@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 class SiteRelationDb(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: SiteRelationTypeV7,
+    val type: SiteRelationType,
 
     @ManyToOne
     @JoinColumn(name = "start_site_id", nullable = false)

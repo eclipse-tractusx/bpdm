@@ -18,6 +18,18 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.ErrorCodeV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteCreateErrorV7
+import org.eclipse.tractusx.bpdm.pool.api.v7.exception.SiteUpdateErrorV7
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressConstraintError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressFieldError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressMetadataError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressScriptVariantError
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -44,7 +56,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVa
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.error.ErrorInfoV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.RegionV7Dto
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressContentError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressUpdateError
@@ -77,8 +88,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ApiV7AddressMapper(
-    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper
 ) {
 
     /**
@@ -198,14 +208,14 @@ class ApiV7AddressMapper(
                     "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is AddressContentError -> addressParseErrorMapper.toCreateErrorInfo(error, entityKey)
+            is AddressContentError -> toCreateContentErrorInfo(error, entityKey)
         }
 
     private fun toUpdateErrorInfo(error: AddressUpdateError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
         when (error) {
             is UnresolvableAddress ->
                 ErrorInfoV7(AddressUpdateErrorV7.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentError -> addressParseErrorMapper.toUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> toUpdateContentErrorInfo(error, entityKey)
             is SiteNotInAddressLegalEntity ->
                 ErrorInfoV7(
                     AddressUpdateErrorV7.SiteNotInLegalEntity,
@@ -234,7 +244,7 @@ class ApiV7AddressMapper(
 
     private fun toDto(record: AddressRelationRecord): AddressRelationVerboseV7Dto =
         AddressRelationVerboseV7Dto(
-            type = record.type,
+            type = toDto(record.type),
             businessPartnerSourceBpna = record.sourceBpna,
             businessPartnerTargetBpna = record.targetBpna,
             validityPeriods = record.validityPeriods.map { apiV7BusinessPartnerMapper.toDto(it) },
@@ -295,4 +305,144 @@ class ApiV7AddressMapper(
             nameSuffix = record.nameSuffix,
             additionalNameSuffix = record.additionalNameSuffix
         )
+
+    private fun toCreateContentErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<AddressCreateErrorV7> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressCreateErrorV7.RegionNotFound,
+            countryNotFound = AddressCreateErrorV7.CountryNotFound,
+            identifierNotFound = AddressCreateErrorV7.IdentifierNotFound,
+            duplicateIdentifier = AddressCreateErrorV7.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressCreateErrorV7.IdentifiersTooMany,
+            scriptVariantCityMissing = AddressCreateErrorV7.ScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = AddressCreateErrorV7.ScriptVariantDuplicateScriptCode
+        )
+
+    private fun toUpdateContentErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<AddressUpdateErrorV7> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressUpdateErrorV7.RegionNotFound,
+            countryNotFound = AddressUpdateErrorV7.CountryNotFound,
+            identifierNotFound = AddressUpdateErrorV7.IdentifierNotFound,
+            duplicateIdentifier = AddressUpdateErrorV7.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressUpdateErrorV7.IdentifiersTooMany,
+            scriptVariantCityMissing = AddressUpdateErrorV7.ScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = AddressUpdateErrorV7.ScriptVariantDuplicateScriptCode
+        )
+
+    /**
+     * Returns the API error for a legal entity create rejected by its legal address content.
+     */
+    fun toLegalAddressCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = LegalEntityCreateErrorV7.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityCreateErrorV7.LegalAddressCountryNotFound,
+            identifierNotFound = LegalEntityCreateErrorV7.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityCreateErrorV7.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityCreateErrorV7.LegalAddressIdentifiersTooMany,
+            scriptVariantCityMissing = LegalEntityCreateErrorV7.LegalAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = LegalEntityCreateErrorV7.LegalAddressScriptVariantDuplicateScriptCode
+        )
+
+    /**
+     * Returns the API error for a legal entity update rejected by its legal address content.
+     */
+    fun toLegalAddressUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<LegalEntityUpdateErrorV7> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = LegalEntityUpdateErrorV7.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityUpdateErrorV7.LegalAddressCountryNotFound,
+            identifierNotFound = LegalEntityUpdateErrorV7.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityUpdateErrorV7.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityUpdateErrorV7.LegalAddressIdentifiersTooMany,
+            scriptVariantCityMissing = LegalEntityUpdateErrorV7.LegalAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = LegalEntityUpdateErrorV7.LegalAddressScriptVariantDuplicateScriptCode
+        )
+
+    /**
+     * Returns the API error for a site create rejected by its main address content.
+     */
+    fun toMainAddressCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<SiteCreateErrorV7> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = SiteCreateErrorV7.MainAddressRegionNotFound,
+            countryNotFound = SiteCreateErrorV7.MainAddressCountryNotFound,
+            identifierNotFound = SiteCreateErrorV7.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteCreateErrorV7.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteCreateErrorV7.MainAddressIdentifiersTooMany,
+            scriptVariantCityMissing = SiteCreateErrorV7.MainAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = SiteCreateErrorV7.MainAddressScriptVariantDuplicateScriptCode
+        )
+
+    /**
+     * Returns the API error for a site update rejected by its main address content.
+     */
+    fun toMainAddressUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV7<SiteUpdateErrorV7> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = SiteUpdateErrorV7.MainAddressRegionNotFound,
+            countryNotFound = SiteUpdateErrorV7.MainAddressCountryNotFound,
+            identifierNotFound = SiteUpdateErrorV7.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteUpdateErrorV7.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteUpdateErrorV7.MainAddressIdentifiersTooMany,
+            scriptVariantCityMissing = SiteUpdateErrorV7.MainAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = SiteUpdateErrorV7.MainAddressScriptVariantDuplicateScriptCode
+        )
+
+    private fun <E : ErrorCodeV7> toContentErrorInfo(
+        error: AddressContentError,
+        entityKey: String?,
+        regionNotFound: E,
+        countryNotFound: E,
+        identifierNotFound: E,
+        duplicateIdentifier: E,
+        identifiersTooMany: E,
+        scriptVariantCityMissing: E,
+        scriptVariantDuplicateScriptCode: E
+    ): ErrorInfoV7<E> =
+        when (error) {
+            is AddressFieldError -> throw internalError(error)
+            is AddressMetadataError -> when (error) {
+                is AddressMetadataError.IdentifierTypeNotFound ->
+                    ErrorInfoV7(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
+                is AddressMetadataError.PhysicalCountryNotFound ->
+                    ErrorInfoV7(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                is AddressMetadataError.AlternativeCountryNotFound ->
+                    ErrorInfoV7(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                is AddressMetadataError.PhysicalRegionNotFound ->
+                    ErrorInfoV7(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
+                is AddressMetadataError.AlternativeRegionNotFound ->
+                    ErrorInfoV7(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
+                is AddressMetadataError.ScriptCodeNotFound -> throw internalError(error)
+            }
+            is AddressConstraintError -> when (error) {
+                is AddressConstraintError.IdentifiersTooMany ->
+                    ErrorInfoV7(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
+                is AddressConstraintError.DuplicateIdentifier ->
+                    ErrorInfoV7(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
+            }
+            is AddressScriptVariantError -> when (error) {
+                is AddressScriptVariantError.PhysicalCityMissing ->
+                    ErrorInfoV7(scriptVariantCityMissing, "Script variant ${error.index} has no city in its physical address", entityKey)
+                is AddressScriptVariantError.AlternativeCityMissing ->
+                    ErrorInfoV7(scriptVariantCityMissing, "Script variant ${error.index} has no city in its alternative address", entityKey)
+                is AddressScriptVariantError.DuplicateScriptCode ->
+                    ErrorInfoV7(scriptVariantDuplicateScriptCode, "Duplicate address script variant for script code '${error.scriptCode}'", entityKey)
+            }
+        }
+
+    private fun internalError(error: Any) =
+        BpdmValidationException("Unexpected address validation error that has no client error code: $error")
+
+    private fun toDto(relationType: AddressRelationType): AddressRelationTypeV7 =
+        when (relationType) {
+            AddressRelationType.IsReplacedBy -> AddressRelationTypeV7.IsReplacedBy
+        }
 }

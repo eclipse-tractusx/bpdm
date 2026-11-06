@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
 import org.springframework.stereotype.Service
 
 /**
@@ -75,7 +75,7 @@ class GoldenRecordTaskIdentifierDistinctnessValidator {
         }
     }
 
-    private data class WrittenAddress(val target: String?, val content: LogisticAddressRequest) {
+    private data class WrittenAddress(val target: String?, val content: LogisticAddressRaw) {
 
         fun collisionsWith(earlier: List<WrittenAddress>): List<AddressConstraintError.DuplicateIdentifier> {
             val takenIdentifiers = earlier

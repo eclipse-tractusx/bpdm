@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed.relation
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -39,7 +39,7 @@ sealed interface RelationUpsertParsed {
 }
 
 data class LegalEntityRelationUpsertParsed(
-    val type: LegalEntityRelationTypeV7,
+    val type: LegalEntityRelationType,
     val source: LegalEntityDb,
     val target: LegalEntityDb,
     override val validityPeriods: List<RelationValidityPeriodRaw>,

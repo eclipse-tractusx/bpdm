@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogEntryVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.model.output.changelog.ChangelogEntryRecord
@@ -39,7 +41,7 @@ class ApiV7ChangelogMapper {
             bpn = record.bpn,
             businessPartnerType = record.businessPartnerType,
             timestamp = record.timestamp,
-            changelogType = record.changelogType
+            changelogType = toDto(record.changelogType)
         )
 
     /**
@@ -49,5 +51,11 @@ class ApiV7ChangelogMapper {
     fun toException(errors: List<ChangelogSearchError>): RuntimeException =
         when (val error = errors.first()) {
             is ChangelogSearchError.BpnsTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
+        }
+
+    private fun toDto(changelogType: ChangelogType): ChangelogTypeV7 =
+        when (changelogType) {
+            ChangelogType.CREATE -> ChangelogTypeV7.CREATE
+            ChangelogType.UPDATE -> ChangelogTypeV7.UPDATE
         }
 }

@@ -19,9 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 
 data class SiteCreateRaw(
     val legalEntityBpn: String,
-    val content: SiteContentRequest
+    val content: SiteContentRaw
 )

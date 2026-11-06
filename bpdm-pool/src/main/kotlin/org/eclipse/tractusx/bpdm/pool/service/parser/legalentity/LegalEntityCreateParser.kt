@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator

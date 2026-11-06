@@ -18,6 +18,15 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.ErrorCodeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.LegalEntityUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.exception.SiteUpdateErrorV6
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressConstraintError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressFieldError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressMetadataError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressScriptVariantError
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
@@ -39,7 +48,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.error.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.RegionV6Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressContentError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressUpdateError
@@ -70,8 +78,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ApiV6AddressMapper(
-    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
-    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
+    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper
 ) {
 
     /**
@@ -154,14 +161,14 @@ class ApiV6AddressMapper(
                     "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is AddressContentError -> addressParseErrorMapperV6.toCreateErrorInfo(error, entityKey)
+            is AddressContentError -> toCreateContentErrorInfo(error, entityKey)
         }
 
     private fun toUpdateErrorInfo(error: AddressUpdateError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
         when (error) {
             is UnresolvableAddress ->
                 ErrorInfoV6(AddressUpdateErrorV6.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentError -> addressParseErrorMapperV6.toUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> toUpdateContentErrorInfo(error, entityKey)
             is SiteNotInAddressLegalEntity ->
                 ErrorInfoV6(
                     AddressUpdateErrorV6.SiteNotInLegalEntity,
@@ -235,4 +242,115 @@ class ApiV6AddressMapper(
             nameSuffix = record.nameSuffix,
             additionalNameSuffix = record.additionalNameSuffix
         )
+
+    private fun toCreateContentErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<AddressCreateErrorV6> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressCreateErrorV6.RegionNotFound,
+            countryNotFound = AddressCreateErrorV6.CountryNotFound,
+            identifierNotFound = AddressCreateErrorV6.IdentifierNotFound,
+            duplicateIdentifier = AddressCreateErrorV6.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressCreateErrorV6.IdentifiersTooMany
+        )
+
+    private fun toUpdateContentErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<AddressUpdateErrorV6> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = AddressUpdateErrorV6.RegionNotFound,
+            countryNotFound = AddressUpdateErrorV6.CountryNotFound,
+            identifierNotFound = AddressUpdateErrorV6.IdentifierNotFound,
+            duplicateIdentifier = AddressUpdateErrorV6.AddressDuplicateIdentifier,
+            identifiersTooMany = AddressUpdateErrorV6.IdentifiersTooMany
+        )
+
+    /**
+     * Returns the API error for a legal entity create rejected by its legal address content.
+     */
+    fun toLegalAddressCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = LegalEntityCreateErrorV6.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityCreateErrorV6.LegalAddressCountryNotFound,
+            identifierNotFound = LegalEntityCreateErrorV6.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityCreateErrorV6.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany
+        )
+
+    /**
+     * Returns the API error for a legal entity update rejected by its legal address content.
+     */
+    fun toLegalAddressUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<LegalEntityUpdateErrorV6> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = LegalEntityUpdateErrorV6.LegalAddressRegionNotFound,
+            countryNotFound = LegalEntityUpdateErrorV6.LegalAddressCountryNotFound,
+            identifierNotFound = LegalEntityUpdateErrorV6.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityUpdateErrorV6.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany
+        )
+
+    /**
+     * Returns the API error for a site create rejected by its main address content.
+     */
+    fun toMainAddressCreateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<SiteCreateErrorV6> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = SiteCreateErrorV6.MainAddressRegionNotFound,
+            countryNotFound = SiteCreateErrorV6.MainAddressCountryNotFound,
+            identifierNotFound = SiteCreateErrorV6.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteCreateErrorV6.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteCreateErrorV6.MainAddressIdentifiersTooMany
+        )
+
+    /**
+     * Returns the API error for a site update rejected by its main address content.
+     */
+    fun toMainAddressUpdateErrorInfo(error: AddressContentError, entityKey: String?): ErrorInfoV6<SiteUpdateErrorV6> =
+        toContentErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = SiteUpdateErrorV6.MainAddressRegionNotFound,
+            countryNotFound = SiteUpdateErrorV6.MainAddressCountryNotFound,
+            identifierNotFound = SiteUpdateErrorV6.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteUpdateErrorV6.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteUpdateErrorV6.MainAddressIdentifiersTooMany
+        )
+
+    private fun <E : ErrorCodeV6> toContentErrorInfo(
+        error: AddressContentError,
+        entityKey: String?,
+        regionNotFound: E,
+        countryNotFound: E,
+        identifierNotFound: E,
+        duplicateIdentifier: E,
+        identifiersTooMany: E
+    ): ErrorInfoV6<E> =
+        when (error) {
+            is AddressFieldError -> throw internalError(error)
+            is AddressMetadataError -> when (error) {
+                is AddressMetadataError.IdentifierTypeNotFound ->
+                    ErrorInfoV6(identifierNotFound, "Address Identifier Type '${error.type}' does not exist", entityKey)
+                is AddressMetadataError.PhysicalCountryNotFound ->
+                    ErrorInfoV6(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                is AddressMetadataError.AlternativeCountryNotFound ->
+                    ErrorInfoV6(countryNotFound, "Address country '${error.country}' does not exist", entityKey)
+                is AddressMetadataError.PhysicalRegionNotFound ->
+                    ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
+                is AddressMetadataError.AlternativeRegionNotFound ->
+                    ErrorInfoV6(regionNotFound, "Address administrative area level1 '${error.regionCode}' does not exist", entityKey)
+                is AddressMetadataError.ScriptCodeNotFound -> throw internalError(error)
+            }
+            is AddressConstraintError -> when (error) {
+                is AddressConstraintError.IdentifiersTooMany ->
+                    ErrorInfoV6(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
+                is AddressConstraintError.DuplicateIdentifier ->
+                    ErrorInfoV6(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
+            }
+            is AddressScriptVariantError -> throw internalError(error)
+        }
 }

@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.site
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteContentError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.springframework.stereotype.Service
 
@@ -43,17 +43,17 @@ class SiteHeaderParser(
     /**
      * Validates each header and reports either the validated header or every problem found in that entry.
      */
-    fun parse(headers: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteContentError>> {
+    fun parse(headers: List<SiteHeaderRaw>): List<ParseResult<SiteHeaderParsed, SiteContentError>> {
         val scriptCodes = fetchScriptCodes(headers)
         return headers.map { parseEntry(it, scriptCodes) }
     }
 
-    private fun fetchScriptCodes(headers: List<SiteHeaderRequest>): Map<String, ScriptCodeDb> {
+    private fun fetchScriptCodes(headers: List<SiteHeaderRaw>): Map<String, ScriptCodeDb> {
         val keys = headers.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet()
         return scriptCodeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
     }
 
-    private fun parseEntry(header: SiteHeaderRequest, scriptCodes: Map<String, ScriptCodeDb>): ParseResult<SiteHeaderParsed, SiteContentError> {
+    private fun parseEntry(header: SiteHeaderRaw, scriptCodes: Map<String, ScriptCodeDb>): ParseResult<SiteHeaderParsed, SiteContentError> {
         val errors = mutableListOf<SiteContentError>()
 
         val name = header.name ?: run { errors.add(SiteContentError.NameMissing); null }
@@ -74,7 +74,7 @@ class SiteHeaderParser(
     }
 
     private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
+        request: ConfidenceCriteriaRaw,
         errors: MutableList<SiteContentError>
     ): ConfidenceCriteriaParsed? {
         val sharedByOwner = request.sharedByOwner
@@ -93,7 +93,7 @@ class SiteHeaderParser(
     }
 
     private fun parseScriptVariants(
-        requests: List<SiteScriptVariant>,
+        requests: List<SiteScriptVariantRaw>,
         scriptCodes: Map<String, ScriptCodeDb>,
         errors: MutableList<SiteContentError>
     ): List<SiteScriptVariantParsed> {
@@ -110,7 +110,7 @@ class SiteHeaderParser(
 
     private fun parseScriptVariant(
         index: Int,
-        variant: SiteScriptVariant,
+        variant: SiteScriptVariantRaw,
         scriptCodes: Map<String, ScriptCodeDb>,
         errors: MutableList<SiteContentError>
     ): SiteScriptVariantParsed? {

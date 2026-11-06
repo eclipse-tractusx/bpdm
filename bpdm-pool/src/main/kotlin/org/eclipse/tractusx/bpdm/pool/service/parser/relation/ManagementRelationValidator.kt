@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationTimePeriod
@@ -64,7 +64,7 @@ class ManagementRelationValidator(
         managed: LegalEntityDb,
         relationsDuringPeriods: (Collection<RelationDb>) -> List<RelationDb>
     ): RelationUpsertError? =
-        relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsManagedBy, managed))
+        relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsManagedBy, managed))
             .takeIf { it.isNotEmpty() }
             ?.let { managements -> RelationUpsertError.MultipleManagers(managed.bpn, managements.map { it.endNode.bpn }) }
 
@@ -73,8 +73,8 @@ class ManagementRelationValidator(
         manager: LegalEntityDb,
         relationsDuringPeriods: (Collection<RelationDb>) -> List<RelationDb>
     ): RelationUpsertError? {
-        val managedRelations = relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsManagedBy, managed))
-        val managerRelations = relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsManagedBy, manager))
+        val managedRelations = relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsManagedBy, managed))
+        val managerRelations = relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsManagedBy, manager))
 
         return when {
             managedRelations.any { it.endNode.bpn == managed.bpn } -> RelationUpsertError.ManagedIsManager(managed.bpn)

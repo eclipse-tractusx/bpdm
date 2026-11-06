@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.AddressRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -71,7 +71,7 @@ class AddressRelationUpsertService(
         return upsertResult.value
     }
 
-    private fun write(relation: AddressRelationUpsertParsed): UpsertResult<AddressRelationDb> {
+    private fun write(relation: AddressRelationUpsertParsed): UpsertResultParsed<AddressRelationDb> {
         val validityPeriods = relation.validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }
         val existingRelation = relation.existingRelation
 
@@ -79,11 +79,11 @@ class AddressRelationUpsertService(
             val newRelation = create(relation, validityPeriods)
             handleHeadquarterSynchronization(newRelation)
 
-            return UpsertResult(newRelation, UpsertType.Created)
+            return UpsertResultParsed(newRelation, UpsertType.Created)
         }
 
         if (!validityPeriodsDiffer(existingRelation.validityPeriods, validityPeriods)) {
-            return UpsertResult(existingRelation, UpsertType.NoChange)
+            return UpsertResultParsed(existingRelation, UpsertType.NoChange)
         }
 
         existingRelation.validityPeriods.clear()
@@ -93,7 +93,7 @@ class AddressRelationUpsertService(
 
         handleHeadquarterSynchronization(existingRelation)
 
-        return UpsertResult(existingRelation, UpsertType.Updated)
+        return UpsertResultParsed(existingRelation, UpsertType.Updated)
     }
 
     private fun logOutcome(upsertType: UpsertType, relation: AddressRelationUpsertParsed) {
@@ -107,7 +107,7 @@ class AddressRelationUpsertService(
 
     private fun create(relation: AddressRelationUpsertParsed, validityPeriods: List<RelationValidityPeriodDb>): AddressRelationDb {
         val newRelation = AddressRelationDb(
-            type = AddressRelationTypeV7.IsReplacedBy,
+            type = AddressRelationType.IsReplacedBy,
             startAddress = relation.source,
             endAddress = relation.target,
             validityPeriods = validityPeriods.toMutableList(),
@@ -115,8 +115,8 @@ class AddressRelationUpsertService(
         )
         addressRelationRepository.saveAndFlush(newRelation)
 
-        changelogCreateService.record(ChangelogRecord(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
-        changelogCreateService.record(ChangelogRecord(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
 
         return newRelation
     }

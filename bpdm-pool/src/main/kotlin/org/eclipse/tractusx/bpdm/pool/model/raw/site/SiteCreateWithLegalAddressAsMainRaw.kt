@@ -19,10 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 
 data class SiteCreateWithLegalAddressAsMainRaw(
     val legalEntityBpn: String,
-    val header: SiteHeaderRequest,
+    val header: SiteHeaderRaw,
     val exclusiveLegalAddress: Boolean
 )

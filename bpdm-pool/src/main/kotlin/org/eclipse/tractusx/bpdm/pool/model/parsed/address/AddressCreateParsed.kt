@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 
 data class AddressCreateParsed(
     val legalEntity: LegalEntityDb,

@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
@@ -63,7 +63,7 @@ class SiteCreateService(
         sites.zip(stagedAddresses).forEach { (site, stagedAddress) -> site.mainAddress = stagedAddress.address }
 
         siteRepository.saveAll(sites)
-        changelogCreateService.record(sites.map { ChangelogRecord(it.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.SITE) })
+        changelogCreateService.record(sites.map { ChangelogEntryRaw(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
 
         if (sites.isNotEmpty())
             logger.info { "Created ${countForLog(sites.size, "site", "sites")}: ${sites.map { it.bpn }.joinIdentifiersForLog()}" }

@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskKind
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcome
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcomeRaw
 import org.eclipse.tractusx.bpdm.pool.service.gateway.GoldenRecordRelationTaskGateway
 import org.eclipse.tractusx.bpdm.pool.service.gateway.GoldenRecordTaskGateway
 import org.eclipse.tractusx.bpdm.pool.service.operation.task.GoldenRecordTaskTrackingService
@@ -63,18 +63,18 @@ class UnreportedTaskReportApplicationService(
         }
         val tasksWithOutcome = unreportedTasks.zip(outcomes)
 
-        val unknownTasks = tasksWithOutcome.filter { (_, outcome) -> outcome is TaskErrorReportOutcome.TaskUnknown }.map { (task, _) -> task }
+        val unknownTasks = tasksWithOutcome.filter { (_, outcome) -> outcome is TaskErrorReportOutcomeRaw.TaskUnknown }.map { (task, _) -> task }
         if (unknownTasks.isNotEmpty())
             logger.warn { "Orchestrator does not know ${countTasksForLog(unknownTasks.size, kind)}, dropping them: ${unknownTasks.toLogIdentifiers()}" }
 
-        val failedReports = tasksWithOutcome.mapNotNull { (task, outcome) -> (outcome as? TaskErrorReportOutcome.Failed)?.let { task to it.cause } }
+        val failedReports = tasksWithOutcome.mapNotNull { (task, outcome) -> (outcome as? TaskErrorReportOutcomeRaw.Failed)?.let { task to it.cause } }
         if (failedReports.isNotEmpty())
             logger.warn {
                 "Could not report ${countTasksForLog(failedReports.size, kind)} as errors, retrying in the next run: " +
                     "${failedReports.map { (task, _) -> task.taskId }.joinIdentifiersForLog()} (causes: ${failedReports.map { (_, cause) -> cause }.distinct().joinIdentifiersForLog()})"
             }
 
-        val reportedTasks = tasksWithOutcome.filter { (_, outcome) -> outcome is TaskErrorReportOutcome.Reported }.map { (task, _) -> task }
+        val reportedTasks = tasksWithOutcome.filter { (_, outcome) -> outcome is TaskErrorReportOutcomeRaw.Reported }.map { (task, _) -> task }
         trackingService.untrack(reportedTasks + unknownTasks)
     }
 

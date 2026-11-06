@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
@@ -63,7 +63,7 @@ class AlternativeHeadquarterRelationValidator(
         relationsDuringPeriods: (Collection<RelationDb>) -> List<RelationDb>
     ): RelationUpsertError? {
         val alternativeRelations = relationsDuringPeriods(
-            relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, alternative)
+            relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, alternative)
         ).filterNot { it.startNode.bpn == alternative.bpn && it.endNode.bpn == main.bpn }
 
         val alternativeViolation = alternativeRelations.firstNotNullOfOrNull { relation ->
@@ -79,7 +79,7 @@ class AlternativeHeadquarterRelationValidator(
         }
         if (alternativeViolation != null) return alternativeViolation
 
-        val mainRelations = relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, main))
+        val mainRelations = relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, main))
         val mainAsOtherAlternative = mainRelations.find { it.startNode.bpn == main.bpn && it.endNode.bpn != alternative.bpn }
         if (mainAsOtherAlternative != null)
             return RelationUpsertError.MainAlreadyAlternative(main.bpn, alternative.bpn, mainAsOtherAlternative.endNode.bpn)
@@ -92,7 +92,7 @@ class AlternativeHeadquarterRelationValidator(
         alternative: LegalEntityDb,
         relationsDuringPeriods: (Collection<RelationDb>) -> List<RelationDb>
     ): RelationUpsertError? =
-        relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationTypeV7.IsOwnedBy, alternative))
+        relationsDuringPeriods(relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsOwnedBy, alternative))
             .firstOrNull()
             ?.let { ownership ->
                 val isOwned = ownership.startNode.bpn == alternative.bpn

@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.AddressRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
@@ -62,7 +62,7 @@ class AddressRelationUpsertParser(
         if (source == null || target == null || inputErrors.isNotEmpty()) return ParseResult.Failure(inputErrors)
 
         val existingRelation = addressRelationRepository
-            .findAll(AddressRelationRepository.byRelation(startAddress = source, endAddress = target, type = AddressRelationTypeV7.IsReplacedBy))
+            .findAll(AddressRelationRepository.byRelation(startAddress = source, endAddress = target, type = AddressRelationType.IsReplacedBy))
             .singleOrNull()
         val ruleErrors = successionValidator.validate(source, target, relation.validityPeriods, existingRelation)
 

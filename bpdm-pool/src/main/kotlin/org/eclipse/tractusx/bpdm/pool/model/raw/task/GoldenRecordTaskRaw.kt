@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.model.raw.task
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteScriptVariantRaw
 import java.time.Instant
 
 data class GoldenRecordTaskRaw(
@@ -52,48 +52,48 @@ enum class UpsertIntent {
 
 data class LegalEntityUpsertRaw(
     val reference: BpnReferenceRaw,
-    val header: LegalEntityHeaderRaw,
+    val header: LegalEntityUpsertHeaderRaw,
     val legalAddress: AddressUpsertRaw,
     val intent: UpsertIntent
 )
 
-data class LegalEntityHeaderRaw(
+data class LegalEntityUpsertHeaderRaw(
     val legalName: String?,
     val legalShortName: String?,
     val legalForm: String?,
-    val identifiers: List<LegalEntityIdentifier>,
+    val identifiers: List<LegalEntityIdentifierRaw>,
     val states: List<BusinessStateRaw>,
-    val confidenceCriteria: ConfidenceCriteriaRequest,
+    val confidenceCriteria: ConfidenceCriteriaRaw,
     val isDataSpaceParticipant: Boolean?,
     val ownershipUltimate: Boolean?,
-    val scriptVariants: List<LegalEntityScriptVariant>
+    val scriptVariants: List<LegalEntityScriptVariantRaw>
 )
 
 sealed interface SiteUpsertRaw {
     val reference: BpnReferenceRaw
-    val header: SiteHeaderRaw
+    val header: SiteUpsertHeaderRaw
     val intent: UpsertIntent
 
     data class WithOwnMainAddress(
         override val reference: BpnReferenceRaw,
-        override val header: SiteHeaderRaw,
+        override val header: SiteUpsertHeaderRaw,
         override val intent: UpsertIntent,
         val mainAddress: AddressUpsertRaw
     ) : SiteUpsertRaw
 
     data class WithLegalAddressAsMain(
         override val reference: BpnReferenceRaw,
-        override val header: SiteHeaderRaw,
+        override val header: SiteUpsertHeaderRaw,
         override val intent: UpsertIntent,
-        val mainAddressScriptVariants: List<AddressScriptVariant>
+        val mainAddressScriptVariants: List<AddressScriptVariantRaw>
     ) : SiteUpsertRaw
 }
 
-data class SiteHeaderRaw(
+data class SiteUpsertHeaderRaw(
     val name: String?,
     val states: List<BusinessStateRaw>,
-    val confidenceCriteria: ConfidenceCriteriaRequest,
-    val scriptVariants: List<SiteScriptVariant>
+    val confidenceCriteria: ConfidenceCriteriaRaw,
+    val scriptVariants: List<SiteScriptVariantRaw>
 )
 
 data class BusinessStateRaw(
@@ -104,7 +104,7 @@ data class BusinessStateRaw(
 
 data class AddressUpsertRaw(
     val reference: BpnReferenceRaw,
-    val content: LogisticAddressRequest
+    val content: LogisticAddressRaw
 )
 
 data class AdditionalSiteRaw(

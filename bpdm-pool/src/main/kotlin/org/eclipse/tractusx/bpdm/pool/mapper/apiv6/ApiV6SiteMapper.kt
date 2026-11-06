@@ -34,7 +34,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteWithMainAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
@@ -52,8 +51,7 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV6SiteMapper(
     private val apiV6AddressMapper: ApiV6AddressMapper,
-    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
-    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
+    private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper
 ) {
 
     /**
@@ -176,7 +174,7 @@ class ApiV6SiteMapper(
                 ErrorInfoV6(SiteCreateErrorV6.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfoV6(SiteCreateErrorV6.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
-            is AddressContentError -> addressParseErrorMapperV6.toSiteCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV6AddressMapper.toMainAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress,
             is UnresolvableAddress,
             is SiteContentError -> throw internalError(error)
@@ -186,7 +184,7 @@ class ApiV6SiteMapper(
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentError -> addressParseErrorMapperV6.toSiteUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV6AddressMapper.toMainAddressUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress,
             is SiteContentError -> throw internalError(error)
         }

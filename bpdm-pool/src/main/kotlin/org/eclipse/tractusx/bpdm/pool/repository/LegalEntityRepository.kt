@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
 import org.springframework.data.jpa.domain.Specification
@@ -61,7 +61,7 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
                 "WHERE i.type.businessPartnerType = :businessPartnerType AND i.type.technicalKey = :typeKey AND upper(i.value) = upper(:idValue)"
     )
     fun findByIdentifierTypeKeyAndValueIgnoreCase(
-        businessPartnerType: IdentifierBusinessPartnerTypeV7,
+        businessPartnerType: IdentifierBusinessPartnerType,
         typeKey: String,
         idValue: String
     ): LegalEntityDb?

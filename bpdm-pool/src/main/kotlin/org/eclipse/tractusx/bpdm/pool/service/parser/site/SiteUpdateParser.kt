@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.combine
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteUpdateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator

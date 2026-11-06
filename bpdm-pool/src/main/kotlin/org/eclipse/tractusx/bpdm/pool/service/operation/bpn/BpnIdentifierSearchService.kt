@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.bpn
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.BpnIdentifierMatchDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.bpn.BpnIdentifierSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
@@ -43,10 +43,10 @@ class BpnIdentifierSearchService(
     @Transactional(readOnly = true)
     fun search(criteria: BpnIdentifierSearchParsed): Set<BpnIdentifierMatchDb> =
         when (criteria.identifierType.businessPartnerType) {
-            IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY ->
+            IdentifierBusinessPartnerType.LEGAL_ENTITY ->
                 legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(criteria.identifierType, criteria.identifierValues)
 
-            IdentifierBusinessPartnerTypeV7.ADDRESS ->
+            IdentifierBusinessPartnerType.ADDRESS ->
                 addressIdentifierRepository.findBpnsByIdentifierTypeAndValues(criteria.identifierType, criteria.identifierValues)
         }
 }

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.QualityLevelV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.QualityLevel
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.metadata.FieldQualityRuleSearchParsed
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
@@ -47,7 +47,7 @@ class FieldQualityRuleSearchService(
 
         return (defaultRulesByField.keys + countryRulesByField.keys)
             .mapNotNull { field -> countryRulesByField[field] ?: defaultRulesByField[field] }
-            .filter { it.qualityLevel != QualityLevelV7.FORBIDDEN }
+            .filter { it.qualityLevel != QualityLevel.FORBIDDEN }
             .sortedWith(compareBy({ it.schemaName }, { it.fieldPath }))
     }
 

@@ -19,22 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 
 /**
  * Keeps a legal entity's legal address on the end of the address succession that is valid today.
@@ -42,14 +40,12 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 @Service
 class HeadquarterSyncService(
     private val relationRepository: AddressRelationRepository,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val scriptVariantCoverageService: ScriptVariantCoverageService,
-    private val changelogCreateService: ChangelogCreateService
+    private val legalEntityUpdateService: LegalEntityUpdateService
 ) {
-    private val logger = KotlinLogging.logger { }
 
     /**
-     * Relocates the legal address of [legalEntityDb] to the last address of today's succession chain starting at it, if any.
+     * Relocates the legal address of [legalEntityDb] to the last address of today's succession chain starting at it, if
+     * any, and drops the legal entity's script variants the new legal address does not cover.
      */
     @Transactional
     fun synchronizeHeadquarter(legalEntityDb: LegalEntityDb){
@@ -63,7 +59,7 @@ class HeadquarterSyncService(
 
         do{
             val nextAddress = addressesToProcess.removeFirst()
-            val replacingRelations =  relationRepository.findByTypeAndStartAddress(AddressRelationTypeV7.IsReplacedBy, nextAddress)
+            val replacingRelations =  relationRepository.findByTypeAndStartAddress(AddressRelationType.IsReplacedBy, nextAddress)
 
             val replacingRelationValidities =  replacingRelations
                 .flatMap { relation -> relation.validityPeriods.map { RelationValidityPeriod(relation, it) } }
@@ -88,22 +84,22 @@ class HeadquarterSyncService(
         val newLegalAddress = relocatedAddresses.lastOrNull()
 
         if(newLegalAddress != null){
-            val currentLegalAddress = legalEntityDb.legalAddress
-            legalEntityDb.legalAddress = newLegalAddress
-            val updatedAt = DbTimestamp.now()
-            legalEntityDb.updatedAt = updatedAt
-            currentLegalAddress.updatedAt = updatedAt
-            newLegalAddress.updatedAt = updatedAt
-
-            legalEntityRepository.save(legalEntityDb)
-            logger.info { "Updated legal address of legal entity '${legalEntityDb.bpn}': From '${currentLegalAddress.bpn}' to '${newLegalAddress.bpn}'" }
-
-            scriptVariantCoverageService.pruneUncoveredScriptVariants(legalEntityDb)
-
-            changelogCreateService.record(ChangelogRecord(legalEntityDb.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-            changelogCreateService.record(ChangelogRecord(currentLegalAddress.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
-            changelogCreateService.record(ChangelogRecord(newLegalAddress.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+            val header = LegalEntityHeaderChangeParsed.NoOp.copy(
+                relocatedLegalAddress = FieldUpdateRaw.Set(newLegalAddress),
+                scriptVariants = coveredScriptVariants(legalEntityDb, newLegalAddress)
+            )
+            legalEntityUpdateService.update(listOf(LegalEntityChangeParsed(legalEntityDb, header, AddressContentChangeParsed.NoOp)))
         }
+    }
+
+    // Requests naming a legal entity in a script its legal address does not cover are rejected by the parsers; a
+    // relocation has no request to reject, so the uncovered script variants are dropped instead.
+    private fun coveredScriptVariants(legalEntity: LegalEntityDb, newLegalAddress: LogisticAddressDb): FieldUpdateRaw<List<LegalEntityScriptVariantParsed>> {
+        val coveredScriptCodes = newLegalAddress.scriptCodes().toSet()
+        val covered = legalEntity.scriptVariants.filter { it.scriptCode.technicalKey in coveredScriptCodes }
+        if (covered.size == legalEntity.scriptVariants.size) return FieldUpdateRaw.NoOp
+
+        return FieldUpdateRaw.Set(covered.map { LegalEntityScriptVariantParsed(it.scriptCode, it.legalName, it.shortName) })
     }
 
     private data class RelationValidityPeriod(

@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.application
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
@@ -1953,7 +1953,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
 
         val relation = org.eclipse.tractusx.bpdm.pool.entity.RelationDb(
-            type = LegalEntityRelationTypeV7.IsOwnedBy,
+            type = LegalEntityRelationType.IsOwnedBy,
             startNode = sourceEntity,
             endNode = targetEntity,
             validityPeriods = mutableListOf(currentValidityPeriod()),
@@ -1967,7 +1967,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
 
         val relation = org.eclipse.tractusx.bpdm.pool.entity.RelationDb(
-            type = LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor,
+            type = LegalEntityRelationType.IsAlternativeHeadquarterFor,
             startNode = sourceEntity,
             endNode = targetEntity,
             validityPeriods = mutableListOf(currentValidityPeriod()),
@@ -2293,7 +2293,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             RelationRepository.byRelation(
                 startNode = sourceAfter,
                 endNode = targetAfter,
-                type = LegalEntityRelationTypeV7.IsOwnedBy
+                type = LegalEntityRelationType.IsOwnedBy
             )
         ).singleOrNull()
 

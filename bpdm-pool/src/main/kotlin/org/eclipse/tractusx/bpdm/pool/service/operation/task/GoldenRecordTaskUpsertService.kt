@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.task
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed

@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed.error
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 
 /**
  * Reason a BPN-by-identifier search is rejected.
  */
 sealed interface BpnIdentifierSearchError {
     data class IdentifierValuesTooMany(val count: Int, val maxCount: Int) : BpnIdentifierSearchError
-    data class IdentifierTypeNotFound(val typeKey: String, val businessPartnerType: IdentifierBusinessPartnerTypeV7) : BpnIdentifierSearchError
+    data class IdentifierTypeNotFound(val typeKey: String, val businessPartnerType: IdentifierBusinessPartnerType) : BpnIdentifierSearchError
 }
