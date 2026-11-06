@@ -38,7 +38,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.relation.RelationVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreateResult
@@ -58,8 +57,7 @@ import org.springframework.stereotype.Component
 class ApiV7LegalEntityMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
     private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val apiV7MetadataMapper: ApiV7MetadataMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val apiV7MetadataMapper: ApiV7MetadataMapper
 ) {
 
     /**
@@ -163,7 +161,7 @@ class ApiV7LegalEntityMapper(
 
     private fun toCreateErrorInfo(error: LegalEntityCreateError, entityKey: String?): ErrorInfoV7<LegalEntityCreateErrorV7> =
         when (error) {
-            is AddressContentError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toLegalAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentError -> toContentErrorInfo(
                 error,
@@ -192,7 +190,7 @@ class ApiV7LegalEntityMapper(
                 "Legal entity '${error.bpnl}' cannot carry the ultimate-owner flag because it is an alternative headquarter",
                 entityKey
             )
-            is AddressContentError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toLegalAddressUpdateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentError -> toContentErrorInfo(
                 error,

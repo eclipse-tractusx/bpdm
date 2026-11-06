@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
@@ -31,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderChangeParsed
@@ -52,7 +52,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val siteEntityMapper: SiteEntityMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val siteRepository: SiteRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
@@ -109,13 +109,13 @@ class SiteUpdateService(
     private fun willChange(target: SiteDb, header: SiteHeaderChangeParsed): Boolean {
         header.name.ifSet { if (it != target.name) return true }
         header.confidenceCriteria.ifSet {
-            if (siteEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+            if (parsedToDbMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
         }
         header.states.ifSet {
-            if (stateKeys(siteEntityMapper.toStates(it, target)) != stateKeys(target.states)) return true
+            if (stateKeys(parsedToDbMapper.toSiteStates(it, target)) != stateKeys(target.states)) return true
         }
         header.scriptVariants.ifSet {
-            if (scriptVariantKeys(siteEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+            if (scriptVariantKeys(parsedToDbMapper.toSiteScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
 
         return false
@@ -131,8 +131,8 @@ class SiteUpdateService(
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         header.name.ifSet { target.name = it }
-        header.confidenceCriteria.ifSet { target.confidenceCriteria = siteEntityMapper.toConfidence(it, numberOfSharingMembers) }
-        header.states.ifSet { target.states.replace(siteEntityMapper.toStates(it, target)) }
-        header.scriptVariants.ifSet { target.scriptVariants.replace(siteEntityMapper.toScriptVariants(it)) }
+        header.confidenceCriteria.ifSet { target.confidenceCriteria = parsedToDbMapper.toConfidence(it, numberOfSharingMembers) }
+        header.states.ifSet { target.states.replace(parsedToDbMapper.toSiteStates(it, target)) }
+        header.scriptVariants.ifSet { target.scriptVariants.replace(parsedToDbMapper.toSiteScriptVariants(it)) }
     }
 }

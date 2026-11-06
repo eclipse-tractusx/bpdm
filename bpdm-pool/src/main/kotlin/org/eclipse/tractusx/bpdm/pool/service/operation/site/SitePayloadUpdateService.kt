@@ -19,11 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressChangeMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteHeaderChangeMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteUpdateParsed
 import org.springframework.stereotype.Service
@@ -36,8 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SitePayloadUpdateService(
     private val siteUpdateService: SiteUpdateService,
-    private val siteHeaderUpdateMapper: SiteHeaderChangeMapper,
-    private val addressUpdateMapper: AddressChangeMapper
+    private val parsedToDbMapper: ParsedToDbMapper
 ) {
 
     /**
@@ -48,8 +46,8 @@ class SitePayloadUpdateService(
         val updateRequests = parsed.map {
             SiteChangeParsed(
                 it.target,
-                siteHeaderUpdateMapper.toFullUpdate(it.content.header),
-                addressUpdateMapper.toFullUpdate(it.content.mainAddress, FieldUpdateRaw.NoOp)
+                parsedToDbMapper.toSiteHeaderFullChange(it.content.header),
+                parsedToDbMapper.toAddressFullChange(it.content.mainAddress, FieldUpdateRaw.NoOp)
             )
         }
 

@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIssueService
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressCreateService(
     private val bpnIssueService: BpnIssueService,
-    private val addressEntityMapper: AddressEntityMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
 
@@ -54,7 +54,7 @@ class AddressCreateService(
     fun stageCreate(parsed: List<AddressCreateParsed>): List<PendingAddressWriteParsed> {
         val bpns = bpnIssueService.issueAddressBpns(parsed.size)
         return parsed.zip(bpns) { entry, bpn ->
-            PendingAddressWriteParsed(addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
+            PendingAddressWriteParsed(parsedToDbMapper.toAddressEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
         }
     }
 

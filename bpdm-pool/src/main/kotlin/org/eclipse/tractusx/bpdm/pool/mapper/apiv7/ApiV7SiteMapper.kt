@@ -36,7 +36,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.site.SiteCreateResult
@@ -56,8 +55,7 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV7SiteMapper(
     private val apiV7AddressMapper: ApiV7AddressMapper,
-    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper
 ) {
 
     /**
@@ -158,7 +156,7 @@ class ApiV7SiteMapper(
                 ErrorInfoV7(SiteCreateErrorV7.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfoV7(SiteCreateErrorV7.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
-            is AddressContentError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toMainAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress ->
                 ErrorInfoV7(
                     SiteCreateErrorV7.ScriptVariantNotCoveredByMainAddress,
@@ -183,7 +181,7 @@ class ApiV7SiteMapper(
         when (error) {
             is UnresolvableSite ->
                 ErrorInfoV7(SiteUpdateErrorV7.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressContentError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV7AddressMapper.toMainAddressUpdateErrorInfo(error, entityKey)
             is SiteContentError.ScriptVariantNameMissing ->
                 ErrorInfoV7(SiteUpdateErrorV7.ScriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
             is SiteContentError.ScriptVariantDuplicateScriptCode ->

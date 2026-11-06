@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressChangeMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressPayloadUpdateService(
     private val addressStagedUpdateService: AddressUpdateService,
-    private val addressUpdateMapper: AddressChangeMapper
+    private val parsedToDbMapper: ParsedToDbMapper
 ) {
 
     /**
@@ -54,7 +54,7 @@ class AddressPayloadUpdateService(
     fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWriteParsed> =
         parsed.map { entry ->
             addressStagedUpdateService.stageUpdate(
-                AddressChangeParsed(entry.target, addressUpdateMapper.toFullUpdate(entry.address, entry.sites.toFieldUpdate()))
+                AddressChangeParsed(entry.target, parsedToDbMapper.toAddressFullChange(entry.address, entry.sites.toFieldUpdate()))
             )
         }
 

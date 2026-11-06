@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIssueService
 import org.springframework.stereotype.Service
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service
 @Service
 class SiteHeaderTransientCreateService(
     private val bpnIssueService: BpnIssueService,
-    private val siteEntityMapper: SiteEntityMapper
+    private val parsedToDbMapper: ParsedToDbMapper
 ) {
 
     /**
@@ -42,7 +42,7 @@ class SiteHeaderTransientCreateService(
     fun createTransiently(request: List<SiteHeaderCreateParsed>): List<SiteDb>{
         val bpns = bpnIssueService.issueSiteBpns(request.size)
         return request.zip(bpns) { entry, bpn ->
-            siteEntityMapper.toEntity(bpn, entry.legalEntity, entry.header, numberOfSharingMembers = 1)
+            parsedToDbMapper.toSite(bpn, entry.legalEntity, entry.header, numberOfSharingMembers = 1)
         }
     }
 }

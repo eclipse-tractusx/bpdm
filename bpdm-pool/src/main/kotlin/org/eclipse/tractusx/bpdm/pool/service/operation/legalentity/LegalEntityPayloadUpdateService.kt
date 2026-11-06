@@ -19,11 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressChangeMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityHeaderChangeMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityUpdateParsed
 import org.springframework.stereotype.Service
@@ -43,8 +42,7 @@ import java.time.temporal.ChronoUnit
 class LegalEntityPayloadUpdateService(
     private val legalEntityUpdateService: LegalEntityUpdateService,
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
-    private val legalEntityHeaderUpdateMapper: LegalEntityHeaderChangeMapper,
-    private val addressUpdateMapper: AddressChangeMapper
+    private val parsedToDbMapper: ParsedToDbMapper
 ) {
 
     /**
@@ -65,8 +63,8 @@ class LegalEntityPayloadUpdateService(
         val updateRequests = parsed.map {
             LegalEntityChangeParsed(
                 it.target,
-                legalEntityHeaderUpdateMapper.toFullUpdate(it.content.header, currentness),
-                addressUpdateMapper.toFullUpdate(it.content.legalAddress, FieldUpdateRaw.NoOp)
+                parsedToDbMapper.toLegalEntityHeaderFullChange(it.content.header, currentness),
+                parsedToDbMapper.toAddressFullChange(it.content.legalAddress, FieldUpdateRaw.NoOp)
             )
         }
 

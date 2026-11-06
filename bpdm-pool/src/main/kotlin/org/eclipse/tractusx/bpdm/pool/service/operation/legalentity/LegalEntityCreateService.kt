@@ -19,13 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderParsed
@@ -47,7 +47,7 @@ import java.time.temporal.ChronoUnit
 @Service
 class LegalEntityCreateService(
     private val addressCreateService: AddressCreateService,
-    private val legalEntityEntityMapper: LegalEntityEntityMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val bpnIssueService: BpnIssueService,
     private val changelogCreateService: ChangelogCreateService,
     private val legalEntityRepository: LegalEntityRepository
@@ -87,7 +87,7 @@ class LegalEntityCreateService(
         // A just-issued BPNL cannot be referenced by any ownership relation yet — relations are written through their own
         // path — so a new entity has no ultimate owner above it and keeps the mapper's null. No recalculation needed.
         return headers.zip(bpns) { header, bpn ->
-            legalEntityEntityMapper.toEntity(bpn, header, currentness, numberOfSharingMembers = 0)
+            parsedToDbMapper.toLegalEntity(bpn, header, currentness, numberOfSharingMembers = 0)
         }
     }
 }

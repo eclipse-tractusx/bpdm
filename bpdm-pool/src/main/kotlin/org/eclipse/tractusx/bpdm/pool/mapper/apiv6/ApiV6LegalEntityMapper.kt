@@ -39,7 +39,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.relation.RelationVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.AddressParseErrorMapperV6
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.legalentity.LegalEntityCreateResult
@@ -58,8 +57,7 @@ import org.springframework.stereotype.Component
 class ApiV6LegalEntityMapper(
     private val apiV6AddressMapper: ApiV6AddressMapper,
     private val apiV6BusinessPartnerMapper: ApiV6BusinessPartnerMapper,
-    private val apiV6MetadataMapper: ApiV6MetadataMapper,
-    private val addressParseErrorMapperV6: AddressParseErrorMapperV6
+    private val apiV6MetadataMapper: ApiV6MetadataMapper
 ) {
 
     /**
@@ -163,7 +161,7 @@ class ApiV6LegalEntityMapper(
 
     private fun toCreateErrorInfo(error: LegalEntityCreateError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =
         when (error) {
-            is AddressContentError -> addressParseErrorMapperV6.toLegalEntityCreateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV6AddressMapper.toLegalAddressCreateErrorInfo(error, entityKey)
             is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentError -> toContentErrorInfo(
                 error,
@@ -183,7 +181,7 @@ class ApiV6LegalEntityMapper(
                     "Legal entity '${error.bpn}' can't be updated as it doesn't exist",
                     entityKey
                 )
-            is AddressContentError -> addressParseErrorMapperV6.toLegalEntityUpdateErrorInfo(error, entityKey)
+            is AddressContentError -> apiV6AddressMapper.toLegalAddressUpdateErrorInfo(error, entityKey)
             // A v6 write never sets the ownership flag, so the uniqueness rule it guards cannot be broken from v6.
             is MultipleUltimateOwnersInHierarchy -> throw internalError(error)
             // A v6 write never sets the ownership flag on an alternative headquarter, so this cannot be broken from v6.

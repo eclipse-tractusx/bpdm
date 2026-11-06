@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed
@@ -35,7 +36,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
@@ -53,7 +53,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val legalEntityEntityMapper: LegalEntityEntityMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val repository: LegalEntityRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
@@ -117,19 +117,19 @@ class LegalEntityUpdateService(
         header.legalShortName.ifSet { if (it != target.legalName.shortName) return true }
         header.legalForm.ifSet { if (it?.technicalKey != target.legalForm?.technicalKey) return true }
         header.confidenceCriteria.ifSet {
-            if (legalEntityEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
+            if (parsedToDbMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
         }
         header.isDataSpaceParticipant.ifSet { if (it != target.isDataSpaceParticipant) return true }
         header.ownershipUltimate.ifSet { if (it != target.ownershipUltimate) return true }
         header.ultimateOwnerBpnl.ifSet { if (it != target.ultimateOwnerBpnl) return true }
         header.identifiers.ifSet {
-            if (identifierKeys(legalEntityEntityMapper.toIdentifiers(it, target)) != identifierKeys(target.identifiers)) return true
+            if (identifierKeys(parsedToDbMapper.toLegalEntityIdentifiers(it, target)) != identifierKeys(target.identifiers)) return true
         }
         header.states.ifSet {
-            if (stateKeys(legalEntityEntityMapper.toStates(it, target)) != stateKeys(target.states)) return true
+            if (stateKeys(parsedToDbMapper.toLegalEntityStates(it, target)) != stateKeys(target.states)) return true
         }
         header.scriptVariants.ifSet {
-            if (scriptVariantKeys(legalEntityEntityMapper.toScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
+            if (scriptVariantKeys(parsedToDbMapper.toLegalEntityScriptVariants(it)) != scriptVariantKeys(target.scriptVariants)) return true
         }
 
         return false
@@ -149,14 +149,14 @@ class LegalEntityUpdateService(
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         applyLegalName(target, header)
         header.legalForm.ifSet { target.legalForm = it }
-        header.confidenceCriteria.ifSet { target.confidenceCriteria = legalEntityEntityMapper.toConfidence(it, numberOfSharingMembers) }
+        header.confidenceCriteria.ifSet { target.confidenceCriteria = parsedToDbMapper.toConfidence(it, numberOfSharingMembers) }
         header.isDataSpaceParticipant.ifSet { target.isDataSpaceParticipant = it }
         header.ownershipUltimate.ifSet { target.ownershipUltimate = it }
         header.ultimateOwnerBpnl.ifSet { target.ultimateOwnerBpnl = it }
         header.currentness.ifSet { target.currentness = it }
-        header.identifiers.ifSet { target.identifiers.replace(legalEntityEntityMapper.toIdentifiers(it, target)) }
-        header.states.ifSet { target.states.replace(legalEntityEntityMapper.toStates(it, target)) }
-        header.scriptVariants.ifSet { target.scriptVariants.replace(legalEntityEntityMapper.toScriptVariants(it)) }
+        header.identifiers.ifSet { target.identifiers.replace(parsedToDbMapper.toLegalEntityIdentifiers(it, target)) }
+        header.states.ifSet { target.states.replace(parsedToDbMapper.toLegalEntityStates(it, target)) }
+        header.scriptVariants.ifSet { target.scriptVariants.replace(parsedToDbMapper.toLegalEntityScriptVariants(it)) }
     }
 
     // Legal name and short name are separate update fields but one embedded entity value, so setting either rebuilds the

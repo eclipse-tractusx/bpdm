@@ -19,13 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
+import org.eclipse.tractusx.bpdm.pool.mapper.ParsedToDbMapper
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressChangeMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderCreateParsed
@@ -52,7 +52,7 @@ import org.springframework.transaction.annotation.Transactional
 class SiteCreateWithReferencedAddressAsMainService(
     private val addressUpdateService: AddressUpdateService,
     private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
-    private val addressUpdateMapper: AddressChangeMapper,
+    private val parsedToDbMapper: ParsedToDbMapper,
     private val siteRepository: SiteRepository,
     private val changelogCreateService: ChangelogCreateService
 ) {
@@ -98,7 +98,7 @@ class SiteCreateWithReferencedAddressAsMainService(
         val statedContent = ofOneAddress.mapNotNull { (entry, _) -> entry.mainAddressContent }.singleOrNull()
 
         return statedContent
-            ?.let { addressUpdateMapper.toFullUpdate(it, sites) }
+            ?.let { parsedToDbMapper.toAddressFullChange(it, sites) }
             ?: AddressContentChangeParsed.NoOp.copy(sites = sites)
     }
 }
