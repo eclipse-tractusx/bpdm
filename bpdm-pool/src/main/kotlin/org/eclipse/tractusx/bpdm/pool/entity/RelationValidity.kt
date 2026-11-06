@@ -26,4 +26,10 @@ import java.time.LocalDate
  * period never counts. Shared by everything that walks the ownership graph, so they all agree on which edges exist.
  */
 fun RelationDb.isValidOn(date: LocalDate): Boolean =
-    validityPeriods.any { period -> date >= period.validFrom && (period.validTo == null || date <= period.validTo) }
+    validityPeriods.any { it.covers(date) }
+
+/**
+ * Whether this period covers [date], from its start up to and including its end.
+ */
+fun RelationValidityPeriodDb.covers(date: LocalDate): Boolean =
+    date >= validFrom && (validTo == null || date <= validTo)

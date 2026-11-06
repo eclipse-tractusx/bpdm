@@ -56,8 +56,8 @@ enum class RelationType {
 }
 
 data class RelationValidityPeriod(
-    @Schema(description = RelationValidityPeriodDescription.validFrom)
+    @get:Schema(description = RelationValidityPeriodDescription.validFrom)
     val validFrom: LocalDate,
-    @Schema(description = RelationValidityPeriodDescription.validTo)
+    @get:Schema(description = RelationValidityPeriodDescription.validTo)
     val validTo: LocalDate?
 )

@@ -22,7 +22,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.relation.SharableRelationType
  *
  * Guarantees:
  * - [sourceBpn] and [targetBpn] differ.
- * - Every validity period ending at a `validTo` starts before it.
+ * - Every validity period ending at a `validTo` starts on or before it.
  */
 data class RelationOutputParsed(
     val relation: RelationDb,

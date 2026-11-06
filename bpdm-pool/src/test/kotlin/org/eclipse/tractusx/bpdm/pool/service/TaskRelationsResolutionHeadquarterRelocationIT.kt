@@ -155,6 +155,34 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
 
     /**
      * GIVEN a legal entity and an additional address
+     * WHEN additional address replaces legal address for a period ending today
+     * THEN user sees the additional address as new legal address, as the relocation still holds on its end date
+     */
+    @Test
+    fun `legal address replaced until today changes headquarter`(){
+        //GIVEN
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
+        val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
+        val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
+
+        //WHEN
+        val today = LocalDate.now()
+        val activeUntilToday = listOf(RelationValidityPeriod(today.minusDays(1), today))
+        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeUntilToday, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        val results = resolveRelationTasks(listOf(taskToResolve))
+
+        //THEN
+        assertThat(results.single().errors).isEmpty()
+
+        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
+        assertThat(actualLegalEntity.legalAddress.bpna).isEqualTo(createdAddAddress.address.bpna)
+    }
+
+    /**
+     * GIVEN a legal entity and an additional address
      * WHEN additional address replaces legal address effective some point in the future
      * THEN user sees legal address of legal entity did not change
      */

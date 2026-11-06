@@ -11,6 +11,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Breaking
 
 - BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
+- BPDM Pool and Gate: A relation's `validTo` is now inclusive: a relation still holds on its end date, so two validity periods meeting on one date overlap and are rejected, and a period following another starts the day after the other ends. The Gate accepts a validity period that starts and ends on the same date [#1892](https://github.com/eclipse-tractusx/bpdm/issues/1892)
 
 ### Added
 

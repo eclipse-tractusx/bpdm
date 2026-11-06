@@ -257,7 +257,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(1),
-                    validTo = futureDate.plusYears(2)
+                    validTo = futureDate.plusYears(2).minusDays(1)
                 ),
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(2),
@@ -265,7 +265,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                 ),
                 RelationValidityPeriod(
                     validFrom = futureDate,
-                    validTo = futureDate.plusYears(1)
+                    validTo = futureDate.plusYears(1).minusDays(1)
                 ),
             ),
             getAnyReasonCode()
@@ -291,7 +291,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2026, 1),
-                    validTo = LocalDate.ofYearDay(2027, 1)
+                    validTo = LocalDate.of(2026, 12, 31)
                 ),
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2027, 1),
@@ -299,7 +299,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                 ),
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2025, 1),
-                    validTo = LocalDate.ofYearDay(2026, 1)
+                    validTo = LocalDate.of(2025, 12, 31)
                 ),
             ),
             getAnyReasonCode()
@@ -639,6 +639,66 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                 RelationValidityPeriod(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
+                )
+            ),
+            getAnyReasonCode()
+        )
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
+    @ParameterizedTest
+    @EnumSource(LegalEntityRelationTypeV7::class)
+    fun `try create legal entity relation with validity periods meeting on one date`(relationType: LegalEntityRelationTypeV7){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = futureDate.plusYears(1),
+                    validTo = futureDate.plusYears(2)
+                )
+            ),
+            getAnyReasonCode()
+        )
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
+    @ParameterizedTest
+    @EnumSource(AddressRelationTypeV7::class)
+    fun `try create address relation with validity periods meeting on one date`(relationType: AddressRelationTypeV7){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalEntity.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo = LocalDate.ofYearDay(2026, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2026, 1),
+                    validTo = LocalDate.ofYearDay(2027, 1)
                 )
             ),
             getAnyReasonCode()

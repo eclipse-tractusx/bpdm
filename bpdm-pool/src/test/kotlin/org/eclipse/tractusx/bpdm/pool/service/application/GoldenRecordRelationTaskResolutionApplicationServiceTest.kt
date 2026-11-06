@@ -261,7 +261,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
                 validFrom = nowDate.plusYears(1),
-                validTo = nowDate.plusYears(2)
+                validTo = nowDate.plusYears(2).minusDays(1)
             ))
         )
         val resultAB = upsertRelationsGoldenRecordIntoPool("TASK_AB", relationAB)
@@ -531,6 +531,70 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SINGLE_SUCCESSOR", violatingSingleSuccessor).single()
 
         assertThat(result.errors.size).isEqualTo(1)
+    }
+
+    /**
+     * GIVEN legal entity A is replaced by legal entity B until a given date
+     * WHEN trying to create relation 'legal entity A is replaced by legal entity C' starting on that date
+     * THEN return multiple successors error
+     */
+    @Test
+    fun `create IsReplacedBy relation - violate single successor on the end date of the other succession`() {
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
+        val successionEnd = LocalDate.of(2025, 12, 31)
+
+        val aReplacedByB = buildRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedB.legalEntity.header.bpnl,
+            validityPeriods = listOf(RelationValidityPeriod(validFrom = LocalDate.of(2025, 1, 1), validTo = successionEnd))
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID", aReplacedByB)
+
+        val aReplacedByC = buildRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
+            validityPeriods = listOf(RelationValidityPeriod(validFrom = successionEnd, validTo = null))
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SINGLE_SUCCESSOR", aReplacedByC).single()
+
+        assertThat(result.errors.size).isEqualTo(1)
+    }
+
+    /**
+     * GIVEN legal entity A is replaced by legal entity B until a given date
+     * WHEN creating relation 'legal entity A is replaced by legal entity C' starting on the day after
+     * THEN the next succession is accepted
+     */
+    @Test
+    fun `create IsReplacedBy relation - allow next successor from the day after the other succession ends`() {
+        val savedA = createLegalEntity("$testName A")
+        val savedB = createLegalEntity("$testName B")
+        val savedC = createLegalEntity("$testName C")
+        val successionEnd = LocalDate.of(2025, 12, 31)
+
+        val aReplacedByB = buildRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedB.legalEntity.header.bpnl,
+            validityPeriods = listOf(RelationValidityPeriod(validFrom = LocalDate.of(2025, 1, 1), validTo = successionEnd))
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID", aReplacedByB)
+
+        val aReplacedByC = buildRelationRequest(
+            relationType = RelationType.IsReplacedBy,
+            businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
+            validityPeriods = listOf(RelationValidityPeriod(validFrom = successionEnd.plusDays(1), validTo = null))
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_NEXT_SUCCESSOR", aReplacedByC).single()
+
+        assertThat(result.errors).isEmpty()
     }
 
     /**
