@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.changelog
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 
 data class ChangelogEntryRaw(
     val bpn: String,
-    val changelogType: ChangelogTypeV7,
+    val changelogType: ChangelogType,
     val businessPartnerType: BusinessPartnerType
 )

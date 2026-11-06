@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.LegalEntityRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
@@ -73,20 +73,20 @@ class LegalEntityRelationUpsertParser(
         val validityPeriods = relation.validityPeriods
 
         val ruleErrors = when (type) {
-            LegalEntityRelationTypeV7.IsOwnedBy -> ownershipValidator.validate(source, target, validityPeriods, existingRelation)
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> alternativeHeadquarterValidator.validate(source, target, validityPeriods, existingRelation)
-            LegalEntityRelationTypeV7.IsManagedBy -> managementValidator.validate(source, target, validityPeriods, existingRelation)
-            LegalEntityRelationTypeV7.IsReplacedBy -> successionValidator.validate(source, target, validityPeriods, existingRelation)
+            LegalEntityRelationType.IsOwnedBy -> ownershipValidator.validate(source, target, validityPeriods, existingRelation)
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterValidator.validate(source, target, validityPeriods, existingRelation)
+            LegalEntityRelationType.IsManagedBy -> managementValidator.validate(source, target, validityPeriods, existingRelation)
+            LegalEntityRelationType.IsReplacedBy -> successionValidator.validate(source, target, validityPeriods, existingRelation)
         }
 
         return parseResultOf(LegalEntityRelationUpsertParsed(type, source, target, validityPeriods, reasonCode, existingRelation), ruleErrors)
     }
 
-    private fun toLegalEntityRelationType(type: RelationType): LegalEntityRelationTypeV7 =
+    private fun toLegalEntityRelationType(type: RelationType): LegalEntityRelationType =
         when (type) {
-            RelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor
-            RelationType.IsManagedBy -> LegalEntityRelationTypeV7.IsManagedBy
-            RelationType.IsOwnedBy -> LegalEntityRelationTypeV7.IsOwnedBy
-            RelationType.IsReplacedBy -> LegalEntityRelationTypeV7.IsReplacedBy
+            RelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationType.IsAlternativeHeadquarterFor
+            RelationType.IsManagedBy -> LegalEntityRelationType.IsManagedBy
+            RelationType.IsOwnedBy -> LegalEntityRelationType.IsOwnedBy
+            RelationType.IsReplacedBy -> LegalEntityRelationType.IsReplacedBy
         }
 }

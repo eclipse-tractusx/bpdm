@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderMetadataParsed
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
@@ -36,7 +37,6 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 
 /**
  * Validates the fields of a legal-entity header against the metadata they reference — legal forms, identifier types and
@@ -65,7 +65,7 @@ class LegalEntityHeaderParser(
 
         return LegalEntityHeaderMetadataParsed(
             legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys).associateBy { it.technicalKey },
-            idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY, idTypeKeys)
+            idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
                 .associateBy { it.technicalKey },
             scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(scriptCodeKeys).associateBy { it.technicalKey }
         )

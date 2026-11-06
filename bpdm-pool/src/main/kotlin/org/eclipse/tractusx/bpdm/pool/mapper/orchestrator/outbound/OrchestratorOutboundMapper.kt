@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressScriptVariantRecord
@@ -231,22 +231,22 @@ class OrchestratorOutboundMapper {
             confidenceLevel = record.confidenceLevel
         )
 
-    private fun toRelationType(type: LegalEntityRelationTypeV7): LegalEntityGoldenRecordRelationType =
+    private fun toRelationType(type: LegalEntityRelationType): LegalEntityGoldenRecordRelationType =
         when (type) {
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationTypeV7.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
-            LegalEntityRelationTypeV7.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
-            LegalEntityRelationTypeV7.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
         }
 
-    private fun toRelationType(type: SiteRelationTypeV7): SiteGoldenRecordRelationType =
+    private fun toRelationType(type: SiteRelationType): SiteGoldenRecordRelationType =
         when (type) {
-            SiteRelationTypeV7.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+            SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
         }
 
-    private fun toRelationType(type: AddressRelationTypeV7): AddressGoldenRecordRelationType =
+    private fun toRelationType(type: AddressRelationType): AddressGoldenRecordRelationType =
         when (type) {
-            AddressRelationTypeV7.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+            AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
         }
 
     private fun toBpnReference(bpn: String) = BpnReference(bpn, null, BpnReferenceType.Bpn)

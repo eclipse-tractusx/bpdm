@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierTypeCategoryV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierTypeCategory
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
@@ -117,7 +120,7 @@ class ApiV7InboundMapper {
      * Returns the raw identifier type search criteria a client sent.
      */
     fun toIdentifierTypeSearchRaw(businessPartnerType: IdentifierBusinessPartnerTypeV7, country: String?): IdentifierTypeSearchRaw =
-        IdentifierTypeSearchRaw(businessPartnerType = businessPartnerType, country = country)
+        IdentifierTypeSearchRaw(businessPartnerType = toModel(businessPartnerType), country = country)
 
     /**
      * Returns the raw field quality rule search for [country].
@@ -131,13 +134,13 @@ class ApiV7InboundMapper {
     fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV7Dto): IdentifierTypeCreateRaw =
         IdentifierTypeCreateRaw(
             technicalKey = identifierType.technicalKey,
-            businessPartnerType = identifierType.businessPartnerType,
+            businessPartnerType = toModel(identifierType.businessPartnerType),
             name = identifierType.name,
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
             transliteratedAbbreviation = identifierType.transliteratedAbbreviation,
             format = identifierType.format,
-            categories = identifierType.categories,
+            categories = identifierType.categories.map { toModel(it) }.toSet(),
             details = identifierType.details.map { IdentifierTypeDetailRaw(it.country, it.mandatory) }
         )
 
@@ -162,7 +165,7 @@ class ApiV7InboundMapper {
      */
     fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV7Request): BpnIdentifierSearchRaw =
         BpnIdentifierSearchRaw(
-            businessPartnerType = request.businessPartnerType,
+            businessPartnerType = toModel(request.businessPartnerType),
             identifierTypeKey = request.idType,
             identifierValues = request.idValues
         )
@@ -477,6 +480,21 @@ class ApiV7InboundMapper {
             nameSuffix = street.nameSuffix,
             additionalNameSuffix = street.additionalNameSuffix
         )
+
+    private fun toModel(businessPartnerType: IdentifierBusinessPartnerTypeV7): IdentifierBusinessPartnerType =
+        when (businessPartnerType) {
+            IdentifierBusinessPartnerTypeV7.LEGAL_ENTITY -> IdentifierBusinessPartnerType.LEGAL_ENTITY
+            IdentifierBusinessPartnerTypeV7.ADDRESS -> IdentifierBusinessPartnerType.ADDRESS
+        }
+
+    private fun toModel(category: IdentifierTypeCategoryV7): IdentifierTypeCategory =
+        when (category) {
+            IdentifierTypeCategoryV7.VAT -> IdentifierTypeCategory.VAT
+            IdentifierTypeCategoryV7.TIN -> IdentifierTypeCategory.TIN
+            IdentifierTypeCategoryV7.NBR -> IdentifierTypeCategory.NBR
+            IdentifierTypeCategoryV7.IBR -> IdentifierTypeCategory.IBR
+            IdentifierTypeCategoryV7.OTH -> IdentifierTypeCategory.OTH
+        }
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
 

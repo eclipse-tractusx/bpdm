@@ -18,7 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.site
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.address.AddressScriptVariantRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
@@ -41,7 +41,7 @@ data class SiteRecord(
 )
 
 data class SiteRelationRecord(
-    val type: SiteRelationTypeV7,
+    val type: SiteRelationType,
     val sourceBpns: String,
     val targetBpns: String,
     val validityPeriods: List<RelationValidityPeriodRecord>,

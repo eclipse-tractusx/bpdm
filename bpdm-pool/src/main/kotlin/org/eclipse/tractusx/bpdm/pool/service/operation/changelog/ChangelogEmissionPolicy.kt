@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.changelog
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 
 /**
@@ -55,7 +55,7 @@ object ChangelogEmissionPolicy {
     }
 
     private fun winnerIn(recordsOfPartner: List<IndexedValue<ChangelogEntryRaw>>): IndexedValue<ChangelogEntryRaw> =
-        recordsOfPartner.firstOrNull { (_, record) -> record.changelogType == ChangelogTypeV7.CREATE }
+        recordsOfPartner.firstOrNull { (_, record) -> record.changelogType == ChangelogType.CREATE }
             ?: recordsOfPartner.first()
 
     private fun rank(businessPartnerType: BusinessPartnerType): Int =

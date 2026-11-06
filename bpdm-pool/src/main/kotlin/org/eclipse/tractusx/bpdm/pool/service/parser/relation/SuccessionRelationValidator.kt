@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntityWithExplicitTimestamps
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -64,7 +64,7 @@ class SuccessionRelationValidator(
             predecessor = predecessor,
             successor = successor,
             bpnOf = { it.bpn },
-            successionsOf = { relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsReplacedBy, it) },
+            successionsOf = { relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsReplacedBy, it) },
             successorOf = { it.endNode },
             validityPeriodsOf = { it.validityPeriods },
             validityPeriods = validityPeriods,
@@ -90,7 +90,7 @@ class SuccessionRelationValidator(
             predecessor = predecessor,
             successor = successor,
             bpnOf = { it.bpn },
-            successionsOf = { siteRelationRepository.findByTypeAndStartSite(SiteRelationTypeV7.IsReplacedBy, it) },
+            successionsOf = { siteRelationRepository.findByTypeAndStartSite(SiteRelationType.IsReplacedBy, it) },
             successorOf = { it.endSite },
             validityPeriodsOf = { it.validityPeriods },
             validityPeriods = validityPeriods,
@@ -119,7 +119,7 @@ class SuccessionRelationValidator(
             predecessor = predecessor,
             successor = successor,
             bpnOf = { it.bpn },
-            successionsOf = { addressRelationRepository.findByTypeAndStartAddress(AddressRelationTypeV7.IsReplacedBy, it) },
+            successionsOf = { addressRelationRepository.findByTypeAndStartAddress(AddressRelationType.IsReplacedBy, it) },
             successorOf = { it.endAddress },
             validityPeriodsOf = { it.validityPeriods },
             validityPeriods = validityPeriods,

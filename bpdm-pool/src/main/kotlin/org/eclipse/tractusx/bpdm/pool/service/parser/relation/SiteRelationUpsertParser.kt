@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.SiteRelationUpsertParsed
@@ -62,7 +62,7 @@ class SiteRelationUpsertParser(
         if (source == null || target == null || inputErrors.isNotEmpty()) return ParseResult.Failure(inputErrors)
 
         val existingRelation = siteRelationRepository
-            .findAll(SiteRelationRepository.byRelation(startSite = source, endSite = target, type = SiteRelationTypeV7.IsReplacedBy))
+            .findAll(SiteRelationRepository.byRelation(startSite = source, endSite = target, type = SiteRelationType.IsReplacedBy))
             .singleOrNull()
         val ruleErrors = successionValidator.validate(source, target, relation.validityPeriods, existingRelation)
 

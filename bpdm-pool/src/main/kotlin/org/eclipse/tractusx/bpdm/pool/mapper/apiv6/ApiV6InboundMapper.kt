@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativePostalAddressRaw
@@ -47,7 +48,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntitySearch
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierBusinessPartnerTypeV6
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.IdentifierTypeV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.metadata.LegalFormV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.participant.CxMembershipSearchV6Request
@@ -106,7 +106,7 @@ class ApiV6InboundMapper {
      */
     fun toIdentifierTypeSearchRaw(businessPartnerType: IdentifierBusinessPartnerTypeV6, country: String?): IdentifierTypeSearchRaw =
         IdentifierTypeSearchRaw(
-            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(businessPartnerType.name),
+            businessPartnerType = IdentifierBusinessPartnerType.valueOf(businessPartnerType.name),
             country = country
         )
 
@@ -122,7 +122,7 @@ class ApiV6InboundMapper {
     fun toIdentifierTypeCreateRaw(identifierType: IdentifierTypeV6Dto): IdentifierTypeCreateRaw =
         IdentifierTypeCreateRaw(
             technicalKey = identifierType.technicalKey,
-            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(identifierType.businessPartnerType.name),
+            businessPartnerType = IdentifierBusinessPartnerType.valueOf(identifierType.businessPartnerType.name),
             name = identifierType.name,
             abbreviation = identifierType.abbreviation,
             transliteratedName = identifierType.transliteratedName,
@@ -153,7 +153,7 @@ class ApiV6InboundMapper {
      */
     fun toBpnIdentifierSearchRaw(request: IdentifiersSearchV6Request): BpnIdentifierSearchRaw =
         BpnIdentifierSearchRaw(
-            businessPartnerType = IdentifierBusinessPartnerTypeV7.valueOf(request.businessPartnerType.name),
+            businessPartnerType = IdentifierBusinessPartnerType.valueOf(request.businessPartnerType.name),
             identifierTypeKey = request.idType,
             identifierValues = request.idValues
         )

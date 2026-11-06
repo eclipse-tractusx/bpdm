@@ -18,13 +18,13 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.model.output.changelog
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import java.time.Instant
 
 data class ChangelogEntryRecord(
     val bpn: String,
     val businessPartnerType: BusinessPartnerType,
     val timestamp: Instant,
-    val changelogType: ChangelogTypeV7
+    val changelogType: ChangelogType
 )

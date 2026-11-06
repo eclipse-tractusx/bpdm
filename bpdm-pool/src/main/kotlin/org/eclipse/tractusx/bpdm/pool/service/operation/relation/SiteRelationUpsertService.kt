@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.SiteRelationType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
@@ -94,7 +94,7 @@ class SiteRelationUpsertService(
 
     private fun create(relation: SiteRelationUpsertParsed, validityPeriods: List<RelationValidityPeriodDb>): SiteRelationDb {
         val newRelation = SiteRelationDb(
-            type = SiteRelationTypeV7.IsReplacedBy,
+            type = SiteRelationType.IsReplacedBy,
             startSite = relation.source,
             endSite = relation.target,
             validityPeriods = validityPeriods.toMutableList(),
@@ -102,8 +102,8 @@ class SiteRelationUpsertService(
         )
         siteRelationRepository.save(newRelation)
 
-        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
-        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE))
+        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE))
+        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE))
 
         return newRelation
     }

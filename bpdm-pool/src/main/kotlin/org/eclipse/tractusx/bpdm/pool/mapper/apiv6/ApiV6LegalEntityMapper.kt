@@ -18,6 +18,7 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv6
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -37,7 +38,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.legalentity.LegalEntityWithLegalAddressVerboseV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.relation.RelationVerboseV6Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.*
 import org.eclipse.tractusx.bpdm.pool.model.output.businesspartner.BusinessStateRecord
@@ -151,12 +151,12 @@ class ApiV6LegalEntityMapper(
     private fun toDto(record: LegalEntityRelationRecord): RelationVerboseV6Dto? =
         toRelationType(record.type)?.let { RelationVerboseV6Dto(it, record.sourceBpnl, record.targetBpnl) }
 
-    private fun toRelationType(relationType: LegalEntityRelationTypeV7): LegalEntityRelationTypeV6? =
+    private fun toRelationType(relationType: LegalEntityRelationType): LegalEntityRelationTypeV6? =
         when (relationType) {
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV6.IsAlternativeHeadquarterFor
-            LegalEntityRelationTypeV7.IsManagedBy -> LegalEntityRelationTypeV6.IsManagedBy
-            LegalEntityRelationTypeV7.IsOwnedBy -> LegalEntityRelationTypeV6.IsOwnedBy
-            LegalEntityRelationTypeV7.IsReplacedBy -> null
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV6.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityRelationTypeV6.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityRelationTypeV6.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> null
         }
 
     private fun toCreateErrorInfo(error: LegalEntityCreateError, entityKey: String?): ErrorInfoV6<LegalEntityCreateErrorV6> =

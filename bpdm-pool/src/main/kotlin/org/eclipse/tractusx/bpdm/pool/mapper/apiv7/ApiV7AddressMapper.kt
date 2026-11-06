@@ -18,6 +18,8 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.ErrorCodeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityCreateErrorV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.exception.LegalEntityUpdateErrorV7
@@ -242,7 +244,7 @@ class ApiV7AddressMapper(
 
     private fun toDto(record: AddressRelationRecord): AddressRelationVerboseV7Dto =
         AddressRelationVerboseV7Dto(
-            type = record.type,
+            type = toDto(record.type),
             businessPartnerSourceBpna = record.sourceBpna,
             businessPartnerTargetBpna = record.targetBpna,
             validityPeriods = record.validityPeriods.map { apiV7BusinessPartnerMapper.toDto(it) },
@@ -438,4 +440,9 @@ class ApiV7AddressMapper(
 
     private fun internalError(error: Any) =
         BpdmValidationException("Unexpected address validation error that has no client error code: $error")
+
+    private fun toDto(relationType: AddressRelationType): AddressRelationTypeV7 =
+        when (relationType) {
+            AddressRelationType.IsReplacedBy -> AddressRelationTypeV7.IsReplacedBy
+        }
 }

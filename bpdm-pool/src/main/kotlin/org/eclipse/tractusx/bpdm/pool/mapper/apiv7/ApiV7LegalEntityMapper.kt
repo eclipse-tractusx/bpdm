@@ -18,6 +18,8 @@
  ******************************************************************************/
 package org.eclipse.tractusx.bpdm.pool.mapper.apiv7
 
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -144,7 +146,7 @@ class ApiV7LegalEntityMapper(
 
     private fun toDto(record: LegalEntityRelationRecord): RelationVerboseV7Dto =
         RelationVerboseV7Dto(
-            type = record.type,
+            type = toDto(record.type),
             businessPartnerSourceBpnl = record.sourceBpnl,
             businessPartnerTargetBpnl = record.targetBpnl,
             validityPeriods = record.validityPeriods.map { apiV7BusinessPartnerMapper.toDto(it) },
@@ -237,4 +239,12 @@ class ApiV7LegalEntityMapper(
     // An error the bounded DTO already rules out, or that this use case cannot reach, gets no public code.
     private fun internalError(error: LegalEntityCreateError) =
         BpdmValidationException("Unexpected legal entity parse error (no public error code): $error")
+
+    private fun toDto(relationType: LegalEntityRelationType): LegalEntityRelationTypeV7 =
+        when (relationType) {
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityRelationTypeV7.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityRelationTypeV7.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> LegalEntityRelationTypeV7.IsReplacedBy
+        }
 }

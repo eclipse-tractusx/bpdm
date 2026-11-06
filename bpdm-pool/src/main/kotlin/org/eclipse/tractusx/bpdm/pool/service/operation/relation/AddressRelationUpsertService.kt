@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.AddressRelationType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
@@ -107,7 +107,7 @@ class AddressRelationUpsertService(
 
     private fun create(relation: AddressRelationUpsertParsed, validityPeriods: List<RelationValidityPeriodDb>): AddressRelationDb {
         val newRelation = AddressRelationDb(
-            type = AddressRelationTypeV7.IsReplacedBy,
+            type = AddressRelationType.IsReplacedBy,
             startAddress = relation.source,
             endAddress = relation.target,
             validityPeriods = validityPeriods.toMutableList(),
@@ -115,8 +115,8 @@ class AddressRelationUpsertService(
         )
         addressRelationRepository.saveAndFlush(newRelation)
 
-        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
-        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
+        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
 
         return newRelation
     }

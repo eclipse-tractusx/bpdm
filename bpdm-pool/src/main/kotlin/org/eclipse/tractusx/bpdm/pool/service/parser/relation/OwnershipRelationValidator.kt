@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser.relation
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
@@ -64,7 +64,7 @@ class OwnershipRelationValidator(
         owner: LegalEntityDb,
         relationsDuringPeriods: (Collection<RelationDb>) -> List<RelationDb>
     ): RelationUpsertError? =
-        relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsOwnedBy, owned))
+        relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, owned))
             .firstOrNull { it.endNode.bpn != owner.bpn }
             ?.let { RelationUpsertError.MultipleOwners(owned.bpn, owner.bpn, it.endNode.bpn) }
 
@@ -80,7 +80,7 @@ class OwnershipRelationValidator(
             val ancestor = ancestorQueue.removeFirst()
             if (!ancestorBpns.add(ancestor.bpn)) continue
 
-            relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsOwnedBy, ancestor))
+            relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, ancestor))
                 .forEach { ancestorQueue.addFirst(it.endNode) }
         }
 
@@ -95,7 +95,7 @@ class OwnershipRelationValidator(
         legalEntity: LegalEntityDb,
         relationsDuringPeriods: (Collection<RelationDb>) -> List<RelationDb>
     ): RelationUpsertError? =
-        relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, legalEntity))
+        relationsDuringPeriods(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
             .firstOrNull()
             ?.let { RelationUpsertError.OwnershipOfAlternative(legalEntity.bpn, it.endNode.bpn) }
 }

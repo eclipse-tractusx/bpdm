@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -75,16 +75,16 @@ class LegalEntityRelationUpsertService(
         logOutcome(upsertResult.upsertType, relation)
 
         when (relation.type) {
-            LegalEntityRelationTypeV7.IsOwnedBy -> {
+            LegalEntityRelationType.IsOwnedBy -> {
                 ultimateOwnerRecalculationService.recalculate(listOf(relation.source))
                 legalEntityRelationTriggerService.reschedule(written, TriggerEventType.OwnershipValidityBoundary)
             }
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> {
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> {
                 ultimateOwnerRecalculationService.recalculate(listOf(relation.source))
                 legalEntityRelationTriggerService.reschedule(written, TriggerEventType.AlternativeHeadquarterValidityBoundary)
             }
-            LegalEntityRelationTypeV7.IsManagedBy -> makeParticipant(relation.source)
-            LegalEntityRelationTypeV7.IsReplacedBy -> Unit
+            LegalEntityRelationType.IsManagedBy -> makeParticipant(relation.source)
+            LegalEntityRelationType.IsReplacedBy -> Unit
         }
 
         return written
@@ -126,8 +126,8 @@ class LegalEntityRelationUpsertService(
         )
         relationRepository.save(newRelation)
 
-        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
 
         return newRelation
     }

@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.relation.LegalEntityRelationType
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
@@ -95,7 +95,7 @@ class UltimateOwnerResolutionService(
             return
         }
 
-        currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, legalEntity))
+        currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
             .forEach { alternativeRelation ->
                 val alternative = alternativeRelation.startNode
                 if (visited.add(alternative.bpn)) {
@@ -103,12 +103,12 @@ class UltimateOwnerResolutionService(
                 }
             }
 
-        currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationTypeV7.IsOwnedBy, legalEntity))
+        currentlyValidRelations(relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity))
             .forEach { collectWithDescendants(it.startNode, visited, resolved) }
     }
 
     private fun mainOfAlternative(legalEntity: LegalEntityDb): LegalEntityDb? =
-        currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor, legalEntity))
+        currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity))
             .firstOrNull()
             ?.endNode
 
@@ -121,7 +121,7 @@ class UltimateOwnerResolutionService(
         }
 
         var highestFlagHolder = currentBpn.takeIf { legalEntity.ownershipUltimate }
-        val owningRelations = currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationTypeV7.IsOwnedBy, legalEntity))
+        val owningRelations = currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity))
 
         owningRelations.forEach { relation ->
             when (val ownerResolution = resolveWithCycleProtection(relation.endNode, visited)) {

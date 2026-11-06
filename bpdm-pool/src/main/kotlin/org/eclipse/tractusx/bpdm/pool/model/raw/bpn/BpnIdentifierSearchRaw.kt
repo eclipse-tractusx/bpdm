@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.raw.bpn
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.metadata.IdentifierBusinessPartnerTypeV7
+import org.eclipse.tractusx.bpdm.pool.model.raw.metadata.IdentifierBusinessPartnerType
 
 data class BpnIdentifierSearchRaw(
-    val businessPartnerType: IdentifierBusinessPartnerTypeV7,
+    val businessPartnerType: IdentifierBusinessPartnerType,
     val identifierTypeKey: String,
     val identifierValues: List<String>
 )
