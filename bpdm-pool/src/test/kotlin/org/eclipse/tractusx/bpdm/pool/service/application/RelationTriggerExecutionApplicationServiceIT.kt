@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.application
 
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -37,7 +37,6 @@ import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
-import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
@@ -66,10 +65,10 @@ import java.time.*
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
-class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
+class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
     private val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
-    private val triggerBatchProcessExecutionService: TriggerBatchProcessExecutionService,
+    private val relationTriggerExecutionService: RelationTriggerExecutionApplicationService,
     private val poolApiClient: PoolV7Client,
     private val legalEntityRepository: LegalEntityRepository,
     private val dataHelper: PoolDataHelper,
@@ -116,7 +115,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         lateinit var updateTimeframe: Timeframe
         executeAtDate(LocalDate.now().plusDays(1)) {
             val updateStartTime = Instant.now()
-            triggerBatchProcessExecutionService.executeUnprocessedTriggers()
+            relationTriggerExecutionService.executeDueTriggers()
             updateTimeframe = Timeframe(updateStartTime.minusSeconds(2), Instant.now().plusSeconds(2))
         }
 
@@ -155,7 +154,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val originalLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
 
         //WHEN
-        triggerBatchProcessExecutionService.executeUnprocessedTriggers()
+        relationTriggerExecutionService.executeDueTriggers()
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
@@ -188,7 +187,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val alternativeBefore = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
         assertThat(alternativeBefore.header.ultimateOwnerBpnl).isNull()
 
-        executeAtDate(LocalDate.now().plusDays(1)) { triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
+        executeAtDate(LocalDate.now().plusDays(1)) { relationTriggerExecutionService.executeDueTriggers() }
 
         val alternativeAfter = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
         assertThat(alternativeAfter.header.ultimateOwnerBpnl).isEqualTo(main.legalEntity.header.bpnl)

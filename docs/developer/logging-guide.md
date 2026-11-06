@@ -128,7 +128,7 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 - **Aspects are not reported for Pool business partner writes.** The write services hold the `FieldUpdate` masks but report subject and change type only, so the aspect rule in [2.1](#21-info) is unmet there.
 - **A request id stops at the service boundary.** `RequestLoggingFilter` ignores any inbound header and the BPDM clients send none, so one golden record flow appears under a different id in each service.
 - **Derived sharing member counts are DEBUG.** `SharingMemberConfidenceService` recalculates one address and its legal entity per call, so an INFO line there would be one per entry; the scheduled sync reports the records it changed instead.
-- **Not every write reports a count.** The Pool trigger batch plumbing returns no number of changes, so its runs stay silent at DEBUG rather than reporting an outcome.
+- **Not every write reports a count.** Pool's relation trigger execution returns no number of changes, so its runs stay silent at DEBUG rather than reporting an outcome.
 - **The Orchestrator's v6 task lines are duplicated.** `GoldenRecordTaskLegacyServiceMapper` re-implements task creation and step success instead of delegating to the state machine, so those two lines exist twice.
 - **A batch line names at most twenty subjects.** `joinIdentifiersForLog` counts the remainder rather than listing it, so a large batch names a sample of its identifiers; only subjects with a changelog recover the rest at DEBUG.
 

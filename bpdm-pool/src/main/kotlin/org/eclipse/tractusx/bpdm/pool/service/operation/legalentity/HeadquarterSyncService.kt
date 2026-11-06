@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
@@ -30,13 +30,15 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.ScriptVariantCoverageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 
+/**
+ * Keeps a legal entity's legal address on the end of the address succession that is valid today.
+ */
 @Service
 class HeadquarterSyncService(
     private val relationRepository: AddressRelationRepository,
@@ -46,6 +48,9 @@ class HeadquarterSyncService(
 ) {
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Relocates the legal address of [legalEntityDb] to the last address of today's succession chain starting at it, if any.
+     */
     @Transactional
     fun synchronizeHeadquarter(legalEntityDb: LegalEntityDb){
         val addressesToProcess = ArrayDeque<LogisticAddressDb>()
