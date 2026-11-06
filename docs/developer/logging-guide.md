@@ -125,7 +125,7 @@ That distinction sets the cost ceiling for this guide. We do not build machinery
 *Accepted, not oversights. Each is a candidate for a later contribution.*
 
 - **Inline lines can lie on rollback.** Persisted-change lines still written inline are emitted inside the transaction, so a rollback leaves a line claiming a change that did not happen; there is always an ERROR alongside it. Lines logged through `PersistedChangeLogger` are exact; the remaining writers move over one by one.
-- **Aspects are not reported for Pool business partner writes.** The write services hold the `FieldUpdateRaw` masks but report subject and change type only, so the aspect rule in [2.1](#21-info) is unmet there.
+- **Aspects are barely reported for Pool business partner writes.** The write services hold the `FieldUpdateRaw` masks but report subject and change type only; the one exception is a legal address relocation. The aspect rule in [2.1](#21-info) is otherwise unmet there.
 - **A request id stops at the service boundary.** `RequestLoggingFilter` ignores any inbound header and the BPDM clients send none, so one golden record flow appears under a different id in each service.
 - **Derived sharing member counts are DEBUG.** `SharingMemberConfidenceService` recalculates one address and its legal entity per call, so an INFO line there would be one per entry; the scheduled sync reports the records it changed instead.
 - **Not every write reports a count.** Pool's relation trigger execution returns no number of changes, so its runs stay silent at DEBUG rather than reporting an outcome.

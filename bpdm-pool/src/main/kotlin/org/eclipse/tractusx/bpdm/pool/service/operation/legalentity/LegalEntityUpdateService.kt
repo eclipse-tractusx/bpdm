@@ -27,11 +27,13 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeader
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ifSet
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.orKeep
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.common.util.countForLog
-import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.BusinessPartnerChangeRaw
+import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressWriteCommitService
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
@@ -53,19 +55,20 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpdateService(
     private val addressUpdateService: AddressUpdateService,
+    private val addressWriteCommitService: AddressWriteCommitService,
     private val parsedToDbMapper: ParsedToDbMapper,
     private val repository: LegalEntityRepository,
-    private val changelogCreateService: ChangelogCreateService
+    private val changelogCreateService: ChangelogCreateService,
+    private val changeLogger: PersistedChangeLogger
 ) {
-
-    private val logger = KotlinLogging.logger { }
 
     /**
      * Applies the given changes and reports for each legal entity whether the aggregate — its header or its legal
-     * address — actually changed.
+     * address — actually changed. Relocating a legal address also updates the address it replaces.
      */
     @Transactional
     fun update(requests: List<LegalEntityChangeParsed>): List<UpsertResultParsed<LegalEntityDb>> {
+        val previousLegalAddresses = requests.map { it.legalEntity.legalAddress }
         // Before the address: the address keeps the script variants its partners are named in, so it has to see the legal
         // entity's new scripts to let go of one it is dropping.
         val headerUpdates = requests.map { updateHeader(it) }
@@ -81,14 +84,32 @@ class LegalEntityUpdateService(
         updatedLegalEntities.forEach { it.value.updatedAt = DbTimestamp.now() }
         repository.saveAll(updatedLegalEntities.map { it.value })
         changelogCreateService.record(updatedLegalEntities.map { ChangelogEntryRaw(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+        updatedLegalEntities.forEach {
+            changeLogger.log(BusinessPartnerChangeRaw(PersistedChangeType.Updated, BusinessPartnerChangeRaw.Kind.LegalEntity, it.value.bpn))
+        }
 
-        if (updatedLegalEntities.isNotEmpty())
-            logger.info {
-                "Updated ${countForLog(updatedLegalEntities.size, "legal entity", "legal entities")}: " +
-                        updatedLegalEntities.map { it.value.bpn }.joinIdentifiersForLog()
-            }
+        commitRelocations(requests.map { it.legalEntity }.zip(previousLegalAddresses), legalAddressUpdates)
 
         return legalEntityChangeResults
+    }
+
+    private fun commitRelocations(
+        legalEntitiesWithPreviousLegalAddress: List<Pair<LegalEntityDb, LogisticAddressDb>>,
+        legalAddressUpdates: List<UpsertResultParsed<LogisticAddressDb>>
+    ) {
+        val relocated = legalEntitiesWithPreviousLegalAddress.filter { (legalEntity, previous) -> legalEntity.legalAddress.bpn != previous.bpn }
+        relocated.forEach { (legalEntity, _) ->
+            changeLogger.log(
+                BusinessPartnerChangeRaw(PersistedChangeType.Updated, BusinessPartnerChangeRaw.Kind.LegalEntity, legalEntity.bpn, BusinessPartnerChangeRaw.Aspect.LegalAddress)
+            )
+        }
+
+        val alreadyUpdatedBpns = legalAddressUpdates.filter { it.upsertType == UpsertType.Updated }.map { it.value.bpn }.toSet()
+        val addressesChangingRole = relocated
+            .flatMap { (legalEntity, previous) -> listOf(previous, legalEntity.legalAddress) }
+            .filterNot { it.bpn in alreadyUpdatedBpns }
+            .distinctBy { it.bpn }
+        addressWriteCommitService.commit(addressesChangingRole.map { PendingAddressWriteParsed(it, UpsertType.Updated) })
     }
 
     private fun updateHeader(request: LegalEntityChangeParsed): UpsertResultParsed<LegalEntityDb> {
@@ -122,6 +143,7 @@ class LegalEntityUpdateService(
         header.isDataSpaceParticipant.ifSet { if (it != target.isDataSpaceParticipant) return true }
         header.ownershipUltimate.ifSet { if (it != target.ownershipUltimate) return true }
         header.ultimateOwnerBpnl.ifSet { if (it != target.ultimateOwnerBpnl) return true }
+        header.relocatedLegalAddress.ifSet { if (it.bpn != target.legalAddress.bpn) return true }
         header.identifiers.ifSet {
             if (identifierKeys(parsedToDbMapper.toLegalEntityIdentifiers(it, target)) != identifierKeys(target.identifiers)) return true
         }
@@ -157,6 +179,7 @@ class LegalEntityUpdateService(
         header.identifiers.ifSet { target.identifiers.replace(parsedToDbMapper.toLegalEntityIdentifiers(it, target)) }
         header.states.ifSet { target.states.replace(parsedToDbMapper.toLegalEntityStates(it, target)) }
         header.scriptVariants.ifSet { target.scriptVariants.replace(parsedToDbMapper.toLegalEntityScriptVariants(it)) }
+        header.relocatedLegalAddress.ifSet { target.legalAddress = it }
     }
 
     // Legal name and short name are separate update fields but one embedded entity value, so setting either rebuilds the

@@ -230,8 +230,8 @@ class ParsedToDbMapper {
     )
 
     /**
-     * Returns the change that replaces a legal entity's header with [header], leaving the derived ultimate owner and an
-     * unstated ownership flag untouched.
+     * Returns the change that replaces a legal entity's header with [header], leaving the derived ultimate owner, the
+     * legal address and an unstated ownership flag untouched.
      */
     fun toLegalEntityHeaderFullChange(header: LegalEntityHeaderParsed, currentness: Instant) = LegalEntityHeaderChangeParsed(
         legalName = FieldUpdateRaw.Set(header.legalName),
@@ -245,7 +245,8 @@ class ParsedToDbMapper {
         currentness = FieldUpdateRaw.Set(currentness),
         identifiers = FieldUpdateRaw.Set(header.identifiers),
         states = FieldUpdateRaw.Set(header.states),
-        scriptVariants = FieldUpdateRaw.Set(header.scriptVariants)
+        scriptVariants = FieldUpdateRaw.Set(header.scriptVariants),
+        relocatedLegalAddress = FieldUpdateRaw.NoOp
     )
 
     /**

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed.Companion.NoOp
@@ -48,7 +49,8 @@ import java.time.Instant
  * A partial update to a legal entity's header: each field is a [FieldUpdateRaw] carrying domain values, applied by
  * `LegalEntityUpdateService`. No default values — a full replace must address every field. [ultimateOwnerBpnl] is derived
  * from [ownershipUltimate] plus the ownership relations, so a payload replace leaves it [FieldUpdateRaw.NoOp] and
- * `UltimateOwnerRecalculationService` sets only it.
+ * `UltimateOwnerRecalculationService` sets only it. Likewise [relocatedLegalAddress] follows the address succession, so
+ * only `HeadquarterSyncService` sets it.
  *
  * Build a targeted update by copying from [NoOp], for example
  * `LegalEntityHeaderChangeParsed.NoOp.copy(ultimateOwnerBpnl = FieldUpdateRaw.Set(bpnl))`.
@@ -64,7 +66,8 @@ data class LegalEntityHeaderChangeParsed(
     val currentness: FieldUpdateRaw<Instant>,
     val identifiers: FieldUpdateRaw<List<LegalEntityIdentifierParsed>>,
     val states: FieldUpdateRaw<List<LegalEntityStateRaw>>,
-    val scriptVariants: FieldUpdateRaw<List<LegalEntityScriptVariantParsed>>
+    val scriptVariants: FieldUpdateRaw<List<LegalEntityScriptVariantParsed>>,
+    val relocatedLegalAddress: FieldUpdateRaw<LogisticAddressDb>
 ) {
     companion object {
         val NoOp = LegalEntityHeaderChangeParsed(
@@ -78,7 +81,8 @@ data class LegalEntityHeaderChangeParsed(
             currentness = FieldUpdateRaw.NoOp,
             identifiers = FieldUpdateRaw.NoOp,
             states = FieldUpdateRaw.NoOp,
-            scriptVariants = FieldUpdateRaw.NoOp
+            scriptVariants = FieldUpdateRaw.NoOp,
+            relocatedLegalAddress = FieldUpdateRaw.NoOp
         )
     }
 }

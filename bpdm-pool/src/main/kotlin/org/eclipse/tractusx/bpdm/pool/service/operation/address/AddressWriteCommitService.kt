@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
 import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogType
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeLogger
+import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.common.util.countForLog
-import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -43,9 +43,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressWriteCommitService(
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val changelogCreateService: ChangelogCreateService
+    private val changelogCreateService: ChangelogCreateService,
+    private val changeLogger: PersistedChangeLogger
 ) {
-    private val logger = KotlinLogging.logger { }
 
     /**
      * Persists the staged addresses that changed, emits their CREATE or UPDATE changelog, and returns one result per
@@ -64,17 +64,15 @@ class AddressWriteCommitService(
             }
         })
 
-        report("Created", staged.filter { it.upsertType == UpsertType.Created })
-        report("Updated", staged.filter { it.upsertType == UpsertType.Updated })
+        staged.forEach { write ->
+            val type = when (write.upsertType) {
+                UpsertType.Created -> PersistedChangeType.Created
+                UpsertType.Updated -> PersistedChangeType.Updated
+                UpsertType.NoChange -> return@forEach
+            }
+            changeLogger.log(BusinessPartnerChangeRaw(type, BusinessPartnerChangeRaw.Kind.Address, write.address.bpn))
+        }
 
         return staged.map { UpsertResultParsed(it.address, it.upsertType) }
-    }
-
-    private fun report(change: String, written: List<PendingAddressWriteParsed>) {
-        if (written.isEmpty()) return
-
-        logger.info {
-            "$change ${countForLog(written.size, "address", "addresses")}: ${written.map { it.address.bpn }.joinIdentifiersForLog()}"
-        }
     }
 }
