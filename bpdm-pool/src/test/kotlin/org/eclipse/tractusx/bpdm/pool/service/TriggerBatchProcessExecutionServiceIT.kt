@@ -34,6 +34,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
@@ -61,9 +65,10 @@ import java.time.*
 )
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
 class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
-    private val taskRelationsResolutionService: TaskRelationsResolutionService,
+    private val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
+    private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val triggerBatchProcessExecutionService: TriggerBatchProcessExecutionService,
     private val poolApiClient: PoolV7Client,
     private val legalEntityRepository: LegalEntityRepository,
@@ -104,7 +109,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
-        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        resolveRelationTasks(listOf(taskToResolve))
 
         //WHEN
         val creationEndTime = Instant.now()
@@ -145,7 +150,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
-        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        resolveRelationTasks(listOf(taskToResolve))
 
         val originalLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
 
@@ -178,7 +183,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         )
 
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", alternativeRelation)
-        taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        resolveRelationTasks(listOf(taskToResolve))
 
         val alternativeBefore = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
         assertThat(alternativeBefore.header.ultimateOwnerBpnl).isNull()
@@ -233,4 +238,9 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         return poolApiClient.metadata.getReasonCodes(PaginationRequest()).content.first().technicalKey
     }
 
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults()
+    }
 }

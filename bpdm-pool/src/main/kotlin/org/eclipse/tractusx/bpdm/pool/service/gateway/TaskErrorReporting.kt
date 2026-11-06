@@ -27,6 +27,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 private val logger = KotlinLogging.logger { }
 
 /**
+ * The longest task error description the Orchestrator accepts.
+ */
+internal const val MAX_ERROR_DESCRIPTION_LENGTH = 250
+
+/**
  * Reports each task with [taskIds] through [report] and returns how the Orchestrator answered each.
  */
 internal fun reportTaskErrors(taskIds: List<String>, report: (String) -> Unit): List<TaskErrorReportOutcome> =

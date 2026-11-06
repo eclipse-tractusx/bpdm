@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsBatchResolutionService
+import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordTaskResolutionApplicationService
 import org.eclipse.tractusx.bpdm.pool.service.application.UnreportedTaskReportApplicationService
 import org.springframework.context.annotation.Configuration
@@ -37,7 +37,7 @@ class GoldenRecordTaskScheduler(
     private val configProperties: GoldenRecordTaskConfigProperties,
     private val taskScheduler: TaskScheduler,
     private val taskResolutionService: GoldenRecordTaskResolutionApplicationService,
-    private val relationTaskResolutionService: TaskRelationsBatchResolutionService,
+    private val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
     private val unreportedTaskReportService: UnreportedTaskReportApplicationService
 ) {
 
@@ -63,7 +63,7 @@ class GoldenRecordTaskScheduler(
     fun processTasks() {
         logger.debug { "Start golden record task processing schedule..." }
         runStep("golden record task resolution", taskResolutionService::resolveTasks)
-        runStep("golden record relation task resolution", relationTaskResolutionService::reserveAndResolve)
+        runStep("golden record relation task resolution", relationTaskResolutionService::resolveTasks)
         runStep("unreported task report", unreportedTaskReportService::reportUnreportedTasks)
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,23 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.model.raw.relation
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import java.time.LocalDate
 
-interface IRelationUpsertStrategyService {
+data class RelationRaw(
+    val type: RelationType,
+    val sourceBpn: String,
+    val targetBpn: String,
+    val validityPeriods: List<RelationValidityPeriodRaw>,
+    val reasonCode: String?
+)
 
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>
+data class RelationValidityPeriodRaw(
+    val validFrom: LocalDate,
+    val validTo: LocalDate?
+)
 
-    data class UpsertRequest(
-        val source: LegalEntityDb,
-        val target: LegalEntityDb,
-        val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val existingRelation: RelationDb?,
-        val reasonCode: ReasonCodeDb?
-    )
+enum class RelationType {
+    IsAlternativeHeadquarterFor,
+    IsManagedBy,
+    IsOwnedBy,
+    IsReplacedBy
 }

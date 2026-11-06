@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,22 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation.relation
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 
-interface IAddressRelationUpsertStratergyService {
-
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<AddressRelationDb>
-
-    data class UpsertRequest(
-        val source: LogisticAddressDb,
-        val target: LogisticAddressDb,
-        val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val reasonCode: ReasonCodeDb?
-    )
+/**
+ * Whether [newValidityPeriods] differ from [existingValidityPeriods], comparing the periods in the order given.
+ */
+internal fun validityPeriodsDiffer(
+    existingValidityPeriods: Collection<RelationValidityPeriodDb>,
+    newValidityPeriods: Collection<RelationValidityPeriodDb>
+): Boolean {
+    if (existingValidityPeriods.size != newValidityPeriods.size) return true
+    return existingValidityPeriods.zip(newValidityPeriods).any { (existing, new) -> existing.validFrom != new.validFrom || existing.validTo != new.validTo }
 }

@@ -20,10 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.service.gateway
 
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorOutboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.OrchestratorInboundMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorRelationOutboundMapper
+import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordRelationTaskResultRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRelationTaskRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcome
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.springframework.stereotype.Component
 
 /**
@@ -33,15 +38,36 @@ import org.springframework.stereotype.Component
 class GoldenRecordRelationTaskGateway(
     private val orchestrationApiClient: OrchestrationApiClient,
     private val taskProperties: GoldenRecordTaskConfigProperties,
-    private val outboundMapper: OrchestratorOutboundMapper
+    private val inboundMapper: OrchestratorInboundMapper,
+    private val outboundMapper: OrchestratorRelationOutboundMapper
 ) {
+
+    /**
+     * Reserves up to [amount] golden record relation tasks waiting for the Pool and returns them, or none when no task waits.
+     */
+    fun reserveTasks(amount: Int): List<GoldenRecordRelationTaskRaw> =
+        orchestrationApiClient.relationsGoldenRecordTasks
+            .reserveTasksForStep(TaskStepReservationRequest(step = taskProperties.step, amount = amount))
+            .reservedTasks
+            .map { inboundMapper.toRaw(it) }
+
+    /**
+     * Reports [results] of reserved golden record relation tasks to the Orchestrator.
+     */
+    fun resolveTasks(results: List<GoldenRecordRelationTaskResultRecord>) {
+        val resultEntries = results.map { withAcceptedErrorLength(outboundMapper.toResultEntry(it)) }
+        orchestrationApiClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(step = taskProperties.step, results = resultEntries))
+    }
 
     /**
      * Reports the relation tasks with [taskIds] to the Orchestrator as failed without a known cause and returns how it answered each.
      */
     fun resolveTasksAsErrors(taskIds: List<String>): List<TaskErrorReportOutcome> =
         reportTaskErrors(taskIds) { taskId ->
-            val resultEntry = outboundMapper.toRelationsErrorReportEntry(taskId)
+            val resultEntry = outboundMapper.toErrorReportEntry(taskId)
             orchestrationApiClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(step = taskProperties.step, results = listOf(resultEntry)))
         }
+
+    private fun withAcceptedErrorLength(result: TaskRelationsStepResultEntryDto) =
+        result.copy(errors = result.errors.map { it.copy(description = it.description.take(MAX_ERROR_DESCRIPTION_LENGTH)) })
 }

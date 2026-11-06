@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.application
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -29,6 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelati
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
@@ -52,11 +54,12 @@ import java.util.*
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
-@ActiveProfiles("test-no-auth")
+@ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @Import(OrchestratorMockConfiguration::class)
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class TaskRelationsResolutionServiceTest @Autowired constructor(
-    val taskRelationsResolutionService: TaskRelationsResolutionService,
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OrchestratorMockContextInitializer::class])
+class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constructor(
+    val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
+    val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     val poolClient: PoolV7Client,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
@@ -104,7 +107,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
+        assertThat(result[0].errors.map { it.description }).containsExactlyInAnyOrder(
+            "Source legal entity with specified BPNL : ${BusinessPartnerVerboseValues.firstBpnL} not found",
+            "Target legal entity with specified BPNL : ${BusinessPartnerVerboseValues.secondBpnL} not found"
+        )
     }
 
     /*
@@ -347,7 +353,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         //Step4: Assert error
         assertThat(resultDataspaceParticipantViolation.size).isEqualTo(1)
         val violationResult = resultDataspaceParticipantViolation.first()
-        assertThat(violationResult.errors.size).isEqualTo(1)
+        assertThat(violationResult.errors.map { it.description }).anyMatch { it.contains("is not a dataspace participant") }
     }
 
     /**
@@ -650,6 +656,35 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result.errors.single().type).isEqualTo(TaskRelationsErrorType.Unspecified)
     }
 
+    /**
+     * GIVEN a relation golden record task whose later validity period ends before it starts
+     * WHEN trying to refine relation task
+     * THEN inverted validity period error returned
+     */
+    @Test
+    fun `reject relation with inverted later validity period`() {
+        //GIVEN
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val relation = buildRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
+            validityPeriods = listOf(
+                RelationValidityPeriod(validFrom = LocalDate.of(2020, 1, 1), validTo = LocalDate.of(2020, 12, 31)),
+                RelationValidityPeriod(validFrom = LocalDate.of(2025, 5, 1), validTo = LocalDate.of(2025, 1, 1))
+            )
+        )
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("TASK_INVERTED_PERIOD", relation).single()
+
+        //THEN
+        assertThat(result.errors.map { it.description })
+            .containsExactly("Relation validity period validFrom '2025-05-01' cannot be after validTo '2025-01-01'.")
+    }
+
     @ParameterizedTest
     @EnumSource(value = LegalEntityRelationTypeV7::class, names = ["IsReplacedBy"], mode = EnumSource.Mode.EXCLUDE)
     fun `reject unsupported address relation type`(relationType: LegalEntityRelationTypeV7) {
@@ -920,7 +955,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
         assertThat(result[0].errors.size).isEqualTo(1)
-        assertThat(result[0].errors[0].description).contains("Invalid 'IsReplacedBy' relation:")
+        assertThat(result[0].errors[0].description)
+            .startsWith("Invalid 'IsReplacedBy' relation:")
+            .contains("Both addresses must")
     }
 
     /**
@@ -970,8 +1007,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val result = upsertRelationsGoldenRecordIntoPool("TASK_UNKNOWN_SITES", unknownSiteRelation).single()
 
         //THEN
-        assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors[0].description).contains("Source site BPNS BPNS0000000000XY not found")
+        assertThat(result.errors.map { it.description }).containsExactlyInAnyOrder(
+            "Source site BPNS BPNS0000000000XY not found",
+            "Target site BPNS BPNS0000000000ZY not found"
+        )
     }
 
     /**
@@ -1354,7 +1393,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepResultEntryDto> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartnerRelations = businessPartnerRelations)
-        return taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(taskStep)
+        return resolveRelationTasks(taskStep)
     }
 
     private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
@@ -1450,4 +1489,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         )
     }
 
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+        orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults()
+    }
 }

@@ -25,13 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartnerCreateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.service.IRelationUpsertStrategyService
-import org.eclipse.tractusx.bpdm.pool.service.OwnedByRelationUpsertService
 import org.eclipse.tractusx.bpdm.pool.service.compareLegalEntity
 import org.eclipse.tractusx.bpdm.pool.service.compareLogisticAddress
 import org.eclipse.tractusx.bpdm.pool.service.compareSite
@@ -77,7 +74,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     val poolDataHelper: PoolDataHelper,
     val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
     val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
-    val ownedByRelationUpsertService: OwnedByRelationUpsertService,
+    val relationTaskResolutionService: GoldenRecordRelationTaskResolutionApplicationService,
     val relationRepository: RelationRepository,
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
     val transactionTemplate: TransactionTemplate
@@ -1980,20 +1977,20 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     private fun createIsOwnedByRelationViaService(sourceBpn: String, targetBpn: String) {
-        transactionTemplate.execute {
-            val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
-            val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
+        assertThat(resolveOwnershipTask(sourceBpn, targetBpn).errors).isEmpty()
+    }
 
-            val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
-                source = sourceEntity,
-                target = targetEntity,
-                validityPeriods = listOf(currentValidityPeriod()),
-                existingRelation = null,
-                reasonCode = null
-            )
-            val result = ownedByRelationUpsertService.upsertRelation(upsertRequest)
-            result.value.validityPeriods.size
-        }
+    private fun resolveOwnershipTask(sourceBpn: String, targetBpn: String): TaskRelationsStepResultEntryDto {
+        val ownership = BusinessPartnerRelations(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = sourceBpn,
+            businessPartnerTargetBpn = targetBpn,
+            validityPeriods = listOf(currentValidityPeriod().let { RelationValidityPeriod(it.validFrom, it.validTo) }),
+            reasonCode = null
+        )
+        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(TaskRelationsStepReservationEntryDto(UUID.randomUUID().toString(), UUID.randomUUID().toString(), ownership)))
+        relationTaskResolutionService.resolveTasks()
+        return orchestratorMockDataFactory.getRelationStepResults().single()
     }
 
     // Production rejects relations without validity periods (see RelationValidityPeriodValidator),
@@ -2286,24 +2283,9 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         legalEntityRepository.save(rootADb)
         legalEntityRepository.save(rootBDb)
 
-        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
-            transactionTemplate.execute {
-                val source = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
-                val target = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        val result = resolveOwnershipTask(rootA.legalEntity.header.bpnl, rootB.legalEntity.header.bpnl)
 
-                ownedByRelationUpsertService.upsertRelation(
-                    IRelationUpsertStrategyService.UpsertRequest(
-                        source = source,
-                        target = target,
-                        validityPeriods = listOf(currentValidityPeriod()),
-                        existingRelation = null,
-                        reasonCode = null
-                    )
-                )
-            }
-        }
-
-        assertThat(exception.message).contains("Multiple ultimate owners in entity hierarchy")
+        assertThat(result.errors.map { it.description }).anyMatch { it.contains("Multiple ultimate owners in entity hierarchy") }
 
         val sourceAfter = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
         val targetAfter = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
