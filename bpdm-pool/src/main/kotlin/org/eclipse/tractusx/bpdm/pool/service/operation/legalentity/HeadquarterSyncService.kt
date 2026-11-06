@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.covers
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -68,7 +69,7 @@ class HeadquarterSyncService(
                 .filterNot{ visitedValidityPeriods.contains(it) }
 
             val activeValidities = notVisitiedValidities
-                .filter {  it.validityPeriod.validFrom <= today && (it.validityPeriod.validTo?: LocalDate.MAX) > today }
+                .filter { it.validityPeriod.covers(today) }
 
             activeValidities.forEach { visitedValidityPeriods.add(it) }
 

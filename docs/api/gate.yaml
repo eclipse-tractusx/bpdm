@@ -3773,22 +3773,26 @@ components:
         validFrom:
           type: string
           format: date
+          description: The first date on which the relation is valid (inclusive).
         validTo:
           type:
             - string
             - "null"
           format: date
+          description: The last date on which the relation is valid (inclusive).
     RelationValidityPeriodV7Dto:
       type: object
       properties:
         validFrom:
           type: string
           format: date
+          description: The first date on which the relation is valid (inclusive).
         validTo:
           type:
             - string
             - "null"
           format: date
+          description: The last date on which the relation is valid (inclusive).
     SharingStateV6Dto:
       type: object
       properties:

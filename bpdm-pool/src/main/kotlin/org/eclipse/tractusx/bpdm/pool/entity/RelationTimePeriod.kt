@@ -40,8 +40,8 @@ data class RelationTimePeriod(
     }
 
     /**
-     * Whether this period and [other] intersect, where periods meeting on a single shared date do not.
+     * Whether this period and [other] share at least one date.
      */
     fun hasOverlap(other: RelationTimePeriod): Boolean =
-        validFrom < other.validTo && validTo > other.validFrom
+        validFrom <= other.validTo && validTo >= other.validFrom
 }

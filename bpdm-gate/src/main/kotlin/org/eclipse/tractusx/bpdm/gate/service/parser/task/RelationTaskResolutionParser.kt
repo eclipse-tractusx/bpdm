@@ -81,7 +81,7 @@ class RelationTaskResolutionParser(
     private fun validateValidityPeriods(relation: RelationDb, result: RelationTaskResultRaw.Succeeded): List<RelationTaskResolutionError> =
         result.validityPeriods.mapNotNull { period ->
             period.validTo
-                ?.takeIf { !period.validFrom.isBefore(it) }
-                ?.let { RelationTaskResolutionError.ResultUnusable(relation, "validFrom '${period.validFrom}' cannot be same or after validTo '$it'.") }
+                ?.takeIf { period.validFrom.isAfter(it) }
+                ?.let { RelationTaskResolutionError.ResultUnusable(relation, "validFrom '${period.validFrom}' cannot be after validTo '$it'.") }
         }
 }

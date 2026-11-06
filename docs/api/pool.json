@@ -7911,12 +7911,12 @@
           "validFrom" : {
             "type" : "string",
             "format" : "date",
-            "description" : "The date from which the relation is valid."
+            "description" : "The first date on which the relation is valid (inclusive)."
           },
           "validTo" : {
             "type" : [ "string", "null" ],
             "format" : "date",
-            "description" : "The date until which the relation is valid."
+            "description" : "The last date on which the relation is valid (inclusive)."
           }
         }
       },

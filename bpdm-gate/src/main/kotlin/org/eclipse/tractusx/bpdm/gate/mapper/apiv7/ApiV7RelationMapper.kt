@@ -100,7 +100,7 @@ class ApiV7RelationMapper {
             is SourceEqualsTarget ->
                 "${relation(error.externalId)} is invalid: business partner '${error.businessPartnerExternalId}' is both its source and its target"
             is InvalidValidityPeriod ->
-                "${relation(error.externalId)} is invalid: validFrom '${error.validFrom}' of a validity period is not before its validTo '${error.validTo}'"
+                "${relation(error.externalId)} is invalid: validFrom '${error.validFrom}' of a validity period is after its validTo '${error.validTo}'"
         }
 
     private fun relation(externalId: String?) =
