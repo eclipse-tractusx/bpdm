@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.participation.SharingMemberRecordRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.AddressUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.BpnReferenceKind
@@ -63,6 +64,7 @@ import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.PhysicalPostalAddressRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant
@@ -96,7 +98,8 @@ import org.eclipse.tractusx.bpdm.pool.model.request.PhysicalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.PostalAddressScriptVariant as PoolPostalAddressScriptVariant
 
 /**
- * Translates the golden record and golden record relation tasks the Orchestrator hands to the Pool into the Pool's raw model.
+ * Translates the golden record tasks, golden record relation tasks and sharing member records the Orchestrator hands to
+ * the Pool into the Pool's raw model.
  */
 @Component
 class OrchestratorInboundMapper {
@@ -119,6 +122,15 @@ class OrchestratorInboundMapper {
         GoldenRecordRelationTaskRaw(
             taskId = task.taskId,
             relation = toRelation(task.businessPartnerRelations)
+        )
+
+    /**
+     * Returns the raw sharing member record [record] carries.
+     */
+    fun toRaw(record: SharingMemberRecord): SharingMemberRecordRaw =
+        SharingMemberRecordRaw(
+            recordId = record.recordId,
+            isGoldenRecordCounted = record.isGoldenRecordCounted
         )
 
     private fun toRelation(relation: BusinessPartnerRelations): RelationRaw =

@@ -27,6 +27,8 @@ interface SharingMemberRecordRepository:  JpaRepository<SharingMemberRecordDb, L
 
     fun findByRecordId(recordId: String): SharingMemberRecordDb?
 
+    fun findByRecordIdIn(recordIds: Collection<String>): List<SharingMemberRecordDb>
+
     fun findByAddress(address: LogisticAddressDb): Set<SharingMemberRecordDb>
 
 }

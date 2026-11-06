@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
@@ -179,6 +180,23 @@ class OrchestratorMockDataFactory(
                 .put(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS))
                 .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(SharingMemberRecord("", null, Instant.now(), Instant.now()))))
         )
+    }
+
+    fun mockSharingMemberRecords(records: List<SharingMemberRecord>){
+        configureWireMock()
+
+        WireMock.stubFor(
+            WireMock
+                .get(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(PageDto(records.size.toLong(), 1, 0, records.size, records))))
+        )
+    }
+
+    fun getSharingMemberRecordQueryTimestamps(): List<Instant>{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        return WireMock.findAll(WireMock.getRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS)))
+            .map { Instant.parse(it.queryParameter("timestampAfter").firstValue()) }
     }
 
     fun getSharingMemberRecordUpdates(): List<SharingMemberRecordUpdateRequest>{
