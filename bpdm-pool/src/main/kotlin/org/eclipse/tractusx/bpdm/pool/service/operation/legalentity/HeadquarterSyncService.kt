@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -100,9 +100,9 @@ class HeadquarterSyncService(
 
             scriptVariantCoverageService.pruneUncoveredScriptVariants(legalEntityDb)
 
-            changelogCreateService.record(ChangelogRecord(legalEntityDb.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-            changelogCreateService.record(ChangelogRecord(currentLegalAddress.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
-            changelogCreateService.record(ChangelogRecord(newLegalAddress.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogEntryRaw(legalEntityDb.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+            changelogCreateService.record(ChangelogEntryRaw(currentLegalAddress.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogEntryRaw(newLegalAddress.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
         }
     }
 

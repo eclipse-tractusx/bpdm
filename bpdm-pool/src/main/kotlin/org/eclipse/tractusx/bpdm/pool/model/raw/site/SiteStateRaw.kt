@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,13 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.raw.task
+package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-/**
- * How the Orchestrator answered the error report of one task.
- */
-sealed interface TaskErrorReportOutcome {
-    data object Reported : TaskErrorReportOutcome
-    data object TaskUnknown : TaskErrorReportOutcome
-    data class Failed(val cause: String) : TaskErrorReportOutcome
-}
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.Instant
+
+data class SiteStateRaw(
+    val validFrom: Instant?,
+    val validTo: Instant?,
+    val type: BusinessStateType
+)

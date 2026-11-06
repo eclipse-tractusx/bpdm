@@ -26,17 +26,17 @@ import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ifSet
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
@@ -64,22 +64,22 @@ class SiteUpdateService(
      * actually changed.
      */
     @Transactional
-    fun update(requests: List<SiteUpdate>): List<UpsertResult<SiteDb>> {
+    fun update(requests: List<SiteChangeParsed>): List<UpsertResultParsed<SiteDb>> {
         // Before the address: the address keeps the script variants its partners are named in, so it has to see the site's
         // new scripts to let go of one it is dropping.
         val headerUpdates = requests.map { updateHeader(it) }
-        val mainAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.site.mainAddress, it.mainAddress) })
+        val mainAddressUpdates = addressUpdateService.update(requests.map { AddressChangeParsed(it.site.mainAddress, it.mainAddress) })
 
         val siteChangeResults = headerUpdates.zip(mainAddressUpdates) { headerResult, mainAddressResult ->
             val hasChanged = headerResult.upsertType != UpsertType.NoChange || mainAddressResult.upsertType != UpsertType.NoChange
-            UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
+            UpsertResultParsed(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
 
         val updatedSites = siteChangeResults.filter { it.upsertType == UpsertType.Updated }
 
         updatedSites.forEach { it.value.updatedAt = DbTimestamp.now() }
         siteRepository.saveAll(updatedSites.map { it.value })
-        changelogCreateService.record(updatedSites.map { ChangelogRecord(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE) })
+        changelogCreateService.record(updatedSites.map { ChangelogEntryRaw(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.SITE) })
 
         if (updatedSites.isNotEmpty())
             logger.info {
@@ -89,13 +89,13 @@ class SiteUpdateService(
         return siteChangeResults
     }
 
-    private fun updateHeader(request: SiteUpdate): UpsertResult<SiteDb> {
+    private fun updateHeader(request: SiteChangeParsed): UpsertResultParsed<SiteDb> {
         // The verdict is taken before the change is applied, but the change is applied either way: a field that does
         // not count towards the verdict is still written.
         val changed = willChange(request.site, request.header)
         applyHeader(request.site, request.header)
 
-        return UpsertResult(request.site, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        return UpsertResultParsed(request.site, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
     /**
@@ -106,7 +106,7 @@ class SiteUpdateService(
      * cannot drift apart. A script code is a stored entity and is compared by its technical key rather than by
      * reference, because navigating to one can yield a lazy proxy while the parsed value holds the initialised instance.
      */
-    private fun willChange(target: SiteDb, header: SiteHeaderUpdate): Boolean {
+    private fun willChange(target: SiteDb, header: SiteHeaderChangeParsed): Boolean {
         header.name.ifSet { if (it != target.name) return true }
         header.confidenceCriteria.ifSet {
             if (siteEntityMapper.toConfidence(it, target.confidenceCriteria.numberOfSharingMembers) != target.confidenceCriteria) return true
@@ -127,7 +127,7 @@ class SiteUpdateService(
     private fun scriptVariantKeys(variants: Collection<SiteScriptVariantDb>): Set<Any?> =
         variants.map { it.scriptCode.technicalKey to it.name }.toSet()
 
-    private fun applyHeader(target: SiteDb, header: SiteHeaderUpdate) {
+    private fun applyHeader(target: SiteDb, header: SiteHeaderChangeParsed) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         header.name.ifSet { target.name = it }

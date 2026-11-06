@@ -46,8 +46,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteSearchV6Request
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteStateV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.site.SiteV6Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.AddressDtoRequestMapperV6
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
@@ -309,8 +309,8 @@ class ApiV6InboundMapper(
             scriptVariants = emptyList()
         )
 
-    private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityState =
-        LegalEntityState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
+    private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityStateRaw =
+        LegalEntityStateRaw(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
     private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRaw =
         SiteHeaderRaw(
@@ -320,8 +320,8 @@ class ApiV6InboundMapper(
             scriptVariants = emptyList()
         )
 
-    private fun toStateRequest(state: SiteStateV6Dto): SiteState =
-        SiteState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
+    private fun toStateRequest(state: SiteStateV6Dto): SiteStateRaw =
+        SiteStateRaw(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
     private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRaw =
         ConfidenceCriteriaRaw(

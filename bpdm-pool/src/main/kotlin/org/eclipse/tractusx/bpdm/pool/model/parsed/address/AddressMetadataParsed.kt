@@ -17,13 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
+import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 
-data class ChangelogRecord(
-    val bpn: String,
-    val changelogType: ChangelogTypeV7,
-    val businessPartnerType: BusinessPartnerType
+/**
+ * Metadata entities resolved in one batch and keyed for per-entry lookup during address parsing: identifier types by
+ * technical key, countries by two-letter code, regions by region code, script codes by technical key.
+ */
+data class AddressMetadataParsed(
+    val idTypes: Map<String, IdentifierTypeDb>,
+    val countries: Map<String, CountryDb>,
+    val regions: Map<String, RegionDb>,
+    val scriptCodes: Map<String, ScriptCodeDb>
 )

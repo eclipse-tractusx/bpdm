@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityIdentifierParsed
@@ -63,7 +63,7 @@ class LegalEntityEntityMapper(
     fun toIdentifiers(parsed: List<LegalEntityIdentifierParsed>, parent: LegalEntityDb): List<LegalEntityIdentifierDb> =
         parsed.map { LegalEntityIdentifierDb(value = it.value, type = it.type, issuingBody = it.issuingBody, legalEntity = parent) }
 
-    fun toStates(parsed: List<LegalEntityState>, parent: LegalEntityDb): List<LegalEntityStateDb> =
+    fun toStates(parsed: List<LegalEntityStateRaw>, parent: LegalEntityDb): List<LegalEntityStateDb> =
         parsed.map { LegalEntityStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type, legalEntity = parent) }
 
     fun toScriptVariants(parsed: List<LegalEntityScriptVariantParsed>): List<LegalEntityScriptVariantDb> =

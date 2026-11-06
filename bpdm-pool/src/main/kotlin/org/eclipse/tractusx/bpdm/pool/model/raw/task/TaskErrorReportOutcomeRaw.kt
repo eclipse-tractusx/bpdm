@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,14 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.raw.task
 
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.Instant
-
-/** Reused as-is by both request and parsed stages: a legal-entity state has no metadata to resolve and its type is always present. */
-data class LegalEntityState(
-    val validFrom: Instant?,
-    val validTo: Instant?,
-    val type: BusinessStateType
-)
+/**
+ * How the Orchestrator answered the error report of one task.
+ */
+sealed interface TaskErrorReportOutcomeRaw {
+    data object Reported : TaskErrorReportOutcomeRaw
+    data object TaskUnknown : TaskErrorReportOutcomeRaw
+    data class Failed(val cause: String) : TaskErrorReportOutcomeRaw
+}

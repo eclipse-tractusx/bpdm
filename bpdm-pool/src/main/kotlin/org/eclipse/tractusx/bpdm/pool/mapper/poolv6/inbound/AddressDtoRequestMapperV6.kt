@@ -35,7 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.LogisticAddressV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddressV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
-import org.eclipse.tractusx.bpdm.pool.model.Street
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -112,8 +112,8 @@ class AddressDtoRequestMapperV6 {
     private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRaw =
         GeoCoordinateRaw(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toStreet(street: StreetV6Dto): Street =
-        Street(
+    private fun toStreet(street: StreetV6Dto): StreetRaw =
+        StreetRaw(
             name = street.name,
             houseNumber = street.houseNumber,
             houseNumberSupplement = street.houseNumberSupplement,

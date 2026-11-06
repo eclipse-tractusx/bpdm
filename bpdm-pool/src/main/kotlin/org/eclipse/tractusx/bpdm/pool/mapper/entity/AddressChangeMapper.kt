@@ -20,27 +20,27 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LogisticAddressParsed
 import org.springframework.stereotype.Component
 
 /**
- * Builds an [AddressContentUpdate] that fully replaces a logistic address's content from parsed content — every field is
- * [FieldUpdate.Set]. Site membership is not content, so the caller states it: [FieldUpdate.NoOp] leaves it as it stands,
- * [FieldUpdate.Set] replaces it with the stated sites.
+ * Builds an [AddressContentChangeParsed] that fully replaces a logistic address's content from parsed content — every field is
+ * [FieldUpdateRaw.Set]. Site membership is not content, so the caller states it: [FieldUpdateRaw.NoOp] leaves it as it stands,
+ * [FieldUpdateRaw.Set] replaces it with the stated sites.
  */
 @Component
-class AddressUpdateMapper {
+class AddressChangeMapper {
 
-    fun toFullUpdate(content: LogisticAddressParsed, sites: FieldUpdate<List<SiteDb>>) = AddressContentUpdate(
-        name = FieldUpdate.Set(content.name),
-        physicalPostalAddress = FieldUpdate.Set(content.physicalPostalAddress),
-        alternativePostalAddress = FieldUpdate.Set(content.alternativePostalAddress),
-        confidenceCriteria = FieldUpdate.Set(content.confidenceCriteria),
-        identifiers = FieldUpdate.Set(content.identifiers),
-        states = FieldUpdate.Set(content.states),
-        scriptVariants = FieldUpdate.Set(content.scriptVariants),
+    fun toFullUpdate(content: LogisticAddressParsed, sites: FieldUpdateRaw<List<SiteDb>>) = AddressContentChangeParsed(
+        name = FieldUpdateRaw.Set(content.name),
+        physicalPostalAddress = FieldUpdateRaw.Set(content.physicalPostalAddress),
+        alternativePostalAddress = FieldUpdateRaw.Set(content.alternativePostalAddress),
+        confidenceCriteria = FieldUpdateRaw.Set(content.confidenceCriteria),
+        identifiers = FieldUpdateRaw.Set(content.identifiers),
+        states = FieldUpdateRaw.Set(content.states),
+        scriptVariants = FieldUpdateRaw.Set(content.scriptVariants),
         sites = sites
     )
 }

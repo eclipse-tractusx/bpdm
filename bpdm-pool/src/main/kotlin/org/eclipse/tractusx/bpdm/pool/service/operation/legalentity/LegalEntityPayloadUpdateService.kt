@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityHeaderUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressChangeMapper
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityHeaderChangeMapper
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,8 +43,8 @@ import java.time.temporal.ChronoUnit
 class LegalEntityPayloadUpdateService(
     private val legalEntityUpdateService: LegalEntityUpdateService,
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
-    private val legalEntityHeaderUpdateMapper: LegalEntityHeaderUpdateMapper,
-    private val addressUpdateMapper: AddressUpdateMapper
+    private val legalEntityHeaderUpdateMapper: LegalEntityHeaderChangeMapper,
+    private val addressUpdateMapper: AddressChangeMapper
 ) {
 
     /**
@@ -52,7 +52,7 @@ class LegalEntityPayloadUpdateService(
      * entity whether it actually changed.
      */
     @Transactional
-    fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>> {
+    fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResultParsed<LegalEntityDb>> {
         val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
 
         // Read before the update mutates the targets: only a changed ownership flag can move an ultimate owner, so only
@@ -63,10 +63,10 @@ class LegalEntityPayloadUpdateService(
         }
 
         val updateRequests = parsed.map {
-            LegalEntityUpdate(
+            LegalEntityChangeParsed(
                 it.target,
                 legalEntityHeaderUpdateMapper.toFullUpdate(it.content.header, currentness),
-                addressUpdateMapper.toFullUpdate(it.content.legalAddress, FieldUpdate.NoOp)
+                addressUpdateMapper.toFullUpdate(it.content.legalAddress, FieldUpdateRaw.NoOp)
             )
         }
 

@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.OrchestratorIn
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorRelationOutboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordRelationTaskResultRecord
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRelationTaskRaw
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcome
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcomeRaw
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
@@ -62,7 +62,7 @@ class GoldenRecordRelationTaskGateway(
     /**
      * Reports the relation tasks with [taskIds] to the Orchestrator as failed without a known cause and returns how it answered each.
      */
-    fun resolveTasksAsErrors(taskIds: List<String>): List<TaskErrorReportOutcome> =
+    fun resolveTasksAsErrors(taskIds: List<String>): List<TaskErrorReportOutcomeRaw> =
         reportTaskErrors(taskIds) { taskId ->
             val resultEntry = outboundMapper.toErrorReportEntry(taskId)
             orchestrationApiClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(step = taskProperties.step, results = listOf(resultEntry)))

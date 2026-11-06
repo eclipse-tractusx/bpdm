@@ -40,9 +40,9 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalPostalAddressRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressMetadata
-import org.eclipse.tractusx.bpdm.pool.model.AddressState
-import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressMetadataParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressStateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.GeoCoordinateParsed
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressConstraintError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressContentError
@@ -78,7 +78,7 @@ class AddressRequestParser(
         return contents.map { parseEntry(it, metadata) }
     }
 
-    private fun fetchMetadata(contents: List<LogisticAddressRaw>): AddressMetadata {
+    private fun fetchMetadata(contents: List<LogisticAddressRaw>): AddressMetadataParsed {
         val scriptVariants = contents.flatMap { it.scriptVariants }
 
         val idTypeKeys = contents.flatMap { it.identifiers }.mapNotNull { it.type }.toSet()
@@ -96,7 +96,7 @@ class AddressRequestParser(
         val countries = countryRepository.findByCountryCodeIn(countryKeys)
         val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(scriptCodeKeys)
 
-        return AddressMetadata(
+        return AddressMetadataParsed(
             idTypes = idTypes.associateBy { it.technicalKey },
             countries = countries.associateBy { it.countryCode },
             regions = regions.associateBy { it.regionCode },
@@ -106,7 +106,7 @@ class AddressRequestParser(
 
     private fun parseEntry(
         request: LogisticAddressRaw,
-        metadata: AddressMetadata
+        metadata: AddressMetadataParsed
     ): ParseResult<LogisticAddressParsed, AddressContentError> {
         val errors = mutableListOf<AddressContentError>()
 
@@ -135,7 +135,7 @@ class AddressRequestParser(
 
     private fun parsePhysical(
         request: PhysicalPostalAddressRaw,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>
     ): PhysicalPostalAddressParsed? {
         val country = parseCountry(request.country, metadata, errors, AddressFieldError.PhysicalCountryMissing) { AddressMetadataError.PhysicalCountryNotFound(it) }
@@ -165,7 +165,7 @@ class AddressRequestParser(
 
     private fun parseAlternative(
         request: AlternativePostalAddressRaw,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>
     ): AlternativePostalAddressParsed? {
         val country = parseCountry(request.country, metadata, errors, AddressFieldError.AlternativeCountryMissing) { AddressMetadataError.AlternativeCountryNotFound(it) }
@@ -216,7 +216,7 @@ class AddressRequestParser(
 
     private fun parseIdentifiers(
         requests: List<AddressIdentifierRaw>,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>
     ): List<AddressIdentifierParsed> {
         if (requests.size > ValidationLimits.IDENTIFIER_AMOUNT_LIMIT) {
@@ -236,15 +236,15 @@ class AddressRequestParser(
     private fun parseStates(
         requests: List<AddressStateRaw>,
         errors: MutableList<AddressContentError>
-    ): List<AddressState> =
+    ): List<AddressStateParsed> =
         requests.mapIndexedNotNull { index, request ->
             val type = request.type ?: run { errors.add(AddressFieldError.StateTypeMissing(index)); return@mapIndexedNotNull null }
-            AddressState(request.validFrom, request.validTo, type)
+            AddressStateParsed(request.validFrom, request.validTo, type)
         }
 
     private fun parseScriptVariants(
         requests: List<AddressScriptVariantRaw>,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>
     ): List<AddressScriptVariantParsed> {
         val claimedScriptCodes = mutableSetOf<String>()
@@ -261,7 +261,7 @@ class AddressRequestParser(
     private fun parseScriptVariant(
         index: Int,
         variant: AddressScriptVariantRaw,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>
     ): AddressScriptVariantParsed? {
         val scriptCode = metadata.scriptCodes[variant.scriptCode]
@@ -314,7 +314,7 @@ class AddressRequestParser(
 
     private fun parseRegion(
         regionCode: String?,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>,
         notFound: (String) -> AddressMetadataError
     ): RegionDb? {
@@ -324,7 +324,7 @@ class AddressRequestParser(
 
     private fun parseCountry(
         value: String?,
-        metadata: AddressMetadata,
+        metadata: AddressMetadataParsed,
         errors: MutableList<AddressContentError>,
         missingError: AddressFieldError,
         notFound: (String) -> AddressMetadataError
@@ -342,10 +342,10 @@ class AddressRequestParser(
         return country
     }
 
-    private fun parseGeoCoordinate(request: GeoCoordinateRaw): GeoCoordinate? {
+    private fun parseGeoCoordinate(request: GeoCoordinateRaw): GeoCoordinateParsed? {
         val longitude = request.longitude
         val latitude = request.latitude
         // A coordinate says nothing without both longitude and latitude, so a half-given one counts as absent.
-        return if (longitude != null && latitude != null) GeoCoordinate(longitude, latitude, request.altitude) else null
+        return if (longitude != null && latitude != null) GeoCoordinateParsed(longitude, latitude, request.altitude) else null
     }
 }

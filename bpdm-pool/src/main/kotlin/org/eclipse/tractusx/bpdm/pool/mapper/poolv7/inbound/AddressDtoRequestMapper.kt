@@ -44,9 +44,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.PostalAddressScriptVa
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.StreetV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
-import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
-import org.eclipse.tractusx.bpdm.pool.model.Street
-import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetScriptVariantRaw
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -69,9 +68,6 @@ class AddressDtoRequestMapper {
             confidenceCriteria = toConfidenceRequest(address.confidenceCriteria),
             scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
-
-    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): LogisticAddressRaw =
-        toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
 
     private fun toPhysicalRequest(physical: PhysicalPostalAddressV7Dto): PhysicalPostalAddressRaw =
         PhysicalPostalAddressRaw(
@@ -150,8 +146,8 @@ class AddressDtoRequestMapper {
             city = variant.city
         )
 
-    private fun toScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariant =
-        StreetScriptVariant(
+    private fun toScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariantRaw =
+        StreetScriptVariantRaw(
             name = street.name,
             direction = street.direction,
             namePrefix = street.namePrefix,
@@ -160,8 +156,8 @@ class AddressDtoRequestMapper {
             additionalNameSuffix = street.additionalNameSuffix
         )
 
-    private fun toStreet(street: StreetV7Dto): Street =
-        Street(
+    private fun toStreet(street: StreetV7Dto): StreetRaw =
+        StreetRaw(
             name = street.name,
             houseNumber = street.houseNumber,
             houseNumberSupplement = street.houseNumberSupplement,

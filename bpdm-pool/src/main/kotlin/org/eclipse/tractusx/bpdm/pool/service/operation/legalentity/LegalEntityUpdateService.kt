@@ -19,6 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.orKeep
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
@@ -26,12 +32,11 @@ import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.model.update.*
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
@@ -60,22 +65,22 @@ class LegalEntityUpdateService(
      * address — actually changed.
      */
     @Transactional
-    fun update(requests: List<LegalEntityUpdate>): List<UpsertResult<LegalEntityDb>> {
+    fun update(requests: List<LegalEntityChangeParsed>): List<UpsertResultParsed<LegalEntityDb>> {
         // Before the address: the address keeps the script variants its partners are named in, so it has to see the legal
         // entity's new scripts to let go of one it is dropping.
         val headerUpdates = requests.map { updateHeader(it) }
-        val legalAddressUpdates = addressUpdateService.update(requests.map { AddressUpdate(it.legalEntity.legalAddress, it.legalAddress) })
+        val legalAddressUpdates = addressUpdateService.update(requests.map { AddressChangeParsed(it.legalEntity.legalAddress, it.legalAddress) })
 
         val legalEntityChangeResults = headerUpdates.zip(legalAddressUpdates) { headerResult, legalAddressResult ->
             val hasChanged = headerResult.upsertType != UpsertType.NoChange || legalAddressResult.upsertType != UpsertType.NoChange
-            UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
+            UpsertResultParsed(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
 
         val updatedLegalEntities = legalEntityChangeResults.filter { it.upsertType == UpsertType.Updated }
 
         updatedLegalEntities.forEach { it.value.updatedAt = DbTimestamp.now() }
         repository.saveAll(updatedLegalEntities.map { it.value })
-        changelogCreateService.record(updatedLegalEntities.map { ChangelogRecord(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+        changelogCreateService.record(updatedLegalEntities.map { ChangelogEntryRaw(it.value.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
 
         if (updatedLegalEntities.isNotEmpty())
             logger.info {
@@ -86,13 +91,13 @@ class LegalEntityUpdateService(
         return legalEntityChangeResults
     }
 
-    private fun updateHeader(request: LegalEntityUpdate): UpsertResult<LegalEntityDb> {
+    private fun updateHeader(request: LegalEntityChangeParsed): UpsertResultParsed<LegalEntityDb> {
         // The verdict is taken before the change is applied, but the change is applied either way: `currentness` does
         // not count towards the verdict yet must still be restamped.
         val changed = willChange(request.legalEntity, request.header)
         applyHeader(request.legalEntity, request.header)
 
-        return UpsertResult(request.legalEntity, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        return UpsertResultParsed(request.legalEntity, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
     /**
@@ -107,7 +112,7 @@ class LegalEntityUpdateService(
      * `currentness` is deliberately absent: the Pool restamps it on every task resolution, so counting it would emit a
      * changelog for every touch and keep the golden record process rediscovering its own writes.
      */
-    private fun willChange(target: LegalEntityDb, header: LegalEntityHeaderUpdate): Boolean {
+    private fun willChange(target: LegalEntityDb, header: LegalEntityHeaderChangeParsed): Boolean {
         header.legalName.ifSet { if (it != target.legalName.value) return true }
         header.legalShortName.ifSet { if (it != target.legalName.shortName) return true }
         header.legalForm.ifSet { if (it?.technicalKey != target.legalForm?.technicalKey) return true }
@@ -139,7 +144,7 @@ class LegalEntityUpdateService(
     private fun scriptVariantKeys(variants: Collection<LegalEntityScriptVariantDb>): Set<Any?> =
         variants.map { listOf(it.scriptCode.technicalKey, it.legalName, it.shortName) }.toSet()
 
-    private fun applyHeader(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
+    private fun applyHeader(target: LegalEntityDb, header: LegalEntityHeaderChangeParsed) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         applyLegalName(target, header)
@@ -156,8 +161,8 @@ class LegalEntityUpdateService(
 
     // Legal name and short name are separate update fields but one embedded entity value, so setting either rebuilds the
     // pair and carries the untouched half forward.
-    private fun applyLegalName(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
-        if (header.legalName is FieldUpdate.NoOp && header.legalShortName is FieldUpdate.NoOp) return
+    private fun applyLegalName(target: LegalEntityDb, header: LegalEntityHeaderChangeParsed) {
+        if (header.legalName is FieldUpdateRaw.NoOp && header.legalShortName is FieldUpdateRaw.NoOp) return
 
         target.legalName = NameDb(
             value = header.legalName.orKeep(target.legalName.value),

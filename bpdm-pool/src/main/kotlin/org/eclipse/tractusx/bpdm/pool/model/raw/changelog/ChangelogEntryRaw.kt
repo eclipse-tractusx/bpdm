@@ -17,21 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.raw.changelog
 
-/**
- * A street's script-variant text, shared by the loose request and the validated stage because every one of its parts
- * stays optional in both.
- */
-data class StreetScriptVariant(
-    val name: String? = null,
-    val direction: String? = null,
-    val namePrefix: String? = null,
-    val additionalNamePrefix: String? = null,
-    val nameSuffix: String? = null,
-    val additionalNameSuffix: String? = null
-) {
-    companion object {
-        val empty = StreetScriptVariant(null, null, null, null, null, null)
-    }
-}
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
+
+data class ChangelogEntryRaw(
+    val bpn: String,
+    val changelogType: ChangelogTypeV7,
+    val businessPartnerType: BusinessPartnerType
+)

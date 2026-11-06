@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.update
+package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 
@@ -43,7 +43,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
  * One address to update together with the change to apply to it, so a batch write cannot pair targets and changes
  * positionally and get them out of step.
  */
-data class AddressUpdate(
+data class AddressChangeParsed(
     val address: LogisticAddressDb,
-    val content: AddressContentUpdate
+    val content: AddressContentChangeParsed
 )

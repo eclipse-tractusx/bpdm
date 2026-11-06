@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 
 data class SiteContentParsed(
     val header: SiteHeaderParsed,
@@ -31,7 +31,7 @@ data class SiteContentParsed(
 
 data class SiteHeaderParsed(
     val name: String,
-    val states: List<SiteState>,
+    val states: List<SiteStateRaw>,
     val confidenceCriteria: ConfidenceCriteriaParsed,
     val scriptVariants: List<SiteScriptVariantParsed>
 ) {

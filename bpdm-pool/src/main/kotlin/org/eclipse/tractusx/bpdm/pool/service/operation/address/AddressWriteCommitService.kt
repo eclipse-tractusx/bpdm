@@ -25,11 +25,11 @@ import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.util.countForLog
 import org.eclipse.tractusx.bpdm.common.util.joinIdentifiersForLog
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
 import org.springframework.stereotype.Service
@@ -52,14 +52,14 @@ class AddressWriteCommitService(
      * staged write.
      */
     @Transactional
-    fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> {
+    fun commit(staged: List<PendingAddressWriteParsed>): List<UpsertResultParsed<LogisticAddressDb>> {
         staged.filter { it.upsertType == UpsertType.Updated }.forEach { it.address.updatedAt = DbTimestamp.now() }
         logisticAddressRepository.saveAll(staged.filter { it.upsertType != UpsertType.NoChange }.map { it.address })
 
         changelogCreateService.record(staged.mapNotNull {
             when (it.upsertType) {
-                UpsertType.Created -> ChangelogRecord(it.address.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.ADDRESS)
-                UpsertType.Updated -> ChangelogRecord(it.address.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS)
+                UpsertType.Created -> ChangelogEntryRaw(it.address.bpn, ChangelogTypeV7.CREATE, BusinessPartnerType.ADDRESS)
+                UpsertType.Updated -> ChangelogEntryRaw(it.address.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS)
                 UpsertType.NoChange -> null
             }
         })
@@ -67,10 +67,10 @@ class AddressWriteCommitService(
         report("Created", staged.filter { it.upsertType == UpsertType.Created })
         report("Updated", staged.filter { it.upsertType == UpsertType.Updated })
 
-        return staged.map { UpsertResult(it.address, it.upsertType) }
+        return staged.map { UpsertResultParsed(it.address, it.upsertType) }
     }
 
-    private fun report(change: String, written: List<PendingAddressWrite>) {
+    private fun report(change: String, written: List<PendingAddressWriteParsed>) {
         if (written.isEmpty()) return
 
         logger.info {

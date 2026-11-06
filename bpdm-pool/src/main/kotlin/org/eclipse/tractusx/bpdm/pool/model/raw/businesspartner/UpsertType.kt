@@ -17,10 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner
 
 
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
-)
+enum class UpsertType{
+    Created,
+    Updated,
+    NoChange
+}

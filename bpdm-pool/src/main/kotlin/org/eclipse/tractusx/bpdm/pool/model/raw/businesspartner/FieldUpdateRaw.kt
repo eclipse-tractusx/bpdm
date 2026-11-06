@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.update
+package org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner
 
 /**
  * A single field's contribution to a partial update: either [Set] it to a value (which, for a nullable field, includes
@@ -25,19 +25,19 @@ package org.eclipse.tractusx.bpdm.pool.model.update
  * full replace (every field [Set]) or a targeted change (only some fields [Set], the rest [NoOp]) with the same shape,
  * and the applying service — not the caller — decides how each [Set] value is written.
  */
-sealed interface FieldUpdate<out T> {
-    data class Set<out T>(val value: T) : FieldUpdate<T>
-    data object NoOp : FieldUpdate<Nothing>
+sealed interface FieldUpdateRaw<out T> {
+    data class Set<out T>(val value: T) : FieldUpdateRaw<T>
+    data object NoOp : FieldUpdateRaw<Nothing>
 }
 
-/** Runs [action] with the new value only when this field is [FieldUpdate.Set]; a [FieldUpdate.NoOp] is ignored. */
-inline fun <T> FieldUpdate<T>.ifSet(action: (T) -> Unit) {
-    if (this is FieldUpdate.Set) action(value)
+/** Runs [action] with the new value only when this field is [FieldUpdateRaw.Set]; a [FieldUpdateRaw.NoOp] is ignored. */
+inline fun <T> FieldUpdateRaw<T>.ifSet(action: (T) -> Unit) {
+    if (this is FieldUpdateRaw.Set) action(value)
 }
 
 /**
- * The new value when this field is [FieldUpdate.Set], otherwise [current]. For fields that cannot be written in
+ * The new value when this field is [FieldUpdateRaw.Set], otherwise [current]. For fields that cannot be written in
  * isolation — several update fields backing one composite entity value — so an untouched part carries forward.
  */
-fun <T> FieldUpdate<T>.orKeep(current: T): T =
-    if (this is FieldUpdate.Set) value else current
+fun <T> FieldUpdateRaw<T>.orKeep(current: T): T =
+    if (this is FieldUpdateRaw.Set) value else current

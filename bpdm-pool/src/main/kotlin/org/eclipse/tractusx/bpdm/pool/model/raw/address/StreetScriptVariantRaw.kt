@@ -17,24 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper.entity
+package org.eclipse.tractusx.bpdm.pool.model.raw.address
 
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
-import org.springframework.stereotype.Component
-
-/**
- * Builds a [SiteHeaderUpdate] that fully replaces a site's header from parsed content — every field is
- * [FieldUpdate.Set].
- */
-@Component
-class SiteHeaderUpdateMapper {
-
-    fun toFullUpdate(header: SiteHeaderParsed) = SiteHeaderUpdate(
-        name = FieldUpdate.Set(header.name),
-        confidenceCriteria = FieldUpdate.Set(header.confidenceCriteria),
-        states = FieldUpdate.Set(header.states),
-        scriptVariants = FieldUpdate.Set(header.scriptVariants)
-    )
+data class StreetScriptVariantRaw(
+    val name: String? = null,
+    val direction: String? = null,
+    val namePrefix: String? = null,
+    val additionalNamePrefix: String? = null,
+    val nameSuffix: String? = null,
+    val additionalNameSuffix: String? = null
+) {
+    companion object {
+        val empty = StreetScriptVariantRaw(null, null, null, null, null, null)
+    }
 }

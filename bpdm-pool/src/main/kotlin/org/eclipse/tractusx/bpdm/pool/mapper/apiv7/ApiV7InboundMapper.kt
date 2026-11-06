@@ -45,8 +45,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerUpdateV7Reque
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteV7Dto
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressSearchRaw
@@ -293,7 +293,7 @@ class ApiV7InboundMapper(
             legalEntityBpn = request.bpnLParent,
             header = SiteHeaderRaw(
                 name = request.name,
-                states = request.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+                states = request.states.map { SiteStateRaw(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
                 scriptVariants = request.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.name) }
             ),
@@ -322,7 +322,7 @@ class ApiV7InboundMapper(
             legalShortName = header.legalShortName,
             legalForm = header.legalForm,
             identifiers = header.identifiers.map { LegalEntityIdentifierRaw(it.value, it.type, it.issuingBody) },
-            states = header.states.map { LegalEntityState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+            states = header.states.map { LegalEntityStateRaw(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(header.confidenceCriteria),
             isDataSpaceParticipant = header.isParticipantData,
             ownershipUltimate = header.ownershipUltimate,
@@ -342,7 +342,7 @@ class ApiV7InboundMapper(
     private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRaw =
         SiteHeaderRaw(
             name = site.name,
-            states = site.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
+            states = site.states.map { SiteStateRaw(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
             scriptVariants = site.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.name) }
         )

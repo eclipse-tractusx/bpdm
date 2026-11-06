@@ -17,36 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.Instant
 
-/**
- * Bounded address value types that carry no stage-specific metadata, so they are shared across the loose raw
- * ([LogisticAddressRaw]) and resolved ([LogisticAddressParsed]) stages without per-stage variants.
- */
-
-data class Street(
-    val name: String? = null,
-    val houseNumber: String? = null,
-    val houseNumberSupplement: String? = null,
-    val milestone: String? = null,
-    val direction: String? = null,
-    val namePrefix: String? = null,
-    val additionalNamePrefix: String? = null,
-    val nameSuffix: String? = null,
-    val additionalNameSuffix: String? = null
-)
-
-data class AddressState(
+data class LegalEntityStateRaw(
     val validFrom: Instant?,
     val validTo: Instant?,
     val type: BusinessStateType
-)
-
-data class GeoCoordinate(
-    val longitude: Double,
-    val latitude: Double,
-    val altitude: Double? = null
 )

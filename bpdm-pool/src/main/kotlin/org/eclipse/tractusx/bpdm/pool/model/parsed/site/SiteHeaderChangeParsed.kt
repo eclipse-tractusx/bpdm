@@ -17,9 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.update
+package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation
@@ -40,11 +42,24 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 /**
- * A site to update together with the change to apply to its header and to its main address. The main address is
- * identified by the site itself, so a caller cannot point the address change at some other address.
+ * A partial update to a site's header: each field is a [FieldUpdateRaw] carrying domain values, applied by
+ * `SiteUpdateService`. No default values — a full replace must address every field.
+ *
+ * Build a targeted update by copying from [NoOp], for example
+ * `SiteHeaderChangeParsed.NoOp.copy(name = FieldUpdateRaw.Set("…"))`.
  */
-data class SiteUpdate(
-    val site: SiteDb,
-    val header: SiteHeaderUpdate,
-    val mainAddress: AddressContentUpdate
-)
+data class SiteHeaderChangeParsed(
+    val name: FieldUpdateRaw<String>,
+    val confidenceCriteria: FieldUpdateRaw<ConfidenceCriteriaParsed>,
+    val states: FieldUpdateRaw<List<SiteStateRaw>>,
+    val scriptVariants: FieldUpdateRaw<List<SiteScriptVariantParsed>>
+) {
+    companion object {
+        val NoOp = SiteHeaderChangeParsed(
+            name = FieldUpdateRaw.NoOp,
+            confidenceCriteria = FieldUpdateRaw.NoOp,
+            states = FieldUpdateRaw.NoOp,
+            scriptVariants = FieldUpdateRaw.NoOp
+        )
+    }
+}

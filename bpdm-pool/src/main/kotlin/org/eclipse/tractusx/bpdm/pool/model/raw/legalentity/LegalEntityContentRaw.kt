@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 
 data class LegalEntityContentRaw(
     val header: LegalEntityHeaderRaw,
@@ -33,7 +32,7 @@ data class LegalEntityHeaderRaw(
     val legalShortName: String?,
     val legalForm: String?,
     val identifiers: List<LegalEntityIdentifierRaw>,
-    val states: List<LegalEntityState>,
+    val states: List<LegalEntityStateRaw>,
     val confidenceCriteria: ConfidenceCriteriaRaw,
     val isDataSpaceParticipant: Boolean,
     /** Null means the request does not state the flag, so an update leaves it untouched (v6 cannot express it at all). */

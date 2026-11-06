@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
  * Metadata entities resolved in one batch and keyed for per-entry lookup during legal-entity header parsing: legal forms
  * and identifier types and script codes, each by technical key.
  */
-data class LegalEntityHeaderMetadata(
+data class LegalEntityHeaderMetadataParsed(
     val legalForms: Map<String, LegalFormDb>,
     val idTypes: Map<String, IdentifierTypeDb>,
     val scriptCodes: Map<String, ScriptCodeDb>

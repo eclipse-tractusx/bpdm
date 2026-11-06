@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCri
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
 
 data class LegalEntityContentParsed(
     val header: LegalEntityHeaderParsed,
@@ -36,7 +36,7 @@ data class LegalEntityHeaderParsed(
     val legalShortName: String?,
     val legalForm: LegalFormDb?,
     val identifiers: List<LegalEntityIdentifierParsed>,
-    val states: List<LegalEntityState>,
+    val states: List<LegalEntityStateRaw>,
     val confidenceCriteria: ConfidenceCriteriaParsed,
     val isDataSpaceParticipant: Boolean,
     /** Null means the payload does not state the flag: keep the current value on update, default to false on create. */

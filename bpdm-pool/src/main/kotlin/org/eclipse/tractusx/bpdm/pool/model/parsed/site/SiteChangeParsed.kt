@@ -17,11 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.update
+package org.eclipse.tractusx.bpdm.pool.model.parsed.site
 
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
-import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation
@@ -42,24 +41,11 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteScriptVariantParsed
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 /**
- * A partial update to a site's header: each field is a [FieldUpdate] carrying domain values, applied by
- * `SiteUpdateService`. No default values — a full replace must address every field.
- *
- * Build a targeted update by copying from [NoOp], for example
- * `SiteHeaderUpdate.NoOp.copy(name = FieldUpdate.Set("…"))`.
+ * A site to update together with the change to apply to its header and to its main address. The main address is
+ * identified by the site itself, so a caller cannot point the address change at some other address.
  */
-data class SiteHeaderUpdate(
-    val name: FieldUpdate<String>,
-    val confidenceCriteria: FieldUpdate<ConfidenceCriteriaParsed>,
-    val states: FieldUpdate<List<SiteState>>,
-    val scriptVariants: FieldUpdate<List<SiteScriptVariantParsed>>
-) {
-    companion object {
-        val NoOp = SiteHeaderUpdate(
-            name = FieldUpdate.NoOp,
-            confidenceCriteria = FieldUpdate.NoOp,
-            states = FieldUpdate.NoOp,
-            scriptVariants = FieldUpdate.NoOp
-        )
-    }
-}
+data class SiteChangeParsed(
+    val site: SiteDb,
+    val header: SiteHeaderChangeParsed,
+    val mainAddress: AddressContentChangeParsed
+)

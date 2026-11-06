@@ -24,13 +24,13 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelationTypeV7
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.LegalEntityRelationUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -90,13 +90,13 @@ class LegalEntityRelationUpsertService(
         return written
     }
 
-    private fun write(relation: LegalEntityRelationUpsertParsed): UpsertResult<RelationDb> {
+    private fun write(relation: LegalEntityRelationUpsertParsed): UpsertResultParsed<RelationDb> {
         val validityPeriods = relation.validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }
         val existingRelation = relation.existingRelation
-            ?: return UpsertResult(create(relation, validityPeriods), UpsertType.Created)
+            ?: return UpsertResultParsed(create(relation, validityPeriods), UpsertType.Created)
 
         if (!validityPeriodsDiffer(existingRelation.validityPeriods, validityPeriods)) {
-            return UpsertResult(existingRelation, UpsertType.NoChange)
+            return UpsertResultParsed(existingRelation, UpsertType.NoChange)
         }
 
         existingRelation.validityPeriods.clear()
@@ -104,7 +104,7 @@ class LegalEntityRelationUpsertService(
         existingRelation.updatedAt = DbTimestamp.now()
         relationRepository.save(existingRelation)
 
-        return UpsertResult(existingRelation, UpsertType.Updated)
+        return UpsertResultParsed(existingRelation, UpsertType.Updated)
     }
 
     private fun logOutcome(upsertType: UpsertType, relation: LegalEntityRelationUpsertParsed) {
@@ -126,8 +126,8 @@ class LegalEntityRelationUpsertService(
         )
         relationRepository.save(newRelation)
 
-        changelogCreateService.record(ChangelogRecord(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-        changelogCreateService.record(ChangelogRecord(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogEntryRaw(relation.source.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+        changelogCreateService.record(ChangelogEntryRaw(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
 
         return newRelation
     }

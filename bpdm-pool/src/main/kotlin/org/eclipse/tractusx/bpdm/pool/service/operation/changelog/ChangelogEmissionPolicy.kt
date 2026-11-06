@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.changelog
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 
 /**
  * The changelog entries a transaction writes and the recorded entries they superseded.
  */
 data class ChangelogEmissionPlan(
-    val emitted: List<ChangelogRecord>,
-    val suppressed: List<ChangelogRecord>
+    val emitted: List<ChangelogEntryRaw>,
+    val suppressed: List<ChangelogEntryRaw>
 )
 
 /**
@@ -40,7 +40,7 @@ object ChangelogEmissionPolicy {
      * Collapses the recorded entries to one per business partner, a creation outranking an update, and orders them
      * legal entity before site before address.
      */
-    fun plan(recorded: List<ChangelogRecord>): ChangelogEmissionPlan {
+    fun plan(recorded: List<ChangelogEntryRaw>): ChangelogEmissionPlan {
         val winningPositions = recorded.withIndex()
             .groupBy { (_, record) -> record.bpn }
             .map { (_, recordsOfPartner) -> winnerIn(recordsOfPartner).index }
@@ -54,7 +54,7 @@ object ChangelogEmissionPolicy {
         )
     }
 
-    private fun winnerIn(recordsOfPartner: List<IndexedValue<ChangelogRecord>>): IndexedValue<ChangelogRecord> =
+    private fun winnerIn(recordsOfPartner: List<IndexedValue<ChangelogEntryRaw>>): IndexedValue<ChangelogEntryRaw> =
         recordsOfPartner.firstOrNull { (_, record) -> record.changelogType == ChangelogTypeV7.CREATE }
             ?: recordsOfPartner.first()
 

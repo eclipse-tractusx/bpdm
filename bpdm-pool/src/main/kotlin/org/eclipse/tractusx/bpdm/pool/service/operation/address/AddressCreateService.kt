@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIssueService
 import org.springframework.stereotype.Service
@@ -51,10 +51,10 @@ class AddressCreateService(
      * Builds the addresses with their BPNs issued but nothing yet persisted or logged, so a caller can wire them into a
      * not-yet-persisted parent before handing them to [commit].
      */
-    fun stageCreate(parsed: List<AddressCreateParsed>): List<PendingAddressWrite> {
+    fun stageCreate(parsed: List<AddressCreateParsed>): List<PendingAddressWriteParsed> {
         val bpns = bpnIssueService.issueAddressBpns(parsed.size)
         return parsed.zip(bpns) { entry, bpn ->
-            PendingAddressWrite(addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
+            PendingAddressWriteParsed(addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
         }
     }
 
@@ -62,6 +62,6 @@ class AddressCreateService(
      * Persists the staged addresses and emits their CREATE changelog.
      */
     @Transactional
-    fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
+    fun commit(staged: List<PendingAddressWriteParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         addressWriteCommitService.commit(staged)
 }

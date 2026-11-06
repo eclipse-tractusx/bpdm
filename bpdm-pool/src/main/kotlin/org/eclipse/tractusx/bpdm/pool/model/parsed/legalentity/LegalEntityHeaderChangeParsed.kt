@@ -17,14 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.update
+package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate.Companion.NoOp
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderChangeParsed.Companion.NoOp
 import java.time.Instant
 
 /*******************************************************************************
@@ -46,40 +45,40 @@ import java.time.Instant
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 /**
- * A partial update to a legal entity's header: each field is a [FieldUpdate] carrying domain values, applied by
+ * A partial update to a legal entity's header: each field is a [FieldUpdateRaw] carrying domain values, applied by
  * `LegalEntityUpdateService`. No default values — a full replace must address every field. [ultimateOwnerBpnl] is derived
- * from [ownershipUltimate] plus the ownership relations, so a payload replace leaves it [FieldUpdate.NoOp] and
+ * from [ownershipUltimate] plus the ownership relations, so a payload replace leaves it [FieldUpdateRaw.NoOp] and
  * `UltimateOwnerRecalculationService` sets only it.
  *
  * Build a targeted update by copying from [NoOp], for example
- * `LegalEntityHeaderUpdate.NoOp.copy(ultimateOwnerBpnl = FieldUpdate.Set(bpnl))`.
+ * `LegalEntityHeaderChangeParsed.NoOp.copy(ultimateOwnerBpnl = FieldUpdateRaw.Set(bpnl))`.
  */
-data class LegalEntityHeaderUpdate(
-    val legalName: FieldUpdate<String>,
-    val legalShortName: FieldUpdate<String?>,
-    val legalForm: FieldUpdate<LegalFormDb?>,
-    val confidenceCriteria: FieldUpdate<ConfidenceCriteriaParsed>,
-    val isDataSpaceParticipant: FieldUpdate<Boolean>,
-    val ownershipUltimate: FieldUpdate<Boolean>,
-    val ultimateOwnerBpnl: FieldUpdate<String?>,
-    val currentness: FieldUpdate<Instant>,
-    val identifiers: FieldUpdate<List<LegalEntityIdentifierParsed>>,
-    val states: FieldUpdate<List<LegalEntityState>>,
-    val scriptVariants: FieldUpdate<List<LegalEntityScriptVariantParsed>>
+data class LegalEntityHeaderChangeParsed(
+    val legalName: FieldUpdateRaw<String>,
+    val legalShortName: FieldUpdateRaw<String?>,
+    val legalForm: FieldUpdateRaw<LegalFormDb?>,
+    val confidenceCriteria: FieldUpdateRaw<ConfidenceCriteriaParsed>,
+    val isDataSpaceParticipant: FieldUpdateRaw<Boolean>,
+    val ownershipUltimate: FieldUpdateRaw<Boolean>,
+    val ultimateOwnerBpnl: FieldUpdateRaw<String?>,
+    val currentness: FieldUpdateRaw<Instant>,
+    val identifiers: FieldUpdateRaw<List<LegalEntityIdentifierParsed>>,
+    val states: FieldUpdateRaw<List<LegalEntityStateRaw>>,
+    val scriptVariants: FieldUpdateRaw<List<LegalEntityScriptVariantParsed>>
 ) {
     companion object {
-        val NoOp = LegalEntityHeaderUpdate(
-            legalName = FieldUpdate.NoOp,
-            legalShortName = FieldUpdate.NoOp,
-            legalForm = FieldUpdate.NoOp,
-            confidenceCriteria = FieldUpdate.NoOp,
-            isDataSpaceParticipant = FieldUpdate.NoOp,
-            ownershipUltimate = FieldUpdate.NoOp,
-            ultimateOwnerBpnl = FieldUpdate.NoOp,
-            currentness = FieldUpdate.NoOp,
-            identifiers = FieldUpdate.NoOp,
-            states = FieldUpdate.NoOp,
-            scriptVariants = FieldUpdate.NoOp
+        val NoOp = LegalEntityHeaderChangeParsed(
+            legalName = FieldUpdateRaw.NoOp,
+            legalShortName = FieldUpdateRaw.NoOp,
+            legalForm = FieldUpdateRaw.NoOp,
+            confidenceCriteria = FieldUpdateRaw.NoOp,
+            isDataSpaceParticipant = FieldUpdateRaw.NoOp,
+            ownershipUltimate = FieldUpdateRaw.NoOp,
+            ultimateOwnerBpnl = FieldUpdateRaw.NoOp,
+            currentness = FieldUpdateRaw.NoOp,
+            identifiers = FieldUpdateRaw.NoOp,
+            states = FieldUpdateRaw.NoOp,
+            scriptVariants = FieldUpdateRaw.NoOp
         )
     }
 }

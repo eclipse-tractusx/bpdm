@@ -17,11 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
+import org.springframework.stereotype.Component
 
-enum class UpsertType{
-    Created,
-    Updated,
-    NoChange
+/**
+ * Builds a [SiteHeaderChangeParsed] that fully replaces a site's header from parsed content — every field is
+ * [FieldUpdateRaw.Set].
+ */
+@Component
+class SiteHeaderChangeMapper {
+
+    fun toFullUpdate(header: SiteHeaderParsed) = SiteHeaderChangeParsed(
+        name = FieldUpdateRaw.Set(header.name),
+        confidenceCriteria = FieldUpdateRaw.Set(header.confidenceCriteria),
+        states = FieldUpdateRaw.Set(header.states),
+        scriptVariants = FieldUpdateRaw.Set(header.scriptVariants)
+    )
 }

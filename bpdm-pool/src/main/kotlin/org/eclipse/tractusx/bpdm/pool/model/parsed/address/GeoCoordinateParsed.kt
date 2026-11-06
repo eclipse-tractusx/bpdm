@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,13 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressV7Dto
-
-
-data class LogisticAddressWithScriptVariantsDto (
-    val address: LogisticAddressV7Dto,
-    val scriptVariants: List<LogisticAddressScriptVariantV7Dto>
+data class GeoCoordinateParsed(
+    val longitude: Double,
+    val latitude: Double,
+    val altitude: Double? = null
 )

@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SharingMemberRecordDb
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.GoldenRecordCountedUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.SharingMemberRecordChangeRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -108,7 +108,7 @@ class SharingMemberConfidenceService(
             address.confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
             address.updatedAt = DbTimestamp.now()
             logisticAddressRepository.save(address)
-            changelogCreateService.record(ChangelogRecord(address.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
+            changelogCreateService.record(ChangelogEntryRaw(address.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.ADDRESS))
             logger.debug { "Updated number of sharing members of address '${address.bpn}' to $newNumberOfSharingMembers" }
         }
 
@@ -119,7 +119,7 @@ class SharingMemberConfidenceService(
                 legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
                 legalEntity.updatedAt = DbTimestamp.now()
                 legalEntityRepository.save(legalEntity)
-                changelogCreateService.record(ChangelogRecord(legalEntity.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+                changelogCreateService.record(ChangelogEntryRaw(legalEntity.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
                 logger.debug { "Updated number of sharing members of legal entity '${legalEntity.bpn}' to $newNumberOfSharingMembers" }
             }
         }

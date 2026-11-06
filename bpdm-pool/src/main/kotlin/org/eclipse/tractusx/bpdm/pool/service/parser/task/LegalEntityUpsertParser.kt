@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.orRecord
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
@@ -101,7 +101,7 @@ class LegalEntityUpsertParser(
             legalShortName = header.legalShortName,
             legalForm = header.legalForm,
             identifiers = header.identifiers,
-            states = header.states.map { LegalEntityState(it.validFrom, it.validTo, it.type!!) },
+            states = header.states.map { LegalEntityStateRaw(it.validFrom, it.validTo, it.type!!) },
             confidenceCriteria = header.confidenceCriteria,
             isDataSpaceParticipant = isDataSpaceParticipant,
             ownershipUltimate = header.ownershipUltimate,

@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation.address
 
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.UpsertResultParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PendingAddressWriteParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSiteMembershipParsed
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
-import org.eclipse.tractusx.bpdm.pool.model.update.orKeep
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressContentChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressChangeParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.FieldUpdateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.orKeep
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -52,13 +52,13 @@ class AddressUpdateService(
      * Applies the given changes and reports for each address whether it actually changed.
      */
     @Transactional
-    fun update(requests: List<AddressUpdate>): List<UpsertResult<LogisticAddressDb>> =
+    fun update(requests: List<AddressChangeParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         commit(requests.map { stageUpdate(it) })
 
     /**
      * Applies the given change to a single address and reports whether it actually changed.
      */
-    fun update(request: AddressUpdate): UpsertResult<LogisticAddressDb> =
+    fun update(request: AddressChangeParsed): UpsertResultParsed<LogisticAddressDb> =
         update(listOf(request)).single()
 
     /**
@@ -66,14 +66,14 @@ class AddressUpdateService(
      * address whether it actually changed.
      */
     @Transactional
-    fun setSites(memberships: List<AddressSiteMembershipParsed>): List<UpsertResult<LogisticAddressDb>> =
-        update(memberships.map { AddressUpdate(it.address, AddressContentUpdate.NoOp.copy(sites = FieldUpdate.Set(it.sites))) })
+    fun setSites(memberships: List<AddressSiteMembershipParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
+        update(memberships.map { AddressChangeParsed(it.address, AddressContentChangeParsed.NoOp.copy(sites = FieldUpdateRaw.Set(it.sites))) })
 
     /**
      * Applies one change in memory without persisting, so a caller can see whether the address changed — and wire it into
      * a not-yet-persisted parent — before handing it to [commit].
      */
-    fun stageUpdate(request: AddressUpdate): PendingAddressWrite {
+    fun stageUpdate(request: AddressChangeParsed): PendingAddressWriteParsed {
         val target = request.address
 
         // The verdict is taken before the change is applied, but the change is applied either way: a field that does
@@ -81,14 +81,14 @@ class AddressUpdateService(
         val changed = willChange(target, request.content)
         apply(target, request.content)
 
-        return PendingAddressWrite(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        return PendingAddressWriteParsed(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
     /**
      * Persists the staged addresses that changed and emits their UPDATE changelog.
      */
     @Transactional
-    fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
+    fun commit(staged: List<PendingAddressWriteParsed>): List<UpsertResultParsed<LogisticAddressDb>> =
         addressWriteCommitService.commit(staged)
 
     /**
@@ -99,7 +99,7 @@ class AddressUpdateService(
      * technical key rather than by reference: navigating to one can yield a lazy proxy while the parsed value holds the
      * initialised instance, and those two are never reference-equal.
      */
-    private fun willChange(target: LogisticAddressDb, update: AddressContentUpdate): Boolean {
+    private fun willChange(target: LogisticAddressDb, update: AddressContentChangeParsed): Boolean {
         update.name.ifSet { if (it != target.name) return true }
         update.physicalPostalAddress.ifSet {
             if (physicalKey(addressEntityMapper.toPhysical(it)) != physicalKey(target.physicalPostalAddress)) return true
@@ -164,7 +164,7 @@ class AddressUpdateService(
 
     private fun scriptVariantsAfter(
         target: LogisticAddressDb,
-        update: AddressContentUpdate,
+        update: AddressContentChangeParsed,
         stated: List<AddressScriptVariantParsed>
     ): List<LogisticAddressScriptVariantDb> {
         val statedVariants = addressEntityMapper.toScriptVariants(stated)
@@ -186,7 +186,7 @@ class AddressUpdateService(
         return (legalEntity?.scriptCodes().orEmpty() + mainAddressSites.flatMap { it.scriptCodes() }).toSet()
     }
 
-    private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
+    private fun apply(target: LogisticAddressDb, update: AddressContentChangeParsed) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         update.name.ifSet { target.name = it }

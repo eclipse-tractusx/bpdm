@@ -24,13 +24,11 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressState
-import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
-import org.eclipse.tractusx.bpdm.pool.model.Street
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
 
 data class LogisticAddressParsed(
     val name: String?,
-    val states: List<AddressState>,
+    val states: List<AddressStateParsed>,
     val identifiers: List<AddressIdentifierParsed>,
     val physicalPostalAddress: PhysicalPostalAddressParsed,
     val alternativePostalAddress: AlternativePostalAddressParsed?,
@@ -41,7 +39,7 @@ data class LogisticAddressParsed(
 }
 
 data class PhysicalPostalAddressParsed(
-    val geographicCoordinates: GeoCoordinate?,
+    val geographicCoordinates: GeoCoordinateParsed?,
     val country: CountryDb,
     val administrativeAreaLevel1: RegionDb?,
     val administrativeAreaLevel2: String?,
@@ -49,7 +47,7 @@ data class PhysicalPostalAddressParsed(
     val postalCode: String?,
     val city: String,
     val district: String?,
-    val street: Street?,
+    val street: StreetRaw?,
     val companyPostalCode: String?,
     val industrialZone: String?,
     val building: String?,
@@ -59,7 +57,7 @@ data class PhysicalPostalAddressParsed(
 )
 
 data class AlternativePostalAddressParsed(
-    val geographicCoordinates: GeoCoordinate?,
+    val geographicCoordinates: GeoCoordinateParsed?,
     val country: CountryDb,
     val administrativeAreaLevel1: RegionDb?,
     val postalCode: String?,

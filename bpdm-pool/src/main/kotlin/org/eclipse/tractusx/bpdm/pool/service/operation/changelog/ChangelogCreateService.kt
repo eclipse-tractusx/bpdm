@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.changelog
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
-import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
+import org.eclipse.tractusx.bpdm.pool.model.raw.changelog.ChangelogEntryRaw
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionSynchronization
@@ -42,25 +42,25 @@ class ChangelogCreateService(
     /**
      * Records the given changelog entries for writing when the current transaction commits.
      */
-    fun record(records: Collection<ChangelogRecord>) {
+    fun record(records: Collection<ChangelogEntryRaw>) {
         buffer().addAll(records)
     }
 
     /**
      * Records a single changelog entry for writing when the current transaction commits.
      */
-    fun record(record: ChangelogRecord) {
+    fun record(record: ChangelogEntryRaw) {
         buffer().add(record)
     }
 
-    private fun buffer(): MutableList<ChangelogRecord> {
+    private fun buffer(): MutableList<ChangelogEntryRaw> {
         openBuffer()?.let { return it }
 
         check(TransactionSynchronizationManager.isActualTransactionActive()) {
             "Changelog entries can only be recorded within an active transaction"
         }
 
-        val buffer = mutableListOf<ChangelogRecord>()
+        val buffer = mutableListOf<ChangelogEntryRaw>()
         val origin = TransactionSynchronizationManager.getCurrentTransactionName() ?: UNNAMED_TRANSACTION
 
         // The synchronized variant unbinds the buffer once the transaction completes and suspends it around a nested
@@ -72,20 +72,20 @@ class ChangelogCreateService(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun openBuffer(): MutableList<ChangelogRecord>? =
-        TransactionSynchronizationManager.getResource(this) as MutableList<ChangelogRecord>?
+    private fun openBuffer(): MutableList<ChangelogEntryRaw>? =
+        TransactionSynchronizationManager.getResource(this) as MutableList<ChangelogEntryRaw>?
 
-    private fun ChangelogRecord.toEntity(): PartnerChangelogEntryDb =
+    private fun ChangelogEntryRaw.toEntity(): PartnerChangelogEntryDb =
         PartnerChangelogEntryDb(bpn, businessPartnerType, changelogType)
 
-    private fun summarize(emitted: List<ChangelogRecord>): String =
+    private fun summarize(emitted: List<ChangelogEntryRaw>): String =
         emitted.groupingBy { it.businessPartnerType to it.changelogType }
             .eachCount()
             .entries
             .joinToString(", ") { (partnerAndChange, count) -> "$count ${partnerAndChange.first} ${partnerAndChange.second}" }
 
     private inner class ChangelogFlush(
-        private val recorded: List<ChangelogRecord>,
+        private val recorded: List<ChangelogEntryRaw>,
         private val origin: String
     ) : TransactionSynchronization {
 

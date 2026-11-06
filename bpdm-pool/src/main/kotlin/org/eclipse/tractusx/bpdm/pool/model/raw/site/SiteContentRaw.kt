@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
 
 data class SiteContentRaw(
     val header: SiteHeaderRaw,
@@ -30,7 +29,7 @@ data class SiteContentRaw(
 
 data class SiteHeaderRaw(
     val name: String?,
-    val states: List<SiteState>,
+    val states: List<SiteStateRaw>,
     val confidenceCriteria: ConfidenceCriteriaRaw,
     val scriptVariants: List<SiteScriptVariantRaw>
 )

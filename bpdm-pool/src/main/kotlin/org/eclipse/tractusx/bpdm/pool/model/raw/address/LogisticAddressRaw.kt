@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.model.raw.address
 import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.model.Street
 import java.time.Instant
 
 data class LogisticAddressRaw(
@@ -44,7 +43,7 @@ data class PhysicalPostalAddressRaw(
     val postalCode: String?,
     val city: String?,
     val district: String?,
-    val street: Street?,
+    val street: StreetRaw?,
     val companyPostalCode: String?,
     val industrialZone: String?,
     val building: String?,

@@ -19,6 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressStateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.GeoCoordinateParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressIdentifierParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AlternativeAddressScriptVariantParsed
@@ -27,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PhysicalAddressScript
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PhysicalPostalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.model.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -99,7 +102,7 @@ class AddressEntityMapper {
     fun toIdentifiers(parsed: List<AddressIdentifierParsed>): List<AddressIdentifierDb> =
         parsed.map { AddressIdentifierDb(value = it.value, type = it.type) }
 
-    fun toStates(parsed: List<AddressState>): List<AddressStateDb> =
+    fun toStates(parsed: List<AddressStateParsed>): List<AddressStateDb> =
         parsed.map { AddressStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type) }
 
     fun toScriptVariants(parsed: List<AddressScriptVariantParsed>): List<LogisticAddressScriptVariantDb> =
@@ -112,10 +115,10 @@ class AddressEntityMapper {
             )
         }
 
-    private fun toGeo(geo: GeoCoordinate) =
+    private fun toGeo(geo: GeoCoordinateParsed) =
         GeographicCoordinateDb(latitude = geo.latitude, longitude = geo.longitude, altitude = geo.altitude)
 
-    private fun toStreet(street: Street) =
+    private fun toStreet(street: StreetRaw) =
         StreetDb(
             name = street.name,
             houseNumber = street.houseNumber,
@@ -144,7 +147,7 @@ class AddressEntityMapper {
             city = variant.city
         )
 
-    private fun toScriptVariantStreet(street: StreetScriptVariant) =
+    private fun toScriptVariantStreet(street: StreetScriptVariantRaw) =
         StreetScriptVariantDb(
             name = street.name,
             direction = street.direction,

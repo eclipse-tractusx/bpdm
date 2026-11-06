@@ -17,20 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.UpsertType
 
-/**
- * A logistic address with a staged, not-yet-persisted write (create or update) and the resulting change state. Produced
- * by [org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService]'s `stageCreate` /
- * [org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressUpdateService]'s `stageUpdate` and consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressWriteCommitService]'s `commit`, which is the single
- * place an address is saved and changelogged. It is handed to callers so they can wire the (still-unsaved) address into
- * a cyclic parent — legal entity or site — before it is persisted.
- */
-data class PendingAddressWrite(
-    val address: LogisticAddressDb,
+
+data class UpsertResultParsed<T>(
+    val value: T,
     val upsertType: UpsertType
 )

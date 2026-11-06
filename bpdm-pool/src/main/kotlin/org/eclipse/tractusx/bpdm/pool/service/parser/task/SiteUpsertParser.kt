@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.orRecord
 import org.eclipse.tractusx.bpdm.common.model.parseResultOf
 import org.eclipse.tractusx.bpdm.common.model.parsedOrNull
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.BpnReferenceParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
@@ -190,7 +190,7 @@ class SiteUpsertParser(
 
         return SiteHeaderRaw(
             name = header.name,
-            states = header.states.map { SiteState(it.validFrom, it.validTo, it.type!!) },
+            states = header.states.map { SiteStateRaw(it.validFrom, it.validTo, it.type!!) },
             confidenceCriteria = header.confidenceCriteria,
             scriptVariants = header.scriptVariants
         )

@@ -17,14 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.raw.address
 
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.Instant
-
-/** Reused as-is by both request and parsed stages: a site state has no metadata to resolve and its type is always present. */
-data class SiteState(
-    val validFrom: Instant?,
-    val validTo: Instant?,
-    val type: BusinessStateType
+data class StreetRaw(
+    val name: String? = null,
+    val houseNumber: String? = null,
+    val houseNumberSupplement: String? = null,
+    val milestone: String? = null,
+    val direction: String? = null,
+    val namePrefix: String? = null,
+    val additionalNamePrefix: String? = null,
+    val nameSuffix: String? = null,
+    val additionalNameSuffix: String? = null
 )

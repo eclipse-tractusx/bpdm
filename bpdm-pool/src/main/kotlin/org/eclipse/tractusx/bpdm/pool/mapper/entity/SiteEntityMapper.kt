@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteStateRaw
 import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
@@ -56,7 +56,7 @@ class SiteEntityMapper(
     fun toConfidence(parsed: ConfidenceCriteriaParsed, numberOfSharingMembers: Int): ConfidenceCriteriaDb =
         addressEntityMapper.toConfidence(parsed, numberOfSharingMembers)
 
-    fun toStates(parsed: List<SiteState>, parent: SiteDb): List<SiteStateDb> =
+    fun toStates(parsed: List<SiteStateRaw>, parent: SiteDb): List<SiteStateDb> =
         parsed.map { SiteStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type, site = parent) }
 
     fun toScriptVariants(parsed: List<SiteScriptVariantParsed>): List<SiteScriptVariantDb> =

@@ -91,8 +91,8 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationE
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.model.Street as PoolStreet
-import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant as PoolStreetScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.StreetScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativeAddressScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalAddressScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.address.PostalAddressScriptVariantRaw
@@ -302,8 +302,8 @@ class OrchestratorInboundMapper {
             city = variant.city
         )
 
-    private fun toScriptVariantStreet(street: StreetScriptVariant): PoolStreetScriptVariant =
-        PoolStreetScriptVariant(
+    private fun toScriptVariantStreet(street: StreetScriptVariant): StreetScriptVariantRaw =
+        StreetScriptVariantRaw(
             name = street.name,
             direction = street.direction,
             namePrefix = street.namePrefix,
@@ -312,8 +312,8 @@ class OrchestratorInboundMapper {
             additionalNameSuffix = street.additionalNameSuffix
         )
 
-    private fun toStreet(street: Street): PoolStreet =
-        PoolStreet(
+    private fun toStreet(street: Street): StreetRaw =
+        StreetRaw(
             name = street.name,
             houseNumber = street.houseNumber,
             houseNumberSupplement = street.houseNumberSupplement,
