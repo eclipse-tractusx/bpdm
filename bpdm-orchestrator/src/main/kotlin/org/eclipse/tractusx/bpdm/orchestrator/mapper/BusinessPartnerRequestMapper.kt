@@ -50,6 +50,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.SiteScriptVariantReq
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.StreetRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.StreetScriptVariantRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.UncategorizedPropertiesRequest
+import org.eclipse.tractusx.bpdm.orchestrator.model.request.UncategorizedScriptVariantRequest
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation as AddressGoldenRecordRelationDto
 import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite as AdditionalSiteDto
@@ -259,7 +260,8 @@ class BusinessPartnerRequestMapper {
             nameParts = uncategorized.nameParts,
             identifiers = uncategorized.identifiers.map(::toIdentifierRequest),
             states = uncategorized.states.map(::toBusinessStateRequest),
-            address = uncategorized.address?.let(::toPostalAddressWithScriptVariantsRequest)
+            address = uncategorized.address?.let(::toPostalAddressWithScriptVariantsRequest),
+            scriptVariants = uncategorized.scriptVariants.map { UncategorizedScriptVariantRequest(it.scriptCode, it.nameParts) }
         )
 
     fun toLegalEntityScriptVariantRequest(scriptVariant: LegalEntityScriptVariantDto) =

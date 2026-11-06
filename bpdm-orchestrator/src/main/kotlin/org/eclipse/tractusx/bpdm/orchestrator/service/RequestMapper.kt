@@ -53,6 +53,7 @@ class RequestMapper {
                 legalEntityHeaderScriptVariants = toLegalEntityScriptVariants(businessPartner),
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
+                uncategorizedScriptVariants = toUncategorizedScriptVariants(businessPartner),
                 legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
                 siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
                 addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner),
@@ -85,6 +86,7 @@ class RequestMapper {
                 legalEntityHeaderScriptVariants = toLegalEntityScriptVariants(businessPartner),
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
+                uncategorizedScriptVariants = toUncategorizedScriptVariants(businessPartner),
                 legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
                 siteGoldenRecordRelations = toSiteGoldenRecordRelations(businessPartner),
                 addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner),
@@ -301,6 +303,12 @@ class RequestMapper {
             businessPartner.additionalAddress?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.AdditionalAddress, it.scriptCode, it.postalProperties) },
             businessPartner.uncategorized.address?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.UncategorizedAddress, it.scriptCode, it.postalProperties) }
         ).flatten().toMutableList()
+    }
+
+    fun toUncategorizedScriptVariants(businessPartner: BusinessPartnerRequest): MutableList<UncategorizedScriptVariantDb> {
+        return businessPartner.uncategorized.scriptVariants
+            .flatMap { variant -> variant.nameParts.map { UncategorizedScriptVariantDb(variant.scriptCode, it) } }
+            .toMutableList()
     }
 
     fun toPostalAddressScriptVariant(
@@ -585,6 +593,12 @@ class RequestMapper {
         ).flatten().toMutableList()
     }
 
+
+    fun toUncategorizedScriptVariants(businessPartner: BusinessPartner): MutableList<UncategorizedScriptVariantDb>{
+        return businessPartner.uncategorized.scriptVariants
+            .flatMap { variant -> variant.nameParts.map { UncategorizedScriptVariantDb(variant.scriptCode, it) } }
+            .toMutableList()
+    }
 
     fun toPostalAddressScriptVariant(scope: PostalAddressDb.Scope, scriptCode: String, postalAddressScriptVariant: PostalAddressScriptVariant): PostalAddressScriptVariantDb{
         return with(postalAddressScriptVariant){

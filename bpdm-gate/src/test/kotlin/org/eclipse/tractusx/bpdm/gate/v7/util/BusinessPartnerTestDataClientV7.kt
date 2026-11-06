@@ -43,6 +43,7 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.orchestrator.api.model.UncategorizedScriptVariant
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
@@ -192,42 +193,42 @@ class BusinessPartnerTestDataClientV7(
 
     fun refineToLegalEntityChangedInPool(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val changedGoldenRecord = goldenRecordMockFactory.mockLegalEntityRefinementChangedInPool(seed, owningCompany, input.nameParts)
+        val changedGoldenRecord = goldenRecordMockFactory.mockLegalEntityRefinementChangedInPool(seed, owningCompany, input.nameParts, input.uncategorizedScriptVariants())
         shareBusinessPartnerAndResolve(input.externalId)
         return changedGoldenRecord
     }
 
     fun refineToLegalEntityOnSite(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val poolMockResult = goldenRecordMockFactory.mockLegalEntityOnSiteRefinement(seed, owningCompany, input.nameParts)
+        val poolMockResult = goldenRecordMockFactory.mockLegalEntityOnSiteRefinement(seed, owningCompany, input.nameParts, input.uncategorizedScriptVariants())
         shareBusinessPartnerAndResolve(input.externalId)
         return poolMockResult
     }
 
     fun refineToSite(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val poolMockResult = goldenRecordMockFactory.mockSiteRefinement(seed, owningCompany, input.nameParts)
+        val poolMockResult = goldenRecordMockFactory.mockSiteRefinement(seed, owningCompany, input.nameParts, input.uncategorizedScriptVariants())
         shareBusinessPartnerAndResolve(input.externalId)
         return poolMockResult
     }
 
     fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, owningCompany, input.nameParts)
+        val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, owningCompany, input.nameParts, input.uncategorizedScriptVariants())
         shareBusinessPartnerAndResolve(input.externalId)
         return refinement.poolResult
     }
 
     fun refineToAdditionalAddressWithAdditionalSites(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressWithAdditionalSitesResult {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        val refinement = goldenRecordMockFactory.mockAdditionalAddressWithAdditionalSitesRefinement(seed, owningCompany, input.nameParts)
+        val refinement = goldenRecordMockFactory.mockAdditionalAddressWithAdditionalSitesRefinement(seed, owningCompany, input.nameParts, input.uncategorizedScriptVariants())
         shareBusinessPartnerAndResolve(input.externalId)
         return refinement.poolResult
     }
 
     private fun prepareLegalEntityRefinement(input: BusinessPartnerInputV7Dto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseV7Dto {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-        return goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)
+        return goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts, input.uncategorizedScriptVariants())
     }
 
     private fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputV7Dto {
@@ -250,3 +251,6 @@ class BusinessPartnerTestDataClientV7(
         goldenRecordUpdateService.updateFromPoolChanges()
     }
 }
+
+private fun BusinessPartnerInputV7Dto.uncategorizedScriptVariants() =
+    scriptVariants.map { UncategorizedScriptVariant(it.scriptCode, it.nameParts) }

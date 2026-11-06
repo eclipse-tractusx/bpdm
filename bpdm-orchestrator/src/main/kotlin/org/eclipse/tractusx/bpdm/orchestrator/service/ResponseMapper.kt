@@ -79,8 +79,14 @@ class ResponseMapper {
             nameParts = toUncategorizedNameParts(businessPartner.nameParts),
             identifiers = toIdentifiers(businessPartner, IdentifierDb.Scope.Uncategorized),
             states = toStates(businessPartner, BusinessStateDb.Scope.Uncategorized),
-            address = toUncategorizedAddress(businessPartner)
+            address = toUncategorizedAddress(businessPartner),
+            scriptVariants = toUncategorizedScriptVariants(businessPartner)
         )
+
+    fun toUncategorizedScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.uncategorizedScriptVariants
+            .groupBy({ it.scriptCode }, { it.name })
+            .map { (scriptCode, nameParts) -> UncategorizedScriptVariant(scriptCode, nameParts) }
 
     fun toLegalEntity(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         with(businessPartner) {

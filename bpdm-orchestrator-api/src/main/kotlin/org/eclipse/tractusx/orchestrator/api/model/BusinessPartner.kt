@@ -464,17 +464,28 @@ data class UncategorizedProperties(
     @Schema(description = "Business states for which it is unknown whether they belong to the legal entity, site or any address")
     val states: List<BusinessState>,
     @Schema(description = "Address information for which it is unknown whether they belong to the legal, site main or additional address")
-    val address: PostalAddressWithScriptVariants?
+    val address: PostalAddressWithScriptVariants?,
+    @Schema(description = "Name parts in a different script for which it is unknown whether they belong to the legal entity, site or any address")
+    val scriptVariants: List<UncategorizedScriptVariant> = emptyList()
 ){
     companion object{
         val empty = UncategorizedProperties(
             nameParts = emptyList(),
             identifiers = emptyList(),
             states = emptyList(),
-            address = null
+            address = null,
+            scriptVariants = emptyList()
         )
     }
 }
+
+@Schema(description = "Uncategorized name parts of this business partner data written in a particular script")
+data class UncategorizedScriptVariant(
+    @Schema(description = "The code of the script these name parts are written in")
+    val scriptCode: String,
+    @Schema(description = "The uncategorized name parts written in the script")
+    val nameParts: List<String>
+)
 
 data class LegalEntityScriptVariant(
     val scriptCode: String,

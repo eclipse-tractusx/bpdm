@@ -201,6 +201,35 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     }
 
     /**
+     * GIVEN business partner output whose script variant carries uncategorized name parts
+     * WHEN that business partner is shared again and the refinement result drops the name parts
+     * THEN the output variant has no name parts instead of restoring the previously stored ones
+     *
+     */
+    @Test
+    fun `search output does not restore dropped script variant name parts`(){
+        //GIVEN
+        val firstInput = testDataClient.businessPartner.upsertInput(testName)
+        testDataClient.businessPartner.refineToLegalEntity(firstInput)
+
+        //WHEN
+        val resubmittedInput = testDataClient.businessPartner.upsertInput(
+            testData.businessPartner.input.request.fromSeed("$testName Second").copy(
+                externalId = firstInput.externalId,
+                scriptVariants = firstInput.scriptVariants.map { it.copy(nameParts = emptyList()) }
+            )
+        )
+        val goldenRecord = testDataClient.businessPartner.refineToLegalEntity(resubmittedInput)
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(firstInput.externalId))
+
+        //THEN
+        val expectedOutput = testData.businessPartner.output.fromLegalEntity(resubmittedInput, goldenRecord)
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+    }
+
+    /**
      * GIVEN no business partner output for a given external-ID
      * WHEN output consumer searches for output with that external-ID
      * THEN output consumer sees an empty result

@@ -51,7 +51,10 @@ class BusinessPartnerOutputDtoV7Factory {
             site = null,
             address = buildAddressRepresentation(legalEntity.legalAddress, AddressType.LegalAddress),
             externalSequenceTimestamp = null,
-            scriptVariants = legalEntity.scriptVariants.map { buildLegalEntityScriptVariant(it.scriptCode, it) },
+            scriptVariants = run {
+                val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
+                (leByCode.keys + input.scriptVariants.map { it.scriptCode }).map { code -> buildLegalEntityScriptVariant(code, leByCode[code], nameParts = input.namePartsOf(code)) }
+            },
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
         )
@@ -72,7 +75,7 @@ class BusinessPartnerOutputDtoV7Factory {
             scriptVariants = run {
                 val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
                 val siteByCode = site.site.scriptVariants.associateBy { it.scriptCode }
-                (leByCode.keys + siteByCode.keys).map { code -> buildLegalEntityScriptVariant(code, leByCode[code], siteByCode[code]) }
+                (leByCode.keys + siteByCode.keys + input.scriptVariants.map { it.scriptCode }).map { code -> buildLegalEntityScriptVariant(code, leByCode[code], siteByCode[code], input.namePartsOf(code)) }
             },
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
@@ -94,7 +97,7 @@ class BusinessPartnerOutputDtoV7Factory {
             scriptVariants = run {
                 val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
                 val siteByCode = site.site.scriptVariants.associateBy { it.scriptCode }
-                (leByCode.keys + siteByCode.keys).map { code -> buildSiteScriptVariant(code, leByCode[code], siteByCode[code]) }
+                (leByCode.keys + siteByCode.keys + input.scriptVariants.map { it.scriptCode }).map { code -> buildSiteScriptVariant(code, leByCode[code], siteByCode[code], input.namePartsOf(code)) }
             },
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
@@ -120,7 +123,7 @@ class BusinessPartnerOutputDtoV7Factory {
             scriptVariants = run {
                 val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
                 val addByCode = additionalAddress.scriptVariants.associateBy { it.scriptCode }
-                (leByCode.keys + addByCode.keys).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code]) }
+                (leByCode.keys + addByCode.keys + input.scriptVariants.map { it.scriptCode }).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code], nameParts = input.namePartsOf(code)) }
             },
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
@@ -149,7 +152,7 @@ class BusinessPartnerOutputDtoV7Factory {
                 val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
                 val siteByCode = site.site.scriptVariants.associateBy { it.scriptCode }
                 val addByCode = additionalAddress.scriptVariants.associateBy { it.scriptCode }
-                (leByCode.keys + siteByCode.keys + addByCode.keys).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code], siteByCode[code]) }
+                (leByCode.keys + siteByCode.keys + addByCode.keys + input.scriptVariants.map { it.scriptCode }).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code], siteByCode[code], input.namePartsOf(code)) }
             },
             additionalSites = additionalSites,
             createdAt = Instant.MIN,
@@ -274,30 +277,30 @@ class BusinessPartnerOutputDtoV7Factory {
         }
     }
 
-    private fun buildLegalEntityScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantV7Dto?, site: org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto? = null): BusinessPartnerScriptVariantV7Dto{
+    private fun buildLegalEntityScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantV7Dto?, site: org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto? = null, nameParts: List<String> = emptyList()): BusinessPartnerScriptVariantV7Dto{
         return BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptCode,
-            nameParts = emptyList(),
+            nameParts = nameParts,
             legalEntity = buildScriptVariantLegalEntityComponent(legalEntityScriptVariant),
             site = site?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantV7Dto(),
             address = buildScriptVariantAddressComponent(legalEntityScriptVariant?.legalAddress)
         )
     }
 
-    private fun buildSiteScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantV7Dto?, siteScriptVariant: org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto?): BusinessPartnerScriptVariantV7Dto{
+    private fun buildSiteScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantV7Dto?, siteScriptVariant: org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto?, nameParts: List<String> = emptyList()): BusinessPartnerScriptVariantV7Dto{
         return BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptCode,
-            nameParts = emptyList(),
+            nameParts = nameParts,
             legalEntity = buildScriptVariantLegalEntityComponent(legalEntityScriptVariant),
             site = siteScriptVariant?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantV7Dto(),
             address = buildScriptVariantAddressComponent(siteScriptVariant?.mainAddress)
         )
     }
 
-    private fun buildAdditionalAddressScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantV7Dto?, addressScriptVariant: LogisticAddressScriptVariantV7Dto?, site: org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto? = null): BusinessPartnerScriptVariantV7Dto{
+    private fun buildAdditionalAddressScriptVariant(scriptCode: String, legalEntityScriptVariant: LegalEntityScriptVariantV7Dto?, addressScriptVariant: LogisticAddressScriptVariantV7Dto?, site: org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto? = null, nameParts: List<String> = emptyList()): BusinessPartnerScriptVariantV7Dto{
         return BusinessPartnerScriptVariantV7Dto(
             scriptCode = scriptCode,
-            nameParts = emptyList(),
+            nameParts = nameParts,
             legalEntity = buildScriptVariantLegalEntityComponent(legalEntityScriptVariant),
             site = site?.let { buildScriptVariantSiteComponent(it) } ?: SiteScriptVariantV7Dto(),
             address = buildScriptVariantAddressComponent(addressScriptVariant?.address)
@@ -338,3 +341,6 @@ class BusinessPartnerOutputDtoV7Factory {
     }
 
 }
+
+    private fun BusinessPartnerInputV7Dto.namePartsOf(scriptCode: String) =
+        scriptVariants.find { it.scriptCode == scriptCode }?.nameParts.orEmpty()

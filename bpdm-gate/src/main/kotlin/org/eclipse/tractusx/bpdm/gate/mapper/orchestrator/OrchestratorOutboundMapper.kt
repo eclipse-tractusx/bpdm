@@ -58,6 +58,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
+import org.eclipse.tractusx.orchestrator.api.model.UncategorizedScriptVariant
 import org.springframework.stereotype.Component
 import java.time.ZoneOffset
 
@@ -96,7 +97,8 @@ class OrchestratorOutboundMapper {
                 // The Gate stores every input identifier as uncategorized, so none belongs to the legal entity or address.
                 identifiers = input.identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
                 states = toStates(input, BusinessPartnerType.GENERIC),
-                address = postalAddress.takeIf { addressType == null }?.let { toWithScriptVariants(it, input) }
+                address = postalAddress.takeIf { addressType == null }?.let { toWithScriptVariants(it, input) },
+                scriptVariants = input.scriptVariants.map { UncategorizedScriptVariant(it.scriptCode, it.nameParts) }
             ),
             owningCompany = candidate.owningCompanyBpnl,
             legalEntity = LegalEntity(
