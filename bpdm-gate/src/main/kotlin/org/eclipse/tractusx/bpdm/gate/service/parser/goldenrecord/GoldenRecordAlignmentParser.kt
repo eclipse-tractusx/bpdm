@@ -57,24 +57,8 @@ class GoldenRecordAlignmentParser(
                 .let { data -> legalEntity?.let { withLegalEntity(data, it) } ?: data }
                 .let { data -> (site ?: address?.adoptedSite)?.let { withSite(data, it) } ?: data }
                 .let { data -> address?.let { withAddress(data, it) } ?: data }
-                .let { data -> withStoredScriptVariantNameParts(data, storedOutput) }
             BusinessPartnerOutputParsed(sharingState, storedOutput, aligned)
         }
-
-    /**
-     * Restores the name parts of [storedOutput]'s script variants on every variant of [data] that lacks them, since
-     * golden records do not carry uncategorized name parts.
-     */
-    private fun withStoredScriptVariantNameParts(data: BusinessPartnerOutputContentParsed, storedOutput: BusinessPartnerDb?): BusinessPartnerOutputContentParsed {
-        val storedNamePartsByCode = storedOutput?.scriptVariants.orEmpty().associate { it.scriptCode to it.nameParts.toList() }
-        if (storedNamePartsByCode.isEmpty()) return data
-
-        return data.copy(
-            scriptVariants = data.scriptVariants.mapTo(linkedSetOf()) { variant ->
-                if (variant.nameParts.isEmpty()) variant.copy(nameParts = storedNamePartsByCode[variant.scriptCode].orEmpty()) else variant
-            }
-        )
-    }
 
     private fun withLegalEntity(data: BusinessPartnerOutputContentParsed, legalEntity: LegalEntityGoldenRecordRaw): BusinessPartnerOutputContentParsed =
         data.copy(

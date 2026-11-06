@@ -501,6 +501,11 @@ The second one reaches beyond your task - an address can carry the names of two 
 a result that stops writing an address in a script another partner is still named in fails the task
 rather than silently stranding that partner.
 
+`uncategorized.scriptVariants` is different: it carries the name parts the sharing member wrote in
+each script without your having to categorize them, and nothing else derives them.
+A refinement service has to return it exactly as it received it - a result that drops a variant or
+empties its `nameParts` loses those names for good, because no later step can restore them.
+
 ### Relation Tasks Are A Separate Queue
 
 Relations between business partners - `IsOwnedBy`, `IsManagedBy`, `IsReplacedBy`,

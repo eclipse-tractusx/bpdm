@@ -15,6 +15,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Added
 
 - BPDM Pool: New `/v7/countries` and `/v6/countries` metadata endpoints return the list of accepted country codes, names and descriptions from the provider-maintained country catalogue [#1862](https://github.com/eclipse-tractusx/bpdm/issues/1862)
+- BPDM Orchestrator: The V7 business partner data gained an additive `uncategorized.scriptVariants` field carrying uncategorized name parts per `scriptCode`, so the Gate's script variant name parts now round-trip through golden record tasks into the business partner output instead of being lost [#1906](https://github.com/eclipse-tractusx/bpdm/issues/1906)
 
 ### Changed
 

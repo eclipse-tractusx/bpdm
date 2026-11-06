@@ -1581,7 +1581,6 @@
             "$ref" : "#/components/schemas/PhysicalAddress"
           },
           "alternativeAddress" : {
-            "type" : "null",
             "oneOf" : [ {
               "$ref" : "#/components/schemas/AlternativeAddress"
             }, {
@@ -1636,6 +1635,13 @@
           },
           "physicalAddress" : {
             "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
+          },
+          "alternativeAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+            }, {
+              "type" : "null"
+            } ]
           }
         }
       },
@@ -1715,6 +1721,13 @@
           "physicalAddress" : {
             "$ref" : "#/components/schemas/PhysicalAddress"
           },
+          "alternativeAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddress"
+            }, {
+              "type" : "null"
+            } ]
+          },
           "hasChanged" : {
             "type" : [ "boolean", "null" ],
             "deprecated" : true,
@@ -1737,13 +1750,6 @@
             "items" : {
               "$ref" : "#/components/schemas/PostalAddressScriptVariantWithScriptCode"
             }
-          },
-          "alternativeAddress" : {
-            "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddress"
-            }, {
-              "type" : "null"
-            } ]
           }
         }
       },
@@ -2775,6 +2781,12 @@
             }, {
               "type" : "null"
             } ]
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/UncategorizedScriptVariant"
+            }
           }
         }
       },
@@ -2806,6 +2818,21 @@
             }, {
               "type" : "null"
             } ]
+          }
+        }
+      },
+      "UncategorizedScriptVariant" : {
+        "type" : "object",
+        "description" : "Uncategorized name parts of this business partner data written in a particular script",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "nameParts" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }
       }
