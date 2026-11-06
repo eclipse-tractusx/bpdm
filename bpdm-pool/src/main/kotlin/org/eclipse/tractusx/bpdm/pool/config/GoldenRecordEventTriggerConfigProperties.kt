@@ -28,10 +28,6 @@ data class GoldenRecordEventTriggerConfigProperties(
 ){
     companion object{
         const val PREFIX = "bpdm.event-triggers"
-        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.pool.config.GoldenRecordEventTriggerConfigProperties"
-        private const val BEAN_QUALIFIER = "'${PREFIX}-$QUALIFIED_NAME'"
-
-        const val GET_CRON = "@$BEAN_QUALIFIER.getCron()"
     }
 
 }

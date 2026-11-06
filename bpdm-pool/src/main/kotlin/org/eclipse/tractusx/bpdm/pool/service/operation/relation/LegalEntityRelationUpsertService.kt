@@ -27,14 +27,12 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityRelati
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.participation.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.LegalEntityRelationUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
@@ -42,7 +40,6 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.UltimateOwne
 import org.eclipse.tractusx.bpdm.pool.service.operation.participation.DataSpaceParticipantUpdateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 /**
  * Writes relations between two legal entities and keeps the state that depends on them current.
@@ -53,7 +50,7 @@ class LegalEntityRelationUpsertService(
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogCreateService: ChangelogCreateService,
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
-    private val eventTriggerRepository: LegalEntityRelationEventTriggerRepository,
+    private val legalEntityRelationTriggerService: LegalEntityRelationTriggerService,
     private val dataSpaceParticipantUpdateService: DataSpaceParticipantUpdateService
 ) {
 
@@ -80,11 +77,11 @@ class LegalEntityRelationUpsertService(
         when (relation.type) {
             LegalEntityRelationTypeV7.IsOwnedBy -> {
                 ultimateOwnerRecalculationService.recalculate(listOf(relation.source))
-                rescheduleValidityBoundaryTriggers(written, TriggerEventType.OwnershipValidityBoundary)
+                legalEntityRelationTriggerService.reschedule(written, TriggerEventType.OwnershipValidityBoundary)
             }
             LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> {
                 ultimateOwnerRecalculationService.recalculate(listOf(relation.source))
-                rescheduleValidityBoundaryTriggers(written, TriggerEventType.AlternativeHeadquarterValidityBoundary)
+                legalEntityRelationTriggerService.reschedule(written, TriggerEventType.AlternativeHeadquarterValidityBoundary)
             }
             LegalEntityRelationTypeV7.IsManagedBy -> makeParticipant(relation.source)
             LegalEntityRelationTypeV7.IsReplacedBy -> Unit
@@ -133,21 +130,6 @@ class LegalEntityRelationUpsertService(
         changelogCreateService.record(ChangelogRecord(relation.target.bpn, ChangelogTypeV7.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
 
         return newRelation
-    }
-
-    // Only the difference is applied: Hibernate flushes inserts before deletes, so deleting and reinserting a trigger with an
-    // unchanged date would collide on the (relation_id, event_type, trigger_date) unique constraint.
-    private fun rescheduleValidityBoundaryTriggers(relation: RelationDb, eventType: TriggerEventType) {
-        val today = LocalDate.now()
-        val startDates = relation.validityPeriods.map { it.validFrom }.filter { it > today }
-        val expiryDates = relation.validityPeriods.mapNotNull { it.validTo }.map { it.plusDays(1) }.filter { it > today }
-        val desiredTriggerDates = (startDates + expiryDates).toSet()
-
-        val unprocessedTriggers = eventTriggerRepository.findByRelationAndEventType(relation, eventType).filterNot { it.isProcessed }
-        val scheduledTriggerDates = unprocessedTriggers.map { it.triggerDate }.toSet()
-
-        eventTriggerRepository.deleteAll(unprocessedTriggers.filterNot { it.triggerDate in desiredTriggerDates })
-        eventTriggerRepository.saveAll((desiredTriggerDates - scheduledTriggerDates).map { LegalEntityRelationEventTriggerDb(it, false, eventType, relation) })
     }
 
     private fun makeParticipant(legalEntity: LegalEntityDb) {

@@ -27,16 +27,13 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.changelog.ChangelogTypeV7
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
-import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.relation.AddressRelationUpsertParsed
-import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.HeadquarterSyncService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.legalentity.HeadquarterSyncService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -50,7 +47,7 @@ class AddressRelationUpsertService(
     private val addressRepository: LogisticAddressRepository,
     private val changelogCreateService: ChangelogCreateService,
     private val headquarterSyncService: HeadquarterSyncService,
-    private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
+    private val addressRelationTriggerService: AddressRelationTriggerService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -134,13 +131,6 @@ class AddressRelationUpsertService(
             headquarterSyncService.synchronizeHeadquarter(relation.startAddress.legalEntity!!)
         }
 
-        val existingUnprocessedTriggers = addressRelationEventTriggerRepository.findByRelationAndEventType(relation, TriggerEventType.ReplacedAddress)
-            .filterNot { it.isProcessed }
-        addressRelationEventTriggerRepository.deleteAll(existingUnprocessedTriggers)
-
-        val futureEventTriggers = relation.validityPeriods
-            .filter { it.validFrom > today }
-            .map { AddressRelationEventTriggerDb(it.validFrom, false, TriggerEventType.ReplacedAddress, relation) }
-        addressRelationEventTriggerRepository.saveAll(futureEventTriggers)
+        addressRelationTriggerService.reschedule(relation)
     }
 }
