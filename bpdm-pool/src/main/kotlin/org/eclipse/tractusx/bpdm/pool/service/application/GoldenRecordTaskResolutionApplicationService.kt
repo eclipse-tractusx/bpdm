@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.application
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
+import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskKind
 import org.eclipse.tractusx.bpdm.pool.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.task.AdditionalSiteRecord
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
@@ -78,7 +79,7 @@ class GoldenRecordTaskResolutionApplicationService(
             taskGateway.resolveTasks(reservedTasks.map(::resolve))
         } catch (ex: Throwable) {
             logger.error(ex) { "Error while processing cleaning task" }
-            trackingService.trackUnreported(reservedTasks.map { it.taskId })
+            trackingService.trackUnreported(GoldenRecordTaskKind.BusinessPartner, reservedTasks.map { it.taskId })
         }
     }
 

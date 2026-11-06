@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.OrchestratorIn
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorOutboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcome
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
@@ -57,6 +58,15 @@ class GoldenRecordTaskGateway(
         val resultEntries = results.map { withAcceptedErrorLength(outboundMapper.toResultEntry(it)) }
         orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = taskProperties.step, results = resultEntries))
     }
+
+    /**
+     * Reports the tasks with [taskIds] to the Orchestrator as failed without a known cause and returns how it answered each.
+     */
+    fun resolveTasksAsErrors(taskIds: List<String>): List<TaskErrorReportOutcome> =
+        reportTaskErrors(taskIds) { taskId ->
+            val resultEntry = outboundMapper.toErrorReportEntry(taskId)
+            orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = taskProperties.step, results = listOf(resultEntry)))
+        }
 
     private fun withAcceptedErrorLength(result: TaskStepResultEntryDto) =
         result.copy(errors = result.errors.map { it.copy(description = it.description.take(MAX_ERROR_DESCRIPTION_LENGTH)) })

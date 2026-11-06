@@ -20,12 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskKind
 import org.springframework.data.jpa.repository.JpaRepository
-import java.time.Instant
 
 interface GoldenRecordTaskRepository: JpaRepository<GoldenRecordTaskDb, Long> {
 
-    fun findFirstByLastCheckedBefore(checkedBefore: Instant): GoldenRecordTaskDb?
-
-    fun findFirstByIsResolved(isResolved: Boolean): GoldenRecordTaskDb?
+    fun findByKind(kind: GoldenRecordTaskKind): List<GoldenRecordTaskDb>
 }
