@@ -8,46 +8,32 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ## [7.6.0] - unreleased
 
-### Breaking
-
-- BPDM Orchestrator: Fixed the deprecated V6 API contract by removing accidental V7-only fields that were mistakenly exposed in a previous release. This is a breaking change for V6 consumers because the invalid fields are no longer part of the frozen contract.
-- BPDM Pool and Gate: A relation's `validTo` is now inclusive: a relation still holds on its end date, so two validity periods meeting on one date overlap and are rejected, and a period following another starts the day after the other ends. The Gate accepts a validity period that starts and ends on the same date [#1892](https://github.com/eclipse-tractusx/bpdm/issues/1892)
-
 ### Added
 
-- BPDM Pool: New `/v7/countries` and `/v6/countries` metadata endpoints return the list of accepted country codes, names and descriptions from the provider-maintained country catalogue [#1862](https://github.com/eclipse-tractusx/bpdm/issues/1862)
+- BPDM Pool: New `/v7/countries` and `/v6/countries` metadata endpoints list the supported country codes with their names and descriptions. They replace the fixed country enumeration in the OpenAPI documents of Pool and Gate [#1862](https://github.com/eclipse-tractusx/bpdm/issues/1862)
 - BPDM Orchestrator: The V7 business partner data gained an additive `uncategorized.scriptVariants` field carrying uncategorized name parts per `scriptCode`, so the Gate's script variant name parts now round-trip through golden record tasks into the business partner output instead of being lost [#1906](https://github.com/eclipse-tractusx/bpdm/issues/1906)
 
 ### Changed
 
-- BPDM Pool: Legal forms and identifier types in V6 and V7 now accept countries from the Pool country catalogue, including when filtering identifier-type searches. Legal-form languages are represented as strings.
-- BPDM Gate: Address country codes in the V6 and V7 input and output schemas are strings instead of an enumeration. Sharing members can submit provider-maintained countries through the API or CSV upload; generated API clients must be regenerated.
-- BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown
+- BPDM Gate: Sharing business partners no longer rejects an unsupported address country code. Such a business partner is rejected during the golden record process instead [#1862](https://github.com/eclipse-tractusx/bpdm/issues/1862)
+- BPDM Pool: Every referenced BPN now resolves case-insensitively, so a lower-case BPN in a create, update or relation request names the same business partner as its upper-case form instead of being reported as unknown [#1930](https://github.com/eclipse-tractusx/bpdm/issues/1930)
 - BPDM Pool: An address now keeps the script variants its legal entity and sites are still named in and drops the rest, so a write no longer has to restate another business partner's scripts to keep it readable and the `ScriptVariantCoverageStillNeeded` error is gone. A golden record task creating a site on the legal address in a script the legal address lacks now adds that script instead of being rejected [#1869](https://github.com/eclipse-tractusx/bpdm/issues/1869)
-- BPDM Pool: Address countries are validated against the provider-maintained country catalogue at request time. The address country schema is now a string instead of an enumeration, so generated API clients must be regenerated.
-- BPDM Pool: Stored address countries now reference the maintained country catalogue through foreign keys. There is no API change.
-- BPDM Pool: Regions, subdivisions and field quality rules use plain country codes validated against the provider-maintained country catalogue instead of the compiled enum. Unknown countries are rejected with an error naming the code.
-- BPDM Gate: Searching the business partner and relation changelogs ignores unknown external IDs instead of reporting them as errors. The response fields `invalidEntries` and `errors` are deprecated and always `0` and empty.
-- BPDM Gate: Setting business partners ready to be shared reports every unknown external ID and every business partner in a state that cannot be set ready at once, with one error message each, instead of only the first kind of problem found.
-- BPDM Gate: Upserting input relations through the V7 API reports every invalid relation at once, with one error message for each problem, instead of only the first one found. A request with more relations than the configured upsert limit (`bpdm.api.upsert-limit`, 100 by default) is rejected.
-- BPDM Gate: Creating or updating an input relation through the V6 API reports every problem of the relation at once, except for an already existing relation.
-- BPDM Pool and Gate: Business partner states in the V6 and V7 Pool responses and the Gate output always carry `validFrom` and `validTo`. A missing start is reported as the earliest date `1900-01-01T00:00:00`, a missing end as the latest date `9999-12-31T23:59:59` (UTC). On input both dates stay optional; dates before the earliest or after the latest date are treated as that date, a start on the earliest date counts as a missing start and an end on the latest date as a missing end. Gate output states use the new `BusinessPartnerStateResponseDto` in the API module.
+- BPDM Gate: Searching the business partner and relation changelogs ignores unknown external IDs instead of reporting them as errors. The response fields `invalidEntries` and `errors` are deprecated and always `0` and empty. [#1927](https://github.com/eclipse-tractusx/bpdm/issues/1927)
+- BPDM Gate: Setting business partners ready to be shared, upserting input relations through the V7 API and creating or updating an input relation through the V6 API report every problem at once, with one error message each, instead of only the first one found (V6 still reports an already existing relation on its own). [#1927](https://github.com/eclipse-tractusx/bpdm/issues/1927)
 
 ### Fixed
 
-- BPDM Pool: A golden record or relation task whose result could not be delivered to the Orchestrator is reported to it as an error afterwards, instead of staying reserved until the Orchestrator's pending timeout turns it into a timeout error.
-- BPDM Gate: Uploading business partners as CSV reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error.
+- BPDM Orchestrator: The OpenAPI document of the V6 golden record task API no longer lists V7 fields that V6 never processed (`additionalSites`, script variants, golden record relations, ultimate ownership, `updatedAt` and `isParticipantData`). V6 returned these fields empty or not at all and ignored them on input, so V6 integrations are unaffected. [#1855](https://github.com/eclipse-tractusx/bpdm/issues/1855)
+- BPDM Pool and Gate: A relation's `validTo` is now inclusive, as CX-0010 requires: a relation still holds on its end date, so two validity periods meeting on one date overlap and are rejected, and a period following another starts the day after the other ends. The Gate accepts a validity period that starts and ends on the same date [#1892](https://github.com/eclipse-tractusx/bpdm/issues/1892)
+- BPDM Gate: Upserting input relations through the V7 API enforces the API-wide upsert limit (`bpdm.api.upsert-limit`, 100 by default) and rejects a request that names the same external ID more than once, instead of letting the later entry win. [#1927](https://github.com/eclipse-tractusx/bpdm/issues/1927)
+- BPDM Pool and Gate: Business partner states in the V6 and V7 Pool responses and the Gate output always carry `validFrom` and `validTo`, as the standard requires. A missing start is reported as the earliest date `1900-01-01T00:00:00`, a missing end as the latest date `9999-12-31T23:59:59` (UTC). On input both dates stay optional; dates before the earliest or after the latest date are treated as that date, a start on the earliest date counts as a missing start and an end on the latest date as a missing end. [#1890](https://github.com/eclipse-tractusx/bpdm/issues/1890)
+- BPDM Pool: A golden record or relation task whose result could not be delivered to the Orchestrator is reported to it as an error afterwards, instead of staying reserved until the Orchestrator's pending timeout turns it into a timeout error. [#1933](https://github.com/eclipse-tractusx/bpdm/issues/1933)
+- BPDM Gate: The CSV upload reports an invalid tenant BPNL or a tenant unknown to the Pool as a 400 error and a malformed or incomplete geographic coordinate as an error instead of storing it as `0.0`. It fills the street name prefix and additional name prefix from their own columns instead of the wrong ones, no longer adds an empty alternative postal address or `0.0` coordinates for blank columns, keeps a site or address state that has a type but no validity dates, and stores an empty house number as absent. [#1926](https://github.com/eclipse-tractusx/bpdm/issues/1926)
 - BPDM Gate: The output address type now always describes the address's role towards the output's site. [#1886](https://github.com/eclipse-tractusx/bpdm/issues/1886)
-- BPDM Gate: The CSV upload reports a malformed or incomplete geographic coordinate as an error instead of storing it as `0.0`.
-- BPDM Gate: Upserting input relations through the V7 API rejects a request that names the same external ID more than once instead of letting the later entry win.
-- BPDM Gate: Creating or updating an input relation through the V6 API stores it without a reason code instead of an empty one, so the V7 API returns `null` as its reason code.
-- BPDM Gate: The CSV upload stores the street name prefix and additional name prefix from their own columns. Before, the name prefix column was ignored and both prefixes were filled from the wrong columns.
-- BPDM Gate: The CSV upload no longer adds an empty alternative postal address, or coordinates of `0.0`, to business partners whose CSV row leaves those columns blank.
-- BPDM Gate: The CSV upload keeps a site or address state that has a type but no validity dates, instead of dropping it, and stores an empty house number as absent.
-- BPDM Gate: Updating an input relation through the V6 API stores the validity periods given in the request. Before, they were ignored and the relation's validity periods were removed.
-- BPDM Gate: Creation and update timestamps now match subsequent reads. Changes to child records update the parent timestamp, while unchanged inputs preserve it.
-- BPDM Pool: The OpenAPI document describes the business partner search result with its own address schemas instead of sharing them with the address endpoints, and lists the `alternativePostalAddress`, `legalForm` and script variant `alternativeAddress` fields it omitted from several V6 and V7 request and response schemas.
-- BPDM Pool: The business partner search treats an empty `bpn` as absent, so a search by legal name with an empty `bpn` returns the matching business partners instead of an empty page.
+- BPDM Gate: Creating or updating an input relation through the V6 API stores it without a reason code instead of an empty one, so the V7 API returns `null` as its reason code, and an update stores the given validity periods instead of removing them. [#1929](https://github.com/eclipse-tractusx/bpdm/issues/1929)
+- BPDM Gate: Creation and update timestamps now match subsequent reads. Changes to child records update the parent timestamp, while unchanged inputs preserve it. [#1928](https://github.com/eclipse-tractusx/bpdm/issues/1928)
+- BPDM Pool: The OpenAPI document describes the business partner search result with its own address schemas instead of sharing them with the address endpoints, and lists the `alternativePostalAddress`, `legalForm` and script variant `alternativeAddress` fields it omitted from several V6 and V7 request and response schemas. [#1931](https://github.com/eclipse-tractusx/bpdm/issues/1931)
+- BPDM Pool: The business partner search treats an empty `bpn` as absent, so a search by legal name with an empty `bpn` returns the matching business partners instead of an empty page. [#1932](https://github.com/eclipse-tractusx/bpdm/issues/1932)
 
 ## [7.5.0] - 2026-09-08
 
