@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ChangelogRecord
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.address.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.changelog.ChangelogCreateService

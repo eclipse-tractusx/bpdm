@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
 import org.springframework.stereotype.Component

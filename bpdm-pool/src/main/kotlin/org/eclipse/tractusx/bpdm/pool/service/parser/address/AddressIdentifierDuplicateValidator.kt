@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.address
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.AddressConstraintError
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.springframework.stereotype.Service
 
@@ -41,14 +41,14 @@ class AddressIdentifierDuplicateValidator(
      * [contents] — null for a create, the address's own BPN for an update — and an identifier owned by the entry's own
      * BPN is not a duplicate.
      */
-    fun validate(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<List<AddressConstraintError>> {
+    fun validate(contents: List<LogisticAddressRaw>, ownerBpns: List<String?>): List<List<AddressConstraintError>> {
         require(contents.size == ownerBpns.size) { "contents and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(contents)
         return contents.mapIndexed { i, content -> duplicateErrorsFor(content, ownerBpns[i], candidates) }
     }
 
     private fun duplicateErrorsFor(
-        content: LogisticAddressRequest,
+        content: LogisticAddressRaw,
         ownerBpn: String?,
         candidates: Map<Key, Candidate>
     ): List<AddressConstraintError> =
@@ -64,7 +64,7 @@ class AddressIdentifierDuplicateValidator(
                 null
         }
 
-    private fun buildCandidates(contents: List<LogisticAddressRequest>): Map<Key, Candidate> {
+    private fun buildCandidates(contents: List<LogisticAddressRaw>): Map<Key, Candidate> {
         val identifiers = contents.flatMap { it.identifiers }
 
         val withinRequest = identifiers

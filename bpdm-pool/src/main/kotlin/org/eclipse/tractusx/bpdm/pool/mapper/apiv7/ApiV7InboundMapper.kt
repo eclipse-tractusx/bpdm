@@ -73,14 +73,14 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressA
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteScriptVariantRaw
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -291,11 +291,11 @@ class ApiV7InboundMapper(
     fun toSiteCreateWithLegalAddressAsMainRaw(request: SiteCreateWithLegalAddressAsMainV7Request): SiteCreateWithLegalAddressAsMainRaw =
         SiteCreateWithLegalAddressAsMainRaw(
             legalEntityBpn = request.bpnLParent,
-            header = SiteHeaderRequest(
+            header = SiteHeaderRaw(
                 name = request.name,
                 states = request.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
-                scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+                scriptVariants = request.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.name) }
             ),
             exclusiveLegalAddress = false
         )
@@ -306,8 +306,8 @@ class ApiV7InboundMapper(
     fun toSiteUpdateRaw(request: SitePartnerUpdateV7Request): SiteUpdateRaw =
         SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
 
-    private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRequest =
-        LegalEntityContentRequest(
+    private fun toContentRequest(legalEntity: LegalEntityV7Dto): LegalEntityContentRaw =
+        LegalEntityContentRaw(
             header = toHeaderRequest(legalEntity),
             legalAddress = addressDtoRequestMapper.toContentRequest(
                 legalEntity.legalAddress,
@@ -315,23 +315,23 @@ class ApiV7InboundMapper(
             )
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityV7Dto): LegalEntityHeaderRequest {
+    private fun toHeaderRequest(legalEntity: LegalEntityV7Dto): LegalEntityHeaderRaw {
         val header = legalEntity.header
-        return LegalEntityHeaderRequest(
+        return LegalEntityHeaderRaw(
             legalName = header.legalName,
             legalShortName = header.legalShortName,
             legalForm = header.legalForm,
-            identifiers = header.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
+            identifiers = header.identifiers.map { LegalEntityIdentifierRaw(it.value, it.type, it.issuingBody) },
             states = header.states.map { LegalEntityState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(header.confidenceCriteria),
             isDataSpaceParticipant = header.isParticipantData,
             ownershipUltimate = header.ownershipUltimate,
-            scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariant(it.scriptCode, it.legalName, it.shortName) }
+            scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRaw(it.scriptCode, it.legalName, it.shortName) }
         )
     }
 
-    private fun toContentRequest(site: SiteV7Dto): SiteContentRequest =
-        SiteContentRequest(
+    private fun toContentRequest(site: SiteV7Dto): SiteContentRaw =
+        SiteContentRaw(
             header = toHeaderRequest(site),
             mainAddress = addressDtoRequestMapper.toContentRequest(
                 site.mainAddress,
@@ -339,16 +339,16 @@ class ApiV7InboundMapper(
             )
         )
 
-    private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRequest =
-        SiteHeaderRequest(
+    private fun toHeaderRequest(site: SiteV7Dto): SiteHeaderRaw =
+        SiteHeaderRaw(
             name = site.name,
             states = site.states.map { SiteState(it.validFrom.toValidFromInstant(), it.validTo.toValidToInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
-            scriptVariants = site.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+            scriptVariants = site.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.name) }
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),

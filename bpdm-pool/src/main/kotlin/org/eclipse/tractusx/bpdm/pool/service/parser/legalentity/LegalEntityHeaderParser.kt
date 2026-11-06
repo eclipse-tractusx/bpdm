@@ -23,14 +23,14 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityContentError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
@@ -53,12 +53,12 @@ class LegalEntityHeaderParser(
     /**
      * Validates each header and reports either the validated header or every problem found in that entry.
      */
-    fun parse(headers: List<LegalEntityHeaderRequest>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityContentError>> {
+    fun parse(headers: List<LegalEntityHeaderRaw>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityContentError>> {
         val metadata = fetchMetadata(headers)
         return headers.map { parseEntry(it, metadata) }
     }
 
-    private fun fetchMetadata(headers: List<LegalEntityHeaderRequest>): LegalEntityHeaderMetadata {
+    private fun fetchMetadata(headers: List<LegalEntityHeaderRaw>): LegalEntityHeaderMetadata {
         val legalFormKeys = headers.mapNotNull { it.legalForm }.toSet()
         val idTypeKeys = headers.flatMap { it.identifiers }.mapNotNull { it.type }.toSet()
         val scriptCodeKeys = headers.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet()
@@ -71,7 +71,7 @@ class LegalEntityHeaderParser(
         )
     }
 
-    private fun parseEntry(header: LegalEntityHeaderRequest, metadata: LegalEntityHeaderMetadata): ParseResult<LegalEntityHeaderParsed, LegalEntityContentError> {
+    private fun parseEntry(header: LegalEntityHeaderRaw, metadata: LegalEntityHeaderMetadata): ParseResult<LegalEntityHeaderParsed, LegalEntityContentError> {
         val errors = mutableListOf<LegalEntityContentError>()
 
         val legalName = header.legalName ?: run { errors.add(LegalEntityContentError.NameMissing); null }
@@ -108,7 +108,7 @@ class LegalEntityHeaderParser(
     }
 
     private fun parseConfidence(
-        request: ConfidenceCriteriaRequest,
+        request: ConfidenceCriteriaRaw,
         errors: MutableList<LegalEntityContentError>
     ): ConfidenceCriteriaParsed? {
         val sharedByOwner = request.sharedByOwner
@@ -127,7 +127,7 @@ class LegalEntityHeaderParser(
     }
 
     private fun parseIdentifiers(
-        requests: List<LegalEntityIdentifier>,
+        requests: List<LegalEntityIdentifierRaw>,
         metadata: LegalEntityHeaderMetadata,
         errors: MutableList<LegalEntityContentError>
     ): List<LegalEntityIdentifierParsed> {
@@ -146,7 +146,7 @@ class LegalEntityHeaderParser(
     }
 
     private fun parseScriptVariants(
-        requests: List<LegalEntityScriptVariant>,
+        requests: List<LegalEntityScriptVariantRaw>,
         metadata: LegalEntityHeaderMetadata,
         errors: MutableList<LegalEntityContentError>
     ): List<LegalEntityScriptVariantParsed> {
@@ -163,7 +163,7 @@ class LegalEntityHeaderParser(
 
     private fun parseScriptVariant(
         index: Int,
-        variant: LegalEntityScriptVariant,
+        variant: LegalEntityScriptVariantRaw,
         metadata: LegalEntityHeaderMetadata,
         errors: MutableList<LegalEntityContentError>
     ): LegalEntityScriptVariantParsed? {

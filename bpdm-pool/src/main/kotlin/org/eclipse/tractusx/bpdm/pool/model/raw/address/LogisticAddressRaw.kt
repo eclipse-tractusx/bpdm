@@ -17,25 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.raw.address
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.model.Street
 import java.time.Instant
 
-data class LogisticAddressRequest(
+data class LogisticAddressRaw(
     val name: String?,
-    val states: List<AddressStateRequest>,
-    val identifiers: List<AddressIdentifierRequest>,
-    val physicalPostalAddress: PhysicalPostalAddressRequest,
-    val alternativePostalAddress: AlternativePostalAddressRequest?,
-    val confidenceCriteria: ConfidenceCriteriaRequest,
-    val scriptVariants: List<AddressScriptVariant>
+    val states: List<AddressStateRaw>,
+    val identifiers: List<AddressIdentifierRaw>,
+    val physicalPostalAddress: PhysicalPostalAddressRaw,
+    val alternativePostalAddress: AlternativePostalAddressRaw?,
+    val confidenceCriteria: ConfidenceCriteriaRaw,
+    val scriptVariants: List<AddressScriptVariantRaw>
 )
 
-data class PhysicalPostalAddressRequest(
-    val geographicCoordinates: GeoCoordinateRequest?,
+data class PhysicalPostalAddressRaw(
+    val geographicCoordinates: GeoCoordinateRaw?,
     val country: String?,
     val administrativeAreaLevel1: String?,
     val administrativeAreaLevel2: String?,
@@ -52,8 +53,8 @@ data class PhysicalPostalAddressRequest(
     val taxJurisdictionCode: String?
 )
 
-data class AlternativePostalAddressRequest(
-    val geographicCoordinates: GeoCoordinateRequest?,
+data class AlternativePostalAddressRaw(
+    val geographicCoordinates: GeoCoordinateRaw?,
     val country: String?,
     val administrativeAreaLevel1: String?,
     val postalCode: String?,
@@ -63,26 +64,19 @@ data class AlternativePostalAddressRequest(
     val deliveryServiceNumber: String?
 )
 
-data class GeoCoordinateRequest(
+data class GeoCoordinateRaw(
     val longitude: Double?,
     val latitude: Double?,
     val altitude: Double?
 )
 
-data class ConfidenceCriteriaRequest(
-    val sharedByOwner: Boolean?,
-    val checkedByExternalDataSource: Boolean?,
-    val lastConfidenceCheckAt: Instant?,
-    val nextConfidenceCheckAt: Instant?
-)
-
-data class AddressStateRequest(
+data class AddressStateRaw(
     val validFrom: Instant?,
     val validTo: Instant?,
     val type: BusinessStateType?
 )
 
-data class AddressIdentifierRequest(
+data class AddressIdentifierRaw(
     val value: String?,
     val type: String?
 )

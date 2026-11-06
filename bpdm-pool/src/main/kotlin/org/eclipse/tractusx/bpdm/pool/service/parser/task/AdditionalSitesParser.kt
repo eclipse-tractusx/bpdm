@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.error.GoldenRecordTaskError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferencesParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.AdditionalSiteRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteHeaderParser
 import org.springframework.stereotype.Service
@@ -62,7 +62,7 @@ class AdditionalSitesParser(
             .mapNotNull { it.orRecord(errors) { error -> GoldenRecordTaskError.AdditionalSiteInvalid(error) } }
         // A new site has had no confidence assessed of its own, so it borrows the one stated for the task's site.
         val newSites = unknown.mapNotNull { (additionalSite, reference) ->
-            siteHeaderParser.parse(listOf(SiteHeaderRequest(additionalSite.name, emptyList(), site.header.confidenceCriteria, emptyList()))).single()
+            siteHeaderParser.parse(listOf(SiteHeaderRaw(additionalSite.name, emptyList(), site.header.confidenceCriteria, emptyList()))).single()
                 .orRecord(errors) { GoldenRecordTaskError.AdditionalSiteCreateInvalid(it) }
                 ?.let { AdditionalSiteCreateParsed(reference, it) }
         }

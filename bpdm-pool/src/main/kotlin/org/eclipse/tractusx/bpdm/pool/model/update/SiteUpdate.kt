@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.model.update
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation

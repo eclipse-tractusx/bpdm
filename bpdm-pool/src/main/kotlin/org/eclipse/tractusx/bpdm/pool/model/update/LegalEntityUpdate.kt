@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.model.update
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation

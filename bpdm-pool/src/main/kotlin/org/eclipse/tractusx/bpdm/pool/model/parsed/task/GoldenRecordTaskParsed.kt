@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed.task
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LogisticAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityUpdateParsed

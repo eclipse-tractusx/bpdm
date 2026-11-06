@@ -17,24 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
 
-data class SiteContentRequest(
-    val header: SiteHeaderRequest,
-    val mainAddress: LogisticAddressRequest
-)
-
-data class SiteHeaderRequest(
-    val name: String?,
-    val states: List<SiteState>,
-    val confidenceCriteria: ConfidenceCriteriaRequest,
-    val scriptVariants: List<SiteScriptVariant>
-)
-
-data class SiteScriptVariant(
-    val scriptCode: String,
-    /** Non-null unlike most loose request fields: no inbound source can express a missing site script variant name. */
-    val name: String
+/**
+ * A site whose main address already exists, together with that address's content as this site describes it.
+ */
+data class SiteCreateWithReferencedAddressAsMainRaw(
+    val mainAddressBpn: String,
+    val header: SiteHeaderRaw,
+    val mainAddress: LogisticAddressRaw
 )

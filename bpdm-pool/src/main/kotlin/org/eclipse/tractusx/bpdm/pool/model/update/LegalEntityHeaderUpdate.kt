@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.model.update
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity.LegalEntityScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate.Companion.NoOp
 import java.time.Instant
 

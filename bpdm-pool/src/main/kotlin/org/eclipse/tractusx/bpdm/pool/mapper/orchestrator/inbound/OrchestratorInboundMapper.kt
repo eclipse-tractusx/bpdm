@@ -32,11 +32,11 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordRelationTaskRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationType
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationValidityPeriodRaw
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityUpsertHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.NamePartKind
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.NamePartRaw
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedAddressRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedAddressRelationKind
@@ -53,17 +53,17 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedStreetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedStreetScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UpsertIntent
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressIdentifierRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressStateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AlternativePostalAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.GeoCoordinateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.PhysicalPostalAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativePostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteScriptVariantRaw
 import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
@@ -93,10 +93,9 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorR
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.Street as PoolStreet
 import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant as PoolStreetScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.AlternativeAddressScriptVariant as PoolAlternativeAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.PhysicalAddressScriptVariant as PoolPhysicalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.PostalAddressScriptVariant as PoolPostalAddressScriptVariant
-
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativeAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PostalAddressScriptVariantRaw
 /**
  * Translates the golden record tasks, golden record relation tasks and sharing member records the Orchestrator hands to
  * the Pool into the Pool's raw model.
@@ -161,16 +160,16 @@ class OrchestratorInboundMapper {
     private fun toLegalEntity(legalEntity: LegalEntity): LegalEntityUpsertRaw =
         LegalEntityUpsertRaw(
             reference = toReference(legalEntity.bpnReference),
-            header = LegalEntityHeaderRaw(
+            header = LegalEntityUpsertHeaderRaw(
                 legalName = legalEntity.legalName,
                 legalShortName = legalEntity.legalShortName,
                 legalForm = legalEntity.legalForm,
-                identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
+                identifiers = legalEntity.identifiers.map { LegalEntityIdentifierRaw(it.value, it.type, it.issuingBody) },
                 states = legalEntity.states.map { toState(it) },
                 confidenceCriteria = toConfidenceRequest(legalEntity.confidenceCriteria),
                 isDataSpaceParticipant = legalEntity.isParticipantData,
                 ownershipUltimate = legalEntity.ownershipUltimate,
-                scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariant(it.scriptCode, it.legalName, it.legalShortName) }
+                scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRaw(it.scriptCode, it.legalName, it.legalShortName) }
             ),
             legalAddress = AddressUpsertRaw(
                 reference = toReference(legalEntity.legalAddress.bpnReference),
@@ -184,11 +183,11 @@ class OrchestratorInboundMapper {
 
     private fun toSite(site: Site): SiteUpsertRaw {
         val reference = toReference(site.bpnReference)
-        val header = SiteHeaderRaw(
+        val header = SiteUpsertHeaderRaw(
             name = site.siteName,
             states = site.states.map { toState(it) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
-            scriptVariants = site.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.siteName) }
+            scriptVariants = site.scriptVariants.map { SiteScriptVariantRaw(it.scriptCode, it.siteName) }
         )
         val mainAddressScriptVariants = site.scriptVariants.map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.mainAddress) }
         val intent = toIntent(site.hasChanged)
@@ -212,11 +211,11 @@ class OrchestratorInboundMapper {
     private fun toAdditionalAddress(address: PostalAddressWithScriptVariants): AddressUpsertRaw =
         AddressUpsertRaw(toReference(address.bpnReference), toContentRequest(address))
 
-    private fun toContentRequest(address: PostalAddressWithScriptVariants): LogisticAddressRequest =
+    private fun toContentRequest(address: PostalAddressWithScriptVariants): LogisticAddressRaw =
         toContentRequest(address.postalProperties, address.scriptVariants)
 
-    private fun toContentRequest(address: PostalAddress, scriptVariants: List<PostalAddressScriptVariantWithScriptCode>): LogisticAddressRequest =
-        LogisticAddressRequest(
+    private fun toContentRequest(address: PostalAddress, scriptVariants: List<PostalAddressScriptVariantWithScriptCode>): LogisticAddressRaw =
+        LogisticAddressRaw(
             name = address.addressName,
             states = address.states.map { toStateRequest(it) },
             identifiers = address.identifiers.map { toIdentifierRequest(it) },
@@ -226,16 +225,16 @@ class OrchestratorInboundMapper {
             scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteria): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteria): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt,
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt
         )
 
-    private fun toPhysicalRequest(physical: PhysicalAddress): PhysicalPostalAddressRequest =
-        PhysicalPostalAddressRequest(
+    private fun toPhysicalRequest(physical: PhysicalAddress): PhysicalPostalAddressRaw =
+        PhysicalPostalAddressRaw(
             geographicCoordinates = toGeoRequest(physical.geographicCoordinates),
             country = physical.country,
             administrativeAreaLevel1 = physical.administrativeAreaLevel1,
@@ -253,8 +252,8 @@ class OrchestratorInboundMapper {
             taxJurisdictionCode = physical.taxJurisdictionCode
         )
 
-    private fun toAlternativeRequest(alternative: AlternativeAddress): AlternativePostalAddressRequest =
-        AlternativePostalAddressRequest(
+    private fun toAlternativeRequest(alternative: AlternativeAddress): AlternativePostalAddressRaw =
+        AlternativePostalAddressRaw(
             geographicCoordinates = toGeoRequest(alternative.geographicCoordinates),
             country = alternative.country,
             administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
@@ -265,30 +264,30 @@ class OrchestratorInboundMapper {
             deliveryServiceNumber = alternative.deliveryServiceNumber
         )
 
-    private fun toStateRequest(state: BusinessState): AddressStateRequest =
-        AddressStateRequest(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
+    private fun toStateRequest(state: BusinessState): AddressStateRaw =
+        AddressStateRaw(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
 
-    private fun toIdentifierRequest(identifier: Identifier): AddressIdentifierRequest =
-        AddressIdentifierRequest(value = identifier.value, type = identifier.type)
+    private fun toIdentifierRequest(identifier: Identifier): AddressIdentifierRaw =
+        AddressIdentifierRaw(value = identifier.value, type = identifier.type)
 
-    private fun toGeoRequest(geo: GeoCoordinate): GeoCoordinateRequest =
-        GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
+    private fun toGeoRequest(geo: GeoCoordinate): GeoCoordinateRaw =
+        GeoCoordinateRaw(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toScriptVariant(variant: PostalAddressScriptVariantWithScriptCode): AddressScriptVariant =
-        AddressScriptVariant(
+    private fun toScriptVariant(variant: PostalAddressScriptVariantWithScriptCode): AddressScriptVariantRaw =
+        AddressScriptVariantRaw(
             scriptCode = variant.scriptCode,
             address = toPostalScriptVariant(variant.postalProperties)
         )
 
-    private fun toPostalScriptVariant(variant: PostalAddressScriptVariant): PoolPostalAddressScriptVariant =
-        PoolPostalAddressScriptVariant(
+    private fun toPostalScriptVariant(variant: PostalAddressScriptVariant): PostalAddressScriptVariantRaw =
+        PostalAddressScriptVariantRaw(
             addressName = variant.addressName,
             physicalAddress = toPhysicalScriptVariant(variant.physicalAddress),
             alternativeAddress = variant.alternativeAddress?.let { toAlternativeScriptVariant(it) }
         )
 
-    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariant): PoolPhysicalAddressScriptVariant =
-        PoolPhysicalAddressScriptVariant(
+    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariant): PhysicalAddressScriptVariantRaw =
+        PhysicalAddressScriptVariantRaw(
             city = variant.city,
             district = variant.district,
             street = toScriptVariantStreet(variant.street),
@@ -298,8 +297,8 @@ class OrchestratorInboundMapper {
             door = variant.door
         )
 
-    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariant): PoolAlternativeAddressScriptVariant =
-        PoolAlternativeAddressScriptVariant(
+    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariant): AlternativeAddressScriptVariantRaw =
+        AlternativeAddressScriptVariantRaw(
             city = variant.city
         )
 

@@ -19,6 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativePostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.AddressIdentifierV6Dto
@@ -29,13 +36,12 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.address.StreetV6Dto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
 import org.eclipse.tractusx.bpdm.pool.model.Street
-import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * Maps a **v6** address request into the shared loose [LogisticAddressRequest]. No validation here (the parser's job),
+ * Maps a **v6** address request into the shared loose [LogisticAddressRaw]. No validation here (the parser's job),
  * so the country enum is passed on as its raw alpha-2 string for the parser to re-validate; Pool-computed confidence
  * values are dropped (not part of an upsert).
  */
@@ -45,8 +51,8 @@ class AddressDtoRequestMapperV6 {
     /**
      * Returns the content of the given address as the shared loose request model.
      */
-    fun toContentRequest(address: LogisticAddressV6Dto): LogisticAddressRequest =
-        LogisticAddressRequest(
+    fun toContentRequest(address: LogisticAddressV6Dto): LogisticAddressRaw =
+        LogisticAddressRaw(
             name = address.name,
             states = address.states.map { toStateRequest(it) },
             identifiers = address.identifiers.map { toIdentifierRequest(it) },
@@ -58,8 +64,8 @@ class AddressDtoRequestMapperV6 {
             scriptVariants = emptyList()
         )
 
-    private fun toPhysicalRequest(physical: PhysicalPostalAddressV6Dto): PhysicalPostalAddressRequest =
-        PhysicalPostalAddressRequest(
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressV6Dto): PhysicalPostalAddressRaw =
+        PhysicalPostalAddressRaw(
             geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
             country = physical.country,
             administrativeAreaLevel1 = physical.administrativeAreaLevel1,
@@ -77,8 +83,8 @@ class AddressDtoRequestMapperV6 {
             taxJurisdictionCode = physical.taxJurisdictionCode
         )
 
-    private fun toAlternativeRequest(alternative: AlternativePostalAddressV6Dto): AlternativePostalAddressRequest =
-        AlternativePostalAddressRequest(
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressV6Dto): AlternativePostalAddressRaw =
+        AlternativePostalAddressRaw(
             geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
             country = alternative.country,
             administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
@@ -89,22 +95,22 @@ class AddressDtoRequestMapperV6 {
             deliveryServiceNumber = alternative.deliveryServiceNumber
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
         )
 
-    private fun toStateRequest(state: AddressStateV6Dto): AddressStateRequest =
-        AddressStateRequest(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
+    private fun toStateRequest(state: AddressStateV6Dto): AddressStateRaw =
+        AddressStateRaw(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
 
-    private fun toIdentifierRequest(identifier: AddressIdentifierV6Dto): AddressIdentifierRequest =
-        AddressIdentifierRequest(value = identifier.value, type = identifier.type)
+    private fun toIdentifierRequest(identifier: AddressIdentifierV6Dto): AddressIdentifierRaw =
+        AddressIdentifierRaw(value = identifier.value, type = identifier.type)
 
-    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRequest =
-        GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
+    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRaw =
+        GeoCoordinateRaw(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
     private fun toStreet(street: StreetV6Dto): Street =
         Street(

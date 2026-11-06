@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed.legalentity
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 
 data class LegalEntityUpdateParsed(
     val target: LegalEntityDb,

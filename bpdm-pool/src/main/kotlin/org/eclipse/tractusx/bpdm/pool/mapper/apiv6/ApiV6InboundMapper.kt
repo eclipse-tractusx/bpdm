@@ -73,12 +73,12 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithLegalAddressA
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteGetRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteSearchRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -267,7 +267,7 @@ class ApiV6InboundMapper(
     fun toSiteCreateWithLegalAddressAsMainRaw(request: SiteCreateWithLegalAddressAsMainV6Request): SiteCreateWithLegalAddressAsMainRaw =
         SiteCreateWithLegalAddressAsMainRaw(
             legalEntityBpn = request.bpnLParent,
-            header = SiteHeaderRequest(
+            header = SiteHeaderRaw(
                 name = request.name,
                 states = request.states.map { toStateRequest(it) },
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
@@ -283,24 +283,24 @@ class ApiV6InboundMapper(
     fun toSiteUpdateRaw(request: SitePartnerUpdateV6Request): SiteUpdateRaw =
         SiteUpdateRaw(siteBpn = request.bpns, content = toContentRequest(request.site))
 
-    private fun toContentRequest(site: SiteV6Dto): SiteContentRequest =
-        SiteContentRequest(
+    private fun toContentRequest(site: SiteV6Dto): SiteContentRaw =
+        SiteContentRaw(
             header = toHeaderRequest(site),
             mainAddress = addressDtoRequestMapperV6.toContentRequest(site.mainAddress)
         )
 
-    private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRequest =
-        LegalEntityContentRequest(
+    private fun toContentRequest(legalEntity: LegalEntityV6Dto, legalAddress: LogisticAddressV6Dto): LegalEntityContentRaw =
+        LegalEntityContentRaw(
             header = toHeaderRequest(legalEntity),
             legalAddress = addressDtoRequestMapperV6.toContentRequest(legalAddress)
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityV6Dto): LegalEntityHeaderRequest =
-        LegalEntityHeaderRequest(
+    private fun toHeaderRequest(legalEntity: LegalEntityV6Dto): LegalEntityHeaderRaw =
+        LegalEntityHeaderRaw(
             legalName = legalEntity.legalName,
             legalShortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
-            identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
+            identifiers = legalEntity.identifiers.map { LegalEntityIdentifierRaw(it.value, it.type, it.issuingBody) },
             states = legalEntity.states.map { toStateRequest(it) },
             confidenceCriteria = toConfidenceRequest(legalEntity.confidenceCriteria),
             isDataSpaceParticipant = legalEntity.isCatenaXMemberData,
@@ -312,8 +312,8 @@ class ApiV6InboundMapper(
     private fun toStateRequest(state: LegalEntityStateV6Dto): LegalEntityState =
         LegalEntityState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
-    private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRequest =
-        SiteHeaderRequest(
+    private fun toHeaderRequest(site: SiteV6Dto): SiteHeaderRaw =
+        SiteHeaderRaw(
             name = site.name,
             states = site.states.map { toStateRequest(it) },
             confidenceCriteria = toConfidenceRequest(site.confidenceCriteria),
@@ -323,8 +323,8 @@ class ApiV6InboundMapper(
     private fun toStateRequest(state: SiteStateV6Dto): SiteState =
         SiteState(state.validFrom.toValidFromInstant(), state.validTo.toValidToInstant(), state.type)
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV6Dto): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.entity
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.LogisticAddressParsed
 import org.springframework.stereotype.Component
 
 /**

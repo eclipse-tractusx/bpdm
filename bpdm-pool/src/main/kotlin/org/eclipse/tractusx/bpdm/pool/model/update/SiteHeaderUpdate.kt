@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.model.update
 
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteScriptVariantParsed
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation

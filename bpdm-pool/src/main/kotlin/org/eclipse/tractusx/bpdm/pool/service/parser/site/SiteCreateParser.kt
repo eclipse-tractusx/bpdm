@@ -23,11 +23,11 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateRaw
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.ScriptVariantCoverageValidator
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
@@ -62,7 +62,7 @@ class SiteCreateParser(
      * a main address that does not exist yet.
      */
     fun parseContent(
-        contents: List<SiteContentRequest>,
+        contents: List<SiteContentRaw>,
         mainAddressBpns: List<String?> = contents.map { null }
     ): List<ParseResult<SiteContentParsed, SiteCreateError>> {
         val headerResults = siteHeaderParser.parse(contents.map { it.header })

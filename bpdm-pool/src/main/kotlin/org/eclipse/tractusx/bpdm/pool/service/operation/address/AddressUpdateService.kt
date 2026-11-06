@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSiteMembershipParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressSiteMembershipParsed
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate

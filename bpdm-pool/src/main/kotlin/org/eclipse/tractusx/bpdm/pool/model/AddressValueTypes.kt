@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.Instant
 
 /**
- * Bounded address value types that carry no stage-specific metadata, so they are shared across the loose request
- * ([LogisticAddressRequest]) and resolved ([LogisticAddressParsed]) stages without per-stage variants.
+ * Bounded address value types that carry no stage-specific metadata, so they are shared across the loose raw
+ * ([LogisticAddressRaw]) and resolved ([LogisticAddressParsed]) stages without per-stage variants.
  */
 
 data class Street(

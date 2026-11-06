@@ -32,13 +32,13 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.SiteUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteUpdateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityUpsertRaw
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.SiteUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UpsertIntent
-import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteCreateWithReferencedAddressAsMainRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.site.SiteHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.address.AddressBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.site.SiteCreateParser
@@ -93,7 +93,7 @@ class SiteUpsertParser(
 
         return when (site) {
             is SiteUpsertRaw.WithLegalAddressAsMain -> {
-                val content = SiteContentRequest(header, sharedLegalAddress(site, legalEntity))
+                val content = SiteContentRaw(header, sharedLegalAddress(site, legalEntity))
                 if (existingBpn != null)
                     parseUpdate(existingBpn, reference, BpnReferenceParsed.Unstated, content, errors)
                 else
@@ -106,7 +106,7 @@ class SiteUpsertParser(
                     errors += GoldenRecordTaskError.SiteMainAddressIsLegalAddress
                     return null
                 }
-                val content = SiteContentRequest(header, site.mainAddress.content)
+                val content = SiteContentRaw(header, site.mainAddress.content)
                 val existingMainAddress = (mainAddressReference as? BpnReferenceParsed.Existing)
                     ?.let { addressBpnParser.parse(listOf(it.bpn)).single().parsedOrNull() }
 
@@ -141,7 +141,7 @@ class SiteUpsertParser(
         siteBpn: String,
         reference: BpnReferenceParsed,
         mainAddressReference: BpnReferenceParsed,
-        content: SiteContentRequest,
+        content: SiteContentRaw,
         errors: MutableList<GoldenRecordTaskError>
     ): SiteUpsertParsed? =
         siteUpdateParser.parse(listOf(SiteUpdateRaw(siteBpn, content))).single()
@@ -152,17 +152,17 @@ class SiteUpsertParser(
         reference: BpnReferenceParsed,
         mainAddressReference: BpnReferenceParsed,
         mainAddress: LogisticAddressDb,
-        content: SiteContentRequest,
+        content: SiteContentRaw,
         errors: MutableList<GoldenRecordTaskError>
     ): SiteUpsertParsed? =
         siteCreateWithReferencedAddressAsMainParser
-            .parse(listOf(SiteCreateWithReferencedAddressAsMainRequest(mainAddress.bpn, content.header, content.mainAddress))).single()
+            .parse(listOf(SiteCreateWithReferencedAddressAsMainRaw(mainAddress.bpn, content.header, content.mainAddress))).single()
             .orRecord(errors) { GoldenRecordTaskError.SiteCreateInvalid(it) }
             ?.let { SiteUpsertParsed.CreateOnExistingAddress(reference, mainAddressReference, it) }
 
     private fun parseCreateOnLegalAddress(
         reference: BpnReferenceParsed,
-        content: SiteContentRequest,
+        content: SiteContentRaw,
         legalEntityPlan: LegalEntityUpsertParsed?,
         errors: MutableList<GoldenRecordTaskError>
     ): SiteUpsertParsed? {
@@ -175,20 +175,20 @@ class SiteUpsertParser(
 
     // The site writes the legal address as its main address, so the legal entity's variant wins for a script both state;
     // a script only the legal entity is named in stays on the address because the legal entity still needs it.
-    private fun sharedLegalAddress(site: SiteUpsertRaw.WithLegalAddressAsMain, legalEntity: LegalEntityUpsertRaw): LogisticAddressRequest {
+    private fun sharedLegalAddress(site: SiteUpsertRaw.WithLegalAddressAsMain, legalEntity: LegalEntityUpsertRaw): LogisticAddressRaw {
         val legalAddress = legalEntity.legalAddress.content
         val legalAddressVariantsByCode = legalAddress.scriptVariants.associateBy { it.scriptCode }
 
         return legalAddress.copy(scriptVariants = site.mainAddressScriptVariants.map { legalAddressVariantsByCode[it.scriptCode] ?: it })
     }
 
-    private fun toHeaderRequest(header: SiteHeaderRaw, errors: MutableList<GoldenRecordTaskError>): SiteHeaderRequest? {
+    private fun toHeaderRequest(header: SiteUpsertHeaderRaw, errors: MutableList<GoldenRecordTaskError>): SiteHeaderRaw? {
         if (header.states.any { it.type == null }) {
             errors += GoldenRecordTaskError.StateTypeMissing
             return null
         }
 
-        return SiteHeaderRequest(
+        return SiteHeaderRaw(
             name = header.name,
             states = header.states.map { SiteState(it.validFrom, it.validTo, it.type!!) },
             confidenceCriteria = header.confidenceCriteria,

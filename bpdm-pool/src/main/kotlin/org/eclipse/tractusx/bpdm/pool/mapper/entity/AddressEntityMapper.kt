@@ -19,9 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AlternativeAddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AlternativePostalAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PhysicalAddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PhysicalPostalAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.model.*
-import org.eclipse.tractusx.bpdm.pool.model.parsed.*
 import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressCreateParsed
 import org.springframework.stereotype.Component
 import java.time.Instant

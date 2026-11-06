@@ -30,11 +30,11 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.task.GoldenRecordTaskReferenc
 import org.eclipse.tractusx.bpdm.pool.model.parsed.task.LegalEntityUpsertParsed
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityCreateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityUpdateRaw
-import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityHeaderRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityUpsertHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.LegalEntityUpsertRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UpsertIntent
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityContentRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.legalentity.LegalEntityUpdateParser
@@ -78,7 +78,7 @@ class LegalEntityUpsertParser(
 
         val isDataSpaceParticipant = legalEntity.header.isDataSpaceParticipant ?: existingLegalEntity?.isDataSpaceParticipant ?: false
         val header = toHeaderRequest(legalEntity.header, isDataSpaceParticipant, errors) ?: return null
-        val content = LegalEntityContentRequest(header, legalEntity.legalAddress.content)
+        val content = LegalEntityContentRaw(header, legalEntity.legalAddress.content)
 
         return if (existingBpn == null)
             legalEntityCreateParser.parse(listOf(LegalEntityCreateRaw(content))).single()
@@ -90,13 +90,13 @@ class LegalEntityUpsertParser(
                 ?.let { LegalEntityUpsertParsed.Update(reference, legalAddressReference, it) }
     }
 
-    private fun toHeaderRequest(header: LegalEntityHeaderRaw, isDataSpaceParticipant: Boolean, errors: MutableList<GoldenRecordTaskError>): LegalEntityHeaderRequest? {
+    private fun toHeaderRequest(header: LegalEntityUpsertHeaderRaw, isDataSpaceParticipant: Boolean, errors: MutableList<GoldenRecordTaskError>): LegalEntityHeaderRaw? {
         if (header.states.any { it.type == null }) {
             errors += GoldenRecordTaskError.StateTypeMissing
             return null
         }
 
-        return LegalEntityHeaderRequest(
+        return LegalEntityHeaderRaw(
             legalName = header.legalName,
             legalShortName = header.legalShortName,
             legalForm = header.legalForm,

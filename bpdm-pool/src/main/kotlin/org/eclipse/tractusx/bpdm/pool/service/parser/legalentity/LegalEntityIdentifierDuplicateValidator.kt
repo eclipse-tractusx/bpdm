@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser.legalentity
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.LegalEntityContentError
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.raw.legalentity.LegalEntityHeaderRaw
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.springframework.stereotype.Service
 
@@ -41,14 +41,14 @@ class LegalEntityIdentifierDuplicateValidator(
      * [headers] — null for a create, the legal entity's own BPN for an update — and an identifier owned by the entry's
      * own BPN is not a duplicate.
      */
-    fun validate(headers: List<LegalEntityHeaderRequest>, ownerBpns: List<String?>): List<List<LegalEntityContentError>> {
+    fun validate(headers: List<LegalEntityHeaderRaw>, ownerBpns: List<String?>): List<List<LegalEntityContentError>> {
         require(headers.size == ownerBpns.size) { "headers and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(headers)
         return headers.mapIndexed { i, header -> duplicateErrorsFor(header, ownerBpns[i], candidates) }
     }
 
     private fun duplicateErrorsFor(
-        header: LegalEntityHeaderRequest,
+        header: LegalEntityHeaderRaw,
         ownerBpn: String?,
         candidates: Map<Key, Candidate>
     ): List<LegalEntityContentError> =
@@ -64,7 +64,7 @@ class LegalEntityIdentifierDuplicateValidator(
                 null
         }
 
-    private fun buildCandidates(headers: List<LegalEntityHeaderRequest>): Map<Key, Candidate> {
+    private fun buildCandidates(headers: List<LegalEntityHeaderRaw>): Map<Key, Candidate> {
         val identifiers = headers.flatMap { it.identifiers }
 
         val withinRequest = identifiers

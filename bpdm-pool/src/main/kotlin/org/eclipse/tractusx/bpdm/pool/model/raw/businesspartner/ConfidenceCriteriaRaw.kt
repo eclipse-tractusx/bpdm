@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,11 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner
 
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import java.time.Instant
 
-data class SiteHeaderCreateParsed(
-    val legalEntity: LegalEntityDb,
-    val header: SiteHeaderParsed
+data class ConfidenceCriteriaRaw(
+    val sharedByOwner: Boolean?,
+    val checkedByExternalDataSource: Boolean?,
+    val lastConfidenceCheckAt: Instant?,
+    val nextConfidenceCheckAt: Instant?
 )

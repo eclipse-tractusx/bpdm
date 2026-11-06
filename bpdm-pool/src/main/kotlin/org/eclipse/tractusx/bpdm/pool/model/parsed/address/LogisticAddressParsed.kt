@@ -17,8 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.parsed
+package org.eclipse.tractusx.bpdm.pool.model.parsed.address
 
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.entity.CountryDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
@@ -26,7 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
 import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
 import org.eclipse.tractusx.bpdm.pool.model.Street
-import java.time.Instant
 
 data class LogisticAddressParsed(
     val name: String?,
@@ -39,13 +39,6 @@ data class LogisticAddressParsed(
 ) {
     fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }
-
-data class ConfidenceCriteriaParsed(
-    val sharedByOwner: Boolean,
-    val checkedByExternalDataSource: Boolean,
-    val lastConfidenceCheckAt: Instant,
-    val nextConfidenceCheckAt: Instant
-)
 
 data class PhysicalPostalAddressParsed(
     val geographicCoordinates: GeoCoordinate?,

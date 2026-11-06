@@ -17,31 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.raw.site
 
-import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
+import org.eclipse.tractusx.bpdm.pool.model.SiteState
 
-data class AddressScriptVariant(
+data class SiteContentRaw(
+    val header: SiteHeaderRaw,
+    val mainAddress: LogisticAddressRaw
+)
+
+data class SiteHeaderRaw(
+    val name: String?,
+    val states: List<SiteState>,
+    val confidenceCriteria: ConfidenceCriteriaRaw,
+    val scriptVariants: List<SiteScriptVariantRaw>
+)
+
+data class SiteScriptVariantRaw(
     val scriptCode: String,
-    val address: PostalAddressScriptVariant
-)
-
-data class PostalAddressScriptVariant(
-    val addressName: String? = null,
-    val physicalAddress: PhysicalAddressScriptVariant = PhysicalAddressScriptVariant(),
-    val alternativeAddress: AlternativeAddressScriptVariant? = null
-)
-
-data class PhysicalAddressScriptVariant(
-    val city: String? = null,
-    val district: String? = null,
-    val street: StreetScriptVariant? = null,
-    val industrialZone: String? = null,
-    val building: String? = null,
-    val floor: String? = null,
-    val door: String? = null
-)
-
-data class AlternativeAddressScriptVariant(
-    val city: String? = null
+    /** Non-null unlike most loose request fields: no inbound source can express a missing site script variant name. */
+    val name: String
 )

@@ -17,35 +17,37 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.raw.legalentity
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 
-data class LegalEntityContentRequest(
-    val header: LegalEntityHeaderRequest,
-    val legalAddress: LogisticAddressRequest
+data class LegalEntityContentRaw(
+    val header: LegalEntityHeaderRaw,
+    val legalAddress: LogisticAddressRaw
 )
 
-data class LegalEntityHeaderRequest(
+data class LegalEntityHeaderRaw(
     val legalName: String?,
     val legalShortName: String?,
     val legalForm: String?,
-    val identifiers: List<LegalEntityIdentifier>,
+    val identifiers: List<LegalEntityIdentifierRaw>,
     val states: List<LegalEntityState>,
-    val confidenceCriteria: ConfidenceCriteriaRequest,
+    val confidenceCriteria: ConfidenceCriteriaRaw,
     val isDataSpaceParticipant: Boolean,
     /** Null means the request does not state the flag, so an update leaves it untouched (v6 cannot express it at all). */
     val ownershipUltimate: Boolean?,
-    val scriptVariants: List<LegalEntityScriptVariant>
+    val scriptVariants: List<LegalEntityScriptVariantRaw>
 )
 
-data class LegalEntityIdentifier(
+data class LegalEntityIdentifierRaw(
     val value: String?,
     val type: String?,
     val issuingBody: String?
 )
 
-data class LegalEntityScriptVariant(
+data class LegalEntityScriptVariantRaw(
     val scriptCode: String,
     val legalName: String?,
     val shortName: String?

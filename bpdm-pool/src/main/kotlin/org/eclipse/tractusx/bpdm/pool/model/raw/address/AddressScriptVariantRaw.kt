@@ -17,13 +17,31 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model.raw.address
 
-/**
- * A site whose main address already exists, together with that address's content as this site describes it.
- */
-data class SiteCreateWithReferencedAddressAsMainRequest(
-    val mainAddressBpn: String,
-    val header: SiteHeaderRequest,
-    val mainAddress: LogisticAddressRequest
+import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
+
+data class AddressScriptVariantRaw(
+    val scriptCode: String,
+    val address: PostalAddressScriptVariantRaw
+)
+
+data class PostalAddressScriptVariantRaw(
+    val addressName: String? = null,
+    val physicalAddress: PhysicalAddressScriptVariantRaw = PhysicalAddressScriptVariantRaw(),
+    val alternativeAddress: AlternativeAddressScriptVariantRaw? = null
+)
+
+data class PhysicalAddressScriptVariantRaw(
+    val city: String? = null,
+    val district: String? = null,
+    val street: StreetScriptVariant? = null,
+    val industrialZone: String? = null,
+    val building: String? = null,
+    val floor: String? = null,
+    val door: String? = null
+)
+
+data class AlternativeAddressScriptVariantRaw(
+    val city: String? = null
 )

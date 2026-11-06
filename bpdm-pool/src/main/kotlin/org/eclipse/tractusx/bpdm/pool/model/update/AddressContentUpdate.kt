@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.model.update
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AlternativePostalAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.PhysicalPostalAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.AlternativePostalAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.businesspartner.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.address.PhysicalPostalAddressParsed
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation.site
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.site.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.service.operation.bpn.BpnIssueService
 import org.springframework.stereotype.Service
 

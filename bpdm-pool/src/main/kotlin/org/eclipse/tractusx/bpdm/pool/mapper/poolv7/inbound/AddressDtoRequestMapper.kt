@@ -19,6 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressIdentifierRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AddressStateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativeAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.AlternativePostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.GeoCoordinateRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.LogisticAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PhysicalPostalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.address.PostalAddressScriptVariantRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.businesspartner.ConfidenceCriteriaRaw
 import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressIdentifierV7Dto
@@ -36,21 +47,20 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.businesspartner.ConfidenceCri
 import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
 import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * Maps a Pool API logistic address into the loose [LogisticAddressRequest]. No validation here (the parser's job), so the
+ * Maps a Pool API logistic address into the loose [LogisticAddressRaw]. No validation here (the parser's job), so the
  * country enum is passed on as its raw alpha-2 string for the parser to re-validate; Pool-computed confidence values are
  * dropped (not part of an upsert).
  */
 @Component
 class AddressDtoRequestMapper {
 
-    fun toContentRequest(address: LogisticAddressV7Dto, scriptVariants: List<LogisticAddressScriptVariantV7Dto>): LogisticAddressRequest =
-        LogisticAddressRequest(
+    fun toContentRequest(address: LogisticAddressV7Dto, scriptVariants: List<LogisticAddressScriptVariantV7Dto>): LogisticAddressRaw =
+        LogisticAddressRaw(
             name = address.name,
             states = address.states.map { toStateRequest(it) },
             identifiers = address.identifiers.map { toIdentifierRequest(it) },
@@ -60,11 +70,11 @@ class AddressDtoRequestMapper {
             scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
 
-    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): LogisticAddressRequest =
+    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): LogisticAddressRaw =
         toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
 
-    private fun toPhysicalRequest(physical: PhysicalPostalAddressV7Dto): PhysicalPostalAddressRequest =
-        PhysicalPostalAddressRequest(
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressV7Dto): PhysicalPostalAddressRaw =
+        PhysicalPostalAddressRaw(
             geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
             country = physical.country,
             administrativeAreaLevel1 = physical.administrativeAreaLevel1,
@@ -82,8 +92,8 @@ class AddressDtoRequestMapper {
             taxJurisdictionCode = physical.taxJurisdictionCode
         )
 
-    private fun toAlternativeRequest(alternative: AlternativePostalAddressV7Dto): AlternativePostalAddressRequest =
-        AlternativePostalAddressRequest(
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressV7Dto): AlternativePostalAddressRaw =
+        AlternativePostalAddressRaw(
             geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
             country = alternative.country,
             administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
@@ -94,38 +104,38 @@ class AddressDtoRequestMapper {
             deliveryServiceNumber = alternative.deliveryServiceNumber
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaRaw =
+        ConfidenceCriteriaRaw(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
         )
 
-    private fun toStateRequest(state: AddressStateV7Dto): AddressStateRequest =
-        AddressStateRequest(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
+    private fun toStateRequest(state: AddressStateV7Dto): AddressStateRaw =
+        AddressStateRaw(validFrom = state.validFrom.toValidFromInstant(), validTo = state.validTo.toValidToInstant(), type = state.type)
 
-    private fun toIdentifierRequest(identifier: AddressIdentifierV7Dto): AddressIdentifierRequest =
-        AddressIdentifierRequest(value = identifier.value, type = identifier.type)
+    private fun toIdentifierRequest(identifier: AddressIdentifierV7Dto): AddressIdentifierRaw =
+        AddressIdentifierRaw(value = identifier.value, type = identifier.type)
 
-    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRequest =
-        GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
+    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRaw =
+        GeoCoordinateRaw(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toScriptVariant(variant: LogisticAddressScriptVariantV7Dto): AddressScriptVariant =
-        AddressScriptVariant(
+    private fun toScriptVariant(variant: LogisticAddressScriptVariantV7Dto): AddressScriptVariantRaw =
+        AddressScriptVariantRaw(
             scriptCode = variant.scriptCode,
             address = toPostalScriptVariant(variant.address)
         )
 
-    private fun toPostalScriptVariant(variant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariant =
-        PostalAddressScriptVariant(
+    private fun toPostalScriptVariant(variant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariantRaw =
+        PostalAddressScriptVariantRaw(
             addressName = variant.addressName,
             physicalAddress = toPhysicalScriptVariant(variant.physicalAddress),
             alternativeAddress = variant.alternativeAddress?.let { toAlternativeScriptVariant(it) }
         )
 
-    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariant =
-        PhysicalAddressScriptVariant(
+    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariantRaw =
+        PhysicalAddressScriptVariantRaw(
             city = variant.city,
             district = variant.district,
             street = variant.street?.let { toScriptVariantStreet(it) },
@@ -135,8 +145,8 @@ class AddressDtoRequestMapper {
             door = variant.door
         )
 
-    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariant =
-        AlternativeAddressScriptVariant(
+    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariantRaw =
+        AlternativeAddressScriptVariantRaw(
             city = variant.city
         )
 
