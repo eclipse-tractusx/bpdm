@@ -95,7 +95,7 @@ jobs:
         with:
           version: ${{ github.event.inputs.helm_version || 'latest' }}
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.13'
           check-latest: true
@@ -128,7 +128,7 @@ jobs:
           path: /tmp
 
       - name: Download System Tester Image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: bpdm-system-tester-docker
           path: /tmp
