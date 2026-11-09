@@ -6,6 +6,7 @@
     * [Country Catalogue](#country-catalogue)
     * [Region and Field Quality Rule Countries](#region-and-field-quality-rule-countries)
     * [Legal Form and Identifier Type Countries](#legal-form-and-identifier-type-countries)
+    * [Outstanding Reserved Golden Record Tasks](#outstanding-reserved-golden-record-tasks)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
@@ -55,6 +56,13 @@ Null-country field quality rules remain valid as country-independent defaults.
 
 Before upgrading, correct or clear every non-null `country_code` in `legal_forms` and `identifier_type_details` that is absent from the `countries` catalogue.
 The migration fails and names any unresolved codes, so add intended countries to the catalogue or correct the affected metadata before upgrading.
+
+### Outstanding Reserved Golden Record Tasks
+
+The Pool changed how it tracks reserved golden record tasks whose result it failed to report to the Orchestrator the first time.
+The migration deletes every such tracked task, so the Pool no longer retries reporting the ones still outstanding.
+
+Before upgrading, ensure the Pool tracks no outstanding task: `SELECT count(*) FROM golden_record_tasks WHERE is_resolved = false` in the Pool database must return 0.
 
 ## 7.4.x to 7.5.x
 

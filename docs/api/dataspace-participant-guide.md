@@ -105,6 +105,7 @@ record is only readable once you have the list it belongs to:
 
 | Endpoint                             | Resolves                                                                    |
 |--------------------------------------|-----------------------------------------------------------------------------|
+| `GET /v7/countries`                  | `country` of a postal address                                               |
 | `GET /v7/legal-forms`                | `legalForm` of a legal entity                                               |
 | `GET /v7/identifier-types`           | the `type` of a legal entity or address identifier                          |
 | `GET /v7/administrative-areas-level1`| `administrativeAreaLevel1` of a postal address                              |

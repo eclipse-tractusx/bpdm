@@ -258,14 +258,16 @@ that case.
 ### Before You Start
 
 Not every part of a business partner takes free text.
-Identifier types, legal forms and administrative areas are chosen from lists the golden record
-process provider maintains, and the Pool publishes those lists: `GET /v7/identifier-types` for an
-identifier's `type`, `GET /v7/legal-forms` for `legalEntity.legalForm`, and
-`GET /v7/administrative-areas-level1` for a postal address's `administrativeAreaLevel1`.
+Countries, identifier types, legal forms and administrative areas are chosen from lists the golden
+record process provider maintains, and the Pool publishes those lists: `GET /v7/countries` for a
+postal address's `country`, `GET /v7/identifier-types` for an identifier's `type`,
+`GET /v7/legal-forms` for `legalEntity.legalForm`, and `GET /v7/administrative-areas-level1` for a
+postal address's `administrativeAreaLevel1`.
 
 Read them once before you map your source data onto the format, and map onto the values they
 contain.
-A value outside them is a common cause of a record ending in `Error`.
+The Gate accepts a value outside them, so it is not rejected when you share it - it is a common cause
+of a record ending in `Error` instead.
 
 ### Sharing Another Company's Business Partner
 
@@ -644,7 +646,7 @@ The company changes hands, or another party takes over maintaining its data, on 
 Two relations are involved, and they have to be reported in this order:
 
 1. The existing relation, under its unchanged `externalId`, its open period now carrying a `validTo`
-   of that date and all of its earlier periods still in the list.
+   of the day before that date and all of its earlier periods still in the list.
    Wait for it to succeed.
 2. Then a new relation, under a **new** `externalId`, the same source partner, the new owner or
    manager as target, one period starting on that date.
@@ -652,8 +654,9 @@ Two relations are involved, and they have to be reported in this order:
 The order is what makes this work, and sending both at once does not replace it.
 A business partner has one owner and one manager at a time, so a new relation that reaches the
 process while the old one still holds an open period overlaps it and fails.
-Periods that meet on a single date do not overlap, so once the old one is closed on the handover date
-the new one can start on that same date with neither a gap nor an overlap between them.
+A period still holds on its `validTo`, so two periods that meet on a single date overlap.
+Closing the old one on the day before the handover date lets the new one start on that date with
+neither a gap nor an overlap between them.
 
 Should the new relation fail because it arrived too early, it is not lost: share it again once the
 old one has succeeded, and it re-enters the process.
@@ -682,14 +685,20 @@ This is the event that reaches furthest, because a partner that is out of use ow
 nothing and represents nobody.
 
 1. Find what points at it: `POST /v7/input/relations/search` filtered by target, paged through.
-2. End every one of them, each under its own `externalId`, each with a `validTo` of that date on its
-   open period and its earlier periods left in place.
+2. End every one of them, each under its own `externalId`, each with a `validTo` on its open period
+   of the last day the partner is in use - the day before it goes out of use - and its earlier
+   periods left in place.
    Closing a relation narrows it, so these do not constrain each other and the order among them does
    not matter - one request or several, whichever suits your system.
    Every alternative headquarter designation the partner is part of ends too, whichever end it sits
    at.
 3. Wait for all of them to succeed.
-4. Only then share the business partner itself with its closed active and new inactive state.
+4. Only then share the business partner itself with its closed active and new inactive state, the
+   inactive one starting on the date it goes out of use.
+
+A relation still holds on its `validTo`, so a relation ending on the date the partner goes out of use
+would have it own or manage something on a day it is already inactive.
+Ending the relations the day before leaves no such day.
 
 What does matter is that step 4 comes last.
 Deactivating the partner first leaves relations pointing at a partner that is already out of use.
@@ -746,9 +755,9 @@ Both have to be active for the designation to hold, so either one going out of u
 ownership and data management, which are only cut when the governing side goes.
 
 1. Send the designation again under its existing `externalId`, its open period now carrying a
-   `validTo` of that date.
+   `validTo` of the last day both are in use - the day before the one goes out of use.
 2. Then share the business partner that goes out of use with its closed active and new inactive
-   state.
+   state, the inactive one starting on the date it goes out of use.
 3. Watch both sharing states, the relation's and the business partner's.
    They are separate calls, and each can fail without the other.
 

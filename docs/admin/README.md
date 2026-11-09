@@ -28,6 +28,14 @@ While the endpoints to create new legal forms and identifier types currently exi
 
 ---
 
+#### Countries
+
+The countries the Pool accepts are kept in its `countries` database table and can only be maintained there; the Pool API offers no endpoint to create them.
+Consumers read the list through `GET countries`.
+
+Addresses, administrative areas, legal forms and identifier types all reference this table.
+A country missing from it is rejected wherever it is given, including when creating legal forms and identifier types through the API, so add a country to the table before using it.
+
 ### BPN Request Identifiers
 
 When matching business partner data to existing golden records a refinement service may discover that the business partner data is new and has no BPN yet.

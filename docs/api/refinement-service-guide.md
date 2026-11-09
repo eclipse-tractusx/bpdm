@@ -179,6 +179,9 @@ It has two halves.
   it is unknown whether they belong to the legal entity, the site or an address
 * `uncategorized.address` - address data for which it is unknown whether it is a legal, a site main
   or an additional address
+* `uncategorized.scriptVariants` - the name parts the sharing member wrote in another script, per
+  `scriptCode`; unlike the rest, you return them unchanged (see
+  [Script Variant Coverage](#script-variant-coverage))
 
 **Categorized data** is the golden record the data is understood to describe: `legalEntity`, `site`
 and `additionalAddress`, plus `nameParts` for the name parts you have attributed to a level
@@ -497,9 +500,10 @@ Where a business partner's data is also written in another script, it travels in
 of the legal entity, the site or the address, each keyed by a `scriptCode` the Pool publishes.
 Two rules bind a result: a variant has to carry the same mandatory content as the data it mirrors, and
 a legal entity or site may only be named in a script its address is also written in.
-The second one reaches beyond your task - an address can carry the names of two business partners - so
-a result that stops writing an address in a script another partner is still named in fails the task
-rather than silently stranding that partner.
+The second one reaches beyond your task, because an address can carry the names of two business
+partners. The Pool settles it for you: an address keeps every script a business partner built on it is
+still named in, even where your result leaves that script out, and a site you create on the legal
+address in a script the legal address lacks adds that script to it.
 
 `uncategorized.scriptVariants` is different: it carries the name parts the sharing member wrote in
 each script without your having to categorize them, and nothing else derives them.
