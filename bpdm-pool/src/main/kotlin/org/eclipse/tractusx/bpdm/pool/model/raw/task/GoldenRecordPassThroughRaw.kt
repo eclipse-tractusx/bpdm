@@ -49,7 +49,13 @@ data class UncategorizedRaw(
     val nameParts: List<String>,
     val identifiers: List<UncategorizedIdentifierRaw>,
     val states: List<BusinessStateRaw>,
-    val address: UncategorizedAddressRaw?
+    val address: UncategorizedAddressRaw?,
+    val scriptVariants: List<UncategorizedScriptVariantRaw>
+)
+
+data class UncategorizedScriptVariantRaw(
+    val scriptCode: String,
+    val nameParts: List<String>
 )
 
 data class UncategorizedIdentifierRaw(

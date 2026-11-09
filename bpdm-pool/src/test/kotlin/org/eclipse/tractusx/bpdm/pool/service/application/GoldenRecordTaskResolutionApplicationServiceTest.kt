@@ -172,6 +172,19 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `task result hands back the uncategorized script variants of the task`() {
+
+        val uncategorizedScriptVariants = listOf(UncategorizedScriptVariant("KANJI", listOf("Name Part 1", "Name Part 2")))
+        val createLegalEntityRequest = with(minValidLegalEntity().withLegalReferences("123".toBpnRequest(), "222".toBpnRequest())) {
+            copy(uncategorized = uncategorized.copy(scriptVariants = uncategorizedScriptVariants))
+        }
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        assertThat(createResult[0].errors).isEmpty()
+        assertThat(createResult[0].businessPartner.uncategorized.scriptVariants).isEqualTo(uncategorizedScriptVariants)
+    }
+
+    @Test
     fun `create legal entity persists ownership ultimate and keeps ultimate owner bpnl empty`() {
         val baseRequest = minValidLegalEntity()
         val createRequest = baseRequest

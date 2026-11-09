@@ -21,7 +21,7 @@
 # Only script variants are compared here; master data, identifiers, states, BPNs and confidence
 # criteria are covered by their own features. The "script variant" argument of the refine steps is the
 # seed that determines the generated variant content (a different seed produces different variants).
-@CXTPM-1043
+@CXTPM-1093
 Feature: Output Reflects Golden Record Script Variants
 
   # -- Each business partner type reflects its golden record's script variants --
@@ -218,9 +218,56 @@ Feature: Output Reflects Golden Record Script Variants
   #* The sharing member shares a record for one of the legal entity's additional addresses with a different script code.
   #* The golden record process refines it to that additional address of the existing legal entity.
   #* The address record's output merges both variants: each script code fills only its own entity's properties and leaves the others empty.
+  #* The sharing member updates the address record, and the golden record process refines it again in the address's script code alone.
+  #* The legal entity record's output still reflects the legal entity's script variants.
   @TEST_CXTPM-1025 @BPDM
   Scenario: Output Merges The Script Variants Of A Legal Entity And Its Additional Address
     Given record "acme-le-record" reflects legal entity "acme" with script code "CHINESE_SIMPLIFIED"
     When the sharing member shares record "acme-address-record"
     And the golden record process refines record "acme-address-record" to additional address "acme-branch" with script code "KANJI" of existing legal entity "acme"
     Then "acme-address-record" output reflects the merged script variants of additional address "acme-branch" of legal entity "acme"
+    When the sharing member updates record "acme-address-record"
+    And the golden record process refines record "acme-address-record" to additional address "acme-branch" with script code "KANJI" of existing legal entity "acme"
+    Then "acme-le-record" output reflects the script variants of legal entity "acme"
+
+  # -- A site on the legal address adds its script to the legal address --
+
+  #h3. Test Objective:
+  #
+  #* Verify a site created on the legal address in a script the legal address lacks adds that script to the legal address instead of being rejected.
+  #
+  #h3. Preconditions:
+  #
+  #* A record reflects a legal entity named in one script code.
+  #
+  #h3. Description:
+  #
+  #* The sharing member shares a second record.
+  #* The golden record process refines it to a new site on the legal entity's legal address, named in a different script code only.
+  #* Once the Gate has applied the Pool's changes, the legal entity record's output names its address in both script codes.
+  @TEST_CXTPM-1082 @BPDM
+  Scenario: Site On The Legal Address Adds A Script The Legal Address Lacks
+    Given record "acme-record" reflects legal entity "acme" with script code "CHINESE_SIMPLIFIED"
+    When the sharing member shares record "acme-site-record"
+    And the golden record process refines record "acme-site-record" to site "acme-site" with script code "KANJI" on the legal address of legal entity "acme"
+    And the Gate has applied the Pool changes of the address of record "acme-record"
+    Then "acme-record" output reflects its address in the scripts "CHINESE_SIMPLIFIED, KANJI"
+
+  # -- The sharing member's name parts per script reach the output --
+
+  #h3. Test Objective:
+  #
+  #* Verify the name parts a sharing member states in a script travel with the golden record task and reach the record's output unchanged.
+  #
+  #h3. Description:
+  #
+  #* The sharing member shares a record with name parts in one script code.
+  #* The golden record task of the record carries those name parts.
+  #* The golden record process refines the record to a legal entity.
+  #* The record's output reflects the shared name parts in that script code.
+  @TEST_CXTPM-1081 @BPDM
+  Scenario: Shared Script Variant Name Parts Reach The Output
+    When the sharing member shares record "acme-record" with script variant name parts in "KANJI"
+    Then the golden record task of "acme-record" carries the script variant name parts in "KANJI"
+    When the golden record process refines record "acme-record" to legal entity "acme" with script variant "acme-content"
+    Then "acme-record" output reflects the shared script variant name parts in "KANJI"

@@ -46,6 +46,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -78,6 +79,10 @@ class TestDataConfiguration {
 
         return testMetadata
     }
+
+    @Bean
+    fun unsupportedCountry(@Value("\${bpdm.test-data.unsupported-country:ZZ}") countryCode: String): UnsupportedCountry =
+        UnsupportedCountry(countryCode)
 
     @Bean
     fun gateTestDataFactory(testMetadata: TestMetadata, testRunData: TestRunData): GateInputFactory {
@@ -238,3 +243,9 @@ class TestDataConfiguration {
         )
     }
 }
+
+/**
+ * A country code the Pool's country catalogue does not list. Defaults to `ZZ`, which is no ISO 3166-1 code; an
+ * environment whose operator added `ZZ` to the catalogue sets `bpdm.test-data.unsupported-country` instead.
+ */
+data class UnsupportedCountry(val code: String)

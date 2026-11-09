@@ -22,7 +22,7 @@
 # The shared address can be an ADDITIONAL address of the sites (first scenarios) or the sites' MAIN
 # address (last scenario): the golden record flow lets a new site adopt an already-existing address as
 # its main address, so several sites can share one main address.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Output Reflects Additional Sites Of Address
 
   #h3. Test Objective:
@@ -98,7 +98,7 @@ Feature: Output Reflects Additional Sites Of Address
   #* The sharing member updates the second record.
   #* The golden record process refines it to the same additional address, but under a different site than before.
   #* The address belongs to the first record's site and to the second record's new site alone - the site it no longer uses is gone.
-  @TEST_CXTPM-XXXX @BPDM
+  @TEST_CXTPM-1089 @BPDM
   Scenario: Site No Longer Stated Comes Off The Address
     Given the sharing member shares record "dock-a-record"
     And the sharing member shares record "dock-b-record"
@@ -179,3 +179,26 @@ Feature: Output Reflects Additional Sites Of Address
     Then "hq-site-a-record" output lists the site of record "hq-site-b-record" as an additional site of its address
     And "hq-site-b-record" output lists the site of record "hq-site-a-record" as an additional site of its address
     And the Pool address of "hq-site-a-record" belongs to the sites of records "hq-site-a-record, hq-site-b-record"
+
+  #h3. Test Objective:
+  #
+  #* Verify the output types its address by the role it plays for the output's own site, even when the address is another site's main address.
+  #
+  #h3. Preconditions:
+  #
+  #* A record reflects a site whose main address is shared under a known label.
+  #
+  #h3. Description:
+  #
+  #* The sharing member shares a second record.
+  #* The golden record process refines it to that same address as an additional address of a second site of the same legal entity.
+  #* Once the Gate has applied the Pool's changes, the first record's output types the address as a site main address and the second record's output as an additional address.
+  @TEST_CXTPM-1088 @BPDM
+  Scenario: Address Type Follows The Output's Own Site
+    Given the sharing member shares record "werk-a-record"
+    And the golden record process refines record "werk-a-record" to site "werk-a" with shared main address "werk-hq" of legal entity "acme" with master data "werk-a-content"
+    When the sharing member shares record "werk-b-record"
+    And the golden record process refines record "werk-b-record" to additional address "werk-hq" of site "werk-b" of legal entity "acme" with master data "werk-b-content"
+    And the Gate has applied the Pool changes of the address of record "werk-b-record"
+    Then "werk-a-record" output types its address as a site main address
+    And "werk-b-record" output types its address as an additional address

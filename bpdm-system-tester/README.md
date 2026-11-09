@@ -165,3 +165,9 @@ To run only the fast round-trip smoke scenarios (as CI does on a pull request; i
 ```bash
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @Smoke
 ```
+One scenario shares a business partner in a country the Pool does not support and expects the golden record process
+to reject it. It uses `ZZ`, which the seeded country catalogue does not list. An environment whose operator added
+`ZZ` to its catalogue names another unsupported code instead:
+```bash
+BPDM_TEST_DATA_UNSUPPORTED_COUNTRY=QZ java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+```

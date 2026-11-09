@@ -9,7 +9,7 @@
 # legal name, short name, legal form, site name, address name, address type and postal addresses.
 # It deliberately excludes identifiers, states, BPNs, confidence criteria and golden record
 # relations, which are covered by dedicated tests.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Output Reflects Own Shared Master Data
 
   #h3. Test Objective:

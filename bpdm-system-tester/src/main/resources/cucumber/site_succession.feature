@@ -6,7 +6,7 @@
 # succession has no side effects on the involved sites: nothing is reclassified, nothing is inherited and no
 # state changes, so the predecessor site keeps its addresses and its state. This feature gathers the scenarios
 # for site successions.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Site Succession
 
   #h3. Test Objective:

@@ -26,12 +26,16 @@ import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.test.system.config.UnsupportedCountry
 import org.eclipse.tractusx.bpdm.test.system.utils.ApiCallEvidence
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
@@ -39,6 +43,13 @@ import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.orchestrator.api.model.BusinessState
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 
 class GoldenRecordContentsInOutputStepDefs(
     private val sharingMemberGates: SharingMemberGates,
@@ -46,11 +57,16 @@ class GoldenRecordContentsInOutputStepDefs(
     private val shareActions: BusinessPartnerShareActions,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertRepository: GateAssertRepositoryV7,
-    private val apiCallEvidence: ApiCallEvidence
+    private val apiCallEvidence: ApiCallEvidence,
+    private val unsupportedCountry: UnsupportedCountry
 ) : SpringTestRunConfiguration() {
 
     companion object {
         private val logger = KotlinLogging.logger { }
+
+        // Bounds the wait for the Gate's Pool synchronisation, which runs every 30 seconds by default.
+        private val GATE_POOL_SYNC_TIMEOUT = Duration.ofMinutes(3)
+        private val GATE_POOL_SYNC_POLL_INTERVAL = Duration.ofSeconds(5)
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
@@ -160,6 +176,13 @@ class GoldenRecordContentsInOutputStepDefs(
         shareActions.upload(recordId, isOwnCompanyData = true, member = member)
     }
 
+    @When("the sharing member shares record {string} with an unsupported country")
+    fun `when shares record with unsupported country`(recordId: String) {
+        logger.info { "[$scenarioName] When: the sharing member shares record '$recordId' with an unsupported country" }
+        // The Gate leaves the country to the golden record process, so it has to take the input as it is.
+        shareActions.upload(recordId, isOwnCompanyData = true) { it.withAddressCountry(unsupportedCountry.code) }
+    }
+
     @When("the sharing member shares record {string} stating the site of record {string} as an additional site of its address")
     fun `when shares record stating the site of another record`(recordId: String, otherRecordId: String) {
         logger.info {
@@ -217,6 +240,53 @@ class GoldenRecordContentsInOutputStepDefs(
         // and update scenarios automatically expect the latest master data.
         val legalEntity = shareActions.refineAsLegalEntity(recordId, masterDataSeed, legalEntityId)
         context.legalEntities[legalEntityId] = legalEntity
+    }
+
+    @When("the golden record process refines record {string} to legal entity {string} with an unsupported country")
+    fun `when refines to legal entity with unsupported country`(recordId: String, legalEntityId: String) {
+        logger.info {
+            "[$scenarioName] When: the golden record process refines record '$recordId' to legal entity '$legalEntityId' " +
+                "with an unsupported country"
+        }
+        shareActions.refineAsLegalEntity(recordId, masterDataSeed = legalEntityId, legalEntityLabel = legalEntityId) {
+            it.withLegalAddressCountry(unsupportedCountry.code)
+        }
+    }
+
+    @When("the golden record process refines record {string} to legal entity {string} with a state without validity dates")
+    fun `when refines to legal entity with undated state`(recordId: String, legalEntityId: String) {
+        logger.info {
+            "[$scenarioName] When: the golden record process refines record '$recordId' to legal entity '$legalEntityId' " +
+                "with a state without validity dates"
+        }
+        shareActions.refineAsLegalEntity(recordId, masterDataSeed = legalEntityId, legalEntityLabel = legalEntityId) {
+            it.copy(legalEntity = it.legalEntity.copy(states = listOf(BusinessState(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))))
+        }
+    }
+
+    @When("the Gate has applied the Pool changes of the address of record {string}")
+    fun `when gate has applied pool changes of address`(recordId: String) {
+        logger.info { "[$scenarioName] When: the Gate has applied the Pool changes of the address of record '$recordId'" }
+        // Right after its task an output already carries what the task said; only the Gate's Pool synchronisation
+        // replaces that with the golden record as the Pool keeps it, which the output shows by taking on the Pool
+        // address's update time.
+        val runId = context.runId(recordId)
+        val deadline = Instant.now().plus(GATE_POOL_SYNC_TIMEOUT)
+        while (true) {
+            val output = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId)).content.single()
+            val poolAddress = poolClient.addresses.getAddress(output.address.addressBpn)
+            val outputUpdatedAt = output.address.updatedAt?.truncatedTo(ChronoUnit.MILLIS)
+            val poolUpdatedAt = poolAddress.address.updatedAt.truncatedTo(ChronoUnit.MILLIS)
+            if (outputUpdatedAt != null && !outputUpdatedAt.isBefore(poolUpdatedAt)) {
+                apiCallEvidence.attach("GET", "/v7/addresses/${output.address.addressBpn}", response = poolAddress)
+                return
+            }
+            check(Instant.now().isBefore(deadline)) {
+                "The Gate output of '$recordId' still shows its address as updated at $outputUpdatedAt, while the Pool " +
+                    "address was updated at $poolUpdatedAt, after ${GATE_POOL_SYNC_TIMEOUT.toMinutes()} minutes"
+            }
+            Thread.sleep(GATE_POOL_SYNC_POLL_INTERVAL.toMillis())
+        }
     }
 
     @When("the golden record process refines record {string} to site {string} of legal entity {string} with master data {string}")
@@ -498,6 +568,36 @@ class GoldenRecordContentsInOutputStepDefs(
             .isEqualTo(AddressType.AdditionalAddress)
     }
 
+    @Then("{string} sharing fails in the golden record process")
+    fun `then sharing fails`(recordId: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' sharing fails in the golden record process" }
+        val sharingState = gateOf(recordId).sharingStates.waitForCompletedState(recordId)
+        assertThat(sharingState)
+            .describedAs("sharing state of record '%s'", recordId)
+            .isEqualTo(SharingStateTypeV7.Error)
+    }
+
+    @Then("{string} output types its address as a site main address")
+    fun `then output types address as site main address`(recordId: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output types its address as a site main address" }
+        assertOutputAddressType(recordId, AddressType.SiteMainAddress)
+    }
+
+    @Then("{string} output types its address as an additional address")
+    fun `then output types address as additional address`(recordId: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output types its address as an additional address" }
+        assertOutputAddressType(recordId, AddressType.AdditionalAddress)
+    }
+
+    @Then("{string} output reports the state from {string} to {string}")
+    fun `then output reports state`(recordId: String, validFrom: String, validTo: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output reports the state from '$validFrom' to '$validTo'" }
+        val reportedPeriods = outputOf(recordId).states.map { it.validFrom to it.validTo }
+        assertThat(reportedPeriods)
+            .describedAs("validity of the top-level states of record '%s'", recordId)
+            .containsExactly(utcDateTimeOf(validFrom) to utcDateTimeOf(validTo))
+    }
+
     // -------------------------------------------------------------------------
     // Then - top-level identifiers and states surfacing rule
     //
@@ -691,6 +791,35 @@ class GoldenRecordContentsInOutputStepDefs(
         val poolAddress = poolClient.addresses.getAddress(bpna)
         apiCallEvidence.attach("GET", "/v7/addresses/$bpna", response = poolAddress)
         return poolAddress
+    }
+
+    private fun assertOutputAddressType(recordId: String, expected: AddressType) {
+        assertThat(outputOf(recordId).address.addressType)
+            .describedAs("address type in the output of record '%s'", recordId)
+            .isEqualTo(expected)
+    }
+
+    private fun utcDateTimeOf(instant: String): LocalDateTime =
+        LocalDateTime.ofInstant(Instant.parse(instant), ZoneOffset.UTC)
+
+    private fun BusinessPartnerInputV7Request.withAddressCountry(country: String): BusinessPartnerInputV7Request =
+        copy(
+            address = address.copy(
+                physicalPostalAddress = address.physicalPostalAddress.copy(country = country),
+                alternativePostalAddress = address.alternativePostalAddress?.copy(country = country)
+            )
+        )
+
+    private fun BusinessPartner.withLegalAddressCountry(country: String): BusinessPartner {
+        val legalAddress = legalEntity.legalAddress
+        return copy(
+            legalEntity = legalEntity.copy(
+                legalAddress = legalAddress.copy(
+                    physicalAddress = legalAddress.physicalAddress.copy(country = country),
+                    alternativeAddress = legalAddress.alternativeAddress?.copy(country = country)
+                )
+            )
+        )
     }
 
     private fun String.splitRecordIds(): List<String> =

@@ -29,7 +29,7 @@
 # address is a legal address, the legal entity and the address share the same confidence level. When the
 # matched address is an additional address, the legal entity always carries NoConfidence and the address is
 # evaluated independently.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Output Reflects Golden Record Confidence Criteria
 
   # -- Legal entity matched to legal address --

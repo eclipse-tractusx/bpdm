@@ -3,7 +3,7 @@
 # address and the former legal address becomes an additional address. This feature asserts that address
 # reclassification outcome; relation reflection in the output is covered in
 # output_reflects_golden_record_relations.feature.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Headquarter Relocation
 
   #h3. Test Objective:
