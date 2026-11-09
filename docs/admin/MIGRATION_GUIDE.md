@@ -6,6 +6,7 @@
     * [Country Catalogue](#country-catalogue)
     * [Region and Field Quality Rule Countries](#region-and-field-quality-rule-countries)
     * [Legal Form and Identifier Type Countries](#legal-form-and-identifier-type-countries)
+    * [Outstanding Reserved Golden Record Tasks](#outstanding-reserved-golden-record-tasks)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Alternative Headquarter Relation Directionality](#alternative-headquarter-relation-directionality)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
