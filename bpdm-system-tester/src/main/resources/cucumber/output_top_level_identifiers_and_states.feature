@@ -12,7 +12,7 @@
 # "output_reflects_golden_record_master_data_changes.feature") deliberately IGNORE identifiers and states;
 # this feature is their counterpart and asserts ONLY the top-level identifiers and states, ignoring the
 # descriptive master data.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
 
   #h3. Test Objective:
@@ -74,3 +74,18 @@ Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
     When the sharing member shares record "acme-site-address-record"
     And the golden record process refines record "acme-site-address-record" to additional address "acme-dock" of site "acme-site" of legal entity "acme" with master data "acme-site-address-content"
     Then "acme-site-address-record" output top-level identifiers and states reflect additional address "acme-dock" of site "acme-site" of legal entity "acme"
+
+  #h3. Test Objective:
+  #
+  #* Verify a state without validity dates is reported from the earliest to the latest date, since the output always carries both dates.
+  #
+  #h3. Description:
+  #
+  #* The sharing member shares a record.
+  #* The golden record process refines it to a legal entity whose single state has neither a start nor an end date.
+  #* The record's output reports that state from the earliest to the latest date.
+  @TEST_CXTPM-1090 @BPDM
+  Scenario: Legal Entity State Without Dates Reports The Earliest And Latest Date
+    When the sharing member shares record "acme-record"
+    And the golden record process refines record "acme-record" to legal entity "acme" with a state without validity dates
+    Then "acme-record" output reports the state from "1900-01-01T00:00:00Z" to "9999-12-31T23:59:59Z"

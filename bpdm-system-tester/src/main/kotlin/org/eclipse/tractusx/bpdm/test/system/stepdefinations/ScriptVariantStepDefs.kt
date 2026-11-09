@@ -23,6 +23,7 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
@@ -33,6 +34,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
+import org.eclipse.tractusx.orchestrator.api.model.UncategorizedScriptVariant
 
 /**
  * Steps for the "Output Reflects Golden Record Script Variants" feature.
@@ -167,6 +169,42 @@ class ScriptVariantStepDefs(
         )
     }
 
+    @When("the golden record process refines record {string} to site {string} with script code {string} on the legal address of legal entity {string}")
+    fun `when refines to site on legal address with script code`(recordId: String, siteId: String, scriptCode: String, legalEntityId: String) {
+        logger.info { "[$scenarioName] When: refines '$recordId' to site '$siteId' with script code '$scriptCode' on the legal address of legal entity '$legalEntityId'" }
+        shareActions.refineAsSiteOnLegalAddress(recordId, siteLabel = siteId, siteScriptCode = scriptCode, legalEntityLabel = legalEntityId)
+    }
+
+    // -------------------------------------------------------------------------
+    // Script variant name parts - the sharing member's name parts per script reach the output unchanged
+    // -------------------------------------------------------------------------
+
+    @When("the sharing member shares record {string} with script variant name parts in {string}")
+    fun `when shares record with script variant name parts`(recordId: String, scriptCode: String) {
+        logger.info { "[$scenarioName] When: the sharing member shares record '$recordId' with script variant name parts in '$scriptCode'" }
+        shareActions.upload(recordId, isOwnCompanyData = true) { input ->
+            input.copy(scriptVariants = input.scriptVariants.take(1).map { it.copy(scriptCode = scriptCode) })
+        }
+    }
+
+    @Then("the golden record task of {string} carries the script variant name parts in {string}")
+    fun `then task carries script variant name parts`(recordId: String, scriptCode: String) {
+        logger.info { "[$scenarioName] Then: the golden record task of '$recordId' carries the script variant name parts in '$scriptCode'" }
+        val reservedTask = shareActions.reservedTaskOf(recordId)
+        assertThat(reservedTask.uncategorized.scriptVariants)
+            .describedAs("uncategorized script variants of the golden record task of record '%s'", recordId)
+            .containsExactly(UncategorizedScriptVariant(scriptCode, sharedNamePartsOf(recordId, scriptCode)))
+    }
+
+    @Then("{string} output reflects the shared script variant name parts in {string}")
+    fun `then output reflects shared script variant name parts`(recordId: String, scriptCode: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output reflects the shared script variant name parts in '$scriptCode'" }
+        val namePartsByScript = outputOf(recordId).scriptVariants.associate { it.scriptCode to it.nameParts }
+        assertThat(namePartsByScript)
+            .describedAs("script variant name parts in the output of record '%s'", recordId)
+            .containsEntry(scriptCode, sharedNamePartsOf(recordId, scriptCode))
+    }
+
     // -------------------------------------------------------------------------
     // Then - the output reflects the merged script variants of the golden records the record was refined to
     // -------------------------------------------------------------------------
@@ -247,9 +285,30 @@ class ScriptVariantStepDefs(
         assertPoolReflectsScriptVariants(expected, outputFactory.fromAdditionalAddressOnSite(inputResponseOf(recordId), poolLegalEntity, poolSite, poolAddress))
     }
 
+    @Then("{string} output reflects its address in the scripts {string}")
+    fun `then output reflects address in scripts`(recordId: String, scriptCodes: String) {
+        logger.info { "[$scenarioName] Then: '$recordId' output reflects its address in the scripts '$scriptCodes'" }
+        // A variant names the address only where the address has a golden record variant in that script; the others
+        // carry just the name parts or the names of the legal entity and site.
+        val addressScriptCodes = outputOf(recordId).scriptVariants.filter { it.address.physicalAddress.city != null }.map { it.scriptCode }
+        assertThat(addressScriptCodes)
+            .describedAs("scripts the output of record '%s' names its address in", recordId)
+            .containsExactlyInAnyOrderElementsOf(scriptCodes.split(",").map { it.trim() })
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private fun outputOf(recordId: String): BusinessPartnerOutputV7Dto {
+        val runId = context.runId(recordId)
+        val outputPage = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId))
+        apiCallEvidence.attach("POST", "/v7/output/business-partners/search", request = listOf(runId), response = outputPage)
+        return outputPage.content.single()
+    }
+
+    private fun sharedNamePartsOf(recordId: String, scriptCode: String): List<String> =
+        stateOf(recordId).currentInput!!.scriptVariants.single { it.scriptCode == scriptCode }.nameParts
 
     private fun assertAdditionalAddressOfLegalEntityScriptVariants(recordId: String) {
         val state = stateOf(recordId)

@@ -21,8 +21,10 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
+import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
@@ -46,13 +48,15 @@ class BusinessPartnerShareActions(
     /**
      * Shares the record's input data through [member]'s Gate, which every later step on that record then acts
      * through as well. Scenarios that name no sharing member are read as sharing through the first one.
+     * [adjustInput] changes the generated input before it is shared.
      */
     fun upload(
         recordId: String,
         isOwnCompanyData: Boolean,
         contentSeed: String = recordId,
         additionalSites: List<AdditionalSiteInputV7Dto> = emptyList(),
-        member: SharingMember = SharingMember.FIRST
+        member: SharingMember = SharingMember.FIRST,
+        adjustInput: (BusinessPartnerInputV7Request) -> BusinessPartnerInputV7Request = { it }
     ) {
         val existingState = context.records[recordId]
         check(existingState == null || existingState.member == member) {
@@ -61,6 +65,7 @@ class BusinessPartnerShareActions(
 
         val inputData = testDataGenerator.buildInputData(contentSeed)
             .copy(isOwnCompanyData = isOwnCompanyData, additionalSites = additionalSites)
+            .let(adjustInput)
         val runId = context.runId(recordId)
         val request = listOf(inputData.copy(externalId = runId))
         val response = sharingMemberGates.of(member).businessParters.upsertBusinessPartnersInput(request)
@@ -140,6 +145,26 @@ class BusinessPartnerShareActions(
     }
 
     /**
+     * Refines a record into a legal entity exactly like the label overload above, but hands the golden record process
+     * the refinement as [adjustTask] changes it, and waits for the sharing process to complete without expecting it to
+     * succeed. This lets a scenario refine to content the Pool has to reject or normalise. Returns the golden record
+     * the unchanged refinement describes.
+     */
+    fun refineAsLegalEntity(
+        recordId: String,
+        masterDataSeed: String,
+        legalEntityLabel: String,
+        adjustTask: (BusinessPartner) -> BusinessPartner
+    ): LegalEntityWithLegalAddressVerboseV7Dto {
+        val state = context.records[recordId]!!
+        val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified = false))
+        resolveTask(recordId, adjustTask(entityResult.taskData).withGoldenRecordRequestIdentifiers(legalEntityLabel))
+        context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
+        return entityResult.legalEntity
+    }
+
+    /**
      * Refines a record into the legal entity it already reflects, now carrying the ultimate owner flag, and waits for
      * the golden record process to complete. The flag is stated on the refinement instead of carried over from the
      * record's re-shared input, because that input references the BPNs the sharing member declared, which the Pool
@@ -184,6 +209,45 @@ class BusinessPartnerShareActions(
     ): SiteBasedLegalEntity {
         val state = context.records[recordId]!!
         val entityResult = testDataGenerator.buildSiteBasedLegalEntity(masterDataSeed, givenConfidence(state, verified))
+        resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, siteLabel = siteLabel))
+        context.records[recordId] = state.copy(
+            legalEntity = entityResult.siteBasedLegalEntity.legalEntity,
+            poolSite = SiteWithMainAddressVerboseV7Dto(
+                entityResult.siteBasedLegalEntity.site,
+                entityResult.siteBasedLegalEntity.legalEntity.legalAddress
+            )
+        )
+        gateOf(recordId).sharingStates.waitForCompletedState(recordId)
+        return entityResult.siteBasedLegalEntity
+    }
+
+    /**
+     * Refines a record into a new site whose main address is the legal address of the legal entity an earlier step
+     * refined under [legalEntityLabel], and waits for the golden record process to complete. The legal entity is
+     * restated as that step left it, in the scripts it is named in, while the site is named in [siteScriptCode] only.
+     * Returns the site together with its parent legal entity.
+     */
+    fun refineAsSiteOnLegalAddress(
+        recordId: String,
+        siteLabel: String,
+        siteScriptCode: String,
+        legalEntityLabel: String
+    ): SiteBasedLegalEntity {
+        val state = context.records[recordId]!!
+        val existingLegalEntity = context.legalEntities[legalEntityLabel]
+            ?: error("legal entity '$legalEntityLabel' must be defined by an earlier refinement step")
+        val legalEntityScriptCode = existingLegalEntity.scriptVariants.first().scriptCode
+
+        // The seed the legal entity was first refined with, so its master data stays as it is.
+        val entityResult = testDataGenerator.buildSiteBasedLegalEntity(legalEntityLabel, givenConfidence(state, verified = false)).let {
+            it.copy(
+                siteBasedLegalEntity = SiteBasedLegalEntity(
+                    legalEntity = it.siteBasedLegalEntity.legalEntity.withScriptCode(legalEntityScriptCode),
+                    site = it.siteBasedLegalEntity.site.withScriptCode(siteScriptCode)
+                ),
+                taskData = it.taskData.withLegalEntityScriptCode(legalEntityScriptCode).withSiteScriptCode(siteScriptCode)
+            )
+        }
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, siteLabel = siteLabel))
         context.records[recordId] = state.copy(
             legalEntity = entityResult.siteBasedLegalEntity.legalEntity,
@@ -369,18 +433,25 @@ class BusinessPartnerShareActions(
         return addressResult.additionalSiteAddressWithParent
     }
 
+    /**
+     * Waits until the golden record process has reserved the record's task and returns the business partner data the
+     * sharing member handed it.
+     */
+    fun reservedTaskOf(recordId: String): BusinessPartner =
+        taskReservationWatcher.waitForReservedTask(taskIdOf(recordId)).businessPartner
+
+    // The name parts the sharing member stated per script cannot be told apart by business partner type, so the
+    // refinement hands them back uncategorized, just as it received them.
     private fun resolveTask(recordId: String, taskData: BusinessPartner) =
         resolveReservedTask(recordId) { reserved ->
-            taskData.copy(additionalSites = consolidatedSites(recordId, taskData, reserved.additionalSites))
+            taskData.copy(
+                uncategorized = taskData.uncategorized.copy(scriptVariants = reserved.uncategorized.scriptVariants),
+                additionalSites = consolidatedSites(recordId, taskData, reserved.additionalSites)
+            )
         }
 
     private fun resolveReservedTask(recordId: String, result: (BusinessPartner) -> BusinessPartner) {
-        val runId = context.runId(recordId)
-        val gate = gateOf(recordId)
-        gate.sharingStates.waitForTaskId(recordId)
-        val sharingStatePage = gate.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
-        apiCallEvidence.attach("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
-        val taskId = sharingStatePage.content.single().taskId!!
+        val taskId = taskIdOf(recordId)
         val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
         val resultRequest = TaskStepResultRequest(
             TaskStep.CleanAndSync,
@@ -388,6 +459,15 @@ class BusinessPartnerShareActions(
         )
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
         apiCallEvidence.attach("POST", "/v7/business-partners/golden-record-tasks/step-results", resultRequest)
+    }
+
+    private fun taskIdOf(recordId: String): String {
+        val runId = context.runId(recordId)
+        val gate = gateOf(recordId)
+        gate.sharingStates.waitForTaskId(recordId)
+        val sharingStatePage = gate.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
+        apiCallEvidence.attach("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
+        return sharingStatePage.content.single().taskId!!
     }
 
     // The sites of the address this record is refined to, next to the record's own site - what the Pool applies as that
@@ -435,8 +515,16 @@ class BusinessPartnerShareActions(
     private fun LogisticAddressVerboseV7Dto.withScriptCode(scriptCode: String): LogisticAddressVerboseV7Dto =
         copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
 
+    private fun SiteVerboseV7Dto.withScriptCode(scriptCode: String): SiteVerboseV7Dto =
+        copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
     private fun BusinessPartner.withLegalEntityScriptCode(scriptCode: String): BusinessPartner =
         copy(legalEntity = legalEntity.copy(scriptVariants = legalEntity.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
+
+    private fun BusinessPartner.withSiteScriptCode(scriptCode: String): BusinessPartner {
+        val site = site ?: return this
+        return copy(site = site.copy(scriptVariants = site.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
+    }
 
     private fun BusinessPartner.withAdditionalAddressScriptCode(scriptCode: String): BusinessPartner {
         val address = additionalAddress ?: return this

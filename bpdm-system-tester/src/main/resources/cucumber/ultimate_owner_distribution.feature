@@ -8,7 +8,7 @@
 #   - An entity owned by an ultimate owner inherits that ultimate owner's BPNL
 #   - Only currently valid IsOwnedBy relations are followed
 #   - When no ultimate owner exists in the chain, entities report null
-@CXTPM-1043
+@CXTPM-1093
 Feature: Ultimate Owner Distribution
 
   #h3. Test Objective:
