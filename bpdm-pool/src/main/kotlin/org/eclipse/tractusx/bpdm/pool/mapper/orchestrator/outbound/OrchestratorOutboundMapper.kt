@@ -268,7 +268,8 @@ class OrchestratorOutboundMapper {
                 nameParts = nameParts,
                 identifiers = identifiers.map { toIdentifier(it) },
                 states = states.map { toState(it) },
-                address = address?.let { toUncategorizedAddress(it) }
+                address = address?.let { toUncategorizedAddress(it) },
+                scriptVariants = scriptVariants.map { UncategorizedScriptVariant(it.scriptCode, it.nameParts) }
             )
         }
 

@@ -48,6 +48,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedConfidenceCrit
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedGeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedIdentifierRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedPhysicalAddressRaw
+import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedPhysicalAddressScriptVariantRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedStreetRaw
@@ -351,7 +352,8 @@ class OrchestratorInboundMapper {
                     nameParts = nameParts,
                     identifiers = identifiers.map { toIdentifier(it) },
                     states = states.map { toState(it) },
-                    address = address?.let { toUncategorizedAddress(it) }
+                    address = address?.let { toUncategorizedAddress(it) },
+                    scriptVariants = scriptVariants.map { UncategorizedScriptVariantRaw(it.scriptCode, it.nameParts) }
                 )
             }
         )
