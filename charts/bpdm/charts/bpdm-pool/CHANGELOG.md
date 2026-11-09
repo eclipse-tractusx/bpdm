@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [9.2.0] - unreleased
+
+### Changed
+
+- Increase appversion to 7.6.0
+
+## [9.1.0] - 2026-09-08
+
+### Changed
+
+- Increase appversion to 7.5.0
+
 ## [9.0.0] - 2026-06-10
 
 ### Added
