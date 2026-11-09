@@ -12,6 +12,12 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- Increase appversion to 7.6.0
+- Update BPDM Gate Chart to version 8.2.0
+- Update BPDM Pool Chart to version 9.2.0
+- Update BPDM Orchestrator Chart to version 5.2.0
+- Update BPDM Cleaning Service Dummy Chart to version 5.2.0
+
 ## [7.1.0] - 2026-09-08
 
 ### Breaking
