@@ -23,12 +23,14 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeriodV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -197,17 +199,48 @@ class GoldenRecordRelationsInOutputStepDefs(
         shareRelation(relationId, relationType, sourceRecordId, targetRecordId, currentlyValid = true)
     }
 
+    @When("the sharing member shares relation {string} of type {string} from {string} to {string} valid from {string} to {string} and from {string} to {string}")
+    fun `when shares relation with two validity periods`(
+        relationId: String,
+        relationType: String,
+        sourceRecordId: String,
+        targetRecordId: String,
+        firstValidFrom: String,
+        firstValidTo: String,
+        secondValidFrom: String,
+        secondValidTo: String
+    ) {
+        logger.info {
+            "[$scenarioName] When: the sharing member shares relation '$relationId' of type '$relationType' from " +
+                "'$sourceRecordId' to '$targetRecordId' valid from $firstValidFrom to $firstValidTo and from $secondValidFrom to $secondValidTo"
+        }
+        val validityPeriods = listOf(
+            RelationValidityPeriodV7Dto(validFrom = LocalDate.parse(firstValidFrom), validTo = LocalDate.parse(firstValidTo)),
+            RelationValidityPeriodV7Dto(validFrom = LocalDate.parse(secondValidFrom), validTo = LocalDate.parse(secondValidTo))
+        )
+        shareRelation(relationId, relationType, sourceRecordId, targetRecordId, validityPeriods)
+    }
+
     private fun shareRelation(relationId: String, relationType: String, sourceRecordId: String, targetRecordId: String, currentlyValid: Boolean) {
+        val validityPeriods = if (currentlyValid) listOf(RelationValidityPeriodV7Dto(validFrom = LocalDate.now(), validTo = null)) else null
+        shareRelation(relationId, relationType, sourceRecordId, targetRecordId, validityPeriods)
+    }
+
+    // Without stated validity periods the relation keeps the ones its test data seed generates.
+    private fun shareRelation(
+        relationId: String,
+        relationType: String,
+        sourceRecordId: String,
+        targetRecordId: String,
+        validityPeriods: List<RelationValidityPeriodV7Dto>?
+    ) {
         val baseEntry = testDataFactoryGate.relation.input.request
             .fromSeed("$relationId${context.scenarioSuffix}")
             .withExternalId(context.runId(relationId))
             .withRelationType(RelationTypeV7.valueOf(relationType))
             .withSource(context.runId(sourceRecordId))
             .withTarget(context.runId(targetRecordId))
-        val entry = if (currentlyValid)
-            baseEntry.withValidityPeriods(listOf(RelationValidityPeriodV7Dto(validFrom = LocalDate.now(), validTo = null)))
-        else
-            baseEntry
+        val entry = validityPeriods?.let { baseEntry.withValidityPeriods(it) } ?: baseEntry
 
         val request = RelationPutV7Request(listOf(entry))
         val response = gateOf(sourceRecordId).relation.put(true, request)
@@ -280,6 +313,16 @@ class GoldenRecordRelationsInOutputStepDefs(
     fun `then relation output reflects established relation`(relationId: String) {
         logger.info { "[$scenarioName] Then: relation '$relationId' output reflects the established golden record relation" }
         assertHelper.assertRelationOutputReflectsEstablished(relationId, context.relations[relationId]!!)
+    }
+
+    @Then("relation {string} sharing fails in the golden record process")
+    fun `then relation sharing fails`(relationId: String) {
+        logger.info { "[$scenarioName] Then: relation '$relationId' sharing fails in the golden record process" }
+        val relationState = context.relations[relationId]!!
+        val sharingState = gateOf(relationState.sourceRecordId).sharingStates.waitForRelationCompletedState(relationId)
+        assertThat(sharingState)
+            .describedAs("sharing state of relation '%s'", relationId)
+            .isEqualTo(RelationSharingStateTypeV7.Error)
     }
 
     @Then("record {string} reflects {string} as legal address of {string}")

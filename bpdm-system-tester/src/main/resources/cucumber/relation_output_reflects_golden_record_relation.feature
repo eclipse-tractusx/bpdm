@@ -1,4 +1,4 @@
-@CXTPM-1043
+@CXTPM-1093
 Feature: Sharing Member Relation Output Reflects Golden Record Relation
 
   #h3. Test Objective:
@@ -11,14 +11,14 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
   #
   #h3. Description:
   #
-  #* The sharing member shares an IsOwnedBy relation from the owned record to the owner record.
+  #* The sharing member shares an IsOwnedBy relation from the owned record to the owner record, valid in two periods of which the second starts the day after the first ends.
   #* The golden record process establishes the relation.
-  #* The relation output reflects the established golden record relation.
+  #* The relation output reflects the established golden record relation, both validity periods unchanged.
   @TEST_CXTPM-1035 @BPDM @Smoke
   Scenario: IsOwnedBy Relation Reflected In Sharing Member Relation Output
     Given record "owner-record" reflects legal entity "owner"
     And record "owned-record" reflects legal entity "owned"
-    When the sharing member shares relation "ownership" of type "IsOwnedBy" from "owned-record" to "owner-record"
+    When the sharing member shares relation "ownership" of type "IsOwnedBy" from "owned-record" to "owner-record" valid from "2026-01-01" to "2026-06-30" and from "2026-07-01" to "2026-12-31"
     And the golden record process establishes relation "ownership"
     Then relation "ownership" output reflects the established golden record relation
 
@@ -84,3 +84,24 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
     When the sharing member shares relation "relocation" of type "IsReplacedBy" from "legal-address-record" to "branch-record" effective immediately
     And the golden record process establishes relation "relocation"
     Then relation "relocation" output reflects the established golden record relation
+
+  #h3. Test Objective:
+  #
+  #* Verify a relation whose validity periods meet on one date is rejected, because a relation still holds on the end date of a period.
+  #
+  #h3. Preconditions:
+  #
+  #* Two records each reflect a legal entity (owner and owned).
+  #
+  #h3. Description:
+  #
+  #* The sharing member shares an IsOwnedBy relation from the owned record to the owner record, valid in two periods of which the second starts on the day the first ends.
+  #* The golden record process establishes the relation.
+  #* The relation's sharing fails in the golden record process.
+  @TEST_CXTPM-1091 @BPDM
+  Scenario: Validity Periods Meeting On One Date Are Rejected
+    Given record "owner-record" reflects legal entity "owner"
+    And record "owned-record" reflects legal entity "owned"
+    When the sharing member shares relation "meeting-periods" of type "IsOwnedBy" from "owned-record" to "owner-record" valid from "2026-01-01" to "2026-06-30" and from "2026-06-30" to "2026-12-31"
+    And the golden record process establishes relation "meeting-periods"
+    Then relation "meeting-periods" sharing fails in the golden record process

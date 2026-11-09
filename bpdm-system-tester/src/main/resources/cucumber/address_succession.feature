@@ -7,7 +7,7 @@
 # the headquarters (headquarter_relocation.feature). Every other address succession leaves both addresses as they are:
 # nothing is reclassified, nothing is inherited and no state changes. This feature gathers the scenarios for those
 # successions.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Address Succession
 
   #h3. Test Objective:

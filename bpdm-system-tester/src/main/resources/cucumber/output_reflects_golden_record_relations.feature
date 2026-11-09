@@ -22,7 +22,7 @@
 #   - IsReplacedBy at address level is between two addresses of the SAME legal entity. Where the relation
 #     source is the legal address and it is currently valid, the Pool reclassifies (swaps) the two addresses;
 #     this feature only asserts that the relation is reflected and accepts the swap.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Output Reflects Golden Record Relations
 
   #h3. Test Objective:

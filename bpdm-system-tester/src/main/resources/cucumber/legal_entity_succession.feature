@@ -3,7 +3,7 @@
 # legal entity's headquarters (headquarter_relocation.feature), a succession has no side effects on the
 # involved legal entities: nothing is inherited and no state changes. This feature gathers the scenarios for
 # legal entity successions.
-@CXTPM-1043
+@CXTPM-1093
 Feature: Legal Entity Succession
 
   #h3. Test Objective:
