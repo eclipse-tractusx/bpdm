@@ -20,25 +20,25 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.orchestrator.api.model.Site
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
-import org.eclipse.tractusx.orchestrator.api.v6.model.AlternativeAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ConfidenceCriteriaV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.GeoCoordinateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.IdentifierV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntityV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PhysicalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PostalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.SiteV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StreetV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntryV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedPropertiesV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.AlternativeAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.GeoCoordinateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.IdentifierV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.LegalEntityV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.PhysicalAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.PostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.SiteV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.StreetV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateRequestEntryV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.UncategorizedPropertiesV6Dto
 import java.util.*
 import kotlin.random.Random
 
@@ -46,16 +46,16 @@ class OrchestratorRequestFactoryV6(
     private val commonFactory: OrchestratorRequestFactoryCommon
 ) {
 
-    fun buildTaskCreate(seed: String): TaskCreateRequestEntryV6{
-        return TaskCreateRequestEntryV6(
+    fun buildTaskCreate(seed: String): TaskCreateRequestEntryV6Dto{
+        return TaskCreateRequestEntryV6Dto(
             recordId = UUID.randomUUID().toString(),
             businessPartner = buildBusinessPartner(seed)
         )
     }
 
 
-    fun buildBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6{
-        return BusinessPartnerV6(
+    fun buildBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6Dto{
+        return BusinessPartnerV6Dto(
             nameParts = commonFactory.buildNameParts(seed).map(::toNamePartV6),
             owningCompany = "BPNLOwner",
             uncategorized = toUncategorizedPropertiesV6(commonFactory.buildUncategorizedProperties(seed, random)),
@@ -65,55 +65,55 @@ class OrchestratorRequestFactoryV6(
         )
     }
 
-    fun buildLegalEntityBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6{
-        return BusinessPartnerV6(
+    fun buildLegalEntityBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6Dto{
+        return BusinessPartnerV6Dto(
             nameParts = commonFactory.buildNameParts(seed).map(::toNamePartV6),
             owningCompany = "BPNLOwner",
-            uncategorized = UncategorizedPropertiesV6.empty,
+            uncategorized = UncategorizedPropertiesV6Dto.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = null,
             additionalAddress = null
         )
     }
 
-    fun buildSiteBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6{
-        return BusinessPartnerV6(
+    fun buildSiteBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6Dto{
+        return BusinessPartnerV6Dto(
             nameParts = commonFactory.buildNameParts(seed).map(::toNamePartV6),
             owningCompany = "BPNLOwner",
-            uncategorized = UncategorizedPropertiesV6.empty,
+            uncategorized = UncategorizedPropertiesV6Dto.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = toSiteV6(commonFactory.buildSite(seed, random)),
             additionalAddress = null
         )
     }
 
-    fun buildLegalAddressSiteBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6{
-        return BusinessPartnerV6(
+    fun buildLegalAddressSiteBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6Dto{
+        return BusinessPartnerV6Dto(
             nameParts = commonFactory.buildNameParts(seed).map(::toNamePartV6),
             owningCompany = "BPNLOwner",
-            uncategorized = UncategorizedPropertiesV6.empty,
+            uncategorized = UncategorizedPropertiesV6Dto.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = toSiteV6(commonFactory.buildSite(seed, random).copy(siteMainAddress = null)),
             additionalAddress = null
         )
     }
 
-    fun buildLegalEntityAdditionalAddressBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6{
-        return BusinessPartnerV6(
+    fun buildLegalEntityAdditionalAddressBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6Dto{
+        return BusinessPartnerV6Dto(
             nameParts = commonFactory.buildNameParts(seed).map(::toNamePartV6),
             owningCompany = "BPNLOwner",
-            uncategorized = UncategorizedPropertiesV6.empty,
+            uncategorized = UncategorizedPropertiesV6Dto.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = null,
             additionalAddress = toPostalAddressV6(commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random))
         )
     }
 
-    fun buildSiteAdditionalAddressBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6{
-        return BusinessPartnerV6(
+    fun buildSiteAdditionalAddressBusinessPartner(seed: String, random: Random = createRandomFromSeed(seed)): BusinessPartnerV6Dto{
+        return BusinessPartnerV6Dto(
             nameParts = commonFactory.buildNameParts(seed).map(::toNamePartV6),
             owningCompany = "BPNLOwner",
-            uncategorized = UncategorizedPropertiesV6.empty,
+            uncategorized = UncategorizedPropertiesV6Dto.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
             site = toSiteV6(commonFactory.buildSite(seed, random)),
             additionalAddress = toPostalAddressV6(commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random))
@@ -121,8 +121,8 @@ class OrchestratorRequestFactoryV6(
     }
 
 
-    fun buildLegalEntityProperties(seed: String, random: Random = commonFactory.createRandomFromSeed(seed)): LegalEntityV6 {
-        return LegalEntityV6(
+    fun buildLegalEntityProperties(seed: String, random: Random = commonFactory.createRandomFromSeed(seed)): LegalEntityV6Dto {
+        return LegalEntityV6Dto(
             bpnReference = toBpnReferenceV6(commonFactory.buildBpnLReference(seed)),
             legalName = "Legal Name $seed",
             legalShortName = "Legal Short Name $seed",
@@ -141,28 +141,28 @@ class OrchestratorRequestFactoryV6(
         return Random(seed.hashCode())
     }
 
-    private fun toNamePartV6(namePart: org.eclipse.tractusx.orchestrator.api.model.NamePart) =
-        NamePartV6(
+    private fun toNamePartV6(namePart: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartV7Dto) =
+        NamePartV6Dto(
             name = namePart.name,
             type = when (namePart.type) {
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalName -> NamePartTypeV6.LegalName
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.ShortName -> NamePartTypeV6.ShortName
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalForm -> NamePartTypeV6.LegalForm
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.SiteName -> NamePartTypeV6.SiteName
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.AddressName -> NamePartTypeV6.AddressName
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.LegalName -> NamePartTypeV6.LegalName
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.ShortName -> NamePartTypeV6.ShortName
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.LegalForm -> NamePartTypeV6.LegalForm
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.SiteName -> NamePartTypeV6.SiteName
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.AddressName -> NamePartTypeV6.AddressName
             }
         )
 
-    private fun toUncategorizedPropertiesV6(uncategorizedProperties: UncategorizedProperties) =
-        UncategorizedPropertiesV6(
+    private fun toUncategorizedPropertiesV6(uncategorizedProperties: UncategorizedPropertiesV7Dto) =
+        UncategorizedPropertiesV6Dto(
             nameParts = uncategorizedProperties.nameParts,
             identifiers = uncategorizedProperties.identifiers.map(::toIdentifierV6),
             states = uncategorizedProperties.states.map(::toBusinessStateV6),
             address = uncategorizedProperties.address?.postalProperties?.let(::toPostalAddressV6)
         )
 
-    private fun toSiteV6(site: Site) =
-        SiteV6(
+    private fun toSiteV6(site: SiteV7Dto) =
+        SiteV6Dto(
             bpnReference = toBpnReferenceV6(site.bpnReference),
             siteName = site.siteName,
             states = site.states.map(::toBusinessStateV6),
@@ -171,15 +171,15 @@ class OrchestratorRequestFactoryV6(
             siteMainAddress = site.siteMainAddress?.let(::toPostalAddressV6)
         )
 
-    private fun toPostalAddressV6(postalAddress: org.eclipse.tractusx.orchestrator.api.model.PostalAddress) =
-        PostalAddressV6(
+    private fun toPostalAddressV6(postalAddress: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto) =
+        PostalAddressV6Dto(
             bpnReference = toBpnReferenceV6(postalAddress.bpnReference),
             addressName = postalAddress.addressName,
             identifiers = postalAddress.identifiers.map(::toIdentifierV6),
             states = postalAddress.states.map(::toBusinessStateV6),
             confidenceCriteria = toConfidenceCriteriaV6(postalAddress.confidenceCriteria),
-            physicalAddress = PhysicalAddressV6(
-                geographicCoordinates = GeoCoordinateV6(
+            physicalAddress = PhysicalAddressV6Dto(
+                geographicCoordinates = GeoCoordinateV6Dto(
                     postalAddress.physicalAddress.geographicCoordinates.longitude,
                     postalAddress.physicalAddress.geographicCoordinates.latitude,
                     postalAddress.physicalAddress.geographicCoordinates.altitude
@@ -191,7 +191,7 @@ class OrchestratorRequestFactoryV6(
                 postalCode = postalAddress.physicalAddress.postalCode,
                 city = postalAddress.physicalAddress.city,
                 district = postalAddress.physicalAddress.district,
-                street = StreetV6(
+                street = StreetV6Dto(
                     postalAddress.physicalAddress.street.name,
                     postalAddress.physicalAddress.street.houseNumber,
                     postalAddress.physicalAddress.street.houseNumberSupplement,
@@ -210,8 +210,8 @@ class OrchestratorRequestFactoryV6(
                 taxJurisdictionCode = postalAddress.physicalAddress.taxJurisdictionCode
             ),
             alternativeAddress = postalAddress.alternativeAddress?.let {
-                AlternativeAddressV6(
-                    geographicCoordinates = GeoCoordinateV6(
+                AlternativeAddressV6Dto(
+                    geographicCoordinates = GeoCoordinateV6Dto(
                         it.geographicCoordinates.longitude,
                         it.geographicCoordinates.latitude,
                         it.geographicCoordinates.altitude
@@ -228,26 +228,26 @@ class OrchestratorRequestFactoryV6(
             hasChanged = postalAddress.hasChanged
         )
 
-    private fun toBpnReferenceV6(bpnReference: org.eclipse.tractusx.orchestrator.api.model.BpnReference) =
-        BpnReferenceV6(
+    private fun toBpnReferenceV6(bpnReference: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto) =
+        BpnReferenceV6Dto(
             bpnReference.referenceValue,
             bpnReference.desiredBpn,
             bpnReference.referenceType?.let {
                 when (it) {
-                    org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn -> BpnReferenceTypeV6.Bpn
-                    org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> BpnReferenceTypeV6.BpnRequestIdentifier
+                    org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7.Bpn -> BpnReferenceTypeV6.Bpn
+                    org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7.BpnRequestIdentifier -> BpnReferenceTypeV6.BpnRequestIdentifier
                 }
             }
         )
 
-    private fun toBusinessStateV6(businessState: org.eclipse.tractusx.orchestrator.api.model.BusinessState) =
-        BusinessStateV6(businessState.validFrom, businessState.validTo, businessState.type)
+    private fun toBusinessStateV6(businessState: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto) =
+        BusinessStateV6Dto(businessState.validFrom, businessState.validTo, businessState.type)
 
-    private fun toIdentifierV6(identifier: org.eclipse.tractusx.orchestrator.api.model.Identifier) =
-        IdentifierV6(identifier.value, identifier.type, identifier.issuingBody)
+    private fun toIdentifierV6(identifier: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto) =
+        IdentifierV6Dto(identifier.value, identifier.type, identifier.issuingBody)
 
-    private fun toConfidenceCriteriaV6(confidenceCriteria: org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria) =
-        ConfidenceCriteriaV6(
+    private fun toConfidenceCriteriaV6(confidenceCriteria: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto) =
+        ConfidenceCriteriaV6Dto(
             confidenceCriteria.sharedByOwner,
             confidenceCriteria.checkedByExternalDataSource,
             confidenceCriteria.numberOfSharingMembers,

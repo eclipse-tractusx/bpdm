@@ -23,9 +23,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -44,12 +44,12 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
-        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(beforeTestingTime), PaginationRequest())
+        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryV7Request(beforeTestingTime), PaginationRequest())
 
         //THEN
         //Get sharing member record ID for golden record process services
         val sharingMemberRecordId = testDataClient.reserveBusinessPartnerTask(createdTask).recordId
-        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecord(sharingMemberRecordId, null, Instant.now(), Instant.now())))
+        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecordV7Dto(sharingMemberRecordId, null, Instant.now(), Instant.now())))
 
         assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
     }
@@ -63,15 +63,15 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `search sharing member record with is golden record counted`(){
         //GIVEN
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask.recordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask.recordId, true))
 
         //WHEN
-        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(beforeTestingTime), PaginationRequest())
+        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryV7Request(beforeTestingTime), PaginationRequest())
 
         //THEN
         //Get sharing member record ID for golden record process services
         val sharingMemberRecordId = testDataClient.reserveBusinessPartnerTask(createdTask).recordId
-        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecord(sharingMemberRecordId, true, Instant.now(), Instant.now())))
+        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecordV7Dto(sharingMemberRecordId, true, Instant.now(), Instant.now())))
 
         assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
     }
@@ -85,15 +85,15 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `search sharing member record with is NOT golden record counted`(){
         //GIVEN
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask.recordId, false))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask.recordId, false))
 
         //WHEN
-        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(beforeTestingTime), PaginationRequest())
+        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryV7Request(beforeTestingTime), PaginationRequest())
 
         //THEN
         //Get sharing member record ID for golden record process services
         val sharingMemberRecordId = testDataClient.reserveBusinessPartnerTask(createdTask).recordId
-        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecord(sharingMemberRecordId, false, Instant.now(), Instant.now())))
+        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecordV7Dto(sharingMemberRecordId, false, Instant.now(), Instant.now())))
 
         assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
     }
@@ -107,23 +107,23 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `search sharing member records updated after time X`(){
         //GIVEN
         val createdTask1 = testDataClient.createBusinessPartnerTask(testName)
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask1.recordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask1.recordId, true))
 
         val createdTask2 = testDataClient.createBusinessPartnerTask(testName)
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask2.recordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask2.recordId, true))
 
         val timeX = Instant.now()
 
         val createdTask3 = testDataClient.createBusinessPartnerTask(testName)
-        val updatedRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask3.recordId, true))
+        val updatedRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask3.recordId, true))
 
         //WHEN
-        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(timeX), PaginationRequest())
+        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryV7Request(timeX), PaginationRequest())
 
         //THEN
         //Get sharing member record ID for golden record process services
         val sharingMemberRecordId = testDataClient.reserveBusinessPartnerTasks(createdTask3.processingState.step).reservedTasks.find { it.taskId == createdTask3.taskId }!!.recordId
-        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecord(sharingMemberRecordId, true, Instant.now(), Instant.now())))
+        val expectedResult = PageDto(1, 1, 0, 1, listOf(SharingMemberRecordV7Dto(sharingMemberRecordId, true, Instant.now(), Instant.now())))
 
         assertRepo.assertSharingMemberRecordEqual(searchResult, expectedResult)
         assertThat(searchResult.content.single().createdAt).isEqualTo(updatedRecord.createdAt)
@@ -141,11 +141,11 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask1 = testDataClient.createBusinessPartnerTask("$testName 1")
         val createdTask2 = testDataClient.createBusinessPartnerTask("$testName 2")
         val createdTask3 = testDataClient.createBusinessPartnerTask("$testName 3")
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask2.recordId, true))
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(createdTask1.recordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask2.recordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(createdTask1.recordId, true))
 
         //WHEN
-        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(beforeTestingTime), PaginationRequest())
+        val searchResult = orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryV7Request(beforeTestingTime), PaginationRequest())
 
         //THEN
         //Get sharing member record IDs for golden record process services
@@ -154,9 +154,9 @@ class SharingMemberRecordSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val expectedResult = PageDto(
             3, 1, 0, 3,
             listOf(
-                SharingMemberRecord(sharingMemberRecordIdsByTaskId[createdTask3.taskId]!!, null, Instant.now(), Instant.now()),
-                SharingMemberRecord(sharingMemberRecordIdsByTaskId[createdTask2.taskId]!!, true, Instant.now(), Instant.now()),
-                SharingMemberRecord(sharingMemberRecordIdsByTaskId[createdTask1.taskId]!!, true, Instant.now(), Instant.now())
+                SharingMemberRecordV7Dto(sharingMemberRecordIdsByTaskId[createdTask3.taskId]!!, null, Instant.now(), Instant.now()),
+                SharingMemberRecordV7Dto(sharingMemberRecordIdsByTaskId[createdTask2.taskId]!!, true, Instant.now(), Instant.now()),
+                SharingMemberRecordV7Dto(sharingMemberRecordIdsByTaskId[createdTask1.taskId]!!, true, Instant.now(), Instant.now())
             )
         )
 

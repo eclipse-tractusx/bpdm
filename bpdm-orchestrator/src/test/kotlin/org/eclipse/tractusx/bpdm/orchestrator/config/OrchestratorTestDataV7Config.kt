@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.config
 import org.eclipse.tractusx.bpdm.orchestrator.v7.util.OrchestratorAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.orchestrator.v7.util.OrchestratorTestDataClientV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -65,7 +65,7 @@ class OrchestratorTestDataV7Config {
 
     @Bean
     fun orchestratorTestDataClientV7(
-        orchestratorClient: OrchestrationApiClient,
+        orchestratorClient: OrchestratorV7Client,
         requestFactory: OrchestratorRequestFactoryV7
     ): OrchestratorTestDataClientV7{
         return OrchestratorTestDataClientV7(orchestratorClient, requestFactory)

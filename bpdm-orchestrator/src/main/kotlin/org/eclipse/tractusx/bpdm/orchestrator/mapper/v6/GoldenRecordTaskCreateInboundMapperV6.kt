@@ -37,22 +37,22 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.PostalAddressWithScr
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.SiteRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.StreetRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.UncategorizedPropertiesRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.AlternativeAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ConfidenceCriteriaV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.GeoCoordinateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.IdentifierV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntityV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PhysicalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PostalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.SiteV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StreetV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntryV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.AlternativeAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.GeoCoordinateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.IdentifierV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.LegalEntityV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.PhysicalAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.PostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.SiteV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.StreetV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateRequestEntryV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.UncategorizedPropertiesV6Dto
 import org.springframework.stereotype.Component
 
 /**
@@ -63,13 +63,13 @@ import org.springframework.stereotype.Component
 @Component
 class GoldenRecordTaskCreateInboundMapperV6 {
 
-    fun toRequest(entry: TaskCreateRequestEntryV6): GoldenRecordTaskCreateRequest =
+    fun toRequest(entry: TaskCreateRequestEntryV6Dto): GoldenRecordTaskCreateRequest =
         GoldenRecordTaskCreateRequest(
             recordId = entry.recordId,
             businessPartner = toBusinessPartnerRequest(entry.businessPartner)
         )
 
-    private fun toBusinessPartnerRequest(businessPartner: BusinessPartnerV6): BusinessPartnerRequest =
+    private fun toBusinessPartnerRequest(businessPartner: BusinessPartnerV6Dto): BusinessPartnerRequest =
         with(businessPartner) {
             BusinessPartnerRequest(
                 nameParts = nameParts.map(::toNamePartRequest),
@@ -87,7 +87,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             )
         }
 
-    private fun toLegalEntityRequest(legalEntity: LegalEntityV6): LegalEntityRequest =
+    private fun toLegalEntityRequest(legalEntity: LegalEntityV6Dto): LegalEntityRequest =
         with(legalEntity) {
             LegalEntityRequest(
                 bpnReference = toBpnReferenceRequest(bpnReference),
@@ -108,7 +108,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             )
         }
 
-    private fun toNamePartRequest(namePart: NamePartV6) =
+    private fun toNamePartRequest(namePart: NamePartV6Dto) =
         NamePartRequest(
             name = namePart.name,
             type = when (namePart.type) {
@@ -120,7 +120,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             }
         )
 
-    private fun toUncategorizedPropertiesRequest(uncategorized: UncategorizedPropertiesV6) =
+    private fun toUncategorizedPropertiesRequest(uncategorized: UncategorizedPropertiesV6Dto) =
         UncategorizedPropertiesRequest(
             nameParts = uncategorized.nameParts,
             identifiers = uncategorized.identifiers.map(::toIdentifierRequest),
@@ -134,7 +134,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             scriptVariants = emptyList()
         )
 
-    private fun toSiteRequest(site: SiteV6) =
+    private fun toSiteRequest(site: SiteV6Dto) =
         SiteRequest(
             bpnReference = toBpnReferenceRequest(site.bpnReference),
             siteName = site.siteName,
@@ -147,21 +147,21 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             updatedAt = null
         )
 
-    private fun toIdentifierRequest(identifier: IdentifierV6) =
+    private fun toIdentifierRequest(identifier: IdentifierV6Dto) =
         IdentifierRequest(
             value = identifier.value,
             type = identifier.type,
             issuingBody = identifier.issuingBody
         )
 
-    private fun toBusinessStateRequest(state: BusinessStateV6) =
+    private fun toBusinessStateRequest(state: BusinessStateV6Dto) =
         BusinessStateRequest(
             validFrom = state.validFrom,
             validTo = state.validTo,
             type = state.type
         )
 
-    private fun toConfidenceCriteriaRequest(confidenceCriteria: ConfidenceCriteriaV6) =
+    private fun toConfidenceCriteriaRequest(confidenceCriteria: ConfidenceCriteriaV6Dto) =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidenceCriteria.sharedByOwner,
             checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource,
@@ -171,7 +171,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             confidenceLevel = confidenceCriteria.confidenceLevel
         )
 
-    private fun toBpnReferenceRequest(bpnReference: org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceV6) =
+    private fun toBpnReferenceRequest(bpnReference: org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceV6Dto) =
         BpnReferenceRequest(
             referenceValue = bpnReference.referenceValue,
             desiredBpn = bpnReference.desiredBpn,
@@ -183,7 +183,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             }
         )
 
-    private fun toPostalAddressRequest(postalAddress: PostalAddressV6) =
+    private fun toPostalAddressRequest(postalAddress: PostalAddressV6Dto) =
         PostalAddressRequest(
             bpnReference = toBpnReferenceRequest(postalAddress.bpnReference),
             addressName = postalAddress.addressName,
@@ -197,7 +197,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             updatedAt = null
         )
 
-    private fun toPhysicalAddressRequest(physicalAddress: PhysicalAddressV6) =
+    private fun toPhysicalAddressRequest(physicalAddress: PhysicalAddressV6Dto) =
         PhysicalAddressRequest(
             geographicCoordinates = toGeoCoordinateRequest(physicalAddress.geographicCoordinates),
             country = physicalAddress.country,
@@ -216,7 +216,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             taxJurisdictionCode = physicalAddress.taxJurisdictionCode
         )
 
-    private fun toAlternativeAddressRequest(alternativeAddress: AlternativeAddressV6) =
+    private fun toAlternativeAddressRequest(alternativeAddress: AlternativeAddressV6Dto) =
         AlternativeAddressRequest(
             geographicCoordinates = toGeoCoordinateRequest(alternativeAddress.geographicCoordinates),
             country = alternativeAddress.country,
@@ -228,14 +228,14 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber
         )
 
-    private fun toGeoCoordinateRequest(geoCoordinate: GeoCoordinateV6) =
+    private fun toGeoCoordinateRequest(geoCoordinate: GeoCoordinateV6Dto) =
         GeoCoordinateRequest(
             longitude = geoCoordinate.longitude,
             latitude = geoCoordinate.latitude,
             altitude = geoCoordinate.altitude
         )
 
-    private fun toStreetRequest(street: StreetV6) =
+    private fun toStreetRequest(street: StreetV6Dto) =
         StreetRequest(
             name = street.name,
             houseNumber = street.houseNumber,

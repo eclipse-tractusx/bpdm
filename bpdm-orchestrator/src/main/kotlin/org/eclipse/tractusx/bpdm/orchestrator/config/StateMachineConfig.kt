@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -30,10 +30,10 @@ class StateMachineConfig {
     @Bean
     fun stateMachineConfigProperties(): StateMachineConfigProperties{
         return StateMachineConfigProperties(
-            TaskMode.entries.associate { taskMode ->
+            TaskModeV7.entries.associate { taskMode ->
                 when (taskMode) {
-                    TaskMode.UpdateFromSharingMember -> listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)
-                    TaskMode.UpdateFromPool -> listOf(TaskStep.Clean)
+                    TaskModeV7.UpdateFromSharingMember -> listOf(TaskStepV7.CleanAndSync, TaskStepV7.PoolSync)
+                    TaskModeV7.UpdateFromPool -> listOf(TaskStepV7.Clean)
                 }.let { Pair(taskMode, it) }
             }
         )

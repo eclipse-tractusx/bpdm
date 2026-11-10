@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.Relatio
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -171,7 +171,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     fun `find error relation sharing state`() {
         //GIVEN
         val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName)
-        val errorTask = testDataClient.relation.setRelationStateToError(relation.externalId, errorType = TaskRelationsErrorType.Unspecified)
+        val errorTask = testDataClient.relation.setRelationStateToError(relation.externalId, errorType = TaskRelationsErrorTypeV7.Unspecified)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get()

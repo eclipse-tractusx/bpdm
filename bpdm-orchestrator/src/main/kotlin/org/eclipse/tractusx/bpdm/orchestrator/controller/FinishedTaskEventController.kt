@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.GoldenRecordTaskEventApplicationV7Service
-import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.OrchestratorFinishedTaskEventV7Api
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
@@ -31,10 +31,10 @@ import java.time.Instant
 @RestController
 class FinishedTaskEventController(
     private val taskEventApplicationService: GoldenRecordTaskEventApplicationV7Service
-): FinishedTaskEventApi {
+): OrchestratorFinishedTaskEventV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun getEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+    override fun getEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsV7Response {
         return taskEventApplicationService.getFinishedTaskEvents(timestamp, paginationRequest)
     }
 }

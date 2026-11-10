@@ -19,33 +19,33 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.util
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
 import java.time.LocalDate
 
 object OrchestratorTestValues {
 
-    val alwaysActiveRelationValidity = listOf(RelationValidityPeriod(LocalDate.parse("1970-01-01"), LocalDate.parse("9999-01-01")))
+    val alwaysActiveRelationValidity = listOf(RelationValidityPeriodV7Dto(LocalDate.parse("1970-01-01"), LocalDate.parse("9999-01-01")))
 
-    val relationAltHeadquarter = BusinessPartnerRelations(
-        relationType = RelationType.IsAlternativeHeadquarterFor,
+    val relationAltHeadquarter = BusinessPartnerRelationsV7Dto(
+        relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
         businessPartnerSourceBpn = "BPNL1",
         businessPartnerTargetBpn = "BPNL2",
         validityPeriods = alwaysActiveRelationValidity,
         reasonCode = "REASON_CODE_1"
     )
 
-    val relationIsManagedBy = BusinessPartnerRelations(
-        relationType = RelationType.IsManagedBy,
+    val relationIsManagedBy = BusinessPartnerRelationsV7Dto(
+        relationType = RelationTypeV7.IsManagedBy,
         businessPartnerSourceBpn = "BPNL3",
         businessPartnerTargetBpn = "BPNL4",
         validityPeriods = alwaysActiveRelationValidity,
         reasonCode = "REASON_CODE_2"
     )
 
-    val relationIsOwnedBy = BusinessPartnerRelations(
-        relationType = RelationType.IsOwnedBy,
+    val relationIsOwnedBy = BusinessPartnerRelationsV7Dto(
+        relationType = RelationTypeV7.IsOwnedBy,
         businessPartnerSourceBpn = "BPNL5",
         businessPartnerTargetBpn = "BPNL6",
         validityPeriods = alwaysActiveRelationValidity,

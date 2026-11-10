@@ -24,20 +24,20 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationValidityPeri
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.SharableRelationTypeV7
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7 as OrchestratorRelationTypeV7
 import java.time.Instant
 
 class RelationOutputDtoV7Factory {
 
-    fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations): RelationOutputV7Dto{
+    fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelationsV7Dto): RelationOutputV7Dto{
         return RelationOutputV7Dto(
             externalId,
             when (goldenRecordRelation.relationType) {
-                RelationType.IsAlternativeHeadquarterFor -> SharableRelationTypeV7.IsAlternativeHeadquarterFor
-                RelationType.IsManagedBy -> SharableRelationTypeV7.IsManagedBy
-                RelationType.IsOwnedBy -> SharableRelationTypeV7.IsOwnedBy
-                RelationType.IsReplacedBy -> SharableRelationTypeV7.IsReplacedBy
+                OrchestratorRelationTypeV7.IsAlternativeHeadquarterFor -> SharableRelationTypeV7.IsAlternativeHeadquarterFor
+                OrchestratorRelationTypeV7.IsManagedBy -> SharableRelationTypeV7.IsManagedBy
+                OrchestratorRelationTypeV7.IsOwnedBy -> SharableRelationTypeV7.IsOwnedBy
+                OrchestratorRelationTypeV7.IsReplacedBy -> SharableRelationTypeV7.IsReplacedBy
             },
             goldenRecordRelation.businessPartnerSourceBpn,
             goldenRecordRelation.businessPartnerTargetBpn,

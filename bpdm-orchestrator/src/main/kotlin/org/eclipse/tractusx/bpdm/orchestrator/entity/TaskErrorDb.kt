@@ -23,13 +23,13 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
 
 @Embeddable
 data class TaskErrorDb(
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    val type: TaskErrorType,
+    val type: TaskErrorTypeV7,
     @Column(name = "description", nullable = false)
     val description: String
 )

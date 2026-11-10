@@ -52,7 +52,7 @@ class RelationsGoldenRecordTaskResolveOperation(
         return resolvedTasks
     }
 
-    private fun logResolvedTasks(resolvedTasks: List<RelationsGoldenRecordTaskDb>, step: org.eclipse.tractusx.orchestrator.api.model.TaskStep?) {
+    private fun logResolvedTasks(resolvedTasks: List<RelationsGoldenRecordTaskDb>, step: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7?) {
         if (step == null) return
 
         val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }

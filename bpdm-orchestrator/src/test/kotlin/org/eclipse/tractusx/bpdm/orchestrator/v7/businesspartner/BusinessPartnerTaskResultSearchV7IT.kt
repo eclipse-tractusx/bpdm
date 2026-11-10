@@ -21,7 +21,11 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -38,11 +42,11 @@ class BusinessPartnerTaskResultSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
-        val searchRequest = TaskResultStateSearchRequest(listOf(createdTask.taskId))
+        val searchRequest = TaskResultStateSearchV7Request(listOf(createdTask.taskId))
         val searchResult = orchestratorClient.goldenRecordTasks.searchTaskResultStates(searchRequest)
 
         //THEN
-        val expectedResult = TaskResultStateSearchResponse(listOf(ResultState.Pending))
+        val expectedResult = TaskResultStateSearchV7Response(listOf(ResultStateV7.Pending))
         assertRepo.assertTaskResultStateSearchResponseEqual(searchResult, expectedResult)
     }
 
@@ -55,14 +59,14 @@ class BusinessPartnerTaskResultSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `search error business partner task`(){
         //GIVEN
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
-        testDataClient.failBusinessPartnerTask(createdTask.taskId, TaskStep.CleanAndSync)
+        testDataClient.failBusinessPartnerTask(createdTask.taskId, TaskStepV7.CleanAndSync)
 
         //WHEN
-        val searchRequest = TaskResultStateSearchRequest(listOf(createdTask.taskId))
+        val searchRequest = TaskResultStateSearchV7Request(listOf(createdTask.taskId))
         val searchResult = orchestratorClient.goldenRecordTasks.searchTaskResultStates(searchRequest)
 
         //THEN
-        val expectedResult = TaskResultStateSearchResponse(listOf(ResultState.Error))
+        val expectedResult = TaskResultStateSearchV7Response(listOf(ResultStateV7.Error))
         assertRepo.assertTaskResultStateSearchResponseEqual(searchResult, expectedResult)
     }
 
@@ -74,15 +78,15 @@ class BusinessPartnerTaskResultSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     @Test
     fun `search success business partner task`(){
         //GIVEN
-        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskMode.UpdateFromPool)
-        testDataClient.reserveAndResolveBusinessPartnerTask(createdTask.taskId, TaskStep.Clean, "$testName Cleaned")
+        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskModeV7.UpdateFromPool)
+        testDataClient.reserveAndResolveBusinessPartnerTask(createdTask.taskId, TaskStepV7.Clean, "$testName Cleaned")
 
         //WHEN
-        val searchRequest = TaskResultStateSearchRequest(listOf(createdTask.taskId))
+        val searchRequest = TaskResultStateSearchV7Request(listOf(createdTask.taskId))
         val searchResult = orchestratorClient.goldenRecordTasks.searchTaskResultStates(searchRequest)
 
         //THEN
-        val expectedResult = TaskResultStateSearchResponse(listOf(ResultState.Success))
+        val expectedResult = TaskResultStateSearchV7Response(listOf(ResultStateV7.Success))
         assertRepo.assertTaskResultStateSearchResponseEqual(searchResult, expectedResult)
     }
 
@@ -97,7 +101,7 @@ class BusinessPartnerTaskResultSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
-        val searchRequestBody = TaskResultStateSearchRequest(listOf("NOT EXISTS"))
+        val searchRequestBody = TaskResultStateSearchV7Request(listOf("NOT EXISTS"))
         val searchRequest: () -> Unit = { orchestratorClient.goldenRecordTasks.searchTaskResultStates(searchRequestBody) }
 
         //THEN

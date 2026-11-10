@@ -22,7 +22,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedRelationTaskRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.TaskReferenceRaw
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -31,7 +31,7 @@ import java.time.Instant
  */
 @Component
 class RelationTaskGateway(
-    private val orchestrationApiClient: OrchestrationApiClient,
+    private val orchestrationApiClient: OrchestratorV7Client,
     private val orchestratorOutboundMapper: OrchestratorOutboundMapper,
     private val orchestratorInboundMapper: OrchestratorInboundMapper,
     private val taskProperties: GoldenRecordTaskConfigProperties

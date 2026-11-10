@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityPartne
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -45,10 +45,10 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolAssertHelper
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -105,9 +105,9 @@ class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
         val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
-        val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
-        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
-        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        val activeLater = listOf(RelationValidityPeriodV7Dto(LocalDate.now().plusDays(1), null))
+        val replacedByRelation = BusinessPartnerRelationsV7Dto(RelationTypeV7.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryV7Dto("Any", "Any", replacedByRelation)
         resolveRelationTasks(listOf(taskToResolve))
 
         //WHEN
@@ -146,9 +146,9 @@ class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
         val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl)
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
-        val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
-        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
-        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
+        val activeLater = listOf(RelationValidityPeriodV7Dto(LocalDate.now().plusDays(1), null))
+        val replacedByRelation = BusinessPartnerRelationsV7Dto(RelationTypeV7.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryV7Dto("Any", "Any", replacedByRelation)
         resolveRelationTasks(listOf(taskToResolve))
 
         val originalLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
@@ -172,16 +172,16 @@ class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
         mainDb.ownershipUltimate = true
         legalEntityRepository.save(mainDb)
 
-        val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
-        val alternativeRelation = BusinessPartnerRelations(
-            RelationType.IsAlternativeHeadquarterFor,
+        val activeLater = listOf(RelationValidityPeriodV7Dto(LocalDate.now().plusDays(1), null))
+        val alternativeRelation = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsAlternativeHeadquarterFor,
             alternative.legalEntity.header.bpnl,
             main.legalEntity.header.bpnl,
             activeLater,
             anyReasonCode()
         )
 
-        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", alternativeRelation)
+        val taskToResolve = TaskRelationsStepReservationEntryV7Dto("Any", "Any", alternativeRelation)
         resolveRelationTasks(listOf(taskToResolve))
 
         val alternativeBefore = poolApiClient.legalEntities.getLegalEntity(alternative.legalEntity.header.bpnl)
@@ -211,7 +211,7 @@ class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
     private fun buildExpectedRelocatedHeadquarterLegalEntity(
         legalEntity: LegalEntityPartnerCreateVerboseV7Dto,
         newLegalAddress: AddressPartnerCreateVerboseV7Dto,
-        replacedByRelation: BusinessPartnerRelations
+        replacedByRelation: BusinessPartnerRelationsV7Dto
     ): LegalEntityWithLegalAddressVerboseV7Dto{
         val newReplacedRelation = buildAddressReplacedByRelation(replacedByRelation)
 
@@ -223,7 +223,7 @@ class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
         )
     }
 
-    private fun buildAddressReplacedByRelation(replacedByRelation: BusinessPartnerRelations): AddressRelationVerboseV7Dto{
+    private fun buildAddressReplacedByRelation(replacedByRelation: BusinessPartnerRelationsV7Dto): AddressRelationVerboseV7Dto{
         return AddressRelationVerboseV7Dto(
             type = AddressRelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpna = replacedByRelation.businessPartnerSourceBpn,
@@ -237,7 +237,7 @@ class RelationTriggerExecutionApplicationServiceIT @Autowired constructor(
         return poolApiClient.metadata.getReasonCodes(PaginationRequest()).content.first().technicalKey
     }
 
-    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryV7Dto>): List<TaskRelationsStepResultEntryV7Dto> {
         orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults()

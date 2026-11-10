@@ -35,8 +35,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Reque
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
 import java.time.Instant
 import kotlin.random.Random
 
@@ -165,7 +165,7 @@ class GateTestDataClientV6 (
         operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyV6Request(listOf(externalId)))
     }
 
-    fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto{
+    fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateV7Dto{
         setStateToReady(externalId)
         val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
         taskCreationService.createTasksForReadyBusinessPartners()
@@ -173,7 +173,7 @@ class GateTestDataClientV6 (
         return createdTask
     }
 
-    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto{
+    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateV7Dto{
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
         val mockedRefinedTask = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
             seed,
@@ -193,10 +193,10 @@ class GateTestDataClientV6 (
 
     fun setStateToError(externalId: String, seed: String = externalId){
         val random = Random(seed.hashCode())
-        setStateToError(externalId, seed, TaskErrorType.entries.random(random))
+        setStateToError(externalId, seed, TaskErrorTypeV7.entries.random(random))
     }
 
-    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto{
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorTypeV7): TaskClientStateV7Dto{
         val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
 
         setStateToReady(externalId)

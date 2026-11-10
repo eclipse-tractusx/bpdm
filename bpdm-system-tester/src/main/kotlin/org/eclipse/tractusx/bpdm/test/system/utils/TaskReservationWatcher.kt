@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class TaskReservationWatcher(
-    private val orchestrationApiClient: OrchestrationApiClient
+    private val orchestrationApiClient: OrchestratorV7Client
 ) {
 
     companion object {
@@ -42,12 +42,12 @@ class TaskReservationWatcher(
     }
 
     // already-reserved entries keyed by taskId — populated by the scheduler
-    private val reservedTasks  = ConcurrentHashMap<String, TaskStepReservationEntryDto>()
+    private val reservedTasks  = ConcurrentHashMap<String, TaskStepReservationEntryV7Dto>()
     // futures for callers that are waiting on a not-yet-reserved taskId
-    private val waitingFutures = ConcurrentHashMap<String, CompletableFuture<TaskStepReservationEntryDto>>()
+    private val waitingFutures = ConcurrentHashMap<String, CompletableFuture<TaskStepReservationEntryV7Dto>>()
 
-    private val reservedRelationTasks  = ConcurrentHashMap<String, TaskRelationsStepReservationEntryDto>()
-    private val waitingRelationFutures = ConcurrentHashMap<String, CompletableFuture<TaskRelationsStepReservationEntryDto>>()
+    private val reservedRelationTasks  = ConcurrentHashMap<String, TaskRelationsStepReservationEntryV7Dto>()
+    private val waitingRelationFutures = ConcurrentHashMap<String, CompletableFuture<TaskRelationsStepReservationEntryV7Dto>>()
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable, "task-reservation-watcher").also { it.isDaemon = true }
@@ -57,7 +57,7 @@ class TaskReservationWatcher(
         scheduler.scheduleWithFixedDelay(::poll, 0, POLL_INTERVAL_SECONDS, TimeUnit.SECONDS)
     }
 
-    fun waitForReservedTask(taskId: String): TaskStepReservationEntryDto {
+    fun waitForReservedTask(taskId: String): TaskStepReservationEntryV7Dto {
         // Fast path: task already reserved before this call
         reservedTasks[taskId]?.let { return it }
 
@@ -77,7 +77,7 @@ class TaskReservationWatcher(
         }
     }
 
-    fun waitForReservedRelationTask(taskId: String): TaskRelationsStepReservationEntryDto {
+    fun waitForReservedRelationTask(taskId: String): TaskRelationsStepReservationEntryV7Dto {
         reservedRelationTasks[taskId]?.let { return it }
 
         val future = waitingRelationFutures.computeIfAbsent(taskId) { CompletableFuture() }
@@ -100,7 +100,7 @@ class TaskReservationWatcher(
         try {
             if (waitingFutures.isNotEmpty()) {
                 val response = orchestrationApiClient.goldenRecordTasks.reserveTasksForStep(
-                    TaskStepReservationRequest(RESERVATION_AMOUNT, TaskStep.CleanAndSync)
+                    TaskStepReservationV7Request(RESERVATION_AMOUNT, TaskStepV7.CleanAndSync)
                 )
                 response.reservedTasks.forEach { entry ->
                     reservedTasks[entry.taskId] = entry
@@ -114,7 +114,7 @@ class TaskReservationWatcher(
         try {
             if (waitingRelationFutures.isNotEmpty()) {
                 val response = orchestrationApiClient.relationsGoldenRecordTasks.reserveTasksForStep(
-                    TaskStepReservationRequest(RESERVATION_AMOUNT, TaskStep.CleanAndSync)
+                    TaskStepReservationV7Request(RESERVATION_AMOUNT, TaskStepV7.CleanAndSync)
                 )
                 response.reservedTasks.forEach { entry ->
                     reservedRelationTasks[entry.taskId] = entry

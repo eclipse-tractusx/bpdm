@@ -23,7 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.orchestrator.api.model.NamePartType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7
 
 @Embeddable
 data class NamePartDb(
@@ -31,5 +31,5 @@ data class NamePartDb(
     val name: String,
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    val type: NamePartType?
+    val type: NamePartTypeV7?
 )

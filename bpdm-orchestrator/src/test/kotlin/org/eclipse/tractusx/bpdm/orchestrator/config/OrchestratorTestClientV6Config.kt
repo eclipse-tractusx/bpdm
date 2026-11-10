@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.config
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.orchestrator.v6.util.OrchestratorTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -41,7 +41,7 @@ class OrchestratorTestClientV6Config {
     @Bean
     fun orchestratorClientV6(
         testClientProvider: OrchestratorTestClientProviderV6
-    ): OrchestratorApiClientV6{
+    ): OrchestratorV6Client{
         return testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
     }
 

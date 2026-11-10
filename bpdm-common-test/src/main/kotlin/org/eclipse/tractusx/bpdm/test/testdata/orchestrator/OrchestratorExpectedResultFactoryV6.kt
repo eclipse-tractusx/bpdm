@@ -19,42 +19,42 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StepStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskProcessingStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.StepStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskClientStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskProcessingStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationEntryV6Dto
 import java.time.Duration
 import java.time.Instant
 
 class OrchestratorExpectedResultFactoryV6(
     val pendingTimeout: Duration,
     val retentionTimeout: Duration,
-    val taskStepTransitions: Map<TaskMode, List<TaskStep>>
+    val taskStepTransitions: Map<TaskModeV7, List<TaskStepV7>>
 ) {
 
     fun buildCreatedTaskClientState(
-        businessPartner: BusinessPartnerV6,
-        taskMode: TaskMode,
+        businessPartner: BusinessPartnerV6Dto,
+        taskMode: TaskModeV7,
         taskId: String = "any UUID",
         recordId: String = "any UUID",
         modifiedAt: Instant = Instant.now(),
         createdAt: Instant = Instant.now()
-    ): TaskClientStateDtoV6{
+    ): TaskClientStateV6Dto{
 
-        return TaskClientStateDtoV6(
+        return TaskClientStateV6Dto(
             taskId = taskId,
             recordId = recordId,
             businessPartnerResult = businessPartner,
-            processingState = TaskProcessingStateDtoV6(
+            processingState = TaskProcessingStateV6Dto(
                 resultState = ResultStateV6.Pending,
                 step = when (taskStepTransitions[taskMode]!!.first()) {
-                    TaskStep.CleanAndSync -> org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6.CleanAndSync
-                    TaskStep.PoolSync -> org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6.PoolSync
-                    TaskStep.Clean -> org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6.Clean
+                    TaskStepV7.CleanAndSync -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6.CleanAndSync
+                    TaskStepV7.PoolSync -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6.PoolSync
+                    TaskStepV7.Clean -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6.Clean
                 },
                 stepState = StepStateV6.Queued,
                 errors = emptyList(),
@@ -66,11 +66,11 @@ class OrchestratorExpectedResultFactoryV6(
     }
 
     fun buildTaskStepReservationEntry(
-        businessPartner: BusinessPartnerV6,
+        businessPartner: BusinessPartnerV6Dto,
         recordId: String =  "any UUID",
         taskId: String = "any UUID"
-    ): TaskStepReservationEntryDtoV6{
-        return TaskStepReservationEntryDtoV6(
+    ): TaskStepReservationEntryV6Dto{
+        return TaskStepReservationEntryV6Dto(
             taskId = taskId,
             recordId = recordId,
             businessPartner = businessPartner

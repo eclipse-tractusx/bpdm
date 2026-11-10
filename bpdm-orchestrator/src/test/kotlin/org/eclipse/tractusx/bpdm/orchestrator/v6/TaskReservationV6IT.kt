@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -39,12 +39,12 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask = testDataClient.createTask(testName)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequestV6(step = createdTask.processingState.step)
+        val reservationRequest = TaskStepReservationV6Request(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
         val expectedEntry = expectedResultFactory.buildTaskStepReservationEntry(createdTask.businessPartnerResult)
-        val expectedResult = TaskStepReservationResponseV6(listOf(expectedEntry), Instant.now().plus(expectedResultFactory.pendingTimeout))
+        val expectedResult = TaskStepReservationV6Response(listOf(expectedEntry), Instant.now().plus(expectedResultFactory.pendingTimeout))
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
@@ -56,11 +56,11 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `reserve no queued tasks`(){
         //WHEN
-        val reservationRequest = TaskStepReservationRequestV6(step = TaskStepV6.CleanAndSync)
+        val reservationRequest = TaskStepReservationV6Request(step = TaskStepV6.CleanAndSync)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponseV6(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationV6Response(emptyList(), Instant.now())
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
@@ -75,11 +75,11 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask = testDataClient.createTask(testName)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequestV6(step = getDifferentStep(createdTask.processingState.step))
+        val reservationRequest = TaskStepReservationV6Request(step = getDifferentStep(createdTask.processingState.step))
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponseV6(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationV6Response(emptyList(), Instant.now())
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 
@@ -95,11 +95,11 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
         testDataClient.reserveTasks(createdTask.processingState.step)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequestV6(step = createdTask.processingState.step)
+        val reservationRequest = TaskStepReservationV6Request(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponseV6(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationV6Response(emptyList(), Instant.now())
         assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
     }
 

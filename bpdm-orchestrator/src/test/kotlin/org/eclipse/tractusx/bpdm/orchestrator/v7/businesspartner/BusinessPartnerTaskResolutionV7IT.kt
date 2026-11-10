@@ -21,7 +21,12 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
@@ -40,15 +45,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildLegalEntityBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
     }
@@ -66,15 +71,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildSiteWithAdditionalSitesBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
     }
@@ -92,8 +97,8 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildSiteWithAdditionalSitesBusinessPartner("result $testName").copy(site = null)
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         val resolveRequest: () -> Unit = { orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest) }
 
         //THEN
@@ -113,15 +118,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildSiteBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
     }
@@ -139,15 +144,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildLegalAddressSiteBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
     }
@@ -165,15 +170,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildLegalEntityAdditionalAddressBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
     }
@@ -191,15 +196,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildSiteAdditionalAddressBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(reservedTask.taskId, reservedTask.recordId, businessPartnerResult)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = false)
     }
@@ -212,8 +217,8 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `try resolve not existing task`(){
         //WHEN
         val businessPartnerResult = requestFactory.buildAdditionalAddressOfSiteBusinessPartner(testName)
-        val resultEntry = TaskStepResultEntryDto("NOT EXISTING", businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(TaskStep.CleanAndSync, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto("NOT EXISTING", businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(TaskStepV7.CleanAndSync, listOf(resultEntry))
         val request: () -> Unit = { orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest) }
 
         //THEN
@@ -233,8 +238,8 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildAdditionalAddressOfSiteBusinessPartner(testName)
-        val resultEntry = TaskStepResultEntryDto(createdTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(createdTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         val request: () -> Unit = { orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest) }
 
         //THEN
@@ -255,15 +260,15 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildAdditionalAddressOfSiteBusinessPartner(testName)
-        val resultEntry = TaskStepResultEntryDto(createdTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest2 = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(createdTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest2 = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest2)
 
         //THEN
-        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+        val actualReservationResponse = orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
 
-        val expectedEntry = TaskStepReservationEntryDto(resultRequest1.taskId, "any UUID", resultRequest1.businessPartner)
-        val expectedResponse = TaskStepReservationResponse(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(resultRequest1.taskId, "any UUID", resultRequest1.businessPartner)
+        val expectedResponse = TaskStepReservationV7Response(reservedTasks = listOf(expectedEntry), timeout = Instant.now().plus(resultFactory.pendingTimeout))
 
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(actualReservationResponse, expectedResponse, ignoreRecordId = true)
     }
@@ -278,13 +283,13 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
         //GIVEN
         (1 .. 11).forEach { testDataClient.createBusinessPartnerTask("$testName $it") }
         val reservedTasks = (1 .. 2).flatMap {
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(10, step = TaskStep.CleanAndSync)).reservedTasks
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(10, step = TaskStepV7.CleanAndSync)).reservedTasks
         }
 
         //WHEN
-        val requestBody = TaskStepResultRequest(
-            step = TaskStep.CleanAndSync,
-            reservedTasks.map { TaskStepResultEntryDto(it.taskId, it.businessPartner) }
+        val requestBody = TaskStepResultV7Request(
+            step = TaskStepV7.CleanAndSync,
+            reservedTasks.map { TaskStepResultEntryV7Dto(it.taskId, it.businessPartner) }
         )
         val request: () -> Unit = { orchestratorClient.goldenRecordTasks.resolveStepResults(requestBody) }
 
@@ -306,8 +311,8 @@ class BusinessPartnerTaskResolutionV7IT: UnscheduledOrchestratorTestBaseV7() {
 
         //WHEN
         val businessPartnerResult = requestFactory.buildLegalEntityBusinessPartner("result $testName")
-        val resultEntry = TaskStepResultEntryDto(reservedTask.taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(createdTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(reservedTask.taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(createdTask.processingState.step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
     }
 }

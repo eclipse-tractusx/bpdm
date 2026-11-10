@@ -28,7 +28,18 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmInvalidBusinessPartn
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -47,19 +58,19 @@ class GoldenRecordTaskService(
 
     private val logger = KotlinLogging.logger { }
 
-    fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
+    fun searchTaskResultStates(stateRequest: TaskResultStateSearchV7Request): TaskResultStateSearchV7Response{
         logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
 
         val uuidsToSearch = stateRequest.taskIds.map { toUUID(it) }.toSet()
         val tasksByUuid  = taskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
 
-        return TaskResultStateSearchResponse(uuidsToSearch
+        return TaskResultStateSearchV7Response(uuidsToSearch
             .map { tasksByUuid[it]?.processingState?.resultState }
             .map { it?.let { responseMapper.toResultState(it) }
             })
     }
 
-    fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
+    fun searchTaskStates(stateRequest: TaskStateV7Request): TaskStateV7Response {
         logger.debug { "Search for the state of golden record task: executing searchTaskStates() with parameters $stateRequest" }
         val requestsByTaskId = stateRequest.entries.associateBy { it.taskId }
 
@@ -68,11 +79,11 @@ class GoldenRecordTaskService(
             .also { tasks -> taskRepository.fetchBusinessPartnerData(tasks) }
             .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskStateResponse(tasks = it) }
+            .let { TaskStateV7Response(tasks = it) }
     }
 
     @Transactional
-    fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
+    fun reserveTasksForStep(reservationRequest: TaskStepReservationV7Request): TaskStepReservationV7Response {
         logger.debug { "Reservation of next golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
         val now = Instant.now()
 
@@ -86,17 +97,17 @@ class GoldenRecordTaskService(
 
         return reservedTasks
             .map { task ->
-                TaskStepReservationEntryDto(
+                TaskStepReservationEntryV7Dto(
                     task.uuid.toString(),
                     task.gateRecord.publicId.toString(),
                     responseMapper.toBusinessPartnerResult(task.businessPartner)
                 )
             }
-            .let { reservations -> TaskStepReservationResponse(reservations, pendingTimeout) }
+            .let { reservations -> TaskStepReservationV7Response(reservations, pendingTimeout) }
     }
 
     @Transactional
-    fun resolveStepResults(resultRequest: TaskStepResultRequest) {
+    fun resolveStepResults(resultRequest: TaskStepResultV7Request) {
         logger.debug { "Step results for reserved golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
         resultRequest.results.filter { it.errors.isEmpty() }.forEach { assertAdditionalSitesHaveSite(it.businessPartner) }
 
@@ -121,7 +132,7 @@ class GoldenRecordTaskService(
         logResolvedTasks(resolvedTasks, resultRequest.step)
     }
 
-    private fun logResolvedTasks(resolvedTasks: List<GoldenRecordTaskDb>, step: TaskStep) {
+    private fun logResolvedTasks(resolvedTasks: List<GoldenRecordTaskDb>, step: TaskStepV7) {
         val tasksByResultState = resolvedTasks.groupBy { it.processingState.resultState }
 
         tasksByResultState[GoldenRecordTaskDb.ResultState.Pending]
@@ -203,7 +214,7 @@ class GoldenRecordTaskService(
             throw BpdmTaskNotFoundException(uuidString)
         }
 
-    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartner) {
+    private fun assertAdditionalSitesHaveSite(businessPartner: BusinessPartnerV7Dto) {
         val hasSite = businessPartner.site?.bpnReference?.referenceValue != null || businessPartner.site?.siteName != null
         if (businessPartner.additionalSites.isNotEmpty() && !hasSite) {
             throw BpdmInvalidBusinessPartnerException(

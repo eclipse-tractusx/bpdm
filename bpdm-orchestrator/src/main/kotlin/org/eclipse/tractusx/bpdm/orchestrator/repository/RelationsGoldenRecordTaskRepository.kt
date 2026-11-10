@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.repository
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
@@ -43,7 +43,7 @@ interface RelationsGoldenRecordTaskRepository : CrudRepository<RelationsGoldenRe
     fun fetchProcessingErrors(tasks: Set<RelationsGoldenRecordTaskDb>): Set<RelationsGoldenRecordTaskDb>
 
     @Query("SELECT task from RelationsGoldenRecordTaskDb task WHERE task.processingState.step = :step AND task.processingState.stepState = :stepState")
-    fun findByStepAndStepState(step: TaskStep, stepState: RelationsGoldenRecordTaskDb.StepState, pageable: Pageable): Page<RelationsGoldenRecordTaskDb>
+    fun findByStepAndStepState(step: TaskStepV7, stepState: RelationsGoldenRecordTaskDb.StepState, pageable: Pageable): Page<RelationsGoldenRecordTaskDb>
 
     fun findTasksByGateRecordInAndProcessingStateResultState(records: Set<SharingMemberRecordDb>, resultState: RelationsGoldenRecordTaskDb.ResultState) : Set<RelationsGoldenRecordTaskDb>
 

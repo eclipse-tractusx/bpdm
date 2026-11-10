@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7E
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
 
 /**
  * Top-level test data factory for the Gate V7 API.
@@ -134,7 +134,7 @@ class TestDataFactoryGateV7(
         }
 
         inner class OutputFactory {
-            fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations) =
+            fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelationsV7Dto) =
                 relationOutputDtoFactory.fromGoldenRecord(externalId, goldenRecordRelation)
 
             fun fromInput(entry: RelationPutV7Entry) =

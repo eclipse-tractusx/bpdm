@@ -26,7 +26,16 @@ import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitiali
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,7 +64,7 @@ class GoldenRecordTaskSchedulerTest @Autowired constructor(
 
     @Test
     fun `golden record task whose result did not reach the Orchestrator is reported as error in the next run`() {
-        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryDto("TASK_1", "RECORD_1", BusinessPartner.empty)))
+        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryV7Dto("TASK_1", "RECORD_1", BusinessPartnerV7Dto.empty)))
         orchestratorMockDataFactory.mockStepResultsResponse(500)
         goldenRecordTaskScheduler.processTasks()
 
@@ -64,14 +73,14 @@ class GoldenRecordTaskSchedulerTest @Autowired constructor(
         goldenRecordTaskScheduler.processTasks()
 
         assertThat(orchestratorMockDataFactory.getStepResults()).containsExactly(
-            TaskStepResultEntryDto("TASK_1", BusinessPartner.empty, listOf(TaskErrorDto(TaskErrorType.Unspecified, UNREPORTED_TASK_ERROR)))
+            TaskStepResultEntryV7Dto("TASK_1", BusinessPartnerV7Dto.empty, listOf(TaskErrorV7Dto(TaskErrorTypeV7.Unspecified, UNREPORTED_TASK_ERROR)))
         )
         assertThat(orchestratorMockDataFactory.getRelationStepResults()).isEmpty()
     }
 
     @Test
     fun `relation task whose result did not reach the Orchestrator is reported as error in the next run`() {
-        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(TaskRelationsStepReservationEntryDto("TASK_1", "RECORD_1", BusinessPartnerRelations.empty)))
+        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(TaskRelationsStepReservationEntryV7Dto("TASK_1", "RECORD_1", BusinessPartnerRelationsV7Dto.empty)))
         orchestratorMockDataFactory.mockRelationStepResultsResponse(500)
         goldenRecordTaskScheduler.processTasks()
 
@@ -80,14 +89,14 @@ class GoldenRecordTaskSchedulerTest @Autowired constructor(
         goldenRecordTaskScheduler.processTasks()
 
         assertThat(orchestratorMockDataFactory.getRelationStepResults()).containsExactly(
-            TaskRelationsStepResultEntryDto("TASK_1", BusinessPartnerRelations.empty, listOf(TaskRelationsErrorDto(TaskRelationsErrorType.Unspecified, UNREPORTED_TASK_ERROR)))
+            TaskRelationsStepResultEntryV7Dto("TASK_1", BusinessPartnerRelationsV7Dto.empty, listOf(TaskRelationsErrorV7Dto(TaskRelationsErrorTypeV7.Unspecified, UNREPORTED_TASK_ERROR)))
         )
         assertThat(orchestratorMockDataFactory.getStepResults()).isEmpty()
     }
 
     @Test
     fun `task reported as error is not reported again`() {
-        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryDto("TASK_1", "RECORD_1", BusinessPartner.empty)))
+        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryV7Dto("TASK_1", "RECORD_1", BusinessPartnerV7Dto.empty)))
         orchestratorMockDataFactory.mockStepResultsResponse(500)
         goldenRecordTaskScheduler.processTasks()
         orchestratorMockDataFactory.mockStepResultsResponse(200)
@@ -101,7 +110,7 @@ class GoldenRecordTaskSchedulerTest @Autowired constructor(
 
     @Test
     fun `task unknown to the Orchestrator is not reported again`() {
-        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryDto("TASK_1", "RECORD_1", BusinessPartner.empty)))
+        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryV7Dto("TASK_1", "RECORD_1", BusinessPartnerV7Dto.empty)))
         orchestratorMockDataFactory.mockStepResultsResponse(500)
         goldenRecordTaskScheduler.processTasks()
         orchestratorMockDataFactory.mockStepResultsResponse(400)
@@ -116,7 +125,7 @@ class GoldenRecordTaskSchedulerTest @Autowired constructor(
 
     @Test
     fun `task whose error report failed is reported again in the next run`() {
-        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryDto("TASK_1", "RECORD_1", BusinessPartner.empty)))
+        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryV7Dto("TASK_1", "RECORD_1", BusinessPartnerV7Dto.empty)))
         orchestratorMockDataFactory.mockStepResultsResponse(500)
         goldenRecordTaskScheduler.processTasks()
         goldenRecordTaskScheduler.processTasks()
@@ -130,7 +139,7 @@ class GoldenRecordTaskSchedulerTest @Autowired constructor(
 
     @Test
     fun `tracked task is reported even when reserving golden record tasks fails`() {
-        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryDto("TASK_1", "RECORD_1", BusinessPartner.empty)))
+        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryV7Dto("TASK_1", "RECORD_1", BusinessPartnerV7Dto.empty)))
         orchestratorMockDataFactory.mockStepResultsResponse(500)
         goldenRecordTaskScheduler.processTasks()
 

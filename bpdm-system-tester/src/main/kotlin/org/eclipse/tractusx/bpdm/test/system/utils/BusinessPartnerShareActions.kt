@@ -29,13 +29,19 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerbo
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withUltimateOwner
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import java.time.Instant
 
 class BusinessPartnerShareActions(
     private val sharingMemberGates: SharingMemberGates,
-    private val orchestratorClient: OrchestrationApiClient,
+    private val orchestratorClient: OrchestratorV7Client,
     private val testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
     private val taskReservationWatcher: TaskReservationWatcher,
     private val apiCallEvidence: ApiCallEvidence
@@ -154,7 +160,7 @@ class BusinessPartnerShareActions(
         recordId: String,
         masterDataSeed: String,
         legalEntityLabel: String,
-        adjustTask: (BusinessPartner) -> BusinessPartner
+        adjustTask: (BusinessPartnerV7Dto) -> BusinessPartnerV7Dto
     ): LegalEntityWithLegalAddressVerboseV7Dto {
         val state = context.records[recordId]!!
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified = false))
@@ -437,12 +443,12 @@ class BusinessPartnerShareActions(
      * Waits until the golden record process has reserved the record's task and returns the business partner data the
      * sharing member handed it.
      */
-    fun reservedTaskOf(recordId: String): BusinessPartner =
+    fun reservedTaskOf(recordId: String): BusinessPartnerV7Dto =
         taskReservationWatcher.waitForReservedTask(taskIdOf(recordId)).businessPartner
 
     // The name parts the sharing member stated per script cannot be told apart by business partner type, so the
     // refinement hands them back uncategorized, just as it received them.
-    private fun resolveTask(recordId: String, taskData: BusinessPartner) =
+    private fun resolveTask(recordId: String, taskData: BusinessPartnerV7Dto) =
         resolveReservedTask(recordId) { reserved ->
             taskData.copy(
                 uncategorized = taskData.uncategorized.copy(scriptVariants = reserved.uncategorized.scriptVariants),
@@ -450,12 +456,12 @@ class BusinessPartnerShareActions(
             )
         }
 
-    private fun resolveReservedTask(recordId: String, result: (BusinessPartner) -> BusinessPartner) {
+    private fun resolveReservedTask(recordId: String, result: (BusinessPartnerV7Dto) -> BusinessPartnerV7Dto) {
         val taskId = taskIdOf(recordId)
         val reservedTask = taskReservationWatcher.waitForReservedTask(taskId)
-        val resultRequest = TaskStepResultRequest(
-            TaskStep.CleanAndSync,
-            listOf(TaskStepResultEntryDto(taskId, result(reservedTask.businessPartner)))
+        val resultRequest = TaskStepResultV7Request(
+            TaskStepV7.CleanAndSync,
+            listOf(TaskStepResultEntryV7Dto(taskId, result(reservedTask.businessPartner)))
         )
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
         apiCallEvidence.attach("POST", "/v7/business-partners/golden-record-tasks/step-results", resultRequest)
@@ -475,20 +481,20 @@ class BusinessPartnerShareActions(
     // record at hand: every other record refined to the same address contributes its site, and a record that moves away
     // takes its site off the address. The scenario's records stand in for the stream a real service would keep a ledger
     // of; on top of them come the sites the sharing member stated itself.
-    private fun consolidatedSites(recordId: String, taskData: BusinessPartner, statedBySharingMember: List<AdditionalSite>): List<AdditionalSite> {
+    private fun consolidatedSites(recordId: String, taskData: BusinessPartnerV7Dto, statedBySharingMember: List<AdditionalSiteV7Dto>): List<AdditionalSiteV7Dto> {
         context.sitesByAddressReference.values.forEach { it.remove(recordId) }
 
         val site = taskData.site ?: return emptyList()
         val addressReference = recordAddressReference(taskData)
         context.sitesByAddressReference.getOrPut(addressReference) { mutableMapOf() }[recordId] =
-            AdditionalSite(site.bpnReference, site.siteName)
+            AdditionalSiteV7Dto(site.bpnReference, site.siteName)
 
         val ofOtherRecords = context.sitesByAddressReference.getValue(addressReference).filterKeys { it != recordId }.values
 
         return (ofOtherRecords + statedBySharingMember).distinctBy { it.bpnReference.referenceValue ?: it.siteName }
     }
 
-    private fun recordAddressReference(taskData: BusinessPartner): String =
+    private fun recordAddressReference(taskData: BusinessPartnerV7Dto): String =
         with(taskData) { additionalAddress?.bpnReference ?: site?.siteMainAddress?.bpnReference ?: legalEntity.legalAddress.bpnReference }
             .referenceValue!!
 
@@ -518,15 +524,15 @@ class BusinessPartnerShareActions(
     private fun SiteVerboseV7Dto.withScriptCode(scriptCode: String): SiteVerboseV7Dto =
         copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
 
-    private fun BusinessPartner.withLegalEntityScriptCode(scriptCode: String): BusinessPartner =
+    private fun BusinessPartnerV7Dto.withLegalEntityScriptCode(scriptCode: String): BusinessPartnerV7Dto =
         copy(legalEntity = legalEntity.copy(scriptVariants = legalEntity.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
 
-    private fun BusinessPartner.withSiteScriptCode(scriptCode: String): BusinessPartner {
+    private fun BusinessPartnerV7Dto.withSiteScriptCode(scriptCode: String): BusinessPartnerV7Dto {
         val site = site ?: return this
         return copy(site = site.copy(scriptVariants = site.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
     }
 
-    private fun BusinessPartner.withAdditionalAddressScriptCode(scriptCode: String): BusinessPartner {
+    private fun BusinessPartnerV7Dto.withAdditionalAddressScriptCode(scriptCode: String): BusinessPartnerV7Dto {
         val address = additionalAddress ?: return this
         return copy(additionalAddress = address.copy(scriptVariants = address.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
     }
@@ -534,18 +540,18 @@ class BusinessPartnerShareActions(
     /**
      * Rewrites the golden record BPN references in the refinement task as BPN request identifiers derived from
      * the stable entity labels instead of the per-refinement master data seed. The Pool resolves a known
-     * request identifier to the same BPN and updates that golden record (see [BpnReference]), so two records
+     * request identifier to the same BPN and updates that golden record (see [BpnReferenceV7Dto]), so two records
      * refined to the same labels land on the same Pool golden records. This is what lets one record's
      * refinement change the master data of a golden record that another record already reflects. The inline
      * response BPNs are left untouched on purpose: assertions ignore them and re-check the BPNs separately
      * against the Pool.
      */
-    private fun BusinessPartner.withGoldenRecordRequestIdentifiers(
+    private fun BusinessPartnerV7Dto.withGoldenRecordRequestIdentifiers(
         legalEntityLabel: String,
         siteLabel: String? = null,
         additionalAddressLabel: String? = null,
         siteMainAddressLabel: String? = null
-    ): BusinessPartner =
+    ): BusinessPartnerV7Dto =
         copy(
             legalEntity = legalEntity.copy(
                 bpnReference = requestIdentifier("BPNL", legalEntityLabel),
@@ -565,6 +571,6 @@ class BusinessPartnerShareActions(
             } ?: additionalAddress
         )
 
-    private fun requestIdentifier(prefix: String, label: String): BpnReference =
-        BpnReference("$prefix-request-${context.runId(label)}", null, BpnReferenceType.BpnRequestIdentifier)
+    private fun requestIdentifier(prefix: String, label: String): BpnReferenceV7Dto =
+        BpnReferenceV7Dto("$prefix-request-${context.runId(label)}", null, BpnReferenceTypeV7.BpnRequestIdentifier)
 }

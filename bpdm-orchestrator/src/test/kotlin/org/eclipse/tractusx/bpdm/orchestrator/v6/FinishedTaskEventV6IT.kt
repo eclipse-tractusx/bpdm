@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.FinishedTaskEventsV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -37,15 +37,15 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get successfully finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName, TaskMode.UpdateFromPool)
+        val createdTask = testDataClient.createTask(testName, TaskModeV7.UpdateFromPool)
         testDataClient.resolveTask(createdTask.taskId, TaskStepV6.Clean, testName)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTask.processingState.createdAt, PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponseV6(1, 1, 0, 1, listOf(
-            FinishedTaskEventsResponseV6.Event(Instant.now(), ResultStateV6.Success, createdTask.taskId)
+        val expectedResponse = FinishedTaskEventsV6Response(1, 1, 0, 1, listOf(
+            FinishedTaskEventsV6Response.Event(Instant.now(), ResultStateV6.Success, createdTask.taskId)
         ))
 
         assertRepository.assertFinishedTasksResponse(response, expectedResponse)
@@ -59,15 +59,15 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get failed finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName, TaskMode.UpdateFromPool)
+        val createdTask = testDataClient.createTask(testName, TaskModeV7.UpdateFromPool)
         testDataClient.failTask(createdTask.taskId, TaskStepV6.Clean)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTask.processingState.createdAt, PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponseV6(1, 1, 0, 1, listOf(
-            FinishedTaskEventsResponseV6.Event(Instant.now(), ResultStateV6.Error, createdTask.taskId)
+        val expectedResponse = FinishedTaskEventsV6Response(1, 1, 0, 1, listOf(
+            FinishedTaskEventsV6Response.Event(Instant.now(), ResultStateV6.Error, createdTask.taskId)
         ))
 
         assertRepository.assertFinishedTasksResponse(response, expectedResponse)
@@ -81,8 +81,8 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get task event after time`(){
         //GIVEN
-        val createdTask1 = testDataClient.createTask("$testName 1", TaskMode.UpdateFromPool)
-        val createdTask2 = testDataClient.createTask("$testName 1", TaskMode.UpdateFromPool)
+        val createdTask1 = testDataClient.createTask("$testName 1", TaskModeV7.UpdateFromPool)
+        val createdTask2 = testDataClient.createTask("$testName 1", TaskModeV7.UpdateFromPool)
 
         testDataClient.failTask(createdTask1.taskId, TaskStepV6.Clean)
         val timeX = Instant.now()
@@ -92,8 +92,8 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
         val response = orchestratorClient.finishedTaskEvents.getEvents(timeX, PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponseV6(1, 1, 0, 1, listOf(
-            FinishedTaskEventsResponseV6.Event(Instant.now(), ResultStateV6.Error, createdTask2.taskId)
+        val expectedResponse = FinishedTaskEventsV6Response(1, 1, 0, 1, listOf(
+            FinishedTaskEventsV6Response.Event(Instant.now(), ResultStateV6.Error, createdTask2.taskId)
         ))
 
         assertRepository.assertFinishedTasksResponse(response, expectedResponse)
@@ -110,7 +110,7 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
         val response = orchestratorClient.finishedTaskEvents.getEvents(Instant.now(), PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponseV6(0, 0, 0, 0, emptyList())
+        val expectedResponse = FinishedTaskEventsV6Response(0, 0, 0, 0, emptyList())
 
         assertRepository.assertFinishedTasksResponse(response, expectedResponse)
     }

@@ -26,8 +26,18 @@ import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType.*
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Instant
@@ -37,13 +47,13 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
     @Autowired
     private lateinit var testClientProvider: OrchestratorTestClientProviderV7
 
-    private lateinit var operatorClient: OrchestrationApiClient
-    private lateinit var taskCreatorClient: OrchestrationApiClient
-    private lateinit var poolSyncClient: OrchestrationApiClient
-    private lateinit var cleanAndSyncClient: OrchestrationApiClient
-    private lateinit var cleanClient: OrchestrationApiClient
-    private lateinit var unauthorizedClient: OrchestrationApiClient
-    private lateinit var anonymousClient: OrchestrationApiClient
+    private lateinit var operatorClient: OrchestratorV7Client
+    private lateinit var taskCreatorClient: OrchestratorV7Client
+    private lateinit var poolSyncClient: OrchestratorV7Client
+    private lateinit var cleanAndSyncClient: OrchestratorV7Client
+    private lateinit var cleanClient: OrchestratorV7Client
+    private lateinit var unauthorizedClient: OrchestratorV7Client
+    private lateinit var anonymousClient: OrchestratorV7Client
 
     private val authAssertionHelper = AuthAssertionHelper()
 
@@ -67,7 +77,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(TaskMode.UpdateFromPool, emptyList()))
+            orchestratorClient.goldenRecordTasks.createTasks(TaskCreateV7Request(TaskModeV7.UpdateFromPool, emptyList()))
         }
     }
 
@@ -79,7 +89,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(emptyList()))
+            orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateV7Request(emptyList()))
         }
     }
 
@@ -91,7 +101,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.searchTaskResultStates(TaskResultStateSearchRequest(emptyList()))
+            orchestratorClient.goldenRecordTasks.searchTaskResultStates(TaskResultStateSearchV7Request(emptyList()))
         }
     }
 
@@ -115,7 +125,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
         }
     }
 
@@ -127,7 +137,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.CleanAndSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.CleanAndSync))
         }
     }
 
@@ -139,7 +149,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.Clean))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.Clean))
         }
     }
 
@@ -151,7 +161,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.PoolSync, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultV7Request(TaskStepV7.PoolSync, emptyList()))
         }
     }
 
@@ -163,7 +173,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.CleanAndSync, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultV7Request(TaskStepV7.CleanAndSync, emptyList()))
         }
     }
 
@@ -175,7 +185,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.Clean, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultV7Request(TaskStepV7.Clean, emptyList()))
         }
     }
 
@@ -187,7 +197,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.createTasks(TaskCreateRelationsRequest(TaskMode.UpdateFromPool, emptyList()))
+            orchestratorClient.relationsGoldenRecordTasks.createTasks(TaskCreateRelationsV7Request(TaskModeV7.UpdateFromPool, emptyList()))
         }
     }
 
@@ -199,7 +209,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(TaskStateRequest(emptyList()))
+            orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(TaskStateV7Request(emptyList()))
         }
     }
 
@@ -211,7 +221,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.searchTaskResultStates(TaskResultStateSearchRequest(emptyList()))
+            orchestratorClient.relationsGoldenRecordTasks.searchTaskResultStates(TaskResultStateSearchV7Request(emptyList()))
         }
     }
 
@@ -235,7 +245,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.PoolSync))
+            orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.PoolSync))
         }
     }
 
@@ -247,7 +257,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.CleanAndSync))
+            orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.CleanAndSync))
         }
     }
 
@@ -259,7 +269,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.Clean))
+            orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.Clean))
         }
     }
 
@@ -271,7 +281,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(TaskStep.PoolSync, emptyList()))
+            orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultV7Request(TaskStepV7.PoolSync, emptyList()))
         }
     }
 
@@ -283,7 +293,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(TaskStep.CleanAndSync, emptyList()))
+            orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultV7Request(TaskStepV7.CleanAndSync, emptyList()))
         }
     }
 
@@ -295,7 +305,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(TaskStep.Clean, emptyList()))
+            orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultV7Request(TaskStepV7.Clean, emptyList()))
         }
     }
 
@@ -307,7 +317,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryRequest(Instant.now()), PaginationRequest())
+            orchestratorClient.sharingMemberRecords.queryRecords(SharingMemberRecordQueryV7Request(Instant.now()), PaginationRequest())
         }
     }
 
@@ -319,7 +329,7 @@ class OrchestratorAuthV7IT: UnscheduledOrchestratorTestBaseV7() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest("any", true))
+            orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request("any", true))
         }
     }
 

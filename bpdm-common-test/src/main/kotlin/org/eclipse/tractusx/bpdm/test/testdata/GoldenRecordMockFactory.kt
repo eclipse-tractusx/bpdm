@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.test.testdata
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 
 class GoldenRecordMockFactory(
     private val poolMockDataFactory: PoolMockDataFactory,
@@ -31,21 +31,21 @@ class GoldenRecordMockFactory(
 ) {
     data class AdditionalAddressOfSiteRefinement(
         val poolResult: PoolMockDataFactory.AdditionalAddressOfSiteResult,
-        val taskState: TaskClientStateDto
+        val taskState: TaskClientStateV7Dto
     )
 
     data class AdditionalAddressWithAdditionalSitesRefinement(
         val poolResult: PoolMockDataFactory.AdditionalAddressWithAdditionalSitesResult,
-        val taskState: TaskClientStateDto
+        val taskState: TaskClientStateV7Dto
     )
 
-    fun mockLegalEntityRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariant> = emptyList()): LegalEntityWithLegalAddressVerboseV7Dto {
+    fun mockLegalEntityRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()): LegalEntityWithLegalAddressVerboseV7Dto {
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, nameParts, scriptVariants)
         return poolMockResult
     }
 
-    fun mockLegalEntityRefinementChangedInPool(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariant> = emptyList()): LegalEntityWithLegalAddressVerboseV7Dto {
+    fun mockLegalEntityRefinementChangedInPool(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()): LegalEntityWithLegalAddressVerboseV7Dto {
         val taskGoldenRecord = mockLegalEntityRefinement(seed, owningCompany, nameParts, scriptVariants)
         val changedGoldenRecord = taskGoldenRecord.copy(
             header = taskGoldenRecord.header.copy(
@@ -61,19 +61,19 @@ class GoldenRecordMockFactory(
         poolMockDataFactory.mockNoGoldenRecordSearchResults()
     }
 
-    fun mockLegalEntityOnSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariant> = emptyList()): PoolMockDataFactory.SiteWithLegalEntityParent {
+    fun mockLegalEntityOnSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()): PoolMockDataFactory.SiteWithLegalEntityParent {
         val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToLegalEntityOnSite(seed, poolMockResult.legalEntityParent, poolMockResult.site.site, owningCompany, nameParts, scriptVariants)
         return poolMockResult
     }
 
-    fun mockSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariant> = emptyList()): PoolMockDataFactory.SiteWithLegalEntityParent {
+    fun mockSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()): PoolMockDataFactory.SiteWithLegalEntityParent {
         val poolMockResult = poolMockDataFactory.mockSiteAndMainAddressSearchResult(seed)
         orchestratorMockDataFactory.mockRefineToSite(seed, poolMockResult.legalEntityParent, poolMockResult.site, owningCompany, nameParts, scriptVariants)
         return poolMockResult
     }
 
-    fun mockAdditionalAddressOfSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariant> = emptyList()): AdditionalAddressOfSiteRefinement {
+    fun mockAdditionalAddressOfSiteRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()): AdditionalAddressOfSiteRefinement {
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
         val taskState = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
             seed,
@@ -87,7 +87,7 @@ class GoldenRecordMockFactory(
         return AdditionalAddressOfSiteRefinement(poolMockResult, taskState)
     }
 
-    fun mockAdditionalAddressWithAdditionalSitesRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariant> = emptyList()): AdditionalAddressWithAdditionalSitesRefinement {
+    fun mockAdditionalAddressWithAdditionalSitesRefinement(seed: String, owningCompany: String?, nameParts: List<String>, scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()): AdditionalAddressWithAdditionalSitesRefinement {
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressWithAdditionalSitesSearchResult(seed)
         val taskState = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
             seed,

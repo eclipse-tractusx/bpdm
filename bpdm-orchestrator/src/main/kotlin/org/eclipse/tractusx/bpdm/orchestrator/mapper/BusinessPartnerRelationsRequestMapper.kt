@@ -22,21 +22,21 @@ package org.eclipse.tractusx.bpdm.orchestrator.mapper
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRelationsRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationTypeRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationValidityPeriodRequest
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
 import org.springframework.stereotype.Component
 
 @Component
 class BusinessPartnerRelationsRequestMapper {
 
-    fun toBusinessPartnerRelationsRequest(businessPartnerRelations: BusinessPartnerRelations): BusinessPartnerRelationsRequest =
+    fun toBusinessPartnerRelationsRequest(businessPartnerRelations: BusinessPartnerRelationsV7Dto): BusinessPartnerRelationsRequest =
         with(businessPartnerRelations) {
             BusinessPartnerRelationsRequest(
                 relationType = when (relationType) {
-                    RelationType.IsAlternativeHeadquarterFor -> RelationTypeRequest.IsAlternativeHeadquarterFor
-                    RelationType.IsManagedBy -> RelationTypeRequest.IsManagedBy
-                    RelationType.IsOwnedBy -> RelationTypeRequest.IsOwnedBy
-                    RelationType.IsReplacedBy -> RelationTypeRequest.IsReplacedBy
+                    RelationTypeV7.IsAlternativeHeadquarterFor -> RelationTypeRequest.IsAlternativeHeadquarterFor
+                    RelationTypeV7.IsManagedBy -> RelationTypeRequest.IsManagedBy
+                    RelationTypeV7.IsOwnedBy -> RelationTypeRequest.IsOwnedBy
+                    RelationTypeV7.IsReplacedBy -> RelationTypeRequest.IsReplacedBy
                 },
                 businessPartnerSourceBpn = businessPartnerSourceBpn,
                 businessPartnerTargetBpn = businessPartnerTargetBpn,

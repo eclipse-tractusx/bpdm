@@ -23,15 +23,15 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationTypeV7
 
 @Embeddable
 data class LegalEntityGoldenRecordRelationDb(
     @Enumerated(EnumType.STRING)
     @Column(name = "relation_type", nullable = false)
-    val relationType: LegalEntityGoldenRecordRelationType,
+    val relationType: LegalEntityGoldenRecordRelationTypeV7,
 
     @Column(name = "source_bpn", nullable = false)
     val sourceBpn: String,
@@ -44,7 +44,7 @@ data class LegalEntityGoldenRecordRelationDb(
 data class SiteGoldenRecordRelationDb(
     @Enumerated(EnumType.STRING)
     @Column(name = "relation_type", nullable = false)
-    val relationType: SiteGoldenRecordRelationType,
+    val relationType: SiteGoldenRecordRelationTypeV7,
 
     @Column(name = "source_bpn", nullable = false)
     val sourceBpn: String,
@@ -57,7 +57,7 @@ data class SiteGoldenRecordRelationDb(
 data class AddressGoldenRecordRelationDb(
     @Enumerated(EnumType.STRING)
     @Column(name = "relation_type", nullable = false)
-    val relationType: AddressGoldenRecordRelationType,
+    val relationType: AddressGoldenRecordRelationTypeV7,
 
     @Column(name = "source_bpn", nullable = false)
     val sourceBpn: String,

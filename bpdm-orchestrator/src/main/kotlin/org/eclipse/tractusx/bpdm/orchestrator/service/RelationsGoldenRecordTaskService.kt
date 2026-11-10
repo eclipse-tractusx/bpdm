@@ -30,7 +30,18 @@ import org.eclipse.tractusx.bpdm.orchestrator.mapper.BusinessPartnerRelationsReq
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchRelationsData
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequestEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -50,7 +61,7 @@ class RelationsGoldenRecordTaskService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createTasks(createRequest: TaskCreateRelationsRequest): TaskCreateRelationsResponse {
+    fun createTasks(createRequest: TaskCreateRelationsV7Request): TaskCreateRelationsV7Response {
         logger.debug { "Creation of new relations golden record tasks: executing createTasks() with parameters $createRequest" }
 
         val gateRecords = getOrCreateGateRecords(createRequest.requests)
@@ -64,10 +75,10 @@ class RelationsGoldenRecordTaskService(
 
         return createdTasks
             .map { task -> relationsResponseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateRelationsResponse(createdTasks = it) }
+            .let { TaskCreateRelationsV7Response(createdTasks = it) }
     }
 
-    fun searchTaskStates(stateRequest: TaskStateRequest): TaskRelationsStateResponse {
+    fun searchTaskStates(stateRequest: TaskStateV7Request): TaskRelationsStateV7Response {
         logger.debug { "Search for the state of relations golden record task: executing searchTaskStates() with parameters $stateRequest" }
         val requestsByTaskId = stateRequest.entries.associateBy { it.taskId }
 
@@ -76,23 +87,23 @@ class RelationsGoldenRecordTaskService(
             .also { tasks -> relationsTaskRepository.fetchRelationsData(tasks) }
             .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
             .map { task -> relationsResponseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskRelationsStateResponse(tasks = it) }
+            .let { TaskRelationsStateV7Response(tasks = it) }
     }
 
-    fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
+    fun searchTaskResultStates(stateRequest: TaskResultStateSearchV7Request): TaskResultStateSearchV7Response{
         logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
 
         val uuidsToSearch = stateRequest.taskIds.map { toUUID(it) }.toSet()
         val tasksByUuid  = relationsTaskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
 
-        return TaskResultStateSearchResponse(uuidsToSearch
+        return TaskResultStateSearchV7Response(uuidsToSearch
             .map { tasksByUuid[it]?.processingState?.resultState }
             .map { it?.let { relationsResponseMapper.toResultState(it) }
             })
     }
 
     @Transactional
-    fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskRelationsStepReservationResponse {
+    fun reserveTasksForStep(reservationRequest: TaskStepReservationV7Request): TaskRelationsStepReservationV7Response {
         logger.debug { "Reservation of next relations golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
         val now = Instant.now()
 
@@ -106,16 +117,16 @@ class RelationsGoldenRecordTaskService(
 
         return reservedTasks
             .map { task ->
-                TaskRelationsStepReservationEntryDto(
+                TaskRelationsStepReservationEntryV7Dto(
                     task.uuid.toString(),
                     task.gateRecord.publicId.toString(),
                     relationsResponseMapper.toBusinessPartnerRelationsResult(task.businessPartnerRelations)
                 )
             }
-            .let { reservations -> TaskRelationsStepReservationResponse(reservations, pendingTimeout) }
+            .let { reservations -> TaskRelationsStepReservationV7Response(reservations, pendingTimeout) }
     }
 
-    private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntry>): List<SharingMemberRecordDb> {
+    private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntryV7Dto>): List<SharingMemberRecordDb> {
         val privateIds = requests.map { request -> request.recordId?.let { toUUID(it) } }
         val notNullPrivateIds = privateIds.filterNotNull()
 

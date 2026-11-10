@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StepStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.StepStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -41,11 +41,11 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask = testDataClient.createTask(testName)
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedResponse = TaskStateResponseV6(listOf(createdTask))
+        val expectedResponse = TaskStateV6Response(listOf(createdTask))
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }
@@ -62,12 +62,12 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         testDataClient.reserveTasks(createdTask.processingState.step).reservedTasks.single()
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
         val expectedEntry = createdTask.copy(processingState = createdTask.processingState.copy(stepState = StepStateV6.Reserved))
-        val expectedResponse = TaskStateResponseV6(listOf(expectedEntry))
+        val expectedResponse = TaskStateV6Response(listOf(expectedEntry))
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }
@@ -84,12 +84,12 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         val resultRequest = testDataClient.resolveTask(createdTask.taskId, createdTask.processingState.step, "Resolved $testName")
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
         val expectedEntry = createdTask.copy(businessPartnerResult = resultRequest.businessPartner, processingState = createdTask.processingState.copy(step = TaskStepV6.PoolSync))
-        val expectedResponse = TaskStateResponseV6(listOf(expectedEntry))
+        val expectedResponse = TaskStateV6Response(listOf(expectedEntry))
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }
@@ -107,7 +107,7 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         val successRequest = testDataClient.resolveTask(createdTask.taskId, TaskStepV6.PoolSync, "Success $testName")
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
@@ -119,7 +119,7 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
                 stepState = StepStateV6.Success
             )
         )
-        val expectedResponse = TaskStateResponseV6(listOf(expectedEntry))
+        val expectedResponse = TaskStateV6Response(listOf(expectedEntry))
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }
@@ -136,7 +136,7 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         val failRequest = testDataClient.failTask(createdTask.taskId, createdTask.processingState.step)
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
@@ -149,7 +149,7 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
                 errors = failRequest.errors
             )
         )
-        val expectedResponse = TaskStateResponseV6(listOf(expectedEntry))
+        val expectedResponse = TaskStateV6Response(listOf(expectedEntry))
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }
@@ -161,7 +161,7 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `try search not existing task id`(){
         //WHEN
-        val searchRequestBody = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry("NOT EXISTING", "NOT EXISTING")))
+        val searchRequestBody = TaskStateV6Request(listOf(TaskStateV6Request.Entry("NOT EXISTING", "NOT EXISTING")))
         val searchRequest : () -> Unit = { orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequestBody) }
 
         //THEN
@@ -179,11 +179,11 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask = testDataClient.createTask(testName)
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask.taskId, "NOT EXISTING")))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask.taskId, "NOT EXISTING")))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedResponse = TaskStateResponseV6(emptyList())
+        val expectedResponse = TaskStateV6Response(emptyList())
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }
@@ -200,11 +200,11 @@ class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
         val createdTask2 = testDataClient.createTask("$testName 2")
 
         //WHEN
-        val searchRequest = TaskStateRequestV6(listOf(TaskStateRequestV6.Entry(createdTask1.taskId, createdTask2.recordId)))
+        val searchRequest = TaskStateV6Request(listOf(TaskStateV6Request.Entry(createdTask1.taskId, createdTask2.recordId)))
         val searchResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedResponse = TaskStateResponseV6(emptyList())
+        val expectedResponse = TaskStateV6Response(emptyList())
 
         assertRepository.assertTaskStateResponse(searchResponse, expectedResponse)
     }

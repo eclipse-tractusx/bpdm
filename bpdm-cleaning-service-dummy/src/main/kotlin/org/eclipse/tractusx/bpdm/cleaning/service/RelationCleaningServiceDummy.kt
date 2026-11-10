@@ -21,13 +21,17 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
 import org.springframework.stereotype.Service
 
 @Service
 class RelationCleaningServiceDummy(
-    private val orchestrationApiClient: OrchestrationApiClient,
+    private val orchestrationApiClient: OrchestratorV7Client,
     private val cleaningServiceConfigProperties: CleaningServiceConfigProperties
 ) {
 
@@ -37,13 +41,13 @@ class RelationCleaningServiceDummy(
         processRelationPollingTasks(cleaningServiceConfigProperties.step)
     }
 
-    private fun processRelationPollingTasks(step: TaskStep) {
+    private fun processRelationPollingTasks(step: TaskStepV7) {
         try {
             logger.debug { "Starting polling for relation cleaning tasks from Orchestrator... TaskStep ${step.name}" }
 
             do {
                 val cleaningRelationRequest =
-                    orchestrationApiClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(amount = 10, step))
+                    orchestrationApiClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(amount = 10, step))
 
                 val cleaningRelationTasks = cleaningRelationRequest.reservedTasks
 
@@ -54,7 +58,7 @@ class RelationCleaningServiceDummy(
                         processRelationCleaningTask(reservedTask)
                     }
 
-                    orchestrationApiClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(step, cleaningRelationResults))
+                    orchestrationApiClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultV7Request(step, cleaningRelationResults))
                     logger.debug { "Relation cleaning tasks processing completed for this iteration." }
                 }
             } while (cleaningRelationRequest.reservedTasks.isNotEmpty())
@@ -63,9 +67,9 @@ class RelationCleaningServiceDummy(
         }
     }
 
-    fun processRelationCleaningTask(reservedTask: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
+    fun processRelationCleaningTask(reservedTask: TaskRelationsStepReservationEntryV7Dto): TaskRelationsStepResultEntryV7Dto {
         val cleanedBusinessPartnerRelation = reservedTask.businessPartnerRelations
-        return TaskRelationsStepResultEntryDto(reservedTask.taskId, cleanedBusinessPartnerRelation)
+        return TaskRelationsStepResultEntryV7Dto(reservedTask.taskId, cleanedBusinessPartnerRelation)
     }
 
 }

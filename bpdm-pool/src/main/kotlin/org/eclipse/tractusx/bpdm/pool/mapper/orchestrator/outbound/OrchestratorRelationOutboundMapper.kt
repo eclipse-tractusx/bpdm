@@ -28,13 +28,13 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7 as OrchestratorRelationType
 
 /**
  * Translates the outcomes of golden record relation tasks into the results the Orchestrator expects from the Pool.
@@ -45,7 +45,7 @@ class OrchestratorRelationOutboundMapper {
     /**
      * Returns the task step result that reports [result] to the Orchestrator.
      */
-    fun toResultEntry(result: GoldenRecordRelationTaskResultRecord): TaskRelationsStepResultEntryDto =
+    fun toResultEntry(result: GoldenRecordRelationTaskResultRecord): TaskRelationsStepResultEntryV7Dto =
         when (result) {
             is GoldenRecordRelationTaskResultRecord.LegalEntityRelationResolved -> with(result.relation) {
                 toResolvedEntry(result.taskId, toRelationType(type), sourceBpnl, targetBpnl, validityPeriods, reasonCode)
@@ -65,8 +65,8 @@ class OrchestratorRelationOutboundMapper {
     /**
      * Returns the task step result that reports the golden record relation task with [taskId] as failed without a known cause.
      */
-    fun toErrorReportEntry(taskId: String): TaskRelationsStepResultEntryDto =
-        toErrorEntry(taskId, BusinessPartnerRelations.empty, listOf(OrchestratorOutboundMapper.UNREPORTED_TASK_ERROR))
+    fun toErrorReportEntry(taskId: String): TaskRelationsStepResultEntryV7Dto =
+        toErrorEntry(taskId, BusinessPartnerRelationsV7Dto.empty, listOf(OrchestratorOutboundMapper.UNREPORTED_TASK_ERROR))
 
     private fun toResolvedEntry(
         taskId: String,
@@ -76,31 +76,31 @@ class OrchestratorRelationOutboundMapper {
         validityPeriods: List<RelationValidityPeriodRecord>,
         reasonCode: String?
     ) =
-        TaskRelationsStepResultEntryDto(
+        TaskRelationsStepResultEntryV7Dto(
             taskId = taskId,
-            businessPartnerRelations = BusinessPartnerRelations(
+            businessPartnerRelations = BusinessPartnerRelationsV7Dto(
                 relationType = type,
                 businessPartnerSourceBpn = sourceBpn,
                 businessPartnerTargetBpn = targetBpn,
-                validityPeriods = validityPeriods.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) },
+                validityPeriods = validityPeriods.map { RelationValidityPeriodV7Dto(validFrom = it.validFrom, validTo = it.validTo) },
                 reasonCode = reasonCode
             ),
             errors = emptyList()
         )
 
-    private fun toErrorEntry(taskId: String, relations: BusinessPartnerRelations, descriptions: List<String>) =
-        TaskRelationsStepResultEntryDto(
+    private fun toErrorEntry(taskId: String, relations: BusinessPartnerRelationsV7Dto, descriptions: List<String>) =
+        TaskRelationsStepResultEntryV7Dto(
             taskId = taskId,
             businessPartnerRelations = relations,
-            errors = descriptions.map { TaskRelationsErrorDto(type = TaskRelationsErrorType.Unspecified, description = it) }
+            errors = descriptions.map { TaskRelationsErrorV7Dto(type = TaskRelationsErrorTypeV7.Unspecified, description = it) }
         )
 
     private fun toRelations(relation: RelationRaw) =
-        BusinessPartnerRelations(
+        BusinessPartnerRelationsV7Dto(
             relationType = toRelationType(relation.type),
             businessPartnerSourceBpn = relation.sourceBpn,
             businessPartnerTargetBpn = relation.targetBpn,
-            validityPeriods = relation.validityPeriods.map { RelationValidityPeriod(validFrom = it.validFrom, validTo = it.validTo) },
+            validityPeriods = relation.validityPeriods.map { RelationValidityPeriodV7Dto(validFrom = it.validFrom, validTo = it.validTo) },
             reasonCode = relation.reasonCode
         )
 

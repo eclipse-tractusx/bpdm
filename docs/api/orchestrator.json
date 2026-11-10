@@ -50,7 +50,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoSharingMemberRecord"
+                  "$ref" : "#/components/schemas/PageDtoSharingMemberRecordV7Dto"
                 }
               }
             }
@@ -64,7 +64,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/SharingMemberRecordUpdateRequest"
+                "$ref" : "#/components/schemas/SharingMemberRecordUpdateV7Request"
               }
             }
           },
@@ -76,7 +76,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SharingMemberRecord"
+                  "$ref" : "#/components/schemas/SharingMemberRecordV7Dto"
                 }
               }
             }
@@ -94,7 +94,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskCreateRelationsRequest"
+                "$ref" : "#/components/schemas/TaskCreateRelationsV7Request"
               }
             }
           },
@@ -106,7 +106,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskCreateRelationsResponse"
+                  "$ref" : "#/components/schemas/TaskCreateRelationsV7Response"
                 }
               }
             }
@@ -127,7 +127,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskRelationsStepResultRequest"
+                "$ref" : "#/components/schemas/TaskRelationsStepResultV7Request"
               }
             }
           },
@@ -153,7 +153,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStepReservationRequest"
+                "$ref" : "#/components/schemas/TaskStepReservationV7Request"
               }
             }
           },
@@ -165,7 +165,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskRelationsStepReservationResponse"
+                  "$ref" : "#/components/schemas/TaskRelationsStepReservationV7Response"
                 }
               }
             }
@@ -186,7 +186,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStateRequest"
+                "$ref" : "#/components/schemas/TaskStateV7Request"
               }
             }
           },
@@ -198,7 +198,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskRelationsStateResponse"
+                  "$ref" : "#/components/schemas/TaskRelationsStateV7Response"
                 }
               }
             }
@@ -218,7 +218,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskResultStateSearchRequest"
+                "$ref" : "#/components/schemas/TaskResultStateSearchV7Request"
               }
             }
           },
@@ -230,7 +230,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskResultStateSearchResponse"
+                  "$ref" : "#/components/schemas/TaskResultStateSearchV7Response"
                 }
               }
             }
@@ -251,7 +251,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskCreateRequest"
+                "$ref" : "#/components/schemas/TaskCreateV7Request"
               }
             }
           },
@@ -263,7 +263,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskCreateResponse"
+                  "$ref" : "#/components/schemas/TaskCreateV7Response"
                 }
               }
             }
@@ -284,7 +284,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStepResultRequest"
+                "$ref" : "#/components/schemas/TaskStepResultV7Request"
               }
             }
           },
@@ -310,7 +310,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStepReservationRequest"
+                "$ref" : "#/components/schemas/TaskStepReservationV7Request"
               }
             }
           },
@@ -322,7 +322,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskStepReservationResponse"
+                  "$ref" : "#/components/schemas/TaskStepReservationV7Response"
                 }
               }
             }
@@ -343,7 +343,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStateRequest"
+                "$ref" : "#/components/schemas/TaskStateV7Request"
               }
             }
           },
@@ -355,7 +355,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskStateResponse"
+                  "$ref" : "#/components/schemas/TaskStateV7Response"
                 }
               }
             }
@@ -375,7 +375,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskResultStateSearchRequest"
+                "$ref" : "#/components/schemas/TaskResultStateSearchV7Request"
               }
             }
           },
@@ -387,7 +387,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskResultStateSearchResponse"
+                  "$ref" : "#/components/schemas/TaskResultStateSearchV7Response"
                 }
               }
             }
@@ -408,7 +408,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskCreateRequestV6"
+                "$ref" : "#/components/schemas/TaskCreateV6Request"
               }
             }
           },
@@ -420,7 +420,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskCreateResponseV6"
+                  "$ref" : "#/components/schemas/TaskCreateV6Response"
                 }
               }
             }
@@ -441,7 +441,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStepResultRequestV6"
+                "$ref" : "#/components/schemas/TaskStepResultV6Request"
               }
             }
           },
@@ -467,7 +467,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStepReservationRequestV6"
+                "$ref" : "#/components/schemas/TaskStepReservationV6Request"
               }
             }
           },
@@ -479,7 +479,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskStepReservationResponseV6"
+                  "$ref" : "#/components/schemas/TaskStepReservationV6Response"
                 }
               }
             }
@@ -500,7 +500,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskStateRequestV6"
+                "$ref" : "#/components/schemas/TaskStateV6Request"
               }
             }
           },
@@ -512,7 +512,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskStateResponseV6"
+                  "$ref" : "#/components/schemas/TaskStateV6Response"
                 }
               }
             }
@@ -532,7 +532,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/TaskResultStateSearchRequestV6"
+                "$ref" : "#/components/schemas/TaskResultStateSearchV6Request"
               }
             }
           },
@@ -544,7 +544,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskResultStateSearchResponseV6"
+                  "$ref" : "#/components/schemas/TaskResultStateSearchV6Response"
                 }
               }
             }
@@ -597,7 +597,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/FinishedTaskEventsResponse"
+                  "$ref" : "#/components/schemas/FinishedTaskEventsV7Response"
                 }
               }
             }
@@ -650,7 +650,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/FinishedTaskEventsResponse"
+                  "$ref" : "#/components/schemas/FinishedTaskEventsV7Response"
                 }
               }
             }
@@ -703,7 +703,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/FinishedTaskEventsResponseV6"
+                  "$ref" : "#/components/schemas/FinishedTaskEventsV6Response"
                 }
               }
             }
@@ -717,19 +717,19 @@
   },
   "components" : {
     "schemas" : {
-      "AdditionalSite" : {
+      "AdditionalSiteV7Dto" : {
         "type" : "object",
         "description" : "A further site an address belongs to. It carries only what identifies the site, because it is never the subject of the business partner data it appears in: the address it belongs to is the one stated by the surrounding business partner data.",
         "properties" : {
           "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReference"
+            "$ref" : "#/components/schemas/BpnReferenceV7Dto"
           },
           "siteName" : {
             "type" : [ "string", "null" ]
           }
         }
       },
-      "AddressGoldenRecordRelation" : {
+      "AddressGoldenRecordRelationV7Dto" : {
         "type" : "object",
         "description" : "A golden record relation between addresses, pointing from a source BPNA to a target BPNA",
         "properties" : {
@@ -745,12 +745,20 @@
           }
         }
       },
-      "AlternativeAddress" : {
+      "AlternativeAddressScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "city" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "AlternativeAddressV6Dto" : {
         "type" : "object",
         "description" : "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else.",
         "properties" : {
           "geographicCoordinates" : {
-            "$ref" : "#/components/schemas/GeoCoordinate"
+            "$ref" : "#/components/schemas/GeoCoordinateV6Dto"
           },
           "country" : {
             "type" : [ "string", "null" ]
@@ -776,20 +784,12 @@
           }
         }
       },
-      "AlternativeAddressScriptVariant" : {
-        "type" : "object",
-        "properties" : {
-          "city" : {
-            "type" : [ "string", "null" ]
-          }
-        }
-      },
-      "AlternativeAddressV6" : {
+      "AlternativeAddressV7Dto" : {
         "type" : "object",
         "description" : "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else.",
         "properties" : {
           "geographicCoordinates" : {
-            "$ref" : "#/components/schemas/GeoCoordinateV6"
+            "$ref" : "#/components/schemas/GeoCoordinateV7Dto"
           },
           "country" : {
             "type" : [ "string", "null" ]
@@ -815,7 +815,7 @@
           }
         }
       },
-      "BpnReference" : {
+      "BpnReferenceV6Dto" : {
         "type" : "object",
         "description" : "A reference to a BPN for the corresponding business partner data. Either this reference contains an existing BPN or a BPN request identifier. The golden record process makes sure that the each unique BPN request identifier is associated to a unique BPN. For a new BPN request identifier the golden record process creates a new BPN (and golden record) and associates it with the BPN request identifier. Known BPN request identifiers are resolved to the BPN and the corresponding golden record is updated with the business partner data. This makes it possible for duplication check services to reference unique business partners by their own BPN request identifiers instead of needing to rely on BPNs for identification.",
         "properties" : {
@@ -831,7 +831,7 @@
           }
         }
       },
-      "BpnReferenceV6" : {
+      "BpnReferenceV7Dto" : {
         "type" : "object",
         "description" : "A reference to a BPN for the corresponding business partner data. Either this reference contains an existing BPN or a BPN request identifier. The golden record process makes sure that the each unique BPN request identifier is associated to a unique BPN. For a new BPN request identifier the golden record process creates a new BPN (and golden record) and associates it with the BPN request identifier. Known BPN request identifiers are resolved to the BPN and the corresponding golden record is updated with the business partner data. This makes it possible for duplication check services to reference unique business partners by their own BPN request identifiers instead of needing to rely on BPNs for identification.",
         "properties" : {
@@ -847,54 +847,7 @@
           }
         }
       },
-      "BusinessPartner" : {
-        "type" : "object",
-        "description" : "Generic business partner data for golden record processing. Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. The golden record process categorizes and completes the data in order to create and update the resulting golden records. The golden records are found in the legalEntity, site and additionalAddress fields. The business partner data needs to contain the full golden record parent relationship. This means, if an additional address is specified in the business partner data, also its legal entity and also its site parent (if a site exists) needs to be specified. ",
-        "properties" : {
-          "nameParts" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/NamePart"
-            }
-          },
-          "owningCompany" : {
-            "type" : [ "string", "null" ]
-          },
-          "uncategorized" : {
-            "$ref" : "#/components/schemas/UncategorizedProperties"
-          },
-          "legalEntity" : {
-            "$ref" : "#/components/schemas/LegalEntity"
-          },
-          "site" : {
-            "oneOf" : [ {
-              "$ref" : "#/components/schemas/Site"
-            }, {
-              "type" : "null"
-            } ]
-          },
-          "additionalAddress" : {
-            "oneOf" : [ {
-              "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
-            }, {
-              "type" : "null"
-            } ]
-          },
-          "additionalSites" : {
-            "type" : "array",
-            "description" : "The further sites the address of this business partner data belongs to, next to the site in 'site'. Together with 'site' this states the address's complete site membership: a site the address currently belongs to but this field leaves out is unlinked from it. Consolidating the records that share an address into that complete list is the golden record process's responsibility, not the Pool's. An entry that resolves to an existing site links that site to the address; an entry that does not resolve creates a new site with this address as its main address. An already existing site is never updated through this field. A site the address is the main address of cannot be unlinked and has to be stated.",
-            "items" : {
-              "$ref" : "#/components/schemas/AdditionalSite"
-            }
-          },
-          "type" : {
-            "type" : [ "string", "null" ],
-            "description" : "The recognized golden record type this business partner data contains.\n* `Legal Entity`: The business partner data only contains legal entity and legal address information.\n* `Site`: The business partner data contains site, site main address and its parent legal entity information.\n* `Additional Address`: The business partner data contains an additional address, (optional) parent site and parent legal entity information.\n* `Null`: No clear type determined, undecided. The golden record process will not create golden record from this business partner data.",
-            "enum" : [ "LegalEntity", "Site", "Address" ]
-          }
-        }
-      },
-      "BusinessPartnerRelations" : {
+      "BusinessPartnerRelationsV7Dto" : {
         "type" : "object",
         "description" : "The business partner relations data to be processed ",
         "properties" : {
@@ -911,7 +864,7 @@
           "validityPeriods" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/RelationValidityPeriod"
+              "$ref" : "#/components/schemas/RelationValidityPeriodV7Dto"
             }
           },
           "reasonCode" : {
@@ -919,35 +872,35 @@
           }
         }
       },
-      "BusinessPartnerV6" : {
+      "BusinessPartnerV6Dto" : {
         "type" : "object",
         "description" : "Generic business partner data for golden record processing. Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. The golden record process categorizes and completes the data in order to create and update the resulting golden records. The golden records are found in the legalEntity, site and additionalAddress fields. The business partner data needs to contain the full golden record parent relationship. This means, if an additional address is specified in the business partner data, also its legal entity and also its site parent (if a site exists) needs to be specified. ",
         "properties" : {
           "nameParts" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/NamePartV6"
+              "$ref" : "#/components/schemas/NamePartV6Dto"
             }
           },
           "owningCompany" : {
             "type" : [ "string", "null" ]
           },
           "uncategorized" : {
-            "$ref" : "#/components/schemas/UncategorizedPropertiesV6"
+            "$ref" : "#/components/schemas/UncategorizedPropertiesV6Dto"
           },
           "legalEntity" : {
-            "$ref" : "#/components/schemas/LegalEntityV6"
+            "$ref" : "#/components/schemas/LegalEntityV6Dto"
           },
           "site" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/SiteV6"
+              "$ref" : "#/components/schemas/SiteV6Dto"
             }, {
               "type" : "null"
             } ]
           },
           "additionalAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/PostalAddressV6"
+              "$ref" : "#/components/schemas/PostalAddressV6Dto"
             }, {
               "type" : "null"
             } ]
@@ -959,7 +912,54 @@
           }
         }
       },
-      "BusinessState" : {
+      "BusinessPartnerV7Dto" : {
+        "type" : "object",
+        "description" : "Generic business partner data for golden record processing. Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. The golden record process categorizes and completes the data in order to create and update the resulting golden records. The golden records are found in the legalEntity, site and additionalAddress fields. The business partner data needs to contain the full golden record parent relationship. This means, if an additional address is specified in the business partner data, also its legal entity and also its site parent (if a site exists) needs to be specified. ",
+        "properties" : {
+          "nameParts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/NamePartV7Dto"
+            }
+          },
+          "owningCompany" : {
+            "type" : [ "string", "null" ]
+          },
+          "uncategorized" : {
+            "$ref" : "#/components/schemas/UncategorizedPropertiesV7Dto"
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntityV7Dto"
+          },
+          "site" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/SiteV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "additionalAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PostalAddressWithScriptVariantsV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "additionalSites" : {
+            "type" : "array",
+            "description" : "The further sites the address of this business partner data belongs to, next to the site in 'site'. Together with 'site' this states the address's complete site membership: a site the address currently belongs to but this field leaves out is unlinked from it. Consolidating the records that share an address into that complete list is the golden record process's responsibility, not the Pool's. An entry that resolves to an existing site links that site to the address; an entry that does not resolve creates a new site with this address as its main address. An already existing site is never updated through this field. A site the address is the main address of cannot be unlinked and has to be stated.",
+            "items" : {
+              "$ref" : "#/components/schemas/AdditionalSiteV7Dto"
+            }
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "The recognized golden record type this business partner data contains.\n* `Legal Entity`: The business partner data only contains legal entity and legal address information.\n* `Site`: The business partner data contains site, site main address and its parent legal entity information.\n* `Additional Address`: The business partner data contains an additional address, (optional) parent site and parent legal entity information.\n* `Null`: No clear type determined, undecided. The golden record process will not create golden record from this business partner data.",
+            "enum" : [ "LegalEntity", "Site", "Address" ]
+          }
+        }
+      },
+      "BusinessStateV6Dto" : {
         "type" : "object",
         "description" : "The business state information for the corresponding business partner",
         "properties" : {
@@ -980,7 +980,7 @@
           }
         }
       },
-      "BusinessStateV6" : {
+      "BusinessStateV7Dto" : {
         "type" : "object",
         "description" : "The business state information for the corresponding business partner",
         "properties" : {
@@ -1001,7 +1001,7 @@
           }
         }
       },
-      "ConfidenceCriteria" : {
+      "ConfidenceCriteriaV6Dto" : {
         "type" : "object",
         "description" : "Contains information to evaluate how good or verified the information in the attached business partner data is. This information will be directly written in the matched golden record's confidence criteria.",
         "properties" : {
@@ -1029,7 +1029,7 @@
           }
         }
       },
-      "ConfidenceCriteriaV6" : {
+      "ConfidenceCriteriaV7Dto" : {
         "type" : "object",
         "description" : "Contains information to evaluate how good or verified the information in the attached business partner data is. This information will be directly written in the matched golden record's confidence criteria.",
         "properties" : {
@@ -1084,7 +1084,7 @@
           }
         }
       },
-      "FinishedTaskEventsResponse" : {
+      "FinishedTaskEventsV6Response" : {
         "type" : "object",
         "properties" : {
           "totalElements" : {
@@ -1116,7 +1116,7 @@
           }
         }
       },
-      "FinishedTaskEventsResponseV6" : {
+      "FinishedTaskEventsV7Response" : {
         "type" : "object",
         "properties" : {
           "totalElements" : {
@@ -1148,7 +1148,7 @@
           }
         }
       },
-      "GeoCoordinate" : {
+      "GeoCoordinateV6Dto" : {
         "type" : "object",
         "description" : "The exact location of the physical postal address in latitude, longitude, and altitude.",
         "properties" : {
@@ -1166,7 +1166,7 @@
           }
         }
       },
-      "GeoCoordinateV6" : {
+      "GeoCoordinateV7Dto" : {
         "type" : "object",
         "description" : "The exact location of the physical postal address in latitude, longitude, and altitude.",
         "properties" : {
@@ -1184,7 +1184,7 @@
           }
         }
       },
-      "Identifier" : {
+      "IdentifierV6Dto" : {
         "type" : "object",
         "description" : "The additional identifiers of this business partner (excluding the BPN)",
         "properties" : {
@@ -1202,7 +1202,7 @@
           }
         }
       },
-      "IdentifierV6" : {
+      "IdentifierV7Dto" : {
         "type" : "object",
         "description" : "The additional identifiers of this business partner (excluding the BPN)",
         "properties" : {
@@ -1220,72 +1220,7 @@
           }
         }
       },
-      "LegalEntity" : {
-        "type" : "object",
-        "description" : "Legal entity information for this business partner data. Every business partner either is a legal entity or belongs to a legal entity.There, a legal entity property is not allowed to be 'null'. ",
-        "properties" : {
-          "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReference"
-          },
-          "legalName" : {
-            "type" : [ "string", "null" ]
-          },
-          "legalShortName" : {
-            "type" : [ "string", "null" ]
-          },
-          "legalForm" : {
-            "type" : [ "string", "null" ]
-          },
-          "identifiers" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/Identifier"
-            }
-          },
-          "states" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/BusinessState"
-            }
-          },
-          "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteria"
-          },
-          "hasChanged" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "ownershipUltimate" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "ultimateOwnerBpnl" : {
-            "type" : [ "string", "null" ]
-          },
-          "legalAddress" : {
-            "$ref" : "#/components/schemas/PostalAddress"
-          },
-          "scriptVariants" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/LegalEntityScriptVariant"
-            }
-          },
-          "goldenRecordRelations" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelation"
-            }
-          },
-          "updatedAt" : {
-            "type" : [ "string", "null" ],
-            "format" : "date-time"
-          },
-          "isParticipantData" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Whether this legal entity is part of the Data Space network"
-          }
-        }
-      },
-      "LegalEntityGoldenRecordRelation" : {
+      "LegalEntityGoldenRecordRelationV7Dto" : {
         "type" : "object",
         "description" : "A golden record relation between legal entities, pointing from a source BPNL to a target BPNL",
         "properties" : {
@@ -1301,7 +1236,7 @@
           }
         }
       },
-      "LegalEntityScriptVariant" : {
+      "LegalEntityScriptVariantV7Dto" : {
         "type" : "object",
         "properties" : {
           "scriptCode" : {
@@ -1314,16 +1249,16 @@
             "type" : [ "string", "null" ]
           },
           "legalAddress" : {
-            "$ref" : "#/components/schemas/PostalAddressScriptVariant"
+            "$ref" : "#/components/schemas/PostalAddressScriptVariantV7Dto"
           }
         }
       },
-      "LegalEntityV6" : {
+      "LegalEntityV6Dto" : {
         "type" : "object",
         "description" : "Legal entity information for this business partner data. Every business partner either is a legal entity or belongs to a legal entity.There, a legal entity property is not allowed to be 'null'. ",
         "properties" : {
           "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReferenceV6"
+            "$ref" : "#/components/schemas/BpnReferenceV6Dto"
           },
           "legalName" : {
             "type" : [ "string", "null" ]
@@ -1337,30 +1272,95 @@
           "identifiers" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/IdentifierV6"
+              "$ref" : "#/components/schemas/IdentifierV6Dto"
             }
           },
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessStateV6"
+              "$ref" : "#/components/schemas/BusinessStateV6Dto"
             }
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteriaV6"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV6Dto"
           },
           "hasChanged" : {
             "type" : [ "boolean", "null" ]
           },
           "legalAddress" : {
-            "$ref" : "#/components/schemas/PostalAddressV6"
+            "$ref" : "#/components/schemas/PostalAddressV6Dto"
           },
           "catenaXMemberData" : {
             "type" : "boolean"
           }
         }
       },
-      "NamePart" : {
+      "LegalEntityV7Dto" : {
+        "type" : "object",
+        "description" : "Legal entity information for this business partner data. Every business partner either is a legal entity or belongs to a legal entity.There, a legal entity property is not allowed to be 'null'. ",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReferenceV7Dto"
+          },
+          "legalName" : {
+            "type" : [ "string", "null" ]
+          },
+          "legalShortName" : {
+            "type" : [ "string", "null" ]
+          },
+          "legalForm" : {
+            "type" : [ "string", "null" ]
+          },
+          "identifiers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/IdentifierV7Dto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessStateV7Dto"
+            }
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
+          },
+          "hasChanged" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "ownershipUltimate" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "ultimateOwnerBpnl" : {
+            "type" : [ "string", "null" ]
+          },
+          "legalAddress" : {
+            "$ref" : "#/components/schemas/PostalAddressV7Dto"
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityScriptVariantV7Dto"
+            }
+          },
+          "goldenRecordRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelationV7Dto"
+            }
+          },
+          "updatedAt" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "isParticipantData" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether this legal entity is part of the Data Space network"
+          }
+        }
+      },
+      "NamePartV6Dto" : {
         "type" : "object",
         "description" : "A categorized name part for this business partner data",
         "properties" : {
@@ -1374,7 +1374,7 @@
           }
         }
       },
-      "NamePartV6" : {
+      "NamePartV7Dto" : {
         "type" : "object",
         "description" : "A categorized name part for this business partner data",
         "properties" : {
@@ -1388,7 +1388,7 @@
           }
         }
       },
-      "PageDtoSharingMemberRecord" : {
+      "PageDtoSharingMemberRecordV7Dto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
         "properties" : {
@@ -1416,17 +1416,43 @@
             "type" : "array",
             "description" : "Collection of results in the page",
             "items" : {
-              "$ref" : "#/components/schemas/SharingMemberRecord"
+              "$ref" : "#/components/schemas/SharingMemberRecordV7Dto"
             }
           }
         }
       },
-      "PhysicalAddress" : {
+      "PhysicalAddressScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "city" : {
+            "type" : [ "string", "null" ]
+          },
+          "district" : {
+            "type" : [ "string", "null" ]
+          },
+          "street" : {
+            "$ref" : "#/components/schemas/StreetScriptVariantV7Dto"
+          },
+          "industrialZone" : {
+            "type" : [ "string", "null" ]
+          },
+          "building" : {
+            "type" : [ "string", "null" ]
+          },
+          "floor" : {
+            "type" : [ "string", "null" ]
+          },
+          "door" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "PhysicalAddressV6Dto" : {
         "type" : "object",
         "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
         "properties" : {
           "geographicCoordinates" : {
-            "$ref" : "#/components/schemas/GeoCoordinate"
+            "$ref" : "#/components/schemas/GeoCoordinateV6Dto"
           },
           "country" : {
             "type" : [ "string", "null" ]
@@ -1450,7 +1476,7 @@
             "type" : [ "string", "null" ]
           },
           "street" : {
-            "$ref" : "#/components/schemas/Street"
+            "$ref" : "#/components/schemas/StreetV6Dto"
           },
           "companyPostalCode" : {
             "type" : [ "string", "null" ]
@@ -1472,38 +1498,12 @@
           }
         }
       },
-      "PhysicalAddressScriptVariant" : {
-        "type" : "object",
-        "properties" : {
-          "city" : {
-            "type" : [ "string", "null" ]
-          },
-          "district" : {
-            "type" : [ "string", "null" ]
-          },
-          "street" : {
-            "$ref" : "#/components/schemas/StreetScriptVariant"
-          },
-          "industrialZone" : {
-            "type" : [ "string", "null" ]
-          },
-          "building" : {
-            "type" : [ "string", "null" ]
-          },
-          "floor" : {
-            "type" : [ "string", "null" ]
-          },
-          "door" : {
-            "type" : [ "string", "null" ]
-          }
-        }
-      },
-      "PhysicalAddressV6" : {
+      "PhysicalAddressV7Dto" : {
         "type" : "object",
         "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
         "properties" : {
           "geographicCoordinates" : {
-            "$ref" : "#/components/schemas/GeoCoordinateV6"
+            "$ref" : "#/components/schemas/GeoCoordinateV7Dto"
           },
           "country" : {
             "type" : [ "string", "null" ]
@@ -1527,7 +1527,7 @@
             "type" : [ "string", "null" ]
           },
           "street" : {
-            "$ref" : "#/components/schemas/StreetV6"
+            "$ref" : "#/components/schemas/StreetV7Dto"
           },
           "companyPostalCode" : {
             "type" : [ "string", "null" ]
@@ -1549,82 +1549,25 @@
           }
         }
       },
-      "PostalAddress" : {
-        "type" : "object",
-        "description" : "Address information of this business partner data. The address can be either a legal, site main and/or additional address. This can also refer to address information which is unknown to which type it belongs to.",
-        "properties" : {
-          "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReference"
-          },
-          "addressName" : {
-            "type" : [ "string", "null" ],
-            "description" : "The name of this address"
-          },
-          "identifiers" : {
-            "type" : "array",
-            "description" : "Identifiers for this address (in addition to the BPNA)",
-            "items" : {
-              "$ref" : "#/components/schemas/Identifier"
-            }
-          },
-          "states" : {
-            "type" : "array",
-            "description" : "The business state history of this address",
-            "items" : {
-              "$ref" : "#/components/schemas/BusinessState"
-            }
-          },
-          "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteria"
-          },
-          "physicalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalAddress"
-          },
-          "alternativeAddress" : {
-            "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddress"
-            }, {
-              "type" : "null"
-            } ]
-          },
-          "hasChanged" : {
-            "type" : [ "boolean", "null" ],
-            "deprecated" : true,
-            "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
-          },
-          "goldenRecordRelations" : {
-            "type" : "array",
-            "description" : "Golden record relations belonging to this address",
-            "items" : {
-              "$ref" : "#/components/schemas/AddressGoldenRecordRelation"
-            }
-          },
-          "updatedAt" : {
-            "type" : [ "string", "null" ],
-            "format" : "date-time",
-            "description" : "Timestamp when this address was last updated in the source system"
-          }
-        }
-      },
-      "PostalAddressScriptVariant" : {
+      "PostalAddressScriptVariantV7Dto" : {
         "type" : "object",
         "properties" : {
           "addressName" : {
             "type" : [ "string", "null" ]
           },
           "physicalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantV7Dto"
           },
           "alternativeAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+              "$ref" : "#/components/schemas/AlternativeAddressScriptVariantV7Dto"
             }, {
               "type" : "null"
             } ]
           }
         }
       },
-      "PostalAddressScriptVariantWithScriptCode" : {
+      "PostalAddressScriptVariantWithScriptCodeV7Dto" : {
         "type" : "object",
         "properties" : {
           "scriptCode" : {
@@ -1634,23 +1577,23 @@
             "type" : [ "string", "null" ]
           },
           "physicalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantV7Dto"
           },
           "alternativeAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+              "$ref" : "#/components/schemas/AlternativeAddressScriptVariantV7Dto"
             }, {
               "type" : "null"
             } ]
           }
         }
       },
-      "PostalAddressV6" : {
+      "PostalAddressV6Dto" : {
         "type" : "object",
         "description" : "Address information of this business partner data. The address can be either a legal, site main and/or additional address. This can also refer to address information which is unknown to which type it belongs to.",
         "properties" : {
           "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReferenceV6"
+            "$ref" : "#/components/schemas/BpnReferenceV6Dto"
           },
           "addressName" : {
             "type" : [ "string", "null" ],
@@ -1660,25 +1603,25 @@
             "type" : "array",
             "description" : "Identifiers for this address (in addition to the BPNA)",
             "items" : {
-              "$ref" : "#/components/schemas/IdentifierV6"
+              "$ref" : "#/components/schemas/IdentifierV6Dto"
             }
           },
           "states" : {
             "type" : "array",
             "description" : "The business state history of this address",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessStateV6"
+              "$ref" : "#/components/schemas/BusinessStateV6Dto"
             }
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteriaV6"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV6Dto"
           },
           "physicalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalAddressV6"
+            "$ref" : "#/components/schemas/PhysicalAddressV6Dto"
           },
           "alternativeAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddressV6"
+              "$ref" : "#/components/schemas/AlternativeAddressV6Dto"
             }, {
               "type" : "null"
             } ]
@@ -1690,12 +1633,12 @@
           }
         }
       },
-      "PostalAddressWithScriptVariants" : {
+      "PostalAddressV7Dto" : {
         "type" : "object",
-        "description" : "The additional address information of this business partner data. An additional address is an address that is distinct from the legal and site main address. The additional address is either an additional address of the legal entity (site is null) or of the site (site is not null). An additional address of 'Null' means the business partner data has no additional address",
+        "description" : "Address information of this business partner data. The address can be either a legal, site main and/or additional address. This can also refer to address information which is unknown to which type it belongs to.",
         "properties" : {
           "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReference"
+            "$ref" : "#/components/schemas/BpnReferenceV7Dto"
           },
           "addressName" : {
             "type" : [ "string", "null" ],
@@ -1705,25 +1648,25 @@
             "type" : "array",
             "description" : "Identifiers for this address (in addition to the BPNA)",
             "items" : {
-              "$ref" : "#/components/schemas/Identifier"
+              "$ref" : "#/components/schemas/IdentifierV7Dto"
             }
           },
           "states" : {
             "type" : "array",
             "description" : "The business state history of this address",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessState"
+              "$ref" : "#/components/schemas/BusinessStateV7Dto"
             }
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteria"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
           },
           "physicalAddress" : {
-            "$ref" : "#/components/schemas/PhysicalAddress"
+            "$ref" : "#/components/schemas/PhysicalAddressV7Dto"
           },
           "alternativeAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/AlternativeAddress"
+              "$ref" : "#/components/schemas/AlternativeAddressV7Dto"
             }, {
               "type" : "null"
             } ]
@@ -1737,7 +1680,64 @@
             "type" : "array",
             "description" : "Golden record relations belonging to this address",
             "items" : {
-              "$ref" : "#/components/schemas/AddressGoldenRecordRelation"
+              "$ref" : "#/components/schemas/AddressGoldenRecordRelationV7Dto"
+            }
+          },
+          "updatedAt" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time",
+            "description" : "Timestamp when this address was last updated in the source system"
+          }
+        }
+      },
+      "PostalAddressWithScriptVariantsV7Dto" : {
+        "type" : "object",
+        "description" : "The additional address information of this business partner data. An additional address is an address that is distinct from the legal and site main address. The additional address is either an additional address of the legal entity (site is null) or of the site (site is not null). An additional address of 'Null' means the business partner data has no additional address",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReferenceV7Dto"
+          },
+          "addressName" : {
+            "type" : [ "string", "null" ],
+            "description" : "The name of this address"
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "Identifiers for this address (in addition to the BPNA)",
+            "items" : {
+              "$ref" : "#/components/schemas/IdentifierV7Dto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The business state history of this address",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessStateV7Dto"
+            }
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressV7Dto"
+          },
+          "alternativeAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/AlternativeAddressV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "hasChanged" : {
+            "type" : [ "boolean", "null" ],
+            "deprecated" : true,
+            "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
+          },
+          "goldenRecordRelations" : {
+            "type" : "array",
+            "description" : "Golden record relations belonging to this address",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressGoldenRecordRelationV7Dto"
             }
           },
           "updatedAt" : {
@@ -1748,12 +1748,12 @@
           "scriptVariants" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/PostalAddressScriptVariantWithScriptCode"
+              "$ref" : "#/components/schemas/PostalAddressScriptVariantWithScriptCodeV7Dto"
             }
           }
         }
       },
-      "RelationValidityPeriod" : {
+      "RelationValidityPeriodV7Dto" : {
         "type" : "object",
         "properties" : {
           "validFrom" : {
@@ -1768,7 +1768,18 @@
           }
         }
       },
-      "SharingMemberRecord" : {
+      "SharingMemberRecordUpdateV7Request" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : "string"
+          },
+          "isGoldenRecordCounted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "SharingMemberRecordV7Dto" : {
         "type" : "object",
         "properties" : {
           "recordId" : {
@@ -1787,69 +1798,7 @@
           }
         }
       },
-      "SharingMemberRecordUpdateRequest" : {
-        "type" : "object",
-        "properties" : {
-          "recordId" : {
-            "type" : "string"
-          },
-          "isGoldenRecordCounted" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "Site" : {
-        "type" : "object",
-        "description" : "Site information for this business partner data. A site of 'null' means the business partner data has no site.",
-        "properties" : {
-          "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReference"
-          },
-          "siteName" : {
-            "type" : [ "string", "null" ]
-          },
-          "states" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/BusinessState"
-            }
-          },
-          "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteria"
-          },
-          "hasChanged" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "siteMainAddress" : {
-            "oneOf" : [ {
-              "$ref" : "#/components/schemas/PostalAddress"
-            }, {
-              "type" : "null"
-            } ]
-          },
-          "scriptVariants" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/SiteScriptVariant"
-            }
-          },
-          "goldenRecordRelations" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/SiteGoldenRecordRelation"
-            }
-          },
-          "updatedAt" : {
-            "type" : [ "string", "null" ],
-            "format" : "date-time"
-          },
-          "siteMainIsLegalAddress" : {
-            "type" : "boolean",
-            "description" : "This site's main address is the legal address of the legal entity. The address information therefore is stored in the legal address."
-          }
-        }
-      },
-      "SiteGoldenRecordRelation" : {
+      "SiteGoldenRecordRelationV7Dto" : {
         "type" : "object",
         "description" : "A golden record relation between sites, pointing from a source BPNS to a target BPNS",
         "properties" : {
@@ -1865,7 +1814,7 @@
           }
         }
       },
-      "SiteScriptVariant" : {
+      "SiteScriptVariantV7Dto" : {
         "type" : "object",
         "properties" : {
           "scriptCode" : {
@@ -1875,16 +1824,16 @@
             "type" : "string"
           },
           "mainAddress" : {
-            "$ref" : "#/components/schemas/PostalAddressScriptVariant"
+            "$ref" : "#/components/schemas/PostalAddressScriptVariantV7Dto"
           }
         }
       },
-      "SiteV6" : {
+      "SiteV6Dto" : {
         "type" : "object",
         "description" : "Site information for this business partner data. A site of 'null' means the business partner data has no site.",
         "properties" : {
           "bpnReference" : {
-            "$ref" : "#/components/schemas/BpnReferenceV6"
+            "$ref" : "#/components/schemas/BpnReferenceV6Dto"
           },
           "siteName" : {
             "type" : [ "string", "null" ]
@@ -1892,18 +1841,18 @@
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessStateV6"
+              "$ref" : "#/components/schemas/BusinessStateV6Dto"
             }
           },
           "confidenceCriteria" : {
-            "$ref" : "#/components/schemas/ConfidenceCriteriaV6"
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV6Dto"
           },
           "hasChanged" : {
             "type" : [ "boolean", "null" ]
           },
           "siteMainAddress" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/PostalAddressV6"
+              "$ref" : "#/components/schemas/PostalAddressV6Dto"
             }, {
               "type" : "null"
             } ]
@@ -1914,7 +1863,81 @@
           }
         }
       },
-      "Street" : {
+      "SiteV7Dto" : {
+        "type" : "object",
+        "description" : "Site information for this business partner data. A site of 'null' means the business partner data has no site.",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReferenceV7Dto"
+          },
+          "siteName" : {
+            "type" : [ "string", "null" ]
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessStateV7Dto"
+            }
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaV7Dto"
+          },
+          "hasChanged" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "siteMainAddress" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PostalAddressV7Dto"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariantV7Dto"
+            }
+          },
+          "goldenRecordRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteGoldenRecordRelationV7Dto"
+            }
+          },
+          "updatedAt" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "siteMainIsLegalAddress" : {
+            "type" : "boolean",
+            "description" : "This site's main address is the legal address of the legal entity. The address information therefore is stored in the legal address."
+          }
+        }
+      },
+      "StreetScriptVariantV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ]
+          },
+          "direction" : {
+            "type" : [ "string", "null" ]
+          },
+          "namePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNamePrefix" : {
+            "type" : [ "string", "null" ]
+          },
+          "nameSuffix" : {
+            "type" : [ "string", "null" ]
+          },
+          "additionalNameSuffix" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "StreetV6Dto" : {
         "type" : "object",
         "description" : "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway",
         "properties" : {
@@ -1947,30 +1970,7 @@
           }
         }
       },
-      "StreetScriptVariant" : {
-        "type" : "object",
-        "properties" : {
-          "name" : {
-            "type" : [ "string", "null" ]
-          },
-          "direction" : {
-            "type" : [ "string", "null" ]
-          },
-          "namePrefix" : {
-            "type" : [ "string", "null" ]
-          },
-          "additionalNamePrefix" : {
-            "type" : [ "string", "null" ]
-          },
-          "nameSuffix" : {
-            "type" : [ "string", "null" ]
-          },
-          "additionalNameSuffix" : {
-            "type" : [ "string", "null" ]
-          }
-        }
-      },
-      "StreetV6" : {
+      "StreetV7Dto" : {
         "type" : "object",
         "description" : "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway",
         "properties" : {
@@ -2003,7 +2003,7 @@
           }
         }
       },
-      "TaskClientRelationsStateDto" : {
+      "TaskClientRelationsStateV7Dto" : {
         "type" : "object",
         "description" : "The golden record task's processing state together with optional business partner relationship data in case processing is done",
         "properties" : {
@@ -2015,15 +2015,15 @@
             "description" : "The identifier of the gate record for which this task has been created"
           },
           "businessPartnerRelationsResult" : {
-            "$ref" : "#/components/schemas/BusinessPartnerRelations"
+            "$ref" : "#/components/schemas/BusinessPartnerRelationsV7Dto"
           },
           "processingState" : {
-            "$ref" : "#/components/schemas/TaskProcessingRelationsStateDto"
+            "$ref" : "#/components/schemas/TaskProcessingRelationsStateV7Dto"
           }
         },
         "required" : [ "processingState", "recordId", "taskId" ]
       },
-      "TaskClientStateDto" : {
+      "TaskClientStateV6Dto" : {
         "type" : "object",
         "description" : "The golden record task's processing state together with optional business partner data in case processing is done",
         "properties" : {
@@ -2035,15 +2035,15 @@
             "description" : "The identifier of the gate record for which this task has been created"
           },
           "businessPartnerResult" : {
-            "$ref" : "#/components/schemas/BusinessPartner"
+            "$ref" : "#/components/schemas/BusinessPartnerV6Dto"
           },
           "processingState" : {
-            "$ref" : "#/components/schemas/TaskProcessingStateDto"
+            "$ref" : "#/components/schemas/TaskProcessingStateV6Dto"
           }
         },
         "required" : [ "processingState", "recordId", "taskId" ]
       },
-      "TaskClientStateDtoV6" : {
+      "TaskClientStateV7Dto" : {
         "type" : "object",
         "description" : "The golden record task's processing state together with optional business partner data in case processing is done",
         "properties" : {
@@ -2055,15 +2055,28 @@
             "description" : "The identifier of the gate record for which this task has been created"
           },
           "businessPartnerResult" : {
-            "$ref" : "#/components/schemas/BusinessPartnerV6"
+            "$ref" : "#/components/schemas/BusinessPartnerV7Dto"
           },
           "processingState" : {
-            "$ref" : "#/components/schemas/TaskProcessingStateDtoV6"
+            "$ref" : "#/components/schemas/TaskProcessingStateV7Dto"
           }
         },
         "required" : [ "processingState", "recordId", "taskId" ]
       },
-      "TaskCreateRelationsRequest" : {
+      "TaskCreateRelationsRequestEntryV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : [ "string", "null" ],
+            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
+          },
+          "businessPartnerRelations" : {
+            "$ref" : "#/components/schemas/BusinessPartnerRelationsV7Dto",
+            "description" : "The business partner relationship data to be processed"
+          }
+        }
+      },
+      "TaskCreateRelationsV7Request" : {
         "type" : "object",
         "description" : "Request object to specify for which business partner relationship data tasks should be created and in which mode",
         "properties" : {
@@ -2076,38 +2089,51 @@
             "type" : "array",
             "description" : "The list of tasks to create",
             "items" : {
-              "$ref" : "#/components/schemas/TaskCreateRelationsRequestEntry"
+              "$ref" : "#/components/schemas/TaskCreateRelationsRequestEntryV7Dto"
             }
           }
         },
         "required" : [ "mode" ]
       },
-      "TaskCreateRelationsRequestEntry" : {
-        "type" : "object",
-        "properties" : {
-          "recordId" : {
-            "type" : [ "string", "null" ],
-            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
-          },
-          "businessPartnerRelations" : {
-            "$ref" : "#/components/schemas/BusinessPartnerRelations",
-            "description" : "The business partner relationship data to be processed"
-          }
-        }
-      },
-      "TaskCreateRelationsResponse" : {
+      "TaskCreateRelationsV7Response" : {
         "type" : "object",
         "description" : "Response object for giving a list of created tasks",
         "properties" : {
           "createdTasks" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskClientRelationsStateDto"
+              "$ref" : "#/components/schemas/TaskClientRelationsStateV7Dto"
             }
           }
         }
       },
-      "TaskCreateRequest" : {
+      "TaskCreateRequestEntryV6Dto" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : [ "string", "null" ],
+            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
+          },
+          "businessPartner" : {
+            "$ref" : "#/components/schemas/BusinessPartnerV6Dto",
+            "description" : "The business partner data to be processed"
+          }
+        }
+      },
+      "TaskCreateRequestEntryV7Dto" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : [ "string", "null" ],
+            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
+          },
+          "businessPartner" : {
+            "$ref" : "#/components/schemas/BusinessPartnerV7Dto",
+            "description" : "The business partner data to be processed"
+          }
+        }
+      },
+      "TaskCreateV6Request" : {
         "type" : "object",
         "description" : "Request object to specify for which business partner data tasks should be created and in which mode",
         "properties" : {
@@ -2120,39 +2146,25 @@
             "type" : "array",
             "description" : "The list of tasks to create",
             "items" : {
-              "$ref" : "#/components/schemas/TaskCreateRequestEntry"
+              "$ref" : "#/components/schemas/TaskCreateRequestEntryV6Dto"
             }
           }
         },
         "required" : [ "mode" ]
       },
-      "TaskCreateRequestEntry" : {
+      "TaskCreateV6Response" : {
         "type" : "object",
+        "description" : "Response object for giving a list of created tasks",
         "properties" : {
-          "recordId" : {
-            "type" : [ "string", "null" ],
-            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
-          },
-          "businessPartner" : {
-            "$ref" : "#/components/schemas/BusinessPartner",
-            "description" : "The business partner data to be processed"
+          "createdTasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskClientStateV6Dto"
+            }
           }
         }
       },
-      "TaskCreateRequestEntryV6" : {
-        "type" : "object",
-        "properties" : {
-          "recordId" : {
-            "type" : [ "string", "null" ],
-            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
-          },
-          "businessPartner" : {
-            "$ref" : "#/components/schemas/BusinessPartnerV6",
-            "description" : "The business partner data to be processed"
-          }
-        }
-      },
-      "TaskCreateRequestV6" : {
+      "TaskCreateV7Request" : {
         "type" : "object",
         "description" : "Request object to specify for which business partner data tasks should be created and in which mode",
         "properties" : {
@@ -2165,37 +2177,25 @@
             "type" : "array",
             "description" : "The list of tasks to create",
             "items" : {
-              "$ref" : "#/components/schemas/TaskCreateRequestEntryV6"
+              "$ref" : "#/components/schemas/TaskCreateRequestEntryV7Dto"
             }
           }
         },
         "required" : [ "mode" ]
       },
-      "TaskCreateResponse" : {
+      "TaskCreateV7Response" : {
         "type" : "object",
         "description" : "Response object for giving a list of created tasks",
         "properties" : {
           "createdTasks" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskClientStateDto"
+              "$ref" : "#/components/schemas/TaskClientStateV7Dto"
             }
           }
         }
       },
-      "TaskCreateResponseV6" : {
-        "type" : "object",
-        "description" : "Response object for giving a list of created tasks",
-        "properties" : {
-          "createdTasks" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/TaskClientStateDtoV6"
-            }
-          }
-        }
-      },
-      "TaskErrorDto" : {
+      "TaskErrorV6Dto" : {
         "type" : "object",
         "description" : "Describes an error that happened during processing of a task \n",
         "properties" : {
@@ -2211,7 +2211,7 @@
         },
         "required" : [ "description", "type" ]
       },
-      "TaskErrorDtoV6" : {
+      "TaskErrorV7Dto" : {
         "type" : "object",
         "description" : "Describes an error that happened during processing of a task \n",
         "properties" : {
@@ -2227,7 +2227,7 @@
         },
         "required" : [ "description", "type" ]
       },
-      "TaskProcessingRelationsStateDto" : {
+      "TaskProcessingRelationsStateV7Dto" : {
         "type" : "object",
         "description" : "Contains detailed information about the current processing state of a relations golden record task",
         "properties" : {
@@ -2250,7 +2250,7 @@
             "type" : "array",
             "description" : "The actual errors that happened during processing if the task has an error result state. The errors refer to the latest step.",
             "items" : {
-              "$ref" : "#/components/schemas/TaskRelationsErrorDto"
+              "$ref" : "#/components/schemas/TaskRelationsErrorV7Dto"
             }
           },
           "createdAt" : {
@@ -2272,7 +2272,7 @@
         },
         "required" : [ "createdAt", "errors", "modifiedAt", "resultState", "step", "stepState" ]
       },
-      "TaskProcessingStateDto" : {
+      "TaskProcessingStateV6Dto" : {
         "type" : "object",
         "description" : "Contains detailed information about the current processing state of a golden record task",
         "properties" : {
@@ -2295,7 +2295,7 @@
             "type" : "array",
             "description" : "The actual errors that happened during processing if the task has an error result state. The errors refer to the latest step.",
             "items" : {
-              "$ref" : "#/components/schemas/TaskErrorDto"
+              "$ref" : "#/components/schemas/TaskErrorV6Dto"
             }
           },
           "createdAt" : {
@@ -2317,7 +2317,7 @@
         },
         "required" : [ "createdAt", "errors", "modifiedAt", "resultState", "step", "stepState" ]
       },
-      "TaskProcessingStateDtoV6" : {
+      "TaskProcessingStateV7Dto" : {
         "type" : "object",
         "description" : "Contains detailed information about the current processing state of a golden record task",
         "properties" : {
@@ -2340,7 +2340,7 @@
             "type" : "array",
             "description" : "The actual errors that happened during processing if the task has an error result state. The errors refer to the latest step.",
             "items" : {
-              "$ref" : "#/components/schemas/TaskErrorDtoV6"
+              "$ref" : "#/components/schemas/TaskErrorV7Dto"
             }
           },
           "createdAt" : {
@@ -2362,7 +2362,7 @@
         },
         "required" : [ "createdAt", "errors", "modifiedAt", "resultState", "step", "stepState" ]
       },
-      "TaskRelationsErrorDto" : {
+      "TaskRelationsErrorV7Dto" : {
         "type" : "object",
         "description" : "Describes an error that happened during processing of a task \n",
         "properties" : {
@@ -2378,19 +2378,19 @@
         },
         "required" : [ "description", "type" ]
       },
-      "TaskRelationsStateResponse" : {
+      "TaskRelationsStateV7Response" : {
         "type" : "object",
         "description" : "Response object for giving a list of task states",
         "properties" : {
           "tasks" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskClientRelationsStateDto"
+              "$ref" : "#/components/schemas/TaskClientRelationsStateV7Dto"
             }
           }
         }
       },
-      "TaskRelationsStepReservationEntryDto" : {
+      "TaskRelationsStepReservationEntryV7Dto" : {
         "type" : "object",
         "description" : "Task reservation entry",
         "properties" : {
@@ -2403,12 +2403,12 @@
             "description" : "The identifier of the gate record for which this task has been created"
           },
           "businessPartnerRelations" : {
-            "$ref" : "#/components/schemas/BusinessPartnerRelations",
+            "$ref" : "#/components/schemas/BusinessPartnerRelationsV7Dto",
             "description" : "The business partner relations data to process"
           }
         }
       },
-      "TaskRelationsStepReservationResponse" : {
+      "TaskRelationsStepReservationV7Response" : {
         "type" : "object",
         "description" : "Response object for giving a list of reserved tasks",
         "properties" : {
@@ -2416,7 +2416,7 @@
             "type" : "array",
             "description" : "The reserved tasks with their business partner relations data to process",
             "items" : {
-              "$ref" : "#/components/schemas/TaskRelationsStepReservationEntryDto"
+              "$ref" : "#/components/schemas/TaskRelationsStepReservationEntryV7Dto"
             }
           },
           "timeout" : {
@@ -2427,7 +2427,7 @@
           }
         }
       },
-      "TaskRelationsStepResultEntryDto" : {
+      "TaskRelationsStepResultEntryV7Dto" : {
         "type" : "object",
         "description" : "A step result for a relations golden record task",
         "properties" : {
@@ -2436,20 +2436,20 @@
             "description" : "The identifier of the task for which this is a result"
           },
           "businessPartnerRelations" : {
-            "$ref" : "#/components/schemas/BusinessPartnerRelations",
+            "$ref" : "#/components/schemas/BusinessPartnerRelationsV7Dto",
             "description" : "The actual result in form of business partner relations data. Maybe null if an error occurred during processing of this task."
           },
           "errors" : {
             "type" : "array",
             "description" : "Errors that occurred during processing of this task",
             "items" : {
-              "$ref" : "#/components/schemas/TaskRelationsErrorDto"
+              "$ref" : "#/components/schemas/TaskRelationsErrorV7Dto"
             }
           }
         },
         "required" : [ "taskId" ]
       },
-      "TaskRelationsStepResultRequest" : {
+      "TaskRelationsStepResultV7Request" : {
         "type" : "object",
         "description" : "Request object for posting step results of previously reserved tasks",
         "properties" : {
@@ -2461,13 +2461,13 @@
           "results" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskRelationsStepResultEntryDto"
+              "$ref" : "#/components/schemas/TaskRelationsStepResultEntryV7Dto"
             }
           }
         },
         "required" : [ "step" ]
       },
-      "TaskResultStateSearchRequest" : {
+      "TaskResultStateSearchV6Request" : {
         "type" : "object",
         "properties" : {
           "taskIds" : {
@@ -2478,18 +2478,7 @@
           }
         }
       },
-      "TaskResultStateSearchRequestV6" : {
-        "type" : "object",
-        "properties" : {
-          "taskIds" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }
-      },
-      "TaskResultStateSearchResponse" : {
+      "TaskResultStateSearchV6Response" : {
         "type" : "object",
         "properties" : {
           "resultStates" : {
@@ -2501,7 +2490,18 @@
           }
         }
       },
-      "TaskResultStateSearchResponseV6" : {
+      "TaskResultStateSearchV7Request" : {
+        "type" : "object",
+        "properties" : {
+          "taskIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "TaskResultStateSearchV7Response" : {
         "type" : "object",
         "properties" : {
           "resultStates" : {
@@ -2513,7 +2513,7 @@
           }
         }
       },
-      "TaskStateRequest" : {
+      "TaskStateV6Request" : {
         "type" : "object",
         "description" : "Request object for giving a list of task identifiers to search for the state of tasks",
         "properties" : {
@@ -2525,7 +2525,19 @@
           }
         }
       },
-      "TaskStateRequestV6" : {
+      "TaskStateV6Response" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of task states",
+        "properties" : {
+          "tasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskClientStateV6Dto"
+            }
+          }
+        }
+      },
+      "TaskStateV7Request" : {
         "type" : "object",
         "description" : "Request object for giving a list of task identifiers to search for the state of tasks",
         "properties" : {
@@ -2537,31 +2549,19 @@
           }
         }
       },
-      "TaskStateResponse" : {
+      "TaskStateV7Response" : {
         "type" : "object",
         "description" : "Response object for giving a list of task states",
         "properties" : {
           "tasks" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskClientStateDto"
+              "$ref" : "#/components/schemas/TaskClientStateV7Dto"
             }
           }
         }
       },
-      "TaskStateResponseV6" : {
-        "type" : "object",
-        "description" : "Response object for giving a list of task states",
-        "properties" : {
-          "tasks" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/TaskClientStateDtoV6"
-            }
-          }
-        }
-      },
-      "TaskStepReservationEntryDto" : {
+      "TaskStepReservationEntryV6Dto" : {
         "type" : "object",
         "description" : "Task reservation entry",
         "properties" : {
@@ -2574,7 +2574,7 @@
             "description" : "The identifier of the gate record for which this task has been created"
           },
           "businessPartner" : {
-            "$ref" : "#/components/schemas/BusinessPartner",
+            "$ref" : "#/components/schemas/BusinessPartnerV6Dto",
             "description" : "The business partner data to process"
           },
           "requestKey" : {
@@ -2582,7 +2582,7 @@
           }
         }
       },
-      "TaskStepReservationEntryDtoV6" : {
+      "TaskStepReservationEntryV7Dto" : {
         "type" : "object",
         "description" : "Task reservation entry",
         "properties" : {
@@ -2595,7 +2595,7 @@
             "description" : "The identifier of the gate record for which this task has been created"
           },
           "businessPartner" : {
-            "$ref" : "#/components/schemas/BusinessPartnerV6",
+            "$ref" : "#/components/schemas/BusinessPartnerV7Dto",
             "description" : "The business partner data to process"
           },
           "requestKey" : {
@@ -2603,7 +2603,7 @@
           }
         }
       },
-      "TaskStepReservationRequest" : {
+      "TaskStepReservationV6Request" : {
         "type" : "object",
         "description" : "Request object for reserving a number of tasks waiting in a step queue.",
         "properties" : {
@@ -2620,7 +2620,26 @@
         },
         "required" : [ "amount", "step" ]
       },
-      "TaskStepReservationRequestV6" : {
+      "TaskStepReservationV6Response" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of reserved tasks",
+        "properties" : {
+          "reservedTasks" : {
+            "type" : "array",
+            "description" : "The reserved tasks with their business partner data to process",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskStepReservationEntryV6Dto"
+            }
+          },
+          "timeout" : {
+            "type" : "string",
+            "format" : "date-time",
+            "deprecated" : true,
+            "description" : "The timestamp until the reservation is valid and results are accepted"
+          }
+        }
+      },
+      "TaskStepReservationV7Request" : {
         "type" : "object",
         "description" : "Request object for reserving a number of tasks waiting in a step queue.",
         "properties" : {
@@ -2637,7 +2656,7 @@
         },
         "required" : [ "amount", "step" ]
       },
-      "TaskStepReservationResponse" : {
+      "TaskStepReservationV7Response" : {
         "type" : "object",
         "description" : "Response object for giving a list of reserved tasks",
         "properties" : {
@@ -2645,7 +2664,7 @@
             "type" : "array",
             "description" : "The reserved tasks with their business partner data to process",
             "items" : {
-              "$ref" : "#/components/schemas/TaskStepReservationEntryDto"
+              "$ref" : "#/components/schemas/TaskStepReservationEntryV7Dto"
             }
           },
           "timeout" : {
@@ -2656,26 +2675,7 @@
           }
         }
       },
-      "TaskStepReservationResponseV6" : {
-        "type" : "object",
-        "description" : "Response object for giving a list of reserved tasks",
-        "properties" : {
-          "reservedTasks" : {
-            "type" : "array",
-            "description" : "The reserved tasks with their business partner data to process",
-            "items" : {
-              "$ref" : "#/components/schemas/TaskStepReservationEntryDtoV6"
-            }
-          },
-          "timeout" : {
-            "type" : "string",
-            "format" : "date-time",
-            "deprecated" : true,
-            "description" : "The timestamp until the reservation is valid and results are accepted"
-          }
-        }
-      },
-      "TaskStepResultEntryDto" : {
+      "TaskStepResultEntryV6Dto" : {
         "type" : "object",
         "description" : "A step result for a golden record task",
         "properties" : {
@@ -2684,20 +2684,20 @@
             "description" : "The identifier of the task for which this is a result"
           },
           "businessPartner" : {
-            "$ref" : "#/components/schemas/BusinessPartner",
+            "$ref" : "#/components/schemas/BusinessPartnerV6Dto",
             "description" : "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task."
           },
           "errors" : {
             "type" : "array",
             "description" : "Errors that occurred during processing of this task",
             "items" : {
-              "$ref" : "#/components/schemas/TaskErrorDto"
+              "$ref" : "#/components/schemas/TaskErrorV6Dto"
             }
           }
         },
         "required" : [ "taskId" ]
       },
-      "TaskStepResultEntryDtoV6" : {
+      "TaskStepResultEntryV7Dto" : {
         "type" : "object",
         "description" : "A step result for a golden record task",
         "properties" : {
@@ -2706,20 +2706,20 @@
             "description" : "The identifier of the task for which this is a result"
           },
           "businessPartner" : {
-            "$ref" : "#/components/schemas/BusinessPartnerV6",
+            "$ref" : "#/components/schemas/BusinessPartnerV7Dto",
             "description" : "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task."
           },
           "errors" : {
             "type" : "array",
             "description" : "Errors that occurred during processing of this task",
             "items" : {
-              "$ref" : "#/components/schemas/TaskErrorDtoV6"
+              "$ref" : "#/components/schemas/TaskErrorV7Dto"
             }
           }
         },
         "required" : [ "taskId" ]
       },
-      "TaskStepResultRequest" : {
+      "TaskStepResultV6Request" : {
         "type" : "object",
         "description" : "Request object for posting step results of previously reserved tasks",
         "properties" : {
@@ -2731,13 +2731,13 @@
           "results" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskStepResultEntryDto"
+              "$ref" : "#/components/schemas/TaskStepResultEntryV6Dto"
             }
           }
         },
         "required" : [ "step" ]
       },
-      "TaskStepResultRequestV6" : {
+      "TaskStepResultV7Request" : {
         "type" : "object",
         "description" : "Request object for posting step results of previously reserved tasks",
         "properties" : {
@@ -2749,13 +2749,13 @@
           "results" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/TaskStepResultEntryDtoV6"
+              "$ref" : "#/components/schemas/TaskStepResultEntryV7Dto"
             }
           }
         },
         "required" : [ "step" ]
       },
-      "UncategorizedProperties" : {
+      "UncategorizedPropertiesV6Dto" : {
         "type" : "object",
         "description" : "Business partner data that has not yet or can not be categorized",
         "properties" : {
@@ -2768,18 +2768,49 @@
           "identifiers" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/Identifier"
+              "$ref" : "#/components/schemas/IdentifierV6Dto"
             }
           },
           "states" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/BusinessState"
+              "$ref" : "#/components/schemas/BusinessStateV6Dto"
             }
           },
           "address" : {
             "oneOf" : [ {
-              "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
+              "$ref" : "#/components/schemas/PostalAddressV6Dto"
+            }, {
+              "type" : "null"
+            } ]
+          }
+        }
+      },
+      "UncategorizedPropertiesV7Dto" : {
+        "type" : "object",
+        "description" : "Business partner data that has not yet or can not be categorized",
+        "properties" : {
+          "nameParts" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/IdentifierV7Dto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessStateV7Dto"
+            }
+          },
+          "address" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/PostalAddressWithScriptVariantsV7Dto"
             }, {
               "type" : "null"
             } ]
@@ -2787,43 +2818,12 @@
           "scriptVariants" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/UncategorizedScriptVariant"
+              "$ref" : "#/components/schemas/UncategorizedScriptVariantV7Dto"
             }
           }
         }
       },
-      "UncategorizedPropertiesV6" : {
-        "type" : "object",
-        "description" : "Business partner data that has not yet or can not be categorized",
-        "properties" : {
-          "nameParts" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "identifiers" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/IdentifierV6"
-            }
-          },
-          "states" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/BusinessStateV6"
-            }
-          },
-          "address" : {
-            "oneOf" : [ {
-              "$ref" : "#/components/schemas/PostalAddressV6"
-            }, {
-              "type" : "null"
-            } ]
-          }
-        }
-      },
-      "UncategorizedScriptVariant" : {
+      "UncategorizedScriptVariantV7Dto" : {
         "type" : "object",
         "description" : "Uncategorized name parts of this business partner data written in a particular script",
         "properties" : {

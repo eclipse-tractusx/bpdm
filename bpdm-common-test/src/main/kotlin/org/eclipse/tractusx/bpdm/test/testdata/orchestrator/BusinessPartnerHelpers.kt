@@ -14,28 +14,34 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariantsV7Dto
 
-import org.eclipse.tractusx.orchestrator.api.model.*
 
-fun BusinessPartner.copyWithLegalEntityIdentifiers(identifiers: List<Identifier>) =
+fun BusinessPartnerV7Dto.copyWithLegalEntityIdentifiers(identifiers: List<IdentifierV7Dto>) =
     copy(
         legalEntity = legalEntity.copy(
             identifiers = identifiers
         )
     )
 
-fun BusinessPartner.copyWithBpnReferences(bpnReference: BpnReference) =
+fun BusinessPartnerV7Dto.copyWithBpnReferences(bpnReference: BpnReferenceV7Dto) =
     copy(
         legalEntity = legalEntity.copy(bpnReference = bpnReference),
         site = site?.copy(bpnReference = bpnReference),
         additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copy(bpnReference = bpnReference) }
     )
 
-fun BusinessPartner.copyWithConfidenceCriteria(confidenceCriteria: ConfidenceCriteria) =
+fun BusinessPartnerV7Dto.copyWithConfidenceCriteria(confidenceCriteria: ConfidenceCriteriaV7Dto) =
     copy(
         legalEntity = legalEntity.copy(
             confidenceCriteria = confidenceCriteria,
@@ -50,10 +56,10 @@ fun BusinessPartner.copyWithConfidenceCriteria(confidenceCriteria: ConfidenceCri
         additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copy(confidenceCriteria = confidenceCriteria) }
     )
 
-fun BusinessPartner.copyWithLegalAddress(postalAddress: PostalAddressWithScriptVariants) =
+fun BusinessPartnerV7Dto.copyWithLegalAddress(postalAddress: PostalAddressWithScriptVariantsV7Dto) =
     copyWithLegalAddress(postalAddress.postalProperties)
 
-fun BusinessPartner.copyWithLegalAddress(postalAddress: PostalAddress) =
+fun BusinessPartnerV7Dto.copyWithLegalAddress(postalAddress: PostalAddressV7Dto) =
     copy(
         legalEntity = legalEntity.copy(
             legalAddress = postalAddress
@@ -61,33 +67,33 @@ fun BusinessPartner.copyWithLegalAddress(postalAddress: PostalAddress) =
     )
 
 
-fun BusinessPartner.copyWithSiteMainAddress(postalAddress: PostalAddress?) =
+fun BusinessPartnerV7Dto.copyWithSiteMainAddress(postalAddress: PostalAddressV7Dto?) =
     copy(
         site = site?.copy(
             siteMainAddress = postalAddress
         )
     )
 
-fun BusinessPartner.copyWithHasChanged(legalEntityChanged: Boolean = false, siteChanged: Boolean = false, additionalAddressChanged: Boolean = false) =
+fun BusinessPartnerV7Dto.copyWithHasChanged(legalEntityChanged: Boolean = false, siteChanged: Boolean = false, additionalAddressChanged: Boolean = false) =
     copy(
         legalEntity = legalEntity.copy(hasChanged = legalEntityChanged),
         site = site?.copy(hasChanged = siteChanged),
         additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copy(hasChanged = additionalAddressChanged) }
     )
 
-fun BusinessPartner.copyWithBpnRequests() = copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+fun BusinessPartnerV7Dto.copyWithBpnRequests() = copyWithBpnReferenceType(BpnReferenceTypeV7.BpnRequestIdentifier)
 
-fun BusinessPartner.copyWithBpnReferenceType(bpnReferenceType: BpnReferenceType) =
+fun BusinessPartnerV7Dto.copyWithBpnReferenceType(bpnReferenceType: BpnReferenceTypeV7) =
     copy(
         legalEntity = legalEntity.copy(bpnReference = legalEntity.bpnReference.copy(referenceType = bpnReferenceType), legalAddress = legalEntity.legalAddress.copyWithBpnReferenceType(bpnReferenceType)),
         site = site?.copy(bpnReference = site!!.bpnReference.copy(referenceType = bpnReferenceType), siteMainAddress = site?.siteMainAddress?.copyWithBpnReferenceType(bpnReferenceType)),
         additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copyWithBpnReferenceType(bpnReferenceType) }
     )
 
-fun PostalAddress.copyWithBpnReferenceType(bpnReferenceType: BpnReferenceType) =
+fun PostalAddressV7Dto.copyWithBpnReferenceType(bpnReferenceType: BpnReferenceTypeV7) =
     copy(bpnReference = bpnReference.copy(referenceType = bpnReferenceType))
 
-fun BusinessPartner.copyAsCxMemberData() =
+fun BusinessPartnerV7Dto.copyAsCxMemberData() =
     copy(
         legalEntity = legalEntity.copy(isParticipantData = true)
     )

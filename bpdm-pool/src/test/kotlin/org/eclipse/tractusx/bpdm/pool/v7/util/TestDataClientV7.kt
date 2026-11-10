@@ -33,13 +33,13 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockData
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import java.util.UUID
 
 class TestDataClientV7(
@@ -76,14 +76,14 @@ class TestDataClientV7(
      * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
      */
     fun createIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) {
-        val relations = BusinessPartnerRelations(
-            relationType = RelationType.IsOwnedBy,
+        val relations = BusinessPartnerRelationsV7Dto(
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = ownedBpnL,
             businessPartnerTargetBpn = owningBpnL,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
             reasonCode = null
         )
-        val taskEntry = TaskRelationsStepReservationEntryDto(
+        val taskEntry = TaskRelationsStepReservationEntryV7Dto(
             taskId = "$ownedBpnL IsOwnedBy $owningBpnL",
             recordId = UUID.randomUUID().toString(),
             businessPartnerRelations = relations
@@ -98,14 +98,14 @@ class TestDataClientV7(
      * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
      */
     fun createIsAlternativeHeadquarterForRelation(alternativeBpnL: String, mainBpnL: String) {
-        val relations = BusinessPartnerRelations(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+        val relations = BusinessPartnerRelationsV7Dto(
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeBpnL,
             businessPartnerTargetBpn = mainBpnL,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
             reasonCode = null
         )
-        val taskEntry = TaskRelationsStepReservationEntryDto(
+        val taskEntry = TaskRelationsStepReservationEntryV7Dto(
             taskId = "$alternativeBpnL IsAlternativeHeadquarterFor $mainBpnL",
             recordId = UUID.randomUUID().toString(),
             businessPartnerRelations = relations
@@ -115,7 +115,7 @@ class TestDataClientV7(
         check(errors.isEmpty()) { "Could not make '$alternativeBpnL' alternative headquarter of '$mainBpnL': $errors" }
     }
 
-    private fun resolveRelationTask(taskEntry: TaskRelationsStepReservationEntryDto): List<TaskRelationsStepResultEntryDto> {
+    private fun resolveRelationTask(taskEntry: TaskRelationsStepReservationEntryV7Dto): List<TaskRelationsStepResultEntryV7Dto> {
         orchestratorMockDataFactory.mockReservedRelationTasks(listOf(taskEntry))
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults()
@@ -146,7 +146,7 @@ class TestDataClientV7(
         return poolClient.addresses.createAddresses(listOf(request)).entities.first()
     }
 
-    fun processTask(seed: String, businessPartner: BusinessPartner): BusinessPartner{
+    fun processTask(seed: String, businessPartner: BusinessPartnerV7Dto): BusinessPartnerV7Dto{
         WireMock.reset()
 
         orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
@@ -156,7 +156,7 @@ class TestDataClientV7(
         return businessPartnerResult
     }
 
-    fun processTaskToErrors(seed: String, businessPartner: BusinessPartner): List<TaskErrorDto>{
+    fun processTaskToErrors(seed: String, businessPartner: BusinessPartnerV7Dto): List<TaskErrorV7Dto>{
         WireMock.reset()
 
         orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)

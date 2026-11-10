@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecor
 import org.eclipse.tractusx.bpdm.orchestrator.service.RelationsResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.RelationsGoldenRecordTaskCreateParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsResponse
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -50,17 +50,17 @@ class RelationsGoldenRecordTaskCreateApplicationV7Service(
 ) {
 
     @Transactional
-    fun createTasks(createRequest: TaskCreateRelationsRequest): TaskCreateRelationsResponse {
+    fun createTasks(createRequest: TaskCreateRelationsV7Request): TaskCreateRelationsV7Response {
         val requests = createRequest.requests.map { inboundMapper.toRequest(it) }
         val createdTasks = createTasksInternal(createRequest.mode, requests)
 
         return createdTasks
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateRelationsResponse(createdTasks = it) }
+            .let { TaskCreateRelationsV7Response(createdTasks = it) }
     }
 
     private fun createTasksInternal(
-        mode: TaskMode,
+        mode: TaskModeV7,
         requests: List<RelationsGoldenRecordTaskCreateRequest>
     ): List<RelationsGoldenRecordTaskDb> =
         parseAndExecuteAllOrNone(

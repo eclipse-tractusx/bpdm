@@ -29,7 +29,13 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -43,7 +49,7 @@ class GoldenRecordTaskStateMachine(
 
     private val logger = KotlinLogging.logger { }
 
-    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartnerRequest, record: SharingMemberRecordDb): GoldenRecordTaskDb {
+    fun initTask(mode: TaskModeV7, initBusinessPartner: BusinessPartnerRequest, record: SharingMemberRecordDb): GoldenRecordTaskDb {
         logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner data: $initBusinessPartner" }
 
         val initialStep = getInitialStep(mode)
@@ -91,8 +97,8 @@ class GoldenRecordTaskStateMachine(
      */
     fun resolveTaskStepToSuccess(
         task: GoldenRecordTaskDb,
-        step: TaskStep,
-        resultBusinessPartner: BusinessPartner
+        step: TaskStepV7,
+        resultBusinessPartner: BusinessPartnerV7Dto
     ): GoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
@@ -127,7 +133,7 @@ class GoldenRecordTaskStateMachine(
      * Resolves the given step of the task as failed and answers with null where the step was already resolved and the
      * errors are therefore ignored.
      */
-    fun doResolveTaskToError(task: GoldenRecordTaskDb, step: TaskStep, errors: List<TaskErrorDto>): GoldenRecordTaskDb? {
+    fun doResolveTaskToError(task: GoldenRecordTaskDb, step: TaskStepV7, errors: List<TaskErrorV7Dto>): GoldenRecordTaskDb? {
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
@@ -154,7 +160,7 @@ class GoldenRecordTaskStateMachine(
             throw BpdmIllegalStateException(task.uuid, state)
         }
 
-        val errors = listOf(TaskErrorDb(TaskErrorType.Timeout, "Timeout reached"))
+        val errors = listOf(TaskErrorDb(TaskErrorTypeV7.Timeout, "Timeout reached"))
         task.processingState.toError(errors)
         task.updatedAt = DbTimestamp(Instant.now())
 
@@ -171,7 +177,7 @@ class GoldenRecordTaskStateMachine(
         return taskRepository.save(task)
     }
 
-    private fun GoldenRecordTaskDb.ProcessingState.toStep(nextStep: TaskStep) {
+    private fun GoldenRecordTaskDb.ProcessingState.toStep(nextStep: TaskStepV7) {
         step = nextStep
         stepState = GoldenRecordTaskDb.StepState.Queued
     }
@@ -199,28 +205,28 @@ class GoldenRecordTaskStateMachine(
         retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
     }
 
-    private fun getInitialStep(mode: TaskMode): TaskStep {
+    private fun getInitialStep(mode: TaskModeV7): TaskStepV7 {
         return stateMachineConfigProperties.modeSteps[mode]!!.first()
     }
 
-    private fun getNextStep(mode: TaskMode, currentStep: TaskStep): TaskStep? {
+    private fun getNextStep(mode: TaskModeV7, currentStep: TaskStepV7): TaskStepV7? {
         return stateMachineConfigProperties.modeSteps[mode]!!
             .dropWhile { it != currentStep }        // drop steps before currentStep
             .drop(1)                             // then drop currentStep
             .firstOrNull()                          // return next step
     }
 
-    private fun hasAlreadyResolvedStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+    private fun hasAlreadyResolvedStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStepV7): Boolean{
         if(state.step == step) return state.stepState != GoldenRecordTaskDb.StepState.Reserved && state.stepState != GoldenRecordTaskDb.StepState.Queued
         return isStepBefore(step, state.step, state.mode)
     }
 
-    private fun isStepBefore(stepBefore: TaskStep, stepAfter: TaskStep, mode: TaskMode): Boolean{
+    private fun isStepBefore(stepBefore: TaskStepV7, stepAfter: TaskStepV7, mode: TaskModeV7): Boolean{
         val modeSteps = stateMachineConfigProperties.modeSteps[mode]!!
         return modeSteps.contains(stepBefore) && modeSteps.indexOf(stepBefore) <= modeSteps.indexOf(stepAfter)
     }
 
-    private fun isResolvableForStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+    private fun isResolvableForStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStepV7): Boolean{
         return state.resultState == GoldenRecordTaskDb.ResultState.Pending
                 && state.stepState == GoldenRecordTaskDb.StepState.Reserved
                 && state.step == step

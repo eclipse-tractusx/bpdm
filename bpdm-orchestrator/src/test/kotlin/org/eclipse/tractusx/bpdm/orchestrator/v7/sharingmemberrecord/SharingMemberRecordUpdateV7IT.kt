@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.sharingmemberrecord
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
@@ -40,10 +40,10 @@ class SharingMemberRecordUpdateV7IT: UnscheduledOrchestratorTestBaseV7() {
         val sharingMemberRecordId = testDataClient.createBusinessPartnerTask(testName).recordId
 
         //WHEN
-        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(sharingMemberRecordId, true))
+        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(sharingMemberRecordId, true))
 
         //THEN
-        val expectedSharingMemberRecord = SharingMemberRecord(sharingMemberRecordId, true, Instant.now(), Instant.now())
+        val expectedSharingMemberRecord = SharingMemberRecordV7Dto(sharingMemberRecordId, true, Instant.now(), Instant.now())
 
         assertRepo.assertSharingMemberRecordEqual(updatedSharingMemberRecord, expectedSharingMemberRecord)
     }
@@ -59,10 +59,10 @@ class SharingMemberRecordUpdateV7IT: UnscheduledOrchestratorTestBaseV7() {
         val sharingMemberRecordId = testDataClient.createBusinessPartnerTask(testName).recordId
 
         //WHEN
-        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(sharingMemberRecordId, false))
+        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(sharingMemberRecordId, false))
 
         //THEN
-        val expectedSharingMemberRecord = SharingMemberRecord(sharingMemberRecordId, false, Instant.now(), Instant.now())
+        val expectedSharingMemberRecord = SharingMemberRecordV7Dto(sharingMemberRecordId, false, Instant.now(), Instant.now())
 
         assertRepo.assertSharingMemberRecordEqual(updatedSharingMemberRecord, expectedSharingMemberRecord)
     }
@@ -76,13 +76,13 @@ class SharingMemberRecordUpdateV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `set sharing member record from is golden record counted to not counted`(){
         //GIVEN
         val sharingMemberRecordId = testDataClient.createBusinessPartnerTask(testName).recordId
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(sharingMemberRecordId, true))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(sharingMemberRecordId, true))
 
         //WHEN
-        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(sharingMemberRecordId, false))
+        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(sharingMemberRecordId, false))
 
         //THEN
-        val expectedSharingMemberRecord = SharingMemberRecord(sharingMemberRecordId, false, Instant.now(), Instant.now())
+        val expectedSharingMemberRecord = SharingMemberRecordV7Dto(sharingMemberRecordId, false, Instant.now(), Instant.now())
 
         assertRepo.assertSharingMemberRecordEqual(updatedSharingMemberRecord, expectedSharingMemberRecord)
     }
@@ -96,13 +96,13 @@ class SharingMemberRecordUpdateV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `set sharing member record from not golden record counted to is counted`(){
         //GIVEN
         val sharingMemberRecordId = testDataClient.createBusinessPartnerTask(testName).recordId
-        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(sharingMemberRecordId, false))
+        orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(sharingMemberRecordId, false))
 
         //WHEN
-        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest(sharingMemberRecordId, true))
+        val updatedSharingMemberRecord = orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request(sharingMemberRecordId, true))
 
         //THEN
-        val expectedSharingMemberRecord = SharingMemberRecord(sharingMemberRecordId, true, Instant.now(), Instant.now())
+        val expectedSharingMemberRecord = SharingMemberRecordV7Dto(sharingMemberRecordId, true, Instant.now(), Instant.now())
 
         assertRepo.assertSharingMemberRecordEqual(updatedSharingMemberRecord, expectedSharingMemberRecord)
     }
@@ -117,7 +117,7 @@ class SharingMemberRecordUpdateV7IT: UnscheduledOrchestratorTestBaseV7() {
         testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
-        val updateRequest: () -> Unit =  { orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateRequest("NOT EXISTING", true)) }
+        val updateRequest: () -> Unit =  { orchestratorClient.sharingMemberRecords.update(SharingMemberRecordUpdateV7Request("NOT EXISTING", true)) }
 
         //THEN
         Assertions.assertThatThrownBy(updateRequest).isInstanceOf(WebClientResponseException.BadRequest::class.java)

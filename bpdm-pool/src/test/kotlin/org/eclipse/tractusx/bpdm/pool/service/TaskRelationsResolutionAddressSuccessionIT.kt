@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.v7.client.PoolV7Client
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressRelationTypeV7
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.pool.service.application.GoldenRecordRelationTaskResolutionApplicationService
@@ -35,10 +35,10 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactor
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -140,9 +140,9 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
     }
 
     private fun resolveSuccession(predecessorBpna: String, successorBpna: String) {
-        val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
-        val succession = BusinessPartnerRelations(RelationType.IsReplacedBy, predecessorBpna, successorBpna, activeNow, anyReasonCode())
-        val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", succession)
+        val activeNow = listOf(RelationValidityPeriodV7Dto(LocalDate.now(), null))
+        val succession = BusinessPartnerRelationsV7Dto(RelationTypeV7.IsReplacedBy, predecessorBpna, successorBpna, activeNow, anyReasonCode())
+        val taskToResolve = TaskRelationsStepReservationEntryV7Dto("Any", "Any", succession)
 
         val results = resolveRelationTasks(listOf(taskToResolve))
 
@@ -158,7 +158,7 @@ class TaskRelationsResolutionAddressSuccessionIT @Autowired constructor(
         return poolApiClient.metadata.getReasonCodes(PaginationRequest()).content.first().technicalKey
     }
 
-    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryV7Dto>): List<TaskRelationsStepResultEntryV7Dto> {
         orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults()

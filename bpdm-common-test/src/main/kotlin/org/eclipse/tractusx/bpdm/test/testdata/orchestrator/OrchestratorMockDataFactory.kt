@@ -26,11 +26,41 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
-import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
-import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
-import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
 import java.time.Instant
@@ -47,8 +77,8 @@ class OrchestratorMockDataFactory(
 
     fun mockRefineToSuccess(
         seed: String,
-        businessPartnerData: BusinessPartner
-    ): TaskClientStateDto{
+        businessPartnerData: BusinessPartnerV7Dto
+    ): TaskClientStateV7Dto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
@@ -62,8 +92,8 @@ class OrchestratorMockDataFactory(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>,
-        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
-    ): TaskClientStateDto{
+        scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()
+    ): TaskClientStateV7Dto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
@@ -80,8 +110,8 @@ class OrchestratorMockDataFactory(
         siteGoldenRecord: SiteVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>,
-        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
-    ): TaskClientStateDto{
+        scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()
+    ): TaskClientStateV7Dto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
@@ -104,8 +134,8 @@ class OrchestratorMockDataFactory(
         siteGoldenRecord: SiteWithMainAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>,
-        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
-    ): TaskClientStateDto{
+        scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()
+    ): TaskClientStateV7Dto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
@@ -123,8 +153,8 @@ class OrchestratorMockDataFactory(
         addressGoldenRecord: LogisticAddressVerboseV7Dto,
         owningCompany: String?,
         nameParts: List<String>,
-        scriptVariants: List<UncategorizedScriptVariant> = emptyList()
-    ): TaskClientStateDto{
+        scriptVariants: List<UncategorizedScriptVariantV7Dto> = emptyList()
+    ): TaskClientStateV7Dto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
@@ -135,20 +165,20 @@ class OrchestratorMockDataFactory(
         return mockedRefinedTask
     }
 
-    fun mockRefineRelation(seed: String): TaskClientRelationsStateDto{
+    fun mockRefineRelation(seed: String): TaskClientRelationsStateV7Dto{
         configureWireMock()
 
         val mockedCreatedTask = mockCreateRelationTask(seed)
 
         val inputRelation = requestFactory.buildRelation(seed)
-        val refinementTaskData = resultFactory.buildCreatedRelationTaskClientState(inputRelation, TaskMode.UpdateFromSharingMember)
+        val refinementTaskData = resultFactory.buildCreatedRelationTaskClientState(inputRelation, TaskModeV7.UpdateFromSharingMember)
 
         val mockedRefinedTask = mockRelationTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData.businessPartnerRelationsResult, seed)
 
         return mockedRefinedTask
     }
 
-    fun mockCreateTask(seed: String): TaskClientStateDto{
+    fun mockCreateTask(seed: String): TaskClientStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTaskResponse = buildInitialTaskCreationResponse(seed)
@@ -167,13 +197,13 @@ class OrchestratorMockDataFactory(
         WireMock.resetAllRequests()
     }
 
-    fun getCreatedTaskBusinessPartners(): List<BusinessPartner>{
+    fun getCreatedTaskBusinessPartners(): List<BusinessPartnerV7Dto>{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val loggedRequests = WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_BUSINESS_PARTNERS)))
 
         return loggedRequests
-            .map { jsonMapper.readValue(it.body, TaskCreateRequest::class.java) }
+            .map { jsonMapper.readValue(it.body, TaskCreateV7Request::class.java) }
             .flatMap { createRequest -> createRequest.requests.map { it.businessPartner } }
     }
 
@@ -183,11 +213,11 @@ class OrchestratorMockDataFactory(
         WireMock.stubFor(
             WireMock
                 .put(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS))
-                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(SharingMemberRecord("", null, Instant.now(), Instant.now()))))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(SharingMemberRecordV7Dto("", null, Instant.now(), Instant.now()))))
         )
     }
 
-    fun mockSharingMemberRecords(records: List<SharingMemberRecord>){
+    fun mockSharingMemberRecords(records: List<SharingMemberRecordV7Dto>){
         configureWireMock()
 
         WireMock.stubFor(
@@ -204,20 +234,20 @@ class OrchestratorMockDataFactory(
             .map { Instant.parse(it.queryParameter("timestampAfter").firstValue()) }
     }
 
-    fun getSharingMemberRecordUpdates(): List<SharingMemberRecordUpdateRequest>{
+    fun getSharingMemberRecordUpdates(): List<SharingMemberRecordUpdateV7Request>{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         return WireMock.findAll(WireMock.putRequestedFor(WireMock.urlPathEqualTo(BASE_PATH_V7_SHARING_MEMBER_RECORDS)))
-            .map { jsonMapper.readValue(it.body, SharingMemberRecordUpdateRequest::class.java) }
+            .map { jsonMapper.readValue(it.body, SharingMemberRecordUpdateV7Request::class.java) }
     }
 
-    fun mockTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{
+    fun mockTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartnerV7Dto, seed: String): TaskClientStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
             jsonMapper.writeValueAsString(
-                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, taskId)
+                FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Success, taskId)
                 ))
             )
         )))
@@ -230,13 +260,13 @@ class OrchestratorMockDataFactory(
         return mockedRefinedTasks.tasks.single()
     }
 
-    fun mockRelationTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartnerRelations, seed: String): TaskClientRelationsStateDto{
+    fun mockRelationTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartnerRelationsV7Dto, seed: String): TaskClientRelationsStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/finished-events")).willReturn(WireMock.okJson(
             jsonMapper.writeValueAsString(
-                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, taskId)
+                FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Success, taskId)
                 ))
             )
         )))
@@ -249,15 +279,15 @@ class OrchestratorMockDataFactory(
         return mockedRefinedTasks.tasks.single()
     }
 
-    fun mockSharingError(seed: String, errorType: TaskErrorType): TaskClientStateDto{
+    fun mockSharingError(seed: String, errorType: TaskErrorTypeV7): TaskClientStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTask = mockCreateTask(seed)
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
             jsonMapper.writeValueAsString(
-                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, mockedCreatedTask.taskId)
+                FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Error, mockedCreatedTask.taskId)
                 ))
             )
         )))
@@ -270,21 +300,21 @@ class OrchestratorMockDataFactory(
         return mockedErrorTasks.tasks.single()
     }
 
-    fun mockMissingTask(seed: String): TaskClientStateDto{
+    fun mockMissingTask(seed: String): TaskClientStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTask = mockCreateTask(seed)
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
             jsonMapper.writeValueAsString(
-                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, mockedCreatedTask.taskId)
+                FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Success, mockedCreatedTask.taskId)
                 ))
             )
         )))
 
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
-            jsonMapper.writeValueAsString(TaskStateResponse(emptyList()))
+            jsonMapper.writeValueAsString(TaskStateV7Response(emptyList()))
         )))
 
         return mockedCreatedTask
@@ -295,26 +325,26 @@ class OrchestratorMockDataFactory(
     }
 
     fun mockTasksPending(){
-        mockTaskResultStates(ResultState.Pending)
+        mockTaskResultStates(ResultStateV7.Pending)
     }
 
-    private fun mockTaskResultStates(resultState: ResultState?){
+    private fun mockTaskResultStates(resultState: ResultStateV7?){
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search")).willReturn(WireMock.okJson(
-            jsonMapper.writeValueAsString(TaskResultStateSearchResponse(listOf(resultState)))
+            jsonMapper.writeValueAsString(TaskResultStateSearchV7Response(listOf(resultState)))
         )))
     }
 
-    fun mockRelationSharingError(seed: String, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto{
+    fun mockRelationSharingError(seed: String, errorType: TaskRelationsErrorTypeV7): TaskClientRelationsStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTask = mockCreateRelationTask(seed)
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/finished-events")).willReturn(WireMock.okJson(
             jsonMapper.writeValueAsString(
-                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, mockedCreatedTask.taskId)
+                FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Error, mockedCreatedTask.taskId)
                 ))
             )
         )))
@@ -327,7 +357,7 @@ class OrchestratorMockDataFactory(
         return mockedErrorTasks.tasks.single()
     }
 
-    fun mockCreateRelationTask(seed: String): TaskClientRelationsStateDto{
+    fun mockCreateRelationTask(seed: String): TaskClientRelationsStateV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTaskResponse = buildInitialRelationTaskResponse(seed)
@@ -341,26 +371,26 @@ class OrchestratorMockDataFactory(
         return mockedCreatedTask
     }
 
-    fun mockReservedBusinessPartner(seed: String, businessPartner: BusinessPartner): TaskStepReservationEntryDto{
+    fun mockReservedBusinessPartner(seed: String, businessPartner: BusinessPartnerV7Dto): TaskStepReservationEntryV7Dto{
         return mockReservedTasks(buildReservedTasks(seed, businessPartner).reservedTasks).single()
     }
 
-    fun mockReservedTasks(reservedTasks: List<TaskStepReservationEntryDto>): List<TaskStepReservationEntryDto>{
+    fun mockReservedTasks(reservedTasks: List<TaskStepReservationEntryV7Dto>): List<TaskStepReservationEntryV7Dto>{
         configureWireMock()
 
-        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationResponse(reservedTasks, reservationTimeout()), TaskStepReservationResponse(emptyList(), reservationTimeout()))
+        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationV7Response(reservedTasks, reservationTimeout()), TaskStepReservationV7Response(emptyList(), reservationTimeout()))
         mockStepResultsResponse(200)
-        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()), TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()))
+        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationV7Response(emptyList(), reservationTimeout()), TaskRelationsStepReservationV7Response(emptyList(), reservationTimeout()))
 
         return reservedTasks
     }
 
-    fun mockReservedRelationTasks(reservedTasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepReservationEntryDto>{
+    fun mockReservedRelationTasks(reservedTasks: List<TaskRelationsStepReservationEntryV7Dto>): List<TaskRelationsStepReservationEntryV7Dto>{
         configureWireMock()
 
-        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationResponse(reservedTasks, reservationTimeout()), TaskRelationsStepReservationResponse(emptyList(), reservationTimeout()))
+        mockStepReservations(BASE_PATH_V7_RELATIONS, TaskRelationsStepReservationV7Response(reservedTasks, reservationTimeout()), TaskRelationsStepReservationV7Response(emptyList(), reservationTimeout()))
         mockRelationStepResultsResponse(200)
-        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationResponse(emptyList(), reservationTimeout()), TaskStepReservationResponse(emptyList(), reservationTimeout()))
+        mockStepReservations(BASE_PATH_V7_BUSINESS_PARTNERS, TaskStepReservationV7Response(emptyList(), reservationTimeout()), TaskStepReservationV7Response(emptyList(), reservationTimeout()))
 
         return reservedTasks
     }
@@ -406,48 +436,48 @@ class OrchestratorMockDataFactory(
             .willReturn(WireMock.status(status)))
     }
 
-    fun getRelationStepResults(): List<TaskRelationsStepResultEntryDto>{
+    fun getRelationStepResults(): List<TaskRelationsStepResultEntryV7Dto>{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         return WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/step-results")))
-            .flatMap { jsonMapper.readValue(it.body, TaskRelationsStepResultRequest::class.java).results }
+            .flatMap { jsonMapper.readValue(it.body, TaskRelationsStepResultV7Request::class.java).results }
     }
 
-    fun getStepResults(): List<TaskStepResultEntryDto>{
+    fun getStepResults(): List<TaskStepResultEntryV7Dto>{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         return WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")))
-            .flatMap { jsonMapper.readValue(it.body, TaskStepResultRequest::class.java).results }
+            .flatMap { jsonMapper.readValue(it.body, TaskStepResultV7Request::class.java).results }
     }
 
-    fun getBusinessPartnerResolution(): BusinessPartner{
+    fun getBusinessPartnerResolution(): BusinessPartnerV7Dto{
         return getBusinessPartnerResolutionEntry().businessPartner
     }
 
-    fun getBusinessPartnerResolutionErrors(): List<TaskErrorDto>{
+    fun getBusinessPartnerResolutionErrors(): List<TaskErrorV7Dto>{
         return getBusinessPartnerResolutionEntry().errors
     }
 
-    private fun getBusinessPartnerResolutionEntry(): TaskStepResultEntryDto{
+    private fun getBusinessPartnerResolutionEntry(): TaskStepResultEntryV7Dto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val loggedRequests = WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")))
-        val postedResult =  jsonMapper.readValue(loggedRequests.first().body, TaskStepResultRequest::class.java)
+        val postedResult =  jsonMapper.readValue(loggedRequests.first().body, TaskStepResultV7Request::class.java)
 
         return postedResult.results.first()
     }
 
-    fun buildInitialTaskCreationResponse(seed: String): TaskCreateResponse{
-        return TaskCreateResponse(
+    fun buildInitialTaskCreationResponse(seed: String): TaskCreateV7Response{
+        return TaskCreateV7Response(
             listOf(
-                TaskClientStateDto(
+                TaskClientStateV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
-                    BusinessPartner.empty,
-                    TaskProcessingStateDto(
-                        ResultState.Pending,
-                        TaskStep.CleanAndSync,
-                        StepState.Queued,
+                    BusinessPartnerV7Dto.empty,
+                    TaskProcessingStateV7Dto(
+                        ResultStateV7.Pending,
+                        TaskStepV7.CleanAndSync,
+                        StepStateV7.Queued,
                         emptyList(),
                         Instant.now(),
                         Instant.now(),
@@ -458,17 +488,17 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    fun buildInitialRelationTaskResponse(seed: String): TaskCreateRelationsResponse{
-        return TaskCreateRelationsResponse(
+    fun buildInitialRelationTaskResponse(seed: String): TaskCreateRelationsV7Response{
+        return TaskCreateRelationsV7Response(
             listOf(
-                TaskClientRelationsStateDto(
+                TaskClientRelationsStateV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
-                    BusinessPartnerRelations.empty,
-                    TaskProcessingRelationsStateDto(
-                        ResultState.Pending,
-                        TaskStep.CleanAndSync,
-                        StepState.Queued,
+                    BusinessPartnerRelationsV7Dto.empty,
+                    TaskProcessingRelationsStateV7Dto(
+                        ResultStateV7.Pending,
+                        TaskStepV7.CleanAndSync,
+                        StepStateV7.Queued,
                         emptyList(),
                         Instant.now(),
                         Instant.now(),
@@ -479,17 +509,17 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    fun buildSuccessTaskState(seed: String, finishedBusinessPartner: BusinessPartner): TaskStateResponse{
-        return TaskStateResponse(
+    fun buildSuccessTaskState(seed: String, finishedBusinessPartner: BusinessPartnerV7Dto): TaskStateV7Response{
+        return TaskStateV7Response(
             listOf(
-                TaskClientStateDto(
+                TaskClientStateV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
                     finishedBusinessPartner,
-                    TaskProcessingStateDto(
-                        ResultState.Success,
-                        TaskStep.PoolSync,
-                        StepState.Success,
+                    TaskProcessingStateV7Dto(
+                        ResultStateV7.Success,
+                        TaskStepV7.PoolSync,
+                        StepStateV7.Success,
                         emptyList(),
                         Instant.now(),
                         Instant.now(),
@@ -500,17 +530,17 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    fun buildSuccessRelationTaskState(seed: String, finishedRelation: BusinessPartnerRelations): TaskRelationsStateResponse {
-        return TaskRelationsStateResponse(
+    fun buildSuccessRelationTaskState(seed: String, finishedRelation: BusinessPartnerRelationsV7Dto): TaskRelationsStateV7Response {
+        return TaskRelationsStateV7Response(
             listOf(
-                TaskClientRelationsStateDto(
+                TaskClientRelationsStateV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
                     finishedRelation,
-                    TaskProcessingRelationsStateDto(
-                        ResultState.Success,
-                        TaskStep.PoolSync,
-                        StepState.Success,
+                    TaskProcessingRelationsStateV7Dto(
+                        ResultStateV7.Success,
+                        TaskStepV7.PoolSync,
+                        StepStateV7.Success,
                         emptyList(),
                         Instant.now(),
                         Instant.now(),
@@ -521,18 +551,18 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    private fun buildErrorTaskState(seed: String, errorType: TaskErrorType): TaskStateResponse{
-        return TaskStateResponse(
+    private fun buildErrorTaskState(seed: String, errorType: TaskErrorTypeV7): TaskStateV7Response{
+        return TaskStateV7Response(
             listOf(
-                TaskClientStateDto(
+                TaskClientStateV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
-                    BusinessPartner.empty,
-                    TaskProcessingStateDto(
-                        ResultState.Error,
-                        TaskStep.PoolSync,
-                        StepState.Error,
-                        listOf(TaskErrorDto(errorType, "$seed Description")),
+                    BusinessPartnerV7Dto.empty,
+                    TaskProcessingStateV7Dto(
+                        ResultStateV7.Error,
+                        TaskStepV7.PoolSync,
+                        StepStateV7.Error,
+                        listOf(TaskErrorV7Dto(errorType, "$seed Description")),
                         Instant.now(),
                         Instant.now(),
                         Instant.now()
@@ -542,18 +572,18 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    private fun buildErrorRelationTaskState(seed: String, errorType: TaskRelationsErrorType): TaskRelationsStateResponse{
-        return TaskRelationsStateResponse(
+    private fun buildErrorRelationTaskState(seed: String, errorType: TaskRelationsErrorTypeV7): TaskRelationsStateV7Response{
+        return TaskRelationsStateV7Response(
             listOf(
-                TaskClientRelationsStateDto(
+                TaskClientRelationsStateV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
-                    BusinessPartnerRelations.empty,
-                    TaskProcessingRelationsStateDto(
-                        ResultState.Error,
-                        TaskStep.PoolSync,
-                        StepState.Error,
-                        listOf(TaskRelationsErrorDto(errorType, "$seed Description")),
+                    BusinessPartnerRelationsV7Dto.empty,
+                    TaskProcessingRelationsStateV7Dto(
+                        ResultStateV7.Error,
+                        TaskStepV7.PoolSync,
+                        StepStateV7.Error,
+                        listOf(TaskRelationsErrorV7Dto(errorType, "$seed Description")),
                         Instant.now(),
                         Instant.now(),
                         Instant.now()
@@ -563,10 +593,10 @@ class OrchestratorMockDataFactory(
         )
     }
 
-    private fun buildReservedTasks(seed: String, businessPartner: BusinessPartner): TaskStepReservationResponse{
-        return TaskStepReservationResponse(
+    private fun buildReservedTasks(seed: String, businessPartner: BusinessPartnerV7Dto): TaskStepReservationV7Response{
+        return TaskStepReservationV7Response(
             listOf(
-                TaskStepReservationEntryDto(
+                TaskStepReservationEntryV7Dto(
                     UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
                     businessPartner

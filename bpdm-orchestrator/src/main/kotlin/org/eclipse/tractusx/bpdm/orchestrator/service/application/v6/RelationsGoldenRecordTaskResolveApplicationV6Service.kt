@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.RelationsGoldenRecord
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskResolveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskResolveOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.RelationsGoldenRecordTaskResolveParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,7 +41,7 @@ class RelationsGoldenRecordTaskResolveApplicationV6Service(
 ) {
 
     @Transactional
-    fun resolveStepResults(resultRequest: TaskRelationsStepResultRequest) {
+    fun resolveStepResults(resultRequest: TaskRelationsStepResultV7Request) {
         val resolveRequest = RelationsGoldenRecordTaskResolveRequest(
             step = resultRequest.step,
             results = resultRequest.results

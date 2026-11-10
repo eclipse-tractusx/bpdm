@@ -29,9 +29,18 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
-import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -80,7 +89,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
     val fixedTaskId = "1"
     val businessPartnerFactory = BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon(countries = listOf("DE")))
-    val defaultBpnRequest = BpnReference("IGNORED", null, BpnReferenceType.BpnRequestIdentifier)
+    val defaultBpnRequest = BpnReferenceV7Dto("IGNORED", null, BpnReferenceTypeV7.BpnRequestIdentifier)
     val expectedConfidenceCriteria = cleaningServiceDummy.dummyConfidenceCriteria.copy(sharedByOwner = true)
 
     @BeforeEach
@@ -91,17 +100,17 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
                 .inScenario(RESERVATION_SCENARIO)
                 .whenScenarioStateIs(RESERVED_STATE)
-                .willReturn(okJson(jsonMapper.writeValueAsString(TaskStepReservationResponse(emptyList(), Instant.now()))))
+                .willReturn(okJson(jsonMapper.writeValueAsString(TaskStepReservationV7Response(emptyList(), Instant.now()))))
         )
     }
 
     @Test
-    fun `Additional Address with Site without BPNs`() {
+    fun `Additional Address with SiteV7Dto without BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithBpnReferences(BpnReference.empty)
-            .copyWithLegalAddress(PostalAddress.empty)
-            .copyWithSiteMainAddress(PostalAddress.empty)
+            .copyWithBpnReferences(BpnReferenceV7Dto.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
+            .copyWithSiteMainAddress(PostalAddressV7Dto.empty)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
                     identifiers = emptyList() // Assign empty list to uncategorized identifiers
@@ -130,11 +139,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Additional Address with Site with BPNs`() {
+    fun `Additional Address with SiteV7Dto with BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithLegalAddress(PostalAddress.empty)
-            .copyWithSiteMainAddress(PostalAddress.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
+            .copyWithSiteMainAddress(PostalAddressV7Dto.empty)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
                     identifiers = emptyList() // Assign empty list to uncategorized identifiers
@@ -162,11 +171,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Additional Address without Site without BPNs`() {
+    fun `Additional Address without SiteV7Dto without BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithBpnReferences(BpnReference.empty)
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithBpnReferences(BpnReferenceV7Dto.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(site = null)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -195,10 +204,10 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Additional Address without Site with BPNs`() {
+    fun `Additional Address without SiteV7Dto with BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(site = null)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -226,11 +235,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Site with Own Main Address and without BPNs`() {
+    fun `SiteV7Dto with Own Main Address and without BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithBpnReferences(BpnReference.empty)
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithBpnReferences(BpnReferenceV7Dto.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(additionalAddress = null)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -259,10 +268,10 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Site With Own Main Address and BPNs`() {
+    fun `SiteV7Dto With Own Main Address and BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(additionalAddress = null)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -290,10 +299,10 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Site With Legal Address As Main Address And Without BPNs`() {
+    fun `SiteV7Dto With Legal Address As Main Address And Without BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithBpnReferences(BpnReferenceV7Dto.empty)
             .copyWithSiteMainAddress(null)
             .copy(additionalAddress = null)
             .copy(
@@ -322,7 +331,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     @Test
-    fun `Site With Legal Address As Main Address And With BPNs`() {
+    fun `SiteV7Dto With Legal Address As Main Address And With BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
             .copyWithSiteMainAddress(null)
@@ -355,11 +364,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     fun `Additional Sites With BPNs`() {
         //Mock Orchestrator responses
         val additionalSites = listOf(
-            AdditionalSite(BpnReference("BPNS0000000001XY", null, BpnReferenceType.Bpn), "Additional Site 1 test"),
-            AdditionalSite(BpnReference("BPNS0000000002XY", null, BpnReferenceType.Bpn), "Additional Site 2 test")
+            AdditionalSiteV7Dto(BpnReferenceV7Dto("BPNS0000000001XY", null, BpnReferenceTypeV7.Bpn), "Additional Site 1 test"),
+            AdditionalSiteV7Dto(BpnReferenceV7Dto("BPNS0000000002XY", null, BpnReferenceTypeV7.Bpn), "Additional Site 2 test")
         )
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(
                 additionalSites = additionalSites,
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -390,11 +399,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     fun `Additional Sites Without BPNs`() {
         //Mock Orchestrator responses
         val additionalSites = listOf(
-            AdditionalSite(BpnReference.empty, "Additional Site 1 test"),
-            AdditionalSite(BpnReference.empty, "Additional Site 2 test")
+            AdditionalSiteV7Dto(BpnReferenceV7Dto.empty, "Additional Site 1 test"),
+            AdditionalSiteV7Dto(BpnReferenceV7Dto.empty, "Additional Site 2 test")
         )
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithBpnReferences(BpnReferenceV7Dto.empty)
             .copy(additionalSites = additionalSites)
 
         val resolveMapping = mockOrchestratorResolveApi()
@@ -406,7 +415,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
         //Every additional site is requested as its own site, distinct from the site the record itself is about
         val additionalSiteReferences = cleanedBusinessPartner.additionalSites.map { it.bpnReference }
-        assertThat(additionalSiteReferences).allMatch { it.referenceType == BpnReferenceType.BpnRequestIdentifier }
+        assertThat(additionalSiteReferences).allMatch { it.referenceType == BpnReferenceTypeV7.BpnRequestIdentifier }
         assertThat(additionalSiteReferences.map { it.referenceValue }.distinct()).hasSameSizeAs(additionalSites)
         assertThat(additionalSiteReferences).doesNotContain(cleanedBusinessPartner.site!!.bpnReference)
     }
@@ -415,8 +424,8 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     fun `Legal Entity without BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithBpnReferences(BpnReference.empty)
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithBpnReferences(BpnReferenceV7Dto.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(site = null, additionalAddress = null)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -448,7 +457,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     fun `Legal Entity with BPNs`() {
         //Mock Orchestrator responses
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
-            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithLegalAddress(PostalAddressV7Dto.empty)
             .copy(site = null, additionalAddress = null)
             .copy(
                 uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
@@ -477,7 +486,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
 
 
-    fun mockOrchestratorReserveApi(businessPartner: BusinessPartner): StubMapping {
+    fun mockOrchestratorReserveApi(businessPartner: BusinessPartnerV7Dto): StubMapping {
         // Orchestrator reserve
         return orchestratorMockApi.stubFor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
@@ -498,32 +507,32 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         )
     }
 
-    // Helper method to create a sample TaskStepReservationResponse
-    private fun createSampleTaskStepReservationResponse(businessPartner: BusinessPartner): TaskStepReservationResponse {
-        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, UUID.randomUUID().toString(), businessPartner)), Instant.MIN)
+    // Helper method to create a sample TaskStepReservationV7Response
+    private fun createSampleTaskStepReservationResponse(businessPartner: BusinessPartnerV7Dto): TaskStepReservationV7Response {
+        return TaskStepReservationV7Response(listOf(TaskStepReservationEntryV7Dto(fixedTaskId, UUID.randomUUID().toString(), businessPartner)), Instant.MIN)
     }
 
 
-    private fun getResolveResult(stubMapping: StubMapping): TaskStepResultRequest{
+    private fun getResolveResult(stubMapping: StubMapping): TaskStepResultV7Request{
         val serveEvents = orchestratorMockApi.getServeEvents(ServeEventQuery.forStubMapping(stubMapping)).requests
         assertEquals(serveEvents.size, 1)
         val actualRequest = serveEvents.first()!!.request
-        return jsonMapper.readValue<TaskStepResultRequest>(actualRequest.body)
+        return jsonMapper.readValue<TaskStepResultV7Request>(actualRequest.body)
     }
 
-    private fun assertIsEqualIgnoreReferenceValue(actual: TaskStepResultRequest, expected: TaskStepResultRequest){
+    private fun assertIsEqualIgnoreReferenceValue(actual: TaskStepResultV7Request, expected: TaskStepResultV7Request){
         assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFieldsMatchingRegexes(
-                ".*.${BpnReference::referenceValue.name}"
+                ".*.${BpnReferenceV7Dto::referenceValue.name}"
             )
             .isEqualTo(expected)
     }
 
-    private fun createResultRequest(expectedBusinessPartner: BusinessPartner): TaskStepResultRequest {
-        return TaskStepResultRequest(
+    private fun createResultRequest(expectedBusinessPartner: BusinessPartnerV7Dto): TaskStepResultV7Request {
+        return TaskStepResultV7Request(
             cleaningServiceConfigProperties.step, listOf(
-                TaskStepResultEntryDto(
+                TaskStepResultEntryV7Dto(
                     fixedTaskId,
                     expectedBusinessPartner,
                     emptyList()

@@ -8,7 +8,7 @@
  * terms of the Apache License, Version 2.0 which is available at
  * https://www.apache.org/licenses/LICENSE-2.0.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  */
 
 package org.eclipse.tractusx.bpdm.gate.mapper.orchestrator
@@ -31,30 +31,30 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPag
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskOutputRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResultRaw
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType as OrchestratorAddressRelationType
-import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.model.BusinessState
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
-import org.eclipse.tractusx.orchestrator.api.model.GeoCoordinate as OrchestratorGeoCoordinate
-import org.eclipse.tractusx.orchestrator.api.model.GoldenRecordType
-import org.eclipse.tractusx.orchestrator.api.model.Identifier
-import org.eclipse.tractusx.orchestrator.api.model.IsPostalAddress
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType as OrchestratorLegalEntityRelationType
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalAddress
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.ResultState
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType as OrchestratorSiteRelationType
-import org.eclipse.tractusx.orchestrator.api.model.Street as OrchestratorStreet
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientRelationsStateDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationTypeV7 as OrchestratorAddressRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinateV7Dto as OrchestratorGeoCoordinate
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GoldenRecordTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IsPostalAddressV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationTypeV7 as OrchestratorLegalEntityRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationTypeV7 as OrchestratorSiteRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto as OrchestratorStreet
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.ZoneOffset
@@ -68,14 +68,14 @@ class OrchestratorInboundMapper {
     /**
      * Maps [task] onto its result, translating the error type the task failed with first into a sharing error code.
      */
-    fun toRequest(task: TaskClientStateDto): GoldenRecordTaskResultRaw =
+    fun toRequest(task: TaskClientStateV7Dto): GoldenRecordTaskResultRaw =
         when (task.processingState.resultState) {
-            ResultState.Pending -> GoldenRecordTaskResultRaw.Pending(task.taskId)
-            ResultState.Success -> GoldenRecordTaskResultRaw.Succeeded(task.taskId, toRequest(task.businessPartnerResult), toBpns(task.businessPartnerResult))
-            ResultState.Error -> toFailed(task)
+            ResultStateV7.Pending -> GoldenRecordTaskResultRaw.Pending(task.taskId)
+            ResultStateV7.Success -> GoldenRecordTaskResultRaw.Succeeded(task.taskId, toRequest(task.businessPartnerResult), toBpns(task.businessPartnerResult))
+            ResultStateV7.Error -> toFailed(task)
         }
 
-    private fun toBpns(businessPartner: BusinessPartner): GoldenRecordBpnsRaw =
+    private fun toBpns(businessPartner: BusinessPartnerV7Dto): GoldenRecordBpnsRaw =
         with(businessPartner) {
             GoldenRecordBpnsRaw(
                 legalEntities = setOfNotNull(legalEntity.bpnReference.referenceValue),
@@ -88,7 +88,7 @@ class OrchestratorInboundMapper {
             )
         }
 
-    private fun toFailed(task: TaskClientStateDto): GoldenRecordTaskResultRaw.Failed {
+    private fun toFailed(task: TaskClientStateV7Dto): GoldenRecordTaskResultRaw.Failed {
         val errors = task.processingState.errors
         return GoldenRecordTaskResultRaw.Failed(
             taskId = task.taskId,
@@ -97,15 +97,15 @@ class OrchestratorInboundMapper {
         )
     }
 
-    private fun toErrorCode(errorType: TaskErrorType?): BusinessPartnerSharingErrorCode =
+    private fun toErrorCode(errorType: TaskErrorTypeV7?): BusinessPartnerSharingErrorCode =
         when (errorType) {
-            TaskErrorType.Timeout -> BusinessPartnerSharingErrorCode.SharingTimeout
-            TaskErrorType.NaturalPersonError -> BusinessPartnerSharingErrorCode.NaturalPersonError
-            TaskErrorType.BpnErrorNotFound -> BusinessPartnerSharingErrorCode.BpnErrorNotFound
-            TaskErrorType.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorCode.BpnErrorTooManyOptions
-            TaskErrorType.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorCode.MandatoryFieldValidationFailed
-            TaskErrorType.BlacklistCountryPresent -> BusinessPartnerSharingErrorCode.BlacklistCountryPresent
-            TaskErrorType.UnknownSpecialCharacters -> BusinessPartnerSharingErrorCode.UnknownSpecialCharacters
+            TaskErrorTypeV7.Timeout -> BusinessPartnerSharingErrorCode.SharingTimeout
+            TaskErrorTypeV7.NaturalPersonError -> BusinessPartnerSharingErrorCode.NaturalPersonError
+            TaskErrorTypeV7.BpnErrorNotFound -> BusinessPartnerSharingErrorCode.BpnErrorNotFound
+            TaskErrorTypeV7.BpnErrorTooManyOptions -> BusinessPartnerSharingErrorCode.BpnErrorTooManyOptions
+            TaskErrorTypeV7.MandatoryFieldValidationFailed -> BusinessPartnerSharingErrorCode.MandatoryFieldValidationFailed
+            TaskErrorTypeV7.BlacklistCountryPresent -> BusinessPartnerSharingErrorCode.BlacklistCountryPresent
+            TaskErrorTypeV7.UnknownSpecialCharacters -> BusinessPartnerSharingErrorCode.UnknownSpecialCharacters
             else -> BusinessPartnerSharingErrorCode.SharingProcessError
         }
 
@@ -113,7 +113,7 @@ class OrchestratorInboundMapper {
      * Maps [businessPartner] onto its output request, taking the address the golden record type points to as the
      * business partner's address and leaving every value the result lacks empty.
      */
-    fun toRequest(businessPartner: BusinessPartner): GoldenRecordTaskOutputRaw {
+    fun toRequest(businessPartner: BusinessPartnerV7Dto): GoldenRecordTaskOutputRaw {
         val addressType = toAddressType(businessPartner)
         val address = addressType?.let { addressOf(it, businessPartner) }
         val legalEntity = businessPartner.legalEntity
@@ -156,28 +156,28 @@ class OrchestratorInboundMapper {
         )
     }
 
-    private fun toAddressType(businessPartner: BusinessPartner): AddressType? =
+    private fun toAddressType(businessPartner: BusinessPartnerV7Dto): AddressType? =
         when (businessPartner.type) {
-            GoldenRecordType.LegalEntity -> AddressType.LegalAddress
-            GoldenRecordType.Site -> businessPartner.site?.let { if (it.siteMainIsLegalAddress) AddressType.LegalAndSiteMainAddress else AddressType.SiteMainAddress }
-            GoldenRecordType.Address -> AddressType.AdditionalAddress
+            GoldenRecordTypeV7.LegalEntity -> AddressType.LegalAddress
+            GoldenRecordTypeV7.Site -> businessPartner.site?.let { if (it.siteMainIsLegalAddress) AddressType.LegalAndSiteMainAddress else AddressType.SiteMainAddress }
+            GoldenRecordTypeV7.Address -> AddressType.AdditionalAddress
             null -> null
         }
 
-    private fun addressOf(addressType: AddressType, businessPartner: BusinessPartner): IsPostalAddress? =
+    private fun addressOf(addressType: AddressType, businessPartner: BusinessPartnerV7Dto): IsPostalAddressV7? =
         when (addressType) {
             AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> businessPartner.legalEntity.legalAddress
             AddressType.SiteMainAddress -> businessPartner.site?.siteMainAddress
             AddressType.AdditionalAddress -> businessPartner.additionalAddress
         }
 
-    private fun toIdentifiers(identifiers: List<Identifier>, businessPartnerType: BusinessPartnerType) =
+    private fun toIdentifiers(identifiers: List<IdentifierV7Dto>, businessPartnerType: BusinessPartnerType) =
         identifiers.map { GoldenRecordTaskOutputRaw.Identifier(it.type, it.value, it.issuingBody, businessPartnerType) }
 
-    private fun toStates(states: List<BusinessState>, businessPartnerType: BusinessPartnerType) =
+    private fun toStates(states: List<BusinessStateV7Dto>, businessPartnerType: BusinessPartnerType) =
         states.map { GoldenRecordTaskOutputRaw.State(it.type, toLocalDateTime(it.validFrom), toLocalDateTime(it.validTo), businessPartnerType) }
 
-    private fun toConfidence(confidence: ConfidenceCriteria) =
+    private fun toConfidence(confidence: ConfidenceCriteriaV7Dto) =
         with(confidence) {
             GoldenRecordTaskOutputRaw.Confidence(
                 sharedByOwner = sharedByOwner,
@@ -189,7 +189,7 @@ class OrchestratorInboundMapper {
             )
         }
 
-    private fun toPhysicalPostalAddress(address: PhysicalAddress) =
+    private fun toPhysicalPostalAddress(address: PhysicalAddressV7Dto) =
         with(address) {
             BusinessPartnerValuesRaw.PhysicalPostalAddress(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
@@ -210,7 +210,7 @@ class OrchestratorInboundMapper {
             )
         }
 
-    private fun toAlternativePostalAddress(address: AlternativeAddress) =
+    private fun toAlternativePostalAddress(address: AlternativeAddressV7Dto) =
         with(address) {
             BusinessPartnerValuesRaw.AlternativePostalAddress(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
@@ -245,7 +245,7 @@ class OrchestratorInboundMapper {
         return GeoCoordinateRaw(longitude = longitude, latitude = latitude, altitude = coordinate.altitude)
     }
 
-    private fun toScriptVariants(addressType: AddressType, businessPartner: BusinessPartner): List<BusinessPartnerValuesRaw.ScriptVariant> {
+    private fun toScriptVariants(addressType: AddressType, businessPartner: BusinessPartnerV7Dto): List<BusinessPartnerValuesRaw.ScriptVariant> {
         val legalEntityVariantsByCode = businessPartner.legalEntity.scriptVariants.associateBy { it.scriptCode }
         val siteVariantsByCode = businessPartner.site?.scriptVariants.orEmpty().associateBy { it.scriptCode }
         val addressVariantsByCode = when (addressType) {
@@ -271,7 +271,7 @@ class OrchestratorInboundMapper {
         }
     }
 
-    private fun toPhysicalAddressScriptVariant(addressVariant: PostalAddressScriptVariant?): BusinessPartnerValuesRaw.PhysicalAddressScriptVariant {
+    private fun toPhysicalAddressScriptVariant(addressVariant: PostalAddressScriptVariantV7Dto?): BusinessPartnerValuesRaw.PhysicalAddressScriptVariant {
         val physicalAddress = addressVariant?.physicalAddress
         val street = physicalAddress?.street
         return BusinessPartnerValuesRaw.PhysicalAddressScriptVariant(
@@ -292,7 +292,7 @@ class OrchestratorInboundMapper {
         )
     }
 
-    private fun toRelation(relation: LegalEntityGoldenRecordRelation) =
+    private fun toRelation(relation: LegalEntityGoldenRecordRelationV7Dto) =
         GoldenRecordRelationRaw(
             type = when (relation.relationType) {
                 OrchestratorLegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
@@ -304,7 +304,7 @@ class OrchestratorInboundMapper {
             targetBpn = relation.targetBpn
         )
 
-    private fun toRelation(relation: SiteGoldenRecordRelation) =
+    private fun toRelation(relation: SiteGoldenRecordRelationV7Dto) =
         GoldenRecordRelationRaw(
             type = when (relation.relationType) {
                 OrchestratorSiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
@@ -313,7 +313,7 @@ class OrchestratorInboundMapper {
             targetBpn = relation.targetBpn
         )
 
-    private fun toRelation(relation: AddressGoldenRecordRelation) =
+    private fun toRelation(relation: AddressGoldenRecordRelationV7Dto) =
         GoldenRecordRelationRaw(
             type = when (relation.relationType) {
                 OrchestratorAddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
@@ -328,14 +328,14 @@ class OrchestratorInboundMapper {
     /**
      * Maps [task] onto its result, translating the error type the task failed with first into a sharing error code.
      */
-    fun toRequest(task: TaskClientRelationsStateDto): RelationTaskResultRaw =
+    fun toRequest(task: TaskClientRelationsStateV7Dto): RelationTaskResultRaw =
         when (task.processingState.resultState) {
-            ResultState.Pending -> RelationTaskResultRaw.Pending(task.taskId)
-            ResultState.Success -> toSucceeded(task)
-            ResultState.Error -> toFailed(task)
+            ResultStateV7.Pending -> RelationTaskResultRaw.Pending(task.taskId)
+            ResultStateV7.Success -> toSucceeded(task)
+            ResultStateV7.Error -> toFailed(task)
         }
 
-    private fun toSucceeded(task: TaskClientRelationsStateDto): RelationTaskResultRaw.Succeeded =
+    private fun toSucceeded(task: TaskClientRelationsStateV7Dto): RelationTaskResultRaw.Succeeded =
         with(task.businessPartnerRelationsResult) {
             RelationTaskResultRaw.Succeeded(
                 taskId = task.taskId,
@@ -347,7 +347,7 @@ class OrchestratorInboundMapper {
             )
         }
 
-    private fun toFailed(task: TaskClientRelationsStateDto): RelationTaskResultRaw.Failed {
+    private fun toFailed(task: TaskClientRelationsStateV7Dto): RelationTaskResultRaw.Failed {
         val errors = task.processingState.errors
         return RelationTaskResultRaw.Failed(
             taskId = task.taskId,
@@ -356,25 +356,25 @@ class OrchestratorInboundMapper {
         )
     }
 
-    private fun toRelationType(relationType: RelationType): SharableRelationType =
+    private fun toRelationType(relationType: RelationTypeV7): SharableRelationType =
         when (relationType) {
-            RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
-            RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
-            RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
-            RelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
+            RelationTypeV7.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
+            RelationTypeV7.IsManagedBy -> SharableRelationType.IsManagedBy
+            RelationTypeV7.IsOwnedBy -> SharableRelationType.IsOwnedBy
+            RelationTypeV7.IsReplacedBy -> SharableRelationType.IsReplacedBy
         }
 
-    private fun toErrorCode(errorType: TaskRelationsErrorType?): RelationSharingStateErrorCode =
+    private fun toErrorCode(errorType: TaskRelationsErrorTypeV7?): RelationSharingStateErrorCode =
         when (errorType) {
-            TaskRelationsErrorType.Timeout -> RelationSharingStateErrorCode.SharingTimeout
-            TaskRelationsErrorType.Unspecified, null -> RelationSharingStateErrorCode.SharingProcessError
+            TaskRelationsErrorTypeV7.Timeout -> RelationSharingStateErrorCode.SharingTimeout
+            TaskRelationsErrorTypeV7.Unspecified, null -> RelationSharingStateErrorCode.SharingProcessError
         }
 
     /**
      * Maps the first page of [events] onto its finished tasks, the finish time of its last event and whether more
      * pages follow.
      */
-    fun toPage(events: FinishedTaskEventsResponse): FinishedGoldenRecordTaskPageRaw =
+    fun toPage(events: FinishedTaskEventsV7Response): FinishedGoldenRecordTaskPageRaw =
         FinishedGoldenRecordTaskPageRaw(
             taskIds = events.content.map { it.taskId },
             lastFinishedAt = events.content.lastOrNull()?.timestamp,

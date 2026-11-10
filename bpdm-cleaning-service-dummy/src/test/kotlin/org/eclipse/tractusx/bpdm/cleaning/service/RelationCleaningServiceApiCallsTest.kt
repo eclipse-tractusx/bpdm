@@ -28,8 +28,14 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
-import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -86,21 +92,21 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
                 .inScenario(RESERVATION_SCENARIO)
                 .whenScenarioStateIs(RESERVED_STATE)
-                .willReturn(okJson(jsonMapper.writeValueAsString(TaskRelationsStepReservationResponse(emptyList(), Instant.now()))))
+                .willReturn(okJson(jsonMapper.writeValueAsString(TaskRelationsStepReservationV7Response(emptyList(), Instant.now()))))
         )
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `Relation Cleaning Test for all RelationTypes`(relationType: RelationType) {
+    @EnumSource(RelationTypeV7::class)
+    fun `Relation Cleaning Test for all RelationTypes`(relationType: RelationTypeV7) {
         val mockedRelation = createRelation("rel1", relationType)
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedRelation)
 
-        val expectedResponse = TaskRelationsStepResultRequest(
+        val expectedResponse = TaskRelationsStepResultV7Request(
             cleaningServiceConfigProperties.step,
-            listOf(TaskRelationsStepResultEntryDto(fixedTaskId, mockedRelation))
+            listOf(TaskRelationsStepResultEntryV7Dto(fixedTaskId, mockedRelation))
         )
 
         relationCleaningServiceDummy.relationPollForCleanAndSyncTasks()
@@ -109,7 +115,7 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
         assertThat(actualResponse).isEqualTo(expectedResponse)
     }
 
-    fun mockOrchestratorReserveApi(relation: BusinessPartnerRelations): StubMapping {
+    fun mockOrchestratorReserveApi(relation: BusinessPartnerRelationsV7Dto): StubMapping {
         return orchestratorMockApi.stubFor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
                 .inScenario(RESERVATION_SCENARIO)
@@ -118,8 +124,8 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
                 .willReturn(
                     okJson(
                         jsonMapper.writeValueAsString(
-                            TaskRelationsStepReservationResponse(
-                                listOf(TaskRelationsStepReservationEntryDto(fixedTaskId, UUID.randomUUID().toString(), relation)),
+                            TaskRelationsStepReservationV7Response(
+                                listOf(TaskRelationsStepReservationEntryV7Dto(fixedTaskId, UUID.randomUUID().toString(), relation)),
                                 Instant.now()
                             )
                         )
@@ -135,20 +141,20 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
         )
     }
 
-    private fun getResolveResult(stubMapping: StubMapping): TaskRelationsStepResultRequest {
+    private fun getResolveResult(stubMapping: StubMapping): TaskRelationsStepResultV7Request {
         val serveEvents = orchestratorMockApi.getServeEvents(ServeEventQuery.forStubMapping(stubMapping)).requests
         assertEquals(1, serveEvents.size)
         val actualRequest = serveEvents.first().request
-        return jsonMapper.readValue(actualRequest.body, TaskRelationsStepResultRequest::class.java)
+        return jsonMapper.readValue(actualRequest.body, TaskRelationsStepResultV7Request::class.java)
     }
 
-    private fun createRelation(idSuffix: String, relationType: RelationType): BusinessPartnerRelations {
-        return BusinessPartnerRelations(
+    private fun createRelation(idSuffix: String, relationType: RelationTypeV7): BusinessPartnerRelationsV7Dto {
+        return BusinessPartnerRelationsV7Dto(
             relationType = relationType,
             businessPartnerSourceBpn = "BPNL_SOURCE_$idSuffix",
             businessPartnerTargetBpn = "BPNL_TARGET_$idSuffix",
             validityPeriods = listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.parse("2020-01-01"),
                     validTo = LocalDate.parse("2030-01-01")
                 )

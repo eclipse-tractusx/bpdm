@@ -21,32 +21,30 @@ package org.eclipse.tractusx.bpdm.orchestrator.mapper.v6
 
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.v6.TaskV6Mapper.toV6
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner as BusinessPartnerV7
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as LegalEntityV7
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto as TaskClientStateDtoV7
-import org.eclipse.tractusx.orchestrator.api.v6.model.AlternativeAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ConfidenceCriteriaV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.GeoCoordinateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.IdentifierV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntityV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PhysicalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PostalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.SiteV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StepStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StreetV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskProcessingStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto as BusinessPartnerV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto as LegalEntityV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto as TaskClientStateDtoV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.AlternativeAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.ConfidenceCriteriaV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.GeoCoordinateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.IdentifierV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.LegalEntityV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.PhysicalAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.PostalAddressV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.SiteV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.StepStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.StreetV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskClientStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskErrorV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskProcessingStateV6Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.UncategorizedPropertiesV6Dto
 
 /**
  * Translates the V7 golden record task client state into the reduced V6 shape, dropping the V7-only fields
@@ -55,9 +53,9 @@ import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
 @Component
 class GoldenRecordTaskCreateOutboundMapperV6 {
 
-    fun toClientState(clientState: TaskClientStateDtoV7): TaskClientStateDtoV6 =
+    fun toClientState(clientState: TaskClientStateDtoV7): TaskClientStateV6Dto =
         with(clientState) {
-            TaskClientStateDtoV6(
+            TaskClientStateV6Dto(
                 taskId = taskId,
                 recordId = recordId,
                 businessPartnerResult = toBusinessPartnerV6(businessPartnerResult),
@@ -65,23 +63,23 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
             )
         }
 
-    private fun toBusinessPartnerV6(businessPartner: BusinessPartnerV7): BusinessPartnerV6 =
+    private fun toBusinessPartnerV6(businessPartner: BusinessPartnerV7): BusinessPartnerV6Dto =
         with(businessPartner) {
-            BusinessPartnerV6(
+            BusinessPartnerV6Dto(
                 nameParts = nameParts.map {
-                    NamePartV6(
+                    NamePartV6Dto(
                         name = it.name,
                         type = when (it.type) {
-                            org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalName -> NamePartTypeV6.LegalName
-                            org.eclipse.tractusx.orchestrator.api.model.NamePartType.ShortName -> NamePartTypeV6.ShortName
-                            org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalForm -> NamePartTypeV6.LegalForm
-                            org.eclipse.tractusx.orchestrator.api.model.NamePartType.SiteName -> NamePartTypeV6.SiteName
-                            org.eclipse.tractusx.orchestrator.api.model.NamePartType.AddressName -> NamePartTypeV6.AddressName
+                            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.LegalName -> NamePartTypeV6.LegalName
+                            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.ShortName -> NamePartTypeV6.ShortName
+                            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.LegalForm -> NamePartTypeV6.LegalForm
+                            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.SiteName -> NamePartTypeV6.SiteName
+                            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7.AddressName -> NamePartTypeV6.AddressName
                         }
                     )
                 },
                 owningCompany = owningCompany,
-                uncategorized = UncategorizedPropertiesV6(
+                uncategorized = UncategorizedPropertiesV6Dto(
                     nameParts = uncategorized.nameParts,
                     identifiers = uncategorized.identifiers.map(::toIdentifierV6),
                     states = uncategorized.states.map(::toBusinessStateV6),
@@ -89,7 +87,7 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
                 ),
                 legalEntity = toLegalEntityV6(legalEntity),
                 site = site?.let {
-                    SiteV6(
+                    SiteV6Dto(
                         bpnReference = toBpnReferenceV6(it.bpnReference),
                         siteName = it.siteName,
                         states = it.states.map(::toBusinessStateV6),
@@ -102,9 +100,9 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
             )
         }
 
-    private fun toLegalEntityV6(legalEntity: LegalEntityV7): LegalEntityV6 =
+    private fun toLegalEntityV6(legalEntity: LegalEntityV7): LegalEntityV6Dto =
         with(legalEntity) {
-            LegalEntityV6(
+            LegalEntityV6Dto(
                 bpnReference = toBpnReferenceV6(bpnReference),
                 legalName = legalName,
                 legalShortName = legalShortName,
@@ -118,22 +116,22 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
             )
         }
 
-    private fun toProcessingStateV6(processingState: org.eclipse.tractusx.orchestrator.api.model.TaskProcessingStateDto) =
-        TaskProcessingStateDtoV6(
+    private fun toProcessingStateV6(processingState: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateV7Dto) =
+        TaskProcessingStateV6Dto(
             resultState = when (processingState.resultState) {
-                org.eclipse.tractusx.orchestrator.api.model.ResultState.Pending -> ResultStateV6.Pending
-                org.eclipse.tractusx.orchestrator.api.model.ResultState.Success -> ResultStateV6.Success
-                org.eclipse.tractusx.orchestrator.api.model.ResultState.Error -> ResultStateV6.Error
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7.Pending -> ResultStateV6.Pending
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7.Success -> ResultStateV6.Success
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7.Error -> ResultStateV6.Error
             },
             step = processingState.step.toV6(),
             stepState = when (processingState.stepState) {
-                org.eclipse.tractusx.orchestrator.api.model.StepState.Queued -> StepStateV6.Queued
-                org.eclipse.tractusx.orchestrator.api.model.StepState.Reserved -> StepStateV6.Reserved
-                org.eclipse.tractusx.orchestrator.api.model.StepState.Success -> StepStateV6.Success
-                org.eclipse.tractusx.orchestrator.api.model.StepState.Error -> StepStateV6.Error
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7.Queued -> StepStateV6.Queued
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7.Reserved -> StepStateV6.Reserved
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7.Success -> StepStateV6.Success
+                org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7.Error -> StepStateV6.Error
             },
             errors = processingState.errors.map {
-                TaskErrorDtoV6(
+                TaskErrorV6Dto(
                     type = it.type.toV6(),
                     description = it.description
                 )
@@ -143,14 +141,14 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
             timeout = processingState.timeout
         )
 
-    private fun toIdentifierV6(identifier: org.eclipse.tractusx.orchestrator.api.model.Identifier) =
-        IdentifierV6(identifier.value, identifier.type, identifier.issuingBody)
+    private fun toIdentifierV6(identifier: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto) =
+        IdentifierV6Dto(identifier.value, identifier.type, identifier.issuingBody)
 
-    private fun toBusinessStateV6(state: org.eclipse.tractusx.orchestrator.api.model.BusinessState) =
-        BusinessStateV6(state.validFrom, state.validTo, state.type)
+    private fun toBusinessStateV6(state: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto) =
+        BusinessStateV6Dto(state.validFrom, state.validTo, state.type)
 
-    private fun toConfidenceCriteriaV6(confidenceCriteria: org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria) =
-        ConfidenceCriteriaV6(
+    private fun toConfidenceCriteriaV6(confidenceCriteria: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto) =
+        ConfidenceCriteriaV6Dto(
             confidenceCriteria.sharedByOwner,
             confidenceCriteria.checkedByExternalDataSource,
             confidenceCriteria.numberOfSharingMembers,
@@ -159,27 +157,27 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
             confidenceCriteria.confidenceLevel
         )
 
-    private fun toBpnReferenceV6(bpnReference: org.eclipse.tractusx.orchestrator.api.model.BpnReference) =
-        BpnReferenceV6(
+    private fun toBpnReferenceV6(bpnReference: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto) =
+        BpnReferenceV6Dto(
             bpnReference.referenceValue,
             bpnReference.desiredBpn,
             bpnReference.referenceType?.let {
                 when (it) {
-                    org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn -> BpnReferenceTypeV6.Bpn
-                    org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> BpnReferenceTypeV6.BpnRequestIdentifier
+                    org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7.Bpn -> BpnReferenceTypeV6.Bpn
+                    org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7.BpnRequestIdentifier -> BpnReferenceTypeV6.BpnRequestIdentifier
                 }
             }
         )
 
-    private fun toPostalAddressV6(postalAddress: org.eclipse.tractusx.orchestrator.api.model.PostalAddress) =
-        PostalAddressV6(
+    private fun toPostalAddressV6(postalAddress: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto) =
+        PostalAddressV6Dto(
             bpnReference = toBpnReferenceV6(postalAddress.bpnReference),
             addressName = postalAddress.addressName,
             identifiers = postalAddress.identifiers.map(::toIdentifierV6),
             states = postalAddress.states.map(::toBusinessStateV6),
             confidenceCriteria = toConfidenceCriteriaV6(postalAddress.confidenceCriteria),
-            physicalAddress = PhysicalAddressV6(
-                geographicCoordinates = GeoCoordinateV6(
+            physicalAddress = PhysicalAddressV6Dto(
+                geographicCoordinates = GeoCoordinateV6Dto(
                     postalAddress.physicalAddress.geographicCoordinates.longitude,
                     postalAddress.physicalAddress.geographicCoordinates.latitude,
                     postalAddress.physicalAddress.geographicCoordinates.altitude
@@ -191,7 +189,7 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
                 postalCode = postalAddress.physicalAddress.postalCode,
                 city = postalAddress.physicalAddress.city,
                 district = postalAddress.physicalAddress.district,
-                street = StreetV6(
+                street = StreetV6Dto(
                     postalAddress.physicalAddress.street.name,
                     postalAddress.physicalAddress.street.houseNumber,
                     postalAddress.physicalAddress.street.houseNumberSupplement,
@@ -210,8 +208,8 @@ class GoldenRecordTaskCreateOutboundMapperV6 {
                 taxJurisdictionCode = postalAddress.physicalAddress.taxJurisdictionCode
             ),
             alternativeAddress = postalAddress.alternativeAddress?.let {
-                AlternativeAddressV6(
-                    geographicCoordinates = GeoCoordinateV6(
+                AlternativeAddressV6Dto(
+                    geographicCoordinates = GeoCoordinateV6Dto(
                         it.geographicCoordinates.longitude,
                         it.geographicCoordinates.latitude,
                         it.geographicCoordinates.altitude

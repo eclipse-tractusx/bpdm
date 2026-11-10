@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.test.containers
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
@@ -45,8 +45,8 @@ class OrchestratorMockConfiguration {
             Duration.ofDays(1),
             Duration.ofDays(1),
             mapOf(
-                TaskMode.UpdateFromPool to listOf(TaskStep.CleanAndSync, TaskStep.PoolSync),
-                TaskMode.UpdateFromSharingMember to listOf(TaskStep.Clean)
+                TaskModeV7.UpdateFromPool to listOf(TaskStepV7.CleanAndSync, TaskStepV7.PoolSync),
+                TaskModeV7.UpdateFromSharingMember to listOf(TaskStepV7.Clean)
             )
         )
 

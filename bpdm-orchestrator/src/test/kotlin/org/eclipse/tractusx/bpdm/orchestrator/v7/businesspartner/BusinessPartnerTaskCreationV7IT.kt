@@ -21,7 +21,13 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Response
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -34,16 +40,16 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN gate receives created task response with new sharing member record ID
      */
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `create task for new sharing member record`(taskMode: TaskMode){
+    @EnumSource(TaskModeV7::class)
+    fun `create task for new sharing member record`(taskMode: TaskModeV7){
         //WHEN
         val requestEntry = requestFactory.buildBusinessPartnerTaskCreateEntry(testName).copy(recordId = null)
-        val createRequest = TaskCreateRequest(taskMode, listOf(requestEntry))
+        val createRequest = TaskCreateV7Request(taskMode, listOf(requestEntry))
         val response = orchestratorClient.goldenRecordTasks.createTasks(createRequest)
 
         //THEN
         val expectedEntry = resultFactory.buildCreatedBusinessPartnerTaskClientState(requestEntry.businessPartner, taskMode)
-        val expectedResponse = TaskCreateResponse(listOf(expectedEntry))
+        val expectedResponse = TaskCreateV7Response(listOf(expectedEntry))
         assertRepo.assertBusinessPartnerTaskCreateResponseEqual(response, expectedResponse, isForNewRecord = true)
     }
 
@@ -53,18 +59,18 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN user sees created task in step first step for sharing member record
      */
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `create new sharing member update task for existing sharing member record`(taskMode: TaskMode){
+    @EnumSource(TaskModeV7::class)
+    fun `create new sharing member update task for existing sharing member record`(taskMode: TaskModeV7){
         //GIVEN
         val recordId = testDataClient.createBusinessPartnerTask("$testName 1").recordId
 
         //WHEN
         val newTask = requestFactory.buildBusinessPartnerTaskCreateEntry("$testName 2").copy(recordId = recordId)
-        val createRequest = TaskCreateRequest(taskMode, listOf(newTask))
+        val createRequest = TaskCreateV7Request(taskMode, listOf(newTask))
         val createResult = orchestratorClient.goldenRecordTasks.createTasks(createRequest)
 
         //THEN
-        val expectedResult = TaskCreateResponse(listOf(resultFactory.buildCreatedBusinessPartnerTaskClientState(
+        val expectedResult = TaskCreateV7Response(listOf(resultFactory.buildCreatedBusinessPartnerTaskClientState(
             businessPartner = createRequest.requests.single().businessPartner,
             taskMode = taskMode,
             recordId = recordId
@@ -81,7 +87,7 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
         //WHEN
         val businessPartner = requestFactory.buildSiteWithAdditionalSitesBusinessPartner(testName).copy(site = null)
         val newTask = requestFactory.buildBusinessPartnerTaskCreateEntry(testName).copy(businessPartner = businessPartner)
-        val requestBody = TaskCreateRequest(TaskMode.UpdateFromSharingMember, listOf(newTask))
+        val requestBody = TaskCreateV7Request(TaskModeV7.UpdateFromSharingMember, listOf(newTask))
         val createRequest: () -> Unit = { orchestratorClient.goldenRecordTasks.createTasks(requestBody) }
 
         //THEN
@@ -93,11 +99,11 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN user sees 400 BAD REQUEST error
      */
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `try create task for not existing sharing member record`(taskMode: TaskMode){
+    @EnumSource(TaskModeV7::class)
+    fun `try create task for not existing sharing member record`(taskMode: TaskModeV7){
         //WHEN
         val newTask = requestFactory.buildBusinessPartnerTaskCreateEntry(testName).copy(recordId = "NOT EXISTING")
-        val requestBody = TaskCreateRequest(taskMode, listOf(newTask))
+        val requestBody = TaskCreateV7Request(taskMode, listOf(newTask))
         val createRequest: () -> Unit
                 =  { orchestratorClient.goldenRecordTasks.createTasks(requestBody) }
 
@@ -111,30 +117,30 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN user sees existing task aborted
      */
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `abort task when creating new one`(taskMode: TaskMode){
+    @EnumSource(TaskModeV7::class)
+    fun `abort task when creating new one`(taskMode: TaskModeV7){
         //GIVEN
         val createdTaskOld = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
         val requestEntry = requestFactory.buildBusinessPartnerTaskCreateEntry(testName).copy(recordId = createdTaskOld.recordId)
-        val createRequest = TaskCreateRequest(taskMode, listOf(requestEntry))
+        val createRequest = TaskCreateV7Request(taskMode, listOf(requestEntry))
         orchestratorClient.goldenRecordTasks.createTasks(createRequest)
 
         //THEN
-        val oldTaskEntry = TaskStateRequest.Entry(createdTaskOld.taskId, createdTaskOld.recordId)
-        val actualOldTaskResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(listOf(oldTaskEntry)))
+        val oldTaskEntry = TaskStateV7Request.Entry(createdTaskOld.taskId, createdTaskOld.recordId)
+        val actualOldTaskResponse = orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateV7Request(listOf(oldTaskEntry)))
 
         val expectedEntry = createdTaskOld.copy(
             businessPartnerResult = createdTaskOld.businessPartnerResult,
             processingState = createdTaskOld.processingState.copy(
-                resultState = ResultState.Error,
+                resultState = ResultStateV7.Error,
                 step = createdTaskOld.processingState.step,
-                stepState = StepState.Error,
+                stepState = StepStateV7.Error,
                 errors = emptyList()
             )
         )
-        val expectedResponse = TaskStateResponse(listOf(expectedEntry))
+        val expectedResponse = TaskStateV7Response(listOf(expectedEntry))
 
         assertRepo.assertBusinessPartnerTaskStateResponseEqual(actualOldTaskResponse, expectedResponse)
     }
@@ -144,10 +150,10 @@ class BusinessPartnerTaskCreationV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN throw 400 BAD REQUEST error
      */
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `try create too many business partner tasks`(taskMode: TaskMode) {
+    @EnumSource(TaskModeV7::class)
+    fun `try create too many business partner tasks`(taskMode: TaskModeV7) {
         //WHEN
-        val requestBody = TaskCreateRequest(
+        val requestBody = TaskCreateV7Request(
             taskMode,
             (1 .. 11).map { requestFactory.buildBusinessPartnerTaskCreateEntry("$testName $it") }
         )

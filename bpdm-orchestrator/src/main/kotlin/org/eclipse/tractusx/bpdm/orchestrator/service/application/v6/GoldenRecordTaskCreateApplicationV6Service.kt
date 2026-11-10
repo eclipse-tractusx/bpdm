@@ -32,10 +32,10 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCrea
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskModeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskModeV6
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -54,17 +54,17 @@ class GoldenRecordTaskCreateApplicationV6Service(
 ) {
 
     @Transactional
-    fun createTasks(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {
+    fun createTasks(createRequest: TaskCreateV6Request): TaskCreateV6Response {
         val requests = createRequest.requests.map { inboundMapperV6.toRequest(it) }
         val createdTasks = createTasksInternal(createRequest.mode.toTaskMode(), requests, newGateRecordIsGoldenRecordCounted = null)
 
         return createdTasks
             .map { task -> outboundMapperV6.toClientState(responseMapper.toClientState(task, calculateTaskRetentionTimeout(task))) }
-            .let { TaskCreateResponseV6(createdTasks = it) }
+            .let { TaskCreateV6Response(createdTasks = it) }
     }
 
     private fun createTasksInternal(
-        mode: TaskMode,
+        mode: TaskModeV7,
         requests: List<GoldenRecordTaskCreateRequest>,
         newGateRecordIsGoldenRecordCounted: Boolean?
     ): List<GoldenRecordTaskDb> =
@@ -96,7 +96,7 @@ class GoldenRecordTaskCreateApplicationV6Service(
 
     private fun TaskModeV6.toTaskMode() =
         when (this) {
-            TaskModeV6.UpdateFromSharingMember -> TaskMode.UpdateFromSharingMember
-            TaskModeV6.UpdateFromPool -> TaskMode.UpdateFromPool
+            TaskModeV6.UpdateFromSharingMember -> TaskModeV7.UpdateFromSharingMember
+            TaskModeV6.UpdateFromPool -> TaskModeV7.UpdateFromPool
         }
 }

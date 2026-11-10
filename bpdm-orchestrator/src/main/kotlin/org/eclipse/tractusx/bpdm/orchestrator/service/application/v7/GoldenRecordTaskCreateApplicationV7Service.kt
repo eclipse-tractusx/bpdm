@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCrea
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Response
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -50,17 +50,17 @@ class GoldenRecordTaskCreateApplicationV7Service(
 ) {
 
     @Transactional
-    fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
+    fun createTasks(createRequest: TaskCreateV7Request): TaskCreateV7Response {
         val requests = createRequest.requests.map { inboundMapperV7.toRequest(it) }
         val createdTasks = createTasksInternal(createRequest.mode, requests, newGateRecordIsGoldenRecordCounted = null)
 
         return createdTasks
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
-            .let { TaskCreateResponse(createdTasks = it) }
+            .let { TaskCreateV7Response(createdTasks = it) }
     }
 
     private fun createTasksInternal(
-        mode: org.eclipse.tractusx.orchestrator.api.model.TaskMode,
+        mode: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7,
         requests: List<GoldenRecordTaskCreateRequest>,
         newGateRecordIsGoldenRecordCounted: Boolean?
     ): List<GoldenRecordTaskDb> =

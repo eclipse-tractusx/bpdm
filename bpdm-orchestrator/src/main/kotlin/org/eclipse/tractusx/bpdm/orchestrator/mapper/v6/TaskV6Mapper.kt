@@ -19,48 +19,48 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.mapper.v6
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskErrorTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
 
 object TaskV6Mapper {
 
-    fun TaskStepV6.toTaskStep(): TaskStep =
+    fun TaskStepV6.toTaskStep(): TaskStepV7 =
         when (this) {
-            TaskStepV6.CleanAndSync -> TaskStep.CleanAndSync
-            TaskStepV6.PoolSync -> TaskStep.PoolSync
-            TaskStepV6.Clean -> TaskStep.Clean
+            TaskStepV6.CleanAndSync -> TaskStepV7.CleanAndSync
+            TaskStepV6.PoolSync -> TaskStepV7.PoolSync
+            TaskStepV6.Clean -> TaskStepV7.Clean
         }
 
-    fun TaskStep.toV6(): TaskStepV6 =
+    fun TaskStepV7.toV6(): TaskStepV6 =
         when (this) {
-            TaskStep.CleanAndSync -> TaskStepV6.CleanAndSync
-            TaskStep.PoolSync -> TaskStepV6.PoolSync
-            TaskStep.Clean -> TaskStepV6.Clean
+            TaskStepV7.CleanAndSync -> TaskStepV6.CleanAndSync
+            TaskStepV7.PoolSync -> TaskStepV6.PoolSync
+            TaskStepV7.Clean -> TaskStepV6.Clean
         }
 
-    fun TaskErrorTypeV6.toTaskErrorType(): TaskErrorType =
+    fun TaskErrorTypeV6.toTaskErrorType(): TaskErrorTypeV7 =
         when (this) {
-            TaskErrorTypeV6.Timeout -> TaskErrorType.Timeout
-            TaskErrorTypeV6.Unspecified -> TaskErrorType.Unspecified
-            TaskErrorTypeV6.NaturalPersonError -> TaskErrorType.NaturalPersonError
-            TaskErrorTypeV6.BpnErrorNotFound -> TaskErrorType.BpnErrorNotFound
-            TaskErrorTypeV6.BpnErrorTooManyOptions -> TaskErrorType.BpnErrorTooManyOptions
-            TaskErrorTypeV6.MandatoryFieldValidationFailed -> TaskErrorType.MandatoryFieldValidationFailed
-            TaskErrorTypeV6.BlacklistCountryPresent -> TaskErrorType.BlacklistCountryPresent
-            TaskErrorTypeV6.UnknownSpecialCharacters -> TaskErrorType.UnknownSpecialCharacters
+            TaskErrorTypeV6.Timeout -> TaskErrorTypeV7.Timeout
+            TaskErrorTypeV6.Unspecified -> TaskErrorTypeV7.Unspecified
+            TaskErrorTypeV6.NaturalPersonError -> TaskErrorTypeV7.NaturalPersonError
+            TaskErrorTypeV6.BpnErrorNotFound -> TaskErrorTypeV7.BpnErrorNotFound
+            TaskErrorTypeV6.BpnErrorTooManyOptions -> TaskErrorTypeV7.BpnErrorTooManyOptions
+            TaskErrorTypeV6.MandatoryFieldValidationFailed -> TaskErrorTypeV7.MandatoryFieldValidationFailed
+            TaskErrorTypeV6.BlacklistCountryPresent -> TaskErrorTypeV7.BlacklistCountryPresent
+            TaskErrorTypeV6.UnknownSpecialCharacters -> TaskErrorTypeV7.UnknownSpecialCharacters
         }
 
-    fun TaskErrorType.toV6(): TaskErrorTypeV6 =
+    fun TaskErrorTypeV7.toV6(): TaskErrorTypeV6 =
         when (this) {
-            TaskErrorType.Timeout -> TaskErrorTypeV6.Timeout
-            TaskErrorType.Unspecified -> TaskErrorTypeV6.Unspecified
-            TaskErrorType.NaturalPersonError -> TaskErrorTypeV6.NaturalPersonError
-            TaskErrorType.BpnErrorNotFound -> TaskErrorTypeV6.BpnErrorNotFound
-            TaskErrorType.BpnErrorTooManyOptions -> TaskErrorTypeV6.BpnErrorTooManyOptions
-            TaskErrorType.MandatoryFieldValidationFailed -> TaskErrorTypeV6.MandatoryFieldValidationFailed
-            TaskErrorType.BlacklistCountryPresent -> TaskErrorTypeV6.BlacklistCountryPresent
-            TaskErrorType.UnknownSpecialCharacters -> TaskErrorTypeV6.UnknownSpecialCharacters
+            TaskErrorTypeV7.Timeout -> TaskErrorTypeV6.Timeout
+            TaskErrorTypeV7.Unspecified -> TaskErrorTypeV6.Unspecified
+            TaskErrorTypeV7.NaturalPersonError -> TaskErrorTypeV6.NaturalPersonError
+            TaskErrorTypeV7.BpnErrorNotFound -> TaskErrorTypeV6.BpnErrorNotFound
+            TaskErrorTypeV7.BpnErrorTooManyOptions -> TaskErrorTypeV6.BpnErrorTooManyOptions
+            TaskErrorTypeV7.MandatoryFieldValidationFailed -> TaskErrorTypeV6.MandatoryFieldValidationFailed
+            TaskErrorTypeV7.BlacklistCountryPresent -> TaskErrorTypeV6.BlacklistCountryPresent
+            TaskErrorTypeV7.UnknownSpecialCharacters -> TaskErrorTypeV6.UnknownSpecialCharacters
         }
 }

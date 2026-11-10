@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.application.v6
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.SharingMemberRecordOperation
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
 import org.springframework.stereotype.Service
 
 /**
@@ -35,11 +35,11 @@ class SharingMemberRecordApplicationV6Service(
     private val recordOperation: SharingMemberRecordOperation
 ) {
 
-    fun queryRecords(request: SharingMemberRecordQueryRequest, paginationRequest: PaginationRequest): PageDto<SharingMemberRecord> {
+    fun queryRecords(request: SharingMemberRecordQueryV7Request, paginationRequest: PaginationRequest): PageDto<SharingMemberRecordV7Dto> {
         return recordOperation.queryRecords(request, paginationRequest)
     }
 
-    fun updateRecord(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
+    fun updateRecord(request: SharingMemberRecordUpdateV7Request): SharingMemberRecordV7Dto {
         return recordOperation.updateRecord(request)
     }
 }

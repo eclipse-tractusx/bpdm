@@ -14,13 +14,44 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantWithScriptCodeV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariantsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedPropertiesV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -30,7 +61,7 @@ class ResponseMapper {
 
     fun toClientState(task: GoldenRecordTaskDb, timeout: Instant) =
         with(task) {
-            TaskClientStateDto(
+            TaskClientStateV7Dto(
                 taskId = task.uuid.toString(),
                 recordId = task.gateRecord.privateId.toString(),
                 businessPartnerResult = toBusinessPartnerResult(businessPartner),
@@ -40,7 +71,7 @@ class ResponseMapper {
 
     fun toProcessingState(task: GoldenRecordTaskDb, timeout: Instant) =
         with(task.processingState) {
-            TaskProcessingStateDto(
+            TaskProcessingStateV7Dto(
                 resultState = toResultState(resultState),
                 step = step,
                 stepState = toStepState(stepState),
@@ -53,13 +84,13 @@ class ResponseMapper {
 
     fun toTaskError(taskError: TaskErrorDb) =
         with(taskError) {
-            TaskErrorDto(type = type, description = description)
+            TaskErrorV7Dto(type = type, description = description)
         }
 
 
     fun toBusinessPartnerResult(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         with(businessPartner) {
-            BusinessPartner(
+            BusinessPartnerV7Dto(
                 nameParts = toCategorizedNameParts(nameParts),
                 owningCompany = owningCompany,
                 uncategorized = toUncategorizedProperties(businessPartner),
@@ -71,11 +102,11 @@ class ResponseMapper {
         }
 
     fun toAdditionalSites(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
-        businessPartner.additionalSites.map { AdditionalSite(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
+        businessPartner.additionalSites.map { AdditionalSiteV7Dto(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
 
 
     fun toUncategorizedProperties(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
-        UncategorizedProperties(
+        UncategorizedPropertiesV7Dto(
             nameParts = toUncategorizedNameParts(businessPartner.nameParts),
             identifiers = toIdentifiers(businessPartner, IdentifierDb.Scope.Uncategorized),
             states = toStates(businessPartner, BusinessStateDb.Scope.Uncategorized),
@@ -86,11 +117,11 @@ class ResponseMapper {
     fun toUncategorizedScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.uncategorizedScriptVariants
             .groupBy({ it.scriptCode }, { it.name })
-            .map { (scriptCode, nameParts) -> UncategorizedScriptVariant(scriptCode, nameParts) }
+            .map { (scriptCode, nameParts) -> UncategorizedScriptVariantV7Dto(scriptCode, nameParts) }
 
     fun toLegalEntity(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         with(businessPartner) {
-            LegalEntity(
+            LegalEntityV7Dto(
                 bpnReference = toBpnReference(businessPartner, BpnReferenceDb.Scope.LegalEntity),
                 legalName = legalName,
                 legalShortName = legalShortName,
@@ -112,7 +143,7 @@ class ResponseMapper {
     fun toSite(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.takeIf { it.siteExists }?.let {
             with(businessPartner) {
-                Site(
+                SiteV7Dto(
                     bpnReference = toBpnReference(businessPartner, BpnReferenceDb.Scope.Site),
                     siteName = siteName,
                     states = toStates(businessPartner, BusinessStateDb.Scope.Site),
@@ -128,23 +159,23 @@ class ResponseMapper {
 
 
     fun toCategorizedNameParts(nameParts: List<NamePartDb>) =
-        nameParts.filter { it.type != null }.map { NamePart(it.name, it.type!!) }
+        nameParts.filter { it.type != null }.map { NamePartV7Dto(it.name, it.type!!) }
 
     fun toUncategorizedNameParts(nameParts: List<NamePartDb>) =
         nameParts.filter { it.type == null }.map { it.name }
 
     fun toIdentifiers(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: IdentifierDb.Scope) =
-        businessPartner.identifiers.filter { it.scope == scope }.map { Identifier(it.value, it.type, it.issuingBody) }
+        businessPartner.identifiers.filter { it.scope == scope }.map { IdentifierV7Dto(it.value, it.type, it.issuingBody) }
 
     fun toStates(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: BusinessStateDb.Scope) =
-        businessPartner.businessStates.filter { it.scope == scope }.map { BusinessState(it.validFrom?.instant, it.validTo?.instant, it.type) }
+        businessPartner.businessStates.filter { it.scope == scope }.map { BusinessStateV7Dto(it.validFrom?.instant, it.validTo?.instant, it.type) }
 
     fun toConfidence(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: ConfidenceCriteriaDb.Scope) =
-        businessPartner.confidences[scope]?.let { toConfidence(it) } ?: ConfidenceCriteria.empty
+        businessPartner.confidences[scope]?.let { toConfidence(it) } ?: ConfidenceCriteriaV7Dto.empty
 
     fun toConfidence(confidenceCriteria: ConfidenceCriteriaDb) =
         with(confidenceCriteria) {
-            ConfidenceCriteria(
+            ConfidenceCriteriaV7Dto(
                 sharedByOwner = sharedByOwner,
                 checkedByExternalDataSource = checkedByExternalDataSource,
                 numberOfSharingMembers = numberOfSharingMembers,
@@ -156,29 +187,29 @@ class ResponseMapper {
 
     fun toBpnReference(bpnReference: BpnReferenceDb) =
         with(bpnReference) {
-            BpnReference(referenceValue = referenceValue, desiredBpn = desiredBpn, referenceType = referenceType)
+            BpnReferenceV7Dto(referenceValue = referenceValue, desiredBpn = desiredBpn, referenceType = referenceType)
         }
 
     fun toBpnReference(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: BpnReferenceDb.Scope) =
-        businessPartner.bpnReferences[scope]?.let { toBpnReference(it) } ?: BpnReference.empty
+        businessPartner.bpnReferences[scope]?.let { toBpnReference(it) } ?: BpnReferenceV7Dto.empty
 
     fun toPostalAddressOrEmpty(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: PostalAddressDb.Scope) =
         toPostalAddress(businessPartner, scope)
 
     fun toAdditionalAddress(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         toPostalAddress(businessPartner, PostalAddressDb.Scope.AdditionalAddress)?.let {
-            PostalAddressWithScriptVariants(it, toAdditionalAddressScriptVariant(businessPartner))
+            PostalAddressWithScriptVariantsV7Dto(it, toAdditionalAddressScriptVariant(businessPartner))
         }
 
     fun toUncategorizedAddress(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         toPostalAddress(businessPartner, PostalAddressDb.Scope.UncategorizedAddress)?.let {
-            PostalAddressWithScriptVariants(it, toUncategorizedAddressScriptVariant(businessPartner))
+            PostalAddressWithScriptVariantsV7Dto(it, toUncategorizedAddressScriptVariant(businessPartner))
         }
 
     fun toPostalAddress(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: PostalAddressDb.Scope) =
         businessPartner.addresses[scope]?.let { postalAddress ->
             with(postalAddress) {
-                PostalAddress(
+                PostalAddressV7Dto(
                     bpnReference = toBpnReference(businessPartner, scope.bpnReference),
                     addressName = addressName,
                     identifiers = toIdentifiers(businessPartner, scope.identifier),
@@ -195,7 +226,7 @@ class ResponseMapper {
 
     fun toPhysicalAddress(physicalAddress: PostalAddressDb.PhysicalAddressDb) =
         with(physicalAddress) {
-            PhysicalAddress(
+            PhysicalAddressV7Dto(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
                 country = country,
                 administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -217,7 +248,7 @@ class ResponseMapper {
     fun toAlternativeAddress(alternativeAddress: PostalAddressDb.AlternativeAddress) =
         alternativeAddress.takeIf { it.exists }?.let {
             with(alternativeAddress) {
-                AlternativeAddress(
+                AlternativeAddressV7Dto(
                     geographicCoordinates = toGeoCoordinate(geographicCoordinates),
                     country = country,
                     administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -233,12 +264,12 @@ class ResponseMapper {
 
     fun toGeoCoordinate(geoCoordinate: PostalAddressDb.GeoCoordinate) =
         with(geoCoordinate) {
-            GeoCoordinate(longitude = longitude, latitude = latitude, altitude = altitude)
+            GeoCoordinateV7Dto(longitude = longitude, latitude = latitude, altitude = altitude)
         }
 
     fun toStreet(street: PostalAddressDb.Street) =
         with(street) {
-            Street(
+            StreetV7Dto(
                 name, houseNumber,
                 houseNumberSupplement = houseNumberSupplement,
                 milestone = milestone,
@@ -252,34 +283,34 @@ class ResponseMapper {
 
     fun toResultState(resultState: GoldenRecordTaskDb.ResultState) =
         when(resultState){
-            GoldenRecordTaskDb.ResultState.Pending -> ResultState.Pending
-            GoldenRecordTaskDb.ResultState.Success ->  ResultState.Success
-            GoldenRecordTaskDb.ResultState.Error ->  ResultState.Error
-            GoldenRecordTaskDb.ResultState.Aborted ->  ResultState.Error
+            GoldenRecordTaskDb.ResultState.Pending -> ResultStateV7.Pending
+            GoldenRecordTaskDb.ResultState.Success ->  ResultStateV7.Success
+            GoldenRecordTaskDb.ResultState.Error ->  ResultStateV7.Error
+            GoldenRecordTaskDb.ResultState.Aborted ->  ResultStateV7.Error
         }
 
     fun toStepState(stepState: GoldenRecordTaskDb.StepState) =
         when(stepState){
-            GoldenRecordTaskDb.StepState.Queued -> StepState.Queued
-            GoldenRecordTaskDb.StepState.Reserved -> StepState.Reserved
-            GoldenRecordTaskDb.StepState.Success -> StepState.Success
-            GoldenRecordTaskDb.StepState.Error -> StepState.Error
-            GoldenRecordTaskDb.StepState.Aborted -> StepState.Error
+            GoldenRecordTaskDb.StepState.Queued -> StepStateV7.Queued
+            GoldenRecordTaskDb.StepState.Reserved -> StepStateV7.Reserved
+            GoldenRecordTaskDb.StepState.Success -> StepStateV7.Success
+            GoldenRecordTaskDb.StepState.Error -> StepStateV7.Error
+            GoldenRecordTaskDb.StepState.Aborted -> StepStateV7.Error
         }
 
 
     fun toAdditionalAddressScriptVariant(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.AdditionalAddress }.map{
-            PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it))
+            PostalAddressScriptVariantWithScriptCodeV7Dto(it.scriptCode, toPostalAddressScriptVariant(it))
         }
 
     fun toUncategorizedAddressScriptVariant(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.UncategorizedAddress }.map{
-            PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it))
+            PostalAddressScriptVariantWithScriptCodeV7Dto(it.scriptCode, toPostalAddressScriptVariant(it))
         }
 
     fun toPostalAddressScriptVariant(addressScriptVariant: PostalAddressScriptVariantDb) =
-        PostalAddressScriptVariant(
+        PostalAddressScriptVariantV7Dto(
             addressName = addressScriptVariant.addressName,
             physicalAddress = toPhysicalAddressScriptVariant(addressScriptVariant.physicalAddress),
             alternativeAddress = addressScriptVariant.alternativeAddress?.let { toAlternativeAddressScriptVariant(it) }
@@ -287,7 +318,7 @@ class ResponseMapper {
 
     fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDb) =
         with(physicalAddressScriptVariant){
-            PhysicalAddressScriptVariant(
+            PhysicalAddressScriptVariantV7Dto(
                 city = city,
                 district = district,
                 street = toScriptVariantStreet(street),
@@ -300,14 +331,14 @@ class ResponseMapper {
 
     fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDb) =
         with(alternativeAddressScriptVariant){
-            AlternativeAddressScriptVariant(
+            AlternativeAddressScriptVariantV7Dto(
                 city = city
             )
         }
 
     fun toScriptVariantStreet(street: StreetScriptVariantDb) =
         with(street){
-            StreetScriptVariant(
+            StreetScriptVariantV7Dto(
                 name = name,
                 direction = direction,
                 namePrefix = namePrefix,
@@ -317,36 +348,36 @@ class ResponseMapper {
             )
         }
 
-    fun toLegalEntityScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<LegalEntityScriptVariant>{
+    fun toLegalEntityScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<LegalEntityScriptVariantV7Dto>{
         val legalAddressVariantsByScriptCode = businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.LegalAddress }.associateBy { it.scriptCode }
 
         return businessPartner.legalEntityHeaderScriptVariants.map { headerVariant ->
             val legalAddressVariant = legalAddressVariantsByScriptCode[headerVariant.scriptCode]
 
-            LegalEntityScriptVariant(headerVariant.scriptCode, headerVariant.legalName, headerVariant.legalShortName, legalAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariant.empty )
+            LegalEntityScriptVariantV7Dto(headerVariant.scriptCode, headerVariant.legalName, headerVariant.legalShortName, legalAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariantV7Dto.empty )
         }
     }
 
     fun toLegalEntityGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.legalEntityGoldenRecordRelations
-            .map { LegalEntityGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
+            .map { LegalEntityGoldenRecordRelationV7Dto(it.relationType, it.sourceBpn, it.targetBpn) }
 
     fun toSiteGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
         businessPartner.siteGoldenRecordRelations
-            .map { SiteGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
+            .map { SiteGoldenRecordRelationV7Dto(it.relationType, it.sourceBpn, it.targetBpn) }
 
     fun toAddressGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: AddressGoldenRecordRelationDb.Scope) =
         businessPartner.addressGoldenRecordRelations
             .filter { it.scope == scope }
-            .map { AddressGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
+            .map { AddressGoldenRecordRelationV7Dto(it.relationType, it.sourceBpn, it.targetBpn) }
 
-    fun toSiteScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<SiteScriptVariant>{
+    fun toSiteScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<SiteScriptVariantV7Dto>{
         val mainAddressVariantsByScriptCode = businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.SiteMainAddress }.associateBy { it.scriptCode }
 
         return businessPartner.siteHeaderScriptVariants.map { headerVariant ->
             val mainAddressVariant = mainAddressVariantsByScriptCode[headerVariant.scriptCode]
 
-            SiteScriptVariant(headerVariant.scriptCode, headerVariant.siteName ?: "", mainAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariant.empty )
+            SiteScriptVariantV7Dto(headerVariant.scriptCode, headerVariant.siteName ?: "", mainAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariantV7Dto.empty )
         }
     }
 

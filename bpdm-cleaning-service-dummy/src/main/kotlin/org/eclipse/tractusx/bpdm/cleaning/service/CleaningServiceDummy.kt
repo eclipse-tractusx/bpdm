@@ -23,8 +23,22 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.util.toUUID
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GoldenRecordTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariantsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -33,13 +47,13 @@ import java.util.*
 
 @Service
 class CleaningServiceDummy(
-    private val orchestrationApiClient: OrchestrationApiClient,
+    private val orchestrationApiClient: OrchestratorV7Client,
     private val cleaningServiceConfigProperties: CleaningServiceConfigProperties
     ) {
 
     private val logger = KotlinLogging.logger { }
 
-    val dummyConfidenceCriteria = ConfidenceCriteria(
+    val dummyConfidenceCriteria = ConfidenceCriteriaV7Dto(
         sharedByOwner = false,
         numberOfSharingMembers = 1,
         checkedByExternalDataSource = false,
@@ -54,13 +68,13 @@ class CleaningServiceDummy(
     }
 
 
-    private fun processPollingTasks(step: TaskStep) {
+    private fun processPollingTasks(step: TaskStepV7) {
         try {
             logger.debug { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
 
             do{
                 val cleaningRequest = orchestrationApiClient.goldenRecordTasks
-                    .reserveTasksForStep(TaskStepReservationRequest(amount = 10, step))
+                    .reserveTasksForStep(TaskStepReservationV7Request(amount = 10, step))
 
                 val cleaningTasks = cleaningRequest.reservedTasks
 
@@ -71,7 +85,7 @@ class CleaningServiceDummy(
                         processCleaningTask(reservedTask)
                     }
 
-                    orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
+                    orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultV7Request(step, cleaningResults))
                     logger.debug { "Cleaning tasks processing completed for this iteration." }
                 }
             }while (cleaningRequest.reservedTasks.isNotEmpty())
@@ -80,11 +94,11 @@ class CleaningServiceDummy(
         }
     }
 
-    fun processCleaningTask(reservedTask: TaskStepReservationEntryDto): TaskStepResultEntryDto {
+    fun processCleaningTask(reservedTask: TaskStepReservationEntryV7Dto): TaskStepResultEntryV7Dto {
         val businessPartner = reservedTask.businessPartner
         val sharedByOwner = businessPartner.owningCompany?.isNotBlank() ?: false
 
-        val cleanedBusinessPartner = BusinessPartner(
+        val cleanedBusinessPartner = BusinessPartnerV7Dto(
             nameParts = businessPartner.nameParts,
             // Identifiers are taken as legal identifiers and should be removed from uncategorized collection
             uncategorized = businessPartner.uncategorized.copy(identifiers = emptyList()),
@@ -95,15 +109,15 @@ class CleaningServiceDummy(
             additionalSites = cleanAdditionalSites(businessPartner)
         )
 
-        return TaskStepResultEntryDto(reservedTask.taskId, cleanedBusinessPartner)
+        return TaskStepResultEntryV7Dto(reservedTask.taskId, cleanedBusinessPartner)
     }
 
-    private fun cleanLegalEntity(businessPartner: BusinessPartner, sharedByOwner: Boolean): LegalEntity {
-        val addressToClean = businessPartner.legalEntity.legalAddress.takeIf { it != PostalAddress.empty }
+    private fun cleanLegalEntity(businessPartner: BusinessPartnerV7Dto, sharedByOwner: Boolean): LegalEntityV7Dto {
+        val addressToClean = businessPartner.legalEntity.legalAddress.takeIf { it != PostalAddressV7Dto.empty }
             ?: businessPartner.uncategorized.address?.postalProperties
             ?: businessPartner.site?.siteMainAddress
             ?: businessPartner.additionalAddress?.postalProperties
-            ?: PostalAddress.empty
+            ?: PostalAddressV7Dto.empty
 
         val legalAddressBpnReference =  addressToClean.bpnReference
             .toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.legalAddressReference())
@@ -115,23 +129,23 @@ class CleaningServiceDummy(
                     identifiers = identifiers.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.identifiers,
                     states = states,
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
-                    hasChanged = (businessPartner.type == GoldenRecordType.LegalEntity) || (businessPartner.type == GoldenRecordType.Site && businessPartner.site!!.siteMainIsLegalAddress),
+                    hasChanged = (businessPartner.type == GoldenRecordTypeV7.LegalEntity) || (businessPartner.type == GoldenRecordTypeV7.Site && businessPartner.site!!.siteMainIsLegalAddress),
                     isParticipantData = sharedByOwner,
                     legalAddress = cleanAddress(addressToClean, legalAddressBpnReference, true, sharedByOwner),
                 )
             }
     }
 
-    private fun cleanSite(businessPartner: BusinessPartner, sharedByOwner: Boolean): Site?{
+    private fun cleanSite(businessPartner: BusinessPartnerV7Dto, sharedByOwner: Boolean): SiteV7Dto?{
         return businessPartner.site?.let { site ->
 
             val addressToClean = if(site.siteMainIsLegalAddress){
                 null
             }else {
-                site.siteMainAddress?.takeIf { it != PostalAddress.empty }
+                site.siteMainAddress?.takeIf { it != PostalAddressV7Dto.empty }
                     ?: businessPartner.uncategorized.address?.postalProperties
                     ?: businessPartner.additionalAddress?.postalProperties
-                    ?: PostalAddress.empty
+                    ?: PostalAddressV7Dto.empty
             }
 
             val siteMainBpnReference = addressToClean?.bpnReference
@@ -141,20 +155,20 @@ class CleaningServiceDummy(
                 copy(
                     bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference()),
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
-                    hasChanged = businessPartner.type == GoldenRecordType.Site,
+                    hasChanged = businessPartner.type == GoldenRecordTypeV7.Site,
                     siteMainAddress = addressToClean?.let { cleanAddress(addressToClean, siteMainBpnReference!!, true, sharedByOwner) }
                 )
             }
         }
     }
 
-    private fun cleanAdditionalAddress(businessPartner: BusinessPartner, sharedByOwner: Boolean): PostalAddressWithScriptVariants? {
+    private fun cleanAdditionalAddress(businessPartner: BusinessPartnerV7Dto, sharedByOwner: Boolean): PostalAddressWithScriptVariantsV7Dto? {
         return businessPartner.additionalAddress?.let {
-            PostalAddressWithScriptVariants(
+            PostalAddressWithScriptVariantsV7Dto(
                 postalProperties = cleanAddress(
                     it.postalProperties,
                     it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), null, businessPartner.addressReference()),
-                    businessPartner.type == GoldenRecordType.Address,
+                    businessPartner.type == GoldenRecordTypeV7.Address,
                     sharedByOwner
                 ),
                 scriptVariants = it.scriptVariants
@@ -169,7 +183,7 @@ class CleaningServiceDummy(
     // whole stream over time, which this service does not see - it is handed one record per task and keeps no ledger.
     // So it passes the sharing member's own statement through: an address several records name ends up with the sites
     // of whichever record was refined last. A refinement service meant for production has to keep that ledger.
-    private fun cleanAdditionalSites(businessPartner: BusinessPartner): List<AdditionalSite> {
+    private fun cleanAdditionalSites(businessPartner: BusinessPartnerV7Dto): List<AdditionalSiteV7Dto> {
         return businessPartner.additionalSites.map { additionalSite ->
             // An entry without a name offers nothing to derive a distinct reference from, and the record's name parts -
             // the fallback the primary site reference uses - would alias the entry onto that primary site.
@@ -182,7 +196,7 @@ class CleaningServiceDummy(
         }
     }
 
-    private fun cleanAddress(addressToClean: PostalAddress, bpnReference: BpnReference, hasChanged: Boolean, sharedByOwner: Boolean): PostalAddress {
+    private fun cleanAddress(addressToClean: PostalAddressV7Dto, bpnReference: BpnReferenceV7Dto, hasChanged: Boolean, sharedByOwner: Boolean): PostalAddressV7Dto {
         return addressToClean.copy(
                 bpnReference =  bpnReference,
                 hasChanged = hasChanged,
@@ -190,32 +204,32 @@ class CleaningServiceDummy(
             )
     }
 
-    private fun BusinessPartner.legalEntityReference() =
+    private fun BusinessPartnerV7Dto.legalEntityReference() =
         "LEGAL_ENTITY${legalEntity.legalName ?: namePartsName()}".toUUID()
 
-    private fun BusinessPartner.siteReference() = siteReferenceOf(site?.siteName ?: namePartsName())
+    private fun BusinessPartnerV7Dto.siteReference() = siteReferenceOf(site?.siteName ?: namePartsName())
 
     private fun siteReferenceOf(siteName: String) = "S_$siteName".toUUID()
 
-    private fun BusinessPartner.addressReference() = "A_${additionalAddress?.addressName ?: namePartsName()}".toUUID()
+    private fun BusinessPartnerV7Dto.addressReference() = "A_${additionalAddress?.addressName ?: namePartsName()}".toUUID()
 
-    private fun BusinessPartner.namePartsName() = uncategorized.nameParts.joinToString(" ")
+    private fun BusinessPartnerV7Dto.namePartsName() = uncategorized.nameParts.joinToString(" ")
 
-    private fun BusinessPartner.legalAddressReference() = "LEGAL_ADDRESS".toUUID()
+    private fun BusinessPartnerV7Dto.legalAddressReference() = "LEGAL_ADDRESS".toUUID()
 
-    private fun BusinessPartner.siteMainAddressReference() = "SITE_MAIN_ADDRESS".toUUID()
+    private fun BusinessPartnerV7Dto.siteMainAddressReference() = "SITE_MAIN_ADDRESS".toUUID()
 
 
-    private fun generateBpnRequestIdentifier(legalEntityReference: UUID, siteReference: UUID? = null, addressReference: UUID? = null): BpnReference{
+    private fun generateBpnRequestIdentifier(legalEntityReference: UUID, siteReference: UUID? = null, addressReference: UUID? = null): BpnReferenceV7Dto{
         val siteReferenceString = siteReference?.let { "${siteReference}_" } ?: ""
         val addressReferenceString = addressReference?.let { "${addressReference}_" } ?: ""
-        return BpnReference( addressReferenceString + siteReferenceString + legalEntityReference.toString(), null, BpnReferenceType.BpnRequestIdentifier)
+        return BpnReferenceV7Dto( addressReferenceString + siteReferenceString + legalEntityReference.toString(), null, BpnReferenceTypeV7.BpnRequestIdentifier)
     }
 
 
 
-    private fun BpnReference.toRequestIfNotBpn(legalEntityReference: UUID, siteReference: UUID? = null, additionalAddressReference: UUID? = null) =
-        if(referenceType == BpnReferenceType.Bpn)
+    private fun BpnReferenceV7Dto.toRequestIfNotBpn(legalEntityReference: UUID, siteReference: UUID? = null, additionalAddressReference: UUID? = null) =
+        if(referenceType == BpnReferenceTypeV7.Bpn)
             this
         else
             generateBpnRequestIdentifier(legalEntityReference, siteReference, additionalAddressReference)
