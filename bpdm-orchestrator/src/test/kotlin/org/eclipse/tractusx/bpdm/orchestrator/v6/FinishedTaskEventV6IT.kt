@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.FinishedTaskEventsV6Response
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
@@ -37,7 +37,7 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get successfully finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName, TaskMode.UpdateFromPool)
+        val createdTask = testDataClient.createTask(testName, TaskModeV7.UpdateFromPool)
         testDataClient.resolveTask(createdTask.taskId, TaskStepV6.Clean, testName)
 
         //WHEN
@@ -59,7 +59,7 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get failed finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName, TaskMode.UpdateFromPool)
+        val createdTask = testDataClient.createTask(testName, TaskModeV7.UpdateFromPool)
         testDataClient.failTask(createdTask.taskId, TaskStepV6.Clean)
 
         //WHEN
@@ -81,8 +81,8 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get task event after time`(){
         //GIVEN
-        val createdTask1 = testDataClient.createTask("$testName 1", TaskMode.UpdateFromPool)
-        val createdTask2 = testDataClient.createTask("$testName 1", TaskMode.UpdateFromPool)
+        val createdTask1 = testDataClient.createTask("$testName 1", TaskModeV7.UpdateFromPool)
+        val createdTask2 = testDataClient.createTask("$testName 1", TaskModeV7.UpdateFromPool)
 
         testDataClient.failTask(createdTask1.taskId, TaskStepV6.Clean)
         val timeX = Instant.now()

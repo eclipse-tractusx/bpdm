@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.config
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClientImpl
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.DefaultOrchestratorV7Client
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
@@ -47,7 +47,7 @@ data class OrchestratorClientConfigurationProperties(
 @Configuration
 class OrchestratorClientConfiguration{
     @Bean
-    fun orchestratorClient(clientProperties: OrchestratorClientConfigurationProperties, webClientProvider: BpdmWebClientProvider): OrchestrationApiClient{
-        return OrchestrationApiClientImpl { webClientProvider.builder(clientProperties).build() }
+    fun orchestratorClient(clientProperties: OrchestratorClientConfigurationProperties, webClientProvider: BpdmWebClientProvider): OrchestratorV7Client{
+        return DefaultOrchestratorV7Client { webClientProvider.builder(clientProperties).build() }
     }
 }

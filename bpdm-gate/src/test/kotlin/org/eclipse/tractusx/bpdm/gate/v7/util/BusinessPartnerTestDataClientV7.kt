@@ -39,11 +39,11 @@ import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
@@ -75,28 +75,28 @@ class BusinessPartnerTestDataClientV7(
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyV7Request(listOf(externalId)))
     }
 
-    fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto {
+    fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateV7Dto {
         setStateToReady(externalId)
         val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
         taskCreationService.createTasksForReadyBusinessPartners()
         return createdTask
     }
 
-    fun sharedBusinessPartnerOf(externalId: String, seed: String = externalId): BusinessPartner {
+    fun sharedBusinessPartnerOf(externalId: String, seed: String = externalId): BusinessPartnerV7Dto {
         // Other tests share this mock server, so only what is recorded from here on is this record's sharing.
         orchestratorMockDataFactory.resetRecordedRequests()
         setStateToPending(externalId, seed)
         return orchestratorMockDataFactory.getCreatedTaskBusinessPartners().single()
     }
 
-    fun goldenRecordCountedSyncedToOrchestrator(): List<SharingMemberRecordUpdateRequest> {
+    fun goldenRecordCountedSyncedToOrchestrator(): List<SharingMemberRecordUpdateV7Request> {
         orchestratorMockDataFactory.mockSharingMemberRecordUpdates()
         orchestratorMockDataFactory.resetRecordedRequests()
         goldenRecordCountedSyncService.synchronizeGoldenRecordCounted()
         return orchestratorMockDataFactory.getSharingMemberRecordUpdates()
     }
 
-    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {
+    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateV7Dto {
         val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList())
         setStateToReady(externalId)
         taskCreationService.createTasksForReadyBusinessPartners()
@@ -104,7 +104,7 @@ class BusinessPartnerTestDataClientV7(
         return refinement.taskState
     }
 
-    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorTypeV7): TaskClientStateV7Dto {
         val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
         setStateToReady(externalId)
         taskCreationService.createTasksForReadyBusinessPartners()
@@ -112,7 +112,7 @@ class BusinessPartnerTestDataClientV7(
         return errorTask
     }
 
-    fun setStateToResultWithoutCountry(externalId: String, seed: String = externalId): TaskClientStateDto {
+    fun setStateToResultWithoutCountry(externalId: String, seed: String = externalId): TaskClientStateV7Dto {
         val refinedTask = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList()).taskState
         val refinedResult = refinedTask.businessPartnerResult
         val additionalAddress = refinedResult.additionalAddress!!
@@ -127,7 +127,7 @@ class BusinessPartnerTestDataClientV7(
         return incompleteTask
     }
 
-    fun setStateToTaskMissing(externalId: String, seed: String = externalId): TaskClientStateDto {
+    fun setStateToTaskMissing(externalId: String, seed: String = externalId): TaskClientStateV7Dto {
         val createdTask = orchestratorMockDataFactory.mockMissingTask(seed)
         setStateToReady(externalId)
         taskCreationService.createTasksForReadyBusinessPartners()
@@ -135,17 +135,17 @@ class BusinessPartnerTestDataClientV7(
         return createdTask
     }
 
-    fun setStateToPendingAfterHealthCheck(externalId: String, seed: String = externalId): TaskClientStateDto {
+    fun setStateToPendingAfterHealthCheck(externalId: String, seed: String = externalId): TaskClientStateV7Dto {
         val createdTask = setStateToPending(externalId, seed)
         orchestratorMockDataFactory.mockTasksPending()
         taskHealthCheckService.checkPendingTasks()
         return createdTask
     }
 
-    fun setStateToTaskLost(externalId: String, seed: String = externalId): TaskClientStateDto =
+    fun setStateToTaskLost(externalId: String, seed: String = externalId): TaskClientStateV7Dto =
         setStatesToTaskLost(listOf(externalId)).single()
 
-    fun setStatesToTaskLost(externalIds: List<String>): List<TaskClientStateDto> {
+    fun setStatesToTaskLost(externalIds: List<String>): List<TaskClientStateV7Dto> {
         val createdTasks = externalIds.map { setStateToPending(it) }
         orchestratorMockDataFactory.mockTasksLost()
         taskHealthCheckService.checkPendingTasks()
@@ -253,4 +253,4 @@ class BusinessPartnerTestDataClientV7(
 }
 
 private fun BusinessPartnerInputV7Dto.uncategorizedScriptVariants() =
-    scriptVariants.map { UncategorizedScriptVariant(it.scriptCode, it.nameParts) }
+    scriptVariants.map { UncategorizedScriptVariantV7Dto(it.scriptCode, it.nameParts) }

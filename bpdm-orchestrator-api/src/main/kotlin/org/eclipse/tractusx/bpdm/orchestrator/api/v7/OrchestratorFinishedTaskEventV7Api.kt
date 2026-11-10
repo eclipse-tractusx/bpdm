@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -56,6 +56,6 @@ interface OrchestratorFinishedTaskEventV7Api {
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events"])
     fun getEvents(@RequestParam timestamp: Instant,
                   @ParameterObject paginationRequest: PaginationRequest
-    ): FinishedTaskEventsResponse
+    ): FinishedTaskEventsV7Response
 
 }

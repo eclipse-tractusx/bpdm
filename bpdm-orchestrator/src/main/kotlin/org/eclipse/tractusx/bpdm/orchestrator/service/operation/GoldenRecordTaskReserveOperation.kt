@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskReser
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.util.toLogIdentifiers
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -42,7 +42,7 @@ class GoldenRecordTaskReserveOperation(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun execute(parsed: GoldenRecordTaskReserveParsed): TaskStepReservationResponse {
+    fun execute(parsed: GoldenRecordTaskReserveParsed): TaskStepReservationV7Response {
         val reservedTasks = parsed.foundTasks.map { goldenRecordTaskStateMachine.doReserve(it) }
         val now = Instant.now()
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
@@ -52,13 +52,13 @@ class GoldenRecordTaskReserveOperation(
 
         return reservedTasks
             .map { task ->
-                TaskStepReservationEntryDto(
+                TaskStepReservationEntryV7Dto(
                     task.uuid.toString(),
                     task.gateRecord.publicId.toString(),
                     responseMapper.toBusinessPartnerResult(task.businessPartner)
                 )
             }
-            .let { reservations -> TaskStepReservationResponse(reservations, pendingTimeout) }
+            .let { reservations -> TaskStepReservationV7Response(reservations, pendingTimeout) }
     }
 
     private fun calculateTaskPendingTimeout(task: GoldenRecordTaskDb): Instant =

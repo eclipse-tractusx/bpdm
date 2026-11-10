@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSite
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
 import org.junit.jupiter.api.Test
 
 class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
@@ -40,8 +40,8 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `create a stated additional site on the record address`() {
         //GIVEN
-        val statedSite = AdditionalSite(
-            bpnReference = BpnReference("Additional Site Reference $testName", null, BpnReferenceType.BpnRequestIdentifier),
+        val statedSite = AdditionalSiteV7Dto(
+            bpnReference = BpnReferenceV7Dto("Additional Site Reference $testName", null, BpnReferenceTypeV7.BpnRequestIdentifier),
             siteName = "Additional Site $testName"
         )
         val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner(testName)
@@ -54,7 +54,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         //THEN
         val createdSite = result.additionalSites.single()
         assertThat(createdSite.siteName).isEqualTo(statedSite.siteName)
-        assertThat(createdSite.bpnReference.referenceType).isEqualTo(BpnReferenceType.Bpn)
+        assertThat(createdSite.bpnReference.referenceType).isEqualTo(BpnReferenceTypeV7.Bpn)
         assertThat(sitesOfMainAddress(result)).containsExactlyInAnyOrder(result.recordSiteBpn(), createdSite.bpn())
     }
 
@@ -66,7 +66,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `create a stated additional site once when it is stated twice`() {
         //GIVEN
-        val statedSite = AdditionalSite(bpnReference = BpnReference.empty, siteName = "Additional Site $testName")
+        val statedSite = AdditionalSiteV7Dto(bpnReference = BpnReferenceV7Dto.empty, siteName = "Additional Site $testName")
         val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner(testName)
             .copyWithBpnRequests()
             .copy(additionalSites = listOf(statedSite, statedSite))
@@ -94,7 +94,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner("Second $testName")
             .copyWithBpnRequests()
             .underLegalEntity(existing.legalEntity.bpnReference.referenceValue!!)
-            .copy(additionalSites = listOf(AdditionalSite(BpnReference(existingSiteBpn, null, BpnReferenceType.Bpn), null)))
+            .copy(additionalSites = listOf(AdditionalSiteV7Dto(BpnReferenceV7Dto(existingSiteBpn, null, BpnReferenceTypeV7.Bpn), null)))
 
         //WHEN
         val result = testDataClient.processTask("Second $testName", businessPartner)
@@ -118,7 +118,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         val stating = orchestratorRequestFactory.buildSiteBusinessPartner("Second $testName")
             .copyWithBpnRequests()
             .underLegalEntity(existing.legalEntity.bpnReference.referenceValue!!)
-            .copy(additionalSites = listOf(AdditionalSite(BpnReference(existingSiteBpn, null, BpnReferenceType.Bpn), null)))
+            .copy(additionalSites = listOf(AdditionalSiteV7Dto(BpnReferenceV7Dto(existingSiteBpn, null, BpnReferenceTypeV7.Bpn), null)))
         val linked = testDataClient.processTask("Second $testName", stating)
         assertThat(sitesOfMainAddress(linked)).containsExactlyInAnyOrder(linked.recordSiteBpn(), existingSiteBpn)
 
@@ -138,8 +138,8 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
     @Test
     fun `reject dropping a site the record address is the main address of`() {
         //GIVEN
-        val statedSite = AdditionalSite(
-            bpnReference = BpnReference("Additional Site Reference $testName", null, BpnReferenceType.BpnRequestIdentifier),
+        val statedSite = AdditionalSiteV7Dto(
+            bpnReference = BpnReferenceV7Dto("Additional Site Reference $testName", null, BpnReferenceTypeV7.BpnRequestIdentifier),
             siteName = "Additional Site $testName"
         )
         val stating = orchestratorRequestFactory.buildSiteBusinessPartner(testName)
@@ -168,7 +168,7 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
 
         val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner("Own $testName")
             .copyWithBpnRequests()
-            .copy(additionalSites = listOf(AdditionalSite(BpnReference(foreignSiteBpn, null, BpnReferenceType.Bpn), null)))
+            .copy(additionalSites = listOf(AdditionalSiteV7Dto(BpnReferenceV7Dto(foreignSiteBpn, null, BpnReferenceTypeV7.Bpn), null)))
 
         //WHEN
         val errors = testDataClient.processTaskToErrors("Own $testName", businessPartner)
@@ -222,14 +222,14 @@ class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {
         assertThat(result.additionalSites).isEmpty()
     }
 
-    private fun BusinessPartner.underLegalEntity(bpnL: String) =
-        copy(legalEntity = legalEntity.copy(bpnReference = BpnReference(bpnL, null, BpnReferenceType.Bpn)))
+    private fun BusinessPartnerV7Dto.underLegalEntity(bpnL: String) =
+        copy(legalEntity = legalEntity.copy(bpnReference = BpnReferenceV7Dto(bpnL, null, BpnReferenceTypeV7.Bpn)))
 
-    private fun BusinessPartner.recordSiteBpn() = site!!.bpnReference.referenceValue!!
+    private fun BusinessPartnerV7Dto.recordSiteBpn() = site!!.bpnReference.referenceValue!!
 
-    private fun AdditionalSite.bpn() = bpnReference.referenceValue!!
+    private fun AdditionalSiteV7Dto.bpn() = bpnReference.referenceValue!!
 
-    private fun sitesOfMainAddress(result: BusinessPartner): List<String> {
+    private fun sitesOfMainAddress(result: BusinessPartnerV7Dto): List<String> {
         val addressBpn = result.site!!.siteMainAddress!!.bpnReference.referenceValue!!
         val address = poolClient.addresses
             .getAddresses(AddressSearchV7Request(addressBpns = listOf(addressBpn)), PaginationRequest())

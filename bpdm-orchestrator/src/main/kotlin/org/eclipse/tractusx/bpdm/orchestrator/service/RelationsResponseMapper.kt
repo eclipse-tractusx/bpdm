@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorV7Dto
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -37,7 +37,7 @@ class RelationsResponseMapper {
 
     fun toClientState(task: RelationsGoldenRecordTaskDb, timeout: Instant) =
         with(task) {
-            TaskClientRelationsStateDto(
+            TaskClientRelationsStateV7Dto(
                 taskId = task.uuid.toString(),
                 recordId = task.gateRecord.privateId.toString(),
                 businessPartnerRelationsResult = toBusinessPartnerRelationsResult(businessPartnerRelations),
@@ -47,12 +47,12 @@ class RelationsResponseMapper {
 
     fun toBusinessPartnerRelationsResult(businessPartnerRelations: RelationsGoldenRecordTaskDb.BusinessPartnerRelations) =
         with(businessPartnerRelations) {
-            BusinessPartnerRelations(
+            BusinessPartnerRelationsV7Dto(
                 relationType = toRelationType(relationType),
                 businessPartnerSourceBpn = businessPartnerSourceBpn,
                 businessPartnerTargetBpn = businessPartnerTargetBpn,
                 validityPeriods = businessPartnerRelations.validityPeriods.map {
-                    RelationValidityPeriod(
+                    RelationValidityPeriodV7Dto(
                         validFrom = it.validFrom,
                         validTo = it.validTo
                     )
@@ -63,7 +63,7 @@ class RelationsResponseMapper {
 
     fun toProcessingState(task: RelationsGoldenRecordTaskDb, timeout: Instant) =
         with(task.processingState) {
-            TaskProcessingRelationsStateDto(
+            TaskProcessingRelationsStateV7Dto(
                 resultState = toResultState(resultState),
                 step = step,
                 stepState = toStepState(stepState),
@@ -76,31 +76,31 @@ class RelationsResponseMapper {
 
     fun toRelationType(relationType: RelationsGoldenRecordTaskDb.RelationType) =
         when(relationType){
-            RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            RelationsGoldenRecordTaskDb.RelationType.IsManagedBy -> RelationType.IsManagedBy
-            RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy -> RelationType.IsOwnedBy
-            RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy -> RelationType.IsReplacedBy
+            RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor -> RelationTypeV7.IsAlternativeHeadquarterFor
+            RelationsGoldenRecordTaskDb.RelationType.IsManagedBy -> RelationTypeV7.IsManagedBy
+            RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy -> RelationTypeV7.IsOwnedBy
+            RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
 
     fun toResultState(resultState: RelationsGoldenRecordTaskDb.ResultState) =
         when(resultState){
-            RelationsGoldenRecordTaskDb.ResultState.Pending -> ResultState.Pending
-            RelationsGoldenRecordTaskDb.ResultState.Success ->  ResultState.Success
-            RelationsGoldenRecordTaskDb.ResultState.Error ->  ResultState.Error
-            RelationsGoldenRecordTaskDb.ResultState.Aborted ->  ResultState.Error
+            RelationsGoldenRecordTaskDb.ResultState.Pending -> ResultStateV7.Pending
+            RelationsGoldenRecordTaskDb.ResultState.Success ->  ResultStateV7.Success
+            RelationsGoldenRecordTaskDb.ResultState.Error ->  ResultStateV7.Error
+            RelationsGoldenRecordTaskDb.ResultState.Aborted ->  ResultStateV7.Error
         }
 
     fun toStepState(stepState: RelationsGoldenRecordTaskDb.StepState) =
         when(stepState){
-            RelationsGoldenRecordTaskDb.StepState.Queued -> StepState.Queued
-            RelationsGoldenRecordTaskDb.StepState.Reserved -> StepState.Reserved
-            RelationsGoldenRecordTaskDb.StepState.Success -> StepState.Success
-            RelationsGoldenRecordTaskDb.StepState.Error -> StepState.Error
-            RelationsGoldenRecordTaskDb.StepState.Aborted -> StepState.Error
+            RelationsGoldenRecordTaskDb.StepState.Queued -> StepStateV7.Queued
+            RelationsGoldenRecordTaskDb.StepState.Reserved -> StepStateV7.Reserved
+            RelationsGoldenRecordTaskDb.StepState.Success -> StepStateV7.Success
+            RelationsGoldenRecordTaskDb.StepState.Error -> StepStateV7.Error
+            RelationsGoldenRecordTaskDb.StepState.Aborted -> StepStateV7.Error
         }
 
     fun toTaskError(taskError: RelationsTaskErrorDb) =
         with(taskError) {
-            TaskRelationsErrorDto(type = type, description = description)
+            TaskRelationsErrorV7Dto(type = type, description = description)
         }
 }

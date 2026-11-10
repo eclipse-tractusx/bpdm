@@ -21,18 +21,18 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.orchestrator.v7.ScheduledTimeoutOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
@@ -40,35 +40,35 @@ import org.junit.jupiter.params.provider.EnumSource
 class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBaseV7(){
 
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `wait for task pending and retention timeout`(taskMode: TaskMode) {
+    @EnumSource(TaskModeV7::class)
+    fun `wait for task pending and retention timeout`(taskMode: TaskModeV7) {
         // create tasks
         val createdTask1 = testDataClient.createBusinessPartnerTask("$testName 1", taskMode)
         val createdTask2 = testDataClient.createBusinessPartnerTask("$testName 2", taskMode)
-        val taskIds = listOf(createdTask1, createdTask2).map { TaskStateRequest.Entry(it.taskId, it.recordId) }
+        val taskIds = listOf(createdTask1, createdTask2).map { TaskStateV7Request.Entry(it.taskId, it.recordId) }
 
         // check for state Pending
         checkStateForAllTasks(taskIds) {
-            assertThat(it.resultState).isEqualTo(ResultState.Pending)
+            assertThat(it.resultState).isEqualTo(ResultStateV7.Pending)
         }
 
         // wait for 1/2 pending time -> should still be pending
         Thread.sleep(taskConfigProperties.taskPendingTimeout.dividedBy(2).toMillis())
         checkStateForAllTasks(taskIds) {
-            assertThat(it.resultState).isEqualTo(ResultState.Pending)
+            assertThat(it.resultState).isEqualTo(ResultStateV7.Pending)
         }
 
         // wait for another 1/2 pending time plus 1sec -> should be in state Error / Timeout
         Thread.sleep(taskConfigProperties.taskPendingTimeout.dividedBy(2).plusSeconds(1).toMillis())
         checkStateForAllTasks(taskIds) {
-            assertThat(it.resultState).isEqualTo(ResultState.Error)
-            assertThat(it.errors.first().type).isEqualTo(TaskErrorType.Timeout)
+            assertThat(it.resultState).isEqualTo(ResultStateV7.Error)
+            assertThat(it.errors.first().type).isEqualTo(TaskErrorTypeV7.Timeout)
         }
 
         // wait for 1/2 retention time -> should still be in state Error / Timeout
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
         checkStateForAllTasks(taskIds) {
-            assertThat(it.resultState).isEqualTo(ResultState.Error)
+            assertThat(it.resultState).isEqualTo(ResultStateV7.Error)
         }
 
         // wait for 1/2 retention time plus 1sec -> should be removed now
@@ -78,8 +78,8 @@ class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBas
     }
 
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `wait for task retention timeout after success`(taskMode: TaskMode) {
+    @EnumSource(TaskModeV7::class)
+    fun `wait for task retention timeout after success`(taskMode: TaskModeV7) {
         // create single task in UpdateFromPool mode (only one step)
         val createdTask = testDataClient.createBusinessPartnerTask("$testName 1", taskMode)
         val createdTasks = listOf(createdTask)
@@ -90,7 +90,7 @@ class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBas
         allSteps.forEach { step ->
             reserveTasks(step).reservedTasks.single()
             // resolve with success
-            val cleaningResult = TaskStepResultEntryDto(
+            val cleaningResult = TaskStepResultEntryV7Dto(
                 taskId = taskId,
                 businessPartner = createdTask.businessPartnerResult
             )
@@ -99,13 +99,13 @@ class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBas
 
         // should be in state Success now
         createdTasks.searchTaskStates(listOf(taskId)).tasks.forEach {
-            assertThat(it.processingState.resultState).isEqualTo(ResultState.Success)
+            assertThat(it.processingState.resultState).isEqualTo(ResultStateV7.Success)
         }
 
         // wait for 1/2 retention time -> should still be in state Success
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
         createdTasks.searchTaskStates(listOf(taskId)).tasks.forEach {
-            assertThat(it.processingState.resultState).isEqualTo(ResultState.Success)
+            assertThat(it.processingState.resultState).isEqualTo(ResultStateV7.Success)
         }
 
         // wait for 1/2 retention time -> should still be removed
@@ -115,8 +115,8 @@ class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBas
     }
 
     @ParameterizedTest
-    @EnumSource(TaskMode::class)
-    fun `wait for task retention timeout after error`(taskMode: TaskMode) {
+    @EnumSource(TaskModeV7::class)
+    fun `wait for task retention timeout after error`(taskMode: TaskModeV7) {
         // create single task
         val createdTask = testDataClient.createBusinessPartnerTask("$testName 1", taskMode)
         val createdTasks = listOf(createdTask)
@@ -128,22 +128,22 @@ class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBas
         val searchIdentity = reservedTask.toTaskSearchIdentity(createdTasks)
 
         // resolve with error
-        val cleaningResult = TaskStepResultEntryDto(
+        val cleaningResult = TaskStepResultEntryV7Dto(
             taskId = taskId,
             businessPartner = reservedTask.businessPartner,
-            errors = listOf(TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event"))
+            errors = listOf(TaskErrorV7Dto(TaskErrorTypeV7.Unspecified, "Unfortunate event"))
         )
         resolveTasks(firstStep, listOf(cleaningResult))
 
         // should be in state Success now
         checkStateForAllTasks(listOf(searchIdentity)) {
-            assertThat(it.resultState).isEqualTo(ResultState.Error)
+            assertThat(it.resultState).isEqualTo(ResultStateV7.Error)
         }
 
         // wait for 1/2 retention time -> should still be in state Success
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
         checkStateForAllTasks(listOf(searchIdentity)) {
-            assertThat(it.resultState).isEqualTo(ResultState.Error)
+            assertThat(it.resultState).isEqualTo(ResultStateV7.Error)
         }
 
         // wait for 1/2 retention time -> should still be removed
@@ -154,39 +154,39 @@ class BusinessPartnerTaskTimeoutScheduledIT: ScheduledTimeoutOrchestratorTestBas
 
 
 
-    private fun reserveTasks(step: TaskStep, amount: Int = 3) =
+    private fun reserveTasks(step: TaskStepV7, amount: Int = 3) =
         orchestratorClient.goldenRecordTasks.reserveTasksForStep(
-            TaskStepReservationRequest(
+            TaskStepReservationV7Request(
                 step = step,
                 amount = amount
             )
         )
 
-    private fun resolveTasks(step: TaskStep, results: List<TaskStepResultEntryDto>) =
+    private fun resolveTasks(step: TaskStepV7, results: List<TaskStepResultEntryV7Dto>) =
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(step, results)
+            TaskStepResultV7Request(step, results)
         )
 
-    private fun searchTaskStates(taskIds: List<TaskStateRequest.Entry>) =
+    private fun searchTaskStates(taskIds: List<TaskStateV7Request.Entry>) =
         orchestratorClient.goldenRecordTasks.searchTaskStates(
-            TaskStateRequest(taskIds)
+            TaskStateV7Request(taskIds)
         )
 
-    private fun checkStateForAllTasks(taskIds: List<TaskStateRequest.Entry>, checkFunc: (TaskProcessingStateDto) -> Unit) {
+    private fun checkStateForAllTasks(taskIds: List<TaskStateV7Request.Entry>, checkFunc: (TaskProcessingStateV7Dto) -> Unit) {
         searchTaskStates(taskIds).tasks
             .also { assertThat(it.size).isEqualTo(taskIds.size) }
             .forEach { stateDto -> checkFunc(stateDto.processingState) }
     }
 
-    private fun TaskClientStateDto.toTaskSearchIdentity() = TaskStateRequest.Entry(taskId, recordId)
+    private fun TaskClientStateV7Dto.toTaskSearchIdentity() = TaskStateV7Request.Entry(taskId, recordId)
 
-    private fun TaskStepReservationEntryDto.toTaskSearchIdentity(createdTasks: List<TaskClientStateDto>) =
-        TaskStateRequest.Entry(taskId, createdTasks.find { it.taskId == taskId }!!.recordId)
+    private fun TaskStepReservationEntryV7Dto.toTaskSearchIdentity(createdTasks: List<TaskClientStateV7Dto>) =
+        TaskStateV7Request.Entry(taskId, createdTasks.find { it.taskId == taskId }!!.recordId)
 
-    private fun List<TaskClientStateDto>.searchTaskStates(taskIds: List<String>) =
+    private fun List<TaskClientStateV7Dto>.searchTaskStates(taskIds: List<String>) =
         this.searchTaskStates(taskIds.toSet())
 
-    private fun List<TaskClientStateDto>.searchTaskStates(taskIds: Set<String>) =
+    private fun List<TaskClientStateV7Dto>.searchTaskStates(taskIds: Set<String>) =
             this.filter { taskIds.contains(it.taskId) }
                 .map { it.toTaskSearchIdentity() }
                 .let { searchTaskStates(it) }

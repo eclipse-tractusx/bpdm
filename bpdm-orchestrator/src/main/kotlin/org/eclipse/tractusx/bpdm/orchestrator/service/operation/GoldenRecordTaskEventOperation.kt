@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -37,16 +37,16 @@ class GoldenRecordTaskEventOperation(
 ) {
     private val finishedTaskStates = setOf(GoldenRecordTaskDb.ResultState.Success, GoldenRecordTaskDb.ResultState.Error)
 
-    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsV7Response {
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size, Sort.Direction.ASC, "updatedAt")
         val finishedTasksPage = taskRepository.findByProcessingStateResultStateInAndUpdatedAtAfter(finishedTaskStates, timestamp.toTimestamp(), pageRequest)
 
-        return FinishedTaskEventsResponse(
+        return FinishedTaskEventsV7Response(
             totalElements = finishedTasksPage.totalElements,
             totalPages = finishedTasksPage.totalPages,
             page = finishedTasksPage.number,
             contentSize = finishedTasksPage.content.size,
-            content = finishedTasksPage.content.map { FinishedTaskEventsResponse.Event(it.updatedAt.instant, responseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
+            content = finishedTasksPage.content.map { FinishedTaskEventsV7Response.Event(it.updatedAt.instant, responseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
         )
     }
 }

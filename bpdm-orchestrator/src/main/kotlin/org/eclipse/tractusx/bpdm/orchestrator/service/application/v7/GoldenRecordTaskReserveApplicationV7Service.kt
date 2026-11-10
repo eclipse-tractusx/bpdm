@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskReserveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskReserveOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskReserveParser
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -38,7 +38,7 @@ class GoldenRecordTaskReserveApplicationV7Service(
 ) {
 
     @Transactional
-    fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
+    fun reserveTasksForStep(reservationRequest: TaskStepReservationV7Request): TaskStepReservationV7Response {
         val unifiedRequest = GoldenRecordTaskReserveRequest(reservationRequest.step, reservationRequest.amount)
         val parseResult = parser.parse(unifiedRequest)
         

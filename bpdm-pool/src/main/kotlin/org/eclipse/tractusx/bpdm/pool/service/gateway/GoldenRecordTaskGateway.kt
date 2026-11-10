@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorO
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcomeRaw
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.springframework.stereotype.Component
 
 /**
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GoldenRecordTaskGateway(
-    private val orchestrationApiClient: OrchestrationApiClient,
+    private val orchestrationApiClient: OrchestratorV7Client,
     private val taskProperties: GoldenRecordTaskConfigProperties,
     private val inboundMapper: OrchestratorInboundMapper,
     private val outboundMapper: OrchestratorOutboundMapper
@@ -47,7 +47,7 @@ class GoldenRecordTaskGateway(
      */
     fun reserveTasks(amount: Int): List<GoldenRecordTaskRaw> =
         orchestrationApiClient.goldenRecordTasks
-            .reserveTasksForStep(TaskStepReservationRequest(step = taskProperties.step, amount = amount))
+            .reserveTasksForStep(TaskStepReservationV7Request(step = taskProperties.step, amount = amount))
             .reservedTasks
             .map { inboundMapper.toRaw(it) }
 
@@ -56,7 +56,7 @@ class GoldenRecordTaskGateway(
      */
     fun resolveTasks(results: List<GoldenRecordTaskResultRecord>) {
         val resultEntries = results.map { withAcceptedErrorLength(outboundMapper.toResultEntry(it)) }
-        orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = taskProperties.step, results = resultEntries))
+        orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultV7Request(step = taskProperties.step, results = resultEntries))
     }
 
     /**
@@ -65,9 +65,9 @@ class GoldenRecordTaskGateway(
     fun resolveTasksAsErrors(taskIds: List<String>): List<TaskErrorReportOutcomeRaw> =
         reportTaskErrors(taskIds) { taskId ->
             val resultEntry = outboundMapper.toErrorReportEntry(taskId)
-            orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = taskProperties.step, results = listOf(resultEntry)))
+            orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultV7Request(step = taskProperties.step, results = listOf(resultEntry)))
         }
 
-    private fun withAcceptedErrorLength(result: TaskStepResultEntryDto) =
+    private fun withAcceptedErrorLength(result: TaskStepResultEntryV7Dto) =
         result.copy(errors = result.errors.map { it.copy(description = it.description.take(MAX_ERROR_DESCRIPTION_LENGTH)) })
 }

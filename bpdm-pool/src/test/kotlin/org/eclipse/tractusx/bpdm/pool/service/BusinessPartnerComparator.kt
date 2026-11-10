@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.pool.service
@@ -32,20 +32,20 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinate
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Site
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Street
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.function.BiPredicate
 
-fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseV7Dto, legalEntity: LegalEntity?) {
+fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseV7Dto, legalEntity: LegalEntityV7Dto?) {
 
     val verboseLegalEntity = verboseRequest.header
 
@@ -61,7 +61,7 @@ fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseV7Dto, 
     compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
 }
 
-fun compareSite(verboseRequest: SiteWithMainAddressVerboseV7Dto, site: Site?) {
+fun compareSite(verboseRequest: SiteWithMainAddressVerboseV7Dto, site: SiteV7Dto?) {
 
     val verboseSite = verboseRequest.site
 
@@ -76,7 +76,7 @@ fun compareSite(verboseRequest: SiteWithMainAddressVerboseV7Dto, site: Site?) {
     compareLogisticAddress(verboseMainAddress, mainAddress)
 }
 
-fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseV7Dto, address: PostalAddress?) {
+fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseV7Dto, address: PostalAddressV7Dto?) {
 
     assertThat(verboseAddress.name).isEqualTo(address?.addressName)
     compareAddressStates(verboseAddress.states, address?.states)
@@ -96,13 +96,13 @@ fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseV7Dto,
 
 
     if(verbosePhysicalAddress.geographicCoordinates == null) {
-        assertThat(address?.physicalAddress?.geographicCoordinates).isEqualTo(GeoCoordinate.empty)
+        assertThat(address?.physicalAddress?.geographicCoordinates).isEqualTo(GeoCoordinateV7Dto.empty)
     }else{
         assertThat(verbosePhysicalAddress.geographicCoordinates).usingRecursiveComparison().isEqualTo(address?.physicalAddress?.geographicCoordinates)
     }
 
     if(verbosePhysicalAddress.street == null) {
-        assertThat(address?.physicalAddress?.street).isEqualTo(Street.empty)
+        assertThat(address?.physicalAddress?.street).isEqualTo(StreetV7Dto.empty)
     }else{
         assertThat(verbosePhysicalAddress.street).usingRecursiveComparison().isEqualTo(address?.physicalAddress?.street)
     }
@@ -118,7 +118,7 @@ fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseV7Dto,
     assertThat(verboseAlternAddress?.administrativeAreaLevel1).isEqualTo(alternAddress?.administrativeAreaLevel1)
 }
 
-fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseV7Dto>, states: Collection<BusinessState>?) {
+fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseV7Dto>, states: Collection<BusinessStateV7Dto>?) {
 
     assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
     val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -132,7 +132,7 @@ fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseV7Dto>, st
     }
 }
 
-fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseV7Dto>, identifiers: Collection<Identifier>?) {
+fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseV7Dto>, identifiers: Collection<IdentifierV7Dto>?) {
 
     assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
     val sortedVerboseIdentifiers = identifiersVerbose.sortedWith( compareBy( {it.value}, {it.typeVerbose.name }) )
@@ -145,7 +145,7 @@ fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVe
     }
 }
 
-fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseV7Dto>,  states: Collection<BusinessState>?) {
+fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseV7Dto>,  states: Collection<BusinessStateV7Dto>?) {
 
     assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
     val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -171,7 +171,7 @@ fun isEqualToIgnoringMilliseconds(): BiPredicate<LocalDateTime?, Instant?> {
     }
 }
 
-fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseV7Dto>, identifiers: Collection<Identifier>?) {
+fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseV7Dto>, identifiers: Collection<IdentifierV7Dto>?) {
 
     assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
 
@@ -184,7 +184,7 @@ fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerbo
     }
 }
 
-fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseV7Dto>, states: Collection<BusinessState>?) {
+fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseV7Dto>, states: Collection<BusinessStateV7Dto>?) {
 
     Assertions.assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
     val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }

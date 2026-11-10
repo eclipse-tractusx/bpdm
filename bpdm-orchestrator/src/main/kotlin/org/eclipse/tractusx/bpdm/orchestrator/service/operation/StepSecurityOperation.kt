@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service.operation
 
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
@@ -32,7 +32,7 @@ class StepSecurityOperation(
 
     private val defaultPermissions = PermissionConfigProperties()
 
-    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStep) {
+    fun assertHasReservationAuthority(authentication: Authentication, step: TaskStepV7) {
         val authorities = authentication.authorities.mapNotNull { it.authority?.uppercase() }
 
         val expectedAuthority = permissionConfigProperties.reservation[step]
@@ -42,7 +42,7 @@ class StepSecurityOperation(
             ?: throw AccessDeniedException("Insufficient permissions")
     }
 
-    fun assertHasResultAuthority(authentication: Authentication, step: TaskStep) {
+    fun assertHasResultAuthority(authentication: Authentication, step: TaskStepV7) {
         val authorities = authentication.authorities.mapNotNull { it.authority?.uppercase() }
 
         val expectedAuthority = permissionConfigProperties.result[step]

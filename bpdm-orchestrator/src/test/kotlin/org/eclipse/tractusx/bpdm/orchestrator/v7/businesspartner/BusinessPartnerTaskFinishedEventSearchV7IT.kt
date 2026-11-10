@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -39,15 +39,15 @@ class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBas
     @Test
     fun `get successfully finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskMode.UpdateFromPool)
-        testDataClient.reserveAndResolveBusinessPartnerTask(createdTask.taskId, TaskStep.Clean, testName)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskModeV7.UpdateFromPool)
+        testDataClient.reserveAndResolveBusinessPartnerTask(createdTask.taskId, TaskStepV7.Clean, testName)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTask.processingState.createdAt, PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, createdTask.taskId)
+        val expectedResponse = FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+            FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Success, createdTask.taskId)
         ))
 
         assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
@@ -61,15 +61,15 @@ class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBas
     @Test
     fun `get failed finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskMode.UpdateFromPool)
-        testDataClient.failBusinessPartnerTask(createdTask.taskId, TaskStep.Clean)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskModeV7.UpdateFromPool)
+        testDataClient.failBusinessPartnerTask(createdTask.taskId, TaskStepV7.Clean)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTask.processingState.createdAt, PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, createdTask.taskId)
+        val expectedResponse = FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+            FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Error, createdTask.taskId)
         ))
 
         assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
@@ -83,19 +83,19 @@ class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBas
     @Test
     fun `get task event after time`(){
         //GIVEN
-        val createdTask1 = testDataClient.createBusinessPartnerTask("$testName 1", TaskMode.UpdateFromPool)
-        val createdTask2 = testDataClient.createBusinessPartnerTask("$testName 1", TaskMode.UpdateFromPool)
+        val createdTask1 = testDataClient.createBusinessPartnerTask("$testName 1", TaskModeV7.UpdateFromPool)
+        val createdTask2 = testDataClient.createBusinessPartnerTask("$testName 1", TaskModeV7.UpdateFromPool)
 
-        testDataClient.failBusinessPartnerTask(createdTask1.taskId, TaskStep.Clean)
+        testDataClient.failBusinessPartnerTask(createdTask1.taskId, TaskStepV7.Clean)
         val timeX = Instant.now()
-        testDataClient.failBusinessPartnerTask(createdTask2.taskId, TaskStep.Clean)
+        testDataClient.failBusinessPartnerTask(createdTask2.taskId, TaskStepV7.Clean)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(timeX, PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, createdTask2.taskId)
+        val expectedResponse = FinishedTaskEventsV7Response(1, 1, 0, 1, listOf(
+            FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Error, createdTask2.taskId)
         ))
 
         assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
@@ -112,7 +112,7 @@ class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBas
         val response = orchestratorClient.finishedTaskEvents.getEvents(Instant.now(), PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponse(0, 0, 0, 0, emptyList())
+        val expectedResponse = FinishedTaskEventsV7Response(0, 0, 0, 0, emptyList())
 
         assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
     }
@@ -133,7 +133,7 @@ class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBas
         val response = orchestratorClient.finishedTaskEvents.getEvents(Instant.now(), PaginationRequest())
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponse(0, 0, 0, 0, emptyList())
+        val expectedResponse = FinishedTaskEventsV7Response(0, 0, 0, 0, emptyList())
 
         assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
     }
@@ -146,16 +146,16 @@ class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBas
     @Test
     fun `get paginated finished task events`(){
         //GIVEN
-        val createdTasks = (1 .. 6).map { testDataClient.createBusinessPartnerTask("$testName $it", TaskMode.UpdateFromPool) }
-        orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.Clean))
-        createdTasks.forEach { testDataClient.resolveBusinessPartnerTask(it.taskId, TaskStep.Clean, "Resolved $testName ${it.taskId}") }
+        val createdTasks = (1 .. 6).map { testDataClient.createBusinessPartnerTask("$testName $it", TaskModeV7.UpdateFromPool) }
+        orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(step = TaskStepV7.Clean))
+        createdTasks.forEach { testDataClient.resolveBusinessPartnerTask(it.taskId, TaskStepV7.Clean, "Resolved $testName ${it.taskId}") }
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTasks.first().processingState.createdAt, PaginationRequest(1, 3))
 
         //THEN
-        val expectedResponse = FinishedTaskEventsResponse(6, 2, 1, 3, createdTasks.drop(3).map {
-            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, it.taskId)
+        val expectedResponse = FinishedTaskEventsV7Response(6, 2, 1, 3, createdTasks.drop(3).map {
+            FinishedTaskEventsV7Response.Event(Instant.now(), ResultStateV7.Success, it.taskId)
         }
         )
 

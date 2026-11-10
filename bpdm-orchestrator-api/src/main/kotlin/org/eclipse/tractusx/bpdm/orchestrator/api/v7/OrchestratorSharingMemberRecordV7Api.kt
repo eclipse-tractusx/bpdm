@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.orchestrator.api.v7
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecord
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -35,11 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 @RequestMapping(value = [ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS], produces = [MediaType.APPLICATION_JSON_VALUE])
 interface OrchestratorSharingMemberRecordV7Api {
     @PutMapping
-    fun update(@RequestBody request: SharingMemberRecordUpdateRequest): SharingMemberRecord
+    fun update(@RequestBody request: SharingMemberRecordUpdateV7Request): SharingMemberRecordV7Dto
 
     @GetMapping
     fun queryRecords(
-        @ParameterObject request: SharingMemberRecordQueryRequest,
+        @ParameterObject request: SharingMemberRecordQueryV7Request,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SharingMemberRecord>
+    ): PageDto<SharingMemberRecordV7Dto>
 }

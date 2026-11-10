@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.pool.service.application
@@ -41,27 +41,27 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSite
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Site
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.Bpn
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.BpnRequestIdentifier
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7.Bpn
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7.BpnRequestIdentifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -124,8 +124,8 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     @Test
     fun `create empty legal entity`() {
 
-        val createLegalEntityRequest = BusinessPartner.empty.copy(
-            legalEntity = LegalEntity.empty
+        val createLegalEntityRequest = BusinessPartnerV7Dto.empty.copy(
+            legalEntity = LegalEntityV7Dto.empty
         )
 
         val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -192,7 +192,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     @Test
     fun `task result hands back the uncategorized script variants of the task`() {
 
-        val uncategorizedScriptVariants = listOf(UncategorizedScriptVariant("KANJI", listOf("Name Part 1", "Name Part 2")))
+        val uncategorizedScriptVariants = listOf(UncategorizedScriptVariantV7Dto("KANJI", listOf("Name Part 1", "Name Part 2")))
         val createLegalEntityRequest = with(minValidLegalEntity().withLegalReferences("123".toBpnRequest(), "222".toBpnRequest())) {
             copy(uncategorized = uncategorized.copy(scriptVariants = uncategorizedScriptVariants))
         }
@@ -335,8 +335,8 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             copy(
                 legalEntity = legalEntity.copy(
                     identifiers = listOf(
-                        Identifier("same", existingIdentifierType, null),
-                        Identifier("same", "Invalid", null)
+                        IdentifierV7Dto("same", existingIdentifierType, null),
+                        IdentifierV7Dto("same", "Invalid", null)
                     )
                 )
             )
@@ -344,7 +344,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
@@ -354,7 +354,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
@@ -367,8 +367,8 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             copy(
                 legalEntity = legalEntity.copy(
                     identifiers = listOf(
-                        Identifier(identifierValue, existingIdentifierType, null),
-                        Identifier(identifierValue, existingIdentifierType, null)
+                        IdentifierV7Dto(identifierValue, existingIdentifierType, null),
+                        IdentifierV7Dto(identifierValue, existingIdentifierType, null)
                     )
                 )
             )
@@ -376,7 +376,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
@@ -389,7 +389,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             copy(
                 legalEntity = legalEntity.copy(
                     identifiers = listOf(
-                        Identifier(identifierValue, existingIdentifierType, null)
+                        IdentifierV7Dto(identifierValue, existingIdentifierType, null)
                     )
                 )
             )
@@ -403,7 +403,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             copy(
                 legalEntity = legalEntity.copy(
                     identifiers = listOf(
-                        Identifier(identifierValue, existingIdentifierType, null)
+                        IdentifierV7Dto(identifierValue, existingIdentifierType, null)
                     )
                 )
             )
@@ -431,7 +431,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
@@ -451,7 +451,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
         assertThat(createResult[0].errors[0].description).isEqualTo("Country 'ZZ' in physical address is not known")
     }
 
@@ -462,7 +462,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             copy(
                 legalEntity = legalEntity.copy(
                     legalAddress = legalEntity.legalAddress.copy(
-                        identifiers = listOf(Identifier("value", "Invalid Ident", null) )
+                        identifiers = listOf(IdentifierV7Dto("value", "Invalid Ident", null) )
                     )
                 )
             )
@@ -470,14 +470,14 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
     fun `create legal entity with invalid duplicated address identifier`() {
 
         val availableIdentifierType = testDataEnvironment.metadata.addressIdentifierTypes.first().technicalKey
-        val sameIdentifier =  Identifier("same value", availableIdentifierType, "Issuing Body 1")
+        val sameIdentifier =  IdentifierV7Dto("same value", availableIdentifierType, "Issuing Body 1")
         val createLegalEntityRequest = with(minValidLegalEntity()){
             copy(
                 legalEntity = legalEntity.copy(
@@ -672,14 +672,14 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val updateLegalEntityRequest = orchTestDataFactory.createLegalEntityBusinessPartner("update")
             .withLegalReferences(legalEntityRequest.toBpnRequest(), legalAddressRequest.toBpnRequest())
             .copyWithLegalEntityIdentifiers(
-                listOf(Identifier("value", "Invalid", null) )
+                listOf(IdentifierV7Dto("value", "Invalid", null) )
             )
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest)
 
         assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
         assertThat(updateResult[0].errors.size).isEqualTo(1)
-        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
@@ -700,7 +700,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest)
         assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
         assertThat(updateResult[0].errors.size).isEqualTo(1)
-        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
@@ -715,18 +715,18 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val updateLegalEntityRequest = orchTestDataFactory.createLegalEntityBusinessPartner("update")
             .run {
                 copy(
-                    legalEntity = legalEntity.copy(bpnReference = BpnReference("InvalidBPN", null, Bpn))
+                    legalEntity = legalEntity.copy(bpnReference = BpnReferenceV7Dto("InvalidBPN", null, Bpn))
                 )
             }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest)
         assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
         assertThat(updateResult[0].errors.size).isEqualTo(1)
-        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorTypeV7.Unspecified)
     }
 
     @Test
-    fun `create Site with minimal fields`() {
+    fun `create SiteV7Dto with minimal fields`() {
         val createSiteRequest = minValidSite()
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
@@ -737,7 +737,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `create Site with all fields`() {
+    fun `create SiteV7Dto with all fields`() {
         val createSiteRequest = orchTestDataFactory.createSiteBusinessPartner("create")
             .copyWithBpnRequests()
 
@@ -768,7 +768,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
 
     @Test
-    fun `create Site without main address`() {
+    fun `create SiteV7Dto without main address`() {
 
         val createSiteRequest = orchTestDataFactory.createSiteBusinessPartner("create")
             .copyWithSiteMainAddress(null)
@@ -781,13 +781,13 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `create Site with invalid addresses administration level 1 and invalid identifier`() {
+    fun `create SiteV7Dto with invalid addresses administration level 1 and invalid identifier`() {
 
         val createSiteRequest = with(orchTestDataFactory.createSiteBusinessPartner("create") ){
             copy(
                 site = site!!.copy(
                     siteMainAddress = site!!.siteMainAddress!!.copy(
-                        identifiers = listOf(Identifier("value", "Invalid", null)),
+                        identifiers = listOf(IdentifierV7Dto("value", "Invalid", null)),
                         physicalAddress = site!!.siteMainAddress!!.physicalAddress.copy(administrativeAreaLevel1 = "Invalid")
                     )
                 )
@@ -801,9 +801,9 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `create Site with same identifier in main address and additional address`() {
+    fun `create SiteV7Dto with same identifier in main address and additional address`() {
 
-        val sameIdentifier = Identifier("value", testDataEnvironment.metadata.legalEntityIdentifierTypes.first().technicalKey, null)
+        val sameIdentifier = IdentifierV7Dto("value", testDataEnvironment.metadata.legalEntityIdentifierTypes.first().technicalKey, null)
         val createSiteRequest = with(orchTestDataFactory.createFullBusinessPartner()){
             copy(
                 site = site!!.copy(
@@ -826,7 +826,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `update Site`() {
+    fun `update SiteV7Dto`() {
         val createSiteRequest = orchTestDataFactory.createSiteBusinessPartner("create").copyWithBpnRequests()
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
@@ -843,7 +843,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `update Site with invalid bpnS`() {
+    fun `update SiteV7Dto with invalid bpnS`() {
 
         val createSiteRequest = orchTestDataFactory.createSiteBusinessPartner("create").copyWithBpnRequests()
 
@@ -852,7 +852,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val updateSiteRequest = with(createResult.first().businessPartner){
             orchTestDataFactory.createSiteBusinessPartner("update")
                 .withLegalReferences(legalEntity.bpnReference, legalEntity.legalAddress.bpnReference)
-                .withSiteReferences(BpnReference("InvalidBPN", null, Bpn), site!!.siteMainAddress!!.bpnReference)
+                .withSiteReferences(BpnReferenceV7Dto("InvalidBPN", null, Bpn), site!!.siteMainAddress!!.bpnReference)
         }
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateSiteRequest)
@@ -860,7 +860,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `update Site with invalid address administration level 1 and invalid identifier`() {
+    fun `update SiteV7Dto with invalid address administration level 1 and invalid identifier`() {
 
         val createSiteRequest = orchTestDataFactory.createSiteBusinessPartner("create").copyWithBpnRequests()
 
@@ -874,7 +874,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             copy(
                 site = site!!.copy(
                     siteMainAddress = site!!.siteMainAddress!!.copy(
-                        identifiers = listOf(Identifier("value", "Invalid", null)),
+                        identifiers = listOf(IdentifierV7Dto("value", "Invalid", null)),
                         physicalAddress = site!!.siteMainAddress!!.physicalAddress.copy(administrativeAreaLevel1 = "Invalid")
                     )
                 )
@@ -887,12 +887,12 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `update Site with same address identifiers in main address and additional address`() {
+    fun `update SiteV7Dto with same address identifiers in main address and additional address`() {
         val createSiteRequest = orchTestDataFactory.createFullBusinessPartner("create").copyWithBpnRequests()
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
 
-        val sameIdentifier = Identifier("value", testDataEnvironment.metadata.legalEntityIdentifierTypes.first().technicalKey, null)
+        val sameIdentifier = IdentifierV7Dto("value", testDataEnvironment.metadata.legalEntityIdentifierTypes.first().technicalKey, null)
         val updateSiteRequest = with(createResult.first().businessPartner){
             orchTestDataFactory.createFullBusinessPartner("update")
                 .withLegalReferences(legalEntity.bpnReference, legalEntity.legalAddress.bpnReference)
@@ -917,7 +917,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `update Site with same reference value`() {
+    fun `update SiteV7Dto with same reference value`() {
         val siteRef = "123"
         val createSiteRequest = orchTestDataFactory.createSiteBusinessPartner("create")
             .copyWithBpnRequests()
@@ -1079,22 +1079,22 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
 
-    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
+    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartnerV7Dto): List<TaskStepResultEntryV7Dto> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
         return resolveTasks(taskStep)
     }
 
-    fun resolveTasks(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
+    fun resolveTasks(taskEntries: List<TaskStepReservationEntryV7Dto>): List<TaskStepResultEntryV7Dto> {
         orchestratorMockDataFactory.mockReservedTasks(taskEntries)
         taskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getStepResults()
     }
 
-    fun singleTaskStep(taskId: String, businessPartner: BusinessPartner): List<TaskStepReservationEntryDto> {
+    fun singleTaskStep(taskId: String, businessPartner: BusinessPartnerV7Dto): List<TaskStepReservationEntryV7Dto> {
 
         return listOf(
-            TaskStepReservationEntryDto(
+            TaskStepReservationEntryV7Dto(
                 taskId = taskId,
                 recordId = UUID.randomUUID().toString(),
                 businessPartner = businessPartner
@@ -1102,10 +1102,10 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         )
     }
 
-    fun multipleTaskStep(businessPartners: List<BusinessPartner>): List<TaskStepReservationEntryDto> {
+    fun multipleTaskStep(businessPartners: List<BusinessPartnerV7Dto>): List<TaskStepReservationEntryV7Dto> {
 
         return businessPartners.map {
-            TaskStepReservationEntryDto(
+            TaskStepReservationEntryV7Dto(
                 taskId = it.legalEntity.bpnReference.referenceValue!!,
                 recordId = UUID.randomUUID().toString(),
                 businessPartner = it
@@ -1114,12 +1114,12 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
 
     }
 
-    fun BusinessPartner.withAdditionalAddressReference(postalAddressBpn: BpnReference): BusinessPartner {
+    fun BusinessPartnerV7Dto.withAdditionalAddressReference(postalAddressBpn: BpnReferenceV7Dto): BusinessPartnerV7Dto {
         return copy(additionalAddress = additionalAddress?.copyAsPostalAddress { it.copy(bpnReference = postalAddressBpn)  } )
     }
 
 
-    fun BusinessPartner.withSiteReferences(siteBpn: BpnReference, siteMainAddressBpn: BpnReference): BusinessPartner {
+    fun BusinessPartnerV7Dto.withSiteReferences(siteBpn: BpnReferenceV7Dto, siteMainAddressBpn: BpnReferenceV7Dto): BusinessPartnerV7Dto {
         return copy(
             site = site?.copy(
                 bpnReference = siteBpn,
@@ -1135,19 +1135,19 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
      * independently. The added variants reuse a seeded main-address script variant, which the address content parser
      * requires to be complete.
      */
-    fun BusinessPartner.withSiteScriptVariantsAlsoCovering(bpna: String): BusinessPartner {
+    fun BusinessPartnerV7Dto.withSiteScriptVariantsAlsoCovering(bpna: String): BusinessPartnerV7Dto {
         val site = site!!
         val mainAddressTemplate = site.scriptVariants.first().mainAddress
         val ownScriptCodes = site.scriptVariants.map { it.scriptCode }
         val addedVariants = poolClient.addresses.getAddress(bpna).scriptVariants
             .map { it.scriptCode }
             .filterNot { it in ownScriptCodes }
-            .map { SiteScriptVariant(it, "Site Name $it", mainAddressTemplate) }
+            .map { SiteScriptVariantV7Dto(it, "Site Name $it", mainAddressTemplate) }
 
         return copy(site = site.copy(scriptVariants = site.scriptVariants + addedVariants))
     }
 
-    fun BusinessPartner.withLegalReferences(legalEntityBpn: BpnReference, legalAddressBpn: BpnReference): BusinessPartner {
+    fun BusinessPartnerV7Dto.withLegalReferences(legalEntityBpn: BpnReferenceV7Dto, legalAddressBpn: BpnReferenceV7Dto): BusinessPartnerV7Dto {
         return copy(
             legalEntity = legalEntity.copy(
                 bpnReference = legalEntityBpn,
@@ -1158,15 +1158,15 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         )
     }
 
-    fun BusinessPartner.withCxMembership(isCatenaXMemberData: Boolean?): BusinessPartner{
+    fun BusinessPartnerV7Dto.withCxMembership(isCatenaXMemberData: Boolean?): BusinessPartnerV7Dto{
         return copy(legalEntity = legalEntity.copy(isParticipantData = isCatenaXMemberData))
     }
 
-    private fun minValidLegalEntity(): BusinessPartner {
-        return with(BusinessPartner.empty) {
+    private fun minValidLegalEntity(): BusinessPartnerV7Dto {
+        return with(BusinessPartnerV7Dto.empty) {
             copy(
                 legalEntity = legalEntity.copy(
-                    bpnReference = BpnReference(referenceValue = "BPNL REQUEST ID", null, referenceType = BpnRequestIdentifier),
+                    bpnReference = BpnReferenceV7Dto(referenceValue = "BPNL REQUEST ID", null, referenceType = BpnRequestIdentifier),
                     legalName = "Legal Name",
                     confidenceCriteria = fullConfidenceCriteria(),
                     legalAddress = minValidAddress().copy(confidenceCriteria = fullConfidenceCriteria())
@@ -1175,12 +1175,12 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         }
     }
 
-    private fun minValidSite(): BusinessPartner {
-        return with(BusinessPartner.empty) {
+    private fun minValidSite(): BusinessPartnerV7Dto {
+        return with(BusinessPartnerV7Dto.empty) {
             copy(
                 legalEntity = minValidLegalEntity().legalEntity,
-                site =  Site.empty.copy(
-                    bpnReference = BpnReference(referenceValue = "BPNS REQUEST ID", null, referenceType = BpnRequestIdentifier),
+                site =  SiteV7Dto.empty.copy(
+                    bpnReference = BpnReferenceV7Dto(referenceValue = "BPNS REQUEST ID", null, referenceType = BpnRequestIdentifier),
                     siteName = "Site Name",
                     confidenceCriteria = fullConfidenceCriteria(),
                     siteMainAddress = minValidAddress()
@@ -1189,8 +1189,8 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         }
     }
 
-    private fun minValidAddress(): PostalAddress {
-        return with(PostalAddress.empty){
+    private fun minValidAddress(): PostalAddressV7Dto {
+        return with(PostalAddressV7Dto.empty){
             copy(
                 confidenceCriteria = fullConfidenceCriteria(),
                 physicalAddress = physicalAddress.copy(
@@ -1201,17 +1201,17 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         }
     }
 
-    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, errorDescription: String) {
+    fun assertTaskError(step: TaskStepResultEntryV7Dto, taskId: String, errorDescription: String) {
 
         assertThat(step.taskId).isEqualTo(taskId)
         assertThat(step.errors.size).isEqualTo(1)
         assertThat(step.errors[0].description).isEqualTo(errorDescription)
     }
 
-    private fun String.toBpnRequest() = BpnReference(this, null, BpnRequestIdentifier)
+    private fun String.toBpnRequest() = BpnReferenceV7Dto(this, null, BpnRequestIdentifier)
 
     private fun fullConfidenceCriteria() =
-        ConfidenceCriteria(
+        ConfidenceCriteriaV7Dto(
             sharedByOwner = true,
             numberOfSharingMembers = 1,
             checkedByExternalDataSource = true,
@@ -1263,7 +1263,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
         //Convert addressType from LegalAddress to LegalAndSiteMainAddress
-        val site = Site(siteRefValue.toBpnRequest(), "site", listOf(), fullConfidenceCriteria(), false, null, emptyList())
+        val site = SiteV7Dto(siteRefValue.toBpnRequest(), "site", listOf(), fullConfidenceCriteria(), false, null, emptyList())
         val updateLinkageRequest = orchTestDataFactory.createFullBusinessPartner("test")
             .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
             .copy(site = site, additionalAddress = null)
@@ -1327,7 +1327,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         assertThat(addressAfterA.addressType).isEqualTo(AddressType.SiteMainAddress)
         assertThat(addressAfterA.additionalSites).isEmpty()
 
-        // Task 2: create a distinct site B whose main address references the SAME address as site A's. Site B states the
+        // Task 2: create a distinct site B whose main address references the SAME address as site A's. SiteV7Dto B states the
         // content of that address and states site A as a further site of it - the address's membership is written as
         // stated, so leaving A out would ask for it to be unlinked from its own main address.
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
@@ -1336,7 +1336,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             .withSiteScriptVariantsAlsoCovering(sharedAddressBpn)
             .copy(
                 additionalAddress = null,
-                additionalSites = listOf(AdditionalSite(BpnReference(siteABpns, null, BpnReferenceType.Bpn), null))
+                additionalSites = listOf(AdditionalSiteV7Dto(BpnReferenceV7Dto(siteABpns, null, BpnReferenceTypeV7.Bpn), null))
             )
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
         val siteBBpns = resultB[0].businessPartner.site?.bpnReference?.referenceValue!!
@@ -1353,7 +1353,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         assertThat(poolClient.sites.getSite(siteABpns).mainAddress.bpna).isEqualTo(sharedAddressBpn)
         assertThat(poolClient.sites.getSite(siteBBpns).mainAddress.bpna).isEqualTo(sharedAddressBpn)
 
-        // Site B's payload became the shared address's content, and it still covers every script both sites are named in,
+        // SiteV7Dto B's payload became the shared address's content, and it still covers every script both sites are named in,
         // so both remain readable.
         assertThat(sharedAddress.scriptVariants.map { it.scriptCode })
             .containsExactlyInAnyOrderElementsOf(createSiteB.site!!.scriptVariants.map { it.scriptCode })
@@ -1375,7 +1375,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
-        // Site B states the shared address's content in its own script only, so the address keeps site A's script.
+        // SiteV7Dto B states the shared address's content in its own script only, so the address keeps site A's script.
         val siteAScriptCode = createSiteA.site!!.scriptVariants.single().scriptCode
         val siteBScriptVariant = createSiteA.site!!.scriptVariants.single().copy(scriptCode = scriptCodeOtherThan(siteAScriptCode))
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
@@ -1385,7 +1385,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
                 it.copy(
                     site = it.site!!.copy(scriptVariants = listOf(siteBScriptVariant)),
                     additionalAddress = null,
-                    additionalSites = listOf(AdditionalSite(BpnReference(siteABpns, null, BpnReferenceType.Bpn), null))
+                    additionalSites = listOf(AdditionalSiteV7Dto(BpnReferenceV7Dto(siteABpns, null, BpnReferenceTypeV7.Bpn), null))
                 )
             }
 
@@ -1411,7 +1411,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
         val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
 
-        // Site B takes over the same address without saying that site A still uses it, which would take the address away
+        // SiteV7Dto B takes over the same address without saying that site A still uses it, which would take the address away
         // from the site it is the main address of.
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
@@ -1584,7 +1584,7 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
     }
 
     /** The same business partner named in [scriptCode] alone - legal entity and site, so the shared address covers both. */
-    private fun BusinessPartner.inScriptCode(scriptCode: String): BusinessPartner =
+    private fun BusinessPartnerV7Dto.inScriptCode(scriptCode: String): BusinessPartnerV7Dto =
         copy(
             legalEntity = legalEntity.copy(scriptVariants = legalEntity.scriptVariants.take(1).map { it.copy(scriptCode = scriptCode) }),
             site = site?.let { site -> site.copy(scriptVariants = site.scriptVariants.take(1).map { it.copy(scriptCode = scriptCode) }) }
@@ -2011,15 +2011,15 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
         assertThat(resolveOwnershipTask(sourceBpn, targetBpn).errors).isEmpty()
     }
 
-    private fun resolveOwnershipTask(sourceBpn: String, targetBpn: String): TaskRelationsStepResultEntryDto {
-        val ownership = BusinessPartnerRelations(
-            relationType = RelationType.IsOwnedBy,
+    private fun resolveOwnershipTask(sourceBpn: String, targetBpn: String): TaskRelationsStepResultEntryV7Dto {
+        val ownership = BusinessPartnerRelationsV7Dto(
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = sourceBpn,
             businessPartnerTargetBpn = targetBpn,
-            validityPeriods = listOf(currentValidityPeriod().let { RelationValidityPeriod(it.validFrom, it.validTo) }),
+            validityPeriods = listOf(currentValidityPeriod().let { RelationValidityPeriodV7Dto(it.validFrom, it.validTo) }),
             reasonCode = null
         )
-        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(TaskRelationsStepReservationEntryDto(UUID.randomUUID().toString(), UUID.randomUUID().toString(), ownership)))
+        orchestratorMockDataFactory.mockReservedRelationTasks(listOf(TaskRelationsStepReservationEntryV7Dto(UUID.randomUUID().toString(), UUID.randomUUID().toString(), ownership)))
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults().single()
     }
@@ -2032,8 +2032,8 @@ class GoldenRecordTaskResolutionApplicationServiceTest @Autowired constructor(
             validTo = null
         )
 
-    private fun createIdentifiers(idTypeKey: String, amount: Int): List<Identifier>{
-        return (1 .. amount).map { Identifier(it.toString(), idTypeKey, null) }
+    private fun createIdentifiers(idTypeKey: String, amount: Int): List<IdentifierV7Dto>{
+        return (1 .. amount).map { IdentifierV7Dto(it.toString(), idTypeKey, null) }
     }
 
     @Test

@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -42,11 +42,11 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask = testDataClient.createRelationTask(testName)
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedResponse = TaskRelationsStateResponse(listOf(createdTask))
+        val expectedResponse = TaskRelationsStateV7Response(listOf(createdTask))
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -63,12 +63,12 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         testDataClient.reserveRelationTask(createdTask)
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedEntry = createdTask.copy(processingState = createdTask.processingState.copy(stepState = StepState.Reserved))
-        val expectedResponse = TaskRelationsStateResponse(listOf(expectedEntry))
+        val expectedEntry = createdTask.copy(processingState = createdTask.processingState.copy(stepState = StepStateV7.Reserved))
+        val expectedResponse = TaskRelationsStateV7Response(listOf(expectedEntry))
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -85,15 +85,15 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val resultRequest = testDataClient.reserveAndResolveRelationTask(createdTask, "Resolved $testName")
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
         val expectedEntry = createdTask.copy(
             businessPartnerRelationsResult = resultRequest.businessPartnerRelations,
-            processingState = createdTask.processingState.copy(step = TaskStep.PoolSync)
+            processingState = createdTask.processingState.copy(step = TaskStepV7.PoolSync)
         )
-        val expectedResponse = TaskRelationsStateResponse(listOf(expectedEntry))
+        val expectedResponse = TaskRelationsStateV7Response(listOf(expectedEntry))
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -107,23 +107,23 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `search successful relation task`(){
         //GIVEN
         val createdTask = testDataClient.createRelationTask(testName)
-        testDataClient.reserveAndResolveRelationTask(createdTask.taskId, TaskStep.CleanAndSync, "Resolved $testName")
-        val successRequest = testDataClient.reserveAndResolveRelationTask(createdTask.taskId, TaskStep.PoolSync, "Success $testName")
+        testDataClient.reserveAndResolveRelationTask(createdTask.taskId, TaskStepV7.CleanAndSync, "Resolved $testName")
+        val successRequest = testDataClient.reserveAndResolveRelationTask(createdTask.taskId, TaskStepV7.PoolSync, "Success $testName")
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
         val expectedEntry = createdTask.copy(
             businessPartnerRelationsResult = successRequest.businessPartnerRelations,
             processingState = createdTask.processingState.copy(
-                resultState = ResultState.Success,
-                step = TaskStep.PoolSync,
-                stepState = StepState.Success
+                resultState = ResultStateV7.Success,
+                step = TaskStepV7.PoolSync,
+                stepState = StepStateV7.Success
             )
         )
-        val expectedResponse = TaskRelationsStateResponse(listOf(expectedEntry))
+        val expectedResponse = TaskRelationsStateV7Response(listOf(expectedEntry))
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -140,20 +140,20 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val failRequest = testDataClient.failRelationTask(createdTask)
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask.taskId, createdTask.recordId)))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask.taskId, createdTask.recordId)))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
         val expectedEntry = createdTask.copy(
             businessPartnerRelationsResult = createdTask.businessPartnerRelationsResult,
             processingState = createdTask.processingState.copy(
-                resultState = ResultState.Error,
+                resultState = ResultStateV7.Error,
                 step = createdTask.processingState.step,
-                stepState = StepState.Error,
+                stepState = StepStateV7.Error,
                 errors = failRequest.errors
             )
         )
-        val expectedResponse = TaskRelationsStateResponse(listOf(expectedEntry))
+        val expectedResponse = TaskRelationsStateV7Response(listOf(expectedEntry))
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -165,7 +165,7 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
     @Test
     fun `try search not existing relation task id`(){
         //WHEN
-        val searchRequestBody = TaskStateRequest(listOf(TaskStateRequest.Entry("NOT EXISTING", "NOT EXISTING")))
+        val searchRequestBody = TaskStateV7Request(listOf(TaskStateV7Request.Entry("NOT EXISTING", "NOT EXISTING")))
         val searchRequest : () -> Unit = { orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequestBody) }
 
         //THEN
@@ -183,11 +183,11 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask = testDataClient.createRelationTask(testName)
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask.taskId, "NOT EXISTING")))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask.taskId, "NOT EXISTING")))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedResponse = TaskRelationsStateResponse(emptyList())
+        val expectedResponse = TaskRelationsStateV7Response(emptyList())
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -204,11 +204,11 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask2 = testDataClient.createRelationTask("$testName 2")
 
         //WHEN
-        val searchRequest = TaskStateRequest(listOf(TaskStateRequest.Entry(createdTask1.taskId, createdTask2.recordId)))
+        val searchRequest = TaskStateV7Request(listOf(TaskStateV7Request.Entry(createdTask1.taskId, createdTask2.recordId)))
         val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(searchRequest)
 
         //THEN
-        val expectedResponse = TaskRelationsStateResponse(emptyList())
+        val expectedResponse = TaskRelationsStateV7Response(emptyList())
 
         assertRepo.assertRelationTaskStateResponseEqual(searchResponse, expectedResponse)
     }
@@ -225,14 +225,14 @@ class RelationTaskSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
         testDataClient.createRelationTask(testName, recordId = abortedTask.recordId)
 
         //WHEN
-        val searchEntry = TaskStateRequest.Entry(abortedTask.taskId, abortedTask.recordId)
-        val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(TaskStateRequest(listOf(searchEntry)))
+        val searchEntry = TaskStateV7Request.Entry(abortedTask.taskId, abortedTask.recordId)
+        val searchResponse = orchestratorClient.relationsGoldenRecordTasks.searchTaskStates(TaskStateV7Request(listOf(searchEntry)))
 
         //THEN
-        val expectedResponse = TaskRelationsStateResponse(listOf(abortedTask.copy(
+        val expectedResponse = TaskRelationsStateV7Response(listOf(abortedTask.copy(
             processingState = abortedTask.processingState.copy(
-                resultState = ResultState.Error,
-                stepState = StepState.Error
+                resultState = ResultStateV7.Error,
+                stepState = StepStateV7.Error
             )
         )))
 

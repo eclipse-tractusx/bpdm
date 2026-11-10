@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePart
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7
 import kotlin.random.Random
 
 
@@ -34,16 +34,16 @@ class BusinessPartnerTestDataFactory(
     val metadata = orchestratorRequestFactory.metadata
 
     //Business Partner with maximal fields filled
-    fun createFullBusinessPartner(seed: String = "Test"): BusinessPartner {
+    fun createFullBusinessPartner(seed: String = "Test"): BusinessPartnerV7Dto {
         val random = orchestratorRequestFactory.createRandomFromSeed(seed)
 
-        return BusinessPartner(
+        return BusinessPartnerV7Dto(
             nameParts = listOf(
-                NamePart("Legal Name $seed", NamePartType.LegalName),
-                NamePart("Site Name $seed", NamePartType.SiteName),
-                NamePart("Address Name $seed", NamePartType.AddressName),
-                NamePart("Legal Short Name $seed", NamePartType.ShortName),
-                NamePart("Legal Form $seed", NamePartType.LegalForm)
+                NamePartV7Dto("Legal Name $seed", NamePartTypeV7.LegalName),
+                NamePartV7Dto("Site Name $seed", NamePartTypeV7.SiteName),
+                NamePartV7Dto("Address Name $seed", NamePartTypeV7.AddressName),
+                NamePartV7Dto("Legal Short Name $seed", NamePartTypeV7.ShortName),
+                NamePartV7Dto("Legal Form $seed", NamePartTypeV7.LegalForm)
             ),
             owningCompany = "Owner Company BPNL $seed",
             uncategorized = orchestratorRequestFactory.buildUncategorizedProperties(seed, random),
@@ -53,19 +53,19 @@ class BusinessPartnerTestDataFactory(
         )
     }
 
-    fun createLegalEntityBusinessPartner(seed: String = "Test"): BusinessPartner {
-        return BusinessPartner.empty.copy(legalEntity = createLegalEntity(seed))
+    fun createLegalEntityBusinessPartner(seed: String = "Test"): BusinessPartnerV7Dto {
+        return BusinessPartnerV7Dto.empty.copy(legalEntity = createLegalEntity(seed))
     }
 
-    fun createSiteBusinessPartner(seed: String = "Test"): BusinessPartner {
-        return BusinessPartner.empty.copy(
+    fun createSiteBusinessPartner(seed: String = "Test"): BusinessPartnerV7Dto {
+        return BusinessPartnerV7Dto.empty.copy(
             legalEntity = createLegalEntity(seed),
             site = orchestratorRequestFactory.buildSite(seed)
         )
     }
 
-    fun createLegalEntity(seed: String = "Test", random: Random = orchestratorRequestFactory.createRandomFromSeed(seed)): LegalEntity {
-        return LegalEntity(
+    fun createLegalEntity(seed: String = "Test", random: Random = orchestratorRequestFactory.createRandomFromSeed(seed)): LegalEntityV7Dto {
+        return LegalEntityV7Dto(
             bpnReference = orchestratorRequestFactory.buildBpnLReference(seed),
             legalName = "Legal Name $seed",
             legalShortName = "Legal Short Name $seed",

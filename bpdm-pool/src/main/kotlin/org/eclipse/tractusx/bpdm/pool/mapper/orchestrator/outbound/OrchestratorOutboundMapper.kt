@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound
@@ -43,41 +43,41 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedAddressRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedAddressRelationKind
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedGeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedIdentifierRaw
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSite
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinate
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePart
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantWithScriptCode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariants
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Site
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Street
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedProperties
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantWithScriptCodeV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariantsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedPropertiesV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -91,9 +91,9 @@ class OrchestratorOutboundMapper {
     /**
      * Returns the task step result that reports [result] to the Orchestrator.
      */
-    fun toResultEntry(result: GoldenRecordTaskResultRecord): TaskStepResultEntryDto =
+    fun toResultEntry(result: GoldenRecordTaskResultRecord): TaskStepResultEntryV7Dto =
         when (result) {
-            is GoldenRecordTaskResultRecord.Resolved -> TaskStepResultEntryDto(result.taskId, toBusinessPartner(result))
+            is GoldenRecordTaskResultRecord.Resolved -> TaskStepResultEntryV7Dto(result.taskId, toBusinessPartner(result))
             is GoldenRecordTaskResultRecord.Rejected -> toErrorEntry(result.taskId, result.errors.map { toDescription(it) })
             is GoldenRecordTaskResultRecord.Failed -> toErrorEntry(result.taskId, listOf(UNEXPECTED_TASK_ERROR))
         }
@@ -101,41 +101,41 @@ class OrchestratorOutboundMapper {
     /**
      * Returns the task step result that reports the golden record task with [taskId] as failed without a known cause.
      */
-    fun toErrorReportEntry(taskId: String): TaskStepResultEntryDto =
+    fun toErrorReportEntry(taskId: String): TaskStepResultEntryV7Dto =
         toErrorEntry(taskId, listOf(UNREPORTED_TASK_ERROR))
 
     private fun toErrorEntry(taskId: String, descriptions: List<String>) =
-        TaskStepResultEntryDto(
+        TaskStepResultEntryV7Dto(
             taskId = taskId,
-            businessPartner = BusinessPartner.empty,
-            errors = descriptions.map { TaskErrorDto(type = TaskErrorType.Unspecified, description = it) }
+            businessPartner = BusinessPartnerV7Dto.empty,
+            errors = descriptions.map { TaskErrorV7Dto(type = TaskErrorTypeV7.Unspecified, description = it) }
         )
 
-    private fun toBusinessPartner(result: GoldenRecordTaskResultRecord.Resolved): BusinessPartner {
+    private fun toBusinessPartner(result: GoldenRecordTaskResultRecord.Resolved): BusinessPartnerV7Dto {
         val legalEntity = toLegalEntity(result.legalEntity, result.isLegalEntityWritten)
         val site = result.site?.let { toSite(it, result.isSiteWritten) }
         // A site whose main address is the legal address states no main address of its own; the legal address is reported
         // as the site wrote it, which is newer than the legal entity's view when only the site changed.
         val siteSharesLegalAddress = result.site != null && result.site.mainAddress.bpn == result.legalEntity.legalAddress.bpn
 
-        return BusinessPartner(
-            nameParts = result.passThrough.nameParts.map { NamePart(it.name, toNamePartType(it.type)) },
+        return BusinessPartnerV7Dto(
+            nameParts = result.passThrough.nameParts.map { NamePartV7Dto(it.name, toNamePartType(it.type)) },
             owningCompany = result.passThrough.owningCompany,
             uncategorized = toUncategorized(result.passThrough),
             legalEntity = if (siteSharesLegalAddress) legalEntity.copy(legalAddress = site!!.siteMainAddress!!) else legalEntity,
             site = if (siteSharesLegalAddress) site!!.copy(siteMainAddress = null) else site,
             additionalAddress = result.additionalAddress?.let { toAddressWithScriptVariants(it) },
-            additionalSites = result.additionalSites.map { AdditionalSite(BpnReference(it.bpn, null, BpnReferenceType.Bpn), it.name) }
+            additionalSites = result.additionalSites.map { AdditionalSiteV7Dto(BpnReferenceV7Dto(it.bpn, null, BpnReferenceTypeV7.Bpn), it.name) }
         )
     }
 
-    private fun toLegalEntity(record: LegalEntityRecord, isWritten: Boolean): LegalEntity =
-        LegalEntity(
+    private fun toLegalEntity(record: LegalEntityRecord, isWritten: Boolean): LegalEntityV7Dto =
+        LegalEntityV7Dto(
             bpnReference = toBpnReference(record.bpn),
             legalName = record.legalName,
             legalShortName = record.legalShortName,
             legalForm = record.legalForm?.technicalKey,
-            identifiers = record.identifiers.map { Identifier(it.value, it.typeTechnicalKey, it.issuingBody) },
+            identifiers = record.identifiers.map { IdentifierV7Dto(it.value, it.typeTechnicalKey, it.issuingBody) },
             states = record.states.map { toState(it) },
             confidenceCriteria = toConfidenceCriteria(record.confidenceCriteria),
             isParticipantData = record.isDataSpaceParticipant,
@@ -144,41 +144,41 @@ class OrchestratorOutboundMapper {
             ultimateOwnerBpnl = record.ultimateOwnerBpnl,
             legalAddress = toPostalAddress(record.legalAddress, isWritten),
             scriptVariants = record.scriptVariants.map {
-                LegalEntityScriptVariant(it.scriptCode, it.legalName, it.shortName, toPostalScriptVariant(it.legalAddress))
+                LegalEntityScriptVariantV7Dto(it.scriptCode, it.legalName, it.shortName, toPostalScriptVariant(it.legalAddress))
             },
             goldenRecordRelations = record.relations
                 .distinctBy { Triple(it.type, it.sourceBpnl, it.targetBpnl) }
-                .map { LegalEntityGoldenRecordRelation(toRelationType(it.type), it.sourceBpnl, it.targetBpnl) },
+                .map { LegalEntityGoldenRecordRelationV7Dto(toRelationType(it.type), it.sourceBpnl, it.targetBpnl) },
             updatedAt = record.updatedAt
         )
 
-    private fun toSite(record: SiteRecord, isWritten: Boolean): Site =
-        Site(
+    private fun toSite(record: SiteRecord, isWritten: Boolean): SiteV7Dto =
+        SiteV7Dto(
             bpnReference = toBpnReference(record.bpn),
             siteName = record.name,
             states = record.states.map { toState(it) },
             confidenceCriteria = toConfidenceCriteria(record.confidenceCriteria),
             hasChanged = isWritten,
             siteMainAddress = toPostalAddress(record.mainAddress, isWritten),
-            scriptVariants = record.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name, toPostalScriptVariant(it.mainAddress)) },
+            scriptVariants = record.scriptVariants.map { SiteScriptVariantV7Dto(it.scriptCode, it.name, toPostalScriptVariant(it.mainAddress)) },
             goldenRecordRelations = record.relations
                 .distinctBy { Triple(it.type, it.sourceBpns, it.targetBpns) }
-                .map { SiteGoldenRecordRelation(toRelationType(it.type), it.sourceBpns, it.targetBpns) },
+                .map { SiteGoldenRecordRelationV7Dto(toRelationType(it.type), it.sourceBpns, it.targetBpns) },
             updatedAt = record.updatedAt
         )
 
     // An additional address stated by a task is always written.
-    private fun toAddressWithScriptVariants(record: AddressRecord): PostalAddressWithScriptVariants =
-        PostalAddressWithScriptVariants(
+    private fun toAddressWithScriptVariants(record: AddressRecord): PostalAddressWithScriptVariantsV7Dto =
+        PostalAddressWithScriptVariantsV7Dto(
             postalProperties = toPostalAddress(record, isWritten = true),
-            scriptVariants = record.scriptVariants.map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalScriptVariant(it)) }
+            scriptVariants = record.scriptVariants.map { PostalAddressScriptVariantWithScriptCodeV7Dto(it.scriptCode, toPostalScriptVariant(it)) }
         )
 
-    private fun toPostalAddress(record: AddressRecord, isWritten: Boolean): PostalAddress =
-        PostalAddress(
+    private fun toPostalAddress(record: AddressRecord, isWritten: Boolean): PostalAddressV7Dto =
+        PostalAddressV7Dto(
             bpnReference = toBpnReference(record.bpn),
             addressName = record.name,
-            identifiers = record.identifiers.map { Identifier(it.value, it.typeTechnicalKey, null) },
+            identifiers = record.identifiers.map { IdentifierV7Dto(it.value, it.typeTechnicalKey, null) },
             states = record.states.map { toState(it) },
             confidenceCriteria = toConfidenceCriteria(record.confidenceCriteria),
             physicalAddress = toPhysicalAddress(record.physicalPostalAddress),
@@ -186,13 +186,13 @@ class OrchestratorOutboundMapper {
             hasChanged = isWritten,
             goldenRecordRelations = record.relations
                 .distinctBy { Triple(it.type, it.sourceBpna, it.targetBpna) }
-                .map { AddressGoldenRecordRelation(toRelationType(it.type), it.sourceBpna, it.targetBpna) },
+                .map { AddressGoldenRecordRelationV7Dto(toRelationType(it.type), it.sourceBpna, it.targetBpna) },
             updatedAt = record.updatedAt
         )
 
-    private fun toPhysicalAddress(record: PhysicalPostalAddressRecord): PhysicalAddress =
-        PhysicalAddress(
-            geographicCoordinates = record.geographicCoordinates?.let { toGeoCoordinate(it) } ?: GeoCoordinate.empty,
+    private fun toPhysicalAddress(record: PhysicalPostalAddressRecord): PhysicalAddressV7Dto =
+        PhysicalAddressV7Dto(
+            geographicCoordinates = record.geographicCoordinates?.let { toGeoCoordinate(it) } ?: GeoCoordinateV7Dto.empty,
             country = record.country.countryCode,
             administrativeAreaLevel1 = record.administrativeAreaLevel1?.code,
             administrativeAreaLevel2 = record.administrativeAreaLevel2,
@@ -201,11 +201,11 @@ class OrchestratorOutboundMapper {
             city = record.city,
             district = record.district,
             street = record.street?.let {
-                Street(
+                StreetV7Dto(
                     it.name, it.houseNumber, it.houseNumberSupplement, it.milestone, it.direction, it.namePrefix,
                     it.additionalNamePrefix, it.nameSuffix, it.additionalNameSuffix
                 )
-            } ?: Street.empty,
+            } ?: StreetV7Dto.empty,
             companyPostalCode = record.companyPostalCode,
             industrialZone = record.industrialZone,
             building = record.building,
@@ -214,9 +214,9 @@ class OrchestratorOutboundMapper {
             taxJurisdictionCode = record.taxJurisdictionCode
         )
 
-    private fun toAlternativeAddress(record: AlternativePostalAddressRecord): AlternativeAddress =
-        AlternativeAddress(
-            geographicCoordinates = record.geographicCoordinates?.let { toGeoCoordinate(it) } ?: GeoCoordinate.empty,
+    private fun toAlternativeAddress(record: AlternativePostalAddressRecord): AlternativeAddressV7Dto =
+        AlternativeAddressV7Dto(
+            geographicCoordinates = record.geographicCoordinates?.let { toGeoCoordinate(it) } ?: GeoCoordinateV7Dto.empty,
             country = record.country.countryCode,
             administrativeAreaLevel1 = record.administrativeAreaLevel1?.code,
             postalCode = record.postalCode,
@@ -226,37 +226,37 @@ class OrchestratorOutboundMapper {
             deliveryServiceNumber = record.deliveryServiceNumber
         )
 
-    private fun toGeoCoordinate(record: GeoCoordinateRecord): GeoCoordinate =
-        GeoCoordinate(record.longitude, record.latitude, record.altitude)
+    private fun toGeoCoordinate(record: GeoCoordinateRecord): GeoCoordinateV7Dto =
+        GeoCoordinateV7Dto(record.longitude, record.latitude, record.altitude)
 
-    private fun toPostalScriptVariant(record: AddressScriptVariantRecord): PostalAddressScriptVariant =
-        PostalAddressScriptVariant(
+    private fun toPostalScriptVariant(record: AddressScriptVariantRecord): PostalAddressScriptVariantV7Dto =
+        PostalAddressScriptVariantV7Dto(
             addressName = record.name,
             physicalAddress = with(record.physicalAddress) {
-                PhysicalAddressScriptVariant(
+                PhysicalAddressScriptVariantV7Dto(
                     city = city,
                     district = district,
                     street = street?.let {
-                        StreetScriptVariant(it.name, it.direction, it.namePrefix, it.additionalNamePrefix, it.nameSuffix, it.additionalNameSuffix)
-                    } ?: StreetScriptVariant.empty,
+                        StreetScriptVariantV7Dto(it.name, it.direction, it.namePrefix, it.additionalNamePrefix, it.nameSuffix, it.additionalNameSuffix)
+                    } ?: StreetScriptVariantV7Dto.empty,
                     industrialZone = industrialZone,
                     building = building,
                     floor = floor,
                     door = door
                 )
             },
-            alternativeAddress = record.alternativeAddress?.let { AlternativeAddressScriptVariant(it.city) }
+            alternativeAddress = record.alternativeAddress?.let { AlternativeAddressScriptVariantV7Dto(it.city) }
         )
 
-    private fun toState(record: BusinessStateRecord): BusinessState =
-        BusinessState(
+    private fun toState(record: BusinessStateRecord): BusinessStateV7Dto =
+        BusinessStateV7Dto(
             validFrom = BusinessStateDates.reportValidFrom(record.validFrom).toUtcInstant(),
             validTo = BusinessStateDates.reportValidTo(record.validTo).toUtcInstant(),
             type = record.type
         )
 
-    private fun toConfidenceCriteria(record: ConfidenceCriteriaRecord): ConfidenceCriteria =
-        ConfidenceCriteria(
+    private fun toConfidenceCriteria(record: ConfidenceCriteriaRecord): ConfidenceCriteriaV7Dto =
+        ConfidenceCriteriaV7Dto(
             sharedByOwner = record.sharedByOwner,
             checkedByExternalDataSource = record.checkedByExternalDataSource,
             numberOfSharingMembers = record.numberOfSharingMembers,
@@ -265,62 +265,62 @@ class OrchestratorOutboundMapper {
             confidenceLevel = record.confidenceLevel
         )
 
-    private fun toRelationType(type: LegalEntityRelationType): LegalEntityGoldenRecordRelationType =
+    private fun toRelationType(type: LegalEntityRelationType): LegalEntityGoldenRecordRelationTypeV7 =
         when (type) {
-            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
-            LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
-            LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationType.IsReplacedBy
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeV7.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeV7.IsOwnedBy
+            LegalEntityRelationType.IsReplacedBy -> LegalEntityGoldenRecordRelationTypeV7.IsReplacedBy
         }
 
-    private fun toRelationType(type: SiteRelationType): SiteGoldenRecordRelationType =
+    private fun toRelationType(type: SiteRelationType): SiteGoldenRecordRelationTypeV7 =
         when (type) {
-            SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationType.IsReplacedBy
+            SiteRelationType.IsReplacedBy -> SiteGoldenRecordRelationTypeV7.IsReplacedBy
         }
 
-    private fun toRelationType(type: AddressRelationType): AddressGoldenRecordRelationType =
+    private fun toRelationType(type: AddressRelationType): AddressGoldenRecordRelationTypeV7 =
         when (type) {
-            AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+            AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationTypeV7.IsReplacedBy
         }
 
-    private fun toBpnReference(bpn: String) = BpnReference(bpn, null, BpnReferenceType.Bpn)
+    private fun toBpnReference(bpn: String) = BpnReferenceV7Dto(bpn, null, BpnReferenceTypeV7.Bpn)
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
 
-    private fun toNamePartType(kind: NamePartKind): NamePartType =
+    private fun toNamePartType(kind: NamePartKind): NamePartTypeV7 =
         when (kind) {
-            NamePartKind.LegalName -> NamePartType.LegalName
-            NamePartKind.ShortName -> NamePartType.ShortName
-            NamePartKind.LegalForm -> NamePartType.LegalForm
-            NamePartKind.SiteName -> NamePartType.SiteName
-            NamePartKind.AddressName -> NamePartType.AddressName
+            NamePartKind.LegalName -> NamePartTypeV7.LegalName
+            NamePartKind.ShortName -> NamePartTypeV7.ShortName
+            NamePartKind.LegalForm -> NamePartTypeV7.LegalForm
+            NamePartKind.SiteName -> NamePartTypeV7.SiteName
+            NamePartKind.AddressName -> NamePartTypeV7.AddressName
         }
 
-    private fun toUncategorized(passThrough: GoldenRecordPassThroughRaw): UncategorizedProperties =
+    private fun toUncategorized(passThrough: GoldenRecordPassThroughRaw): UncategorizedPropertiesV7Dto =
         with(passThrough.uncategorized) {
-            UncategorizedProperties(
+            UncategorizedPropertiesV7Dto(
                 nameParts = nameParts,
                 identifiers = identifiers.map { toIdentifier(it) },
                 states = states.map { toState(it) },
                 address = address?.let { toUncategorizedAddress(it) },
-                scriptVariants = scriptVariants.map { UncategorizedScriptVariant(it.scriptCode, it.nameParts) }
+                scriptVariants = scriptVariants.map { UncategorizedScriptVariantV7Dto(it.scriptCode, it.nameParts) }
             )
         }
 
-    private fun toIdentifier(raw: UncategorizedIdentifierRaw) = Identifier(raw.value, raw.type, raw.issuingBody)
+    private fun toIdentifier(raw: UncategorizedIdentifierRaw) = IdentifierV7Dto(raw.value, raw.type, raw.issuingBody)
 
-    private fun toState(raw: BusinessStateRaw) = BusinessState(raw.validFrom, raw.validTo, raw.type)
+    private fun toState(raw: BusinessStateRaw) = BusinessStateV7Dto(raw.validFrom, raw.validTo, raw.type)
 
-    private fun toUncategorizedAddress(raw: UncategorizedAddressRaw): PostalAddressWithScriptVariants =
-        PostalAddressWithScriptVariants(
-            postalProperties = PostalAddress(
-                bpnReference = BpnReference(
+    private fun toUncategorizedAddress(raw: UncategorizedAddressRaw): PostalAddressWithScriptVariantsV7Dto =
+        PostalAddressWithScriptVariantsV7Dto(
+            postalProperties = PostalAddressV7Dto(
+                bpnReference = BpnReferenceV7Dto(
                     referenceValue = raw.bpnReferenceValue,
                     desiredBpn = raw.bpnReferenceDesiredBpn,
                     referenceType = raw.bpnReferenceKind?.let {
                         when (it) {
-                            BpnReferenceKind.Bpn -> BpnReferenceType.Bpn
-                            BpnReferenceKind.RequestIdentifier -> BpnReferenceType.BpnRequestIdentifier
+                            BpnReferenceKind.Bpn -> BpnReferenceTypeV7.Bpn
+                            BpnReferenceKind.RequestIdentifier -> BpnReferenceTypeV7.BpnRequestIdentifier
                         }
                     }
                 ),
@@ -328,10 +328,10 @@ class OrchestratorOutboundMapper {
                 identifiers = raw.identifiers.map { toIdentifier(it) },
                 states = raw.states.map { toState(it) },
                 confidenceCriteria = with(raw.confidenceCriteria) {
-                    ConfidenceCriteria(sharedByOwner, checkedByExternalDataSource, numberOfSharingMembers, lastConfidenceCheckAt, nextConfidenceCheckAt, confidenceLevel)
+                    ConfidenceCriteriaV7Dto(sharedByOwner, checkedByExternalDataSource, numberOfSharingMembers, lastConfidenceCheckAt, nextConfidenceCheckAt, confidenceLevel)
                 },
                 physicalAddress = with(raw.physicalAddress) {
-                    PhysicalAddress(
+                    PhysicalAddressV7Dto(
                         geographicCoordinates = toGeoCoordinate(geographicCoordinates),
                         country = country,
                         administrativeAreaLevel1 = administrativeAreaLevel1,
@@ -341,7 +341,7 @@ class OrchestratorOutboundMapper {
                         city = city,
                         district = district,
                         street = with(street) {
-                            Street(name, houseNumber, houseNumberSupplement, milestone, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
+                            StreetV7Dto(name, houseNumber, houseNumberSupplement, milestone, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
                         },
                         companyPostalCode = companyPostalCode,
                         industrialZone = industrialZone,
@@ -352,7 +352,7 @@ class OrchestratorOutboundMapper {
                     )
                 },
                 alternativeAddress = raw.alternativeAddress?.let {
-                    AlternativeAddress(
+                    AlternativeAddressV7Dto(
                         geographicCoordinates = toGeoCoordinate(it.geographicCoordinates),
                         country = it.country,
                         administrativeAreaLevel1 = it.administrativeAreaLevel1,
@@ -366,23 +366,23 @@ class OrchestratorOutboundMapper {
                 hasChanged = raw.hasChanged,
                 goldenRecordRelations = raw.relations.map {
                     val type = when (it.type) {
-                        UncategorizedAddressRelationKind.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+                        UncategorizedAddressRelationKind.IsReplacedBy -> AddressGoldenRecordRelationTypeV7.IsReplacedBy
                     }
-                    AddressGoldenRecordRelation(type, it.sourceBpn, it.targetBpn)
+                    AddressGoldenRecordRelationV7Dto(type, it.sourceBpn, it.targetBpn)
                 },
                 updatedAt = raw.updatedAt
             ),
             scriptVariants = raw.scriptVariants.map { variant ->
-                PostalAddressScriptVariantWithScriptCode(
+                PostalAddressScriptVariantWithScriptCodeV7Dto(
                     scriptCode = variant.scriptCode,
-                    postalProperties = PostalAddressScriptVariant(
+                    postalProperties = PostalAddressScriptVariantV7Dto(
                         addressName = variant.addressName,
                         physicalAddress = with(variant.physicalAddress) {
-                            PhysicalAddressScriptVariant(
+                            PhysicalAddressScriptVariantV7Dto(
                                 city = city,
                                 district = district,
                                 street = with(street) {
-                                    StreetScriptVariant(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
+                                    StreetScriptVariantV7Dto(name, direction, namePrefix, additionalNamePrefix, nameSuffix, additionalNameSuffix)
                                 },
                                 industrialZone = industrialZone,
                                 building = building,
@@ -390,13 +390,13 @@ class OrchestratorOutboundMapper {
                                 door = door
                             )
                         },
-                        alternativeAddress = variant.alternativeAddress?.let { AlternativeAddressScriptVariant(it.city) }
+                        alternativeAddress = variant.alternativeAddress?.let { AlternativeAddressScriptVariantV7Dto(it.city) }
                     )
                 )
             }
         )
 
-    private fun toGeoCoordinate(raw: UncategorizedGeoCoordinateRaw) = GeoCoordinate(raw.longitude, raw.latitude, raw.altitude)
+    private fun toGeoCoordinate(raw: UncategorizedGeoCoordinateRaw) = GeoCoordinateV7Dto(raw.longitude, raw.latitude, raw.altitude)
 
     private fun toDescription(error: GoldenRecordTaskError): String =
         when (error) {

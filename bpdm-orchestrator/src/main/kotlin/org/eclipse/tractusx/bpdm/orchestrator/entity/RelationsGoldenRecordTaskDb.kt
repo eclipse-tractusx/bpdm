@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.hibernate.annotations.Type
 import java.util.*
 
@@ -80,7 +80,7 @@ class RelationsGoldenRecordTaskDb(
     class ProcessingState(
         @Enumerated(EnumType.STRING)
         @Column(name = "task_mode", nullable = false)
-        var mode: TaskMode,
+        var mode: TaskModeV7,
         @Enumerated(EnumType.STRING)
         @Column(name = "task_result_state", nullable = false)
         var resultState: ResultState,
@@ -93,7 +93,7 @@ class RelationsGoldenRecordTaskDb(
         val errors: MutableList<RelationsTaskErrorDb>,
         @Enumerated(EnumType.STRING)
         @Column(name = "task_step", nullable = false)
-        var step: TaskStep,
+        var step: TaskStepV7,
         @Enumerated(EnumType.STRING)
         @Column(name = "task_step_state", nullable = false)
         var stepState: StepState,

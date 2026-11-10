@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -36,16 +36,16 @@ class RelationsGoldenRecordTaskEventService(
 ) {
     private val finishedTaskStates = setOf(RelationsGoldenRecordTaskDb.ResultState.Success, RelationsGoldenRecordTaskDb.ResultState.Error)
 
-    fun getRelationsFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+    fun getRelationsFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsV7Response {
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size, Sort.Direction.ASC, "updatedAt")
         val finishedTasksPage = relationsTaskRepository.findByProcessingStateResultStateInAndUpdatedAtAfter(finishedTaskStates, timestamp.toTimestamp(), pageRequest )
 
-        return FinishedTaskEventsResponse(
+        return FinishedTaskEventsV7Response(
             totalElements = finishedTasksPage.totalElements,
             totalPages = finishedTasksPage.totalPages,
             page = finishedTasksPage.number,
             contentSize = finishedTasksPage.content.size,
-            content = finishedTasksPage.content.map { FinishedTaskEventsResponse.Event(it.updatedAt.instant, relationsResponseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
+            content = finishedTasksPage.content.map { FinishedTaskEventsV7Response.Event(it.updatedAt.instant, relationsResponseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
         )
     }
 }

@@ -20,126 +20,126 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v7.util
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 
 class OrchestratorTestDataClientV7(
-    private val orchestratorClient: OrchestrationApiClient,
+    private val orchestratorClient: OrchestratorV7Client,
     private val requestFactory: OrchestratorRequestFactoryV7
 ) {
 
-    fun createBusinessPartnerTask(seed: String, taskMode: TaskMode = TaskMode.UpdateFromSharingMember, recordId: String? = null): TaskClientStateDto {
+    fun createBusinessPartnerTask(seed: String, taskMode: TaskModeV7 = TaskModeV7.UpdateFromSharingMember, recordId: String? = null): TaskClientStateV7Dto {
         val newTask = requestFactory.buildBusinessPartnerTaskCreateEntry(seed).copy(recordId = recordId)
-        val createRequest = TaskCreateRequest(taskMode, listOf(newTask))
+        val createRequest = TaskCreateV7Request(taskMode, listOf(newTask))
         val createResult = orchestratorClient.goldenRecordTasks.createTasks(createRequest)
 
         return createResult.createdTasks.single()
     }
 
-    fun reserveBusinessPartnerTask(task: TaskClientStateDto): TaskStepReservationEntryDto {
+    fun reserveBusinessPartnerTask(task: TaskClientStateV7Dto): TaskStepReservationEntryV7Dto {
         return reserveBusinessPartnerTasks(task.processingState.step).reservedTasks.single()
     }
 
-    fun reserveBusinessPartnerTasks(step: TaskStep): TaskStepReservationResponse {
-        val reservationRequest = TaskStepReservationRequest(step = step)
+    fun reserveBusinessPartnerTasks(step: TaskStepV7): TaskStepReservationV7Response {
+        val reservationRequest = TaskStepReservationV7Request(step = step)
         return orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
     }
 
-    fun reserveAndResolveBusinessPartnerTask(taskId: String, step: TaskStep, seed: String): TaskStepResultEntryDto{
+    fun reserveAndResolveBusinessPartnerTask(taskId: String, step: TaskStepV7, seed: String): TaskStepResultEntryV7Dto{
         reserveBusinessPartnerTasks(step)
         return resolveBusinessPartnerTask(taskId, step, seed)
     }
 
-    fun resolveBusinessPartnerTask(taskId: String, step: TaskStep, seed: String): TaskStepResultEntryDto{
+    fun resolveBusinessPartnerTask(taskId: String, step: TaskStepV7, seed: String): TaskStepResultEntryV7Dto{
         val businessPartnerResult = requestFactory.buildAdditionalAddressOfSiteBusinessPartner(seed)
-        val resultEntry = TaskStepResultEntryDto(taskId, businessPartnerResult, emptyList())
-        val resultRequest = TaskStepResultRequest(step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(taskId, businessPartnerResult, emptyList())
+        val resultRequest = TaskStepResultV7Request(step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry
     }
 
-    fun failBusinessPartnerTask(taskId: String, step: TaskStep): TaskStepResultEntryDto {
+    fun failBusinessPartnerTask(taskId: String, step: TaskStepV7): TaskStepResultEntryV7Dto {
         reserveBusinessPartnerTasks(step)
 
-        val resultEntry = TaskStepResultEntryDto(taskId, BusinessPartner.empty, listOf(TaskErrorDto(TaskErrorType.Unspecified, "Error Description")))
-        val resultRequest = TaskStepResultRequest(step, listOf(resultEntry))
+        val resultEntry = TaskStepResultEntryV7Dto(taskId, BusinessPartnerV7Dto.empty, listOf(TaskErrorV7Dto(TaskErrorTypeV7.Unspecified, "Error Description")))
+        val resultRequest = TaskStepResultV7Request(step, listOf(resultEntry))
         orchestratorClient.goldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry
     }
 
-    fun createRelationTask(seed: String, taskMode: TaskMode = TaskMode.UpdateFromSharingMember, recordId: String? = null): TaskClientRelationsStateDto {
+    fun createRelationTask(seed: String, taskMode: TaskModeV7 = TaskModeV7.UpdateFromSharingMember, recordId: String? = null): TaskClientRelationsStateV7Dto {
         val newTask = requestFactory.buildRelationTaskCreateEntry(seed, recordId)
-        val createRequest = TaskCreateRelationsRequest(taskMode, listOf(newTask))
+        val createRequest = TaskCreateRelationsV7Request(taskMode, listOf(newTask))
         val createResult = orchestratorClient.relationsGoldenRecordTasks.createTasks(createRequest)
 
         return createResult.createdTasks.single()
     }
 
 
-    fun reserveRelationTask(relationTask: TaskClientRelationsStateDto): TaskRelationsStepReservationEntryDto {
+    fun reserveRelationTask(relationTask: TaskClientRelationsStateV7Dto): TaskRelationsStepReservationEntryV7Dto {
         return reserveRelationTask(relationTask.processingState.step).reservedTasks.single()
     }
 
-    fun reserveRelationTask(reservationStep: TaskStep): TaskRelationsStepReservationResponse {
-        val reservationRequest = TaskStepReservationRequest(step = reservationStep)
+    fun reserveRelationTask(reservationStep: TaskStepV7): TaskRelationsStepReservationV7Response {
+        val reservationRequest = TaskStepReservationV7Request(step = reservationStep)
         return orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(reservationRequest)
     }
 
-    fun reserveAndResolveRelationTask(relationTask: TaskClientRelationsStateDto, seed: String): TaskRelationsStepResultEntryDto{
+    fun reserveAndResolveRelationTask(relationTask: TaskClientRelationsStateV7Dto, seed: String): TaskRelationsStepResultEntryV7Dto{
         reserveRelationTask(relationTask)
         return resolveRelationTask(relationTask, seed)
     }
 
-    fun resolveRelationTask(relationTask: TaskClientRelationsStateDto, seed: String): TaskRelationsStepResultEntryDto{
+    fun resolveRelationTask(relationTask: TaskClientRelationsStateV7Dto, seed: String): TaskRelationsStepResultEntryV7Dto{
         val relation = requestFactory.buildRelation(seed)
-        val resultEntry = TaskRelationsStepResultEntryDto(relationTask.taskId, relation, emptyList())
-        val resultRequest = TaskRelationsStepResultRequest(relationTask.processingState.step, listOf(resultEntry))
+        val resultEntry = TaskRelationsStepResultEntryV7Dto(relationTask.taskId, relation, emptyList())
+        val resultRequest = TaskRelationsStepResultV7Request(relationTask.processingState.step, listOf(resultEntry))
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry
     }
 
-    fun reserveAndResolveRelationTask(taskId: String, reservationStep: TaskStep, seed: String): TaskRelationsStepResultEntryDto{
+    fun reserveAndResolveRelationTask(taskId: String, reservationStep: TaskStepV7, seed: String): TaskRelationsStepResultEntryV7Dto{
         reserveRelationTask(reservationStep)
         val relation = requestFactory.buildRelation(seed)
-        val resultEntry = TaskRelationsStepResultEntryDto(taskId, relation, emptyList())
-        val resultRequest = TaskRelationsStepResultRequest(reservationStep, listOf(resultEntry))
+        val resultEntry = TaskRelationsStepResultEntryV7Dto(taskId, relation, emptyList())
+        val resultRequest = TaskRelationsStepResultV7Request(reservationStep, listOf(resultEntry))
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry
     }
 
-    fun failRelationTask(relationTask: TaskClientRelationsStateDto): TaskRelationsStepResultEntryDto {
+    fun failRelationTask(relationTask: TaskClientRelationsStateV7Dto): TaskRelationsStepResultEntryV7Dto {
         reserveRelationTask(relationTask.processingState.step)
 
-        val resultEntry = TaskRelationsStepResultEntryDto(
+        val resultEntry = TaskRelationsStepResultEntryV7Dto(
             relationTask.taskId,
-            BusinessPartnerRelations.empty,
-            listOf(TaskRelationsErrorDto(TaskRelationsErrorType.Unspecified, "Error Description"))
+            BusinessPartnerRelationsV7Dto.empty,
+            listOf(TaskRelationsErrorV7Dto(TaskRelationsErrorTypeV7.Unspecified, "Error Description"))
         )
-        val resultRequest = TaskRelationsStepResultRequest(relationTask.processingState.step, listOf(resultEntry))
+        val resultRequest = TaskRelationsStepResultV7Request(relationTask.processingState.step, listOf(resultEntry))
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(resultRequest)
 
         return resultEntry

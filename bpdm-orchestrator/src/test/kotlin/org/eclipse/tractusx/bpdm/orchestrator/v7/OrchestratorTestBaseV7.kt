@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.v7.util.OrchestratorAssertReposito
 import org.eclipse.tractusx.bpdm.orchestrator.v7.util.OrchestratorTestDataClientV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
 import org.springframework.beans.factory.annotation.Autowired
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 abstract class OrchestratorTestBaseV7: OrchestratorTestBase() {
     @Autowired
-    lateinit var orchestratorClient: OrchestrationApiClient
+    lateinit var orchestratorClient: OrchestratorV7Client
     @Autowired
     lateinit var requestFactory: OrchestratorRequestFactoryV7
     @Autowired

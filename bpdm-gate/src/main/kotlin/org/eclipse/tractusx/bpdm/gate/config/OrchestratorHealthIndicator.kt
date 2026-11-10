@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.stereotype.Component
@@ -28,7 +28,7 @@ import java.time.Instant
 
 @Component("orchestratorHealth")
 class OrchestratorHealthIndicator(
-    private val orchestrationClient: OrchestrationApiClient
+    private val orchestrationClient: OrchestratorV7Client
 ) : HealthIndicator {
 
     override fun health(): Health {

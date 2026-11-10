@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolution
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
 
 class RelationTestDataClientV7(
     private val gateClient: GateV7Client,
@@ -59,20 +59,20 @@ class RelationTestDataClientV7(
         )
     }
 
-    fun setRelationStateToPending(externalId: String, seed: String = externalId): TaskClientRelationsStateDto {
+    fun setRelationStateToPending(externalId: String, seed: String = externalId): TaskClientRelationsStateV7Dto {
         val createdTask = orchestratorMockDataFactory.mockCreateRelationTask(seed)
         relationTaskCreationService.createTasksForReadyRelations()
         return createdTask
     }
 
-    fun setRelationStateToSuccess(externalId: String, seed: String = externalId): TaskClientRelationsStateDto {
+    fun setRelationStateToSuccess(externalId: String, seed: String = externalId): TaskClientRelationsStateV7Dto {
         val refinedTask = orchestratorMockDataFactory.mockRefineRelation(seed)
         relationTaskCreationService.createTasksForReadyRelations()
         relationTaskResolutionService.resolveFinishedTasks()
         return refinedTask
     }
 
-    fun setRelationStateToError(externalId: String, seed: String = externalId, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto {
+    fun setRelationStateToError(externalId: String, seed: String = externalId, errorType: TaskRelationsErrorTypeV7): TaskClientRelationsStateV7Dto {
         val errorTask = orchestratorMockDataFactory.mockRelationSharingError(seed, errorType)
         relationTaskCreationService.createTasksForReadyRelations()
         relationTaskResolutionService.resolveFinishedTasks()
@@ -104,7 +104,7 @@ class RelationTestDataClientV7(
         return relationInput
     }
 
-    fun createLegalEntityRelationOutput(seed: String, relationType: RelationTypeV7 = RelationTypeV7.IsManagedBy): Pair<RelationV7Dto, BusinessPartnerRelations> {
+    fun createLegalEntityRelationOutput(seed: String, relationType: RelationTypeV7 = RelationTypeV7.IsManagedBy): Pair<RelationV7Dto, BusinessPartnerRelationsV7Dto> {
         val source = businessPartner.upsertInput("$seed Source")
         val target = businessPartner.upsertInput("$seed Target")
         val request = testDataFactory.relation.input.request.fromSeed(seed).withRelationType(relationType)
@@ -115,7 +115,7 @@ class RelationTestDataClientV7(
         return Pair(relationInput, goldenRecord)
     }
 
-    fun createAddressRelationOutput(seed: String, relationType: RelationTypeV7 = RelationTypeV7.IsReplacedBy): Pair<RelationV7Dto, BusinessPartnerRelations> {
+    fun createAddressRelationOutput(seed: String, relationType: RelationTypeV7 = RelationTypeV7.IsReplacedBy): Pair<RelationV7Dto, BusinessPartnerRelationsV7Dto> {
         val source = businessPartner.upsertInput("$seed Source")
         val target = businessPartner.upsertInput("$seed Target")
         val request = testDataFactory.relation.input.request.fromSeed(seed).withRelationType(relationType)
@@ -126,7 +126,7 @@ class RelationTestDataClientV7(
         return Pair(relationInput, goldenRecord)
     }
 
-    fun updateLegalEntityRelationOutput(original: RelationV7Dto, updateSeed: String, relationType: RelationTypeV7): BusinessPartnerRelations {
+    fun updateLegalEntityRelationOutput(original: RelationV7Dto, updateSeed: String, relationType: RelationTypeV7): BusinessPartnerRelationsV7Dto {
         val newSource = businessPartner.upsertInput("$updateSeed Source")
         val newTarget = businessPartner.upsertInput("$updateSeed Target")
         val updatedRequest = testDataFactory.relation.input.request.fromSeed(updateSeed).copy(
@@ -139,7 +139,7 @@ class RelationTestDataClientV7(
         return refineRelationToSuccess(updatedRelationInput, updateSeed)
     }
 
-    fun refineRelationToSuccess(input: RelationV7Dto, seed: String = input.externalId): BusinessPartnerRelations {
+    fun refineRelationToSuccess(input: RelationV7Dto, seed: String = input.externalId): BusinessPartnerRelationsV7Dto {
         val refinementResult = orchestratorMockDataFactory.mockRefineRelation(seed).businessPartnerRelationsResult
         relationTaskCreationService.createTasksForReadyRelations()
         relationTaskResolutionService.resolveFinishedTasks()

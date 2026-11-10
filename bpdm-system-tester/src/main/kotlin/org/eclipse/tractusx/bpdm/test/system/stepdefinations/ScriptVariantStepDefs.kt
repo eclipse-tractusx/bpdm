@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 
 /**
  * Steps for the "Output Reflects Golden Record Script Variants" feature.
@@ -193,7 +193,7 @@ class ScriptVariantStepDefs(
         val reservedTask = shareActions.reservedTaskOf(recordId)
         assertThat(reservedTask.uncategorized.scriptVariants)
             .describedAs("uncategorized script variants of the golden record task of record '%s'", recordId)
-            .containsExactly(UncategorizedScriptVariant(scriptCode, sharedNamePartsOf(recordId, scriptCode)))
+            .containsExactly(UncategorizedScriptVariantV7Dto(scriptCode, sharedNamePartsOf(recordId, scriptCode)))
     }
 
     @Then("{string} output reflects the shared script variant name parts in {string}")

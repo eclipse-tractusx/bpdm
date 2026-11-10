@@ -19,42 +19,42 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepStateV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import java.time.Duration
 import java.time.Instant
 
 class OrchestratorExpectedResultFactoryV7(
     val pendingTimeout: Duration,
     val retentionTimeout: Duration,
-    val taskStepTransitions: Map<TaskMode, List<TaskStep>>
+    val taskStepTransitions: Map<TaskModeV7, List<TaskStepV7>>
 ) {
 
     fun buildCreatedBusinessPartnerTaskClientState(
-        businessPartner: BusinessPartner,
-        taskMode: TaskMode,
+        businessPartner: BusinessPartnerV7Dto,
+        taskMode: TaskModeV7,
         taskId: String = "any UUID",
         recordId: String = "any UUID",
         modifiedAt: Instant = Instant.now(),
         createdAt: Instant = Instant.now()
-    ): TaskClientStateDto {
+    ): TaskClientStateV7Dto {
 
-        return TaskClientStateDto(
+        return TaskClientStateV7Dto(
             taskId = taskId,
             recordId = recordId,
             businessPartnerResult = businessPartner,
-            processingState = TaskProcessingStateDto(
-                resultState = ResultState.Pending,
+            processingState = TaskProcessingStateV7Dto(
+                resultState = ResultStateV7.Pending,
                 step = taskStepTransitions[taskMode]!!.first(),
-                stepState = StepState.Queued,
+                stepState = StepStateV7.Queued,
                 errors = emptyList(),
                 modifiedAt = modifiedAt,
                 createdAt = createdAt,
@@ -64,21 +64,21 @@ class OrchestratorExpectedResultFactoryV7(
     }
 
     fun buildCreatedRelationTaskClientState(
-        relation: BusinessPartnerRelations,
-        taskMode: TaskMode,
+        relation: BusinessPartnerRelationsV7Dto,
+        taskMode: TaskModeV7,
         taskId: String = "any UUID",
         recordId: String = "any UUID",
         modifiedAt: Instant = Instant.now(),
         createdAt: Instant = Instant.now()
-    ): TaskClientRelationsStateDto{
-        return TaskClientRelationsStateDto(
+    ): TaskClientRelationsStateV7Dto{
+        return TaskClientRelationsStateV7Dto(
             taskId = taskId,
             recordId = recordId,
             businessPartnerRelationsResult = relation,
-            processingState = TaskProcessingRelationsStateDto(
-                resultState = ResultState.Pending,
+            processingState = TaskProcessingRelationsStateV7Dto(
+                resultState = ResultStateV7.Pending,
                 step = taskStepTransitions[taskMode]!!.first(),
-                stepState = StepState.Queued,
+                stepState = StepStateV7.Queued,
                 errors = emptyList(),
                 modifiedAt = modifiedAt,
                 createdAt = createdAt,

@@ -34,11 +34,11 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -82,12 +82,12 @@ class TaskRelationsRoutingIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val createLegalEntityRelationsRequest = BusinessPartnerRelations(
+        val createLegalEntityRelationsRequest = BusinessPartnerRelationsV7Dto(
             relationType = LegalEntityRelationTypeV7.IsOwnedBy.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.parse("1970-01-01"),
                     validTo = LocalDate.parse("9999-12-31")
                 )
@@ -107,12 +107,12 @@ class TaskRelationsRoutingIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val createLegalEntityRelationsRequest = BusinessPartnerRelations(
+        val createLegalEntityRelationsRequest = BusinessPartnerRelationsV7Dto(
             relationType = LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.parse("1970-01-01"),
                     validTo = LocalDate.parse("9999-12-31")
                 )
@@ -132,12 +132,12 @@ class TaskRelationsRoutingIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val createLegalEntityRelationsRequest = BusinessPartnerRelations(
+        val createLegalEntityRelationsRequest = BusinessPartnerRelationsV7Dto(
             relationType = LegalEntityRelationTypeV7.IsManagedBy.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     //Can't create relation in the past
                     validFrom = LocalDate.now().plusDays(1),
                     validTo = LocalDate.parse("9999-12-31")
@@ -158,12 +158,12 @@ class TaskRelationsRoutingIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val createLegalEntityRelationsRequest = BusinessPartnerRelations(
+        val createLegalEntityRelationsRequest = BusinessPartnerRelationsV7Dto(
             relationType = LegalEntityRelationTypeV7.IsReplacedBy.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.parse("1970-01-01"),
                     validTo = LocalDate.parse("9999-12-31")
                 )
@@ -184,12 +184,12 @@ class TaskRelationsRoutingIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
-        val createAddressRelationsRequest = BusinessPartnerRelations(
+        val createAddressRelationsRequest = BusinessPartnerRelationsV7Dto(
             relationType = relationType.toTaskDto(),
             businessPartnerSourceBpn = legalEntity1.legalEntity.legalAddress.bpna,
             businessPartnerTargetBpn = additionalAddress1.address.bpna,
             validityPeriods = listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.parse("1970-01-01"),
                     validTo = LocalDate.parse("9999-12-31")
                 )
@@ -213,34 +213,34 @@ class TaskRelationsRoutingIT @Autowired constructor(
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
-    private fun upsertBusinessPartnerRelations(taskId: String, businessPartnerRelations: BusinessPartnerRelations) : TaskRelationsStepResultEntryDto {
+    private fun upsertBusinessPartnerRelations(taskId: String, businessPartnerRelations: BusinessPartnerRelationsV7Dto) : TaskRelationsStepResultEntryV7Dto {
         val taskEntry = singleTaskStep(taskId, businessPartnerRelations)
         orchestratorMockDataFactory.mockReservedRelationTasks(listOf(taskEntry))
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults().single()
     }
 
-    private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelations): TaskRelationsStepReservationEntryDto {
+    private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelationsV7Dto): TaskRelationsStepReservationEntryV7Dto {
 
-        return TaskRelationsStepReservationEntryDto(
+        return TaskRelationsStepReservationEntryV7Dto(
                 taskId = taskId,
                 recordId = UUID.randomUUID().toString(),
                 businessPartnerRelations = businessPartnerRelations
         )
     }
 
-    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
+    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationTypeV7 {
         return when(this){
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationTypeV7.IsManagedBy -> RelationType.IsManagedBy
-            LegalEntityRelationTypeV7.IsOwnedBy -> RelationType.IsOwnedBy
-            LegalEntityRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> RelationTypeV7.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> RelationTypeV7.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
     }
 
-    private fun AddressRelationTypeV7.toTaskDto(): RelationType {
+    private fun AddressRelationTypeV7.toTaskDto(): RelationTypeV7 {
         return when(this){
-            AddressRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
     }
 

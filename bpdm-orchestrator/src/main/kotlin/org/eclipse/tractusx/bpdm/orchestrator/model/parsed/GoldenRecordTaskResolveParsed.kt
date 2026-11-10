@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.orchestrator.model.parsed
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryV7Dto
 
 data class GoldenRecordTaskResolveParsed(
-    val step: TaskStep,
+    val step: TaskStepV7,
     val task: GoldenRecordTaskDb,
-    val resultEntry: TaskStepResultEntryDto
+    val resultEntry: TaskStepResultEntryV7Dto
 )

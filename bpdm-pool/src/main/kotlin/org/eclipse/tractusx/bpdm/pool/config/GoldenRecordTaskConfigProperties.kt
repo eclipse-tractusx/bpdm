@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties.Companion.PREFIX
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(PREFIX)
 data class GoldenRecordTaskConfigProperties(
     val cron: String = "-",
     val batchSize: Int = 100,
-    val step: TaskStep
+    val step: TaskStepV7
 ) {
     companion object {
         const val PREFIX = "bpdm.tasks"

@@ -35,8 +35,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
 import java.time.Instant
 
 /**
@@ -57,27 +57,27 @@ class ShareOwnCompanyDataTestDataGenerator(
 
     data class SiteBasedLegalEntityResult(
         val siteBasedLegalEntity: SiteBasedLegalEntity,
-        val taskData: BusinessPartner
+        val taskData: BusinessPartnerV7Dto
     )
 
     data class LegalEntityResult(
         val legalEntity: LegalEntityWithLegalAddressVerboseV7Dto,
-        val taskData: BusinessPartner
+        val taskData: BusinessPartnerV7Dto
     )
 
     data class SiteResult(
         val siteWithParent: SiteWithParent,
-        val taskData: BusinessPartner
+        val taskData: BusinessPartnerV7Dto
     )
 
     data class AdditionalSiteAddressResult(
         val additionalSiteAddressWithParent: AdditionalSiteAddressWithParent,
-        val taskData: BusinessPartner
+        val taskData: BusinessPartnerV7Dto
     )
 
     data class AdditionalLegalEntityAddressResult(
         val additionalLegalEntityAddressWithParent: AdditionalLegalEntityAddressWithParent,
-        val taskData: BusinessPartner
+        val taskData: BusinessPartnerV7Dto
     )
 
     fun buildSiteBasedLegalEntity(id: String, givenConfidence: GivenConfidence = TestDataV7.SharedByOwner): SiteBasedLegalEntityResult {
@@ -92,7 +92,7 @@ class ShareOwnCompanyDataTestDataGenerator(
 
         val taskData = refinementTestDataFactory.buildLegalEntityOnSiteBusinessPartner(
             legalEntity, siteCreate.site, "BPNL000000000001", emptyList()
-        ).copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        ).copyWithBpnReferenceType(BpnReferenceTypeV7.BpnRequestIdentifier)
 
         return SiteBasedLegalEntityResult(SiteBasedLegalEntity(legalEntity, siteCreate.site), taskData)
     }
@@ -102,7 +102,7 @@ class ShareOwnCompanyDataTestDataGenerator(
         val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAddress, givenConfidence)
 
         val taskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntity, "BPNL000000000001", emptyList())
-            .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+            .copyWithBpnReferenceType(BpnReferenceTypeV7.BpnRequestIdentifier)
 
         return LegalEntityResult(legalEntity, taskData)
     }
@@ -123,7 +123,7 @@ class ShareOwnCompanyDataTestDataGenerator(
         val siteWithParent = SiteWithParent(legalEntityParent, site)
 
         val taskData = refinementTestDataFactory.buildSiteBusinessPartner(legalEntityParent, site, "BPNL000000000001", emptyList())
-            .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+            .copyWithBpnReferenceType(BpnReferenceTypeV7.BpnRequestIdentifier)
 
         return SiteResult(siteWithParent, taskData)
     }
@@ -157,7 +157,7 @@ class ShareOwnCompanyDataTestDataGenerator(
 
         val taskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(
             determinedParent.legalEntity, determinedParent.site, additionalAddress, "BPNL000000000001", emptyList()
-        ).copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        ).copyWithBpnReferenceType(BpnReferenceTypeV7.BpnRequestIdentifier)
 
         return AdditionalSiteAddressResult(AdditionalSiteAddressWithParent(determinedParent, additionalAddress), taskData)
     }
@@ -184,7 +184,7 @@ class ShareOwnCompanyDataTestDataGenerator(
 
         val taskData = refinementTestDataFactory.buildAdditionLegalEntityAddressBusinessPartner(
             legalEntityParent, additionalAddress, "BPNL000000000001", emptyList()
-        ).copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        ).copyWithBpnReferenceType(BpnReferenceTypeV7.BpnRequestIdentifier)
 
         return AdditionalLegalEntityAddressResult(AdditionalLegalEntityAddressWithParent(legalEntityParent, additionalAddress), taskData)
     }

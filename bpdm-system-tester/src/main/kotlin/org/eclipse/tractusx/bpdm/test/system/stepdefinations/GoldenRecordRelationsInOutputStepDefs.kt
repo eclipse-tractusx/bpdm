@@ -33,14 +33,14 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7R
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import java.time.LocalDate
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7 as OrchestratorRelationType
 
 /**
  * Steps for the "Output Reflects Golden Record Relations" feature.
@@ -55,7 +55,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
  */
 class GoldenRecordRelationsInOutputStepDefs(
     private val sharingMemberGates: SharingMemberGates,
-    private val orchestratorClient: OrchestrationApiClient,
+    private val orchestratorClient: OrchestratorV7Client,
     private val shareActions: BusinessPartnerShareActions,
     private val taskReservationWatcher: TaskReservationWatcher,
     private val testDataFactoryGate: TestDataFactoryGateV7,
@@ -276,12 +276,12 @@ class GoldenRecordRelationsInOutputStepDefs(
         val (sourceBpn, targetBpn) = goldenRecordBpnsOf(relationState.submittedEntry.relationType, sourceOutput, targetOutput)
 
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(
-            TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(
-                TaskRelationsStepResultEntryDto(taskId, BusinessPartnerRelations(
+            TaskRelationsStepResultV7Request(TaskStepV7.CleanAndSync, listOf(
+                TaskRelationsStepResultEntryV7Dto(taskId, BusinessPartnerRelationsV7Dto(
                     relationType = OrchestratorRelationType.valueOf(relationState.submittedEntry.relationType.name),
                     businessPartnerSourceBpn = sourceBpn,
                     businessPartnerTargetBpn = targetBpn,
-                    validityPeriods = relationState.submittedEntry.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+                    validityPeriods = relationState.submittedEntry.validityPeriods.map { RelationValidityPeriodV7Dto(it.validFrom, it.validTo) },
                     reasonCode = relationState.submittedEntry.reasonCode
                 ))
             ))

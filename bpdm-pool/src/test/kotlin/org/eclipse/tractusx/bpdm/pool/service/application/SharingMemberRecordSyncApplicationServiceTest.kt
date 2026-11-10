@@ -27,12 +27,12 @@ import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitiali
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecord
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -119,23 +119,23 @@ class SharingMemberRecordSyncApplicationServiceTest @Autowired constructor(
     }
 
     private fun createLegalEntityShared(recordId: String): String {
-        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryDto("TASK_1", recordId, minValidLegalEntity())))
+        orchestratorMockDataFactory.mockReservedTasks(listOf(TaskStepReservationEntryV7Dto("TASK_1", recordId, minValidLegalEntity())))
         taskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getStepResults().single().businessPartner.legalEntity.bpnReference.referenceValue!!
     }
 
     private fun sharingMemberRecord(recordId: String, isGoldenRecordCounted: Boolean, updatedAt: Instant = Instant.now()) =
-        SharingMemberRecord(recordId, isGoldenRecordCounted, updatedAt, updatedAt)
+        SharingMemberRecordV7Dto(recordId, isGoldenRecordCounted, updatedAt, updatedAt)
 
-    private fun minValidLegalEntity(): BusinessPartner =
-        with(BusinessPartner.empty) {
+    private fun minValidLegalEntity(): BusinessPartnerV7Dto =
+        with(BusinessPartnerV7Dto.empty) {
             copy(
                 legalEntity = legalEntity.copy(
-                    bpnReference = BpnReference(referenceValue = "BPNL REQUEST ID", null, referenceType = BpnReferenceType.BpnRequestIdentifier),
+                    bpnReference = BpnReferenceV7Dto(referenceValue = "BPNL REQUEST ID", null, referenceType = BpnReferenceTypeV7.BpnRequestIdentifier),
                     legalName = "Legal Name",
                     confidenceCriteria = confidenceCriteria(),
                     legalAddress = legalEntity.legalAddress.copy(
-                        bpnReference = BpnReference(referenceValue = "BPNA REQUEST ID", null, referenceType = BpnReferenceType.BpnRequestIdentifier),
+                        bpnReference = BpnReferenceV7Dto(referenceValue = "BPNA REQUEST ID", null, referenceType = BpnReferenceTypeV7.BpnRequestIdentifier),
                         confidenceCriteria = confidenceCriteria(),
                         physicalAddress = legalEntity.legalAddress.physicalAddress.copy(country = "DE", city = "Stuttgart")
                     )
@@ -144,7 +144,7 @@ class SharingMemberRecordSyncApplicationServiceTest @Autowired constructor(
         }
 
     private fun confidenceCriteria() =
-        ConfidenceCriteria(
+        ConfidenceCriteriaV7Dto(
             sharedByOwner = true,
             numberOfSharingMembers = 1,
             checkedByExternalDataSource = true,

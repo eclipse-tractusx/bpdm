@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.RelationsGoldenRecordTaskEventApplicationV7Service
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.OrchestratorRelationsFinishedTaskEventV7Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
@@ -34,7 +34,7 @@ class RelationsFinishedTaskEventController(
 ) : OrchestratorRelationsFinishedTaskEventV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun getRelationsEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+    override fun getRelationsEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsV7Response {
         return relationsTaskEventApplicationService.getRelationsFinishedTaskEvents(timestamp, paginationRequest)
     }
 }

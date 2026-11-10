@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskModeV6
 
-internal fun TaskMode.toV6(): TaskModeV6 =
+internal fun TaskModeV7.toV6(): TaskModeV6 =
     when (this) {
-        TaskMode.UpdateFromSharingMember -> TaskModeV6.UpdateFromSharingMember
-        TaskMode.UpdateFromPool -> TaskModeV6.UpdateFromPool
+        TaskModeV7.UpdateFromSharingMember -> TaskModeV6.UpdateFromSharingMember
+        TaskModeV7.UpdateFromPool -> TaskModeV6.UpdateFromPool
     }

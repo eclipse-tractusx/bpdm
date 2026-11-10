@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.sharingstate
 
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
 import org.junit.jupiter.api.Test
 
 class SyncGoldenRecordCountedV7IT : UnscheduledGateTestBaseV7() {
@@ -34,7 +34,7 @@ class SyncGoldenRecordCountedV7IT : UnscheduledGateTestBaseV7() {
         val sentUpdates = testDataClient.businessPartner.goldenRecordCountedSyncedToOrchestrator()
 
         //THEN
-        assertRepo.assertSharingMemberRecordUpdates(sentUpdates, listOf(SharingMemberRecordUpdateRequest(task.recordId, true)))
+        assertRepo.assertSharingMemberRecordUpdates(sentUpdates, listOf(SharingMemberRecordUpdateV7Request(task.recordId, true)))
     }
 
     /**
@@ -54,7 +54,7 @@ class SyncGoldenRecordCountedV7IT : UnscheduledGateTestBaseV7() {
         val sentUpdates = testDataClient.businessPartner.goldenRecordCountedSyncedToOrchestrator()
 
         //THEN
-        assertRepo.assertSharingMemberRecordUpdates(sentUpdates, tasks.map { SharingMemberRecordUpdateRequest(it.recordId, true) })
+        assertRepo.assertSharingMemberRecordUpdates(sentUpdates, tasks.map { SharingMemberRecordUpdateV7Request(it.recordId, true) })
     }
 
     /**

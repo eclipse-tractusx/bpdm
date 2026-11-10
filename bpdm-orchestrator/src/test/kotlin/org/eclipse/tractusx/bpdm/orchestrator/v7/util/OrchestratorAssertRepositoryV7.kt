@@ -22,42 +22,42 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.util
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.IPageDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecord
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
 import java.time.temporal.ChronoUnit
 
 class OrchestratorAssertRepositoryV7 {
 
 
-    fun assertBusinessPartnerTaskCreateResponseEqual(actual: TaskCreateResponse, expected: TaskCreateResponse, isForNewRecord: Boolean){
+    fun assertBusinessPartnerTaskCreateResponseEqual(actual: TaskCreateV7Response, expected: TaskCreateV7Response, isForNewRecord: Boolean){
         assertBusinessPartnerClientStatesEqual(actual.createdTasks, expected.createdTasks, ignoreTaskId = true, ignoreRecordId = isForNewRecord)
     }
 
-    fun assertBusinessPartnerTaskStateResponseEqual(actual: TaskStateResponse, expected: TaskStateResponse){
+    fun assertBusinessPartnerTaskStateResponseEqual(actual: TaskStateV7Response, expected: TaskStateV7Response){
         assertBusinessPartnerClientStatesEqual(actual.tasks, expected.tasks, ignoreTaskId = false, ignoreRecordId = false)
     }
 
-    fun assertBusinessPartnerTaskReservationResponseEqual(actual: TaskStepReservationResponse, expected: TaskStepReservationResponse, ignoreRecordId: Boolean){
+    fun assertBusinessPartnerTaskReservationResponseEqual(actual: TaskStepReservationV7Response, expected: TaskStepReservationV7Response, ignoreRecordId: Boolean){
         assertBusinessPartnerTaskReservationEntriesEqual(actual.reservedTasks, expected.reservedTasks, ignoreRecordId)
         Assertions.assertThat(actual.timeout).isCloseTo(expected.timeout, Assertions.within(1, ChronoUnit.SECONDS))
     }
 
-    fun assertBusinessPartnerTaskReservationEntriesEqual(actual: List<TaskStepReservationEntryDto>, expected: List<TaskStepReservationEntryDto>, ignoreRecordId: Boolean){
+    fun assertBusinessPartnerTaskReservationEntriesEqual(actual: List<TaskStepReservationEntryV7Dto>, expected: List<TaskStepReservationEntryV7Dto>, ignoreRecordId: Boolean){
         val ignoredFields = listOfNotNull(
-            TaskStepReservationEntryDto::recordId.name.takeIf { ignoreRecordId }
+            TaskStepReservationEntryV7Dto::recordId.name.takeIf { ignoreRecordId }
         ).toTypedArray()
 
         Assertions.assertThat(actual)
@@ -66,21 +66,21 @@ class OrchestratorAssertRepositoryV7 {
             .isEqualTo(expected)
     }
 
-    fun assertTaskResultStateSearchResponseEqual(actual: TaskResultStateSearchResponse, expected: TaskResultStateSearchResponse){
+    fun assertTaskResultStateSearchResponseEqual(actual: TaskResultStateSearchV7Response, expected: TaskResultStateSearchV7Response){
         Assertions.assertThat(actual).isEqualTo(expected)
     }
 
-    fun assertFinishedTaskEventsResponseEqual(actual: FinishedTaskEventsResponse, expected: FinishedTaskEventsResponse){
+    fun assertFinishedTaskEventsResponseEqual(actual: FinishedTaskEventsV7Response, expected: FinishedTaskEventsV7Response){
         assertPageDto(actual, expected)
 
         assertFinishedBusinessPartnerTaskEventEqual(actual.content, expected.content)
     }
 
-    fun assertFinishedBusinessPartnerTaskEventEqual(actual: Collection<FinishedTaskEventsResponse.Event>, expected: Collection<FinishedTaskEventsResponse.Event>){
+    fun assertFinishedBusinessPartnerTaskEventEqual(actual: Collection<FinishedTaskEventsV7Response.Event>, expected: Collection<FinishedTaskEventsV7Response.Event>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                FinishedTaskEventsResponse.Event::timestamp.name
+                FinishedTaskEventsV7Response.Event::timestamp.name
             )
             .isEqualTo(expected)
 
@@ -89,17 +89,17 @@ class OrchestratorAssertRepositoryV7 {
         }
     }
 
-    fun assertRelationTaskCreateResponseEqual(actual: TaskCreateRelationsResponse, expected: TaskCreateRelationsResponse, isForNewRecord: Boolean){
+    fun assertRelationTaskCreateResponseEqual(actual: TaskCreateRelationsV7Response, expected: TaskCreateRelationsV7Response, isForNewRecord: Boolean){
         assertTaskClientRelationsStateEqual(actual.createdTasks, expected.createdTasks, ignoreTaskId = true, ignoreRecordId = isForNewRecord)
     }
 
-    fun assertRelationTaskStateResponseEqual(actual: TaskRelationsStateResponse, expected: TaskRelationsStateResponse){
+    fun assertRelationTaskStateResponseEqual(actual: TaskRelationsStateV7Response, expected: TaskRelationsStateV7Response){
         assertTaskClientRelationsStateEqual(actual.tasks, expected.tasks, ignoreTaskId = false, ignoreRecordId = false)
     }
 
     fun assertRelationTaskReservationResponseEqual(
-        actual: TaskRelationsStepReservationResponse,
-        expected: TaskRelationsStepReservationResponse,
+        actual: TaskRelationsStepReservationV7Response,
+        expected: TaskRelationsStepReservationV7Response,
         ignoreRecordId: Boolean
     ){
         assertRelationTaskReservationEntriesEqual(actual.reservedTasks, expected.reservedTasks, ignoreRecordId)
@@ -107,15 +107,15 @@ class OrchestratorAssertRepositoryV7 {
     }
 
     fun assertTaskClientRelationsStateEqual(
-        actual: List<TaskClientRelationsStateDto>,
-        expected: List<TaskClientRelationsStateDto>,
+        actual: List<TaskClientRelationsStateV7Dto>,
+        expected: List<TaskClientRelationsStateV7Dto>,
         ignoreTaskId: Boolean = true,
         ignoreRecordId: Boolean = true
     ){
         val ignoredFields = listOfNotNull(
-            TaskClientStateDto::taskId.name.takeIf { ignoreTaskId },
-            TaskClientStateDto::recordId.name.takeIf { ignoreRecordId },
-            TaskClientStateDto::processingState.name
+            TaskClientStateV7Dto::taskId.name.takeIf { ignoreTaskId },
+            TaskClientStateV7Dto::recordId.name.takeIf { ignoreRecordId },
+            TaskClientStateV7Dto::processingState.name
         ).toTypedArray()
 
         Assertions.assertThat(actual)
@@ -127,12 +127,12 @@ class OrchestratorAssertRepositoryV7 {
     }
 
     fun assertRelationTaskReservationEntriesEqual(
-        actual: List<TaskRelationsStepReservationEntryDto>,
-        expected: List<TaskRelationsStepReservationEntryDto>,
+        actual: List<TaskRelationsStepReservationEntryV7Dto>,
+        expected: List<TaskRelationsStepReservationEntryV7Dto>,
         ignoreRecordId: Boolean
     ){
         val ignoredFields = listOfNotNull(
-            TaskStepReservationEntryDto::recordId.name.takeIf { ignoreRecordId }
+            TaskStepReservationEntryV7Dto::recordId.name.takeIf { ignoreRecordId }
         ).toTypedArray()
 
         Assertions.assertThat(actual)
@@ -143,15 +143,15 @@ class OrchestratorAssertRepositoryV7 {
 
 
     fun assertBusinessPartnerClientStatesEqual(
-        actual: List<TaskClientStateDto>,
-        expected: List<TaskClientStateDto>,
+        actual: List<TaskClientStateV7Dto>,
+        expected: List<TaskClientStateV7Dto>,
         ignoreTaskId: Boolean = true,
         ignoreRecordId: Boolean = true
     ){
         val ignoredFields = listOfNotNull(
-            TaskClientStateDto::taskId.name.takeIf { ignoreTaskId },
-            TaskClientStateDto::recordId.name.takeIf { ignoreRecordId },
-            TaskClientStateDto::processingState.name
+            TaskClientStateV7Dto::taskId.name.takeIf { ignoreTaskId },
+            TaskClientStateV7Dto::recordId.name.takeIf { ignoreRecordId },
+            TaskClientStateV7Dto::processingState.name
         ).toTypedArray()
 
         Assertions.assertThat(actual)
@@ -162,18 +162,18 @@ class OrchestratorAssertRepositoryV7 {
         assertBusinessPartnerProcessingStates(actual.map { it.processingState }, expected.map { it.processingState })
     }
 
-    fun assertSharingMemberRecordEqual(actual: PageDto<SharingMemberRecord>, expected: PageDto<SharingMemberRecord>){
+    fun assertSharingMemberRecordEqual(actual: PageDto<SharingMemberRecordV7Dto>, expected: PageDto<SharingMemberRecordV7Dto>){
         assertPageDto(actual, expected)
 
         actual.content.zip(expected.content){ actualEntry, expectedEntry -> assertSharingMemberRecordEqual(actualEntry, expectedEntry) }
     }
 
-    fun assertSharingMemberRecordEqual(actual: SharingMemberRecord, expected: SharingMemberRecord){
+    fun assertSharingMemberRecordEqual(actual: SharingMemberRecordV7Dto, expected: SharingMemberRecordV7Dto){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
-                SharingMemberRecord::createdAt.name,
-                SharingMemberRecord::updatedAt.name
+                SharingMemberRecordV7Dto::createdAt.name,
+                SharingMemberRecordV7Dto::updatedAt.name
             )
             .isEqualTo(expected)
 
@@ -181,12 +181,12 @@ class OrchestratorAssertRepositoryV7 {
         Assertions.assertThat(actual.updatedAt).isCloseTo(expected.updatedAt, Assertions.within(1, ChronoUnit.SECONDS))
     }
 
-    fun assertBusinessPartnerProcessingStates(actual: List<TaskProcessingStateDto>, expected: List<TaskProcessingStateDto>) {
+    fun assertBusinessPartnerProcessingStates(actual: List<TaskProcessingStateV7Dto>, expected: List<TaskProcessingStateV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(TaskProcessingStateDto::createdAt.name)
-            .ignoringFields(TaskProcessingStateDto::modifiedAt.name)
-            .ignoringFields(TaskProcessingStateDto::timeout.name)
+            .ignoringFields(TaskProcessingStateV7Dto::createdAt.name)
+            .ignoringFields(TaskProcessingStateV7Dto::modifiedAt.name)
+            .ignoringFields(TaskProcessingStateV7Dto::timeout.name)
             .isEqualTo(expected)
 
         actual.zip(expected).forEach { (actualEntry, expectedEntry) ->
@@ -194,12 +194,12 @@ class OrchestratorAssertRepositoryV7 {
         }
     }
 
-    fun assertRelationProcessingStates(actual: List<TaskProcessingRelationsStateDto>, expected: List<TaskProcessingRelationsStateDto>) {
+    fun assertRelationProcessingStates(actual: List<TaskProcessingRelationsStateV7Dto>, expected: List<TaskProcessingRelationsStateV7Dto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(TaskProcessingRelationsStateDto::createdAt.name)
-            .ignoringFields(TaskProcessingRelationsStateDto::modifiedAt.name)
-            .ignoringFields(TaskProcessingRelationsStateDto::timeout.name)
+            .ignoringFields(TaskProcessingRelationsStateV7Dto::createdAt.name)
+            .ignoringFields(TaskProcessingRelationsStateV7Dto::modifiedAt.name)
+            .ignoringFields(TaskProcessingRelationsStateV7Dto::timeout.name)
             .isEqualTo(expected)
 
         actual.zip(expected).forEach { (actualEntry, expectedEntry) ->

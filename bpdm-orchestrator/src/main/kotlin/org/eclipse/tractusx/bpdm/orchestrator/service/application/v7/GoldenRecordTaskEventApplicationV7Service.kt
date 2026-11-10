@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskEventOperation
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -33,7 +33,7 @@ class GoldenRecordTaskEventApplicationV7Service(
     private val eventOperation: GoldenRecordTaskEventOperation
 ) {
 
-    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsResponse {
+    fun getFinishedTaskEvents(timestamp: Instant, paginationRequest: PaginationRequest): FinishedTaskEventsV7Response {
         return eventOperation.getFinishedTaskEvents(timestamp, paginationRequest)
     }
 }

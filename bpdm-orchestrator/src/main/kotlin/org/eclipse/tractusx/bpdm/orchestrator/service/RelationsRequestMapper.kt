@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRelationsRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationTypeRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorV7Dto
 import org.springframework.stereotype.Service
 
 @Service
@@ -53,14 +53,14 @@ class RelationsRequestMapper {
             )
         }
 
-    fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelations) =
+    fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelationsV7Dto) =
         with(businessPartnerRelations){
             RelationsGoldenRecordTaskDb.BusinessPartnerRelations(
                 relationType = when (relationType) {
-                    RelationType.IsAlternativeHeadquarterFor -> RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
-                    RelationType.IsManagedBy -> RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
-                    RelationType.IsOwnedBy -> RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
-                    RelationType.IsReplacedBy -> RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy
+                    RelationTypeV7.IsAlternativeHeadquarterFor -> RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
+                    RelationTypeV7.IsManagedBy -> RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
+                    RelationTypeV7.IsOwnedBy -> RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
+                    RelationTypeV7.IsReplacedBy -> RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy
                 },
                 businessPartnerSourceBpn = businessPartnerSourceBpn,
                 businessPartnerTargetBpn = businessPartnerTargetBpn,
@@ -74,7 +74,7 @@ class RelationsRequestMapper {
             )
         }
 
-    fun toTaskError(error: TaskRelationsErrorDto) =
+    fun toTaskError(error: TaskRelationsErrorV7Dto) =
         with(error) {
             RelationsTaskErrorDb(type = type, description = description)
         }

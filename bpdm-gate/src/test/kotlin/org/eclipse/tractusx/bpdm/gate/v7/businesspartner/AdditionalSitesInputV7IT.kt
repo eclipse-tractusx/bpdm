@@ -24,7 +24,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.AdditionalSiteInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.SiteRepresentationInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -60,7 +60,7 @@ class AdditionalSitesInputV7IT : UnscheduledGateTestBaseV7() {
         val sharedBusinessPartner = testDataClient.businessPartner.sharedBusinessPartnerOf(request.externalId)
 
         //THEN
-        val sharedByBpn = sharedBusinessPartner.additionalSites.single { it.bpnReference.referenceType == BpnReferenceType.Bpn }
+        val sharedByBpn = sharedBusinessPartner.additionalSites.single { it.bpnReference.referenceType == BpnReferenceTypeV7.Bpn }
         val sharedByName = sharedBusinessPartner.additionalSites.single { it.bpnReference.referenceType == null }
 
         assertThat(sharedByBpn.bpnReference.referenceValue).isEqualTo("BPNS0000000042XY")

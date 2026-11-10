@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskClientStateV6Dto
@@ -42,7 +42,7 @@ class OrchestratorTestDataClientV6(
         return createTask(seed).recordId
     }
 
-    fun createTask(seed: String, taskMode: TaskMode = TaskMode.UpdateFromSharingMember, recordId: String? = null): TaskClientStateV6Dto{
+    fun createTask(seed: String, taskMode: TaskModeV7 = TaskModeV7.UpdateFromSharingMember, recordId: String? = null): TaskClientStateV6Dto{
         val newTask = requestFactory.buildTaskCreate(seed).copy(recordId = recordId)
         val createRequest = TaskCreateV6Request(taskMode.toV6(), listOf(newTask))
         val createResult = operatorClient.goldenRecordTasks.createTasks(createRequest)

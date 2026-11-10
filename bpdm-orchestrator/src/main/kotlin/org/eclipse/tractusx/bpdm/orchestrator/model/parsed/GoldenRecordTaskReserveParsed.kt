@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.orchestrator.model.parsed
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 
 data class GoldenRecordTaskReserveParsed(
-    val step: TaskStep,
+    val step: TaskStepV7,
     val amount: Int,
     val foundTasks: Set<GoldenRecordTaskDb>
 )

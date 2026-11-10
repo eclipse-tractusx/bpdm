@@ -43,8 +43,8 @@ import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -260,7 +260,7 @@ class GoldenRecordContentsInOutputStepDefs(
                 "with a state without validity dates"
         }
         shareActions.refineAsLegalEntity(recordId, masterDataSeed = legalEntityId, legalEntityLabel = legalEntityId) {
-            it.copy(legalEntity = it.legalEntity.copy(states = listOf(BusinessState(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))))
+            it.copy(legalEntity = it.legalEntity.copy(states = listOf(BusinessStateV7Dto(validFrom = null, validTo = null, type = BusinessStateType.ACTIVE))))
         }
     }
 
@@ -810,7 +810,7 @@ class GoldenRecordContentsInOutputStepDefs(
             )
         )
 
-    private fun BusinessPartner.withLegalAddressCountry(country: String): BusinessPartner {
+    private fun BusinessPartnerV7Dto.withLegalAddressCountry(country: String): BusinessPartnerV7Dto {
         val legalAddress = legalEntity.legalAddress
         return copy(
             legalEntity = legalEntity.copy(

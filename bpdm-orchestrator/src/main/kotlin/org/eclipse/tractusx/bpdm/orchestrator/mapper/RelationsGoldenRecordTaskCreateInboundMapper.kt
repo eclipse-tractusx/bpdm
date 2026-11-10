@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.mapper
 
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequestEntry
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequestEntryV7Dto
 import org.springframework.stereotype.Component
 
 @Component
@@ -28,7 +28,7 @@ class RelationsGoldenRecordTaskCreateInboundMapper(
     private val businessPartnerRelationsRequestMapper: BusinessPartnerRelationsRequestMapper
 ) {
 
-    fun toRequest(entry: TaskCreateRelationsRequestEntry): RelationsGoldenRecordTaskCreateRequest =
+    fun toRequest(entry: TaskCreateRelationsRequestEntryV7Dto): RelationsGoldenRecordTaskCreateRequest =
         RelationsGoldenRecordTaskCreateRequest(
             recordId = entry.recordId,
             businessPartnerRelations = businessPartnerRelationsRequestMapper.toBusinessPartnerRelationsRequest(entry.businessPartnerRelations)

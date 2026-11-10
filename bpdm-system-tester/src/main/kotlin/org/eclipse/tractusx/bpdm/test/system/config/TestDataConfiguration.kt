@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHel
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
@@ -95,7 +95,7 @@ class TestDataConfiguration {
     }
 
     @Bean
-    fun taskReservationWatcher(orchestrationApiClient: OrchestrationApiClient): TaskReservationWatcher {
+    fun taskReservationWatcher(orchestrationApiClient: OrchestratorV7Client): TaskReservationWatcher {
         return TaskReservationWatcher(orchestrationApiClient)
     }
 
@@ -229,7 +229,7 @@ class TestDataConfiguration {
     @Bean
     fun businessPartnerShareActions(
         sharingMemberGates: SharingMemberGates,
-        orchestratorClient: OrchestrationApiClient,
+        orchestratorClient: OrchestratorV7Client,
         testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
         taskReservationWatcher: TaskReservationWatcher,
         apiCallEvidence: ApiCallEvidence

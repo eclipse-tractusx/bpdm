@@ -37,11 +37,11 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -90,12 +90,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo =  futureDate.plusYears(1)
                 )
@@ -116,12 +116,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo =  LocalDate.ofYearDay(2026, 1)
                 )
@@ -142,12 +142,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(1),
                     validTo = null
                 )
@@ -168,12 +168,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = null
                 )
@@ -194,16 +194,16 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(2),
                     validTo = futureDate.plusYears(3)
                 )
@@ -224,16 +224,16 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = LocalDate.ofYearDay(2026, 1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 )
@@ -254,20 +254,20 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(1),
                     validTo = futureDate.plusYears(2).minusDays(1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(2),
                     validTo = futureDate.plusYears(3)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(1).minusDays(1)
                 ),
@@ -288,20 +288,20 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2026, 1),
                     validTo = LocalDate.of(2026, 12, 31)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = LocalDate.of(2025, 12, 31)
                 ),
@@ -322,7 +322,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
@@ -343,7 +343,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
@@ -364,20 +364,20 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(2)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(1),
                     validTo = futureDate.plusYears(2)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(2),
                     validTo = futureDate.plusYears(3)
                 )
@@ -397,12 +397,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         executeInPast {
-            val relationToCreate = BusinessPartnerRelations(
-                RelationType.IsManagedBy,
+            val relationToCreate = BusinessPartnerRelationsV7Dto(
+                RelationTypeV7.IsManagedBy,
                 legalEntity2.legalEntity.header.bpnl,
                 legalEntity1.legalEntity.header.bpnl,
                 listOf(
-                    RelationValidityPeriod(
+                    RelationValidityPeriodV7Dto(
                         validFrom = pastDate.minusYears(1),
                         validTo = pastDate
                     )
@@ -414,12 +414,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
 
         //When
-        val relationToUpdate = BusinessPartnerRelations(
-            RelationType.IsManagedBy,
+        val relationToUpdate = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsManagedBy,
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(1)
                 )
@@ -439,12 +439,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         executeInPast {
-            val relationToCreate = BusinessPartnerRelations(
-                RelationType.IsManagedBy,
+            val relationToCreate = BusinessPartnerRelationsV7Dto(
+                RelationTypeV7.IsManagedBy,
                 legalEntity2.legalEntity.header.bpnl,
                 legalEntity1.legalEntity.header.bpnl,
                 listOf(
-                    RelationValidityPeriod(
+                    RelationValidityPeriodV7Dto(
                         validFrom = pastDate.minusYears(1),
                         validTo = futureDate
                     )
@@ -455,12 +455,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         }
 
         //When
-        val relationToUpdate = BusinessPartnerRelations(
-            RelationType.IsManagedBy,
+        val relationToUpdate = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsManagedBy,
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = pastDate.minusYears(1),
                     validTo = pastDate
                 )
@@ -481,12 +481,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
 
         executeInPast {
-            val relationToCreate = BusinessPartnerRelations(
-                RelationType.IsManagedBy,
+            val relationToCreate = BusinessPartnerRelationsV7Dto(
+                RelationTypeV7.IsManagedBy,
                 legalEntity2.legalEntity.header.bpnl,
                 legalEntity1.legalEntity.header.bpnl,
                 listOf(
-                    RelationValidityPeriod(
+                    RelationValidityPeriodV7Dto(
                         validFrom = pastDate,
                         validTo = futureDate
                     )
@@ -497,12 +497,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         }
 
         //When
-        val relationToUpdate = BusinessPartnerRelations(
-            RelationType.IsManagedBy,
+        val relationToUpdate = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsManagedBy,
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = pastDate,
                     validTo = futureDate.plusYears(1)
                 )
@@ -523,12 +523,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(1)
                 )
@@ -538,12 +538,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         createRelation(relationToCreate)
 
         //When
-        val relationToUpdate = BusinessPartnerRelations(
+        val relationToUpdate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(2),
                     validTo = null
                 )
@@ -562,12 +562,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val relationToCreate = BusinessPartnerRelations(
-            RelationType.IsManagedBy,
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsManagedBy,
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(1)
                 )
@@ -577,12 +577,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         createRelation(relationToCreate)
 
         //When
-        val relationToUpdate = BusinessPartnerRelations(
-            RelationType.IsManagedBy,
+        val relationToUpdate = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsManagedBy,
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = pastDate.minusYears(1),
                     validTo = pastDate
                 )
@@ -601,12 +601,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val relationToCreate = BusinessPartnerRelations(
-            RelationType.IsManagedBy,
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
+            RelationTypeV7.IsManagedBy,
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = pastDate,
                     validTo = futureDate.plusYears(1)
                 )
@@ -627,20 +627,20 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = LocalDate.ofYearDay(2027, 1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2026, 1),
                     validTo = LocalDate.ofYearDay(2027, 1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 )
@@ -661,16 +661,16 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.header.bpnl,
             legalEntity1.legalEntity.header.bpnl,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate,
                     validTo = futureDate.plusYears(1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = futureDate.plusYears(1),
                     validTo = futureDate.plusYears(2)
                 )
@@ -691,16 +691,16 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
         //When
-        val relationToCreate = BusinessPartnerRelations(
+        val relationToCreate = BusinessPartnerRelationsV7Dto(
             relationType.toTaskDto(),
             legalEntity1.legalEntity.legalAddress.bpna,
             additionalAddress1.address.bpna,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = LocalDate.ofYearDay(2026, 1)
                 ),
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.ofYearDay(2026, 1),
                     validTo = LocalDate.ofYearDay(2027, 1)
                 )
@@ -718,21 +718,21 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
 
-    private fun createRelation(relation: BusinessPartnerRelations): TaskRelationsStepResultEntryDto{
-        val entry =   TaskRelationsStepReservationEntryDto("any", "any", relation)
+    private fun createRelation(relation: BusinessPartnerRelationsV7Dto): TaskRelationsStepResultEntryV7Dto{
+        val entry =   TaskRelationsStepReservationEntryV7Dto("any", "any", relation)
         return resolveRelationTasks(listOf(entry)).single()
     }
 
-    private fun assertSuccess(actual: TaskRelationsStepResultEntryDto, expectedContent: BusinessPartnerRelations){
-        val expected = TaskRelationsStepResultEntryDto("any", expectedContent, emptyList())
+    private fun assertSuccess(actual: TaskRelationsStepResultEntryV7Dto, expectedContent: BusinessPartnerRelationsV7Dto){
+        val expected = TaskRelationsStepResultEntryV7Dto("any", expectedContent, emptyList())
 
         Assertions.assertThat(actual)
             .usingRecursiveAssertion()
-            .ignoringFields(TaskRelationsStepResultEntryDto::taskId.name)
+            .ignoringFields(TaskRelationsStepResultEntryV7Dto::taskId.name)
             .isEqualTo(expected)
     }
 
-    private fun assertError(actual: TaskRelationsStepResultEntryDto){
+    private fun assertError(actual: TaskRelationsStepResultEntryV7Dto){
         Assertions.assertThat(actual.errors).isNotEmpty
     }
 
@@ -753,18 +753,18 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 
-    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
+    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationTypeV7 {
         return when(this){
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationTypeV7.IsManagedBy -> RelationType.IsManagedBy
-            LegalEntityRelationTypeV7.IsOwnedBy -> RelationType.IsOwnedBy
-            LegalEntityRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> RelationTypeV7.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> RelationTypeV7.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
     }
 
-    private fun AddressRelationTypeV7.toTaskDto(): RelationType {
+    private fun AddressRelationTypeV7.toTaskDto(): RelationTypeV7 {
         return when(this){
-            AddressRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
     }
 
@@ -772,7 +772,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         return testDataEnvironment.metadata.reasonCodes.first().technicalKey
     }
 
-    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryV7Dto>): List<TaskRelationsStepResultEntryV7Dto> {
         orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults()

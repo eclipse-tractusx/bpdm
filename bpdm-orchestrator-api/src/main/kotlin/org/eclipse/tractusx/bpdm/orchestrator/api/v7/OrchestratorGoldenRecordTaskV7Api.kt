@@ -25,15 +25,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -61,7 +61,7 @@ interface OrchestratorGoldenRecordTaskV7Api {
     )
     @Tag(name = ApiCommons.TAG_CLIENT)
     @PostMapping(value = [ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS])
-    fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
+    fun createTasks(@RequestBody createRequest: TaskCreateV7Request): TaskCreateV7Response
 
     @Operation(
         summary = "Search for the state of golden record tasks by task identifiers",
@@ -78,7 +78,7 @@ interface OrchestratorGoldenRecordTaskV7Api {
     )
     @Tag(name = ApiCommons.TAG_CLIENT)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"])
-    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
+    fun searchTaskStates(@RequestBody stateRequest: TaskStateV7Request): TaskStateV7Response
 
     @Operation(
         summary = "Search for result states by giving a list of task IDs",
@@ -95,7 +95,7 @@ interface OrchestratorGoldenRecordTaskV7Api {
     )
     @Tag(name = ApiCommons.TAG_CLIENT)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"])
-    fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse
+    fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchV7Request): TaskResultStateSearchV7Response
 
     @Operation(
         summary = "Reserve the next golden record tasks waiting in the given step queue",
@@ -115,7 +115,7 @@ interface OrchestratorGoldenRecordTaskV7Api {
     )
     @Tag(name = ApiCommons.TAG_WORKER)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"])
-    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
+    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationV7Request): TaskStepReservationV7Response
 
     @Operation(
         summary = "Post step results for reserved golden record tasks in the given step queue",
@@ -140,5 +140,5 @@ interface OrchestratorGoldenRecordTaskV7Api {
     )
     @Tag(name = ApiCommons.TAG_WORKER)
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"])
-    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
+    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultV7Request)
 }

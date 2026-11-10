@@ -27,15 +27,15 @@ import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.GoldenRecor
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.GoldenRecordTaskReserveApplicationV7Service
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.GoldenRecordTaskResolveApplicationV7Service
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.OrchestratorGoldenRecordTaskV7Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultV7Request
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -51,7 +51,7 @@ class GoldenRecordTaskController(
 ) : OrchestratorGoldenRecordTaskV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
-    override fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
+    override fun createTasks(createRequest: TaskCreateV7Request): TaskCreateV7Response {
         if (createRequest.requests.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
@@ -59,7 +59,7 @@ class GoldenRecordTaskController(
     }
 
     @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")
-    override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
+    override fun reserveTasksForStep(reservationRequest: TaskStepReservationV7Request): TaskStepReservationV7Response {
         if (reservationRequest.amount > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
 
@@ -68,7 +68,7 @@ class GoldenRecordTaskController(
 
     @PreAuthorize("@stepSecurityService.assertHasResultAuthority(authentication, #resultRequest.step)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    override fun resolveStepResults(resultRequest: TaskStepResultRequest) {
+    override fun resolveStepResults(resultRequest: TaskStepResultV7Request) {
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
 
@@ -76,12 +76,12 @@ class GoldenRecordTaskController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
+    override fun searchTaskStates(stateRequest: TaskStateV7Request): TaskStateV7Response {
         return goldenRecordTaskService.searchTaskStates(stateRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse {
+    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchV7Request): TaskResultStateSearchV7Response {
         return goldenRecordTaskService.searchTaskResultStates(stateRequest)
     }
 

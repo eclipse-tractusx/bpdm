@@ -37,12 +37,12 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -81,14 +81,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
     }
 
     /*
-    * GIVEN: An empty BusinessPartnerRelations request
+    * GIVEN: An empty BusinessPartnerRelationsV7Dto request
     * WHEN: Attempting to upsert the empty relations into the pool
     * THEN: The operation should fail, returning an error message
     * */
     @Test
     fun `create empty relations`() {
 
-        val createRelationsRequest = BusinessPartnerRelations.empty
+        val createRelationsRequest = BusinessPartnerRelationsV7Dto.empty
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
@@ -185,7 +185,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 2: Create a relation request
         val createRelationsRequest = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = savedEntity2.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedEntity1.legalEntity.header.bpnl
         )
@@ -261,10 +261,10 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
          * Scenario 1: A→B exists
          */
         val relationAB = buildRelationRequest(
-            relationType = RelationType.IsManagedBy,
+            relationType = RelationTypeV7.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(
                 validFrom = nowDate.plusYears(1),
                 validTo = nowDate.plusYears(2).minusDays(1)
             ))
@@ -276,10 +276,10 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
          * Scenario 2: A→B exists, new A→C overlaps in validity → should throw exception
          */
         val relationAC_conflict = buildRelationRequest(
-            relationType = RelationType.IsManagedBy,
+            relationType = RelationTypeV7.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(
                 validFrom = nowDate.plusYears(1).plusMonths(6),
                 validTo = nowDate.plusYears(1).plusMonths(9)
             ))
@@ -291,10 +291,10 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
          * Scenario 3: A→C exists, new A→C with overlapping validity → overwrite existing validity
          */
         val relationAC_nonOverlap = buildRelationRequest(
-            relationType = RelationType.IsManagedBy,
+            relationType = RelationTypeV7.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(
                 validFrom = nowDate.plusYears(2),
                 validTo = nowDate.plusYears(3)
             ))
@@ -303,10 +303,10 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         assertThat(resultAC_nonOverlap[0].errors).isEmpty()
 
         val relationAC_new = buildRelationRequest(
-            relationType = RelationType.IsManagedBy,
+            relationType = RelationTypeV7.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(
                 validFrom = nowDate.plusYears(2),
                 validTo = nowDate.plusYears(3).plusMonths(6)
             ))
@@ -348,7 +348,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 2: Try to make A is managed by B -> should fail because of only dataspace participants can manage other entities
         val violatingDataspaceParticipantRole = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsManagedBy,
+            relationType = RelationTypeV7.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
@@ -380,7 +380,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 2: Create valid IsOwnedBy relation: A is owned by B
         val validRelation = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
@@ -388,7 +388,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 3: Try to make A is owned by C -> should fail because of only one parent allowed
         val violatingSingleParent = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
@@ -420,14 +420,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 2: Create valid IsOwnedBy relation: A is owned by B
         val validAOwnedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", validAOwnedByB)
 
         val validBOwnedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
@@ -435,7 +435,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 3: Try to make C is owned by A -> should fail because of no cycles allowed
         val violatingNoCycles = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedC.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedA.legalEntity.header.bpnl
         )
@@ -469,7 +469,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 2: Create initial IsOwnedBy relation: A is owned by B
         val relationAOwnedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
@@ -478,7 +478,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 3: Chain Extension - B is owned by C
         val relationBOwnedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
@@ -487,7 +487,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         // Step 4: Update existing A → B with new validity period (non-overlapping)
         val updatedRelationAOwnedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
@@ -521,14 +521,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val savedC = createLegalEntity("$testName C")
 
         val validReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID", validReplacedByB)
 
         val violatingSingleSuccessor = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
@@ -551,18 +551,18 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val successionEnd = LocalDate.of(2025, 12, 31)
 
         val aReplacedByB = buildRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = LocalDate.of(2025, 1, 1), validTo = successionEnd))
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2025, 1, 1), validTo = successionEnd))
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID", aReplacedByB)
 
         val aReplacedByC = buildRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = successionEnd, validTo = null))
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = successionEnd, validTo = null))
         )
 
         val result = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_SINGLE_SUCCESSOR", aReplacedByC).single()
@@ -583,18 +583,18 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val successionEnd = LocalDate.of(2025, 12, 31)
 
         val aReplacedByB = buildRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = LocalDate.of(2025, 1, 1), validTo = successionEnd))
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2025, 1, 1), validTo = successionEnd))
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID", aReplacedByB)
 
         val aReplacedByC = buildRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl,
-            validityPeriods = listOf(RelationValidityPeriod(validFrom = successionEnd.plusDays(1), validTo = null))
+            validityPeriods = listOf(RelationValidityPeriodV7Dto(validFrom = successionEnd.plusDays(1), validTo = null))
         )
 
         val result = upsertRelationsGoldenRecordIntoPool("TASK_NEXT_SUCCESSOR", aReplacedByC).single()
@@ -614,14 +614,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val savedC = createLegalEntity("$testName C")
 
         val aReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_FIRST_PREDECESSOR", aReplacedByC)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
@@ -643,21 +643,21 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val savedC = createLegalEntity("$testName C")
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", aReplacedByB)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", bReplacedByC)
 
         val violatingNoCycles = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedC.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedA.legalEntity.header.bpnl
         )
@@ -679,14 +679,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val savedC = createLegalEntity("$testName C")
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.header.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", aReplacedByB)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = savedB.legalEntity.header.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.header.bpnl
         )
@@ -711,7 +711,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val legalEntity2 =  poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities.single()
 
         val relation = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl
         ).copy(reasonCode = "NOT EXISTS")
@@ -722,7 +722,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         //THEN
         assertThat(result.errors).isNotEmpty
         assertThat(result.errors.size).isEqualTo(1)
-        assertThat(result.errors.single().type).isEqualTo(TaskRelationsErrorType.Unspecified)
+        assertThat(result.errors.single().type).isEqualTo(TaskRelationsErrorTypeV7.Unspecified)
     }
 
     /**
@@ -737,12 +737,12 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val legalEntity2 = createLegalEntity("$testName 2")
 
         val relation = buildRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
             businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
-                RelationValidityPeriod(validFrom = LocalDate.of(2020, 1, 1), validTo = LocalDate.of(2020, 12, 31)),
-                RelationValidityPeriod(validFrom = LocalDate.of(2025, 5, 1), validTo = LocalDate.of(2025, 1, 1))
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2020, 1, 1), validTo = LocalDate.of(2020, 12, 31)),
+                RelationValidityPeriodV7Dto(validFrom = LocalDate.of(2025, 5, 1), validTo = LocalDate.of(2025, 1, 1))
             )
         )
 
@@ -813,7 +813,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val addressB = createAdditionalAddress("$testName B", legalEntity)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressA.address.bpna,
             businessPartnerTargetBpn = addressB.address.bpna
         )
@@ -823,7 +823,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         //THEN
         assertThat(result.errors).isEmpty()
-        assertThat(result.businessPartnerRelations.relationType).isEqualTo(RelationType.IsReplacedBy)
+        assertThat(result.businessPartnerRelations.relationType).isEqualTo(RelationTypeV7.IsReplacedBy)
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(addressA.address.bpna)
         assertThat(result.businessPartnerRelations.businessPartnerTargetBpn).isEqualTo(addressB.address.bpna)
         assertThat(result.businessPartnerRelations.validityPeriods).isEqualTo(aReplacedByB.validityPeriods)
@@ -842,7 +842,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val additionalAddress = createAdditionalAddress("$testName Addr", legalEntity)
 
         val mainAddressReplacedByAdditional = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = site.mainAddress.bpna,
             businessPartnerTargetBpn = additionalAddress.address.bpna
         )
@@ -870,14 +870,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val addressC = createAdditionalAddress("$testName C", legalEntity)
 
         val validReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressA.address.bpna,
             businessPartnerTargetBpn = addressB.address.bpna
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID", validReplacedByB)
 
         val violatingSingleSuccessor = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressA.address.bpna,
             businessPartnerTargetBpn = addressC.address.bpna
         )
@@ -904,14 +904,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val addressC = createAdditionalAddress("$testName C", legalEntity)
 
         val aReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressA.address.bpna,
             businessPartnerTargetBpn = addressC.address.bpna
         )
         upsertRelationsGoldenRecordIntoPool("TASK_FIRST_PREDECESSOR", aReplacedByC)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressB.address.bpna,
             businessPartnerTargetBpn = addressC.address.bpna
         )
@@ -937,21 +937,21 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val addressC = createAdditionalAddress("$testName C", legalEntity)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressA.address.bpna,
             businessPartnerTargetBpn = addressB.address.bpna
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", aReplacedByB)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressB.address.bpna,
             businessPartnerTargetBpn = addressC.address.bpna
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", bReplacedByC)
 
         val violatingNoCycles = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressC.address.bpna,
             businessPartnerTargetBpn = addressA.address.bpna
         )
@@ -978,14 +978,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val addressC = createAdditionalAddress("$testName C", legalEntity)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressA.address.bpna,
             businessPartnerTargetBpn = addressB.address.bpna
         )
         upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", aReplacedByB)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = addressB.address.bpna,
             businessPartnerTargetBpn = addressC.address.bpna
         )
@@ -1042,7 +1042,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val siteB = createSite("$testName B", legalEntity)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteB.site.bpns
         )
@@ -1052,7 +1052,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
         //THEN
         assertThat(result.errors).isEmpty()
-        assertThat(result.businessPartnerRelations.relationType).isEqualTo(RelationType.IsReplacedBy)
+        assertThat(result.businessPartnerRelations.relationType).isEqualTo(RelationTypeV7.IsReplacedBy)
         assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(siteA.site.bpns)
         assertThat(result.businessPartnerRelations.businessPartnerTargetBpn).isEqualTo(siteB.site.bpns)
         assertThat(result.businessPartnerRelations.validityPeriods).isEqualTo(aReplacedByB.validityPeriods)
@@ -1067,7 +1067,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
     fun `create site IsReplacedBy relation - reject unknown sites`() {
         //GIVEN
         val unknownSiteRelation = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = "BPNS0000000000XY",
             businessPartnerTargetBpn = "BPNS0000000000ZY"
         )
@@ -1094,7 +1094,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val site = createSite("$testName A", legalEntity)
 
         val siteReplacedByItself = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = site.site.bpns,
             businessPartnerTargetBpn = site.site.bpns
         )
@@ -1121,7 +1121,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val siteB = createSite("$testName B", legalEntityB)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteB.site.bpns
         )
@@ -1148,14 +1148,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val siteC = createSite("$testName C", legalEntity)
 
         val validReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteB.site.bpns
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID", validReplacedByB)
 
         val violatingSingleSuccessor = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteC.site.bpns
         )
@@ -1182,14 +1182,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val siteC = createSite("$testName C", legalEntity)
 
         val aReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteC.site.bpns
         )
         upsertRelationsGoldenRecordIntoPool("TASK_FIRST_PREDECESSOR", aReplacedByC)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteB.site.bpns,
             businessPartnerTargetBpn = siteC.site.bpns
         )
@@ -1215,21 +1215,21 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val siteC = createSite("$testName C", legalEntity)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteB.site.bpns
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", aReplacedByB)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteB.site.bpns,
             businessPartnerTargetBpn = siteC.site.bpns
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", bReplacedByC)
 
         val violatingNoCycles = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteC.site.bpns,
             businessPartnerTargetBpn = siteA.site.bpns
         )
@@ -1256,14 +1256,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val siteC = createSite("$testName C", legalEntity)
 
         val aReplacedByB = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteA.site.bpns,
             businessPartnerTargetBpn = siteB.site.bpns
         )
         upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", aReplacedByB)
 
         val bReplacedByC = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsReplacedBy,
+            relationType = RelationTypeV7.IsReplacedBy,
             businessPartnerSourceBpn = siteB.site.bpns,
             businessPartnerTargetBpn = siteC.site.bpns
         )
@@ -1290,14 +1290,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val otherB = createLegalEntity("$testName B")
 
         val aToM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
         assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
 
         val bToA = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = otherB.legalEntity.header.bpnl,
             businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
         )
@@ -1318,14 +1318,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val otherD = createLegalEntity("$testName D")
 
         val aToM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
         assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
 
         val mToD = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
             businessPartnerTargetBpn = otherD.legalEntity.header.bpnl
         )
@@ -1346,14 +1346,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val otherD = createLegalEntity("$testName D")
 
         val aToM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
         assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
 
         val aToD = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = otherD.legalEntity.header.bpnl
         )
@@ -1373,14 +1373,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val mainM = createLegalEntity("$testName M")
 
         val aToM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
         assertThat(upsertRelationsGoldenRecordIntoPool("TASK_A_TO_M", aToM)[0].errors).isEmpty()
 
         val mToA = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
             businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
         )
@@ -1400,14 +1400,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val mainM = createLegalEntity("$testName M")
 
         val aToM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
         assertThat(upsertRelationsGoldenRecordIntoPool("TASK_ALT", aToM)[0].errors).isEmpty()
 
         val aOwnedByM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
@@ -1427,14 +1427,14 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         val mainM = createLegalEntity("$testName M")
 
         val aToM = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = RelationTypeV7.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = alternativeA.legalEntity.header.bpnl,
             businessPartnerTargetBpn = mainM.legalEntity.header.bpnl
         )
         assertThat(upsertRelationsGoldenRecordIntoPool("TASK_ALT", aToM)[0].errors).isEmpty()
 
         val mOwnedByA = buildAlwaysActiveRelationRequest(
-            relationType = RelationType.IsOwnedBy,
+            relationType = RelationTypeV7.IsOwnedBy,
             businessPartnerSourceBpn = mainM.legalEntity.header.bpnl,
             businessPartnerTargetBpn = alternativeA.legalEntity.header.bpnl
         )
@@ -1459,31 +1459,31 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         return poolClient.sites.createSite(listOf(request)).entities.single()
     }
 
-    private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepResultEntryDto> {
+    private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelationsV7Dto): List<TaskRelationsStepResultEntryV7Dto> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartnerRelations = businessPartnerRelations)
         return resolveRelationTasks(taskStep)
     }
 
-    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationType {
+    private fun LegalEntityRelationTypeV7.toTaskDto(): RelationTypeV7 {
         return when(this){
-            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            LegalEntityRelationTypeV7.IsManagedBy -> RelationType.IsManagedBy
-            LegalEntityRelationTypeV7.IsOwnedBy -> RelationType.IsOwnedBy
-            LegalEntityRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
+            LegalEntityRelationTypeV7.IsAlternativeHeadquarterFor -> RelationTypeV7.IsAlternativeHeadquarterFor
+            LegalEntityRelationTypeV7.IsManagedBy -> RelationTypeV7.IsManagedBy
+            LegalEntityRelationTypeV7.IsOwnedBy -> RelationTypeV7.IsOwnedBy
+            LegalEntityRelationTypeV7.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
     }
 
-    private fun AddressRelationTypeV7.toTaskDto(): RelationType {
+    private fun AddressRelationTypeV7.toTaskDto(): RelationTypeV7 {
         return when(this){
-            AddressRelationTypeV7.IsReplacedBy -> RelationType.IsReplacedBy
+            AddressRelationTypeV7.IsReplacedBy -> RelationTypeV7.IsReplacedBy
         }
     }
 
-    private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepReservationEntryDto> {
+    private fun singleTaskStep(taskId: String, businessPartnerRelations: BusinessPartnerRelationsV7Dto): List<TaskRelationsStepReservationEntryV7Dto> {
 
         return listOf(
-            TaskRelationsStepReservationEntryDto(
+            TaskRelationsStepReservationEntryV7Dto(
                 taskId = taskId,
                 recordId = UUID.randomUUID().toString(),
                 businessPartnerRelations = businessPartnerRelations
@@ -1502,16 +1502,16 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
 
 
     private fun buildAlwaysActiveRelationRequest(
-        relationType: RelationType,
+        relationType: RelationTypeV7,
         businessPartnerSourceBpn: String,
         businessPartnerTargetBpn: String
-    ): BusinessPartnerRelations{
+    ): BusinessPartnerRelationsV7Dto{
         return buildRelationRequest(
             relationType,
             businessPartnerSourceBpn,
             businessPartnerTargetBpn,
             listOf(
-                RelationValidityPeriod(
+                RelationValidityPeriodV7Dto(
                     validFrom = LocalDate.of(1970, 1, 1),
                     validTo = LocalDate.of(9999, 12, 31)
                 )
@@ -1523,7 +1523,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         relationType: LegalEntityRelationTypeV7,
         businessPartnerSourceBpn: String,
         businessPartnerTargetBpn: String
-    ): BusinessPartnerRelations{
+    ): BusinessPartnerRelationsV7Dto{
         return buildAlwaysActiveRelationRequest(
             relationType = relationType.toTaskDto(),
             businessPartnerSourceBpn = businessPartnerSourceBpn,
@@ -1535,7 +1535,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         relationType: AddressRelationTypeV7,
         businessPartnerSourceBpn: String,
         businessPartnerTargetBpn: String
-    ): BusinessPartnerRelations{
+    ): BusinessPartnerRelationsV7Dto{
         return buildAlwaysActiveRelationRequest(
             relationType = relationType.toTaskDto(),
             businessPartnerSourceBpn = businessPartnerSourceBpn,
@@ -1544,12 +1544,12 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
     }
 
     private fun buildRelationRequest(
-        relationType: RelationType,
+        relationType: RelationTypeV7,
         businessPartnerSourceBpn: String,
         businessPartnerTargetBpn: String,
-        validityPeriods: List<RelationValidityPeriod>
-    ): BusinessPartnerRelations{
-        return BusinessPartnerRelations(
+        validityPeriods: List<RelationValidityPeriodV7Dto>
+    ): BusinessPartnerRelationsV7Dto{
+        return BusinessPartnerRelationsV7Dto(
             relationType = relationType,
             businessPartnerSourceBpn = businessPartnerSourceBpn,
             businessPartnerTargetBpn = businessPartnerTargetBpn,
@@ -1558,7 +1558,7 @@ class GoldenRecordRelationTaskResolutionApplicationServiceTest @Autowired constr
         )
     }
 
-    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryDto>): List<TaskRelationsStepResultEntryDto> {
+    private fun resolveRelationTasks(tasks: List<TaskRelationsStepReservationEntryV7Dto>): List<TaskRelationsStepResultEntryV7Dto> {
         orchestratorMockDataFactory.mockReservedRelationTasks(tasks)
         relationTaskResolutionService.resolveTasks()
         return orchestratorMockDataFactory.getRelationStepResults()

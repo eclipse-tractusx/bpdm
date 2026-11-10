@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-IdentifierV7Dto: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
@@ -22,29 +22,29 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinate
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Site
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Street
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinateV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorV7Dto
 import org.springframework.stereotype.Service
 
 @Service
@@ -83,7 +83,7 @@ class RequestMapper {
             )
         }
 
-    fun toBusinessPartner(businessPartner: BusinessPartner) =
+    fun toBusinessPartner(businessPartner: BusinessPartnerV7Dto) =
         with(businessPartner){
             GoldenRecordTaskDb.BusinessPartner(
                 nameParts = toNameParts(businessPartner),
@@ -116,7 +116,7 @@ class RequestMapper {
             )
         }
 
-    fun toAdditionalSites(businessPartner: BusinessPartner) =
+    fun toAdditionalSites(businessPartner: BusinessPartnerV7Dto) =
         businessPartner.additionalSites
             .map { AdditionalSiteDb(bpnReference = toBpnReference(it.bpnReference), siteName = it.siteName) }
             .toMutableList()
@@ -410,25 +410,25 @@ class RequestMapper {
             scope = scope
         )
 
-    fun toTaskError(error: TaskErrorDto) =
+    fun toTaskError(error: TaskErrorV7Dto) =
         with(error) {
             TaskErrorDb(type = type, description = description)
         }
 
-    fun toNameParts(businessPartner: BusinessPartner) =
+    fun toNameParts(businessPartner: BusinessPartnerV7Dto) =
         mutableListOf(
             businessPartner.uncategorized.nameParts.map { NamePartDb(it, null) },
             businessPartner.nameParts.map { NamePartDb(it.name, it.type) }
         ).flatten().toMutableList()
 
 
-    fun toIdentifier(identifier: Identifier, scope: IdentifierDb.Scope) =
+    fun toIdentifier(identifier: IdentifierV7Dto, scope: IdentifierDb.Scope) =
         with(identifier) {
             IdentifierDb(value, type, issuingBody, scope)
         }
 
 
-    fun toIdentifiers(businessPartner: BusinessPartner) =
+    fun toIdentifiers(businessPartner: BusinessPartnerV7Dto) =
         IdentifierDb.Scope.entries.mapNotNull { scope ->
             when (scope) {
                 IdentifierDb.Scope.LegalEntity -> businessPartner.legalEntity.identifiers
@@ -440,12 +440,12 @@ class RequestMapper {
             }?.map { toIdentifier(it, scope) }
         }.flatten().toMutableList()
 
-    fun toState(state: BusinessState, scope: BusinessStateDb.Scope) =
+    fun toState(state: BusinessStateV7Dto, scope: BusinessStateDb.Scope) =
         with(state) {
             BusinessStateDb(validFrom?.toTimestamp(), validTo?.toTimestamp(), type, scope)
         }
 
-    fun toStates(businessPartner: BusinessPartner) =
+    fun toStates(businessPartner: BusinessPartnerV7Dto) =
         BusinessStateDb.Scope.entries.mapNotNull { scope ->
             when (scope) {
                 BusinessStateDb.Scope.LegalEntity -> businessPartner.legalEntity.states
@@ -458,7 +458,7 @@ class RequestMapper {
             }?.map { toState(it, scope) }
         }.flatten().toMutableList()
 
-    fun toConfidence(confidenceCriteria: ConfidenceCriteria) =
+    fun toConfidence(confidenceCriteria: ConfidenceCriteriaV7Dto) =
         with(confidenceCriteria) {
             ConfidenceCriteriaDb(
                 sharedByOwner,
@@ -470,7 +470,7 @@ class RequestMapper {
             )
         }
 
-    fun toConfidences(businessPartner: BusinessPartner) =
+    fun toConfidences(businessPartner: BusinessPartnerV7Dto) =
         ConfidenceCriteriaDb.Scope.entries.mapNotNull { scope ->
             when (scope) {
                 ConfidenceCriteriaDb.Scope.LegalEntity -> businessPartner.legalEntity.confidenceCriteria
@@ -482,7 +482,7 @@ class RequestMapper {
             }?.let { scope to toConfidence(it) }
         }.toMap().toMutableMap()
 
-    fun toPostalAddress(postalAddress: PostalAddress, scope: PostalAddressDb.Scope) =
+    fun toPostalAddress(postalAddress: PostalAddressV7Dto, scope: PostalAddressDb.Scope) =
         with(postalAddress) {
             PostalAddressDb(
                 addressName = addressName,
@@ -493,7 +493,7 @@ class RequestMapper {
             )
         }
 
-    fun toPostalAddresses(businessPartner: BusinessPartner) =
+    fun toPostalAddresses(businessPartner: BusinessPartnerV7Dto) =
         PostalAddressDb.Scope.entries.mapNotNull { scope ->
             when (scope) {
                 PostalAddressDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress
@@ -504,7 +504,7 @@ class RequestMapper {
         }.toMap().toMutableMap()
 
 
-    fun toBpnReference(bpnReference: BpnReference) =
+    fun toBpnReference(bpnReference: BpnReferenceV7Dto) =
         with(bpnReference) {
             BpnReferenceDb(
                 referenceValue = referenceValue,
@@ -513,7 +513,7 @@ class RequestMapper {
             )
         }
 
-    fun toBpnReferences(businessPartner: BusinessPartner) =
+    fun toBpnReferences(businessPartner: BusinessPartnerV7Dto) =
         BpnReferenceDb.Scope.entries.mapNotNull { scope ->
             when (scope) {
                 BpnReferenceDb.Scope.LegalEntity -> businessPartner.legalEntity.bpnReference
@@ -525,7 +525,7 @@ class RequestMapper {
             }?.let { scope to toBpnReference(it) }
         }.toMap().toMutableMap()
 
-    fun toPhysicalAddress(physicalAddress: PhysicalAddress) =
+    fun toPhysicalAddress(physicalAddress: PhysicalAddressV7Dto) =
         with(physicalAddress) {
             PostalAddressDb.PhysicalAddressDb(
                 geographicCoordinates = toGeoCoordinate(geographicCoordinates),
@@ -546,7 +546,7 @@ class RequestMapper {
             )
         }
 
-    fun toAlternativeAddress(alternativeAddress: AlternativeAddress?) =
+    fun toAlternativeAddress(alternativeAddress: AlternativeAddressV7Dto?) =
         alternativeAddress?.let {
             with(alternativeAddress) {
                 PostalAddressDb.AlternativeAddress(
@@ -578,12 +578,12 @@ class RequestMapper {
         )
 
 
-    fun toGeoCoordinate(geoCoordinate: GeoCoordinate) =
+    fun toGeoCoordinate(geoCoordinate: GeoCoordinateV7Dto) =
         with(geoCoordinate) {
             PostalAddressDb.GeoCoordinate(longitude, latitude, altitude)
         }
 
-    fun toStreet(street: Street) =
+    fun toStreet(street: StreetV7Dto) =
         with(street) {
             PostalAddressDb.Street(
                 name,
@@ -598,15 +598,15 @@ class RequestMapper {
             )
         }
 
-    fun toLegalEntityScriptVariants(businessPartner: BusinessPartner): MutableList<LegalEntityHeaderScriptVariantDb>{
+    fun toLegalEntityScriptVariants(businessPartner: BusinessPartnerV7Dto): MutableList<LegalEntityHeaderScriptVariantDb>{
         return businessPartner.legalEntity.scriptVariants.map { LegalEntityHeaderScriptVariantDb(it.scriptCode, it.legalName, it.legalShortName) }.toMutableList()
     }
 
-    fun toSiteScriptVariants(businessPartner: BusinessPartner): MutableList<SiteHeaderScriptVariantDb>{
+    fun toSiteScriptVariants(businessPartner: BusinessPartnerV7Dto): MutableList<SiteHeaderScriptVariantDb>{
         return businessPartner.site?.scriptVariants?.map { SiteHeaderScriptVariantDb(it.scriptCode, it.siteName) }?.toMutableList() ?: mutableListOf()
     }
 
-    fun toAddressScriptVariants(businessPartner: BusinessPartner): MutableList<PostalAddressScriptVariantDb>{
+    fun toAddressScriptVariants(businessPartner: BusinessPartnerV7Dto): MutableList<PostalAddressScriptVariantDb>{
         return listOfNotNull(
             businessPartner.legalEntity.scriptVariants.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.LegalAddress, it.scriptCode, it.legalAddress) },
             businessPartner.site?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.SiteMainAddress, it.scriptCode, it.mainAddress) },
@@ -616,13 +616,13 @@ class RequestMapper {
     }
 
 
-    fun toUncategorizedScriptVariants(businessPartner: BusinessPartner): MutableList<UncategorizedScriptVariantDb>{
+    fun toUncategorizedScriptVariants(businessPartner: BusinessPartnerV7Dto): MutableList<UncategorizedScriptVariantDb>{
         return businessPartner.uncategorized.scriptVariants
             .flatMap { variant -> variant.nameParts.map { UncategorizedScriptVariantDb(variant.scriptCode, it) } }
             .toMutableList()
     }
 
-    fun toPostalAddressScriptVariant(scope: PostalAddressDb.Scope, scriptCode: String, postalAddressScriptVariant: PostalAddressScriptVariant): PostalAddressScriptVariantDb{
+    fun toPostalAddressScriptVariant(scope: PostalAddressDb.Scope, scriptCode: String, postalAddressScriptVariant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariantDb{
         return with(postalAddressScriptVariant){
             PostalAddressScriptVariantDb(
                 scope = scope,
@@ -633,7 +633,7 @@ class RequestMapper {
         }
     }
 
-    fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariant): PhysicalAddressScriptVariantDb{
+    fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariantDb{
         return with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariantDb(
                 city = city,
@@ -647,7 +647,7 @@ class RequestMapper {
         }
     }
 
-    fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariant): AlternativeAddressScriptVariantDb{
+    fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariantDb{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariantDb(
                 city = city
@@ -655,7 +655,7 @@ class RequestMapper {
         }
     }
 
-    fun toScriptVariantStreet(street: StreetScriptVariant): StreetScriptVariantDb{
+    fun toScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariantDb{
         return with(street){
             StreetScriptVariantDb(
                 name = name,
@@ -668,25 +668,25 @@ class RequestMapper {
         }
     }
 
-    fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<LegalEntityGoldenRecordRelationDb> =
+    fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartnerV7Dto): MutableList<LegalEntityGoldenRecordRelationDb> =
         businessPartner.legalEntity.goldenRecordRelations
             .map { LegalEntityGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
             .toMutableList()
 
-    fun toSiteGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<SiteGoldenRecordRelationDb> =
+    fun toSiteGoldenRecordRelations(businessPartner: BusinessPartnerV7Dto): MutableList<SiteGoldenRecordRelationDb> =
         businessPartner.site?.goldenRecordRelations
             .orEmpty()
             .map { SiteGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
             .toMutableList()
 
-    fun toAddressGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<AddressGoldenRecordRelationDb> =
+    fun toAddressGoldenRecordRelations(businessPartner: BusinessPartnerV7Dto): MutableList<AddressGoldenRecordRelationDb> =
         listOfNotNull(
             businessPartner.legalEntity.legalAddress.goldenRecordRelations.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.LegalAddress) },
             businessPartner.site?.siteMainAddress?.goldenRecordRelations?.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.SiteMainAddress) },
             businessPartner.additionalAddress?.postalProperties?.goldenRecordRelations?.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.AdditionalAddress) }
         ).flatten().toMutableList()
 
-    fun toAddressGoldenRecordRelation(relation: AddressGoldenRecordRelation, scope: AddressGoldenRecordRelationDb.Scope) =
+    fun toAddressGoldenRecordRelation(relation: AddressGoldenRecordRelationV7Dto, scope: AddressGoldenRecordRelationDb.Scope) =
         AddressGoldenRecordRelationDb(
             relationType = relation.relationType,
             sourceBpn = relation.sourceBpn,
@@ -695,18 +695,18 @@ class RequestMapper {
         )
 
     fun toNamePartType(type: NamePartTypeRequest) =
-        NamePartType.valueOf(type.name)
+        NamePartTypeV7.valueOf(type.name)
 
     fun toBpnReferenceType(type: BpnReferenceTypeRequest) =
-        BpnReferenceType.valueOf(type.name)
+        BpnReferenceTypeV7.valueOf(type.name)
 
     fun toLegalEntityGoldenRecordRelationType(type: LegalEntityGoldenRecordRelationTypeRequest) =
-        LegalEntityGoldenRecordRelationType.valueOf(type.name)
+        LegalEntityGoldenRecordRelationTypeV7.valueOf(type.name)
 
     fun toSiteGoldenRecordRelationType(type: SiteGoldenRecordRelationTypeRequest) =
-        SiteGoldenRecordRelationType.valueOf(type.name)
+        SiteGoldenRecordRelationTypeV7.valueOf(type.name)
 
     fun toAddressGoldenRecordRelationType(type: AddressGoldenRecordRelationTypeRequest) =
-        AddressGoldenRecordRelationType.valueOf(type.name)
+        AddressGoldenRecordRelationTypeV7.valueOf(type.name)
 
 }

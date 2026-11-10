@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationTypeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationV7Response
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
@@ -46,12 +46,12 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = createdTask.processingState.step)
+        val reservationRequest = TaskStepReservationV7Request(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedEntry = TaskStepReservationEntryDto(taskId = createdTask.taskId, recordId = createdTask.recordId, businessPartner = createdTask.businessPartnerResult)
-        val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedEntry = TaskStepReservationEntryV7Dto(taskId = createdTask.taskId, recordId = createdTask.recordId, businessPartner = createdTask.businessPartnerResult)
+        val expectedResult = TaskStepReservationV7Response(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = true)
     }
 
@@ -66,8 +66,8 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
     @Test
     fun `reserve queued task carrying site golden record relations`(){
         //GIVEN
-        val siteRelation = SiteGoldenRecordRelation(
-            relationType = SiteGoldenRecordRelationType.IsReplacedBy,
+        val siteRelation = SiteGoldenRecordRelationV7Dto(
+            relationType = SiteGoldenRecordRelationTypeV7.IsReplacedBy,
             sourceBpn = "BPNS0000000001XY",
             targetBpn = "BPNS0000000002XY"
         )
@@ -79,23 +79,23 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
             )
         )
         val createdTask = orchestratorClient.goldenRecordTasks
-            .createTasks(TaskCreateRequest(TaskMode.UpdateFromSharingMember, listOf(entryWithSiteRelation)))
+            .createTasks(TaskCreateV7Request(TaskModeV7.UpdateFromSharingMember, listOf(entryWithSiteRelation)))
             .createdTasks.single()
 
         //WHEN
         val reservedTasks = orchestratorClient.goldenRecordTasks
-            .reserveTasksForStep(TaskStepReservationRequest(step = createdTask.processingState.step))
+            .reserveTasksForStep(TaskStepReservationV7Request(step = createdTask.processingState.step))
 
         //THEN
         val createdBusinessPartner = createdTask.businessPartnerResult
-        val expectedEntry = TaskStepReservationEntryDto(
+        val expectedEntry = TaskStepReservationEntryV7Dto(
             taskId = createdTask.taskId,
             recordId = createdTask.recordId,
             businessPartner = createdBusinessPartner.copy(
                 site = requireNotNull(createdBusinessPartner.site).copy(goldenRecordRelations = listOf(siteRelation))
             )
         )
-        val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
+        val expectedResult = TaskStepReservationV7Response(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = true)
     }
 
@@ -107,11 +107,11 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
     @Test
     fun `reserve no queued tasks`(){
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = TaskStep.CleanAndSync)
+        val reservationRequest = TaskStepReservationV7Request(step = TaskStepV7.CleanAndSync)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationV7Response(emptyList(), Instant.now())
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = false)
     }
 
@@ -126,11 +126,11 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
         val createdTask = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = getDifferentStep(createdTask.processingState.step))
+        val reservationRequest = TaskStepReservationV7Request(step = getDifferentStep(createdTask.processingState.step))
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationV7Response(emptyList(), Instant.now())
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = false)
     }
 
@@ -146,11 +146,11 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
         testDataClient.reserveBusinessPartnerTasks(createdTask.processingState.step)
 
         //WHEN
-        val reservationRequest = TaskStepReservationRequest(step = createdTask.processingState.step)
+        val reservationRequest = TaskStepReservationV7Request(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
+        val expectedResult = TaskStepReservationV7Response(emptyList(), Instant.now())
         assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = false)
     }
 
@@ -162,14 +162,14 @@ class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
     fun `try requesting too many business partner cleaning tasks`() {
         //WHEN
         val request: () -> Unit = {
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(200, TaskStep.CleanAndSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV7Request(200, TaskStepV7.CleanAndSync))
         }
 
         //THEN
         Assertions.assertThatThrownBy(request).isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
-    private fun getDifferentStep(step: TaskStep): TaskStep {
-        return TaskStep.entries.find { it != step }!!
+    private fun getDifferentStep(step: TaskStepV7): TaskStepV7 {
+        return TaskStepV7.entries.find { it != step }!!
     }
 }

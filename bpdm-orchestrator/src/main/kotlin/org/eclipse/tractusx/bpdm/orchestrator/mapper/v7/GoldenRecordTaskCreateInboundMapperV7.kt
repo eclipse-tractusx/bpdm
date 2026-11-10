@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.mapper.v7
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.BusinessPartnerRequestMapper
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequestEntry
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequestEntryV7Dto
 import org.springframework.stereotype.Component
 
 /**
@@ -35,7 +35,7 @@ class GoldenRecordTaskCreateInboundMapperV7(
     private val businessPartnerRequestMapper: BusinessPartnerRequestMapper
 ) {
 
-    fun toRequest(entry: TaskCreateRequestEntry): GoldenRecordTaskCreateRequest =
+    fun toRequest(entry: TaskCreateRequestEntryV7Dto): GoldenRecordTaskCreateRequest =
         GoldenRecordTaskCreateRequest(
             recordId = entry.recordId,
             businessPartner = businessPartnerRequestMapper.toBusinessPartnerRequest(entry.businessPartner)

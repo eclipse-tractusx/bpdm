@@ -23,7 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
 import org.hibernate.annotations.Formula
 
 @Embeddable
@@ -34,7 +34,7 @@ data class BpnReferenceDb(
     val desiredBpn: String?,
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    val referenceType: BpnReferenceType?
+    val referenceType: BpnReferenceTypeV7?
 ) {
     enum class Scope {
         LegalEntity,

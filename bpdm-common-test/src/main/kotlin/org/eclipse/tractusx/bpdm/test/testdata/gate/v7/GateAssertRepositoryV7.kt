@@ -40,7 +40,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.Relatio
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.stats.StatsSharingStatesV7Response
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateV7Request
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -267,7 +267,7 @@ class GateAssertRepositoryV7(
             .isEqualTo(expected)
     }
 
-    fun assertSharingMemberRecordUpdates(actual: Collection<SharingMemberRecordUpdateRequest>, expected: Collection<SharingMemberRecordUpdateRequest>) {
+    fun assertSharingMemberRecordUpdates(actual: Collection<SharingMemberRecordUpdateV7Request>, expected: Collection<SharingMemberRecordUpdateV7Request>) {
         Assertions.assertThat(actual.sortedBy { it.recordId })
             .usingRecursiveComparison()
             .isEqualTo(expected.sortedBy { it.recordId })

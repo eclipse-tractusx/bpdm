@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCrea
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskModeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Response
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskModeV6
@@ -64,7 +64,7 @@ class GoldenRecordTaskCreateApplicationV6Service(
     }
 
     private fun createTasksInternal(
-        mode: TaskMode,
+        mode: TaskModeV7,
         requests: List<GoldenRecordTaskCreateRequest>,
         newGateRecordIsGoldenRecordCounted: Boolean?
     ): List<GoldenRecordTaskDb> =
@@ -96,7 +96,7 @@ class GoldenRecordTaskCreateApplicationV6Service(
 
     private fun TaskModeV6.toTaskMode() =
         when (this) {
-            TaskModeV6.UpdateFromSharingMember -> TaskMode.UpdateFromSharingMember
-            TaskModeV6.UpdateFromPool -> TaskMode.UpdateFromPool
+            TaskModeV6.UpdateFromSharingMember -> TaskModeV7.UpdateFromSharingMember
+            TaskModeV6.UpdateFromPool -> TaskModeV7.UpdateFromPool
         }
 }

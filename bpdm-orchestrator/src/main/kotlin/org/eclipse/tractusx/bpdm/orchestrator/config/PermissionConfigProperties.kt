@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.config
 
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties.Companion.PREFIX
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
@@ -28,8 +28,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class PermissionConfigProperties(
     val createTask: String = "create_task",
     val readTask: String = "read_task",
-    val reservation:  Map<TaskStep, String> = TaskStep.entries.associateWith { "create_reservation_${it.name}" },
-    val result:  Map<TaskStep, String> = TaskStep.entries.associateWith { "create_result_${it.name}" }
+    val reservation:  Map<TaskStepV7, String> = TaskStepV7.entries.associateWith { "create_reservation_${it.name}" },
+    val result:  Map<TaskStepV7, String> = TaskStepV7.entries.associateWith { "create_result_${it.name}" }
 ) {
     companion object {
         const val PREFIX = "bpdm.security.permissions"
