@@ -24,15 +24,15 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v6.GoldenRecordTaskCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.OrchestratorGoldenRecordTaskV6Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskResultStateSearchV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskResultStateSearchV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepResultV6Request
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -46,7 +46,7 @@ class GoldenRecordTaskControllerV6(
 ) : OrchestratorGoldenRecordTaskV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
-    override fun createTasks(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {
+    override fun createTasks(createRequest: TaskCreateV6Request): TaskCreateV6Response {
         if (createRequest.requests.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
@@ -54,7 +54,7 @@ class GoldenRecordTaskControllerV6(
     }
 
     @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")
-    override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequestV6): TaskStepReservationResponseV6 {
+    override fun reserveTasksForStep(reservationRequest: TaskStepReservationV6Request): TaskStepReservationV6Response {
         if (reservationRequest.amount > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
 
@@ -63,7 +63,7 @@ class GoldenRecordTaskControllerV6(
 
     @PreAuthorize("@stepSecurityService.assertHasResultAuthority(authentication, #resultRequest.step)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    override fun resolveStepResults(resultRequest: TaskStepResultRequestV6) {
+    override fun resolveStepResults(resultRequest: TaskStepResultV6Request) {
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
 
@@ -71,12 +71,12 @@ class GoldenRecordTaskControllerV6(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun searchTaskStates(stateRequest: TaskStateRequestV6): TaskStateResponseV6 {
+    override fun searchTaskStates(stateRequest: TaskStateV6Request): TaskStateV6Response {
         return goldenRecordTaskLegacyServiceMapper.searchTaskStates(stateRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
-    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequestV6): TaskResultStateSearchResponseV6 {
+    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchV6Request): TaskResultStateSearchV6Response {
         return goldenRecordTaskLegacyServiceMapper.searchTaskResultStates(stateRequest)
     }
 }

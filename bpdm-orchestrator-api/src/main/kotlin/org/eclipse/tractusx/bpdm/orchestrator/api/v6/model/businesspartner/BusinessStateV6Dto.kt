@@ -17,12 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner
 
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 
-@Schema(description = "Response object for giving a list of task states")
-data class TaskStateResponseV6(
-
-    val tasks: List<TaskClientStateDtoV6>
+@Schema(description = "The business state information for the corresponding business partner")
+data class BusinessStateV6Dto(
+    @get:Schema(description = "Date since when the status is/was valid.")
+    val validFrom: Instant?,
+    @get:Schema(description = "Date until the status was valid, if applicable.")
+    val validTo: Instant?,
+    @get:Schema(description = "The type of this specified status.")
+    val type: BusinessStateType?
 )

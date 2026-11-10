@@ -27,13 +27,13 @@ import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType.*
 import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskModeV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskModeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepResultV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Instant
@@ -43,13 +43,13 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Autowired
     private lateinit var testClientProvider: OrchestratorTestClientProviderV6
 
-    private lateinit var operatorClient: OrchestratorApiClientV6
-    private lateinit var taskCreatorClient: OrchestratorApiClientV6
-    private lateinit var poolSyncClient: OrchestratorApiClientV6
-    private lateinit var cleanAndSyncClient: OrchestratorApiClientV6
-    private lateinit var cleanClient: OrchestratorApiClientV6
-    private lateinit var unauthorizedClient: OrchestratorApiClientV6
-    private lateinit var anonymousClient: OrchestratorApiClientV6
+    private lateinit var operatorClient: OrchestratorV6Client
+    private lateinit var taskCreatorClient: OrchestratorV6Client
+    private lateinit var poolSyncClient: OrchestratorV6Client
+    private lateinit var cleanAndSyncClient: OrchestratorV6Client
+    private lateinit var cleanClient: OrchestratorV6Client
+    private lateinit var unauthorizedClient: OrchestratorV6Client
+    private lateinit var anonymousClient: OrchestratorV6Client
 
     private val authAssertionHelper = AuthAssertionHelper()
 
@@ -72,7 +72,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequestV6(TaskModeV6.UpdateFromPool, emptyList()))
+            orchestratorClient.goldenRecordTasks.createTasks(TaskCreateV6Request(TaskModeV6.UpdateFromPool, emptyList()))
         }
     }
 
@@ -84,7 +84,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateRequestV6(emptyList()))
+            orchestratorClient.goldenRecordTasks.searchTaskStates(TaskStateV6Request(emptyList()))
         }
     }
 
@@ -96,7 +96,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequestV6(step = TaskStepV6.PoolSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV6Request(step = TaskStepV6.PoolSync))
         }
     }
 
@@ -108,7 +108,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequestV6(step = TaskStepV6.CleanAndSync))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV6Request(step = TaskStepV6.CleanAndSync))
         }
     }
 
@@ -120,7 +120,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequestV6(step = TaskStepV6.Clean))
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationV6Request(step = TaskStepV6.Clean))
         }
     }
 
@@ -132,7 +132,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequestV6(TaskStepV6.PoolSync, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultV6Request(TaskStepV6.PoolSync, emptyList()))
         }
     }
 
@@ -144,7 +144,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Authorized,
             Forbidden
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequestV6(TaskStepV6.CleanAndSync, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultV6Request(TaskStepV6.CleanAndSync, emptyList()))
         }
     }
 
@@ -156,7 +156,7 @@ class OrchestratorAuthV6IT: UnscheduledOrchestratorTestBaseV6() {
             Forbidden,
             Authorized
         ){
-            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequestV6(TaskStepV6.Clean, emptyList()))
+            orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultV6Request(TaskStepV6.Clean, emptyList()))
         }
     }
 

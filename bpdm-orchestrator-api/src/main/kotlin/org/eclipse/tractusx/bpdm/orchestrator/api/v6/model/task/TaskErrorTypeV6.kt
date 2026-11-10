@@ -17,15 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task
 
-import io.swagger.v3.oas.annotations.media.Schema
-
-@Schema(description = "Request object for posting step results of previously reserved tasks")
-data class TaskStepResultRequestV6(
-
-    @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
-    val step: TaskStepV6,
-
-    val results: List<TaskStepResultEntryDtoV6>
-)
+enum class TaskErrorTypeV6 {
+    Timeout,
+    Unspecified,
+    NaturalPersonError,
+    BpnErrorNotFound,
+    BpnErrorTooManyOptions,
+    MandatoryFieldValidationFailed,
+    BlacklistCountryPresent,
+    UnknownSpecialCharacters
+}

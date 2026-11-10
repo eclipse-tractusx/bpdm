@@ -17,13 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
 
 @Schema(description = "Task reservation entry")
-data class TaskStepReservationEntryDtoV6(
+data class TaskStepReservationEntryV6Dto(
 
     @get:Schema(description = "The identifier of the reserved task")
     val taskId: String,
@@ -32,7 +33,7 @@ data class TaskStepReservationEntryDtoV6(
     val recordId: String,
 
     @get:Schema(description = "The business partner data to process")
-    val businessPartner: BusinessPartnerV6
+    val businessPartner: BusinessPartnerV6Dto
 ) : RequestWithKey {
     override fun getRequestKey(): String {
         return taskId

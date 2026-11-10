@@ -17,13 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task
 
-import io.swagger.v3.oas.annotations.media.Schema
-
-data class TaskCreateRequestEntryV6(
-    @get:Schema(description = "The unique identifier for this record which was previously issued by the Orchestrator")
-    val recordId: String?,
-    @get:Schema(description = "The business partner data to be processed")
-    val businessPartner: BusinessPartnerV6
-)
+enum class ResultStateV6 {
+    Pending,
+    Success,
+    Error
+}

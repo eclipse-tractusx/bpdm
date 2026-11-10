@@ -21,42 +21,42 @@ package org.eclipse.tractusx.bpdm.orchestrator.api.v6.client
 
 import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.OrchestratorGoldenRecordTaskV6Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationResponseV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskResultStateSearchV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskResultStateSearchV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStateV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Request
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepReservationV6Response
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepResultV6Request
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.PostExchange
 
-interface GoldenRecordTaskApiClientV6: OrchestratorGoldenRecordTaskV6Api {
+interface GoldenRecordTaskV6ApiClient: OrchestratorGoldenRecordTaskV6Api {
 
     @PostExchange(value = ApiCommons.BASE_PATH_V6)
     override fun createTasks(
-        @RequestBody createRequest: TaskCreateRequestV6
-    ): TaskCreateResponseV6
+        @RequestBody createRequest: TaskCreateV6Request
+    ): TaskCreateV6Response
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/step-reservations")
     override fun reserveTasksForStep(
-        @RequestBody reservationRequest: TaskStepReservationRequestV6
-    ): TaskStepReservationResponseV6
+        @RequestBody reservationRequest: TaskStepReservationV6Request
+    ): TaskStepReservationV6Response
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/step-results")
     override fun resolveStepResults(
-        @RequestBody resultRequest: TaskStepResultRequestV6
+        @RequestBody resultRequest: TaskStepResultV6Request
     )
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/state/search")
     override fun searchTaskStates(
-        @RequestBody stateRequest: TaskStateRequestV6
-    ): TaskStateResponseV6
+        @RequestBody stateRequest: TaskStateV6Request
+    ): TaskStateV6Response
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/result-state/search")
     override fun searchTaskResultStates(
-        @RequestBody stateRequest: TaskResultStateSearchRequestV6
-    ): TaskResultStateSearchResponseV6
+        @RequestBody stateRequest: TaskResultStateSearchV6Request
+    ): TaskResultStateSearchV6Response
 }

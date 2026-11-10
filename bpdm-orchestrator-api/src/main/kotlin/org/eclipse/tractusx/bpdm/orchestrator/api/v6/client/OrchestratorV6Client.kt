@@ -19,19 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.api.v6.client
 
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.OrchestratorFinishedTaskEventV6Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
-import org.springdoc.core.annotations.ParameterObject
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import java.time.Instant
+interface OrchestratorV6Client {
 
-@HttpExchange
-interface FinishedTaskEventApiClientV6: OrchestratorFinishedTaskEventV6Api {
+    val goldenRecordTasks: GoldenRecordTaskV6ApiClient
 
-    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/finished-events")
-    override fun getEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponseV6
+    val finishedTaskEvents: FinishedTaskEventV6ApiClient
+
 }

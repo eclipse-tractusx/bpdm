@@ -17,12 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model
+package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
 
-@Schema(description = "Response object for giving a list of created tasks")
-data class TaskCreateResponseV6(
+@Schema(description = "A step result for a golden record task")
+data class TaskStepResultEntryV6Dto(
 
-    val createdTasks: List<TaskClientStateDtoV6>
+    @get:Schema(description = "The identifier of the task for which this is a result", required = true)
+    val taskId: String,
+
+    @get:Schema(description = "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task.")
+    val businessPartner: BusinessPartnerV6Dto,
+
+    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
+    val errors: List<TaskErrorV6Dto> = emptyList()
 )

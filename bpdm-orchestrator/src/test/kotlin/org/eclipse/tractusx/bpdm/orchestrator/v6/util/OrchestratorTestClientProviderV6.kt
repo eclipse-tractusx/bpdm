@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6Impl
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.DefaultOrchestratorV6Client
 import org.springframework.boot.web.server.WebServer
 
 class OrchestratorTestClientProviderV6(
@@ -30,8 +30,8 @@ class OrchestratorTestClientProviderV6(
     private val bpdmWebClientProvider: BpdmWebClientProvider
 ) {
 
-    fun createClient(oauth2RegistrationId: String?): OrchestratorApiClientV6 {
-        return OrchestratorApiClientV6Impl {
+    fun createClient(oauth2RegistrationId: String?): OrchestratorV6Client {
+        return DefaultOrchestratorV6Client {
             bpdmWebClientProvider.builder(
                 BpdmClientCreateProperties(
                     oauth2RegistrationId ?: "",

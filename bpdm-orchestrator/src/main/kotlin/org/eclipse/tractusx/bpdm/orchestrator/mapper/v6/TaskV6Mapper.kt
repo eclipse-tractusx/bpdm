@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.mapper.v6
 
 import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorType
 import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskErrorTypeV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskErrorTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6
 
 object TaskV6Mapper {
 

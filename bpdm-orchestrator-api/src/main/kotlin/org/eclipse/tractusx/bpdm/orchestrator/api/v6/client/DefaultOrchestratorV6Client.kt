@@ -24,9 +24,9 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 
-open class OrchestratorApiClientV6Impl(
+open class DefaultOrchestratorV6Client(
     private val webClientProvider: () -> WebClient
-): OrchestratorApiClientV6 {
+): OrchestratorV6Client {
 
     private val httpServiceProxyFactory: HttpServiceProxyFactory by lazy {
         HttpServiceProxyFactory.builder()
@@ -35,9 +35,9 @@ open class OrchestratorApiClientV6Impl(
             .build()
     }
 
-    override val goldenRecordTasks by lazy { createClient<GoldenRecordTaskApiClientV6>() }
+    override val goldenRecordTasks by lazy { createClient<GoldenRecordTaskV6ApiClient>() }
 
-    override val finishedTaskEvents by lazy { createClient<FinishedTaskEventApiClientV6>() }
+    override val finishedTaskEvents by lazy { createClient<FinishedTaskEventV6ApiClient>() }
 
     private inline fun <reified T: Any> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)!!

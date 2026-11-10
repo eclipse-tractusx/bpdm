@@ -17,12 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.api.v6.client
+package org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task
 
-interface OrchestratorApiClientV6 {
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 
-    val goldenRecordTasks: GoldenRecordTaskApiClientV6
+@Schema(description = "Request object to specify for which business partner data tasks should be created and in which mode")
+data class TaskCreateV6Request(
 
-    val finishedTaskEvents: FinishedTaskEventApiClientV6
+    @get:Schema(required = true, description = "The mode affecting which processing steps the business partner goes through")
+    val mode: TaskModeV6,
 
-}
+    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
+    val requests: List<TaskCreateRequestEntryV6Dto>
+)

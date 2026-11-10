@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpected
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.TestMetadataReferences
-import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -66,7 +66,7 @@ class OrchestratorTestDataV6Config {
 
     @Bean
     fun orchestratorTestDataClientV6(
-        orchestratorClient: OrchestratorApiClientV6,
+        orchestratorClient: OrchestratorV6Client,
         requestFactory: OrchestratorRequestFactoryV6
     ): OrchestratorTestDataClientV6{
         return OrchestratorTestDataClientV6(
