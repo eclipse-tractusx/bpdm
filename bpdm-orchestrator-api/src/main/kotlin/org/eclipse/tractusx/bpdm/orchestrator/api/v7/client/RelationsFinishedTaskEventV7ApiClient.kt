@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.api.v7.client
 
 import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.OrchestratorRelationsFinishedTaskEventV7Api
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsV7Response
 import org.springdoc.core.annotations.ParameterObject

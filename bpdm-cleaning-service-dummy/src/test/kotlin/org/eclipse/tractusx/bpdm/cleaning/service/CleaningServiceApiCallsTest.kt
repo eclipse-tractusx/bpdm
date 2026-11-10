@@ -29,9 +29,10 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSiteV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
@@ -523,7 +524,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFieldsMatchingRegexes(
-                ".*.${BpnReference::referenceValue.name}"
+                ".*.${BpnReferenceV7Dto::referenceValue.name}"
             )
             .isEqualTo(expected)
     }

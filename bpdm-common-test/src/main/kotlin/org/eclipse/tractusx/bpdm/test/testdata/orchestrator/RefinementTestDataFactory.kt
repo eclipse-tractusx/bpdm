@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  *
- * SPDX-License-IdentifierV7Dto: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
@@ -37,28 +37,28 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariantV7Dto as OrchestratorAlternativeAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceTypeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartnerV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessStateV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteriaV7Dto as OrchestratorConfidenceCriteriaV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinateV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IdentifierV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntityScriptVariantV7Dto as OrchestratorLegalEntityScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartTypeV7
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariantV7Dto as OrchestratorPhysicalAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantV7Dto as OrchestratorPostalAddressScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariantWithScriptCodeV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariantsV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariantV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.SiteScriptVariantV7Dto as OrchestratorSiteScriptVariantV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetV7Dto as OrchestratorStreetV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariantV7Dto as OrchestratorStreetScriptVariantV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedPropertiesV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariantV7Dto
 import java.time.LocalDateTime
@@ -221,8 +221,8 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildConfidence(confidence: ConfidenceCriteriaV7Dto): ConfidenceCriteriaV7Dto{
-        return ConfidenceCriteriaV7Dto(
+    private fun buildConfidence(confidence: ConfidenceCriteriaV7Dto): OrchestratorConfidenceCriteriaV7Dto{
+        return OrchestratorConfidenceCriteriaV7Dto(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             numberOfSharingMembers = confidence.numberOfSharingMembers,
@@ -263,7 +263,7 @@ class RefinementTestDataFactory {
             postalCode = physicalPostalAddress.postalCode,
             city = physicalPostalAddress.city,
             district = physicalPostalAddress.district,
-            street = physicalPostalAddress.street?.let { buildStreet(it) } ?: StreetV7Dto.empty,
+            street = physicalPostalAddress.street?.let { buildStreet(it) } ?: OrchestratorStreetV7Dto.empty,
             companyPostalCode = physicalPostalAddress.companyPostalCode,
             industrialZone = physicalPostalAddress.industrialZone,
             building = physicalPostalAddress.building,
@@ -286,8 +286,8 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildStreet(street: StreetV7Dto): StreetV7Dto{
-        return StreetV7Dto(
+    private fun buildStreet(street: StreetV7Dto): OrchestratorStreetV7Dto{
+        return OrchestratorStreetV7Dto(
             name = street.name,
             houseNumber = street.houseNumber,
             houseNumberSupplement = street.houseNumberSupplement,
@@ -300,9 +300,9 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildLegalEntityScriptVariant(legalEntityScriptVariantDto: LegalEntityScriptVariantV7Dto): LegalEntityScriptVariantV7Dto{
+    private fun buildLegalEntityScriptVariant(legalEntityScriptVariantDto: LegalEntityScriptVariantV7Dto): OrchestratorLegalEntityScriptVariantV7Dto{
         return with(legalEntityScriptVariantDto){
-            LegalEntityScriptVariantV7Dto(
+            OrchestratorLegalEntityScriptVariantV7Dto(
                 scriptCode = scriptCode,
                 legalName = legalName,
                 legalShortName = shortName,
@@ -311,9 +311,9 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildSiteScriptVariant(siteScriptVariant: SiteScriptVariantV7Dto): SiteScriptVariantV7Dto{
+    private fun buildSiteScriptVariant(siteScriptVariant: SiteScriptVariantV7Dto): OrchestratorSiteScriptVariantV7Dto{
         return with(siteScriptVariant){
-            SiteScriptVariantV7Dto(
+            OrchestratorSiteScriptVariantV7Dto(
                 scriptCode = scriptCode,
                 siteName = requireNotNull(name) { "A site script variant without a name cannot become a golden record task result" },
                 mainAddress = buildPostalAddressScriptVariant(mainAddress)
@@ -327,9 +327,9 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariantV7Dto): PostalAddressScriptVariantV7Dto{
+    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariantV7Dto): OrchestratorPostalAddressScriptVariantV7Dto{
         return with(postalAddressScriptVariant){
-            PostalAddressScriptVariantV7Dto(
+            OrchestratorPostalAddressScriptVariantV7Dto(
                 addressName = addressName,
                 physicalAddress = buildPhysicalAddressScriptVariant(physicalAddress),
                 alternativeAddress = alternativeAddress?.let { buildAlternativeAddressScriptVariant(it) }
@@ -337,12 +337,12 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantV7Dto): PhysicalAddressScriptVariantV7Dto{
+    private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantV7Dto): OrchestratorPhysicalAddressScriptVariantV7Dto{
         return with(physicalAddressScriptVariant){
-            PhysicalAddressScriptVariantV7Dto(
+            OrchestratorPhysicalAddressScriptVariantV7Dto(
                 city = city,
                 district = district,
-                street = street?.let { buildScriptVariantStreet(it) } ?: StreetScriptVariantV7Dto.empty,
+                street = street?.let { buildScriptVariantStreet(it) } ?: OrchestratorStreetScriptVariantV7Dto.empty,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
@@ -350,17 +350,17 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantV7Dto): AlternativeAddressScriptVariantV7Dto{
+    private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantV7Dto): OrchestratorAlternativeAddressScriptVariantV7Dto{
         return with(alternativeAddressScriptVariant){
-            AlternativeAddressScriptVariantV7Dto(
+            OrchestratorAlternativeAddressScriptVariantV7Dto(
                 city = city
             )
         }
     }
 
-    private fun buildScriptVariantStreet(street: StreetScriptVariantV7Dto): StreetScriptVariantV7Dto{
+    private fun buildScriptVariantStreet(street: StreetScriptVariantV7Dto): OrchestratorStreetScriptVariantV7Dto{
         return with(street){
-            StreetScriptVariantV7Dto(
+            OrchestratorStreetScriptVariantV7Dto(
                 name = name,
                 direction = direction,
                 namePrefix = namePrefix,

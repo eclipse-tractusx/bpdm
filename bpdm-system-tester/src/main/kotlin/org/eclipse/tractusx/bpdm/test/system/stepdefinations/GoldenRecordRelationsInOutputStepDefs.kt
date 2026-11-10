@@ -35,7 +35,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestratorV7Client
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelationsV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriodV7Dto as OrchestratorRelationValidityPeriodV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryV7Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultV7Request
 import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepV7
@@ -281,7 +281,7 @@ class GoldenRecordRelationsInOutputStepDefs(
                     relationType = OrchestratorRelationType.valueOf(relationState.submittedEntry.relationType.name),
                     businessPartnerSourceBpn = sourceBpn,
                     businessPartnerTargetBpn = targetBpn,
-                    validityPeriods = relationState.submittedEntry.validityPeriods.map { RelationValidityPeriodV7Dto(it.validFrom, it.validTo) },
+                    validityPeriods = relationState.submittedEntry.validityPeriods.map { OrchestratorRelationValidityPeriodV7Dto(it.validFrom, it.validTo) },
                     reasonCode = relationState.submittedEntry.reasonCode
                 ))
             ))
