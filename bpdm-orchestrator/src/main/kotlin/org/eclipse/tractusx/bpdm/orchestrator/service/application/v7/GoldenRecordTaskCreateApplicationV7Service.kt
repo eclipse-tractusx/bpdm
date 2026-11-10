@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCrea
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskCreateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskCreateResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -60,7 +60,7 @@ class GoldenRecordTaskCreateApplicationV7Service(
     }
 
     private fun createTasksInternal(
-        mode: org.eclipse.tractusx.orchestrator.api.model.TaskMode,
+        mode: org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode,
         requests: List<GoldenRecordTaskCreateRequest>,
         newGateRecordIsGoldenRecordCounted: Boolean?
     ): List<GoldenRecordTaskDb> =

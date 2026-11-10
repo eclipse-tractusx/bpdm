@@ -14,7 +14,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.sharingstate
 
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.junit.jupiter.api.Test
 
 class SyncGoldenRecordCountedV7IT : UnscheduledGateTestBaseV7() {

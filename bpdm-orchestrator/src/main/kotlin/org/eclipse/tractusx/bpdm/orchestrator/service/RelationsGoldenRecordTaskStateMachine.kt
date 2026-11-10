@@ -29,10 +29,10 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRelationsRequest
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
 import org.springframework.stereotype.Service
 import java.time.Instant
 

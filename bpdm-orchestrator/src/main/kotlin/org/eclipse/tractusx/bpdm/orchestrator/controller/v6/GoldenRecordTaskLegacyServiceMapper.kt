@@ -34,35 +34,35 @@ import org.eclipse.tractusx.bpdm.orchestrator.mapper.v6.TaskV6Mapper.toV6
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.v6.model.AlternativeAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ConfidenceCriteriaV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.GeoCoordinateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.IdentifierV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntityV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PhysicalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PostalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.SiteV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StepStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StreetV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskProcessingStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.AlternativeAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessPartnerV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ConfidenceCriteriaV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.GeoCoordinateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.IdentifierV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.LegalEntityV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.PhysicalAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.PostalAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.SiteV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.StepStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.StreetV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskClientStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskErrorDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskProcessingStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.UncategorizedPropertiesV6
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -672,38 +672,38 @@ class GoldenRecordTaskLegacyServiceMapper(
         return TaskResultStateSearchResponseV6(resultStates)
     }
 
-    private fun org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.toNamePartType() =
+    private fun org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.toNamePartType() =
         when (this) {
-            org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.LegalName -> org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalName
-            org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.ShortName -> org.eclipse.tractusx.orchestrator.api.model.NamePartType.ShortName
-            org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.LegalForm -> org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalForm
-            org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.SiteName -> org.eclipse.tractusx.orchestrator.api.model.NamePartType.SiteName
-            org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.AddressName -> org.eclipse.tractusx.orchestrator.api.model.NamePartType.AddressName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.LegalName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.ShortName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.ShortName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.LegalForm -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalForm
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.SiteName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.SiteName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.AddressName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.AddressName
         }
 
-    private fun org.eclipse.tractusx.orchestrator.api.model.NamePartType.toResponseNamePartType() =
+    private fun org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.toResponseNamePartType() =
         when (this) {
-            org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalName -> org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.LegalName
-            org.eclipse.tractusx.orchestrator.api.model.NamePartType.ShortName -> org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.ShortName
-            org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalForm -> org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.LegalForm
-            org.eclipse.tractusx.orchestrator.api.model.NamePartType.SiteName -> org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.SiteName
-            org.eclipse.tractusx.orchestrator.api.model.NamePartType.AddressName -> org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6.AddressName
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.LegalName
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.ShortName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.ShortName
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalForm -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.LegalForm
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.SiteName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.SiteName
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.AddressName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6.AddressName
         }
 
-    private fun org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6.toBpnReferenceType() =
+    private fun org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6.toBpnReferenceType() =
         when (this) {
-            org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6.Bpn -> org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn
-            org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6.BpnRequestIdentifier -> org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6.Bpn -> org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.Bpn
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6.BpnRequestIdentifier -> org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
         }
 
-    private fun org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.toResponseBpnReferenceType() =
+    private fun org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.toResponseBpnReferenceType() =
         when (this) {
-            org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn -> org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6.Bpn
-            org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6.BpnRequestIdentifier
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.Bpn -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6.Bpn
+            org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6.BpnRequestIdentifier
         }
 
     private fun TaskErrorDtoV6.toTaskErrorDto() =
-        org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto(
+        org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorDto(
             type = type.toTaskErrorType(),
             description = description
         )

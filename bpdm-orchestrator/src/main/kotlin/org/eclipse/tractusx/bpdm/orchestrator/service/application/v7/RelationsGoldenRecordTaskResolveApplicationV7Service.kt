@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.RelationsGoldenRecord
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskResolveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskResolveOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.RelationsGoldenRecordTaskResolveParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepResultRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

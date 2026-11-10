@@ -26,11 +26,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLe
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
-import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
-import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
-import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
+import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons.BASE_PATH_V7_SHARING_MEMBER_RECORDS
+import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
 import java.time.Instant

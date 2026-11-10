@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.outbound.OrchestratorO
 import org.eclipse.tractusx.bpdm.pool.model.output.task.GoldenRecordTaskResultRecord
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.GoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.TaskErrorReportOutcomeRaw
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepResultRequest
 import org.springframework.stereotype.Component
 
 /**

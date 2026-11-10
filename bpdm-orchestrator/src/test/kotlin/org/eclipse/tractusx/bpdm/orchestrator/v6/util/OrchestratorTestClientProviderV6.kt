@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
-import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6Impl
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6Impl
 import org.springframework.boot.web.server.WebServer
 
 class OrchestratorTestClientProviderV6(

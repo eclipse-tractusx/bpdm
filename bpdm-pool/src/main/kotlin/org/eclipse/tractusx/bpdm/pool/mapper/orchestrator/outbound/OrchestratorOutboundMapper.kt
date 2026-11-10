@@ -43,7 +43,7 @@ import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedAddressRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedAddressRelationKind
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedGeoCoordinateRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.task.UncategorizedIdentifierRaw
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset

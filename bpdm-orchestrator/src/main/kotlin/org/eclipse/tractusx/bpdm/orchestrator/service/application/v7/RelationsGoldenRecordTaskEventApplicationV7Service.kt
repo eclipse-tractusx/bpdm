@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskEventOperation
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springframework.stereotype.Service
 import java.time.Instant
 

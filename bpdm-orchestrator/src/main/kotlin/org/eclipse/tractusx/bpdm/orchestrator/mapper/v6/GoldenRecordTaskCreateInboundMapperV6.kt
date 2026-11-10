@@ -37,22 +37,22 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.PostalAddressWithScr
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.SiteRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.StreetRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.UncategorizedPropertiesRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.AlternativeAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ConfidenceCriteriaV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.GeoCoordinateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.IdentifierV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntityV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PhysicalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PostalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.SiteV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StreetV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntryV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.AlternativeAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessPartnerV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ConfidenceCriteriaV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.GeoCoordinateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.IdentifierV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.LegalEntityV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.PhysicalAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.PostalAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.SiteV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.StreetV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestEntryV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.UncategorizedPropertiesV6
 import org.springframework.stereotype.Component
 
 /**
@@ -171,7 +171,7 @@ class GoldenRecordTaskCreateInboundMapperV6 {
             confidenceLevel = confidenceCriteria.confidenceLevel
         )
 
-    private fun toBpnReferenceRequest(bpnReference: org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceV6) =
+    private fun toBpnReferenceRequest(bpnReference: org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceV6) =
         BpnReferenceRequest(
             referenceValue = bpnReference.referenceValue,
             desiredBpn = bpnReference.desiredBpn,

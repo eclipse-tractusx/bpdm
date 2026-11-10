@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.relation
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.ResultState
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.ResultState
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskResultStateSearchRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskResultStateSearchResponse
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 

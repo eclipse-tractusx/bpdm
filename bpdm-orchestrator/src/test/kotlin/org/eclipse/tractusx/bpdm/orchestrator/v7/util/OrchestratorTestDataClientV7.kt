@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v7.util
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 
 class OrchestratorTestDataClientV7(
     private val orchestratorClient: OrchestrationApiClient,

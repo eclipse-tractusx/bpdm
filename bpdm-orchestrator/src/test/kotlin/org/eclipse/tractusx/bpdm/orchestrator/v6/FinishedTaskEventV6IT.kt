@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6
 import org.junit.jupiter.api.Test
 import java.time.Instant
 

@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.gate.service.application.RelationTaskResolution
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientRelationsStateDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskClientRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsErrorType
 
 class RelationTestDataClientV7(
     private val gateClient: GateV7Client,

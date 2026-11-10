@@ -67,7 +67,7 @@ class GoldenRecordTaskResolveParser(
         }
     }
 
-    private fun assertAdditionalSitesHaveSite(businessPartner: org.eclipse.tractusx.orchestrator.api.model.BusinessPartner) {
+    private fun assertAdditionalSitesHaveSite(businessPartner: org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner) {
         if (businessPartner.additionalSites.isNotEmpty() && businessPartner.site == null) {
             throw BpdmInvalidBusinessPartnerException(
                 "additional sites of its address are stated but no site of its own is, which they would be additional to"

@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
 

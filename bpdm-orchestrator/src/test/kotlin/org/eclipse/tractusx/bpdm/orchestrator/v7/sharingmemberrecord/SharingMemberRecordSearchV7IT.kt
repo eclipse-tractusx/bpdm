@@ -23,9 +23,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordQueryRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordUpdateRequest
 import org.junit.jupiter.api.Test
 import java.time.Instant
 

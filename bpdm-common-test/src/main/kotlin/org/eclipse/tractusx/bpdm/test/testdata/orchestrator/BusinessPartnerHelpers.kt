@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 
 fun BusinessPartner.copyWithLegalEntityIdentifiers(identifiers: List<Identifier>) =
     copy(

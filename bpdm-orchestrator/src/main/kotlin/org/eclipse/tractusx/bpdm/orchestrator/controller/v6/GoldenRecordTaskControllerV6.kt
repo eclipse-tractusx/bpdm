@@ -23,16 +23,16 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v6.GoldenRecordTaskCreateApplicationV6Service
-import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApiV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.OrchestratorGoldenRecordTaskV6Api
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskResultStateSearchResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultRequestV6
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -43,7 +43,7 @@ class GoldenRecordTaskControllerV6(
     val goldenRecordTaskLegacyServiceMapper: GoldenRecordTaskLegacyServiceMapper,
     val apiConfigProperties: ApiConfigProperties,
     val goldenRecordTaskCreateApplicationService: GoldenRecordTaskCreateApplicationV6Service
-) : GoldenRecordTaskApiV6 {
+) : OrchestratorGoldenRecordTaskV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
     override fun createTasks(createRequest: TaskCreateRequestV6): TaskCreateResponseV6 {

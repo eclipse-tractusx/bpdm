@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.AddressSearchV7Request
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
-import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AdditionalSite
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReference
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
 import org.junit.jupiter.api.Test
 
 class AdditionalSitesInTaskV7IT : UnscheduledPoolTestBaseV7() {

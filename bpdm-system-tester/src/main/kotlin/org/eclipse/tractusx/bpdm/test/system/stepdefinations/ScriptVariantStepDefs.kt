@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.UncategorizedScriptVariant
 
 /**
  * Steps for the "Output Reflects Golden Record Script Variants" feature.

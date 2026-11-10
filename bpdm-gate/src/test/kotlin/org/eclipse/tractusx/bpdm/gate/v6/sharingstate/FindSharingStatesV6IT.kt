@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateTypeV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 
 /*******************************************************************************

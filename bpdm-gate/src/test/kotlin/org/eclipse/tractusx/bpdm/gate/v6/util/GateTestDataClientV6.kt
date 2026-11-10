@@ -35,8 +35,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SitePartnerCreateV7Reque
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorType
 import java.time.Instant
 import kotlin.random.Random
 

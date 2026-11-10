@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.test.testdata
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.UncategorizedScriptVariant
 
 class GoldenRecordMockFactory(
     private val poolMockDataFactory: PoolMockDataFactory,

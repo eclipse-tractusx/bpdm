@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
-import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskErrorTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultEntryDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessPartnerV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskClientStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskErrorDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskErrorTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultEntryDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepResultRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6
 
 class OrchestratorTestDataClientV6(
     private val operatorClient: OrchestratorApiClientV6,

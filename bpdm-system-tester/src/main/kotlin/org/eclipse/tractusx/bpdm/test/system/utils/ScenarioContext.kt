@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.address.LogisticAddressVerbos
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
-import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AdditionalSite
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 

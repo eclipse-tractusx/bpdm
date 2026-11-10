@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.orchestrator.v7.ScheduledTimeoutOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 

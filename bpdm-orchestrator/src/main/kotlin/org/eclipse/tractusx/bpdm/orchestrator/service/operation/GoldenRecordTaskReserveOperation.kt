@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.parsed.GoldenRecordTaskReser
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.util.toLogIdentifiers
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit

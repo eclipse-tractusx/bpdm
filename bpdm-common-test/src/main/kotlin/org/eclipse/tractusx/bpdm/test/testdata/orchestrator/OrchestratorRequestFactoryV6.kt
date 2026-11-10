@@ -20,25 +20,25 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.orchestrator.api.model.Site
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
-import org.eclipse.tractusx.orchestrator.api.v6.model.AlternativeAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BpnReferenceV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ConfidenceCriteriaV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.GeoCoordinateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.IdentifierV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntityV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartTypeV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.NamePartV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PhysicalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.PostalAddressV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.SiteV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StreetV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestEntryV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.UncategorizedPropertiesV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.Site
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.UncategorizedProperties
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.AlternativeAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BpnReferenceV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessPartnerV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ConfidenceCriteriaV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.GeoCoordinateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.IdentifierV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.LegalEntityV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartTypeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.NamePartV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.PhysicalAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.PostalAddressV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.SiteV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.StreetV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestEntryV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.UncategorizedPropertiesV6
 import java.util.*
 import kotlin.random.Random
 
@@ -141,15 +141,15 @@ class OrchestratorRequestFactoryV6(
         return Random(seed.hashCode())
     }
 
-    private fun toNamePartV6(namePart: org.eclipse.tractusx.orchestrator.api.model.NamePart) =
+    private fun toNamePartV6(namePart: org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePart) =
         NamePartV6(
             name = namePart.name,
             type = when (namePart.type) {
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalName -> NamePartTypeV6.LegalName
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.ShortName -> NamePartTypeV6.ShortName
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.LegalForm -> NamePartTypeV6.LegalForm
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.SiteName -> NamePartTypeV6.SiteName
-                org.eclipse.tractusx.orchestrator.api.model.NamePartType.AddressName -> NamePartTypeV6.AddressName
+                org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalName -> NamePartTypeV6.LegalName
+                org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.ShortName -> NamePartTypeV6.ShortName
+                org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalForm -> NamePartTypeV6.LegalForm
+                org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.SiteName -> NamePartTypeV6.SiteName
+                org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.AddressName -> NamePartTypeV6.AddressName
             }
         )
 
@@ -171,7 +171,7 @@ class OrchestratorRequestFactoryV6(
             siteMainAddress = site.siteMainAddress?.let(::toPostalAddressV6)
         )
 
-    private fun toPostalAddressV6(postalAddress: org.eclipse.tractusx.orchestrator.api.model.PostalAddress) =
+    private fun toPostalAddressV6(postalAddress: org.eclipse.tractusx.bpdm.orchestrator.api.model.PostalAddress) =
         PostalAddressV6(
             bpnReference = toBpnReferenceV6(postalAddress.bpnReference),
             addressName = postalAddress.addressName,
@@ -228,25 +228,25 @@ class OrchestratorRequestFactoryV6(
             hasChanged = postalAddress.hasChanged
         )
 
-    private fun toBpnReferenceV6(bpnReference: org.eclipse.tractusx.orchestrator.api.model.BpnReference) =
+    private fun toBpnReferenceV6(bpnReference: org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReference) =
         BpnReferenceV6(
             bpnReference.referenceValue,
             bpnReference.desiredBpn,
             bpnReference.referenceType?.let {
                 when (it) {
-                    org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn -> BpnReferenceTypeV6.Bpn
-                    org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> BpnReferenceTypeV6.BpnRequestIdentifier
+                    org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.Bpn -> BpnReferenceTypeV6.Bpn
+                    org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> BpnReferenceTypeV6.BpnRequestIdentifier
                 }
             }
         )
 
-    private fun toBusinessStateV6(businessState: org.eclipse.tractusx.orchestrator.api.model.BusinessState) =
+    private fun toBusinessStateV6(businessState: org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessState) =
         BusinessStateV6(businessState.validFrom, businessState.validTo, businessState.type)
 
-    private fun toIdentifierV6(identifier: org.eclipse.tractusx.orchestrator.api.model.Identifier) =
+    private fun toIdentifierV6(identifier: org.eclipse.tractusx.bpdm.orchestrator.api.model.Identifier) =
         IdentifierV6(identifier.value, identifier.type, identifier.issuingBody)
 
-    private fun toConfidenceCriteriaV6(confidenceCriteria: org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria) =
+    private fun toConfidenceCriteriaV6(confidenceCriteria: org.eclipse.tractusx.bpdm.orchestrator.api.model.ConfidenceCriteria) =
         ConfidenceCriteriaV6(
             confidenceCriteria.sharedByOwner,
             confidenceCriteria.checkedByExternalDataSource,

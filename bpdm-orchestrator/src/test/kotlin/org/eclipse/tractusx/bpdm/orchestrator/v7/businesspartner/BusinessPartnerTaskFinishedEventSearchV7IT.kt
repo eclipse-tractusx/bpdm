@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import org.junit.jupiter.api.Test
 import java.time.Instant
 

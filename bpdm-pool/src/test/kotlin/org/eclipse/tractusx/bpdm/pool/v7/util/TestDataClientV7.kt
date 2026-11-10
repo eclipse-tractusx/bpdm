@@ -33,13 +33,13 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockData
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import java.util.UUID
 
 class TestDataClientV7(

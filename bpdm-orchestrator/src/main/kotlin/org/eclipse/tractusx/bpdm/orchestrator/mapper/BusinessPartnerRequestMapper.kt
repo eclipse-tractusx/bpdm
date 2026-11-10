@@ -52,37 +52,37 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.StreetScriptVariantR
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.UncategorizedPropertiesRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.UncategorizedScriptVariantRequest
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation as AddressGoldenRecordRelationDto
-import org.eclipse.tractusx.orchestrator.api.model.AdditionalSite as AdditionalSiteDto
-import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress as AlternativeAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant as AlternativeAddressScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner as BusinessPartnerDto
-import org.eclipse.tractusx.orchestrator.api.model.BusinessState as BusinessStateDto
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference as BpnReferenceDto
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria as ConfidenceCriteriaDto
-import org.eclipse.tractusx.orchestrator.api.model.GeoCoordinate as GeoCoordinateDto
-import org.eclipse.tractusx.orchestrator.api.model.Identifier as IdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation as LegalEntityGoldenRecordRelationDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityScriptVariant as LegalEntityScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.NamePart as NamePartDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalAddress as PhysicalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalAddressScriptVariant as PhysicalAddressScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddress as PostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant as PostalAddressScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as PostalAddressScriptVariantWithScriptCodeDto
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants as PostalAddressWithScriptVariantsDto
-import org.eclipse.tractusx.orchestrator.api.model.Site as SiteDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelation as SiteGoldenRecordRelationDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteScriptVariant as SiteScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.Street as StreetDto
-import org.eclipse.tractusx.orchestrator.api.model.StreetScriptVariant as StreetScriptVariantDto
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties as UncategorizedPropertiesDto
-import org.eclipse.tractusx.orchestrator.api.model.NamePartType
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AddressGoldenRecordRelation as AddressGoldenRecordRelationDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AdditionalSite as AdditionalSiteDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AlternativeAddress as AlternativeAddressDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AlternativeAddressScriptVariant as AlternativeAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner as BusinessPartnerDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessState as BusinessStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReference as BpnReferenceDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.ConfidenceCriteria as ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.GeoCoordinate as GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.Identifier as IdentifierDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntity as LegalEntityDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntityGoldenRecordRelation as LegalEntityGoldenRecordRelationDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntityScriptVariant as LegalEntityScriptVariantDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePart as NamePartDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.PhysicalAddress as PhysicalAddressDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.PhysicalAddressScriptVariant as PhysicalAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.PostalAddress as PostalAddressDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.PostalAddressScriptVariant as PostalAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as PostalAddressScriptVariantWithScriptCodeDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.PostalAddressWithScriptVariants as PostalAddressWithScriptVariantsDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.Site as SiteDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SiteGoldenRecordRelation as SiteGoldenRecordRelationDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SiteScriptVariant as SiteScriptVariantDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.Street as StreetDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.StreetScriptVariant as StreetScriptVariantDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.UncategorizedProperties as UncategorizedPropertiesDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AddressGoldenRecordRelationType
 
 @Component
 class BusinessPartnerRequestMapper {

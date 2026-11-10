@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
 @Service

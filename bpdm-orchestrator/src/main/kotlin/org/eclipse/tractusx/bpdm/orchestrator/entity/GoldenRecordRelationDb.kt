@@ -23,9 +23,9 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
-import org.eclipse.tractusx.orchestrator.api.model.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SiteGoldenRecordRelationType
 
 @Embeddable
 data class LegalEntityGoldenRecordRelationDb(

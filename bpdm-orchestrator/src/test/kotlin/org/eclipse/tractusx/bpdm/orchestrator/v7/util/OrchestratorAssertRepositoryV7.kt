@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.util
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.IPageDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import java.time.temporal.ChronoUnit
 
 class OrchestratorAssertRepositoryV7 {

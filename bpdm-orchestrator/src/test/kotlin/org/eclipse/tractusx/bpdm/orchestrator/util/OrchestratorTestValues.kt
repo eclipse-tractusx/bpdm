@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.util
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationValidityPeriod
 import java.time.LocalDate
 
 object OrchestratorTestValues {

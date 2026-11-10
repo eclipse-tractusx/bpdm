@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.v6.TaskV6Mapper.toTaskStep
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.StepSecurityOperation
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 

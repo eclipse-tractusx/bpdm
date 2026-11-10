@@ -23,26 +23,26 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.SharingMemberRecordApplicationV7Service
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.orchestrator.api.SharingMemberRecordApi
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.OrchestratorSharingMemberRecordV7Api
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordQueryRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordUpdateRequest
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SharingMemberRecordController(
     private val sharingMemberRecordApplicationService: SharingMemberRecordApplicationV7Service
-): SharingMemberRecordApi{
+): OrchestratorSharingMemberRecordV7Api{
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
     override fun update(request: SharingMemberRecordUpdateRequest): SharingMemberRecord {
        return sharingMemberRecordApplicationService.updateRecord(request)
     }
 
-    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, T(org.eclipse.tractusx.orchestrator.api.model.TaskStep).PoolSync)")
+    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, T(org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep).PoolSync)")
     override fun queryRecords(
         request: SharingMemberRecordQueryRequest,
         paginationRequest: PaginationRequest

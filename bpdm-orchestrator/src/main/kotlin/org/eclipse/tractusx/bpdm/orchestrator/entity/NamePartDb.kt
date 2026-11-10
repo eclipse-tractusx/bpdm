@@ -23,7 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.orchestrator.api.model.NamePartType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType
 
 @Embeddable
 data class NamePartDb(

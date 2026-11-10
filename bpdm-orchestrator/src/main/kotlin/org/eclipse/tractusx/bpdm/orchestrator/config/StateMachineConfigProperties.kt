@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
 
 data class StateMachineConfigProperties(
     val modeSteps: Map<TaskMode, List<TaskStep>>

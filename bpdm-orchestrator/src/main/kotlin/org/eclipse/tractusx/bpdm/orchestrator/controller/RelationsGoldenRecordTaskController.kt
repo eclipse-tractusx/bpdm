@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.RelationsGoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.RelationsGoldenRecordTaskCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.RelationsGoldenRecordTaskResolveApplicationV7Service
-import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.OrchestratorRelationsGoldenRecordTaskV7Api
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -38,7 +38,7 @@ class RelationsGoldenRecordTaskController(
     val relationsGoldenRecordTaskService: RelationsGoldenRecordTaskService,
     val relationsGoldenRecordTaskCreateApplicationService: RelationsGoldenRecordTaskCreateApplicationV7Service,
     val relationsGoldenRecordTaskResolveApplicationService: RelationsGoldenRecordTaskResolveApplicationV7Service
-) : RelationsGoldenRecordTaskApi{
+) : OrchestratorRelationsGoldenRecordTaskV7Api{
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
     override fun createTasks(createRequest: TaskCreateRelationsRequest): TaskCreateRelationsResponse {

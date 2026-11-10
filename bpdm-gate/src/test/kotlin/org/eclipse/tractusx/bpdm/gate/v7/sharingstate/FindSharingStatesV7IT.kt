@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 import java.time.Instant
 

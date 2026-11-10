@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskModeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskModeV6
 
 internal fun TaskMode.toV6(): TaskModeV6 =
     when (this) {

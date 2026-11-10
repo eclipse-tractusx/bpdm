@@ -21,13 +21,13 @@ package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.IPageDto
-import org.eclipse.tractusx.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskProcessingStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.FinishedTaskEventsResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskClientStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskProcessingStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationResponseV6
 import java.time.temporal.ChronoUnit
 
 class OrchestratorAssertRepositoryV6 {

@@ -32,10 +32,10 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCrea
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskModeV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskCreateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskModeV6
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID

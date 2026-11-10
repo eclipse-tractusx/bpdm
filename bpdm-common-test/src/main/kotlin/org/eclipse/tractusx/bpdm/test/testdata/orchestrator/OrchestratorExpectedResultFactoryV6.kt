@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartnerV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StepStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskClientStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskProcessingStateDtoV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.BusinessPartnerV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.StepStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskClientStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskProcessingStateDtoV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepReservationEntryDtoV6
 import java.time.Duration
 import java.time.Instant
 
@@ -52,9 +52,9 @@ class OrchestratorExpectedResultFactoryV6(
             processingState = TaskProcessingStateDtoV6(
                 resultState = ResultStateV6.Pending,
                 step = when (taskStepTransitions[taskMode]!!.first()) {
-                    TaskStep.CleanAndSync -> org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6.CleanAndSync
-                    TaskStep.PoolSync -> org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6.PoolSync
-                    TaskStep.Clean -> org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6.Clean
+                    TaskStep.CleanAndSync -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6.CleanAndSync
+                    TaskStep.PoolSync -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6.PoolSync
+                    TaskStep.Clean -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6.Clean
                 },
                 stepState = StepStateV6.Queued,
                 errors = emptyList(),

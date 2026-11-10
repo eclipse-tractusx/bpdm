@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.orchestrator.api.v6.model.ResultStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.StepStateV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateRequestV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponseV6
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.ResultStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.StepStateV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateRequestV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStateResponseV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.TaskStepV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 

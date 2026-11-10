@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpected
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.TestMetadataReferences
-import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
+import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorApiClientV6
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

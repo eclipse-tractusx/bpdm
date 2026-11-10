@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.cleaning.config
 
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties.Companion.PREFIX
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = PREFIX)

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.mapper
 
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecordTaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequestEntry
+import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskCreateRelationsRequestEntry
 import org.springframework.stereotype.Component
 
 @Component
