@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.cleaning.config
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClientImpl
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClientImpl
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties

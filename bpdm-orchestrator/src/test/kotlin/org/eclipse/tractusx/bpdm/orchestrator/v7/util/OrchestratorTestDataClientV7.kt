@@ -20,8 +20,28 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v7.util
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
 
 class OrchestratorTestDataClientV7(
     private val orchestratorClient: OrchestrationApiClient,

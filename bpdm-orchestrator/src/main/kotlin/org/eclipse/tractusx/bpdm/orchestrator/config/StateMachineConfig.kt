@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

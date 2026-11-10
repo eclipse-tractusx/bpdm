@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.service.gateway
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.OrchestratorInboundMapper
 import org.eclipse.tractusx.bpdm.pool.model.raw.participation.SharingMemberRecordPageRaw
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordQueryRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryRequest
 import org.springframework.stereotype.Component
 import java.time.Instant
 

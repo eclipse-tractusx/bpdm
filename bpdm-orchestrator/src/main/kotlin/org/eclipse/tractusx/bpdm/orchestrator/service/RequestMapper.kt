@@ -22,7 +22,29 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 import org.eclipse.tractusx.bpdm.common.model.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelation
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddressScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinate
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Site
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Street
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.StreetScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
 import org.springframework.stereotype.Service
 
 @Service

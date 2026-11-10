@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.GoldenRecordTaskEventApplicationV7Service
-import org.eclipse.tractusx.bpdm.orchestrator.api.OrchestratorFinishedTaskEventV7Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.OrchestratorFinishedTaskEventV7Api
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant

@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCrea
 import org.eclipse.tractusx.bpdm.orchestrator.service.ResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskCreateParser
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Response
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskModeV6

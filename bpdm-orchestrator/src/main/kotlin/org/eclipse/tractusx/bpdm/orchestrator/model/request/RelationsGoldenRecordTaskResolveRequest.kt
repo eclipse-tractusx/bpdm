@@ -19,10 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 
 data class RelationsGoldenRecordTaskResolveRequest(
     val step: TaskStep,
-    val results: List<org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepResultEntryDto>
+    val results: List<org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto>
 )

@@ -21,7 +21,18 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.orchestrator.v7.ScheduledTimeoutOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 

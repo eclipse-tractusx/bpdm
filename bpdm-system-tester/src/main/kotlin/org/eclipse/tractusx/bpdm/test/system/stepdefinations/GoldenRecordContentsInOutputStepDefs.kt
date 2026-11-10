@@ -43,8 +43,8 @@ import org.eclipse.tractusx.bpdm.test.system.utils.SharingMember
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingMemberGates
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime

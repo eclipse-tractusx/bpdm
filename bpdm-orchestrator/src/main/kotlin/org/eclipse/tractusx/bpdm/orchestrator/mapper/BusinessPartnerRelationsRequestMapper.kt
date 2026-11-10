@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.mapper
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRelationsRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationTypeRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationValidityPeriodRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
 import org.springframework.stereotype.Component
 
 @Component

@@ -20,7 +20,14 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequestEntry
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequestEntry
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedProperties
 import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random

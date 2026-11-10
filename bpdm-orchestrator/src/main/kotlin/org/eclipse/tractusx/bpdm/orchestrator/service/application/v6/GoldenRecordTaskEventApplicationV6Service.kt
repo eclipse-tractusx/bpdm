@@ -46,9 +46,9 @@ class GoldenRecordTaskEventApplicationV6Service(
                 FinishedTaskEventsV6Response.Event(
                     timestamp = it.timestamp,
                     resultState = when (it.resultState) {
-                        org.eclipse.tractusx.bpdm.orchestrator.api.model.ResultState.Pending -> ResultStateV6.Pending
-                        org.eclipse.tractusx.bpdm.orchestrator.api.model.ResultState.Success -> ResultStateV6.Success
-                        org.eclipse.tractusx.bpdm.orchestrator.api.model.ResultState.Error -> ResultStateV6.Error
+                        org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState.Pending -> ResultStateV6.Pending
+                        org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState.Success -> ResultStateV6.Success
+                        org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState.Error -> ResultStateV6.Error
                     },
                     taskId = it.taskId
                 )

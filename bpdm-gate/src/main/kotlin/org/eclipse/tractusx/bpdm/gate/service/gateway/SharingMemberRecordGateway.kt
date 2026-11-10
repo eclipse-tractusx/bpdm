@@ -15,7 +15,7 @@ package org.eclipse.tractusx.bpdm.gate.service.gateway
 
 import org.eclipse.tractusx.bpdm.gate.mapper.orchestrator.OrchestratorOutboundMapper
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.GoldenRecordCountedUpdateRaw
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
 import org.springframework.stereotype.Component
 
 /**

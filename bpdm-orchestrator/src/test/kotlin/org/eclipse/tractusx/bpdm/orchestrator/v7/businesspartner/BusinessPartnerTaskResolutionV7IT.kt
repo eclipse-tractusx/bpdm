@@ -21,7 +21,12 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant

@@ -74,7 +74,7 @@ class RelationsGoldenRecordTaskResolveParser(
         }
     }
 
-    private fun assertBusinessPartnerRelationsValid(businessPartnerRelations: org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations) {
+    private fun assertBusinessPartnerRelationsValid(businessPartnerRelations: org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations) {
         // Validate business partner relations
         if (businessPartnerRelations.businessPartnerSourceBpn.isBlank() || businessPartnerRelations.businessPartnerTargetBpn.isBlank()) {
             throw BpdmInvalidBusinessPartnerException(

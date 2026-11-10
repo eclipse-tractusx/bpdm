@@ -28,8 +28,13 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension

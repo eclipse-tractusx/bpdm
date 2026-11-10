@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.Relatio
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
 import org.junit.jupiter.api.Test
 import java.time.Instant
 

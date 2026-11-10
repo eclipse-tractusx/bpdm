@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.orchestrator.service.application.v7
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.SharingMemberRecordOperation
-import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
 import org.springframework.stereotype.Service
 
 /**

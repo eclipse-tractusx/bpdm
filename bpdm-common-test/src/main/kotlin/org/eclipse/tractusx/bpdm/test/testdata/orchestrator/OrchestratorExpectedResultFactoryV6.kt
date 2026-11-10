@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.StepStateV6

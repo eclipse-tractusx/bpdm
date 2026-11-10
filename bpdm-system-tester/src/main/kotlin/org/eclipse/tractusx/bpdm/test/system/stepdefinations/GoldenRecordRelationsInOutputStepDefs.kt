@@ -33,10 +33,14 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7R
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7
 import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import java.time.LocalDate
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType as OrchestratorRelationType
 
 /**
  * Steps for the "Output Reflects Golden Record Relations" feature.

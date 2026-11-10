@@ -21,8 +21,12 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
 import org.springframework.stereotype.Service
 
 @Service

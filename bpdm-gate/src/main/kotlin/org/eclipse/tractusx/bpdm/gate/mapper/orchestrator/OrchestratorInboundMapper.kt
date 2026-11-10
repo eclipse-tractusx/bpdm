@@ -31,30 +31,30 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPag
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskOutputRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.RelationTaskResultRaw
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.AddressGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.AddressGoldenRecordRelationType as OrchestratorAddressRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.AlternativeAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessState
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.FinishedTaskEventsResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.GeoCoordinate as OrchestratorGeoCoordinate
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.GoldenRecordType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.Identifier
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.IsPostalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntityGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntityGoldenRecordRelationType as OrchestratorLegalEntityRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.PhysicalAddress
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.PostalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.ResultState
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SiteGoldenRecordRelation
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SiteGoldenRecordRelationType as OrchestratorSiteRelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.Street as OrchestratorStreet
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskClientRelationsStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelation
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.AddressGoldenRecordRelationType as OrchestratorAddressRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AlternativeAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinate as OrchestratorGeoCoordinate
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GoldenRecordType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.IsPostalAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelation
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.LegalEntityGoldenRecordRelationType as OrchestratorLegalEntityRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PhysicalAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelation
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.SiteGoldenRecordRelationType as OrchestratorSiteRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Street as OrchestratorStreet
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.ZoneOffset

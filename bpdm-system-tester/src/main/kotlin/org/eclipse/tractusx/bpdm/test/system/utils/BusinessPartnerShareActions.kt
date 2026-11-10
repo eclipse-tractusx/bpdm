@@ -29,8 +29,14 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerbo
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withUltimateOwner
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.AdditionalSite
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepResultRequest
 import java.time.Instant
 
 class BusinessPartnerShareActions(

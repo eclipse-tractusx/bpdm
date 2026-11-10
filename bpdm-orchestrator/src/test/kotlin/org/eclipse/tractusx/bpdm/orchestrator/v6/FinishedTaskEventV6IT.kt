@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.FinishedTaskEventsV6Response
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.ResultStateV6
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskStepV6

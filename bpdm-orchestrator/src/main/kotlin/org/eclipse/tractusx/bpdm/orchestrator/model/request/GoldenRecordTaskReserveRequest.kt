@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.model.request
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 
 data class GoldenRecordTaskReserveRequest(
     val step: TaskStep,

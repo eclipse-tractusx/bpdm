@@ -22,8 +22,21 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.util
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.IPageDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.FinishedTaskEventsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStateResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskResultStateSearchResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
 import java.time.temporal.ChronoUnit
 
 class OrchestratorAssertRepositoryV7 {

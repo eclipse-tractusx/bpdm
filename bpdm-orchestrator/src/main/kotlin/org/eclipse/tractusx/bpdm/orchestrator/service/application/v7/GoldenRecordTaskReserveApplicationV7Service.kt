@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskReserveRequest
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.GoldenRecordTaskReserveOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.GoldenRecordTaskReserveParser
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

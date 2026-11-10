@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.LegalEntity
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePart
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePart
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType
 import kotlin.random.Random
 
 

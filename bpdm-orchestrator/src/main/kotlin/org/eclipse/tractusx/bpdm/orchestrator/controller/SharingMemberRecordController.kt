@@ -23,12 +23,11 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.application.v7.SharingMemberRecordApplicationV7Service
-import org.eclipse.tractusx.bpdm.orchestrator.api.SharingMemberRecord
-import org.eclipse.tractusx.bpdm.orchestrator.api.OrchestratorSharingMemberRecordV7Api
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordQueryRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecord
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.OrchestratorSharingMemberRecordV7Api
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordQueryRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -42,7 +41,7 @@ class SharingMemberRecordController(
        return sharingMemberRecordApplicationService.updateRecord(request)
     }
 
-    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, T(org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep).PoolSync)")
+    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, T(org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep).PoolSync)")
     override fun queryRecords(
         request: SharingMemberRecordQueryRequest,
         paginationRequest: PaginationRequest

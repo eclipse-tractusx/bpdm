@@ -18,8 +18,14 @@
  ******************************************************************************/
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReference
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddressWithScriptVariants
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
 
 fun BusinessPartner.copyWithLegalEntityIdentifiers(identifiers: List<Identifier>) =
     copy(

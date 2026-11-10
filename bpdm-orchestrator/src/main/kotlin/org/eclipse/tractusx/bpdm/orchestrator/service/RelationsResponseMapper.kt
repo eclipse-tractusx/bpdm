@@ -21,7 +21,14 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorDto
 import org.springframework.stereotype.Service
 import java.time.Instant
 

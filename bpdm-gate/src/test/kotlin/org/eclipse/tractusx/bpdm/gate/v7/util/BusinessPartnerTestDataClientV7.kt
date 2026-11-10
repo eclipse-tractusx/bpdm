@@ -39,11 +39,11 @@ import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.SharingMemberRecordUpdateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskClientStateDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.UncategorizedScriptVariant
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.sharingmember.SharingMemberRecordUpdateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.UncategorizedScriptVariant
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 

@@ -32,7 +32,13 @@ import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityStateV
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.legalentity.LegalEntityWithLegalAddressVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteStateVerboseV7Dto
 import org.eclipse.tractusx.bpdm.pool.api.v7.model.site.SiteWithMainAddressVerboseV7Dto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.GeoCoordinate
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Identifier
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.LegalEntity
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.PostalAddress
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Site
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.Street
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset

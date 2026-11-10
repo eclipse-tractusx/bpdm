@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.mapper.v7
 import org.eclipse.tractusx.bpdm.orchestrator.mapper.BusinessPartnerRequestMapper
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.orchestrator.model.request.GoldenRecordTaskCreateRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskCreateRequestEntry
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequestEntry
 import org.springframework.stereotype.Component
 
 /**

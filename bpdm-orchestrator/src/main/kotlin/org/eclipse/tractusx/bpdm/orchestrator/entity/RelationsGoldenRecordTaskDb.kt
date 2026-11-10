@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.DbTimestampConverter
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import org.hibernate.annotations.Type
 import java.util.*
 

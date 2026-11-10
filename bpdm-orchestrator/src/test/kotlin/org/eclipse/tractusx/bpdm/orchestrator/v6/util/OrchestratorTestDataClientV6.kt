@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.v6.util
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskClientStateV6Dto

@@ -34,8 +34,8 @@ import org.eclipse.tractusx.bpdm.orchestrator.mapper.v6.TaskV6Mapper.toV6
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStateMachine
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.AlternativeAddressV6Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceV6Dto
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BusinessPartnerV6Dto
@@ -674,36 +674,36 @@ class GoldenRecordTaskLegacyServiceMapper(
 
     private fun org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.toNamePartType() =
         when (this) {
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalName
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.ShortName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.ShortName
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalForm -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalForm
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.SiteName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.SiteName
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.AddressName -> org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.AddressName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalName -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.LegalName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.ShortName -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.ShortName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalForm -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.LegalForm
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.SiteName -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.SiteName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.AddressName -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.AddressName
         }
 
-    private fun org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.toResponseNamePartType() =
+    private fun org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.toResponseNamePartType() =
         when (this) {
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalName
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.ShortName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.ShortName
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.LegalForm -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalForm
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.SiteName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.SiteName
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.NamePartType.AddressName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.AddressName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.LegalName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.ShortName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.ShortName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.LegalForm -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.LegalForm
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.SiteName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.SiteName
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.NamePartType.AddressName -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.NamePartTypeV6.AddressName
         }
 
     private fun org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.toBpnReferenceType() =
         when (this) {
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.Bpn -> org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.Bpn
-            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.BpnRequestIdentifier -> org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.Bpn -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.Bpn
+            org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.BpnRequestIdentifier -> org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.BpnRequestIdentifier
         }
 
-    private fun org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.toResponseBpnReferenceType() =
+    private fun org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.toResponseBpnReferenceType() =
         when (this) {
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.Bpn -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.Bpn
-            org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.BpnRequestIdentifier
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.Bpn -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.Bpn
+            org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType.BpnRequestIdentifier -> org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.businesspartner.BpnReferenceTypeV6.BpnRequestIdentifier
         }
 
     private fun TaskErrorV6Dto.toTaskErrorDto() =
-        org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskErrorDto(
+        org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskErrorDto(
             type = type.toTaskErrorType(),
             description = description
         )

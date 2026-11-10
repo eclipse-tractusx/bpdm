@@ -19,7 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskClientRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskClientStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskProcessingRelationsStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskProcessingStateDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import java.time.Duration
 import java.time.Instant
 

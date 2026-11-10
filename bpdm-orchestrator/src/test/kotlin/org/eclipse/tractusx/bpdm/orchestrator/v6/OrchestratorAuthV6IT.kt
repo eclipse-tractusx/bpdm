@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType.*
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.client.OrchestratorV6Client
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskModeV6

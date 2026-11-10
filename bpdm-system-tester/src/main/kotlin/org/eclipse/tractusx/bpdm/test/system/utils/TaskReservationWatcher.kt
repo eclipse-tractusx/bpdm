@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationEntryDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStepReservationRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStepReservationRequest
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap

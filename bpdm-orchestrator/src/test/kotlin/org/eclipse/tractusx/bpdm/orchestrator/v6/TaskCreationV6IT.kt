@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.v6
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v6.util.toV6
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Request
 import org.eclipse.tractusx.bpdm.orchestrator.api.v6.model.task.TaskCreateV6Response
 import org.junit.jupiter.params.ParameterizedTest

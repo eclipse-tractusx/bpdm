@@ -28,13 +28,13 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationSubject
 import org.eclipse.tractusx.bpdm.pool.model.parsed.error.RelationUpsertError
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationRaw
 import org.eclipse.tractusx.bpdm.pool.model.raw.relation.RelationType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsErrorDto
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsErrorType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.BusinessPartnerRelations
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationValidityPeriod
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorDto
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsErrorType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.RelationType as OrchestratorRelationType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relation.RelationType as OrchestratorRelationType
 
 /**
  * Translates the outcomes of golden record relation tasks into the results the Orchestrator expects from the Pool.

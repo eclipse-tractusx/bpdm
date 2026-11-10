@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.orchestrator.model.request.RelationsGoldenRecor
 import org.eclipse.tractusx.bpdm.orchestrator.service.RelationsResponseMapper
 import org.eclipse.tractusx.bpdm.orchestrator.service.operation.RelationsGoldenRecordTaskCreateOperation
 import org.eclipse.tractusx.bpdm.orchestrator.service.parser.RelationsGoldenRecordTaskCreateParser
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskCreateRelationsRequest
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskCreateRelationsResponse
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.relationtask.TaskCreateRelationsResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID

@@ -35,8 +35,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BpnReferenceType
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BpnReferenceType
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.businesspartner.BusinessPartner
 import java.time.Instant
 
 /**

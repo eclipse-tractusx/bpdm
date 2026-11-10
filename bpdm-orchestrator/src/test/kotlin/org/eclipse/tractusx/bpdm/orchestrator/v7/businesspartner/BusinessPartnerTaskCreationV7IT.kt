@@ -21,7 +21,13 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.*
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.ResultState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.StepState
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskCreateResponse
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskMode
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateRequest
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStateResponse
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource

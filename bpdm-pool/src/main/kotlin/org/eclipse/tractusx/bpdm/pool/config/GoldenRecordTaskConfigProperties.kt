@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties.Companion.PREFIX
-import org.eclipse.tractusx.bpdm.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.model.task.TaskStep
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(PREFIX)

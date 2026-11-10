@@ -22,7 +22,7 @@ import org.eclipse.tractusx.bpdm.gate.model.raw.task.CreatedGoldenRecordTaskRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.FinishedGoldenRecordTaskPageRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.GoldenRecordTaskResultRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.task.TaskReferenceRaw
-import org.eclipse.tractusx.bpdm.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.bpdm.orchestrator.api.v7.client.OrchestrationApiClient
 import org.springframework.stereotype.Component
 import java.time.Instant
 
