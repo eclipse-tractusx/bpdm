@@ -14,11 +14,36 @@ The same reasoning is why `gh-pages` is a separate orphan branch for the release
 ## Layout
 
 ```
-<environment>/<argocd-app>/
-  spec.yaml     the ArgoCD application definition: chart, targetRevision, namespace,
-                the vault plugin, and the raw URL this branch serves values.yaml from
-  values.yaml   the Helm values for that deployment
+<environment>/<group>/
+  values.yaml   the Helm values every app of the group shares
+  <app>/
+    spec.yaml   the ArgoCD application definition: chart, targetRevision, namespace,
+                the vault plugin, and the raw URLs this branch serves the values from
+    values.yaml the Helm values of that app alone
 ```
+
+An app's `spec.yaml` passes the group's `values.yaml` first and its own second, so the app file
+overrides the group file. Helm replaces lists instead of merging them, so lists such as ingress hosts
+live in the app files. An app that stands alone has no group: `<environment>/<app>/`.
+
+The int groups and their ArgoCD apps:
+
+| Folder                         | ArgoCD app                            |
+|--------------------------------|---------------------------------------|
+| `int/sharing-members/member-1` | `bpdm-test-sharing-member`            |
+| `int/sharing-members/member-2` | `bpdm-test-sharing-member-2`          |
+| `int/sharing-members/member-3` | `bpdm-test-sharing-member-3`          |
+| `int/snapshot/core`            | `bpdm-snapshot`                       |
+| `int/snapshot/member-1`        | `bpdm-snapshot-test-sharing-member`   |
+| `int/snapshot/member-2`        | `bpdm-snapshot-test-sharing-member-2` |
+| `int/snapshot/member-3`        | `bpdm-snapshot-test-sharing-member-3` |
+| `int/edc/operator`             | `edc-bpdm`                            |
+| `int/edc/member-1`             | `edc-test-sharing-member`             |
+| `int/edc/member-2`             | `edc-test-sharing-member-2`           |
+| `int/edc/member-3`             | `edc-test-sharing-member-3`           |
+
+The app name is the Helm release name, which names every resource including the database volume.
+Renaming an app therefore starts it on an empty database.
 
 `int/` is the environment the maintainer keeps current; `stable/` is updated on demand.
 
