@@ -14,5 +14,6 @@
 package org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner
 
 data class BusinessPartnerSearchParsed(
-    val externalIds: Set<String>?
+    val externalIds: Set<String>?,
+    val processes: Set<String>? = null
 )

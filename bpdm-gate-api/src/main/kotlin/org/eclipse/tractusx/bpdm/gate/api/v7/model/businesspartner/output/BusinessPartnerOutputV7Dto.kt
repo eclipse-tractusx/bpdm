@@ -50,20 +50,21 @@ data class BusinessPartnerOutputV7Dto(
     val createdAt: Instant,
 
     @get:Schema(description = "Timestamp when the business partner record was last updated")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val process: String? = null
 
 ) : IBaseBusinessPartnerGateV7Dto
 
 @Schema(
     description = "Legal Entity properties of business partner output data",
-    requiredProperties = ["bpnL"]
+    requiredProperties = []
 )
 data class LegalEntityRepresentationOutputV7Dto(
-    override val legalEntityBpn: String,
+    override val legalEntityBpn: String? = null,
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
-    val confidenceCriteria: ConfidenceCriteriaV7Dto,
+    val confidenceCriteria: ConfidenceCriteriaV7Dto? = null,
     @get:Schema(description = "Designates whether this legal entity is the ultimate owner in an ownership chain.")
     val ownershipUltimate: Boolean? = null,
     @get:Schema(description = "The BPNL of the designated ultimate owner up in the ownership chain.")
@@ -79,9 +80,9 @@ data class LegalEntityRepresentationOutputV7Dto(
     description = "Site properties of business partner output data"
 )
 data class SiteRepresentationOutputV7Dto(
-    override val siteBpn: String,
+    override val siteBpn: String? = null,
     override val name: String? = null,
-    val confidenceCriteria: ConfidenceCriteriaV7Dto,
+    val confidenceCriteria: ConfidenceCriteriaV7Dto? = null,
     override val states: Collection<BusinessPartnerStateOutputV7Dto> = emptyList(),
     val goldenRecordRelations: List<SiteGoldenRecordRelationV7Dto> = emptyList(),
 
@@ -102,15 +103,15 @@ data class AdditionalSiteOutputV7Dto(
 
 @Schema(
     description = "Address properties of business partner output data",
-    requiredProperties = ["bpnA"]
+    requiredProperties = []
 )
 data class AddressComponentOutputV7Dto(
-    override val addressBpn: String,
+    override val addressBpn: String? = null,
     override val name: String? = null,
-    override val addressType: AddressType?,
+    override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressV7Dto = PhysicalPostalAddressV7Dto(),
     override val alternativePostalAddress: AlternativePostalAddressV7Dto? = null,
-    val confidenceCriteria: ConfidenceCriteriaV7Dto,
+    val confidenceCriteria: ConfidenceCriteriaV7Dto? = null,
     override val states: Collection<BusinessPartnerStateOutputV7Dto> = emptyList(),
     val identifiers: Collection<AddressIdentifierV7Dto> = emptyList(),
     val goldenRecordRelations: List<AddressGoldenRecordRelationV7Dto> = emptyList(),

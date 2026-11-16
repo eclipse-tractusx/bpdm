@@ -31,7 +31,9 @@ data class BusinessPartnerInputUpsertRaw(
     val address: Address,
     val externalSequenceTimestamp: Instant?,
     val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
-    val additionalSites: List<BusinessPartnerValuesRaw.AdditionalSite>
+    val additionalSites: List<BusinessPartnerValuesRaw.AdditionalSite>,
+    val process: String? = null,
+    val preserveProcess: Boolean = true
 ) {
     data class LegalEntity(
         val bpn: String?,

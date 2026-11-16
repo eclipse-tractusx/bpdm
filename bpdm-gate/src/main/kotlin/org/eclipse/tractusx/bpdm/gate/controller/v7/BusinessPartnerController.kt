@@ -27,6 +27,10 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.GateBusinessPartnerV7Api
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
+import org.eclipse.tractusx.bpdm.common.model.ParseResult
+import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.BusinessPartnerInputUpsertParser
+import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.AlternativeProcessOperationService
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
@@ -49,6 +53,8 @@ class BusinessPartnerController(
     val apiV7InboundMapper: ApiV7InboundMapper,
     val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
     val tenantResolver: TenantResolver,
+    val alternativeProcessOperation: AlternativeProcessOperationService,
+    val inputParser: BusinessPartnerInputUpsertParser,
 ) : GateBusinessPartnerV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
@@ -73,10 +79,22 @@ class BusinessPartnerController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
     override fun getBusinessPartnersOutput(
         externalIds: Collection<String>?,
-        paginationRequest: PaginationRequest
+        paginationRequest: PaginationRequest,
+        processes: Collection<String>?
     ): PageDto<BusinessPartnerOutputV7Dto> {
-        val request = BusinessPartnerSearchRaw(externalIds)
+        val request = BusinessPartnerSearchRaw(externalIds, processes)
         return outputSearchApplicationService.search(request, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(apiV7BusinessPartnerMapper::toDto)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_OUTPUT_PARTNER})")
+    override fun upsertBusinessPartnersOutput(businessPartners: Collection<BusinessPartnerOutputV7Request>): Collection<BusinessPartnerOutputV7Dto> {
+        val requests = businessPartners.toList()
+        val parsed = when (val result = inputParser.parse(requests.map(apiV7InboundMapper::toUpsertIn))) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> throw BpdmBusinessPartnerInputUpsertException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
+        }
+        val outputs = requests.zip(parsed.entries, apiV7InboundMapper::toAlternativeOutput)
+        return alternativeProcessOperation.write(outputs, tenantResolver.currentUserBpn()).map(apiV7BusinessPartnerMapper::toDto)
     }
 }

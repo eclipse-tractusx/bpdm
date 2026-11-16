@@ -17,6 +17,9 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessStateDates
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerStateOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Entry
@@ -40,12 +43,56 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV7InboundMapper {
 
+    fun toAlternativeOutput(request: BusinessPartnerOutputV7Request, partner: org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed) =
+        org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeOutputParsed(
+            partner,
+            request.legalEntity.confidenceCriteria?.let(::toConfidence),
+            request.site?.confidenceCriteria?.let(::toConfidence),
+            request.address.confidenceCriteria?.let(::toConfidence),
+            request.legalEntity.updatedAt, request.site?.updatedAt, request.address.updatedAt
+        )
+
+    private fun toConfidence(criteria: ConfidenceCriteriaV7Dto) =
+        org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw(
+            criteria.sharedByOwner, criteria.checkedByExternalDataSource, criteria.numberOfSharingMembers,
+            criteria.lastConfidenceCheckAt, criteria.nextConfidenceCheckAt, criteria.confidenceLevel
+        )
+
+    fun toUpsertIn(request: BusinessPartnerOutputV7Request): BusinessPartnerInputUpsertRaw =
+        toUpsertIn(
+            BusinessPartnerInputV7Request(
+                externalId = request.externalId,
+                process = request.process,
+                nameParts = request.nameParts,
+                identifiers = request.identifiers,
+                states = request.states.map(::toInputState),
+                roles = request.roles,
+                isOwnCompanyData = request.isOwnCompanyData,
+                legalEntity = with(request.legalEntity) {
+                    LegalEntityRepresentationInputV7Dto(legalEntityBpn, legalName, shortName, legalForm, ownershipUltimate, ultimateOwnerBpnl, states.map(::toInputState))
+                },
+                site = request.site?.let { SiteRepresentationInputV7Dto(it.siteBpn, it.name, it.states.map(::toInputState)) }
+                    ?: SiteRepresentationInputV7Dto(),
+                address = with(request.address) {
+                    AddressRepresentationInputV7Dto(addressBpn, name, addressType, physicalPostalAddress, alternativePostalAddress, states.map(::toInputState))
+                },
+                externalSequenceTimestamp = request.externalSequenceTimestamp,
+                scriptVariants = request.scriptVariants,
+                additionalSites = request.additionalSites.map { AdditionalSiteInputV7Dto(it.siteBpn, it.name) }
+            )
+        )
+
+    private fun toInputState(state: BusinessPartnerStateOutputV7Dto) =
+        BusinessPartnerStateV7Dto(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
+
     /**
      * Returns the unparsed upsert entry carrying exactly the content of [request].
      */
     fun toUpsertIn(request: BusinessPartnerInputV7Request): BusinessPartnerInputUpsertRaw =
         BusinessPartnerInputUpsertRaw(
             externalId = request.externalId,
+            process = request.process,
+            preserveProcess = false,
             nameParts = request.nameParts,
             identifiers = request.identifiers.map { BusinessPartnerInputUpsertRaw.Identifier(it.type, it.value, it.issuingBody) },
             states = toStates(request.states),

@@ -32,7 +32,9 @@ class RawToParsedMapper {
         BusinessPartnerInputUpsertParsed(
             externalId = request.externalId,
             externalSequenceTimestamp = request.externalSequenceTimestamp,
-            content = toContent(request)
+            content = toContent(request),
+            process = request.process?.takeUnless { it.isBlank() },
+            preserveProcess = request.preserveProcess
         )
 
     private fun toContent(request: BusinessPartnerInputUpsertRaw) =

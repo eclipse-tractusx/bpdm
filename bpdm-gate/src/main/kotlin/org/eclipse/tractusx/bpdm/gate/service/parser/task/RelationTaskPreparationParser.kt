@@ -62,6 +62,10 @@ class RelationTaskPreparationParser(
         sourceOutput: BusinessPartnerDb?,
         targetOutput: BusinessPartnerDb?
     ): ParseResult<RelationTaskPreparationParsed, RelationTaskPreparationError> {
+        if (input.source.process != null || input.target.process != null ||
+            sourceOutput?.process != null || targetOutput?.process != null)
+            return ParseResult.ofSingleFailure(RelationTaskPreparationError.AlternativeProcess(relation))
+
         if (sourceOutput == null || targetOutput == null)
             return ParseResult.Success(RelationTaskPreparationParsed.Deferred(relation))
 

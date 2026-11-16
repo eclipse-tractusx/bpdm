@@ -39,14 +39,15 @@ data class BusinessPartnerOutputRecord(
     val scriptVariants: List<BusinessPartnerValuesRaw.ScriptVariant>,
     val additionalSites: List<AdditionalSiteRaw>,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val process: String? = null
 ) {
     data class LegalEntity(
-        val bpn: String,
+        val bpn: String?,
         val legalName: String?,
         val shortName: String?,
         val legalForm: String?,
-        val confidence: ConfidenceCriteriaRaw,
+        val confidence: ConfidenceCriteriaRaw?,
         val ownershipUltimate: Boolean?,
         val ultimateOwnerBpnl: String?,
         val states: List<StateRaw>,
@@ -55,21 +56,21 @@ data class BusinessPartnerOutputRecord(
     )
 
     data class Site(
-        val bpn: String,
+        val bpn: String?,
         val name: String?,
-        val confidence: ConfidenceCriteriaRaw,
+        val confidence: ConfidenceCriteriaRaw?,
         val states: List<StateRaw>,
         val goldenRecordRelations: List<GoldenRecordRelationRaw<SiteGoldenRecordRelationType>>,
         val updatedAt: Instant?
     )
 
     data class Address(
-        val bpn: String,
+        val bpn: String?,
         val name: String?,
         val addressType: AddressType?,
         val physicalPostalAddress: BusinessPartnerValuesRaw.PhysicalPostalAddress?,
         val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?,
-        val confidence: ConfidenceCriteriaRaw,
+        val confidence: ConfidenceCriteriaRaw?,
         val states: List<StateRaw>,
         val goldenRecordRelations: List<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,
         val updatedAt: Instant?

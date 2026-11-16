@@ -43,9 +43,15 @@ interface SharingStateV7ApiClient : GateSharingStateV7Api {
         @RequestParam(required = false) externalIds: Collection<String>?,
         @RequestParam(required = false) sharingStateTypes: Collection<SharingStateTypeV7>?,
         @RequestParam(required = false) updatedAfter: Instant?,
+        @RequestParam(required = false) processes: Collection<String>?,
     ): PageDto<SharingStateV7Dto>
 
     @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V7}/ready")
     override fun postSharingStateReady(@RequestBody request: PostSharingStateReadyV7Request)
 
+    @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V7}/pending")
+    override fun postSharingStatePending(@RequestBody request: org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStatePendingV7Request)
+
+    @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V7}/error")
+    override fun postSharingStateError(@RequestBody request: org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateErrorV7Request)
 }

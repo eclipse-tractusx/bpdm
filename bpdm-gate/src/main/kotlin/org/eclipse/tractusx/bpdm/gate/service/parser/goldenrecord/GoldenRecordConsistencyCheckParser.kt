@@ -39,6 +39,7 @@ class GoldenRecordConsistencyCheckParser(
     fun parse(page: GoldenRecordConsistencyCheckPageRaw): List<ParseResult<GoldenRecordConsistencyCheckParsed, GoldenRecordConsistencyCheckError>> {
         val sharingStatesById = sharingStateRepository.findAllById(page.sharedBusinessPartners.map { it.sharingStateId }).associateBy { it.id }
         val outputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStatesById.values, StageType.Output)
+            .filter { it.process == null }
             .associateBy { it.sharingState.id }
 
         return page.sharedBusinessPartners.map { shared ->

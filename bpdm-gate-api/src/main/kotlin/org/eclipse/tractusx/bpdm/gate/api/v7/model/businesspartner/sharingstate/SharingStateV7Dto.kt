@@ -55,5 +55,6 @@ data class SharingStateV7Dto(
     val taskId: String? = null,
 
     @get:Schema(description = "The time when the sharing state has been last updated")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val process: String? = null
 )

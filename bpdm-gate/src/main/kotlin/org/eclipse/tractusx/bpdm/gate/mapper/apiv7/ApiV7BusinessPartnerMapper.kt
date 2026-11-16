@@ -53,6 +53,7 @@ class ApiV7BusinessPartnerMapper {
         val content = record.content
         return BusinessPartnerInputV7Dto(
             externalId = record.externalId,
+            process = record.process,
             nameParts = content.nameParts,
             identifiers = content.identifiers.map { BusinessPartnerIdentifierV7Dto(type = it.type, value = it.value, issuingBody = it.issuingBody) },
             states = toStateDtos(content.states, BusinessPartnerType.GENERIC),
@@ -102,6 +103,7 @@ class ApiV7BusinessPartnerMapper {
     fun toDto(record: BusinessPartnerOutputRecord): BusinessPartnerOutputV7Dto =
         BusinessPartnerOutputV7Dto(
             externalId = record.externalId,
+            process = record.process,
             nameParts = record.nameParts,
             identifiers = record.identifiers.map(::toDto),
             states = record.states.map(::toDto),
@@ -123,7 +125,7 @@ class ApiV7BusinessPartnerMapper {
             legalName = legalEntity.legalName,
             shortName = legalEntity.shortName,
             legalForm = legalEntity.legalForm,
-            confidenceCriteria = toDto(legalEntity.confidence),
+            confidenceCriteria = legalEntity.confidence?.let(::toDto),
             ownershipUltimate = legalEntity.ownershipUltimate,
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
             states = legalEntity.states.map(::toDto),
@@ -135,7 +137,7 @@ class ApiV7BusinessPartnerMapper {
         SiteRepresentationOutputV7Dto(
             siteBpn = site.bpn,
             name = site.name,
-            confidenceCriteria = toDto(site.confidence),
+            confidenceCriteria = site.confidence?.let(::toDto),
             states = site.states.map(::toDto),
             goldenRecordRelations = site.goldenRecordRelations.map { SiteGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = site.updatedAt ?: Instant.EPOCH
@@ -148,7 +150,7 @@ class ApiV7BusinessPartnerMapper {
             addressType = address.addressType,
             physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV7Dto(),
             alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressV7Dto(),
-            confidenceCriteria = toDto(address.confidence),
+            confidenceCriteria = address.confidence?.let(::toDto),
             states = address.states.map(::toDto),
             goldenRecordRelations = address.goldenRecordRelations.map { AddressGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = address.updatedAt ?: Instant.EPOCH

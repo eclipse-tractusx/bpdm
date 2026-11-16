@@ -74,6 +74,7 @@ class GateExceptionHandler : BpdmExceptionHandler() {
     }
 
     @ExceptionHandler(
+        BpdmAlternativeProcessException::class,
         BpdmRelationTargetNotFoundException::class,
         BpdmRelationTargetNotFoundException::class,
         BpdmRelationSourceNotFoundException::class,

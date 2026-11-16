@@ -45,6 +45,8 @@ class BusinessPartnerCsvRowParser(
         val result = zipParseResults(parseExternalId(externalId), parseSite(row), addressParser.parse(row)) { parsedExternalId, site, address ->
             BusinessPartnerInputUpsertRaw(
                 externalId = parsedExternalId,
+                process = row.process?.takeUnless { it.isBlank() },
+                preserveProcess = false,
                 nameParts = emptyList(),
                 identifiers = identifiers(row),
                 states = emptyList(),

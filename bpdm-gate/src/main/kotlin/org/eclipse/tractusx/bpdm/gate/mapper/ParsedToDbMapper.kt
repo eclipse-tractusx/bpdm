@@ -42,6 +42,29 @@ import org.springframework.stereotype.Component
 @Component
 class ParsedToDbMapper {
 
+    fun writeContent(content: BusinessPartnerInputContentParsed, target: BusinessPartnerDb) {
+        target.nameParts.replace(content.nameParts)
+        target.roles.replace(content.roles)
+        target.identifiers.replace(content.identifiers.map(::toEntity))
+        target.states.replace(content.states.map(::toEntity))
+        target.isOwnCompanyData = content.isOwnCompanyData
+        target.bpnL = content.legalEntity.bpn
+        target.legalName = content.legalEntity.legalName
+        target.shortName = content.legalEntity.shortName
+        target.legalForm = content.legalEntity.legalForm
+        target.ownershipUltimate = content.legalEntity.ownershipUltimate
+        target.ultimateOwnerBpnl = content.legalEntity.ultimateOwnerBpnl
+        target.bpnS = content.site.bpn
+        target.siteName = content.site.name
+        target.additionalSites.replace(content.additionalSites.map(::toEntity))
+        target.bpnA = content.address.bpn
+        target.addressName = content.address.name
+        target.postalAddress.addressType = content.address.addressType
+        target.postalAddress.physicalPostalAddress = content.address.physicalPostalAddress?.let(::toEntity)
+        target.postalAddress.alternativePostalAddress = content.address.alternativePostalAddress?.let(::toEntity)
+        writeScriptVariants(content.scriptVariants, target)
+    }
+
     /**
      * Writes [scriptVariants] into the script variants of [businessPartner], matched by script code.
      */

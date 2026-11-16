@@ -53,6 +53,7 @@ class DbToOutputMapper(
             externalId = entity.sharingState.externalId,
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             content = dbToParsedMapper.toContent(entity),
+            process = entity.sharingState.process,
             createdAt = entity.createdAt.instant,
             updatedAt = entity.updatedAt.instant
         )
@@ -66,6 +67,7 @@ class DbToOutputMapper(
         val externalId = entity.sharingState.externalId
         return BusinessPartnerOutputRecord(
             externalId = externalId,
+            process = entity.process,
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             nameParts = entity.nameParts.toList(),
             identifiers = identifiers.map(::toRecord),
@@ -73,11 +75,15 @@ class DbToOutputMapper(
             roles = entity.roles.toList(),
             isOwnCompanyData = entity.isOwnCompanyData,
             legalEntity = BusinessPartnerOutputRecord.LegalEntity(
-                bpn = entity.bpnL ?: throw BpdmNullMappingException(BusinessPartnerDb::class, BusinessPartnerOutputRecord::class, BusinessPartnerDb::bpnL, externalId),
+                bpn = entity.bpnL.also {
+                    if (it == null && entity.process == null) throw BpdmNullMappingException(BusinessPartnerDb::class, BusinessPartnerOutputRecord::class, BusinessPartnerDb::bpnL, externalId)
+                },
                 legalName = entity.legalName,
                 shortName = entity.shortName,
                 legalForm = entity.legalForm,
-                confidence = dbToParsedMapper.toConfidence(entity.legalEntityConfidence ?: throw BpdmInvalidPartnerException(externalId, "Missing legal entity confidence criteria")),
+                confidence = entity.legalEntityConfidence?.let(dbToParsedMapper::toConfidence).also {
+                    if (it == null && entity.process == null) throw BpdmInvalidPartnerException(externalId, "Missing legal entity confidence criteria")
+                },
                 ownershipUltimate = entity.ownershipUltimate,
                 ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
                 states = statesOf(entity, BusinessPartnerType.LEGAL_ENTITY),
@@ -86,25 +92,31 @@ class DbToOutputMapper(
                 },
                 updatedAt = entity.legalEntityUpdatedAt
             ),
-            site = entity.bpnS?.let { siteBpn ->
+            site = if (entity.bpnS != null || (entity.process != null && entity.siteName != null)) {
                 BusinessPartnerOutputRecord.Site(
-                    bpn = siteBpn,
+                    bpn = entity.bpnS,
                     name = entity.siteName,
-                    confidence = dbToParsedMapper.toConfidence(entity.siteConfidence ?: throw BpdmInvalidPartnerException(externalId, "Missing site confidence criteria")),
+                    confidence = entity.siteConfidence?.let(dbToParsedMapper::toConfidence).also {
+                        if (it == null && entity.process == null) throw BpdmInvalidPartnerException(externalId, "Missing site confidence criteria")
+                    },
                     states = statesOf(entity, BusinessPartnerType.SITE),
                     goldenRecordRelations = entity.siteGoldenRecordRelations.map {
                         GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn)
                     },
                     updatedAt = entity.siteUpdatedAt
                 )
-            },
+            } else null,
             address = BusinessPartnerOutputRecord.Address(
-                bpn = entity.bpnA ?: throw BpdmNullMappingException(BusinessPartnerDb::class, BusinessPartnerOutputRecord::class, BusinessPartnerDb::bpnA, externalId),
+                bpn = entity.bpnA.also {
+                    if (it == null && entity.process == null) throw BpdmNullMappingException(BusinessPartnerDb::class, BusinessPartnerOutputRecord::class, BusinessPartnerDb::bpnA, externalId)
+                },
                 name = entity.addressName,
                 addressType = entity.postalAddress.addressType,
                 physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.let(dbToParsedMapper::toValue),
                 alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(dbToParsedMapper::toValue),
-                confidence = dbToParsedMapper.toConfidence(entity.addressConfidence ?: throw BpdmInvalidPartnerException(externalId, "Missing address confidence criteria")),
+                confidence = entity.addressConfidence?.let(dbToParsedMapper::toConfidence).also {
+                    if (it == null && entity.process == null) throw BpdmInvalidPartnerException(externalId, "Missing address confidence criteria")
+                },
                 states = statesOf(entity, BusinessPartnerType.ADDRESS),
                 goldenRecordRelations = entity.addressGoldenRecordRelations.map {
                     GoldenRecordRelationRaw(it.relationType, it.sourceBpn, it.targetBpn)
@@ -184,6 +196,7 @@ class DbToOutputMapper(
     fun toRecord(entity: SharingStateDb): SharingStateRecord =
         SharingStateRecord(
             externalId = entity.externalId,
+            process = entity.process,
             sharingStateType = entity.sharingStateType,
             sharingErrorCode = entity.sharingErrorCode,
             sharingErrorMessage = entity.sharingErrorMessage,

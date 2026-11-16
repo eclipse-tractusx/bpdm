@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
 
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateBusinessPartnerV7Api {
@@ -88,7 +90,11 @@ interface GateBusinessPartnerV7Api {
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/output/business-partners/search"])
     fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>? = null,
-        @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
+        @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest(),
+        @RequestParam(required = false) processes: Collection<String>? = null
     ): PageDto<BusinessPartnerOutputV7Dto>
 
+    @Operation(summary = "Write outputs for alternative-process records of the caller's tenant")
+    @PutMapping(value = ["${ApiCommons.BASE_PATH_V7}/output/business-partners"])
+    fun upsertBusinessPartnersOutput(@RequestBody businessPartners: Collection<BusinessPartnerOutputV7Request>): Collection<BusinessPartnerOutputV7Dto>
 }

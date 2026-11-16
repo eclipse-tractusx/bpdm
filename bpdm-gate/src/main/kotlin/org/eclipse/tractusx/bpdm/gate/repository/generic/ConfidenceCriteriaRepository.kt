@@ -26,19 +26,19 @@ import org.springframework.data.repository.CrudRepository
 
 interface ConfidenceCriteriaRepository : JpaRepository<ConfidenceCriteriaDb, Long>, CrudRepository<ConfidenceCriteriaDb, Long> {
 
-    @Query("SELECT AVG(c.numberOfBusinessPartners) FROM ConfidenceCriteriaDb AS c")
+    @Query("SELECT AVG(c.numberOfBusinessPartners) FROM ConfidenceCriteriaDb AS c WHERE EXISTS (SELECT b.id FROM BusinessPartnerDb b WHERE b.process IS NULL AND (b.legalEntityConfidence = c OR b.siteConfidence = c OR b.addressConfidence = c))")
     fun averageNumberOfBusinessPartners(): Float?
 
-    @Query("SELECT COUNT(c.numberOfBusinessPartners) FROM ConfidenceCriteriaDb AS c WHERE c.numberOfBusinessPartners <= 1")
+    @Query("SELECT COUNT(c.numberOfBusinessPartners) FROM ConfidenceCriteriaDb AS c WHERE c.numberOfBusinessPartners <= 1 AND EXISTS (SELECT b.id FROM BusinessPartnerDb b WHERE b.process IS NULL AND (b.legalEntityConfidence = c OR b.siteConfidence = c OR b.addressConfidence = c))")
     fun countUnique(): Long?
 
-    @Query("SELECT COUNT(c.sharedByOwner) FROM ConfidenceCriteriaDb AS c")
+    @Query("SELECT COUNT(c.sharedByOwner) FROM ConfidenceCriteriaDb AS c WHERE EXISTS (SELECT b.id FROM BusinessPartnerDb b WHERE b.process IS NULL AND (b.legalEntityConfidence = c OR b.siteConfidence = c OR b.addressConfidence = c))")
     fun countSharedByOwner(): Long?
 
-    @Query("SELECT COUNT(c.checkedByExternalDataSource) FROM ConfidenceCriteriaDb AS c")
+    @Query("SELECT COUNT(c.checkedByExternalDataSource) FROM ConfidenceCriteriaDb AS c WHERE EXISTS (SELECT b.id FROM BusinessPartnerDb b WHERE b.process IS NULL AND (b.legalEntityConfidence = c OR b.siteConfidence = c OR b.addressConfidence = c))")
     fun countCheckedByExternalDataSource(): Long?
 
-    @Query("SELECT AVG(c.confidenceLevel) FROM ConfidenceCriteriaDb AS c")
+    @Query("SELECT AVG(c.confidenceLevel) FROM ConfidenceCriteriaDb AS c WHERE EXISTS (SELECT b.id FROM BusinessPartnerDb b WHERE b.process IS NULL AND (b.legalEntityConfidence = c OR b.siteConfidence = c OR b.addressConfidence = c))")
     fun averageConfidenceLevel(): Float?
 
 }

@@ -47,9 +47,10 @@ class GoldenRecordCountedOperationService(
      */
     @Transactional
     fun recalculate(outputs: List<BusinessPartnerDb>) {
-        val outputsByBpnA = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, outputs.map { it.bpnA!! }).groupBy { it.bpnA!! }
+        val goldenOutputs = outputs.filter { it.process == null && it.sharingState.process == null }
+        val outputsByBpnA = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, goldenOutputs.map { it.bpnA!! }).groupBy { it.bpnA!! }
 
-        outputs.forEach { output ->
+        goldenOutputs.forEach { output ->
             val sameGoldenRecordOutputs = outputsByBpnA[output.bpnA!!].orEmpty().plus(output).toSet().sortedBy { it.createdAt }
             setGoldenRecordCounted(sameGoldenRecordOutputs.first().sharingState, true)
             sameGoldenRecordOutputs.drop(1).forEach { setGoldenRecordCounted(it.sharingState, false) }
@@ -70,7 +71,7 @@ class GoldenRecordCountedOperationService(
      */
     @Transactional
     fun markSynced(syncs: List<GoldenRecordCountedSyncParsed>) {
-        val changed = syncs.filter { it.sharingState.syncedIsGoldenRecordCounted != it.sentIsGoldenRecordCounted }
+        val changed = syncs.filter { it.sharingState.process == null && it.sharingState.syncedIsGoldenRecordCounted != it.sentIsGoldenRecordCounted }
         logger.debug { "Sent ${syncs.size} golden record counted flags to the Orchestrator, ${changed.size} of them not yet recorded as received" }
 
         changed.forEach { sync ->

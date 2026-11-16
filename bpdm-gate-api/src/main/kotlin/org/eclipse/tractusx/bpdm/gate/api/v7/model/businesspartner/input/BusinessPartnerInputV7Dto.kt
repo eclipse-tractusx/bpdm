@@ -51,7 +51,8 @@ data class BusinessPartnerInputV7Dto(
     val createdAt: Instant,
 
     @get:Schema(description = "Timestamp when the business partner record was last updated")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val process: String? = null
 
 ) : IBaseBusinessPartnerGateV7Dto
 

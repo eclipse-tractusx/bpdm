@@ -46,5 +46,8 @@ data class BusinessPartnerInputV7Request(
     val scriptVariants: List<BusinessPartnerScriptVariantV7Dto> = emptyList(),
 
     @get:Schema(description = AdditionalSiteInputV7Dto.collectionDescription)
-    val additionalSites: List<AdditionalSiteInputV7Dto> = emptyList()
+    val additionalSites: List<AdditionalSiteInputV7Dto> = emptyList(),
+
+    @get:Schema(description = "Alternative refinement process. Absent or blank means the golden record process.")
+    val process: String? = null
 ) : IBaseBusinessPartnerGateV7Dto

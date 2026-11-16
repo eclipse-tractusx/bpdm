@@ -31,7 +31,7 @@ class BusinessPartnerCsvTemplateWriter {
      */
     fun write(): ByteArrayResource {
         val outputStream = ByteArrayOutputStream()
-        CSVWriter(OutputStreamWriter(outputStream)).use { it.writeNext(BusinessPartnerCsvRowRaw.Columns.COLUMNS.toTypedArray()) }
+        CSVWriter(OutputStreamWriter(outputStream)).use { it.writeNext((BusinessPartnerCsvRowRaw.Columns.COLUMNS + "process").toTypedArray()) }
         return ByteArrayResource(outputStream.toByteArray())
     }
 }

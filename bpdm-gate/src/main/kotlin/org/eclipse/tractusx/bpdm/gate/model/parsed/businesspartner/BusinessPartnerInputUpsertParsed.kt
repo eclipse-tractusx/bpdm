@@ -18,5 +18,7 @@ import java.time.Instant
 data class BusinessPartnerInputUpsertParsed(
     val externalId: String,
     val externalSequenceTimestamp: Instant?,
-    val content: BusinessPartnerInputContentParsed
+    val content: BusinessPartnerInputContentParsed,
+    val process: String? = null,
+    val preserveProcess: Boolean = true
 )
