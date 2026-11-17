@@ -66,7 +66,13 @@ class CountBusinessPartnersPerStageV7IT : UnscheduledGateTestBaseV7() {
         val output = testDataClient.businessPartner.createOutput(testName)
 
         //WHEN
-        val input = testDataClient.businessPartner.upsertInput(output.externalId, "provider")
+        val request = testData.businessPartner.input.request.fromSeed(output.externalId)
+        val input = testDataClient.businessPartner.upsertInput(
+            request.copy(
+                process = "provider",
+                externalSequenceTimestamp = requireNotNull(request.externalSequenceTimestamp).plusSeconds(1)
+            )
+        )
 
         //THEN
         Assertions.assertThat(gateClient.stats.countPartnersPerStage()).isEqualTo(StatsStagesV7Response(0, 1))
