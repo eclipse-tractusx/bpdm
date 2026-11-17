@@ -103,7 +103,7 @@ class GateAccessGroupOpenApiConfig(
             displayName = "V7 — Admin",
             permissions = with(permissionProperties) {
                 setOf(
-                    readInputPartner, writeInputPartner, uploadInputPartner, readOutputPartner,
+                    readInputPartner, writeInputPartner, uploadInputPartner, readOutputPartner, writeOutputPartner,
                     readInputChangelog, readOutputChangelog, readInputRelation, writeInputRelation,
                     readSharingState, writeSharingState, readStats
                 )
