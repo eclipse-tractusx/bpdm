@@ -25,9 +25,13 @@ import org.eclipse.tractusx.bpdm.gate.api.v6.exception.BusinessPartnerSharingErr
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.PostSharingStateReadyV6Request
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateTypeV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.businesspartner.sharingstate.SharingStateV6Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
+import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation
@@ -49,6 +53,30 @@ import org.junit.jupiter.api.Test
  ******************************************************************************/
 class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
 
+    @Autowired
+    lateinit var testClientProviderV7: GateTestClientProviderV7
+
+    /**
+     * GIVEN golden and alternative-process business partners
+     * WHEN input consumer searches sharing states via the v6 API
+     * THEN only golden-process partners are returned
+     */
+    @Test
+    fun `v6 only returns golden process sharing states`(){
+        //GIVEN
+        testDataClient.createBusinessPartnerInput("$testName golden")
+        testClientProviderV7.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
+            .businessParters.upsertBusinessPartnersInput(
+                listOf(BusinessPartnerInputV7Request(externalId = "$testName alternative", process = "provider"))
+            )
+
+        //WHEN
+        val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
+
+        //THEN
+        org.assertj.core.api.Assertions.assertThat(actualResponse.content.map { it.externalId })
+            .containsExactly("$testName golden")
+    }
 
     /**
      * GIVEN business partner with external-ID

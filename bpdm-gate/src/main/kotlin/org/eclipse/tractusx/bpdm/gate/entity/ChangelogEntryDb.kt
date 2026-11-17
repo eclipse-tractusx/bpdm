@@ -44,6 +44,9 @@ class ChangelogEntryDb(
 
     @Column(name = "golden_record_type")
     @Enumerated(EnumType.STRING)
-    var goldenRecordType: GoldenRecordType
+    var goldenRecordType: GoldenRecordType,
+
+    @Column(name = "process", columnDefinition = "text", updatable = false)
+    val process: String? = null
 
 ) : BaseEntityWithExplicitTimestamps()

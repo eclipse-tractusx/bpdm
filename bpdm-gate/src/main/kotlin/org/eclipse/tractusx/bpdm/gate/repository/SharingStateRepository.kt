@@ -37,10 +37,9 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
 
     object Specs {
         fun byProcesses(processes: Collection<String>?) =
-            Specification<SharingStateDb> { root, _, _ ->
-                processes?.takeIf { it.isNotEmpty() }?.let {
-                    root.get<String>(SharingStateDb::process.name).`in`(it)
-                }
+            Specification<SharingStateDb> { root, _, builder ->
+                val path = root.get<String?>(SharingStateDb::process.name)
+                if (processes.isNullOrEmpty()) builder.isNull(path) else path.`in`(processes)
             }
 
         /**
@@ -89,14 +88,14 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
     @Query("SELECT s FROM SharingStateDb s WHERE s.sharingStateType = :sharingStateType AND s.process IS NULL AND s.id > :id ORDER BY s.id ASC")
     fun findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(sharingStateType: SharingStateType, id: Long, pageable: Pageable): List<SharingStateDb>
 
-    @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s GROUP BY s.sharingStateType")
+    @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s WHERE s.process IS NULL GROUP BY s.sharingStateType")
     fun countSharingStateTypes(): List<SharingStateTypeCount>
 
     @Query("SELECT s FROM SharingStateDb s WHERE s.taskId IN :taskIds AND s.process IS NULL")
     fun findByTaskIdIn(taskIds: Set<String>): Set<SharingStateDb>
 
     @Query(
-        "SELECT s FROM SharingStateDb AS s WHERE s.process IS NULL AND s.id > :id AND s.orchestratorRecordId IS NOT NULL AND s.isGoldenRecordCounted IS NOT NULL " +
+        "SELECT s FROM SharingStateDb AS s WHERE (s.process IS NULL OR s.isGoldenRecordCounted = false) AND s.id > :id AND s.orchestratorRecordId IS NOT NULL AND s.isGoldenRecordCounted IS NOT NULL " +
             "AND (s.syncedIsGoldenRecordCounted IS NULL OR s.isGoldenRecordCounted <> s.syncedIsGoldenRecordCounted) ORDER BY s.id ASC"
     )
     fun findGoldenRecordCountedUnsyncedAfter(id: Long, pageable: Pageable): List<SharingStateDb>

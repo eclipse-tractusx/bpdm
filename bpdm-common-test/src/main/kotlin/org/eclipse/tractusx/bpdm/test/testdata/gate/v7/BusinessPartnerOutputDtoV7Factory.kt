@@ -39,6 +39,40 @@ import java.time.Instant
 
 class BusinessPartnerOutputDtoV7Factory {
 
+    /** Builds a provider request without BPNs or confidence criteria. */
+    fun alternativeRequest(input: BusinessPartnerInputV7Dto, process: String, seed: String = input.externalId) =
+        BusinessPartnerOutputV7Request(
+            externalId = input.externalId,
+            process = process,
+            nameParts = listOf(seed),
+            legalEntity = LegalEntityRepresentationOutputV7Dto(legalName = seed),
+            site = SiteRepresentationOutputV7Dto(name = "$seed site"),
+            address = AddressComponentOutputV7Dto(name = "$seed address")
+        )
+
+    /** Builds the expected response to [request]; persistence timestamps are compared separately. */
+    fun fromAlternativeRequest(request: BusinessPartnerOutputV7Request) =
+        BusinessPartnerOutputV7Dto(
+            externalId = request.externalId,
+            process = request.process,
+            nameParts = request.nameParts,
+            identifiers = request.identifiers,
+            states = request.states,
+            roles = request.roles,
+            isOwnCompanyData = request.isOwnCompanyData,
+            legalEntity = request.legalEntity.copy(updatedAt = request.legalEntity.updatedAt ?: Instant.EPOCH),
+            site = request.site?.let { it.copy(updatedAt = it.updatedAt ?: Instant.EPOCH) },
+            address = request.address.copy(
+                updatedAt = request.address.updatedAt ?: Instant.EPOCH,
+                alternativePostalAddress = request.address.alternativePostalAddress ?: AlternativePostalAddressV7Dto()
+            ),
+            externalSequenceTimestamp = request.externalSequenceTimestamp,
+            scriptVariants = request.scriptVariants,
+            additionalSites = request.additionalSites,
+            createdAt = Instant.MIN,
+            updatedAt = Instant.MIN
+        )
+
     fun fromLegalEntity(input: BusinessPartnerInputV7Dto, legalEntity: LegalEntityWithLegalAddressVerboseV7Dto): BusinessPartnerOutputV7Dto{
         return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,

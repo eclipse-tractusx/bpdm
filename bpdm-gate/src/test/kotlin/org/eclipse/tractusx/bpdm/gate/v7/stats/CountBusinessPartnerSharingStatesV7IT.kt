@@ -40,6 +40,24 @@ class CountBusinessPartnerSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     }
 
     /**
+     * GIVEN golden and alternative-process business partners
+     * WHEN input consumer counts sharing states
+     * THEN only golden-process partners are counted
+     */
+    @Test
+    fun `alternative process partners are not counted`() {
+        //GIVEN
+        testDataClient.businessPartner.upsertInput("$testName golden")
+        testDataClient.businessPartner.upsertInput("$testName alternative", "provider")
+
+        //WHEN
+        val response = gateClient.stats.countPartnersBySharingState()
+
+        //THEN
+        assertRepo.assertSharingStateStats(response, StatsSharingStatesV7Response(1, 0, 0, 0, 0))
+    }
+
+    /**
      * GIVEN business partners in initial state
      * WHEN input consumer counts sharing states
      * THEN input consumer sees correct initial count

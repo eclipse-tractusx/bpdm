@@ -39,7 +39,7 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
             Specification<BusinessPartnerDb> { root, _, builder ->
                 val path = root.get<String?>(BusinessPartnerDb::process.name)
                 if (processes.isNullOrEmpty()) builder.isNull(path)
-                else builder.or(builder.isNull(path), path.`in`(processes))
+                else path.`in`(processes)
             }
 
         /**
@@ -74,7 +74,10 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
 
     fun findBySharingStateInAndStage(sharingStates: Collection<SharingStateDb>, stage: StageType): Set<BusinessPartnerDb>
 
-    @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b WHERE b.process IS NULL GROUP BY b.stage")
+    @Query(
+        "SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b " +
+            "WHERE b.process IS NULL AND (b.stage = org.eclipse.tractusx.bpdm.common.model.StageType.Output OR b.sharingState.process IS NULL) GROUP BY b.stage"
+    )
     fun countPerStages(): List<PartnersPerStageCount>
 
     @Query("SELECT b FROM BusinessPartnerDb b WHERE b.stage = :stage AND b.bpnL IN :bpnL AND b.process IS NULL AND b.sharingState.process IS NULL")

@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.v7
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -91,6 +92,7 @@ interface GateBusinessPartnerV7Api {
     fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest(),
+        @Parameter(description = "Only show outputs of these alternative refinement processes. Absent or empty selects only the golden record process.")
         @RequestParam(required = false) processes: Collection<String>? = null
     ): PageDto<BusinessPartnerOutputV7Dto>
 

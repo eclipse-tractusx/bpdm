@@ -42,13 +42,30 @@ class GoldenRecordCountedOperationService(
     private val logger = KotlinLogging.logger { }
 
     /**
+     * Removes [sharingState] from its golden record's count and promotes the oldest remaining golden-process output.
+     * The old output remains readable; only its contribution to the Orchestrator count changes.
+     */
+    @Transactional
+    fun leaveGoldenRecordProcess(sharingState: SharingStateDb) {
+        if (sharingState.orchestratorRecordId != null) {
+            setGoldenRecordCounted(sharingState, false)
+        }
+        val previousOutputs = businessPartnerRepository.findBySharingStateInAndStage(listOf(sharingState), StageType.Output)
+        val addressBpns = previousOutputs.filter { it.process == null }.mapNotNull { it.bpnA }
+        if (addressBpns.isEmpty()) return
+        recalculate(businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, addressBpns).toList())
+    }
+
+    /**
      * Recounts the golden records of [outputs], so that of all outputs sharing an address golden record only the oldest
      * counts.
      */
     @Transactional
     fun recalculate(outputs: List<BusinessPartnerDb>) {
         val goldenOutputs = outputs.filter { it.process == null && it.sharingState.process == null }
-        val outputsByBpnA = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, goldenOutputs.map { it.bpnA!! }).groupBy { it.bpnA!! }
+        val outputsByBpnA = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, goldenOutputs.map { it.bpnA!! })
+            .filter { it.process == null && it.sharingState.process == null }
+            .groupBy { it.bpnA!! }
 
         goldenOutputs.forEach { output ->
             val sameGoldenRecordOutputs = outputsByBpnA[output.bpnA!!].orEmpty().plus(output).toSet().sortedBy { it.createdAt }
@@ -71,7 +88,7 @@ class GoldenRecordCountedOperationService(
      */
     @Transactional
     fun markSynced(syncs: List<GoldenRecordCountedSyncParsed>) {
-        val changed = syncs.filter { it.sharingState.process == null && it.sharingState.syncedIsGoldenRecordCounted != it.sentIsGoldenRecordCounted }
+        val changed = syncs.filter { it.sharingState.syncedIsGoldenRecordCounted != it.sentIsGoldenRecordCounted }
         logger.debug { "Sent ${syncs.size} golden record counted flags to the Orchestrator, ${changed.size} of them not yet recorded as received" }
 
         changed.forEach { sync ->

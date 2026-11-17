@@ -4,12 +4,15 @@
  */
 package org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output
 
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.*
 import java.time.Instant
 
 data class BusinessPartnerOutputV7Request(
     override val externalId: String,
+
+    @get:Schema(description = "The alternative refinement process this output belongs to. Outputs can only be written for alternative processes; the golden record process writes outputs itself.")
     val process: String,
     override val nameParts: List<String> = emptyList(),
     override val identifiers: Collection<BusinessPartnerIdentifierV7Dto> = emptyList(),

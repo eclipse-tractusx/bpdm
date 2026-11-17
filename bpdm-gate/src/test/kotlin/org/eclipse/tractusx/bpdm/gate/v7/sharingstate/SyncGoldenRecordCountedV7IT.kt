@@ -19,6 +19,44 @@ import org.junit.jupiter.api.Test
 
 class SyncGoldenRecordCountedV7IT : UnscheduledGateTestBaseV7() {
 
+    @Test
+    fun `do not sync a partner created for an alternative process`() {
+        // GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName, "provider")
+        testDataClient.businessPartner.refineAlternatively(input, "provider")
+
+        // WHEN / THEN
+        assertRepo.assertSharingMemberRecordUpdates(
+            testDataClient.businessPartner.goldenRecordCountedSyncedToOrchestrator(), emptyList()
+        )
+    }
+
+    @Test
+    fun `moving a counted partner to an alternative process removes its count and promotes the next partner`() {
+        // GIVEN
+        val golden = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(testName)
+        val first = testDataClient.businessPartner.upsertInput("$testName first")
+        val firstTask = testDataClient.businessPartner.setStateToSuccess(first.externalId, first.externalId, golden)
+        val second = testDataClient.businessPartner.upsertInput("$testName second")
+        val secondTask = testDataClient.businessPartner.setStateToSuccess(second.externalId, second.externalId, golden)
+        testDataClient.businessPartner.goldenRecordCountedSyncedToOrchestrator()
+
+        // WHEN
+        testDataClient.businessPartner.upsertInput(
+            org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request(
+                externalId = first.externalId, process = "provider"
+            )
+        )
+        val sent = testDataClient.businessPartner.goldenRecordCountedSyncedToOrchestrator()
+
+        // THEN
+        assertRepo.assertSharingMemberRecordUpdates(sent, listOf(
+            SharingMemberRecordUpdateRequest(firstTask.recordId, false),
+            SharingMemberRecordUpdateRequest(secondTask.recordId, true)
+        ))
+        assertRepo.assertSharingMemberRecordUpdates(testDataClient.businessPartner.goldenRecordCountedSyncedToOrchestrator(), emptyList())
+    }
+
     /**
      * GIVEN successfully shared business partner
      * WHEN the Gate synchronizes its golden record counts

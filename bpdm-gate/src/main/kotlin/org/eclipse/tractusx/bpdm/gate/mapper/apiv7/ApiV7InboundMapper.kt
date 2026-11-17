@@ -43,9 +43,11 @@ import org.springframework.stereotype.Component
 @Component
 class ApiV7InboundMapper {
 
-    fun toAlternativeOutput(request: BusinessPartnerOutputV7Request, partner: org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertParsed) =
-        org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeOutputParsed(
-            partner,
+    /** Decodes a provider output without validating its content or resolving its tenant-scoped input. */
+    fun toAlternativeOutput(request: BusinessPartnerOutputV7Request) =
+        org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeOutputRaw(
+            toUpsertIn(request),
+            request.site != null,
             request.legalEntity.confidenceCriteria?.let(::toConfidence),
             request.site?.confidenceCriteria?.let(::toConfidence),
             request.address.confidenceCriteria?.let(::toConfidence),
@@ -58,7 +60,7 @@ class ApiV7InboundMapper {
             criteria.lastConfidenceCheckAt, criteria.nextConfidenceCheckAt, criteria.confidenceLevel
         )
 
-    fun toUpsertIn(request: BusinessPartnerOutputV7Request): BusinessPartnerInputUpsertRaw =
+    private fun toUpsertIn(request: BusinessPartnerOutputV7Request): BusinessPartnerInputUpsertRaw =
         toUpsertIn(
             BusinessPartnerInputV7Request(
                 externalId = request.externalId,

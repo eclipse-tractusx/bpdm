@@ -47,6 +47,7 @@ class BusinessPartnerInputUpsertOperationService(
     private val changelogCreateOperation: ChangelogCreateOperationService,
     private val dbToParsedMapper: DbToParsedMapper,
     private val parsedToDbMapper: ParsedToDbMapper,
+    private val goldenRecordCountedOperation: org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.GoldenRecordCountedOperationService,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
@@ -139,7 +140,11 @@ class BusinessPartnerInputUpsertOperationService(
         }
 
     private fun write(request: BusinessPartnerInputUpsertParsed, input: BusinessPartnerDb) {
-        if (!request.preserveProcess) input.sharingState.process = request.process
+        if (!request.preserveProcess) {
+            val leavesGoldenProcess = input.sharingState.process == null && request.process != null
+            input.sharingState.process = request.process
+            if (leavesGoldenProcess) goldenRecordCountedOperation.leaveGoldenRecordProcess(input.sharingState)
+        }
         input.externalSequenceTimestamp = request.externalSequenceTimestamp
         parsedToDbMapper.writeContent(request.content, input)
     }

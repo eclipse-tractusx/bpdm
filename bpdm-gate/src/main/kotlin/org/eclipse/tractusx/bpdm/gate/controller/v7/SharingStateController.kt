@@ -27,7 +27,9 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.GateSharingStateV7Api
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateReadyV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStatePendingV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateErrorV7Request
-import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.AlternativeProcessOperationService
+import org.eclipse.tractusx.bpdm.gate.service.application.AlternativeSharingStateApplicationService
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.AlternativeProcessResult
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmAlternativeProcessException
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
@@ -51,7 +53,7 @@ class SharingStateController(
     private val apiV7SharingStateMapper: ApiV7SharingStateMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val tenantResolver: TenantResolver,
-    private val alternativeProcessOperation: AlternativeProcessOperationService
+    private val alternativeSharingStateApplicationService: AlternativeSharingStateApplicationService
 ): GateSharingStateV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -68,12 +70,20 @@ class SharingStateController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
-    override fun postSharingStatePending(request: PostSharingStatePendingV7Request) =
-        alternativeProcessOperation.pending(request.externalIds, request.process, tenantResolver.currentUserBpn())
+    override fun postSharingStatePending(request: PostSharingStatePendingV7Request) {
+        when (val result = alternativeSharingStateApplicationService.pending(request.externalIds, request.process, tenantResolver.currentUserBpn())) {
+            is AlternativeProcessResult.Applied -> Unit
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.messages.joinToString("; "))
+        }
+    }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
-    override fun postSharingStateError(request: PostSharingStateErrorV7Request) =
-        alternativeProcessOperation.error(request.externalIds, request.process, request.message, tenantResolver.currentUserBpn())
+    override fun postSharingStateError(request: PostSharingStateErrorV7Request) {
+        when (val result = alternativeSharingStateApplicationService.error(request.externalIds, request.process, request.message, tenantResolver.currentUserBpn())) {
+            is AlternativeProcessResult.Applied -> Unit
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.messages.joinToString("; "))
+        }
+    }
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")

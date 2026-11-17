@@ -41,6 +41,44 @@ class CountBusinessPartnersPerStageV7IT : UnscheduledGateTestBaseV7() {
     }
 
     /**
+     * GIVEN golden and alternative-process business partners and outputs
+     * WHEN input consumer requests count per stage
+     * THEN only golden-process records are counted
+     */
+    @Test
+    fun `alternative process partners and outputs are not counted`() {
+        //GIVEN
+        testDataClient.businessPartner.upsertInput("$testName golden")
+        testDataClient.businessPartner.createOutput("$testName golden output")
+        val alternative = testDataClient.businessPartner.upsertInput("$testName alternative", "provider")
+        testDataClient.businessPartner.refineAlternatively(alternative, "provider")
+
+        //WHEN
+        val response = gateClient.stats.countPartnersPerStage()
+
+        //THEN
+        Assertions.assertThat(response).isEqualTo(StatsStagesV7Response(2, 1))
+    }
+
+    @Test
+    fun `count previous golden output until alternative process overwrites it`() {
+        //GIVEN
+        val output = testDataClient.businessPartner.createOutput(testName)
+
+        //WHEN
+        val input = testDataClient.businessPartner.upsertInput(output.externalId, "provider")
+
+        //THEN
+        Assertions.assertThat(gateClient.stats.countPartnersPerStage()).isEqualTo(StatsStagesV7Response(0, 1))
+
+        //WHEN
+        testDataClient.businessPartner.refineAlternatively(input, "provider")
+
+        //THEN
+        Assertions.assertThat(gateClient.stats.countPartnersPerStage()).isEqualTo(StatsStagesV7Response(0, 0))
+    }
+
+    /**
      * GIVEN business partner inputs
      * WHEN input consumer requests count per stage
      * THEN input consumer sees correct input count

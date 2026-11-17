@@ -28,9 +28,9 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.Busines
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
-import org.eclipse.tractusx.bpdm.common.model.ParseResult
-import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.BusinessPartnerInputUpsertParser
-import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.AlternativeProcessOperationService
+import org.eclipse.tractusx.bpdm.gate.service.application.BusinessPartnerOutputUpsertApplicationService
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.AlternativeProcessResult
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmAlternativeProcessException
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmBusinessPartnerInputUpsertException
@@ -53,8 +53,7 @@ class BusinessPartnerController(
     val apiV7InboundMapper: ApiV7InboundMapper,
     val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
     val tenantResolver: TenantResolver,
-    val alternativeProcessOperation: AlternativeProcessOperationService,
-    val inputParser: BusinessPartnerInputUpsertParser,
+    val outputUpsertApplicationService: BusinessPartnerOutputUpsertApplicationService,
 ) : GateBusinessPartnerV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
@@ -89,12 +88,10 @@ class BusinessPartnerController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_OUTPUT_PARTNER})")
     override fun upsertBusinessPartnersOutput(businessPartners: Collection<BusinessPartnerOutputV7Request>): Collection<BusinessPartnerOutputV7Dto> {
-        val requests = businessPartners.toList()
-        val parsed = when (val result = inputParser.parse(requests.map(apiV7InboundMapper::toUpsertIn))) {
-            is ParseResult.Success -> result.parsed
-            is ParseResult.Failure -> throw BpdmBusinessPartnerInputUpsertException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
+        val requests = businessPartners.map(apiV7InboundMapper::toAlternativeOutput)
+        return when (val result = outputUpsertApplicationService.upsert(requests, tenantResolver.currentUserBpn())) {
+            is AlternativeProcessResult.Applied -> result.value.map(apiV7BusinessPartnerMapper::toDto)
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.messages.joinToString("; "))
         }
-        val outputs = requests.zip(parsed.entries, apiV7InboundMapper::toAlternativeOutput)
-        return alternativeProcessOperation.write(outputs, tenantResolver.currentUserBpn()).map(apiV7BusinessPartnerMapper::toDto)
     }
 }

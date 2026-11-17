@@ -32,6 +32,21 @@ import java.time.Instant
 
 class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
 
+    @Test
+    fun `sharing state searches select exactly the requested process`() {
+        // GIVEN
+        val golden = testDataClient.businessPartner.upsertInput("$testName golden")
+        val alternative = testDataClient.businessPartner.upsertInput("$testName alternative", "provider")
+        testDataClient.businessPartner.upsertInput("$testName another", "another")
+
+        // WHEN / THEN
+        org.assertj.core.api.Assertions.assertThat(gateClient.sharingState.getSharingStates(PaginationRequest(), null).content.map { it.externalId })
+            .containsExactly(golden.externalId)
+        val scoped = gateClient.sharingState.getSharingStates(PaginationRequest(), null, processes = listOf("provider"))
+        org.assertj.core.api.Assertions.assertThat(scoped.content.map { it.externalId }).containsExactly(alternative.externalId)
+        org.assertj.core.api.Assertions.assertThat(scoped.content.single().process).isEqualTo("provider")
+    }
+
     /**
      * GIVEN business partner with external-ID
      * WHEN input consumer searches for sharing state by external ID

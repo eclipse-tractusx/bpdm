@@ -16,5 +16,6 @@ import java.time.Instant
 
 data class ChangelogSearchRaw(
     val externalIds: Collection<String>?,
-    val timestampAfter: Instant?
+    val timestampAfter: Instant?,
+    val processes: Collection<String>? = null
 )

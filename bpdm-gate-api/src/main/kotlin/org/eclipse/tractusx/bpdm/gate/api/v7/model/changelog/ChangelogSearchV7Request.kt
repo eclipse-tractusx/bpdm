@@ -32,5 +32,8 @@ data class ChangelogSearchV7Request(
     val timestampAfter: Instant? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of external IDs. Ignored if empty."))
-    val externalIds: Set<String>? = emptySet()
+    val externalIds: Set<String>? = emptySet(),
+
+    @get:Schema(description = "Restrict output changelog entries to these alternative processes. Absent or empty selects only the golden record process.")
+    val processes: Set<String>? = null
 )

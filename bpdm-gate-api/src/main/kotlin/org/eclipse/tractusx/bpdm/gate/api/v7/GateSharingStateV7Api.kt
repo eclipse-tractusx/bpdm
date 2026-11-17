@@ -55,6 +55,7 @@ interface GateSharingStateV7Api {
         @RequestParam(required = false) sharingStateTypes: Collection<SharingStateTypeV7>? = null,
         @Parameter(description = "Only show sharing states updated after given time")
         @RequestParam(required = false) updatedAfter: Instant? = null,
+        @Parameter(description = "Only show sharing states of these alternative refinement processes. Absent or empty selects only the golden record process.")
         @RequestParam(required = false) processes: Collection<String>? = null,
     ): PageDto<SharingStateV7Dto>
 

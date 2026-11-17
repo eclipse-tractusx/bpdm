@@ -31,6 +31,7 @@ class ChangelogSearchParser {
     fun parse(request: ChangelogSearchRaw): ChangelogSearchParsed =
         ChangelogSearchParsed(
             externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet(),
-            timestampAfter = request.timestampAfter
+            timestampAfter = request.timestampAfter,
+            processes = request.processes?.toSet()
         )
 }
