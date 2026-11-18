@@ -217,6 +217,7 @@ class BusinessPartnerOutputDtoV7Factory {
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
             states = logisticAddress.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
+            identifiers = logisticAddress.identifiers.map { AddressIdentifierV7Dto(value = it.value, type = it.type) },
             updatedAt = logisticAddress.updatedAt
         )
     }
