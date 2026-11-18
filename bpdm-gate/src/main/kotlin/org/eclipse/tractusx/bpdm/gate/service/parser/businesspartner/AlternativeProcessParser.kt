@@ -8,6 +8,7 @@ import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeProcessError
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeOutputRaw
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -21,16 +22,17 @@ class AlternativeProcessParser(
     private val inputParser: BusinessPartnerInputUpsertParser
 ) {
     /** Resolves every record to the requested alternative process, accumulating errors for the whole batch. */
-    fun parseStates(records: List<Pair<String, String?>>, tenantBpnl: String?): ParseResult<List<SharingStateDb>, String> {
+    fun parseStates(records: List<Pair<String, String?>>, tenantBpnl: String?): ParseResult<List<SharingStateDb>, AlternativeProcessError> {
         val states = sharingStateRepository.findByExternalIdInAndTenantBpnl(records.map { it.first }, tenantBpnl).associateBy { it.externalId }
-        val errors = mutableListOf<String>()
-        if (records.map { it.first }.distinct().size != records.size) errors.add("External IDs must be unique")
+        val errors = mutableListOf<AlternativeProcessError>()
+        val duplicates = records.map { it.first }.groupingBy { it }.eachCount().filterValues { it > 1 }.keys
+        if (duplicates.isNotEmpty()) errors.add(AlternativeProcessError.DuplicateExternalIds(duplicates))
         records.forEach { (externalId, process) ->
             val state = states[externalId]
             when {
-                state == null -> errors.add("Business partner '$externalId' not found in the caller's tenant")
+                state == null -> errors.add(AlternativeProcessError.BusinessPartnerNotFound(externalId))
                 process.isNullOrBlank() || state.process == null || state.process != process ->
-                    errors.add("Business partner '$externalId' does not belong to process '$process'")
+                    errors.add(AlternativeProcessError.ProcessMismatch(externalId, process))
             }
         }
         return if (errors.isNotEmpty()) ParseResult.Failure(errors)
@@ -38,12 +40,12 @@ class AlternativeProcessParser(
     }
 
     /** Parses a complete output batch and rejects unnamed sites instead of dropping their states and confidence. */
-    fun parseOutputs(requests: List<AlternativeOutputRaw>, tenantBpnl: String?): ParseResult<List<AlternativeOutputParsed>, String> {
+    fun parseOutputs(requests: List<AlternativeOutputRaw>, tenantBpnl: String?): ParseResult<List<AlternativeOutputParsed>, AlternativeProcessError> {
         val siteErrors = requests.filter { it.hasSite && it.partner.site.name.isNullOrBlank() }
-            .map { "Business partner '${it.partner.externalId}': a site output must have a non-blank name" }
+            .map { AlternativeProcessError.SiteNameMissing(it.partner.externalId) }
         if (siteErrors.isNotEmpty()) return ParseResult.Failure(siteErrors)
         val partners = when (val parsed = inputParser.parse(requests.map { it.partner })) {
-            is ParseResult.Failure -> return ParseResult.Failure(parsed.errors.map { it.toString() })
+            is ParseResult.Failure -> return ParseResult.Failure(parsed.errors.map(AlternativeProcessError::InvalidInput))
             is ParseResult.Success -> parsed.parsed.entries
         }
         val states = when (val parsed = parseStates(partners.map { it.externalId to it.process }, tenantBpnl)) {
@@ -56,6 +58,7 @@ class AlternativeProcessParser(
             val state = states[index]
             AlternativeOutputParsed(
                 partners[index], state, existing[state.id],
+                request.addressIdentifiers,
                 request.legalEntityConfidence, request.siteConfidence, request.addressConfidence,
                 request.legalEntityUpdatedAt, request.siteUpdatedAt, request.addressUpdatedAt
             )

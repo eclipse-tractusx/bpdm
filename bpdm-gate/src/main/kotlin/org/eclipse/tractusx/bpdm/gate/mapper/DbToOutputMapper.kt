@@ -114,6 +114,7 @@ class DbToOutputMapper(
                 addressType = entity.postalAddress.addressType,
                 physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.let(dbToParsedMapper::toValue),
                 alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(dbToParsedMapper::toValue),
+                identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }.map(::toRecord),
                 confidence = entity.addressConfidence?.let(dbToParsedMapper::toConfidence).also {
                     if (it == null && entity.process == null) throw BpdmInvalidPartnerException(externalId, "Missing address confidence criteria")
                 },

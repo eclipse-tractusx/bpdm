@@ -76,7 +76,8 @@ class RelationInputUpsertParser(
                     source = source,
                     target = target,
                     validityPeriods = validityPeriods,
-                    reasonCode = request.reasonCode
+                    reasonCode = request.reasonCode,
+                    usesAlternativeProcess = source.process != null || target.process != null
                 )
             }
         }

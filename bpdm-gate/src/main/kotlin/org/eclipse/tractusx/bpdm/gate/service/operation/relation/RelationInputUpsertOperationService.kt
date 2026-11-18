@@ -64,10 +64,9 @@ class RelationInputUpsertOperationService(
             existing.relation.sharingState?.sharingStateType == RelationSharingStateType.Error -> resubmit(existing)
             else -> Unchanged(existing)
         }
-        val input = result.input
-        if (input.source.process != null || input.target.process != null) {
+        if (request.usesAlternativeProcess) {
             sharingStateOperation.fail(
-                input.relation,
+                result.input.relation,
                 org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode.SharingProcessError,
                 "Relations cannot reference business partners using an alternative refinement process"
             )

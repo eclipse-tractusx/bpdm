@@ -37,6 +37,7 @@ import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7SharingStateMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7BusinessPartnerMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
@@ -51,6 +52,7 @@ class SharingStateController(
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
     private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
     private val apiV7SharingStateMapper: ApiV7SharingStateMapper,
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper,
     private val tenantResolver: TenantResolver,
     private val alternativeSharingStateApplicationService: AlternativeSharingStateApplicationService
@@ -73,7 +75,7 @@ class SharingStateController(
     override fun postSharingStatePending(request: PostSharingStatePendingV7Request) {
         when (val result = alternativeSharingStateApplicationService.pending(request.externalIds, request.process, tenantResolver.currentUserBpn())) {
             is AlternativeProcessResult.Applied -> Unit
-            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.messages.joinToString("; "))
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage).joinToString("; "))
         }
     }
 
@@ -81,7 +83,7 @@ class SharingStateController(
     override fun postSharingStateError(request: PostSharingStateErrorV7Request) {
         when (val result = alternativeSharingStateApplicationService.error(request.externalIds, request.process, request.message, tenantResolver.currentUserBpn())) {
             is AlternativeProcessResult.Applied -> Unit
-            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.messages.joinToString("; "))
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage).joinToString("; "))
         }
     }
 

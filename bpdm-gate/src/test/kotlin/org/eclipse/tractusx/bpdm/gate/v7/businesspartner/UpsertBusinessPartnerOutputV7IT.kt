@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AddressIdentifierV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
@@ -25,7 +26,12 @@ class UpsertBusinessPartnerOutputV7IT : UnscheduledGateTestBaseV7() {
     fun `write output for alternative-process partner`() {
         // GIVEN
         val input = testDataClient.businessPartner.upsertInput(testName, process)
-        val request = testData.businessPartner.output.alternativeRequest(input, process)
+        val baseRequest = testData.businessPartner.output.alternativeRequest(input, process)
+        val request = baseRequest.copy(
+            address = baseRequest.address.copy(
+                identifiers = listOf(AddressIdentifierV7Dto(value = "address-id", type = "VAT"))
+            )
+        )
 
         // WHEN
         val actual = gateClient.businessParters.upsertBusinessPartnersOutput(listOf(request))

@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartn
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvUpsertError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeProcessError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.AdditionalSitesWithoutOwnSite
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.DuplicateExternalIds
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.UpsertLimitExceeded
@@ -152,6 +153,7 @@ class ApiV7BusinessPartnerMapper {
             alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressV7Dto(),
             confidenceCriteria = address.confidence?.let(::toDto),
             states = address.states.map(::toDto),
+            identifiers = address.identifiers.map { AddressIdentifierV7Dto(value = it.value, type = it.type) },
             goldenRecordRelations = address.goldenRecordRelations.map { AddressGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = address.updatedAt ?: Instant.EPOCH
         )
@@ -303,6 +305,19 @@ class ApiV7BusinessPartnerMapper {
             is AdditionalSitesWithoutOwnSite ->
                 "Partner with ID '${error.externalId}' is invalid: additional sites of its address are stated " +
                         "but no site of its own is, which they would be additional to"
+        }
+
+    fun toMessage(error: AlternativeProcessError): String =
+        when (error) {
+            is AlternativeProcessError.DuplicateExternalIds ->
+                "External IDs occur more than once in the batch: ${error.externalIds.joinToString()}"
+            is AlternativeProcessError.BusinessPartnerNotFound ->
+                "Business partner '${error.externalId}' not found in the caller's tenant"
+            is AlternativeProcessError.ProcessMismatch ->
+                "Business partner '${error.externalId}' does not belong to process '${error.process}'"
+            is AlternativeProcessError.SiteNameMissing ->
+                "Business partner '${error.externalId}': a site output must have a non-blank name"
+            is AlternativeProcessError.InvalidInput -> toMessage(error.error)
         }
 
     /**

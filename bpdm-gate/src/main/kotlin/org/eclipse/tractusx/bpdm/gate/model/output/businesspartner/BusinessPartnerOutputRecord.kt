@@ -70,6 +70,7 @@ data class BusinessPartnerOutputRecord(
         val addressType: AddressType?,
         val physicalPostalAddress: BusinessPartnerValuesRaw.PhysicalPostalAddress?,
         val alternativePostalAddress: BusinessPartnerValuesRaw.AlternativePostalAddress?,
+        val identifiers: List<IdentifierRaw>,
         val confidence: ConfidenceCriteriaRaw?,
         val states: List<StateRaw>,
         val goldenRecordRelations: List<GoldenRecordRelationRaw<AddressGoldenRecordRelationType>>,

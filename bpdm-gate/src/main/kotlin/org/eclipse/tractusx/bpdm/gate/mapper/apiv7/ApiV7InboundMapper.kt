@@ -48,6 +48,11 @@ class ApiV7InboundMapper {
         org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeOutputRaw(
             toUpsertIn(request),
             request.site != null,
+            request.address.identifiers.map {
+                org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.IdentifierRaw(
+                    it.type, it.value, null, org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType.ADDRESS
+                )
+            },
             request.legalEntity.confidenceCriteria?.let(::toConfidence),
             request.site?.confidenceCriteria?.let(::toConfidence),
             request.address.confidenceCriteria?.let(::toConfidence),

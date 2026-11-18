@@ -4,6 +4,7 @@
  */
 package org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner
 
+import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.IdentifierRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.ConfidenceCriteriaRaw
 import java.time.Instant
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
@@ -14,6 +15,7 @@ data class AlternativeOutputParsed(
     val partner: BusinessPartnerInputUpsertParsed,
     val sharingState: SharingStateDb,
     val storedOutput: BusinessPartnerDb?,
+    val addressIdentifiers: List<IdentifierRaw>,
     val legalEntityConfidence: ConfidenceCriteriaRaw?,
     val siteConfidence: ConfidenceCriteriaRaw?,
     val addressConfidence: ConfidenceCriteriaRaw?,

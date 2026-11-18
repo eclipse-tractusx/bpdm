@@ -9,7 +9,9 @@ import org.eclipse.tractusx.bpdm.common.logging.PersistedChangeType
 import org.eclipse.tractusx.bpdm.common.model.DbTimestamp
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
+import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
@@ -44,6 +46,9 @@ class AlternativeProcessOperationService(
                 val output = request.storedOutput ?: BusinessPartnerDb.createEmpty(state, StageType.Output)
                 val changeType = if (request.storedOutput != null) ChangelogType.UPDATE else ChangelogType.CREATE
                 mapper.writeContent(partner.content, output)
+                output.identifiers.addAll(request.addressIdentifiers.map {
+                    IdentifierDb(it.type, it.value, it.issuingBody, BusinessPartnerType.ADDRESS)
+                })
                 output.process = partner.process
                 output.externalSequenceTimestamp = partner.externalSequenceTimestamp
                 output.legalEntityConfidence = request.legalEntityConfidence?.let(mapper::toEntity)

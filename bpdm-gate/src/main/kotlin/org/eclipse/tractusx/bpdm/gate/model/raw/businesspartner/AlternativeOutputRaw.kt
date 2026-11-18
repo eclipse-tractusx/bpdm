@@ -10,6 +10,7 @@ import java.time.Instant
 data class AlternativeOutputRaw(
     val partner: BusinessPartnerInputUpsertRaw,
     val hasSite: Boolean,
+    val addressIdentifiers: List<IdentifierRaw>,
     val legalEntityConfidence: ConfidenceCriteriaRaw?,
     val siteConfidence: ConfidenceCriteriaRaw?,
     val addressConfidence: ConfidenceCriteriaRaw?,

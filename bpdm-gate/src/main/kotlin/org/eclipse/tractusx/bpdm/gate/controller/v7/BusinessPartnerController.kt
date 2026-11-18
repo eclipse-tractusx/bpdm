@@ -91,7 +91,7 @@ class BusinessPartnerController(
         val requests = businessPartners.map(apiV7InboundMapper::toAlternativeOutput)
         return when (val result = outputUpsertApplicationService.upsert(requests, tenantResolver.currentUserBpn())) {
             is AlternativeProcessResult.Applied -> result.value.map(apiV7BusinessPartnerMapper::toDto)
-            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.messages.joinToString("; "))
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage).joinToString("; "))
         }
     }
 }
