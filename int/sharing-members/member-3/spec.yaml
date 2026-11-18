@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-project: project-bpdm
+project: bpdm
 source:
   repoURL: 'https://eclipse-tractusx.github.io/charts/dev'
   targetRevision: 7.0.0-rc2
@@ -34,4 +34,4 @@ source:
   chart: bpdm
 destination:
   server: 'https://kubernetes.default.svc'
-  namespace: product-bpdm
+  namespace: bpdm

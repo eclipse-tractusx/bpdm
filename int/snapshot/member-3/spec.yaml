@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-project: project-bpdm
+project: bpdm
 source:
   repoURL: 'https://github.com/eclipse-tractusx/bpdm.git'
   path: charts/bpdm
@@ -35,4 +35,4 @@ source:
           https://raw.githubusercontent.com/eclipse-tractusx/bpdm/environments/int/snapshot/member-3/values.yaml
 destination:
   server: 'https://kubernetes.default.svc'
-  namespace: product-bpdm
+  namespace: bpdm
