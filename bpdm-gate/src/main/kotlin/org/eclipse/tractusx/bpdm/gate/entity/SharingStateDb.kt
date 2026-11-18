@@ -61,8 +61,10 @@ class SharingStateDb(
     var sharingProcessStarted: LocalDateTime? = null,
 
     @Column(name = "task_id", nullable = true)
-    var taskId: String? = null
+    var taskId: String? = null,
+
+    @Column(name = "process", columnDefinition = "text")
+    var process: String? = null
 
 ) : BaseEntityWithExplicitTimestamps()
-
 

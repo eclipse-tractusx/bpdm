@@ -44,13 +44,16 @@ class BusinessPartnerOutputSearchOperationService(
         val spec = Specification.allOf(
             BusinessPartnerRepository.Specs.byExternalIdsIn(criteria.externalIds),
             BusinessPartnerRepository.Specs.byTenantBpnl(tenantBpnl),
-            BusinessPartnerRepository.Specs.byStage(StageType.Output)
+            BusinessPartnerRepository.Specs.byStage(StageType.Output),
+            BusinessPartnerRepository.Specs.byOutputProcesses(criteria.processes)
         )
         return businessPartnerRepository.findAll(spec, pageable)
             .map { BusinessPartnerOutputDesignationParsed(it, designatedIdentifiers(it), designatedStates(it)) }
     }
 
     private fun designatedIdentifiers(output: BusinessPartnerDb): List<IdentifierDb> =
+        if (output.process != null) output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.GENERIC }
+        else
         when (output.postalAddress.addressType) {
             AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }
             AddressType.AdditionalAddress -> output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }
@@ -58,6 +61,8 @@ class BusinessPartnerOutputSearchOperationService(
         }
 
     private fun designatedStates(output: BusinessPartnerDb): List<StateDb> =
+        if (output.process != null) output.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }
+        else
         when (output.postalAddress.addressType) {
             AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> output.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }
             AddressType.AdditionalAddress -> output.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }

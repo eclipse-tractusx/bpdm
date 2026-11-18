@@ -14,5 +14,6 @@
 package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 
 data class BusinessPartnerSearchRaw(
-    val externalIds: Collection<String>?
+    val externalIds: Collection<String>?,
+    val processes: Collection<String>? = null
 )

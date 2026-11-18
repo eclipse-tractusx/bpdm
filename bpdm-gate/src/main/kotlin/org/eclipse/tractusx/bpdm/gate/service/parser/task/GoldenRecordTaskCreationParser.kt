@@ -81,6 +81,7 @@ class GoldenRecordTaskCreationParser(
 
     private fun isUnchangedSince(candidate: GoldenRecordTaskCandidateParsed, sharingState: SharingStateDb, input: BusinessPartnerDb?): Boolean =
         sharingState.sharingStateType == SharingStateType.Ready
+                && sharingState.process == null
                 && sharingState.orchestratorRecordId?.toString() == candidate.recordId
                 && input != null
                 && dbToParsedMapper.toContent(input) == candidate.input

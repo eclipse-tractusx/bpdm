@@ -34,6 +34,13 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
 
     object Specs {
 
+        /** Scopes entries by the process that wrote them, independently of later input process switches. */
+        fun byProcesses(processes: Collection<String>?) =
+            Specification<ChangelogEntryDb> { root, _, builder ->
+                val path = root.get<String?>(ChangelogEntryDb::process.name)
+                if (processes.isNullOrEmpty()) builder.isNull(path) else path.`in`(processes)
+            }
+
         /**
          * Restrict to entries with any one of the given ExternalIds; ignore if empty
          */

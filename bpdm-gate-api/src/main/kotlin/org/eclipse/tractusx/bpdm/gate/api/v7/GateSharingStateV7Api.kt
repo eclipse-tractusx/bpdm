@@ -55,6 +55,8 @@ interface GateSharingStateV7Api {
         @RequestParam(required = false) sharingStateTypes: Collection<SharingStateTypeV7>? = null,
         @Parameter(description = "Only show sharing states updated after given time")
         @RequestParam(required = false) updatedAfter: Instant? = null,
+        @Parameter(description = "Only show sharing states of these alternative refinement processes. Absent or empty selects only the golden record process.")
+        @RequestParam(required = false) processes: Collection<String>? = null,
     ): PageDto<SharingStateV7Dto>
 
     @Operation(
@@ -69,4 +71,12 @@ interface GateSharingStateV7Api {
     )
     @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V7}/ready"])
     fun postSharingStateReady(@RequestBody request: PostSharingStateReadyV7Request)
+
+    @Operation(summary = "Mark alternative-process records as picked up")
+    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V7}/pending"])
+    fun postSharingStatePending(@RequestBody request: org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStatePendingV7Request)
+
+    @Operation(summary = "Fail alternative-process records with SharingProcessError")
+    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V7}/error"])
+    fun postSharingStateError(@RequestBody request: org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateErrorV7Request)
 }

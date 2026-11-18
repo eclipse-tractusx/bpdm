@@ -51,7 +51,10 @@ data class BusinessPartnerInputV7Dto(
     val createdAt: Instant,
 
     @get:Schema(description = "Timestamp when the business partner record was last updated")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+
+    @get:Schema(description = "The alternative refinement process this record belongs to. Absent means the golden record process.")
+    val process: String? = null
 
 ) : IBaseBusinessPartnerGateV7Dto
 

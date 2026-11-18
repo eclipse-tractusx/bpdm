@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartn
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerCsvUpsertError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputContentParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeProcessError
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.AdditionalSitesWithoutOwnSite
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.DuplicateExternalIds
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerInputUpsertError.UpsertLimitExceeded
@@ -53,6 +54,7 @@ class ApiV7BusinessPartnerMapper {
         val content = record.content
         return BusinessPartnerInputV7Dto(
             externalId = record.externalId,
+            process = record.process,
             nameParts = content.nameParts,
             identifiers = content.identifiers.map { BusinessPartnerIdentifierV7Dto(type = it.type, value = it.value, issuingBody = it.issuingBody) },
             states = toStateDtos(content.states, BusinessPartnerType.GENERIC),
@@ -102,6 +104,7 @@ class ApiV7BusinessPartnerMapper {
     fun toDto(record: BusinessPartnerOutputRecord): BusinessPartnerOutputV7Dto =
         BusinessPartnerOutputV7Dto(
             externalId = record.externalId,
+            process = record.process,
             nameParts = record.nameParts,
             identifiers = record.identifiers.map(::toDto),
             states = record.states.map(::toDto),
@@ -123,7 +126,7 @@ class ApiV7BusinessPartnerMapper {
             legalName = legalEntity.legalName,
             shortName = legalEntity.shortName,
             legalForm = legalEntity.legalForm,
-            confidenceCriteria = toDto(legalEntity.confidence),
+            confidenceCriteria = legalEntity.confidence?.let(::toDto),
             ownershipUltimate = legalEntity.ownershipUltimate,
             ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
             states = legalEntity.states.map(::toDto),
@@ -135,7 +138,7 @@ class ApiV7BusinessPartnerMapper {
         SiteRepresentationOutputV7Dto(
             siteBpn = site.bpn,
             name = site.name,
-            confidenceCriteria = toDto(site.confidence),
+            confidenceCriteria = site.confidence?.let(::toDto),
             states = site.states.map(::toDto),
             goldenRecordRelations = site.goldenRecordRelations.map { SiteGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = site.updatedAt ?: Instant.EPOCH
@@ -148,8 +151,9 @@ class ApiV7BusinessPartnerMapper {
             addressType = address.addressType,
             physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV7Dto(),
             alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressV7Dto(),
-            confidenceCriteria = toDto(address.confidence),
+            confidenceCriteria = address.confidence?.let(::toDto),
             states = address.states.map(::toDto),
+            identifiers = address.identifiers.map { AddressIdentifierV7Dto(value = it.value, type = it.type) },
             goldenRecordRelations = address.goldenRecordRelations.map { AddressGoldenRecordRelationV7Dto(toDto(it.type), it.sourceBpn, it.targetBpn) },
             updatedAt = address.updatedAt ?: Instant.EPOCH
         )
@@ -301,6 +305,19 @@ class ApiV7BusinessPartnerMapper {
             is AdditionalSitesWithoutOwnSite ->
                 "Partner with ID '${error.externalId}' is invalid: additional sites of its address are stated " +
                         "but no site of its own is, which they would be additional to"
+        }
+
+    fun toMessage(error: AlternativeProcessError): String =
+        when (error) {
+            is AlternativeProcessError.DuplicateExternalIds ->
+                "External IDs occur more than once in the batch: ${error.externalIds.joinToString()}"
+            is AlternativeProcessError.BusinessPartnerNotFound ->
+                "Business partner '${error.externalId}' not found in the caller's tenant"
+            is AlternativeProcessError.ProcessMismatch ->
+                "Business partner '${error.externalId}' does not belong to process '${error.process}'"
+            is AlternativeProcessError.SiteNameMissing ->
+                "Business partner '${error.externalId}': a site output must have a non-blank name"
+            is AlternativeProcessError.InvalidInput -> toMessage(error.error)
         }
 
     /**

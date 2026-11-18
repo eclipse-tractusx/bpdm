@@ -64,6 +64,13 @@ class RelationInputUpsertOperationService(
             existing.relation.sharingState?.sharingStateType == RelationSharingStateType.Error -> resubmit(existing)
             else -> Unchanged(existing)
         }
+        if (request.usesAlternativeProcess) {
+            sharingStateOperation.fail(
+                result.input.relation,
+                org.eclipse.tractusx.bpdm.gate.model.raw.relation.RelationSharingStateErrorCode.SharingProcessError,
+                "Relations cannot reference business partners using an alternative refinement process"
+            )
+        }
         logDebug(result)
         return result
     }

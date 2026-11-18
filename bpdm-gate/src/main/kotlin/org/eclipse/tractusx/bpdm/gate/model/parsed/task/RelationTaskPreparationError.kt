@@ -24,6 +24,10 @@ sealed interface RelationTaskPreparationError {
     val relation: RelationDb
     val message: String
 
+    data class AlternativeProcess(override val relation: RelationDb) : RelationTaskPreparationError {
+        override val message = "Relations cannot reference business partners using an alternative refinement process"
+    }
+
     data class CombinationUnsupported(
         override val relation: RelationDb,
         val relationType: RelationType,

@@ -63,6 +63,18 @@ class AccessGroupOpenApiIT @Autowired constructor(
     }
 
     @Test
+    fun `output writes are granted to admins but not consumers or input managers`() {
+        val operation = "PUT /output/business-partners"
+
+        assertThat(operationsOf("v7-admin")).contains(operation)
+        listOf("v7-input-consumer", "v7-output-consumer", "v7-input-manager").forEach { group ->
+            assertThat(operationsOf(group))
+                .describedAs("operations of group '%s'", group)
+                .doesNotContain(operation)
+        }
+    }
+
+    @Test
     fun `an input manager is granted endpoints an input consumer is not`() {
         val inputConsumerOperations = operationsOf("v7-input-consumer")
         val inputManagerOperations = operationsOf("v7-input-manager")

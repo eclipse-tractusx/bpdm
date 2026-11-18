@@ -29,7 +29,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PostalAddressRepository : JpaRepository<PostalAddressDb, Long> {
 
-    @Query("SELECT a.addressType as type, COUNT(a.addressType) as count FROM BusinessPartnerDb b JOIN b.postalAddress AS a WHERE b.stage = :stage GROUP BY a.addressType")
+    @Query("SELECT a.addressType as type, COUNT(a.addressType) as count FROM BusinessPartnerDb b JOIN b.postalAddress AS a WHERE b.stage = :stage AND b.process IS NULL GROUP BY a.addressType")
     fun countAddressTypes(stage: StageType): List<AddressTypeCount>
 
 

@@ -58,7 +58,7 @@ class ChangelogController(
         paginationRequest: PaginationRequest,
         searchRequest: ChangelogSearchV7Request
     ): PageChangeLogV7Dto<ChangelogGateV7Dto> {
-        val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter)
+        val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter, searchRequest.processes)
         val page = changelogSearchApplicationService.search(request, StageType.Output, GoldenRecordType.BusinessPartner, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
         return apiV7ChangelogMapper.toPageDto(page)
     }

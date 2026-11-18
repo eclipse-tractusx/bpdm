@@ -50,7 +50,8 @@ class ChangelogSearchOperationService(
             ChangelogRepository.Specs.byCreatedAtGreaterThan(criteria.timestampAfter),
             ChangelogRepository.Specs.byStage(stage),
             ChangelogRepository.Specs.byTenantBpnl(tenantBpnl),
-            ChangelogRepository.Specs.byGoldenRecordType(goldenRecordType)
+            ChangelogRepository.Specs.byGoldenRecordType(goldenRecordType),
+            ChangelogRepository.Specs.byProcesses(criteria.processes)
         )
         val oldestFirst = PageRequest.of(pageable.pageNumber, pageable.pageSize, Sort.by(ChangelogEntryDb::createdAt.name).ascending())
         return changelogRepository.findAll(spec, oldestFirst)

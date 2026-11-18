@@ -143,6 +143,7 @@ bpdm:
       writeInputPartner: write_input_partner
       # Name of the permission to read business partner output data
       readOutputPartner: read_output_partner
+      writeOutputPartner: write_output_partner
       # Name of the permission to read changelog entries for business partner input data
       readInputChangelog: read_input_changelog
       # Name of the permission to read changelog entries for business partner output data
@@ -246,7 +247,6 @@ springdoc:
         path: /ui/swagger-ui
       # Show validation specific information for properties (pattern, minimum, maximum, etc...)
         show-common-extensions: true
-
 
 
 

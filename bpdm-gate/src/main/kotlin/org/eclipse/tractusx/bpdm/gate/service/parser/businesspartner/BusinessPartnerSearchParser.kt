@@ -31,6 +31,7 @@ class BusinessPartnerSearchParser {
      */
     fun parse(request: BusinessPartnerSearchRaw): BusinessPartnerSearchParsed =
         BusinessPartnerSearchParsed(
-            externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet()
+            externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet(),
+            processes = request.processes?.toSet()
         )
 }

@@ -117,30 +117,30 @@ class ApiV6BusinessPartnerMapper {
 
     private fun toDto(legalEntity: BusinessPartnerOutputRecord.LegalEntity) =
         LegalEntityRepresentationOutputV6Dto(
-            legalEntityBpn = legalEntity.bpn,
+            legalEntityBpn = requireNotNull(legalEntity.bpn),
             legalName = legalEntity.legalName,
             shortName = legalEntity.shortName,
             legalForm = legalEntity.legalForm,
-            confidenceCriteria = toDto(legalEntity.confidence),
+            confidenceCriteria = toDto(requireNotNull(legalEntity.confidence)),
             states = legalEntity.states.map(::toDto)
         )
 
     private fun toDto(site: BusinessPartnerOutputRecord.Site) =
         SiteRepresentationOutputV6Dto(
-            siteBpn = site.bpn,
+            siteBpn = requireNotNull(site.bpn),
             name = site.name,
-            confidenceCriteria = toDto(site.confidence),
+            confidenceCriteria = toDto(requireNotNull(site.confidence)),
             states = site.states.map(::toDto)
         )
 
     private fun toDto(address: BusinessPartnerOutputRecord.Address) =
         AddressComponentOutputV6Dto(
-            addressBpn = address.bpn,
+            addressBpn = requireNotNull(address.bpn),
             name = address.name,
             addressType = address.addressType,
             physicalPostalAddress = address.physicalPostalAddress?.let(::toDto) ?: PhysicalPostalAddressV6Dto(),
             alternativePostalAddress = address.alternativePostalAddress?.let(::toDto) ?: AlternativePostalAddressV6Dto(),
-            confidenceCriteria = toDto(address.confidence),
+            confidenceCriteria = toDto(requireNotNull(address.confidence)),
             states = address.states.map(::toDto)
         )
 

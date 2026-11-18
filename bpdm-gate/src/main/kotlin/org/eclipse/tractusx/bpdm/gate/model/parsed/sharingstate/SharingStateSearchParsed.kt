@@ -19,5 +19,6 @@ import java.time.Instant
 data class SharingStateSearchParsed(
     val externalIds: Set<String>?,
     val sharingStateTypes: Set<SharingStateType>?,
-    val updatedAfter: Instant?
+    val updatedAfter: Instant?,
+    val processes: Set<String>? = null
 )

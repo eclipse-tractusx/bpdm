@@ -64,6 +64,15 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
     }
 
     @Test
+    fun upsertBusinessPartnersOutput() {
+        assertExpectations(
+            inputManager = AuthExpectationType.Forbidden,
+            inputConsumer = AuthExpectationType.Forbidden,
+            outputConsumer = AuthExpectationType.Forbidden
+        ) { gateClient.businessParters.upsertBusinessPartnersOutput(emptyList()) }
+    }
+
+    @Test
     fun getBusinessPartnersInput() {
         assertExpectations(
             inputManager = AuthExpectationType.Authorized,

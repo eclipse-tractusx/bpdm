@@ -62,9 +62,22 @@ class BusinessPartnerTestDataClientV7(
     private val tenantBpnL: String,
 ) {
 
-    fun upsertInput(seed: String): BusinessPartnerInputV7Dto {
-        val request = testDataFactory.businessPartner.input.request.fromSeed(seed)
+    fun upsertInput(seed: String, process: String? = null): BusinessPartnerInputV7Dto {
+        val request = testDataFactory.businessPartner.input.request.fromSeed(seed).copy(process = process)
         return upsertInput(request)
+    }
+
+    /** Runs an alternative worker's successful result through the real Gate API. */
+    fun refineAlternatively(input: BusinessPartnerInputV7Dto, process: String): BusinessPartnerOutputV7Dto =
+        gateClient.businessParters.upsertBusinessPartnersOutput(
+            listOf(testDataFactory.businessPartner.output.alternativeRequest(input, process))
+        ).single()
+
+    /** Marks a record picked up without invoking any golden record task. */
+    fun setAlternativeStateToPending(externalId: String, process: String) {
+        gateClient.sharingState.postSharingStatePending(
+            org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStatePendingV7Request(listOf(externalId), process)
+        )
     }
 
     fun upsertInput(request: BusinessPartnerInputV7Request): BusinessPartnerInputV7Dto {
@@ -102,6 +115,17 @@ class BusinessPartnerTestDataClientV7(
         taskCreationService.createTasksForReadyBusinessPartners()
         taskResolutionService.resolveFinishedTasks()
         return refinement.taskState
+    }
+
+    /** Runs refinement for [externalId] with task [taskSeed] resolving to [golden]'s existing golden records. */
+    fun setStateToSuccess(externalId: String, taskSeed: String, golden: PoolMockDataFactory.AdditionalAddressOfSiteResult): TaskClientStateDto {
+        val task = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
+            taskSeed, golden.legalEntityParent, golden.siteParent, golden.additionalAddress, null, emptyList()
+        )
+        setStateToReady(externalId)
+        taskCreationService.createTasksForReadyBusinessPartners()
+        taskResolutionService.resolveFinishedTasks()
+        return task
     }
 
     fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {

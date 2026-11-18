@@ -81,6 +81,14 @@ class TestDataFactoryGateV7(
         }
 
         inner class OutputFactory {
+            /** Builds a seed-based alternative output request for an existing input. */
+            fun alternativeRequest(input: BusinessPartnerInputV7Dto, process: String, seed: String = input.externalId) =
+                bpOutputDtoFactory.alternativeRequest(input, process, seed)
+
+            /** Builds the expected provider output response, including its process provenance. */
+            fun fromAlternativeRequest(request: org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request) =
+                bpOutputDtoFactory.fromAlternativeRequest(request)
+
             fun fromLegalEntity(
                 input: BusinessPartnerInputV7Dto,
                 legalEntity: LegalEntityWithLegalAddressVerboseV7Dto

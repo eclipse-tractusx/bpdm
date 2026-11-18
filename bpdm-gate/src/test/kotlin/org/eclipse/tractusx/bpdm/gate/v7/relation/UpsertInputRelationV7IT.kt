@@ -401,4 +401,28 @@ class UpsertInputRelationV7IT : UnscheduledGateTestBaseV7() {
         val actualResponse = gateClient.relation.postSearch(RelationSearchV7Request(externalIds = listOf(valid.externalId, invalid.externalId)))
         assertRepo.assertRelations(actualResponse, PageDto(0, 0, 0, 0, emptyList()))
     }
+
+    /**
+     * GIVEN a business partner in an alternative refinement process
+     * WHEN input manager upserts a relation referencing it
+     * THEN the relation enters the error sharing state
+     */
+    @Test
+    fun `relation referencing alternative process partner enters error state`() {
+        //GIVEN
+        val alternative = testDataClient.businessPartner.upsertInput("$testName source", "provider")
+        testDataClient.businessPartner.upsertInput("$testName target")
+        val request = testData.relation.input.request.fromSeed(testName)
+            .withRelationType(RelationTypeV7.IsManagedBy)
+            .withSource(alternative.externalId)
+            .withTarget("$testName target")
+
+        //WHEN
+        testDataClient.relation.upsertRelationInput(request)
+
+        //THEN
+        val states = gateClient.relationSharingState.get(externalIds = listOf(request.externalId))
+        org.assertj.core.api.Assertions.assertThat(states.content.single().sharingStateType)
+            .isEqualTo(org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.sharingstate.RelationSharingStateTypeV7.Error)
+    }
 }

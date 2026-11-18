@@ -218,7 +218,7 @@ class ScriptVariantStepDefs(
 
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
-        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(requireNotNull(actual.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromLegalEntity(inputResponseOf(recordId), poolLegalEntity))
     }
@@ -232,9 +232,9 @@ class ScriptVariantStepDefs(
 
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
-        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(requireNotNull(actual.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
-        val poolSite = poolClient.sites.getSite(actual.site!!.siteBpn)
+        val poolSite = poolClient.sites.getSite(requireNotNull(actual.site?.siteBpn) { "Golden record site output must have a site BPN" })
         apiCallEvidence.attach("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromLegalEntityOnSite(inputResponseOf(recordId), poolLegalEntity, poolSite))
     }
@@ -248,9 +248,9 @@ class ScriptVariantStepDefs(
 
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
-        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(requireNotNull(actual.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
-        val poolSite = poolClient.sites.getSite(actual.site!!.siteBpn)
+        val poolSite = poolClient.sites.getSite(requireNotNull(actual.site?.siteBpn) { "Golden record site output must have a site BPN" })
         apiCallEvidence.attach("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromSite(inputResponseOf(recordId), poolLegalEntity, poolSite))
     }
@@ -276,11 +276,11 @@ class ScriptVariantStepDefs(
 
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
-        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(requireNotNull(actual.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
-        val poolSite = poolClient.sites.getSite(actual.site!!.siteBpn)
+        val poolSite = poolClient.sites.getSite(requireNotNull(actual.site?.siteBpn) { "Golden record site output must have a site BPN" })
         apiCallEvidence.attach("GET", "/v7/sites/${actual.site!!.siteBpn}", response = poolSite)
-        val poolAddress = poolClient.addresses.getAddress(actual.address.addressBpn)
+        val poolAddress = poolClient.addresses.getAddress(requireNotNull(actual.address.addressBpn) { "Golden record output must have an address BPN" })
         apiCallEvidence.attach("GET", "/v7/addresses/${actual.address.addressBpn}", response = poolAddress)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromAdditionalAddressOnSite(inputResponseOf(recordId), poolLegalEntity, poolSite, poolAddress))
     }
@@ -317,9 +317,9 @@ class ScriptVariantStepDefs(
 
         val actual = assertGateOutputScriptVariants(recordId, expected)
 
-        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(actual.legalEntity.legalEntityBpn, "BPN")
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(requireNotNull(actual.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/${actual.legalEntity.legalEntityBpn}", response = poolLegalEntity)
-        val poolAddress = poolClient.addresses.getAddress(actual.address.addressBpn)
+        val poolAddress = poolClient.addresses.getAddress(requireNotNull(actual.address.addressBpn) { "Golden record output must have an address BPN" })
         apiCallEvidence.attach("GET", "/v7/addresses/${actual.address.addressBpn}", response = poolAddress)
         assertPoolReflectsScriptVariants(expected, outputFactory.fromAdditionalAddressOnLegalEntity(inputResponseOf(recordId), poolLegalEntity, poolAddress))
     }

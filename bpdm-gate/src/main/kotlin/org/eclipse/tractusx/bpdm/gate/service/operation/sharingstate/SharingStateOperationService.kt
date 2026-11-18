@@ -96,7 +96,8 @@ class SharingStateOperationService(
     @Transactional(readOnly = true)
     fun findSharedAfter(sharingStateId: Long, limit: Int): List<SharedBusinessPartnerRaw> {
         val sharingStates = sharingStateRepository.findBySharingStateTypeAndIdGreaterThanOrderByIdAsc(SharingStateType.Success, sharingStateId, Pageable.ofSize(limit))
-        val outputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Output).associateBy { it.sharingState.id }
+        val outputsBySharingStateId = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Output)
+            .filter { it.process == null }.associateBy { it.sharingState.id }
         return sharingStates.map { SharedBusinessPartnerRaw(it.id, outputsBySharingStateId[it.id]?.referencedBpns() ?: GoldenRecordBpnsRaw.NONE) }
     }
 
@@ -108,6 +109,7 @@ class SharingStateOperationService(
     fun start(creations: List<GoldenRecordTaskCreationParsed>) {
         creations.forEach { creation ->
             val sharingState = creation.sharingState
+            if (sharingState.process != null) return@forEach
             creation.recordIdToAssign?.let { sharingState.orchestratorRecordId = it }
             when (creation) {
                 is GoldenRecordTaskCreationParsed.Started -> {

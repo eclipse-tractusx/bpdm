@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.Busine
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
@@ -50,6 +52,10 @@ interface BusinessPartnerV7ApiClient : GateBusinessPartnerV7Api {
     @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/output/business-partners/search")
     override fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>?,
-        @ParameterObject @Valid paginationRequest: PaginationRequest
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
+        @RequestParam(required = false) processes: Collection<String>?
     ): PageDto<BusinessPartnerOutputV7Dto>
+
+    @PutExchange(value = "${ApiCommons.BASE_PATH_V7}/output/business-partners")
+    override fun upsertBusinessPartnersOutput(@RequestBody businessPartners: Collection<BusinessPartnerOutputV7Request>): Collection<BusinessPartnerOutputV7Dto>
 }

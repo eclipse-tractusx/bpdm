@@ -34,6 +34,24 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
     private val anyTime = Instant.now()
 
+    @Test
+    fun `output changelog selects exactly the process that wrote each entry`() {
+        // GIVEN
+        val golden = testDataClient.businessPartner.createOutput("$testName golden")
+        val input = testDataClient.businessPartner.upsertInput("$testName alternative", "provider")
+        testDataClient.businessPartner.refineAlternatively(input, "provider")
+
+        // WHEN / THEN
+        assertRepo.assertChangelog(
+            gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchV7Request()),
+            testData.changelog.ofOnePage(ChangelogGateV7Dto(golden.externalId, anyTime, ChangelogTypeV7.CREATE))
+        )
+        assertRepo.assertChangelog(
+            gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchV7Request(processes = setOf("provider"))),
+            testData.changelog.ofOnePage(ChangelogGateV7Dto(input.externalId, anyTime, ChangelogTypeV7.CREATE))
+        )
+    }
+
     /**
      * GIVEN created output
      * WHEN output consumer searches for changelogs

@@ -34,5 +34,6 @@ data class RelationInputUpsertParsed(
     val source: SharingStateDb,
     val target: SharingStateDb,
     val validityPeriods: List<RelationValidityPeriodRaw>,
-    val reasonCode: String?
+    val reasonCode: String?,
+    val usesAlternativeProcess: Boolean
 )

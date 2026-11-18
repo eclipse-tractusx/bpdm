@@ -43,7 +43,8 @@ class GoldenRecordTaskHealthCheckOperationService(
     }
 
     private fun isStillPendingOnCheckedTask(check: GoldenRecordTaskHealthCheckParsed): Boolean =
-        check.sharingState.sharingStateType == SharingStateType.Pending && check.sharingState.taskId == check.checkedTaskId
+        check.sharingState.process == null &&
+                check.sharingState.sharingStateType == SharingStateType.Pending && check.sharingState.taskId == check.checkedTaskId
 
     companion object {
         private const val TASK_MISSING_MESSAGE = "Missing Task in Orchestrator"

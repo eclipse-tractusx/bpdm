@@ -37,6 +37,9 @@ class BusinessPartnerDb(
     @JoinColumn(name = "sharing_state_id", nullable = false)
     var sharingState: SharingStateDb,
 
+    @Column(name = "process", columnDefinition = "text")
+    var process: String? = null,
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_name_parts", joinColumns = [JoinColumn(name = "business_partner_id")])
     @OrderColumn(name = "name_parts_order")
