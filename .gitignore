@@ -1,0 +1,18 @@
+# Leftovers from the code branches when switching branches in one working tree
+/bpdm-*/
+/charts/
+/docker/
+/db/
+target
+.flattened-pom.xml
+application-developer.properties
+application-developer.yml
+.env
+#IntelliJ
+/.idea/
+*.iml
+#Mac
+**/.DS_Store
+#Claude Code
+CLAUDE.md
+/.claude/
