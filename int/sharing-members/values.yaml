@@ -26,9 +26,26 @@
 keycloak:
   enabled: false
 
+# -- The chart sets no resources for postgres. Memory request equals the limit so the pod is never
+#    evicted for exceeding it; the Gate opens only a few connections (see the Hikari pool size).
+postgres:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 384Mi
+    limits:
+      cpu: 1
+      memory: 384Mi
+  config:
+    postgresqlMaxConnections: 30
+
 bpdm-gate:
   enabled: true
   startupDelaySeconds: 1
+  # -- Only the CPU request is lowered; memory and the limits keep the chart defaults.
+  resources:
+    requests:
+      cpu: 50m
   ingress:
     enabled: true
     className: "nginx"
@@ -49,6 +66,10 @@ bpdm-gate:
         realm: CX-Central
         permissions:
           uploadInputPartner: write_input_partner
+    spring:
+      datasource:
+        hikari:
+          maximum-pool-size: 3
 
 bpdm-pool:
   enabled: false

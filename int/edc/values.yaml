@@ -53,6 +53,18 @@ controlplane:
     #    parses when this accept header is exactly 'application/json'; on the default '*/*' it validates
     #    the body as a signed JWT instead. ASSUMPTION: the wallet stub serves them the same way.
     EDC_IAM_CREDENTIAL_REVOCATION_MIMETYPE: "application/json"
+    # -- Shrinks the JVM's memory outside the heap so the runtime fits the lower memory limit: C1 JIT
+    #    only, smaller code cache, capped metaspace and smaller thread stacks.
+    JAVA_TOOL_OPTIONS: "-XX:TieredStopAtLevel=1 -XX:ReservedCodeCacheSize=64m -XX:MaxMetaspaceSize=192m -Xss512k"
+  # -- The test connectors idle most of the time: a low CPU request with headroom in the limit. The
+  #    memory request equals the limit so the pod is never evicted for exceeding it.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 768Mi
+    limits:
+      cpu: 1.5
+      memory: 768Mi
   bdrs:
     server:
       # -- STOPGAP: the wallet stub's own BPN-DID directory. The environment's BDRS
@@ -62,6 +74,16 @@ controlplane:
       url: "https://ssi-dim-wallet-stub.test.tractus-x.com/api/v1/directory"
 
 dataplane:
+  env:
+    # -- Same JVM settings and sizing as the control plane.
+    JAVA_TOOL_OPTIONS: "-XX:TieredStopAtLevel=1 -XX:ReservedCodeCacheSize=64m -XX:MaxMetaspaceSize=192m -Xss512k"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 768Mi
+    limits:
+      cpu: 1.5
+      memory: 768Mi
   token:
     signer:
       privatekey_alias: "token-private-key"
@@ -74,6 +96,14 @@ postgresql:
     enabled: true
     # -- Empty takes the cluster's default class; the chart would otherwise ask for 'standard'.
     storageClass: ""
+  # -- Memory request equals the limit so the pod is never evicted for exceeding it.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 384Mi
+    limits:
+      cpu: 1
+      memory: 384Mi
   customUser:
     # -- The database and user the connector itself works with.
     database: "edc"
