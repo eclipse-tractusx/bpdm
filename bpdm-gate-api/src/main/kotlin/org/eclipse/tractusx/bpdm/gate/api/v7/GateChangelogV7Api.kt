@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.OutputChangelogSearchV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.PageChangeLogV7Dto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -69,6 +70,6 @@ interface GateChangelogV7Api {
     @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/output/business-partners/changelog/search"])
     fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @RequestBody searchRequest: ChangelogSearchV7Request
+        @RequestBody searchRequest: OutputChangelogSearchV7Request
     ): PageChangeLogV7Dto<ChangelogGateV7Dto>
 }

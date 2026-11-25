@@ -10,6 +10,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Gate: Support sharing business partners through alternative refinement processes [#1949](https://github.com/eclipse-tractusx/bpdm/issues/1949)
 - BPDM Pool: New `/v7/countries` and `/v6/countries` metadata endpoints list the supported country codes with their names and descriptions. They replace the fixed country enumeration in the OpenAPI documents of Pool and Gate [#1862](https://github.com/eclipse-tractusx/bpdm/issues/1862)
 - BPDM Orchestrator: The V7 business partner data gained an additive `uncategorized.scriptVariants` field carrying uncategorized name parts per `scriptCode`, so the Gate's script variant name parts now round-trip through golden record tasks into the business partner output instead of being lost [#1906](https://github.com/eclipse-tractusx/bpdm/issues/1906)
 
@@ -23,6 +24,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Fixed
 
+- BPDM Gate: V7 business partner outputs now return the stored address identifiers in `address.identifiers`, which was previously always empty.
 - BPDM Orchestrator: The OpenAPI document of the V6 golden record task API no longer lists V7 fields that V6 never processed (`additionalSites`, script variants, golden record relations, ultimate ownership, `updatedAt` and `isParticipantData`). V6 returned these fields empty or not at all and ignored them on input, so V6 integrations are unaffected. [#1855](https://github.com/eclipse-tractusx/bpdm/issues/1855)
 - BPDM Pool and Gate: A relation's `validTo` is now inclusive, as CX-0010 requires: a relation still holds on its end date, so two validity periods meeting on one date overlap and are rejected, and a period following another starts the day after the other ends. The Gate accepts a validity period that starts and ends on the same date [#1892](https://github.com/eclipse-tractusx/bpdm/issues/1892)
 - BPDM Gate: Upserting input relations through the V7 API enforces the API-wide upsert limit (`bpdm.api.upsert-limit`, 100 by default) and rejects a request that names the same external ID more than once, instead of letting the later entry win. [#1927](https://github.com/eclipse-tractusx/bpdm/issues/1927)

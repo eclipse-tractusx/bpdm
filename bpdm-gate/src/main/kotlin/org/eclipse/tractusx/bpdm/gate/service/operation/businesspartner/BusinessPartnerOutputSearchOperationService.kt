@@ -12,12 +12,7 @@
  */
 package org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputDesignationParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerSearchParsed
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -32,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class BusinessPartnerOutputSearchOperationService(
-    private val businessPartnerRepository: BusinessPartnerRepository
+    private val businessPartnerRepository: BusinessPartnerRepository,
+    private val designationOperation: BusinessPartnerOutputDesignationOperationService
 ) {
 
     /**
@@ -48,25 +44,6 @@ class BusinessPartnerOutputSearchOperationService(
             BusinessPartnerRepository.Specs.byOutputProcesses(criteria.processes)
         )
         return businessPartnerRepository.findAll(spec, pageable)
-            .map { BusinessPartnerOutputDesignationParsed(it, designatedIdentifiers(it), designatedStates(it)) }
+            .map(designationOperation::designate)
     }
-
-    private fun designatedIdentifiers(output: BusinessPartnerDb): List<IdentifierDb> =
-        if (output.process != null) output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.GENERIC }
-        else
-        when (output.postalAddress.addressType) {
-            AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }
-            AddressType.AdditionalAddress -> output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }
-            AddressType.SiteMainAddress, null -> emptyList()
-        }
-
-    private fun designatedStates(output: BusinessPartnerDb): List<StateDb> =
-        if (output.process != null) output.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }
-        else
-        when (output.postalAddress.addressType) {
-            AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> output.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }
-            AddressType.AdditionalAddress -> output.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }
-            AddressType.SiteMainAddress -> output.states.filter { it.businessPartnerTyp == BusinessPartnerType.SITE }
-            null -> emptyList()
-        }
 }

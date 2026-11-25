@@ -4,4 +4,6 @@
  */
 package org.eclipse.tractusx.bpdm.gate.exception
 
-class BpdmAlternativeProcessException(message: String) : RuntimeException(message)
+class BpdmAlternativeProcessException(
+    val messages: List<String>
+) : RuntimeException("Alternative process request rejected: ${messages.joinToString("; ")}")

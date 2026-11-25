@@ -6,6 +6,8 @@ package org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.model.combine
+import org.eclipse.tractusx.bpdm.common.model.zipParseResults
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeOutputParsed
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeProcessError
@@ -43,25 +45,23 @@ class AlternativeProcessParser(
     fun parseOutputs(requests: List<AlternativeOutputRaw>, tenantBpnl: String?): ParseResult<List<AlternativeOutputParsed>, AlternativeProcessError> {
         val siteErrors = requests.filter { it.hasSite && it.partner.site.name.isNullOrBlank() }
             .map { AlternativeProcessError.SiteNameMissing(it.partner.externalId) }
-        if (siteErrors.isNotEmpty()) return ParseResult.Failure(siteErrors)
         val partners = when (val parsed = inputParser.parse(requests.map { it.partner })) {
-            is ParseResult.Failure -> return ParseResult.Failure(parsed.errors.map(AlternativeProcessError::InvalidInput))
-            is ParseResult.Success -> parsed.parsed.entries
+            is ParseResult.Failure -> ParseResult.Failure(parsed.errors.map(AlternativeProcessError::InvalidInput))
+            is ParseResult.Success -> ParseResult.Success(parsed.parsed.entries)
         }
-        val states = when (val parsed = parseStates(partners.map { it.externalId to it.process }, tenantBpnl)) {
-            is ParseResult.Failure -> return parsed
-            is ParseResult.Success -> parsed.parsed
+        val states = parseStates(requests.map { it.partner.externalId to it.partner.process }, tenantBpnl)
+        return zipParseResults(partners.combine(siteErrors) { it }, states) { parsedPartners, parsedStates ->
+            val existing = businessPartnerRepository.findBySharingStateInAndStage(parsedStates, StageType.Output).associateBy { it.sharingState.id }
+            requests.indices.map { index ->
+                val request = requests[index]
+                val state = parsedStates[index]
+                AlternativeOutputParsed(
+                    parsedPartners[index], state, existing[state.id],
+                    request.addressIdentifiers,
+                    request.legalEntityConfidence, request.siteConfidence, request.addressConfidence,
+                    request.legalEntityUpdatedAt, request.siteUpdatedAt, request.addressUpdatedAt
+                )
+            }
         }
-        val existing = businessPartnerRepository.findBySharingStateInAndStage(states, StageType.Output).associateBy { it.sharingState.id }
-        return ParseResult.Success(requests.indices.map { index ->
-            val request = requests[index]
-            val state = states[index]
-            AlternativeOutputParsed(
-                partners[index], state, existing[state.id],
-                request.addressIdentifiers,
-                request.legalEntityConfidence, request.siteConfidence, request.addressConfidence,
-                request.legalEntityUpdatedAt, request.siteUpdatedAt, request.addressUpdatedAt
-            )
-        })
     }
 }

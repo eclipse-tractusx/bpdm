@@ -73,8 +73,13 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
+    @ExceptionHandler(BpdmAlternativeProcessException::class)
+    fun handleAlternativeProcessException(ex: BpdmAlternativeProcessException, request: WebRequest): ResponseEntity<GateErrorV7Response> {
+        val errorResponse = createResponse(ex.messages, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
     @ExceptionHandler(
-        BpdmAlternativeProcessException::class,
         BpdmRelationTargetNotFoundException::class,
         BpdmRelationTargetNotFoundException::class,
         BpdmRelationSourceNotFoundException::class,

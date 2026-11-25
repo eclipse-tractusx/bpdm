@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.GateV7Client
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateReadyV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.OutputChangelogSearchV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationPutV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.input.RelationSearchV7Request
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
@@ -105,7 +106,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
             inputManager = AuthExpectationType.Forbidden,
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Authorized
-        ) { gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchV7Request()) }
+        ) { gateClient.changelog.getOutputChangelog(PaginationRequest(), OutputChangelogSearchV7Request()) }
     }
 
     @Test

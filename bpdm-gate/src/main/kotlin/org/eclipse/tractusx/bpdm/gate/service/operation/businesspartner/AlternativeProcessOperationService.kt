@@ -14,6 +14,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.mapper.ParsedToDbMapper
 import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.AlternativeOutputParsed
+import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputDesignationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.BusinessPartnerChangeRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.changelog.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.BusinessPartnerSharingErrorCode
@@ -34,11 +35,12 @@ class AlternativeProcessOperationService(
     private val sharingStateOperation: SharingStateOperationService,
     private val changelogOperation: ChangelogCreateOperationService,
     private val mapper: ParsedToDbMapper,
-    private val changeLogger: PersistedChangeLogger
+    private val changeLogger: PersistedChangeLogger,
+    private val designationOperation: BusinessPartnerOutputDesignationOperationService
 ) {
     /** Replaces every parsed output and marks its sharing state successful in the caller's transaction. */
     @Transactional
-    fun write(outputs: List<AlternativeOutputParsed>): List<BusinessPartnerDb> =
+    fun write(outputs: List<AlternativeOutputParsed>): List<BusinessPartnerOutputDesignationParsed> =
             outputs.map { request ->
                 val partner = request.partner
                 val state = request.sharingState
@@ -68,7 +70,7 @@ class AlternativeProcessOperationService(
                     state.externalId, tenantBpnl, BusinessPartnerChangeRaw.Aspect.Output
                 ))
                 sharingStateOperation.succeed(listOf(state))
-                output
+                designationOperation.designate(output)
             }
 
     /** Marks resolved records as picked up without assigning an Orchestrator task. */

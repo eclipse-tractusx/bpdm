@@ -9,6 +9,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.exception.BusinessPartnerSharingErrorV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.*
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.error.GateErrorV7Response
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -69,6 +70,29 @@ class UpdateAlternativeSharingStateV7IT : UnscheduledGateTestBaseV7() {
             }
         }
         assertThat(gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(alternative.externalId), processes = listOf(process))
+            .content.single().sharingStateType).isEqualTo(SharingStateTypeV7.Initial)
+    }
+
+    @Test
+    fun `return separate errors for every rejected pending and error state change`() {
+        // GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName, process)
+        val golden = testDataClient.businessPartner.upsertInput("$testName golden")
+        val externalIds = listOf(input.externalId, golden.externalId, "$testName unknown")
+
+        // WHEN
+        val pendingResponse = assertThrows<WebClientResponseException.BadRequest> {
+            gateClient.sharingState.postSharingStatePending(PostSharingStatePendingV7Request(externalIds, "wrong"))
+        }
+        val errorResponse = assertThrows<WebClientResponseException.BadRequest> {
+            gateClient.sharingState.postSharingStateError(PostSharingStateErrorV7Request(externalIds, "wrong", "Cannot refine"))
+        }
+
+        // THEN
+        listOf(pendingResponse, errorResponse).forEach {
+            assertRepo.assertErrorPerExternalId(it.getResponseBodyAs(GateErrorV7Response::class.java)!!, externalIds)
+        }
+        assertThat(gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(input.externalId), processes = listOf(process))
             .content.single().sharingStateType).isEqualTo(SharingStateTypeV7.Initial)
     }
 }

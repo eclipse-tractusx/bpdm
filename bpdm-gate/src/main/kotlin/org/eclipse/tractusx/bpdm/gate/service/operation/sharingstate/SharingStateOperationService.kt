@@ -109,7 +109,6 @@ class SharingStateOperationService(
     fun start(creations: List<GoldenRecordTaskCreationParsed>) {
         creations.forEach { creation ->
             val sharingState = creation.sharingState
-            if (sharingState.process != null) return@forEach
             creation.recordIdToAssign?.let { sharingState.orchestratorRecordId = it }
             when (creation) {
                 is GoldenRecordTaskCreationParsed.Started -> {

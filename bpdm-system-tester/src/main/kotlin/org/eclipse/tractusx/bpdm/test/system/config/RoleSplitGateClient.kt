@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.client.StatsV7ApiClient
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.OutputChangelogSearchV7Request
 
 /**
  * Sends every Gate call with whichever of two configured credentials is permitted to make it.
@@ -96,7 +97,7 @@ private class SplitChangelogApiClient(
     override fun getInputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
         inputCredential.changelog.getInputChangelog(paginationRequest, searchRequest)
 
-    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
+    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: OutputChangelogSearchV7Request) =
         outputCredential.changelog.getOutputChangelog(paginationRequest, searchRequest)
 }
 

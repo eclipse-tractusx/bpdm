@@ -9,7 +9,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AddressIdentifierV7Dto
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.AdditionalSiteOutputV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.error.GateErrorV7Response
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
@@ -98,6 +100,32 @@ class UpsertBusinessPartnerOutputV7IT : UnscheduledGateTestBaseV7() {
         assertThrows<WebClientResponseException.BadRequest> {
             gateClient.businessParters.upsertBusinessPartnersOutput(listOf(request))
         }
+        assertThat(gateClient.businessParters.getBusinessPartnersOutput(processes = listOf(process)).content).isEmpty()
+    }
+
+    @Test
+    fun `report site input and tenant resolution errors together without writing valid outputs`() {
+        // GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName, process)
+        val invalidInput = testDataClient.businessPartner.upsertInput("$testName invalid", process)
+        val namelessInput = testDataClient.businessPartner.upsertInput("$testName nameless", process)
+        val unknownExternalId = "$testName unknown"
+        val valid = testData.businessPartner.output.alternativeRequest(input, process)
+        val nameless = testData.businessPartner.output.alternativeRequest(namelessInput, process)
+            .let { it.copy(site = it.site!!.copy(name = null)) }
+        val invalid = testData.businessPartner.output.alternativeRequest(invalidInput, process)
+            .copy(site = null, additionalSites = listOf(AdditionalSiteOutputV7Dto("BPNS000000000001")))
+
+        // WHEN
+        val response = assertThrows<WebClientResponseException.BadRequest> {
+            gateClient.businessParters.upsertBusinessPartnersOutput(listOf(valid, nameless, invalid, valid.copy(externalId = unknownExternalId)))
+        }
+
+        // THEN
+        assertRepo.assertErrorPerExternalId(
+            response.getResponseBodyAs(GateErrorV7Response::class.java)!!,
+            listOf(namelessInput.externalId, invalidInput.externalId, unknownExternalId)
+        )
         assertThat(gateClient.businessParters.getBusinessPartnersOutput(processes = listOf(process)).content).isEmpty()
     }
 

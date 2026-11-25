@@ -97,6 +97,35 @@ class AccessGroupOpenApiIT @Autowired constructor(
             .isNotEmpty()
     }
 
+    @Test
+    fun `alternative output requests do not accept golden record relations`() {
+        val document = webClient.get().uri("/docs/api-docs/v7").retrieve().bodyToMono(String::class.java).block()
+        val schemas = objectMapper.readTree(document).path("components").path("schemas")
+
+        listOf("LegalEntityRepresentationOutputV7Request", "SiteRepresentationOutputV7Request", "AddressComponentOutputV7Request").forEach { name ->
+            val properties = schemas.path(name).path("properties")
+            assertThat(properties.isMissingNode).describedAs("properties of %s", name).isFalse()
+            assertThat(properties.has("goldenRecordRelations")).describedAs("golden record relations in %s", name).isFalse()
+        }
+        val requestProperties = schemas.path("BusinessPartnerOutputV7Request").path("properties")
+        mapOf(
+            "legalEntity" to "LegalEntityRepresentationOutputV7Request",
+            "site" to "SiteRepresentationOutputV7Request",
+            "address" to "AddressComponentOutputV7Request"
+        ).forEach { (component, schema) ->
+            assertThat(requestProperties.path(component).toString()).contains("#/components/schemas/$schema")
+        }
+    }
+
+    @Test
+    fun `only business partner output changelog requests expose processes`() {
+        val document = webClient.get().uri("/docs/api-docs/v7").retrieve().bodyToMono(String::class.java).block()
+        val schemas = objectMapper.readTree(document).path("components").path("schemas")
+
+        assertThat(schemas.path("ChangelogSearchV7Request").path("properties").has("processes")).isFalse()
+        assertThat(schemas.path("OutputChangelogSearchV7Request").path("properties").has("processes")).isTrue()
+    }
+
     private fun operationsOf(group: String): Set<String> {
         val document = webClient.get().uri("/docs/api-docs/$group").retrieve().bodyToMono(String::class.java).block()
         val paths = objectMapper.readTree(document).get("paths") ?: return emptySet()

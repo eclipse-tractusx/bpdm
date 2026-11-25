@@ -4,12 +4,10 @@
  */
 package org.eclipse.tractusx.bpdm.gate.service.application
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ParseResult
 import org.eclipse.tractusx.bpdm.gate.mapper.DbToOutputMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.AlternativeProcessResult
 import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.BusinessPartnerOutputRecord
-import org.eclipse.tractusx.bpdm.gate.model.parsed.businesspartner.BusinessPartnerOutputDesignationParsed
 import org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner.AlternativeOutputRaw
 import org.eclipse.tractusx.bpdm.gate.service.operation.businesspartner.AlternativeProcessOperationService
 import org.eclipse.tractusx.bpdm.gate.service.parser.businesspartner.AlternativeProcessParser
@@ -28,12 +26,6 @@ class BusinessPartnerOutputUpsertApplicationService(
     fun upsert(requests: List<AlternativeOutputRaw>, tenantBpnl: String?): AlternativeProcessResult<List<BusinessPartnerOutputRecord>> =
         when (val parsed = parser.parseOutputs(requests, tenantBpnl)) {
             is ParseResult.Failure -> AlternativeProcessResult.Rejected(parsed.errors)
-            is ParseResult.Success -> AlternativeProcessResult.Applied(operation.write(parsed.parsed).map { output ->
-                mapper.toRecord(BusinessPartnerOutputDesignationParsed(
-                    output,
-                    output.identifiers.filter { it.businessPartnerType == BusinessPartnerType.GENERIC },
-                    output.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }
-                ))
-            })
+            is ParseResult.Success -> AlternativeProcessResult.Applied(operation.write(parsed.parsed).map(mapper::toRecord))
         }
 }

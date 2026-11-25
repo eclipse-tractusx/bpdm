@@ -45,9 +45,9 @@ class BusinessPartnerOutputDtoV7Factory {
             externalId = input.externalId,
             process = process,
             nameParts = listOf(seed),
-            legalEntity = LegalEntityRepresentationOutputV7Dto(legalName = seed),
-            site = SiteRepresentationOutputV7Dto(name = "$seed site"),
-            address = AddressComponentOutputV7Dto(name = "$seed address")
+            legalEntity = LegalEntityRepresentationOutputV7Request(legalName = seed),
+            site = SiteRepresentationOutputV7Request(name = "$seed site"),
+            address = AddressComponentOutputV7Request(name = "$seed address")
         )
 
     /** Builds the expected response to [request]; persistence timestamps are compared separately. */
@@ -60,12 +60,23 @@ class BusinessPartnerOutputDtoV7Factory {
             states = request.states,
             roles = request.roles,
             isOwnCompanyData = request.isOwnCompanyData,
-            legalEntity = request.legalEntity.copy(updatedAt = request.legalEntity.updatedAt ?: Instant.EPOCH),
-            site = request.site?.let { it.copy(updatedAt = it.updatedAt ?: Instant.EPOCH) },
-            address = request.address.copy(
-                updatedAt = request.address.updatedAt ?: Instant.EPOCH,
-                alternativePostalAddress = request.address.alternativePostalAddress ?: AlternativePostalAddressV7Dto()
-            ),
+            legalEntity = with(request.legalEntity) {
+                LegalEntityRepresentationOutputV7Dto(
+                    legalEntityBpn = legalEntityBpn, legalName = legalName, shortName = shortName, legalForm = legalForm,
+                    confidenceCriteria = confidenceCriteria, ownershipUltimate = ownershipUltimate, ultimateOwnerBpnl = ultimateOwnerBpnl,
+                    states = states, updatedAt = updatedAt ?: Instant.EPOCH
+                )
+            },
+            site = request.site?.let {
+                SiteRepresentationOutputV7Dto(it.siteBpn, it.name, it.confidenceCriteria, it.states, updatedAt = it.updatedAt ?: Instant.EPOCH)
+            },
+            address = with(request.address) {
+                AddressComponentOutputV7Dto(
+                    addressBpn = addressBpn, name = name, addressType = addressType, physicalPostalAddress = physicalPostalAddress,
+                    alternativePostalAddress = alternativePostalAddress ?: AlternativePostalAddressV7Dto(),
+                    confidenceCriteria = confidenceCriteria, states = states, identifiers = identifiers, updatedAt = updatedAt ?: Instant.EPOCH
+                )
+            },
             externalSequenceTimestamp = request.externalSequenceTimestamp,
             scriptVariants = request.scriptVariants,
             additionalSites = request.additionalSites,

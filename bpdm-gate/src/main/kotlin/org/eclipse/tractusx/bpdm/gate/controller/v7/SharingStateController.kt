@@ -75,7 +75,7 @@ class SharingStateController(
     override fun postSharingStatePending(request: PostSharingStatePendingV7Request) {
         when (val result = alternativeSharingStateApplicationService.pending(request.externalIds, request.process, tenantResolver.currentUserBpn())) {
             is AlternativeProcessResult.Applied -> Unit
-            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage).joinToString("; "))
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
         }
     }
 
@@ -83,7 +83,7 @@ class SharingStateController(
     override fun postSharingStateError(request: PostSharingStateErrorV7Request) {
         when (val result = alternativeSharingStateApplicationService.error(request.externalIds, request.process, request.message, tenantResolver.currentUserBpn())) {
             is AlternativeProcessResult.Applied -> Unit
-            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage).joinToString("; "))
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
         }
     }
 
