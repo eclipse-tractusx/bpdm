@@ -342,7 +342,10 @@ class GateAssertRepositoryV7(
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
-            .ignoringFields(RelationOutputV7Dto::updatedAt.name)
+            .ignoringFields(
+                RelationOutputV7Dto::updatedAt.name,
+                RelationOutputV7Dto::createdAt.name
+            )
             .isEqualTo(expected)
     }
 
@@ -362,6 +365,7 @@ class GateAssertRepositoryV7(
             .ignoringCollectionOrder()
             .ignoringFields(
                 RelationOutputV7Dto::updatedAt.name,
+                RelationOutputV7Dto::createdAt.name,
                 RelationOutputV7Dto::sourceBpn.name,
                 RelationOutputV7Dto::targetBpn.name
             )

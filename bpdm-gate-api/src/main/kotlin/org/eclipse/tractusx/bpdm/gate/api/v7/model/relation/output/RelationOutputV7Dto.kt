@@ -40,5 +40,7 @@ data class RelationOutputV7Dto(
     @get:Schema(description = RelationDescription.reasonCode)
     val reasonCode: String?,
     @get:Schema(description = RelationDescription.updatedAt)
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    @get:Schema(description = RelationDescription.createdAt)
+    val createdAt: Instant
 )

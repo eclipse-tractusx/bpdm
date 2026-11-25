@@ -45,6 +45,7 @@ class RelationOutputDtoV7Factory {
                 RelationValidityPeriodV7Dto(it.validFrom, it.validTo)
             },
             goldenRecordRelation.reasonCode,
+            Instant.MIN,
             Instant.MIN
         )
     }
@@ -61,6 +62,7 @@ class RelationOutputDtoV7Factory {
         targetBpn = "",
         validityPeriods = entry.validityPeriods,
         reasonCode = entry.reasonCode,
-        updatedAt = Instant.MIN
+        updatedAt = Instant.MIN,
+        createdAt = Instant.MIN
     )
 }
