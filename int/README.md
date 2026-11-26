@@ -305,11 +305,6 @@ environment supplies the credentials:
 | `BPDM_INT_GATE_2_*`, `BPDM_INT_GATE_3_*` | The same pair for members 2 and 3, with the member's base URL |
 | `BPDM_INT_EDC_*_API_KEY`                 | The member EDCs' `api#management-key`, step 5                 |
 
-> **Known gap:** until the clean-up after the 7.0 release, the tester's profiles on `main` still point
-> at the old `*.int.catena-x.net` hosts, no profile combines the snapshot with the EDC route, and
-> `int-edc` treats the provider's connector as the third member. Use an `application-developer.yml`
-> with the hosts above, as the guide's *Testing another deployment* section describes.
-
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
