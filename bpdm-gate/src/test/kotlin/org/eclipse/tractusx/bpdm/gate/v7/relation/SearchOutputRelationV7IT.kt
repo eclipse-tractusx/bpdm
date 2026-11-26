@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v7.relation
 
+import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.RelationTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.relation.output.RelationOutputSearchV7Request
@@ -77,6 +78,29 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertRelationOutput(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN relation output that is updated after its creation
+     * WHEN output consumer searches for that output before and after the update
+     * THEN the returned createdAt stays the relation's creation timestamp, distinct from the updated result timestamp
+     */
+    @Test
+    fun `relation output createdAt is unchanged by output updates`() {
+        //GIVEN
+        val (relationInput, _) = testDataClient.relation.createLegalEntityRelationOutput(testName)
+
+        //WHEN
+        val request = RelationOutputSearchV7Request(externalIds = listOf(relationInput.externalId))
+        val beforeUpdate = gateClient.relationOutput.postSearch(request).content.single()
+
+        testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "$testName updated", RelationTypeV7.IsOwnedBy)
+        val afterUpdate = gateClient.relationOutput.postSearch(request).content.single()
+
+        //THEN - createdAt is the relation's creation timestamp and does not move with result updates
+        Assertions.assertThat(afterUpdate.createdAt).isEqualTo(beforeUpdate.createdAt)
+        Assertions.assertThat(beforeUpdate.updatedAt).isAfterOrEqualTo(beforeUpdate.createdAt)
+        Assertions.assertThat(afterUpdate.updatedAt).isAfterOrEqualTo(beforeUpdate.updatedAt)
     }
 
     /**

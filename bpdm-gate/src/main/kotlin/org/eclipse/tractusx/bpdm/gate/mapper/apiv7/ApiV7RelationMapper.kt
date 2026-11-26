@@ -64,7 +64,8 @@ class ApiV7RelationMapper {
             targetBpn = record.targetBpn,
             validityPeriods = record.validityPeriods.map { RelationValidityPeriodV7Dto(validFrom = it.validFrom, validTo = it.validTo) },
             reasonCode = record.reasonCode,
-            updatedAt = record.updatedAt
+            updatedAt = record.updatedAt,
+            createdAt = record.createdAt
         )
 
     /**

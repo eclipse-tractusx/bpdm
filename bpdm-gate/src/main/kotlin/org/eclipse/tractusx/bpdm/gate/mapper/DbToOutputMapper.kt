@@ -159,7 +159,8 @@ class DbToOutputMapper(
             targetBpn = output.targetBpn,
             validityPeriods = output.validityPeriods.map { RelationValidityPeriodRaw(it.validFrom, it.validTo) },
             reasonCode = output.reasonCode,
-            updatedAt = output.resultUpdatedAt.instant
+            updatedAt = output.resultUpdatedAt.instant,
+            createdAt = relation.createdAt.instant
         )
     }
 

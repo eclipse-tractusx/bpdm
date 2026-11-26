@@ -24,5 +24,6 @@ data class RelationOutputRecord(
     val targetBpn: String,
     val validityPeriods: List<RelationValidityPeriodRaw>,
     val reasonCode: String?,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val createdAt: Instant
 )
