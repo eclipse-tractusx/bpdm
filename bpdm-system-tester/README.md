@@ -27,9 +27,11 @@ BPDM_CLIENT_GATE_3_INPUT_BASE_URL= java -jar bpdm-system-tester/target/bpdm-syst
 
 ## Running against a deployed environment
 
-Two profiles are checked in: `int` targets the BPDM deployment on the Catena-X association INT environment,
-`snapshot` the bpdm-snapshot deployment that runs the development state of `main`. Both sit behind the same
-Central-IDP realm and take the same variables — swap the profile name in the commands below.
+Two profiles are checked in: `int` targets the BPDM deployment on the Catena-X association INT environment
+(`business-partners.test.tractus-x.com`), `snapshot` the bpdm-snapshot deployment that runs the development
+state of `main` (`business-partners-snapshot.test.tractus-x.com`). Both consist of a core and the Gates of three
+test sharing members, sit behind the same Central-IDP realm and take the same variables — swap the profile name
+in the commands below.
 
 The tester talks to four clients: Pool, Orchestrator, and one Gate client per side of the Gate API —
 `bpdm.client.gate-input` shares input data and drives the sharing process, `bpdm.client.gate-output` reads the
@@ -48,31 +50,23 @@ Leave them unset and the run acts for a single sharing member: the scenarios tag
 unaffected. They are also excluded from the `@Smoke` subset, since each drives two or three golden record round
 trips.
 
-**One technical user for everything.** A Central-IDP user holding the Pool, Gate and Orchestrator permissions
-serves all four clients; this is how the Gate of the golden record core deployment is tested:
-
-```bash
-SPRING_PROFILES_ACTIVE=int BPDM_INT_CLIENT_ID=<id> BPDM_INT_CLIENT_SECRET=<secret> \
-  java -jar bpdm-system-tester/target/bpdm-system-tester.jar
-```
-
-**A user per Gate role.** A Gate whose technical users the Portal manages grants each of them one role only, so
-no single credential covers the whole Gate API. Name the two Gate users then; Pool and Orchestrator keep
-`BPDM_INT_CLIENT_*`, because the tester reads Pool metadata and golden records and acts as the cleaning
-service against the Orchestrator, which no sharing member user may do:
+**A user per Gate role.** The Gates of both profiles belong to sharing members, whose technical users the
+Portal manages and grants one role each, so no single credential covers the whole Gate API. Name the member's
+two Gate users; Pool and Orchestrator take `BPDM_INT_CLIENT_*`, an operator user, because the tester reads Pool
+metadata and golden records and acts as the cleaning service against the Orchestrator, which no sharing member
+user may do:
 
 ```bash
 SPRING_PROFILES_ACTIVE=int \
 BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
 BPDM_INT_GATE_INPUT_CLIENT_ID=<input manager id> BPDM_INT_GATE_INPUT_CLIENT_SECRET=<input manager secret> \
 BPDM_INT_GATE_OUTPUT_CLIENT_ID=<output consumer id> BPDM_INT_GATE_OUTPUT_CLIENT_SECRET=<output consumer secret> \
-BPDM_CLIENT_GATE_INPUT_BASE_URL=https://business-partners.int.catena-x.net/companies/<member> \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar
 ```
 
-The base URL is only needed for a Gate the profile does not already point at, such as a sharing member's own;
-the output client follows it. Both Gate users have to belong to the same company — the tester compares the BPNL
-in the two tokens before the first scenario and refuses to run on a mismatch, because the Gate would otherwise
+The first member's Gate is checked in; `BPDM_CLIENT_GATE_INPUT_BASE_URL` points the run at another one, and the
+output client follows it. Both Gate users have to belong to the same company — the tester compares the BPNL in
+the two tokens before the first scenario and refuses to run on a mismatch, because the Gate would otherwise
 answer every output read with an empty page.
 
 **A second sharing member.** Add the Gate and the two users of another sharing member to also run the scenarios
@@ -82,14 +76,15 @@ the first's, since two members from one company would neither be told apart by t
 ```bash
 SPRING_PROFILES_ACTIVE=int \
 BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
-BPDM_INT_GATE_2_BASE_URL=https://business-partners.int.catena-x.net/companies/<other member> \
 BPDM_INT_GATE_2_INPUT_CLIENT_ID=<input manager id> BPDM_INT_GATE_2_INPUT_CLIENT_SECRET=<input manager secret> \
 BPDM_INT_GATE_2_OUTPUT_CLIENT_ID=<output consumer id> BPDM_INT_GATE_2_OUTPUT_CLIENT_SECRET=<output consumer secret> \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar
 ```
 
-A third member follows the same shape, with `BPDM_INT_GATE_3_BASE_URL` and the four
-`BPDM_INT_GATE_3_*_CLIENT_*` variables; every member has to act for a company of its own.
+The second and third members' Gates are checked in, so only their users are needed; `BPDM_INT_GATE_2_BASE_URL`
+overrides the Gate, and blanking it (`BPDM_INT_GATE_2_BASE_URL=`) takes the member out of the run. A third
+member follows the same shape, with the four `BPDM_INT_GATE_3_*_CLIENT_*` variables; every member has to act for
+a company of its own.
 
 Locally no such variables are needed: the further Gates of a local installation are checked in as the default
 configuration. See [INSTALL.md](../INSTALL.md#further-gates-for-further-sharing-members) for how to run them.
@@ -103,14 +98,14 @@ SPRING_PROFILES_ACTIVE=int,int-edc \
 BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
 BPDM_INT_EDC_API_KEY=<first member's management key> \
 BPDM_INT_EDC_2_API_KEY=<second member's management key> \
-BPDM_INT_EDC_3_API_KEY=<operator connector's management key> \
+BPDM_INT_EDC_3_API_KEY=<third member's management key> \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar
 ```
 
 The three management API keys are the only values the profile leaves open. Everything else — the connector
 addresses, the provider's DID and each member's BPNL — defaults to the INT deployment as it stands, and the
-Gate base URLs come with it, so no `BPDM_INT_GATE_2_*` or `BPDM_INT_GATE_3_*` variables are needed: an EDC run
-acts for all three members by default. `BPDM_INT_CLIENT_*` is still required, because the Orchestrator and the
+Gate base URLs come from the `int` profile, so no `BPDM_INT_GATE_*` variables are needed: an EDC run acts for
+all three members by default. `BPDM_INT_CLIENT_*` is still required, because the Orchestrator and the
 Pool stay on the direct route.
 
 The Orchestrator is operator-internal, no offer exposes it, and the suite drives it as the cleaning service in
@@ -121,8 +116,18 @@ needs `read_partner`, which that role does not grant, so the Pool is treated lik
 given an offer no real sharing member would have. Its `@EdcAccess` scenario reports as skipped.
 
 Each member negotiates through a connector carrying its own identity, since the Gate offers are scoped to the
-consumer's BPNL. The third member is the operator's own Gate, whose offers are provided and consumed by the
-same connector.
+consumer's BPNL.
+
+Layered on `snapshot` instead of `int`, the profile reaches the snapshot Gates. Their provider connector has the
+same identity as the release one and only a host of its own, so point the run at it:
+
+```bash
+SPRING_PROFILES_ACTIVE=snapshot,int-edc \
+BPDM_INT_EDC_PROVIDER_DATASPACE_API=https://bpdm-snapshot-edc.test.tractus-x.com/api/v1/dsp/2025-1 \
+BPDM_INT_CLIENT_ID=... BPDM_INT_CLIENT_SECRET=... \
+BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
+  java -jar bpdm-system-tester/target/bpdm-system-tester.jar
+```
 
 The negotiations happen once while the Spring context starts, one per data offer, and a failed one is recorded
 rather than thrown: the run reports every offer it could not reach instead of dying on the first. A client
@@ -141,7 +146,7 @@ Any single client can be put back on the direct route from anywhere, for example
 set `security-enabled` for an EDC client: a client on the EDC route derives it as false, because the data plane
 holds the credentials it calls the API with.
 
-The offers have to exist on the provider before a run, for every BPNL involved including the operator's own.
+The offers have to exist on the provider before a run, for every BPNL involved.
 See [EDC Provider Setup.postman_collection.json](../docs/admin/EDC%20Provider%20Setup.postman_collection.json)
 and [setting up the EDC](../docs/maintainer/environments.md#setting-up-the-edc).
 `bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector and offer of every client.
