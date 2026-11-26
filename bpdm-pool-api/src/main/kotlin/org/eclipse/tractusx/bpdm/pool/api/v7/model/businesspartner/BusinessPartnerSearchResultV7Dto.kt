@@ -28,6 +28,6 @@ data class BusinessPartnerSearchResultV7Dto(
     val legalEntity: BusinessPartnerSearchLegalEntityV7Dto,
     val site: BusinessPartnerSearchSiteV7Dto?,
     val address: BusinessPartnerSearchPostalAddressV7Dto,
-    @get:Schema(name = "isParticipantData")
+    @get:Schema(description = "Indicates whether the legal entity the business partner belongs to is a data space participant or is managed by one.", name = "isParticipantData")
     val isParticipantData: Boolean
 )

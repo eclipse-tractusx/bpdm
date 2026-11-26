@@ -3,10 +3,13 @@ info:
   title: Business Partner Data Management Orchestrator
   description: Orchestrator component acts as a passive component and offers for each
     processing steps individual endpoints
-  version: 7.6.0-SNAPSHOT
+  version: 7.6.0
 servers:
   - url: http://localhost:8085
     description: Generated server url
+security:
+  - open_id_scheme: []
+  - bearer_scheme: []
 paths:
   /v7/sharing-member-records:
     get:
@@ -1195,7 +1198,8 @@ components:
           type:
             - boolean
             - "null"
-          description: Whether this legal entity is part of the Data Space network
+          description: Indicates whether the legal entity is a data space participant
+            or is managed by one.
     LegalEntityGoldenRecordRelation:
       type: object
       description: "A golden record relation between legal entities, pointing from\
@@ -2680,3 +2684,19 @@ components:
           type: array
           items:
             type: string
+  securitySchemes:
+    open_id_scheme:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
+          scopes: {}
+        authorizationCode:
+          authorizationUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
+          refreshUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
+          scopes: {}
+    bearer_scheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

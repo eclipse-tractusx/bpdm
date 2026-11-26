@@ -3,11 +3,16 @@
   "info" : {
     "title" : "Business Partner Data Management Pool",
     "description" : "Service that manages and shares business partner data with other CatenaX services",
-    "version" : "7.6.0-SNAPSHOT"
+    "version" : "7.6.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",
     "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "open_id_scheme" : [ ]
+  }, {
+    "bearer_scheme" : [ ]
   } ],
   "tags" : [ {
     "name" : "Changelog Controller",
@@ -3532,11 +3537,11 @@
               "$ref" : "#/components/schemas/ErrorInfoV7AddressCreateErrorV7"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3695,7 +3700,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity the address belongs to is a data space participant or is managed by one."
           },
           "scriptVariants" : {
             "type" : "array",
@@ -3857,11 +3862,11 @@
               "$ref" : "#/components/schemas/ErrorInfoV7AddressUpdateErrorV7"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3945,7 +3950,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity the address belongs to is a data space participant or is managed by one."
           },
           "scriptVariants" : {
             "type" : "array",
@@ -4633,7 +4638,8 @@
             "$ref" : "#/components/schemas/BusinessPartnerSearchPostalAddressV7Dto"
           },
           "isParticipantData" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Indicates whether the legal entity the business partner belongs to is a data space participant or is managed by one."
           }
         }
       },
@@ -5638,11 +5644,11 @@
               "$ref" : "#/components/schemas/ErrorInfoV7LegalEntityCreateErrorV7"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5791,7 +5797,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity is a data space participant or is managed by one."
           },
           "legalForm" : {
             "description" : "The legal form of the legal entity.",
@@ -5967,11 +5973,11 @@
               "$ref" : "#/components/schemas/ErrorInfoV7LegalEntityUpdateErrorV7"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -6273,7 +6279,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity is a data space participant or is managed by one."
           },
           "legalForm" : {
             "description" : "The legal form of the legal entity.",
@@ -6515,7 +6521,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity the address belongs to is a data space participant or is managed by one."
           }
         }
       },
@@ -8159,11 +8165,11 @@
               "$ref" : "#/components/schemas/ErrorInfoV7SiteCreateErrorV7"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -8271,7 +8277,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity the site belongs to is a data space participant or is managed by one."
           },
           "mainAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseV7Dto",
@@ -8393,11 +8399,11 @@
               "$ref" : "#/components/schemas/ErrorInfoV7SiteUpdateErrorV7"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -8669,7 +8675,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity the site belongs to is a data space participant or is managed by one."
           }
         }
       },
@@ -8770,7 +8776,7 @@
           },
           "isParticipantData" : {
             "type" : "boolean",
-            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
+            "description" : "Indicates whether the legal entity the site belongs to is a data space participant or is managed by one."
           },
           "mainAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseV7Dto"
@@ -8911,6 +8917,28 @@
             "description" : "Name or denotation of this type"
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "open_id_scheme" : {
+        "type" : "oauth2",
+        "flows" : {
+          "clientCredentials" : {
+            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "scopes" : { }
+          },
+          "authorizationCode" : {
+            "authorizationUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/auth",
+            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "refreshUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "scopes" : { }
+          }
+        }
+      },
+      "bearer_scheme" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }

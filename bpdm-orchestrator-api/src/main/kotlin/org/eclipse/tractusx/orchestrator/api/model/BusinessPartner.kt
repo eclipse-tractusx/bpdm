@@ -369,7 +369,7 @@ data class LegalEntity(
     @Schema(description = "The business state history of this legal entity")
     val states: List<BusinessState>,
     val confidenceCriteria: ConfidenceCriteria,
-    @get:Schema(description = "Whether this legal entity is part of the Data Space network", name = "isParticipantData")
+    @get:Schema(description = "Indicates whether the legal entity is a data space participant or is managed by one.", name = "isParticipantData")
     val isParticipantData: Boolean?,
     @Schema(description = "Whether this legal entity information differs from its golden record counterpart in the Pool. +" +
             "The Pool will not update the legal entity if it is set to false. " +

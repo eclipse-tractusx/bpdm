@@ -3,11 +3,16 @@
   "info" : {
     "title" : "Business Partner Data Management Gate",
     "description" : "A gate for a member to share business partner data with CatenaX",
-    "version" : "7.6.0-SNAPSHOT"
+    "version" : "7.6.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8081",
     "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "open_id_scheme" : [ ]
+  }, {
+    "bearer_scheme" : [ ]
   } ],
   "paths" : {
     "/v7/input/relations" : {
@@ -4524,6 +4529,28 @@
             "description" : "The cardinal direction describing where the exit to the location of the addressed object on large highways / motorways is located, such as Highway 101 South."
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "open_id_scheme" : {
+        "type" : "oauth2",
+        "flows" : {
+          "clientCredentials" : {
+            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "scopes" : { }
+          },
+          "authorizationCode" : {
+            "authorizationUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/auth",
+            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "refreshUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "scopes" : { }
+          }
+        }
+      },
+      "bearer_scheme" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }
