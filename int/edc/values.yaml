@@ -113,5 +113,5 @@ vault:
   hashicorp:
     url: "https://vault.test.tractus-x.com"
     paths:
-      # -- ASSUMPTION: the new vault keeps the 'bpdm' secret engine.
+      # -- The 'bpdm' secret engine, the same one the ArgoCD vault plugin resolves from.
       secret: /v1/bpdm

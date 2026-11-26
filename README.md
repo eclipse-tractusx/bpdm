@@ -38,6 +38,7 @@ The int groups and their ArgoCD apps:
 | `int/snapshot/member-2`        | `bpdm-snapshot-test-sharing-member-2` |
 | `int/snapshot/member-3`        | `bpdm-snapshot-test-sharing-member-3` |
 | `int/edc/operator`             | `edc-bpdm`                            |
+| `int/edc/operator-snapshot`    | `edc-bpdm-snapshot`                   |
 | `int/edc/member-1`             | `edc-test-sharing-member`             |
 | `int/edc/member-2`             | `edc-test-sharing-member-2`           |
 | `int/edc/member-3`             | `edc-test-sharing-member-3`           |
@@ -48,6 +49,10 @@ Renaming an app therefore starts it on an empty database.
 `int/` is the environment the maintainer keeps current; `stable/` is updated on demand.
 
 ## Documentation
+
+[`int/README.md`](int/README.md) walks through setting up the INT environment from scratch: Portal
+access and test companies, the BPDM app and its subscriptions, the vault, ArgoCD and the first
+end-to-end run.
 
 The guides live on `main` and are the entry point — what runs where, how ArgoCD and the vault plugin
 are wired, how to set up a golden record deployment, a sharing member Gate or an EDC:
