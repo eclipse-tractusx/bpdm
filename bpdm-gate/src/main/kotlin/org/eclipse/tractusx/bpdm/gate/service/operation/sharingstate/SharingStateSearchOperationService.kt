@@ -39,7 +39,8 @@ class SharingStateSearchOperationService(
             SharingStateRepository.Specs.byExternalIdsIn(criteria.externalIds),
             SharingStateRepository.Specs.byTenantBpnl(tenantBpnl),
             SharingStateRepository.Specs.bySharingStateTypes(criteria.sharingStateTypes),
-            SharingStateRepository.Specs.byUpdatedAfter(criteria.updatedAfter)
+            SharingStateRepository.Specs.byUpdatedAfter(criteria.updatedAfter),
+            SharingStateRepository.Specs.byProcesses(criteria.processes)
         )
         return sharingStateRepository.findAll(spec, pageable)
     }

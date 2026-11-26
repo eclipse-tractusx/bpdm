@@ -63,6 +63,18 @@ class AccessGroupOpenApiIT @Autowired constructor(
     }
 
     @Test
+    fun `output writes are granted to admins but not consumers or input managers`() {
+        val operation = "PUT /output/business-partners"
+
+        assertThat(operationsOf("v7-admin")).contains(operation)
+        listOf("v7-input-consumer", "v7-output-consumer", "v7-input-manager").forEach { group ->
+            assertThat(operationsOf(group))
+                .describedAs("operations of group '%s'", group)
+                .doesNotContain(operation)
+        }
+    }
+
+    @Test
     fun `an input manager is granted endpoints an input consumer is not`() {
         val inputConsumerOperations = operationsOf("v7-input-consumer")
         val inputManagerOperations = operationsOf("v7-input-manager")
@@ -83,6 +95,35 @@ class AccessGroupOpenApiIT @Autowired constructor(
         assertThat(outputConsumerOperations.minus(inputConsumerOperations))
             .describedAs("endpoints granted to an output consumer but not to an input consumer")
             .isNotEmpty()
+    }
+
+    @Test
+    fun `alternative output requests do not accept golden record relations`() {
+        val document = webClient.get().uri("/docs/api-docs/v7").retrieve().bodyToMono(String::class.java).block()
+        val schemas = objectMapper.readTree(document).path("components").path("schemas")
+
+        listOf("LegalEntityRepresentationOutputV7Request", "SiteRepresentationOutputV7Request", "AddressComponentOutputV7Request").forEach { name ->
+            val properties = schemas.path(name).path("properties")
+            assertThat(properties.isMissingNode).describedAs("properties of %s", name).isFalse()
+            assertThat(properties.has("goldenRecordRelations")).describedAs("golden record relations in %s", name).isFalse()
+        }
+        val requestProperties = schemas.path("BusinessPartnerOutputV7Request").path("properties")
+        mapOf(
+            "legalEntity" to "LegalEntityRepresentationOutputV7Request",
+            "site" to "SiteRepresentationOutputV7Request",
+            "address" to "AddressComponentOutputV7Request"
+        ).forEach { (component, schema) ->
+            assertThat(requestProperties.path(component).toString()).contains("#/components/schemas/$schema")
+        }
+    }
+
+    @Test
+    fun `only business partner output changelog requests expose processes`() {
+        val document = webClient.get().uri("/docs/api-docs/v7").retrieve().bodyToMono(String::class.java).block()
+        val schemas = objectMapper.readTree(document).path("components").path("schemas")
+
+        assertThat(schemas.path("ChangelogSearchV7Request").path("properties").has("processes")).isFalse()
+        assertThat(schemas.path("OutputChangelogSearchV7Request").path("properties").has("processes")).isTrue()
     }
 
     private fun operationsOf(group: String): Set<String> {

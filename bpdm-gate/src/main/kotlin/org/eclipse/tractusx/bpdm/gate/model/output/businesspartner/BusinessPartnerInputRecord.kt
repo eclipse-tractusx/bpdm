@@ -24,5 +24,6 @@ data class BusinessPartnerInputRecord(
     val externalSequenceTimestamp: Instant?,
     val content: BusinessPartnerInputContentParsed,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val process: String? = null
 )

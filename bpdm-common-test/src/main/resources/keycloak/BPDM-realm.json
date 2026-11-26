@@ -795,6 +795,7 @@
                 "read_input_changelog",
                 "read_sharing_state",
                 "read_output_partner",
+                "write_output_partner",
                 "write_input_partner"
               ]
             }
@@ -817,6 +818,27 @@
                 "read_sharing_state",
                 "write_input_partner"
               ]
+            }
+          },
+          "clientRole": true,
+          "containerId": "90f76867-95c0-46fd-b8a5-3bad03fe8c9d",
+          "attributes": {}
+        },
+        {
+          "name": "write_output_partner",
+          "description": "Write alternative refinement process outputs",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "90f76867-95c0-46fd-b8a5-3bad03fe8c9d",
+          "attributes": {}
+        },
+        {
+          "name": "process_provider",
+          "description": "Read inputs and manage alternative refinement results within one tenant",
+          "composite": true,
+          "composites": {
+            "client": {
+              "BPDM_GATE": ["read_input_partner", "read_sharing_state", "write_sharing_state", "write_output_partner"]
             }
           },
           "clientRole": true,

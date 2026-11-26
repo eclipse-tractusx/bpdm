@@ -46,5 +46,6 @@ class GoldenRecordConsistencyCheckOperationService(
     }
 
     private fun isStillSharedWithCheckedBpns(check: GoldenRecordConsistencyCheckParsed): Boolean =
-        check.sharingState.sharingStateType == SharingStateType.Success && check.currentBpns == check.checkedBpns
+        check.sharingState.process == null &&
+                check.sharingState.sharingStateType == SharingStateType.Success && check.currentBpns == check.checkedBpns
 }

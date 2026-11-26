@@ -55,5 +55,8 @@ data class SharingStateV7Dto(
     val taskId: String? = null,
 
     @get:Schema(description = "The time when the sharing state has been last updated")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+
+    @get:Schema(description = "The alternative refinement process this record belongs to. Absent means the golden record process.")
+    val process: String? = null
 )

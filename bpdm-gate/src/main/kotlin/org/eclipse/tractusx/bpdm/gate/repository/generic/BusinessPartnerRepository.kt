@@ -35,6 +35,13 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
     JpaSpecificationExecutor<BusinessPartnerDb> {
 
     object Specs {
+        fun byOutputProcesses(processes: Collection<String>?) =
+            Specification<BusinessPartnerDb> { root, _, builder ->
+                val path = root.get<String?>(BusinessPartnerDb::process.name)
+                if (processes.isNullOrEmpty()) builder.isNull(path)
+                else path.`in`(processes)
+            }
+
         /**
          * Restrict to entries with any one of the given externalIds; ignore if null
          */
@@ -67,11 +74,17 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
 
     fun findBySharingStateInAndStage(sharingStates: Collection<SharingStateDb>, stage: StageType): Set<BusinessPartnerDb>
 
-    @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b GROUP BY b.stage")
+    @Query(
+        "SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b " +
+            "WHERE b.process IS NULL AND (b.stage = org.eclipse.tractusx.bpdm.common.model.StageType.Output OR b.sharingState.process IS NULL) GROUP BY b.stage"
+    )
     fun countPerStages(): List<PartnersPerStageCount>
 
+    @Query("SELECT b FROM BusinessPartnerDb b WHERE b.stage = :stage AND b.bpnL IN :bpnL AND b.process IS NULL AND b.sharingState.process IS NULL")
     fun findByStageAndBpnLIn(stage: StageType, bpnL: Collection<String>): Set<BusinessPartnerDb>
+    @Query("SELECT b FROM BusinessPartnerDb b WHERE b.stage = :stage AND b.bpnS IN :bpnS AND b.process IS NULL AND b.sharingState.process IS NULL")
     fun findByStageAndBpnSIn(stage: StageType, bpnS: Collection<String>): Set<BusinessPartnerDb>
+    @Query("SELECT b FROM BusinessPartnerDb b WHERE b.stage = :stage AND b.bpnA IN :bpnA AND b.process IS NULL AND b.sharingState.process IS NULL")
     fun findByStageAndBpnAIn(stage: StageType, bpnA: Collection<String>): Set<BusinessPartnerDb>
 
     interface PartnersPerStageCount {

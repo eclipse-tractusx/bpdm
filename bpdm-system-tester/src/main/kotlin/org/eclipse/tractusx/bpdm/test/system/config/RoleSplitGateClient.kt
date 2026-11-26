@@ -31,7 +31,9 @@ import org.eclipse.tractusx.bpdm.gate.api.v7.client.RelationV7ApiClient
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.SharingStateV7ApiClient
 import org.eclipse.tractusx.bpdm.gate.api.v7.client.StatsV7ApiClient
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.input.BusinessPartnerInputV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.output.BusinessPartnerOutputV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.OutputChangelogSearchV7Request
 
 /**
  * Sends every Gate call with whichever of two configured credentials is permitted to make it.
@@ -76,8 +78,14 @@ private class SplitBusinessPartnerApiClient(
     override fun getBusinessPartnersInput(externalIds: Collection<String>?, paginationRequest: PaginationRequest) =
         inputCredential.businessParters.getBusinessPartnersInput(externalIds, paginationRequest)
 
-    override fun getBusinessPartnersOutput(externalIds: Collection<String>?, paginationRequest: PaginationRequest) =
-        outputCredential.businessParters.getBusinessPartnersOutput(externalIds, paginationRequest)
+    override fun getBusinessPartnersOutput(
+        externalIds: Collection<String>?,
+        paginationRequest: PaginationRequest,
+        processes: Collection<String>?
+    ) = outputCredential.businessParters.getBusinessPartnersOutput(externalIds, paginationRequest, processes)
+
+    override fun upsertBusinessPartnersOutput(businessPartners: Collection<BusinessPartnerOutputV7Request>) =
+        outputCredential.businessParters.upsertBusinessPartnersOutput(businessPartners)
 }
 
 /** Splits the business partner changelog API, whose input and output searches fall to different credentials. */
@@ -89,7 +97,7 @@ private class SplitChangelogApiClient(
     override fun getInputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
         inputCredential.changelog.getInputChangelog(paginationRequest, searchRequest)
 
-    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: ChangelogSearchV7Request) =
+    override fun getOutputChangelog(paginationRequest: PaginationRequest, searchRequest: OutputChangelogSearchV7Request) =
         outputCredential.changelog.getOutputChangelog(paginationRequest, searchRequest)
 }
 

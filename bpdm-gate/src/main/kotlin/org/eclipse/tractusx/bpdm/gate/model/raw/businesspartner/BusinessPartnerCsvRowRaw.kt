@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.model.raw.businesspartner
 import com.opencsv.bean.CsvBindByName
 
 data class BusinessPartnerCsvRowRaw(
-
     @CsvBindByName(column = Columns.EXTERNAL_ID)
     val externalId: String? = null,
 

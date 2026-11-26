@@ -33,6 +33,7 @@ class SharingStateSearchParser {
         SharingStateSearchParsed(
             externalIds = request.externalIds?.takeIf { it.isNotEmpty() }?.toSet(),
             sharingStateTypes = request.sharingStateTypes?.takeIf { it.isNotEmpty() }?.toSet(),
-            updatedAfter = request.updatedAfter
+            updatedAfter = request.updatedAfter,
+            processes = request.processes?.toSet()
         )
 }

@@ -25,6 +25,11 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.GateSharingStateV7Api
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateReadyV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStatePendingV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.PostSharingStateErrorV7Request
+import org.eclipse.tractusx.bpdm.gate.service.application.AlternativeSharingStateApplicationService
+import org.eclipse.tractusx.bpdm.gate.model.output.businesspartner.AlternativeProcessResult
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmAlternativeProcessException
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateTypeV7
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.businesspartner.sharingstate.SharingStateV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
@@ -32,6 +37,7 @@ import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmSharingStateReadyException
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7InboundMapper
 import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7SharingStateMapper
+import org.eclipse.tractusx.bpdm.gate.mapper.apiv7.ApiV7BusinessPartnerMapper
 import org.eclipse.tractusx.bpdm.gate.model.output.sharingstate.SharingStateReadyResult
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateReadyRaw
 import org.eclipse.tractusx.bpdm.gate.model.raw.sharingstate.SharingStateSearchRaw
@@ -46,8 +52,10 @@ class SharingStateController(
     private val sharingStateSearchApplicationService: SharingStateSearchApplicationService,
     private val sharingStateReadyApplicationService: SharingStateReadyApplicationService,
     private val apiV7SharingStateMapper: ApiV7SharingStateMapper,
+    private val apiV7BusinessPartnerMapper: ApiV7BusinessPartnerMapper,
     private val apiV7InboundMapper: ApiV7InboundMapper,
-    private val tenantResolver: TenantResolver
+    private val tenantResolver: TenantResolver,
+    private val alternativeSharingStateApplicationService: AlternativeSharingStateApplicationService
 ): GateSharingStateV7Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
@@ -56,10 +64,27 @@ class SharingStateController(
         externalIds: Collection<String>?,
         sharingStateTypes: Collection<SharingStateTypeV7>?,
         updatedAfter: Instant?,
+        processes: Collection<String>?,
     ): PageDto<SharingStateV7Dto> {
-        val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter)
+        val request = SharingStateSearchRaw(externalIds, sharingStateTypes?.map(apiV7InboundMapper::toModel), updatedAfter, processes)
         return sharingStateSearchApplicationService.search(request, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
             .toPageDto(apiV7SharingStateMapper::toDto)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
+    override fun postSharingStatePending(request: PostSharingStatePendingV7Request) {
+        when (val result = alternativeSharingStateApplicationService.pending(request.externalIds, request.process, tenantResolver.currentUserBpn())) {
+            is AlternativeProcessResult.Applied -> Unit
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
+        }
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
+    override fun postSharingStateError(request: PostSharingStateErrorV7Request) {
+        when (val result = alternativeSharingStateApplicationService.error(request.externalIds, request.process, request.message, tenantResolver.currentUserBpn())) {
+            is AlternativeProcessResult.Applied -> Unit
+            is AlternativeProcessResult.Rejected -> throw BpdmAlternativeProcessException(result.errors.map(apiV7BusinessPartnerMapper::toMessage))
+        }
     }
 
 

@@ -28,6 +28,7 @@ class BusinessPartnerInputDtoV7Factory {
     fun fromRequest(request: BusinessPartnerInputV7Request, createdAt: Instant = Instant.now(), updatedAt: Instant = createdAt): BusinessPartnerInputV7Dto =
         BusinessPartnerInputV7Dto(
             externalId = request.externalId,
+            process = request.process?.takeUnless { it.isBlank() },
             nameParts = request.nameParts,
             identifiers = request.identifiers,
             states = request.states,

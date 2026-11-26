@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.v7.GateChangelogV7Api
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogGateV7Dto
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.ChangelogSearchV7Request
+import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.OutputChangelogSearchV7Request
 import org.eclipse.tractusx.bpdm.gate.api.v7.model.changelog.PageChangeLogV7Dto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.controller.TenantResolver
@@ -56,9 +57,9 @@ class ChangelogController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_CHANGELOG})")
     override fun getOutputChangelog(
         paginationRequest: PaginationRequest,
-        searchRequest: ChangelogSearchV7Request
+        searchRequest: OutputChangelogSearchV7Request
     ): PageChangeLogV7Dto<ChangelogGateV7Dto> {
-        val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter)
+        val request = ChangelogSearchRaw(searchRequest.externalIds, searchRequest.timestampAfter, searchRequest.processes)
         val page = changelogSearchApplicationService.search(request, StageType.Output, GoldenRecordType.BusinessPartner, tenantResolver.currentUserBpn(), paginationRequest.toPageRequest())
         return apiV7ChangelogMapper.toPageDto(page)
     }

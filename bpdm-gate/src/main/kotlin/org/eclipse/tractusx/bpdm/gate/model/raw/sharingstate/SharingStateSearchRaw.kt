@@ -18,5 +18,6 @@ import java.time.Instant
 data class SharingStateSearchRaw(
     val externalIds: Collection<String>?,
     val sharingStateTypes: Collection<SharingStateType>?,
-    val updatedAfter: Instant?
+    val updatedAfter: Instant?,
+    val processes: Collection<String>? = null
 )

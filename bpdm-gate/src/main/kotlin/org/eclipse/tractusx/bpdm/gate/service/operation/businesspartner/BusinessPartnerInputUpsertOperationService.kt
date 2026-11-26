@@ -47,6 +47,7 @@ class BusinessPartnerInputUpsertOperationService(
     private val changelogCreateOperation: ChangelogCreateOperationService,
     private val dbToParsedMapper: DbToParsedMapper,
     private val parsedToDbMapper: ParsedToDbMapper,
+    private val goldenRecordCountedOperation: org.eclipse.tractusx.bpdm.gate.service.operation.sharingstate.GoldenRecordCountedOperationService,
     private val changeLogger: PersistedChangeLogger
 ) {
     private val logger = KotlinLogging.logger { }
@@ -111,7 +112,8 @@ class BusinessPartnerInputUpsertOperationService(
     }
 
     private fun hasChanged(request: BusinessPartnerInputUpsertParsed, existing: BusinessPartnerDb) =
-        dbToParsedMapper.toContent(existing) != request.content
+        dbToParsedMapper.toContent(existing) != request.content ||
+                (!request.preserveProcess && request.process != existing.sharingState.process)
 
     private fun persist(input: BusinessPartnerDb, changeType: ChangelogType) {
         val sharingState = input.sharingState
@@ -138,36 +140,13 @@ class BusinessPartnerInputUpsertOperationService(
         }
 
     private fun write(request: BusinessPartnerInputUpsertParsed, input: BusinessPartnerDb) {
-        val content = request.content
+        if (!request.preserveProcess) {
+            val leavesGoldenProcess = input.sharingState.process == null && request.process != null
+            input.sharingState.process = request.process
+            if (leavesGoldenProcess) goldenRecordCountedOperation.leaveGoldenRecordProcess(input.sharingState)
+        }
         input.externalSequenceTimestamp = request.externalSequenceTimestamp
-        input.nameParts.replace(content.nameParts)
-        input.roles.replace(content.roles)
-        input.identifiers.replace(content.identifiers.map(parsedToDbMapper::toEntity))
-        input.states.replace(content.states.map(parsedToDbMapper::toEntity))
-        input.isOwnCompanyData = content.isOwnCompanyData
-
-        input.bpnL = content.legalEntity.bpn
-        input.legalName = content.legalEntity.legalName
-        input.shortName = content.legalEntity.shortName
-        input.legalForm = content.legalEntity.legalForm
-        input.ownershipUltimate = content.legalEntity.ownershipUltimate
-        input.ultimateOwnerBpnl = content.legalEntity.ultimateOwnerBpnl
-
-        input.bpnS = content.site.bpn
-        input.siteName = content.site.name
-        input.additionalSites.replace(content.additionalSites.map(parsedToDbMapper::toEntity))
-
-        input.bpnA = content.address.bpn
-        input.addressName = content.address.name
-        writeAddress(content.address, input.postalAddress)
-
-        parsedToDbMapper.writeScriptVariants(content.scriptVariants, input)
-    }
-
-    private fun writeAddress(address: BusinessPartnerInputContentParsed.Address, postalAddress: PostalAddressDb) {
-        postalAddress.addressType = address.addressType
-        postalAddress.physicalPostalAddress = address.physicalPostalAddress?.let(parsedToDbMapper::toEntity)
-        postalAddress.alternativePostalAddress = address.alternativePostalAddress?.let(parsedToDbMapper::toEntity)
+        parsedToDbMapper.writeContent(request.content, input)
     }
 }
 

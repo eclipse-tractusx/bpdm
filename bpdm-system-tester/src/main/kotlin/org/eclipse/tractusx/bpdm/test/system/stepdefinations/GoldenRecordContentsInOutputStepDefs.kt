@@ -274,7 +274,7 @@ class GoldenRecordContentsInOutputStepDefs(
         val deadline = Instant.now().plus(GATE_POOL_SYNC_TIMEOUT)
         while (true) {
             val output = gateOf(recordId).businessParters.getBusinessPartnersOutput(listOf(runId)).content.single()
-            val poolAddress = poolClient.addresses.getAddress(output.address.addressBpn)
+            val poolAddress = poolClient.addresses.getAddress(requireNotNull(output.address.addressBpn) { "Golden record output must have an address BPN" })
             val outputUpdatedAt = output.address.updatedAt?.truncatedTo(ChronoUnit.MILLIS)
             val poolUpdatedAt = poolAddress.address.updatedAt.truncatedTo(ChronoUnit.MILLIS)
             if (outputUpdatedAt != null && !outputUpdatedAt.isBefore(poolUpdatedAt)) {
@@ -389,7 +389,7 @@ class GoldenRecordContentsInOutputStepDefs(
 
         // (2) The output's BPN really references a Pool golden record with the same master data. Reduce the
         // Pool legal entity through the same output factory so we can reuse the master-data comparison.
-        val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
+        val referencedBpnl = requireNotNull(actualOutput.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolAsOutput = outputFactory.fromLegalEntity(inputResponse, poolLegalEntity).copy(externalId = runId)
@@ -433,8 +433,8 @@ class GoldenRecordContentsInOutputStepDefs(
 
         // (2) The output's BPNs really reference a Pool golden record with the same master data. Reduce the
         // Pool legal entity and site through the same output factory so we can reuse the comparison.
-        val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
-        val referencedBpns = actualOutput.site!!.siteBpn
+        val referencedBpnl = requireNotNull(actualOutput.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }
+        val referencedBpns = requireNotNull(actualOutput.site?.siteBpn) { "Golden record site output must have a site BPN" }
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(referencedBpns)
@@ -484,8 +484,8 @@ class GoldenRecordContentsInOutputStepDefs(
 
         // (2) The output's BPNs really reference a Pool golden record with the same master data. Reduce the
         // Pool legal entity and address through the same output factory so we can reuse the comparison.
-        val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
-        val referencedBpna = actualOutput.address.addressBpn
+        val referencedBpnl = requireNotNull(actualOutput.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }
+        val referencedBpna = requireNotNull(actualOutput.address.addressBpn) { "Golden record output must have an address BPN" }
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolAddress = poolClient.addresses.getAddress(referencedBpna)
@@ -537,9 +537,9 @@ class GoldenRecordContentsInOutputStepDefs(
 
         // (2) The output's BPNs really reference a Pool golden record with the same master data. Reduce the
         // Pool legal entity, site and address through the same output factory so we can reuse the comparison.
-        val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
-        val referencedBpns = actualOutput.site!!.siteBpn
-        val referencedBpna = actualOutput.address.addressBpn
+        val referencedBpnl = requireNotNull(actualOutput.legalEntity.legalEntityBpn) { "Golden record output must have a legal entity BPN" }
+        val referencedBpns = requireNotNull(actualOutput.site?.siteBpn) { "Golden record site output must have a site BPN" }
+        val referencedBpna = requireNotNull(actualOutput.address.addressBpn) { "Golden record output must have an address BPN" }
         val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
         apiCallEvidence.attach("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
         val poolSite = poolClient.sites.getSite(referencedBpns)
@@ -761,7 +761,7 @@ class GoldenRecordContentsInOutputStepDefs(
         val expectedAdditionalSites = otherRecordIds.map { other ->
             val otherSite = outputOf(other).site
                 ?: error("record '$other' output has no site to surface as an additional site")
-            AdditionalSiteOutputV7Dto(otherSite.siteBpn, otherSite.name)
+            AdditionalSiteOutputV7Dto(requireNotNull(otherSite.siteBpn) { "Golden record additional site must have a site BPN" }, otherSite.name)
         }
 
         val actualOutput = outputOf(recordId)
@@ -787,7 +787,7 @@ class GoldenRecordContentsInOutputStepDefs(
 
     /** The Pool golden record address [recordId]'s output references, fetched by its BPNA. */
     private fun poolAddressOf(recordId: String): LogisticAddressVerboseV7Dto {
-        val bpna = outputOf(recordId).address.addressBpn
+        val bpna = requireNotNull(outputOf(recordId).address.addressBpn) { "Golden record output must have an address BPN" }
         val poolAddress = poolClient.addresses.getAddress(bpna)
         apiCallEvidence.attach("GET", "/v7/addresses/$bpna", response = poolAddress)
         return poolAddress

@@ -39,6 +39,51 @@ import java.time.Instant
 
 class BusinessPartnerOutputDtoV7Factory {
 
+    /** Builds a provider request without BPNs or confidence criteria. */
+    fun alternativeRequest(input: BusinessPartnerInputV7Dto, process: String, seed: String = input.externalId) =
+        BusinessPartnerOutputV7Request(
+            externalId = input.externalId,
+            process = process,
+            nameParts = listOf(seed),
+            legalEntity = LegalEntityRepresentationOutputV7Request(legalName = seed),
+            site = SiteRepresentationOutputV7Request(name = "$seed site"),
+            address = AddressComponentOutputV7Request(name = "$seed address")
+        )
+
+    /** Builds the expected response to [request]; persistence timestamps are compared separately. */
+    fun fromAlternativeRequest(request: BusinessPartnerOutputV7Request) =
+        BusinessPartnerOutputV7Dto(
+            externalId = request.externalId,
+            process = request.process,
+            nameParts = request.nameParts,
+            identifiers = request.identifiers,
+            states = request.states,
+            roles = request.roles,
+            isOwnCompanyData = request.isOwnCompanyData,
+            legalEntity = with(request.legalEntity) {
+                LegalEntityRepresentationOutputV7Dto(
+                    legalEntityBpn = legalEntityBpn, legalName = legalName, shortName = shortName, legalForm = legalForm,
+                    confidenceCriteria = confidenceCriteria, ownershipUltimate = ownershipUltimate, ultimateOwnerBpnl = ultimateOwnerBpnl,
+                    states = states, updatedAt = updatedAt ?: Instant.EPOCH
+                )
+            },
+            site = request.site?.let {
+                SiteRepresentationOutputV7Dto(it.siteBpn, it.name, it.confidenceCriteria, it.states, updatedAt = it.updatedAt ?: Instant.EPOCH)
+            },
+            address = with(request.address) {
+                AddressComponentOutputV7Dto(
+                    addressBpn = addressBpn, name = name, addressType = addressType, physicalPostalAddress = physicalPostalAddress,
+                    alternativePostalAddress = alternativePostalAddress ?: AlternativePostalAddressV7Dto(),
+                    confidenceCriteria = confidenceCriteria, states = states, identifiers = identifiers, updatedAt = updatedAt ?: Instant.EPOCH
+                )
+            },
+            externalSequenceTimestamp = request.externalSequenceTimestamp,
+            scriptVariants = request.scriptVariants,
+            additionalSites = request.additionalSites,
+            createdAt = Instant.MIN,
+            updatedAt = Instant.MIN
+        )
+
     fun fromLegalEntity(input: BusinessPartnerInputV7Dto, legalEntity: LegalEntityWithLegalAddressVerboseV7Dto): BusinessPartnerOutputV7Dto{
         return BusinessPartnerOutputV7Dto(
             externalId = input.externalId,
@@ -183,6 +228,7 @@ class BusinessPartnerOutputDtoV7Factory {
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
             states = logisticAddress.states.map { BusinessPartnerStateOutputV7Dto(it.validFrom, it.validTo, it.type) },
+            identifiers = logisticAddress.identifiers.map { AddressIdentifierV7Dto(value = it.value, type = it.type) },
             updatedAt = logisticAddress.updatedAt
         )
     }

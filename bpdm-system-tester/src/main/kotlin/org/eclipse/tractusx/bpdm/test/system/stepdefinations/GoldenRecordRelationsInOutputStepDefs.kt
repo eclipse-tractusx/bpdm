@@ -364,11 +364,13 @@ class GoldenRecordRelationsInOutputStepDefs(
 
         return when {
             relationType !in ADDRESS_CAPABLE_RELATION_TYPES || bothLegalEntities ->
-                sourceOutput.legalEntity.legalEntityBpn to targetOutput.legalEntity.legalEntityBpn
+                requireNotNull(sourceOutput.legalEntity.legalEntityBpn) { "Golden record relation source must have a legal entity BPN" } to
+                    requireNotNull(targetOutput.legalEntity.legalEntityBpn) { "Golden record relation target must have a legal entity BPN" }
             bothSiteMain ->
                 siteBpnOf(sourceOutput) to siteBpnOf(targetOutput)
             else ->
-                sourceOutput.address.addressBpn to targetOutput.address.addressBpn
+                requireNotNull(sourceOutput.address.addressBpn) { "Golden record relation source must have an address BPN" } to
+                    requireNotNull(targetOutput.address.addressBpn) { "Golden record relation target must have an address BPN" }
         }
     }
 

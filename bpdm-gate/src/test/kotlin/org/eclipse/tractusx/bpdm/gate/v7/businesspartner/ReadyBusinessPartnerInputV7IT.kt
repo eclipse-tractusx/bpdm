@@ -34,6 +34,22 @@ import java.time.Instant
 
 class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
+    @Test
+    fun `alternative ready partner never creates an orchestrator task`() {
+        // GIVEN
+        val input = testDataClient.businessPartner.upsertInput(testName, "provider")
+        testDataClient.businessPartner.setStateToReady(input.externalId)
+        orchestratorMockDataFactory.resetRecordedRequests()
+
+        // WHEN
+        taskCreationService.createTasksForReadyBusinessPartners()
+
+        // THEN
+        Assertions.assertThat(orchestratorMockDataFactory.getCreatedTaskBusinessPartners()).isEmpty()
+        val state = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(input.externalId), processes = listOf("provider"))
+        Assertions.assertThat(state.content.single().sharingStateType).isEqualTo(SharingStateTypeV7.Ready)
+    }
+
     /**
      * GIVEN business partner not ready to be shared
      * WHEN input manager makes business partner ready to be shared

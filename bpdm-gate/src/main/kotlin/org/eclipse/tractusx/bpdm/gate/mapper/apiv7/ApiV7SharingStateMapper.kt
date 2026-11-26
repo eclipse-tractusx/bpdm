@@ -36,6 +36,7 @@ class ApiV7SharingStateMapper {
     fun toDto(record: SharingStateRecord): SharingStateV7Dto =
         SharingStateV7Dto(
             externalId = record.externalId,
+            process = record.process,
             sharingStateType = toDto(record.sharingStateType),
             sharingErrorCode = record.sharingErrorCode?.let(::toDto),
             sharingErrorMessage = record.sharingErrorMessage,

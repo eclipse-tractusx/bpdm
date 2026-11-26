@@ -16,5 +16,6 @@ import java.time.Instant
 
 data class ChangelogSearchParsed(
     val externalIds: Set<String>?,
-    val timestampAfter: Instant?
+    val timestampAfter: Instant?,
+    val processes: Set<String>? = null
 )

@@ -121,7 +121,7 @@ class GoldenRecordTaskResolutionParser(
     private fun isNewerThanStored(incoming: BusinessPartnerOutputContentParsed, stored: BusinessPartnerDb?): Boolean {
         val incomingComponentTimestamps = listOf(incoming.legalEntityUpdatedAt, incoming.siteUpdatedAt, incoming.addressUpdatedAt)
         if (incomingComponentTimestamps.all { it == null }) return true
-        if (stored == null) return true
+        if (stored == null || stored.process != null) return true
 
         val storedComponentTimestamps = listOf(stored.legalEntityUpdatedAt, stored.siteUpdatedAt, stored.addressUpdatedAt)
         if (storedComponentTimestamps.all { it == null }) return true

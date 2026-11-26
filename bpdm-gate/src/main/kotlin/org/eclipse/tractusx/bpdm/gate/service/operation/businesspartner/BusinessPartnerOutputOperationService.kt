@@ -80,7 +80,7 @@ class BusinessPartnerOutputOperationService(
     }
 
     private fun hasChanged(content: BusinessPartnerOutputContentParsed, storedOutput: BusinessPartnerDb) =
-        dbToParsedMapper.toUpsertData(storedOutput) != content
+        storedOutput.process != null || dbToParsedMapper.toUpsertData(storedOutput) != content
 
     private fun persist(output: BusinessPartnerDb, changeType: ChangelogType) {
         val sharingState = output.sharingState
@@ -101,6 +101,7 @@ class BusinessPartnerOutputOperationService(
     }
 
     private fun write(content: BusinessPartnerOutputContentParsed, output: BusinessPartnerDb) {
+        output.process = null
         output.nameParts.replace(content.nameParts)
         output.roles.replace(content.roles)
         output.identifiers.replace(content.identifiers.map(parsedToDbMapper::toEntity))

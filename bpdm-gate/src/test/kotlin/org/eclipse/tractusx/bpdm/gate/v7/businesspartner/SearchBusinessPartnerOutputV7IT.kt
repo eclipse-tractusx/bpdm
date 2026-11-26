@@ -29,6 +29,24 @@ import java.time.Instant
 
 class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
 
+    @Test
+    fun `output searches select exactly the requested process`() {
+        // GIVEN
+        val golden = testDataClient.businessPartner.createOutput("$testName golden")
+        val alternativeInput = testDataClient.businessPartner.upsertInput("$testName alternative", "provider")
+        val alternative = testDataClient.businessPartner.refineAlternatively(alternativeInput, "provider")
+
+        // WHEN / THEN
+        assertRepo.assertBusinessPartnerOutput(
+            gateClient.businessParters.getBusinessPartnersOutput(),
+            PageDto(1, 1, 0, 1, listOf(golden))
+        )
+        assertRepo.assertBusinessPartnerOutput(
+            gateClient.businessParters.getBusinessPartnersOutput(processes = listOf("provider")),
+            PageDto(1, 1, 0, 1, listOf(alternative))
+        )
+    }
+
     /**
      * GIVEN an output for site B whose address is the main address of another site A
      *       and a Pool change to that address has been synchronized

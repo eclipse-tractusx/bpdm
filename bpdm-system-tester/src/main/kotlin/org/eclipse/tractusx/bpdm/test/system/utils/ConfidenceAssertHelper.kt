@@ -121,10 +121,10 @@ class ConfidenceAssertHelper(
     }
 
     private fun confidenceOf(output: BusinessPartnerOutputV7Dto, component: OutputComponent): ConfidenceCriteriaV7Dto =
-        when (component) {
+        requireNotNull(when (component) {
             OutputComponent.LEGAL_ENTITY       -> output.legalEntity.confidenceCriteria
             OutputComponent.LEGAL_ADDRESS      -> output.address.confidenceCriteria
             OutputComponent.ADDITIONAL_ADDRESS -> output.address.confidenceCriteria
             OutputComponent.SITE               -> output.site!!.confidenceCriteria
-        }
+        }) { "Golden record output '${output.externalId}' must have confidence criteria for $component" }
 }

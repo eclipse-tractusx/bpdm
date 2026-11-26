@@ -25,5 +25,6 @@ data class SharingStateRecord(
     val sharingErrorMessage: String?,
     val sharingProcessStarted: LocalDateTime?,
     val taskId: String?,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val process: String? = null
 )
