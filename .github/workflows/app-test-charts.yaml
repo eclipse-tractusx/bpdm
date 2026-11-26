@@ -23,7 +23,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.35.0'
+        default: 'kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5'
         required: false
         type: string
       upgrade_from:
@@ -44,7 +44,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.35.0'
+        default: 'kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5'
         required: false
         type: string
       upgrade_from:
@@ -86,9 +86,9 @@ jobs:
       - name: Kubernetes KinD Cluster
         uses: helm/kind-action@1544676c07bb3570fcb70166beaa07c4528fd4aa #v1.15.1
         with:
-          version: v0.31.0
+          version: v0.33.0
           registry: true
-          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.35.0' }}
+          node_image: ${{ inputs.node_image || 'kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5' }}
 
       - name: Set up Helm
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 #v5.0.1
