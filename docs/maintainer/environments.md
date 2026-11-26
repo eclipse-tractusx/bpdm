@@ -9,7 +9,7 @@ This guide describes what runs where and how it is deployed; the deployment conf
 <!-- TOC -->
 * [Association Environments](#association-environments)
   * [What Runs Where](#what-runs-where)
-    * [INT — argocd.int.catena-x.net](#int--argocdintcatena-xnet)
+    * [INT — argocd.test.tractus-x.com](#int--argocdtesttractus-xcom)
     * [STABLE — argocd.stable.catena-x.net](#stable--argocdstablecatena-xnet)
   * [How a Deployment Is Defined](#how-a-deployment-is-defined)
     * [Why the configuration lives on its own branch](#why-the-configuration-lives-on-its-own-branch)
@@ -21,7 +21,7 @@ This guide describes what runs where and how it is deployed; the deployment conf
   * [Operator API Access](#operator-api-access)
   * [Setting Up a Sharing Member Gate](#setting-up-a-sharing-member-gate)
   * [Setting Up the EDC](#setting-up-the-edc)
-    * [The operator EDC](#the-operator-edc)
+    * [The provider EDC](#the-provider-edc)
     * [Creating the assets](#creating-the-assets)
     * [The consumer EDC](#the-consumer-edc)
   * [Feature Branch Deployments](#feature-branch-deployments)
@@ -32,22 +32,34 @@ This guide describes what runs where and how it is deployed; the deployment conf
 
 The association offers two environments, both operated through ArgoCD:
 
-- **INT** — the environment the maintainer keeps current. It always follows the newest release version, and it is where release candidates are validated by the [end-to-end tests](e2e-testing.md).
+- **INT** — the environment the maintainer keeps current. It always follows the newest release version, and it is where release candidates are validated by the [end-to-end tests](e2e-testing.md). It runs on the Tractus-X test environment (`*.test.tractus-x.com`).
 - **STABLE** — updated on demand, when an update is announced. It is expected to run an older line than INT.
 
-### INT — [argocd.int.catena-x.net](https://argocd.int.catena-x.net)
+### INT — [argocd.test.tractus-x.com](https://argocd.test.tractus-x.com)
 
-| ArgoCD app                   | Purpose                                                    | Chart source                     | Root URL                                                                     |
-|------------------------------|------------------------------------------------------------|----------------------------------|------------------------------------------------------------------------------|
-| `bpdm`                       | Golden record core (Pool, Gate, Orchestrator, Cleaning)    | released chart                   | https://business-partners.int.catena-x.net/                                  |
-| `bpdm-test-sharing-member`   | Gate for the test sharing member                           | released chart                   | https://business-partners.int.catena-x.net/companies/test-sharing-member     |
-| `bpdm-test-sharing-member-2` | Gate for a second test sharing member                      | released chart                   | https://business-partners.int.catena-x.net/companies/test-sharing-member-2   |
-| `bpdm-snapshot`              | Development state, chart taken from `main`                 | `main` branch                    | https://business-partners-snapshot.int.catena-x.net/                         |
-| `edc-bpdm`                   | Operator EDC providing the BPDM assets                     | `tractusx-connector`             | https://bpdm-edc.int.catena-x.net                                            |
-| `edc-test-sharing-member`    | Consumer EDC with the test sharing member's identity       | `tractusx-connector`             | https://bpdm-sharing-member-edc.int.catena-x.net                             |
-| `edc-test-sharing-member-2`  | Consumer EDC for the second test sharing member            | `tractusx-connector`             | https://bpdm-sharing-member-2-edc.int.catena-x.net                           |
+The **released golden record core** — Pool, Orchestrator, the Portal's Gate and the Cleaning Service Dummy at https://business-partners.test.tractus-x.com/ — is hosted centrally by the test environment operators, not by BPDM.
+It has no ArgoCD app or configuration of ours; moving it to a new chart version is a request to them (see [release process step 4](release-process.md#4-deploy-the-release-candidate-to-int)).
 
-The Gate of the `bpdm` core deployment is served at `/companies/test-company` — that is the Portal's Gate, not a sharing member's.
+The maintainer deploys everything around it, in the `bpdm` project and namespace:
+
+| ArgoCD app                            | Purpose                                                   | Chart source         | Root URL                                                                              |
+|---------------------------------------|-----------------------------------------------------------|----------------------|---------------------------------------------------------------------------------------|
+| `bpdm-test-sharing-member`            | Gate of test sharing member 1, on the released core       | released chart       | https://business-partners.test.tractus-x.com/companies/test-sharing-member            |
+| `bpdm-test-sharing-member-2`          | Gate of test sharing member 2, on the released core       | released chart       | https://business-partners.test.tractus-x.com/companies/test-sharing-member-2          |
+| `bpdm-test-sharing-member-3`          | Gate of test sharing member 3, on the released core       | released chart       | https://business-partners.test.tractus-x.com/companies/test-sharing-member-3          |
+| `bpdm-snapshot`                       | Snapshot core (Pool, Orchestrator, Cleaning Service Dummy) | `main` branch        | https://business-partners-snapshot.test.tractus-x.com/                                |
+| `bpdm-snapshot-test-sharing-member`   | Gate of test sharing member 1, on the snapshot core       | `main` branch        | https://business-partners-snapshot.test.tractus-x.com/companies/test-sharing-member   |
+| `bpdm-snapshot-test-sharing-member-2` | Gate of test sharing member 2, on the snapshot core       | `main` branch        | https://business-partners-snapshot.test.tractus-x.com/companies/test-sharing-member-2 |
+| `bpdm-snapshot-test-sharing-member-3` | Gate of test sharing member 3, on the snapshot core       | `main` branch        | https://business-partners-snapshot.test.tractus-x.com/companies/test-sharing-member-3 |
+| `edc-bpdm`                            | Provider EDC offering the released member Gates           | `tractusx-connector` | https://bpdm-edc.test.tractus-x.com                                                   |
+| `edc-bpdm-snapshot`                   | Provider EDC offering the snapshot member Gates           | `tractusx-connector` | https://bpdm-snapshot-edc.test.tractus-x.com                                          |
+| `edc-test-sharing-member`             | Consumer EDC of test sharing member 1                     | `tractusx-connector` | https://bpdm-sharing-member-edc.test.tractus-x.com                                    |
+| `edc-test-sharing-member-2`           | Consumer EDC of test sharing member 2                     | `tractusx-connector` | https://bpdm-sharing-member-2-edc.test.tractus-x.com                                  |
+| `edc-test-sharing-member-3`           | Consumer EDC of test sharing member 3                     | `tractusx-connector` | https://bpdm-sharing-member-3-edc.test.tractus-x.com                                  |
+
+Each test sharing member is a company of its own, with its own BPNL; the member EDCs serve both the released and the snapshot Gates.
+The snapshot core has no Gate — the Portal's Gate runs only on the centrally hosted core.
+The [INT walkthrough](https://github.com/eclipse-tractusx/bpdm/blob/environments/int/README.md) on the `environments` branch sets the whole landscape up from scratch: Portal companies, the golden record process app and its subscriptions, the vault, ArgoCD and the EDC offers.
 
 ### STABLE — [argocd.stable.catena-x.net](https://argocd.stable.catena-x.net)
 
@@ -60,17 +72,23 @@ The Gate of the `bpdm` core deployment is served at `/companies/test-company` �
 
 Read deployed chart versions from ArgoCD or from each app's `targetRevision`; they are not listed here because they change every release.
 
-INT holds the accumulated data of every end-to-end run ever executed against it, [by design](e2e-testing.md#test-data-is-not-cleaned-up), so upgrading it exercises a real migration against a populated database.
+INT holds the accumulated data of every end-to-end run executed against it, [by design](e2e-testing.md#test-data-is-not-cleaned-up), so upgrading it exercises a real migration against a populated database.
 
 ## How a Deployment Is Defined
 
-Each ArgoCD app is two files under [`<environment>/<app>/` on the `environments` branch](https://github.com/eclipse-tractusx/bpdm/tree/environments):
+Each ArgoCD app is a folder on the [`environments` branch](https://github.com/eclipse-tractusx/bpdm/tree/environments), `<environment>/<group>/<app>/` — or `<environment>/<app>/` for an app that stands alone, as on STABLE:
 
-- **`spec.yaml`** — the ArgoCD application specification: which chart, from which repository, at which `targetRevision`, into which namespace. It also passes the values file to Helm as a raw URL and enables the vault plugin.
+- **`spec.yaml`** — the ArgoCD application specification: which chart, from which repository, at which `targetRevision`, into which project and namespace. It also passes the values files to Helm as raw URLs and enables the vault plugin.
 - **`values.yaml`** — the Helm values for that deployment: ingress hosts and context paths, the URLs the BPDM components use to reach each other, the Central-IDP configuration, and vault references for every secret.
 
-Creating a new app in ArgoCD means creating it from the corresponding `spec.yaml`; changing an existing deployment means editing `values.yaml` and re-synchronizing.
-Since ArgoCD fetches the values file over its raw URL at sync time, a change is live for the next synchronization as soon as it is merged.
+On INT the apps are grouped (`int/sharing-members/`, `int/snapshot/`, `int/edc/`), and each group has a `values.yaml` of its own that every app of the group shares.
+An app's `spec.yaml` passes the group file first and its own second, so the app file overrides it; lists such as ingress hosts live in the app files, because Helm replaces lists instead of merging them.
+The branch's README maps every folder to its ArgoCD app.
+
+Creating a new app in ArgoCD means creating it from the corresponding `spec.yaml`, under the app name listed above — the name is the Helm release name, which names the database volume, so a different name starts on an empty database.
+Changing an existing deployment means editing `values.yaml` and re-synchronizing.
+Since ArgoCD fetches the values files over their raw URLs at sync time, a change is live for the next synchronization as soon as it is merged.
+A changed `spec.yaml` is not: each live ArgoCD app holds its own copy of the specification from when it was created, so a change there has to be applied in ArgoCD as well.
 
 ### Why the configuration lives on its own branch
 
@@ -88,7 +106,8 @@ Four rules follow:
 ## Secret Management
 
 No secret value is ever written into a `values.yaml`.
-The association operates a central [HashiCorp Vault](https://vault.core.catena-x.net) — one instance for all environments — and the ArgoCD instances run a vault plugin that resolves references at sync time.
+Every environment's ArgoCD runs a vault plugin that resolves references at sync time against that environment's HashiCorp Vault: [vault.test.tractus-x.com](https://vault.test.tractus-x.com) for INT, the association's central [vault.core.catena-x.net](https://vault.core.catena-x.net) for STABLE.
+Access to the INT vault and ArgoCD is granted by the test environment operators; both log in through the Central-IDP with the Portal account.
 
 A reference has the form:
 
@@ -104,7 +123,7 @@ A reference has the form:
 | `<path/to/secret>`   | The secret's path. It is kept identical across environments so a values file differs only in the environment segment |
 | `#<secret-value>`    | The named value inside the secret — one secret can hold several                                                    |
 
-The paths follow the deployment structure: `<environment>/<deployment>/<component>/<purpose>`, for example `int/bpdm/gate/pool-client#client-secret`.
+The paths follow the deployment structure: `<environment>/<deployment>/<component>/<purpose>`, for example `int/bpdm-test-sharing-member/gate/pool-client#client-secret`.
 
 Secrets whose value name is `content` are a different mechanism: those are read by the EDC directly from the vault at runtime, not resolved by the ArgoCD plugin.
 
@@ -112,6 +131,9 @@ Secrets whose value name is `content` are a different mechanism: those are read 
 
 The core deployment the Portal depends on for onboarding companies and serving its partner network and company data pages.
 [INSTALL.md](../../INSTALL.md) covers generic chart installation; what follows is only what an association environment adds.
+
+On INT the test environment operators host this core, so the steps apply to STABLE.
+The only core the maintainer deploys on INT is the snapshot core (`int/snapshot/core`), which has no Gate: it needs the database passwords and the Pool and Cleaning Service Dummy Orchestrator clients below, not the two Gate clients.
 
 ### 1. Gather the client credentials
 
@@ -164,12 +186,15 @@ Full access to the three APIs of the golden record core:
 
 Sharing members get their own Gate, deployed as a separate ArgoCD app with only the Gate component and its database enabled.
 
-Unlike the core deployment, a sharing member Gate needs its own technical users, created in the Portal:
+Unlike the core deployment, a sharing member Gate needs its own technical users, carrying the member company's identity:
 
 | Technical user           | Permission                        |
 |--------------------------|-----------------------------------|
 | Gate → Pool access       | `BPDM Pool Sharing Consumer`      |
 | Gate → Orchestrator access | `BPDM Orchestrator Task Creator` |
+
+On INT they come from the member's subscription to the golden record process app, as two of its five technical user profiles — the [INT walkthrough](https://github.com/eclipse-tractusx/bpdm/blob/environments/int/README.md#3-register-the-golden-record-process-app) lists them.
+The released and the snapshot Gate of a member share these users and the vault secrets below; only their databases differ, one per ArgoCD app.
 
 Its Gate deploys its own database, so it needs its own database passwords:
 
@@ -187,20 +212,24 @@ Then create the ArgoCD app from that member's `spec.yaml`.
 ## Setting Up the EDC
 
 Sharing members reach their Gate over EDC communication.
-That needs an operator EDC providing the [BPDM assets](../architecture/08_Crosscutting_Concepts.md#edc-communication), and — to test the connection — a consumer EDC carrying the sharing member's identity.
+That needs a provider EDC, run by the operator, offering the [BPDM assets](../architecture/08_Crosscutting_Concepts.md#edc-communication), and — to test the connection — a consumer EDC carrying the sharing member's identity.
 
-### The operator EDC
+### The provider EDC
 
 The EDC needs technical users with the **member company's** identity, not the operator's, because the sharing member's Gate is branded to that member's BPNL.
-The Portal only issues those through app subscriptions: register the BPDM apps in the marketplace ([INSTALL.md — Create BPDM marketplace apps](../../INSTALL.md#create-bpdm-marketplace-apps)), have the member company subscribe, and once the subscription is activated the Portal lists the created clients:
+The Portal only issues those through app subscriptions: register the golden record process app in the marketplace, have the member company subscribe, and once the subscription is activated the operator company lists the created technical users.
+The provider EDC holds three of them per member:
 
-1. BPDM Pool Consumer Client
-2. BPDM Sharing Input Manager Client
-3. BPDM Sharing Output Consumer Client
+1. Pool Consumer (`BPDM Pool Consumer`)
+2. Sharing Input Manager (`BPDM Sharing Input Manager`)
+3. Sharing Output Consumer (`BPDM Sharing Output Consumer`)
 
-The EDC also needs access to its company's wallet. As a `Cx-Operator` account, create an `external` technical user with the `Identity Wallet Management` permission; the credentials take a few moments to appear.
+The [INT walkthrough](https://github.com/eclipse-tractusx/bpdm/blob/environments/int/README.md#3-register-the-golden-record-process-app) registers the app with all five technical user profiles a member needs, these three and the two of its [Gate](#setting-up-a-sharing-member-gate); [INSTALL.md — Create BPDM marketplace apps](../../INSTALL.md#create-bpdm-marketplace-apps) covers the generic case.
 
-Finally the EDC needs an RSA key pair for token signing, which is free to create.
+The EDC also needs an RSA key pair for token signing, which is free to create, and access to its company's wallet.
+On INT every connector authenticates against the SSI DIM wallet stub, which takes the BPNL as client ID and does not check the secret, so no wallet technical user is needed.
+On STABLE the wallet is the company's real one: as a `Cx-Operator` account, create an `external` technical user with the `Identity Wallet Management` permission, and store its secret instead of an arbitrary value.
+
 All of it goes into the vault:
 
 ```
@@ -210,31 +239,34 @@ All of it goes into the vault:
 <env>/edc-bpdm/vault#token                            (the vault token)
 <env>/edc-bpdm/token-private-key#content              (private RSA key)
 <env>/edc-bpdm/token-public-key#content               (public RSA key)
-<env>/edc-bpdm/client-secret#content                  (from the wallet client)
-<env>/edc-bpdm/asset-secrets/<member>/pool-member-read#content     (from the Pool Consumer Client)
-<env>/edc-bpdm/asset-secrets/<member>/input-full-access#content    (from the Sharing Input Manager Client)
-<env>/edc-bpdm/asset-secrets/<member>/output-read-access#content   (from the Sharing Output Consumer Client)
+<env>/edc-bpdm/wallet-client-secret#content           (INT: any value; STABLE: from the wallet client)
+<env>/edc-bpdm/asset-secrets/<member>/pool-member-read#content     (from the Pool Consumer)
+<env>/edc-bpdm/asset-secrets/<member>/input-full-access#content    (from the Sharing Input Manager)
+<env>/edc-bpdm/asset-secrets/<member>/output-read-access#content   (from the Sharing Output Consumer)
 ```
 
-Deploy from [`<env>/edc-bpdm/spec.yaml`](https://github.com/eclipse-tractusx/bpdm/tree/environments); the values may need the correct wallet client id.
+The vault token is the one the connector reads its own folder with at runtime. A token from an OIDC login expires, and the connector stops reading its secrets when it does; ask the test environment operators for a long-lived one.
+
+On INT, deploy `edc-bpdm` from `int/edc/operator/spec.yaml` and the snapshot's provider `edc-bpdm-snapshot` from `int/edc/operator-snapshot/spec.yaml`.
+The snapshot provider layers its values on top of `edc-bpdm`'s and overrides only its host and connector context id, so it reads the same `int/edc-bpdm/` vault folder and needs no secrets of its own.
 
 ### Creating the assets
 
 With the EDC running, create the assets the sharing member consumes.
 [INSTALL.md — Creating offers](../../INSTALL.md#creating-offers) describes them, and the [EDC Provider Setup Postman collection](../admin/EDC%20Provider%20Setup.postman_collection.json) automates the calls.
-The collection variables for an environment are checked in next to that environment's EDC configuration, for example [`int/edc-bpdm/`](https://github.com/eclipse-tractusx/bpdm/tree/environments/int/edc-bpdm).
+The collection variables are checked in next to each member's EDC configuration, for example [`int/edc/member-1/`](https://github.com/eclipse-tractusx/bpdm/tree/environments/int/edc/member-1), one Postman environment for the released provider and one for the snapshot provider.
+Each holds both sides: the provider variables to create that member's offers, and the consumer variables to negotiate them through the member's own EDC.
 The `CLIENT_SECRET_PATH_…` variables hold vault paths, not secrets — the EDC resolves them itself.
+The `CLIENT_ID_…` variables and API keys are left empty in the checked-in files; fill them locally and do not commit them.
 
 ### The consumer EDC
 
 The sharing member's own EDC is the same deployment without assets, which removes the whole asset client and marketplace subscription part:
 
-1. Create a wallet client in the sharing member's company.
-2. Create the same vault secrets minus the `asset-secrets` entries, under `<env>/edc-<member>/`.
-3. Deploy from that app's `spec.yaml`, adapting the BPNL and wallet client id in the values.
+1. Create the same vault secrets minus the `asset-secrets` entries, under `<env>/edc-<member>/`. On INT the three member EDCs share one vault token, `int/edc-test-sharing-member/vault#token`.
+2. Deploy from that app's `spec.yaml`, adapting the BPNL — `participant.id`, `participant.bpnl` and, on INT, the wallet client id `dcp.sts.oauth.client.id` — in the values. On STABLE create a wallet client in the sharing member's company first.
 
-The operator's own Gate at `/companies/test-company` is a sharing member like any other, and the operator EDC consumes its own offers for it: an EDC is provider and consumer at once, so its own DID and dataspace API stand on both sides of that negotiation.
-It therefore needs an offer set of its own, created for the operator's BPNL, next to the ones for the test sharing members.
+Each test sharing member on INT is a company with an EDC of its own, so every negotiation crosses from a member's connector to the provider.
 
 To exercise the connection, use the [EDC BPDM Consumer Postman collection](../api/EDC%20BPDM%20Consumer.postman_collection.json) pointed at the consumer's management API and the provider's dataspace API.
 The [system tester](../../bpdm-system-tester) exercises the same negotiation from code and covers every offer in one run:
@@ -247,12 +279,13 @@ SPRING_PROFILES_ACTIVE=int,int-edc BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_K
 Those scenarios only read, so they can be repeated against an environment while its offers are being set up.
 They cover the Gate offers; the Pool scenario reports as skipped, because the suite keeps the Pool on the direct route — see [testing over the EDC](e2e-testing.md#testing-over-the-edc) for why.
 The three `api#management-key` secrets of the connectors are the only values to supply: `bpdm-system-tester/src/main/resources/application-int-edc.yml` names the connector and offer of each sharing member, with the addresses, the provider's DID and each member's BPNL defaulted to the INT deployment.
+Layered on `snapshot` with the snapshot provider's dataspace API, the same scenarios check the snapshot offers.
 Running the whole suite over the EDC instead of only these scenarios is described under [testing over the EDC](e2e-testing.md#testing-over-the-edc).
 
 ## Feature Branch Deployments
 
 A feature that needs validation on a real environment before it is merged can get its own INT deployment.
-It is a normal app whose `spec.yaml` takes the chart from the feature branch of the BPDM repository rather than from a released chart version, on its own hostname — a `bpdm-hq-relocation` app built from `feat/headquarter-relocation` is the shape of it.
+It is a normal app in the `bpdm` project and namespace whose `spec.yaml` takes the chart from the feature branch of the BPDM repository rather than from a released chart version, on its own hostname — a `bpdm-hq-relocation` app built from `feat/headquarter-relocation` is the shape of it.
 
 Pin the images to that branch as well, through each component's `image.tag`.
 The branch's Docker build publishes under the branch name with `/` replaced by `-`, so `feat/headquarter-relocation` produces `feat-headquarter-relocation`.

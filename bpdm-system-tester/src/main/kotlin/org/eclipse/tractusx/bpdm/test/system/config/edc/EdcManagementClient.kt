@@ -211,13 +211,27 @@ class EdcManagementClient(
             .bodyToMono(JSON_OBJECT)
             .block() ?: error("the management API answered the data address of transfer '$transferProcessId' with no body")
 
-        return EdcDataAddress(
+        return dataAddressOf(response, transferProcessId)
+    }
+
+    /** Returns the data plane address with a token newly issued by the provider, whether or not the held one has expired. */
+    fun refreshDataAddress(transferProcessId: String): EdcDataAddress {
+        val response = webClient.post()
+            .uri("/v3/edrs/{id}/refresh", transferProcessId)
+            .retrieve()
+            .bodyToMono(JSON_OBJECT)
+            .block() ?: error("the management API answered the refresh of transfer '$transferProcessId' with no body")
+
+        return dataAddressOf(response, transferProcessId)
+    }
+
+    private fun dataAddressOf(response: Map<String, Any?>, transferProcessId: String): EdcDataAddress =
+        EdcDataAddress(
             endpoint = response["endpoint"] as? String
                 ?: error("the data address of transfer '$transferProcessId' names no endpoint"),
             authorization = response["authorization"] as? String
                 ?: error("the data address of transfer '$transferProcessId' carries no authorization")
         )
-    }
 
     private fun catalogFilterOf(asset: EdcAssetProperties) = buildList {
         add(filter("'http://purl.org/dc/terms/type'.'@id'", asset.type))

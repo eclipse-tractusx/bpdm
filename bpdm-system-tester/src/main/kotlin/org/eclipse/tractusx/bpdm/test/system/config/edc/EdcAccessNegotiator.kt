@@ -88,10 +88,10 @@ class EdcAccessNegotiator(
         return if (isFresh(held)) held.authorization else refreshed(held).authorization
     }
 
-    /** Returns a token fetched after [rejectedToken] was refused, or the token that replaced it in the meantime. */
+    /** Returns a token newly issued after [rejectedToken] was refused, or the token that replaced it in the meantime. */
     fun tokenAfterRejectionOf(rejectedToken: String): String {
         val held = heldAddress()
-        return if (held.authorization != rejectedToken) held.authorization else refreshed(held).authorization
+        return if (held.authorization != rejectedToken) held.authorization else reissued(held).authorization
     }
 
     private fun heldAddress() = dataAddress ?: accessOrThrow().dataAddress
@@ -104,16 +104,24 @@ class EdcAccessNegotiator(
             )
         }
 
-    private fun refreshed(stale: EdcDataAddress): EdcDataAddress = synchronized(this) {
+    private fun refreshed(stale: EdcDataAddress): EdcDataAddress =
+        replaced(stale) { transferProcessId -> management.getDataAddress(transferProcessId) }
+
+    // The consumer connector refreshes on its own only once it deems the token expired, and the provider's data
+    // plane can refuse it as expired seconds before that, so a refused token is replaced unconditionally.
+    private fun reissued(rejected: EdcDataAddress): EdcDataAddress =
+        replaced(rejected) { transferProcessId -> management.refreshDataAddress(transferProcessId) }
+
+    private fun replaced(stale: EdcDataAddress, fetch: (String) -> EdcDataAddress): EdcDataAddress = synchronized(this) {
         // Whoever held the monitor first may already have fetched the replacement this call was about to.
         val held = dataAddress
         if (held != null && held !== stale && isFresh(held)) return held
 
         val transferProcessId = accessOrThrow().transferProcessId
-        return management.getDataAddress(transferProcessId).also {
+        return fetch(transferProcessId).also {
             dataAddress = it
             logger.debug {
-                "Refreshed the transfer token of the '$assetName' data offer from transfer $transferProcessId," +
+                "Replaced the transfer token of the '$assetName' data offer from transfer $transferProcessId," +
                         " expiring ${expiryOf(it)?.toString() ?: "at no time it states"}"
             }
         }

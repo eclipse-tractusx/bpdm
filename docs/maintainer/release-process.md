@@ -118,7 +118,7 @@ Every merge to `main` publishes the application images as `latest` SNAPSHOTs; no
 During this phase the maintainer keeps three things aligned:
 
 - **The release check issue.** Features that land get added to its feature summary table with their test status.
-- **The INT snapshot deployment.** The `bpdm-snapshot` ArgoCD app tracks the chart straight from the `main` branch, so it reflects the current development state. See [Association Environments](environments.md).
+- **The INT snapshot deployment.** The `bpdm-snapshot` core, its three sharing member Gates and the `edc-bpdm-snapshot` provider EDC track the chart straight from the `main` branch, so they reflect the current development state. See [Association Environments](environments.md).
 - **The changelogs.** `CHANGELOG.md` and `charts/bpdm/CHANGELOG.md` each have an open `## [X.Y.0] - unreleased` section that contributions fill as they land. If a contribution needs an operator action on upgrade, it also belongs in the [migration guide](../admin/MIGRATION_GUIDE.md).
 
 If a feature needs to be validated on a real environment before it is merged, it can get its own ArgoCD app deployed from its feature branch — see [feature branch deployments](environments.md#feature-branch-deployments).
@@ -144,15 +144,19 @@ The candidate's chart release entries are left as the workflow generated them; o
 The release candidate has to run on the association's INT environment before it can be released.
 INT always follows the newest release version, so the release candidate goes onto the regular INT deployment rather than a separate app.
 
-1. In [`int/bpdm/spec.yaml`](https://github.com/eclipse-tractusx/bpdm/blob/environments/int/bpdm/spec.yaml) on the `environments` branch, set `targetRevision` to the new chart release-candidate version.
-2. Do the same for the sharing member deployments that take part in the end-to-end tests, listed in [Association Environments](environments.md).
-3. Apply the changed spec in [INT ArgoCD](https://argocd.int.catena-x.net) and synchronize the app.
-4. Wait for the app to reach a green state and check that the migrations ran — a chart upgrade that changes the database schema fails visibly here rather than in the tests.
+INT is split between two owners (see [Association Environments](environments.md#int--argocdtesttractus-xcom)): the test environment operators host the golden record core, and the maintainer deploys the sharing member Gates around it. Both move to the candidate.
+
+1. **Request the core upgrade.** Ask the test environment operators to upgrade the centrally hosted core at `business-partners.test.tractus-x.com` to the release-candidate chart version. Hand them this version's [migration guide](../admin/MIGRATION_GUIDE.md) entry along with it — they are the operator it is written for. Ask them to confirm when the upgrade is done and the migrations ran.
+2. **Upgrade the member Gates.** In `int/sharing-members/member-1/spec.yaml`, `member-2/spec.yaml` and `member-3/spec.yaml` on the [`environments` branch](https://github.com/eclipse-tractusx/bpdm/tree/environments/int/sharing-members), set `targetRevision` to the release-candidate chart version.
+3. Apply the same `targetRevision` to the live apps `bpdm-test-sharing-member`, `-2` and `-3` in [INT ArgoCD](https://argocd.test.tractus-x.com) — a live app keeps its own copy of the spec — and synchronize them.
+4. Wait for the apps to reach a green state and check that the migrations ran — a chart upgrade that changes the database schema fails visibly here rather than in the tests.
+
+Do not start the end-to-end run before the operators have confirmed the core upgrade: against an older core, the run validates the candidate's Gates only, and its results would be recorded against a core version that is not being released.
 
 INT carries the data of every previous end-to-end run, so this is a genuine upgrade of a populated database rather than a fresh install.
 
-If the chart introduced new or renamed configuration, adapt the `values.yaml` of the affected deployments in the same step.
-The [migration guide](../admin/MIGRATION_GUIDE.md) entry for this version is the checklist: if upgrading our own deployment needs a step, an operator's upgrade needs it too.
+If the chart introduced new or renamed configuration, adapt the `values.yaml` of the affected deployments in the same step — the group file `int/sharing-members/values.yaml` or the member's own.
+The migration guide entry for this version is the checklist: if upgrading our own deployment needs a step, an operator's upgrade needs it too.
 
 ## 5. Run the End-to-End Tests
 
@@ -225,7 +229,8 @@ Only the umbrella chart's entry is written up this way — the per-subchart tags
 
 INT always runs the newest release version, so once the release is published the INT deployment moves off the release candidate onto it.
 
-Set `targetRevision` to the released chart version in the `spec.yaml` of the INT apps and synchronize them in [ArgoCD](https://argocd.int.catena-x.net).
+Ask the test environment operators to upgrade the core to the released chart version, as in [step 4](#4-deploy-the-release-candidate-to-int).
+Set `targetRevision` to the released chart version in the `spec.yaml` of the three `int/sharing-members/` apps, apply it to the live apps and synchronize them in [ArgoCD](https://argocd.test.tractus-x.com).
 The candidate and the release are the same code, so this is a version-label change rather than a functional upgrade — but it keeps INT on a released chart.
 
 ## 9. Post-Release Switch

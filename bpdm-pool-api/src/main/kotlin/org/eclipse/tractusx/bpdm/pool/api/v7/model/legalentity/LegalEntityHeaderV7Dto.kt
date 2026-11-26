@@ -40,7 +40,7 @@ data class LegalEntityHeaderV7Dto(
     override val confidenceCriteria: ConfidenceCriteriaV7Dto,
 
     @field:JsonProperty("isParticipantData")
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
+    @get:Schema(description = "Indicates whether the legal entity is a data space participant or is managed by one.", name = "isParticipantData")
     val isParticipantData: Boolean,
 
     @get:Schema(description = "Whether this legal entity is the ultimate owner in the ownership chain. " +

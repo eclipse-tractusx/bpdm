@@ -51,7 +51,7 @@ data class LogisticAddressInvariantVerboseV7Dto(
     @get:Schema(description = LogisticAddressDescription.bpnSite)
     val bpnSite: String?,
 
-    @get:Schema(description = "Indicates whether the address is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
+    @get:Schema(description = "Indicates whether the legal entity the address belongs to is a data space participant or is managed by one.", name = "isParticipantData")
     val isParticipantData: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)

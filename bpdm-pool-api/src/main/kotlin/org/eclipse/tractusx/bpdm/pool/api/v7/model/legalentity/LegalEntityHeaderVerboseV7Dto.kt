@@ -57,7 +57,7 @@ data class LegalEntityHeaderVerboseV7Dto(
 
     override val confidenceCriteria: ConfidenceCriteriaV7Dto,
 
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
+    @get:Schema(description = "Indicates whether the legal entity is a data space participant or is managed by one.", name = "isParticipantData")
     val isParticipantData: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)

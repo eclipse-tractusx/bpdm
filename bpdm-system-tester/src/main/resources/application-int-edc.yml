@@ -18,7 +18,24 @@
 ################################################################################
 
 # Layered on the 'int' profile: reaches the Gates over EDC data offers instead of with credentials of
-# their own, the way a sharing member reaches them.
+# their own, the way a sharing member reaches them. Each of the three test sharing members negotiates
+# through its own connector with the provider connector, which offers the member Gates of the 'int'
+# profile:
+#
+#   SPRING_PROFILES_ACTIVE=int,int-edc \
+#   BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
+#   BPDM_INT_EDC_API_KEY=... BPDM_INT_EDC_2_API_KEY=... BPDM_INT_EDC_3_API_KEY=... \
+#     java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
+#     --plugin json:target/cucumber-report.json
+#
+# Layered on 'snapshot' instead, it reaches the snapshot member Gates through the snapshot provider
+# connector, which has the same identity and only a host of its own:
+#
+#   SPRING_PROFILES_ACTIVE=snapshot,int-edc \
+#   BPDM_INT_EDC_PROVIDER_DATASPACE_API=https://bpdm-snapshot-edc.test.tractus-x.com/api/v1/dsp/2025-1 \
+#   ...
+#
+# The base-urls come from the profile underneath. The member connectors serve both deployments.
 
 bpdm:
   client:
@@ -27,15 +44,14 @@ bpdm:
       edc:
         enabled: false
     gate-input:
-      base-url: https://business-partners.int.catena-x.net/companies/test-sharing-member
       edc:
         enabled: true
         consumer: &first-member-connector
-          management-api-url: ${BPDM_INT_EDC_MANAGEMENT_API:https://bpdm-sharing-member-edc.int.catena-x.net/management}
+          management-api-url: ${BPDM_INT_EDC_MANAGEMENT_API:https://bpdm-sharing-member-edc.test.tractus-x.com/management}
           api-key: ${BPDM_INT_EDC_API_KEY}
-          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.int.catena-x.net/api/v1/dsp/2025-1}
-          provider-did: ${BPDM_INT_EDC_PROVIDER_DID:did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK}
-          consumer-bpnl: ${BPDM_INT_EDC_CONSUMER_BPNL:BPNL000000000BXT}
+          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.test.tractus-x.com/api/v1/dsp/2025-1}
+          provider-did: ${BPDM_INT_EDC_PROVIDER_DID:did:web:ssi-dim-wallet-stub.test.tractus-x.com:BPNL00000003CRHK}
+          consumer-bpnl: ${BPDM_INT_EDC_CONSUMER_BPNL:BPNL00000000071A}
         asset: &gate-input-full
           type: https://w3id.org/catenax/taxonomy#BPDMGate
           subject: https://w3id.org/catenax/taxonomy#FullAccessGateInputForSharingMember
@@ -53,35 +69,32 @@ bpdm:
           usage-purpose: cx.bpdm.gate.download:1
           bpn-scoped: true
     gate-2-input:
-      base-url: ${BPDM_INT_GATE_2_BASE_URL:https://business-partners.int.catena-x.net/companies/test-sharing-member-2}
       edc:
         enabled: true
         consumer: &second-member-connector
-          management-api-url: ${BPDM_INT_EDC_2_MANAGEMENT_API:https://bpdm-sharing-member-2-edc.int.catena-x.net/management}
+          management-api-url: ${BPDM_INT_EDC_2_MANAGEMENT_API:https://bpdm-sharing-member-2-edc.test.tractus-x.com/management}
           api-key: ${BPDM_INT_EDC_2_API_KEY}
-          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.int.catena-x.net/api/v1/dsp/2025-1}
-          provider-did: ${BPDM_INT_EDC_PROVIDER_DID:did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK}
-          consumer-bpnl: ${BPDM_INT_EDC_2_CONSUMER_BPNL:BPNL00000000726A}
+          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.test.tractus-x.com/api/v1/dsp/2025-1}
+          provider-did: ${BPDM_INT_EDC_PROVIDER_DID:did:web:ssi-dim-wallet-stub.test.tractus-x.com:BPNL00000003CRHK}
+          consumer-bpnl: ${BPDM_INT_EDC_2_CONSUMER_BPNL:BPNL00000000080L}
         asset: *gate-input-full
     gate-2-output:
       edc:
         enabled: true
         consumer: *second-member-connector
         asset: *gate-output-read
-    # The operator's own Gate, whose offers the providing connector consumes for it.
     gate-3-input:
-      base-url: ${BPDM_INT_GATE_3_BASE_URL:https://business-partners.int.catena-x.net/companies/test-company}
       edc:
         enabled: true
-        consumer: &operator-connector
-          management-api-url: ${BPDM_INT_EDC_3_MANAGEMENT_API:https://bpdm-edc.int.catena-x.net/management}
+        consumer: &third-member-connector
+          management-api-url: ${BPDM_INT_EDC_3_MANAGEMENT_API:https://bpdm-sharing-member-3-edc.test.tractus-x.com/management}
           api-key: ${BPDM_INT_EDC_3_API_KEY}
-          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.int.catena-x.net/api/v1/dsp/2025-1}
-          provider-did: ${BPDM_INT_EDC_PROVIDER_DID:did:web:portal-backend.int.catena-x.net:api:administration:staticdata:did:BPNL00000003CRHK}
-          consumer-bpnl: ${BPDM_INT_EDC_3_CONSUMER_BPNL:BPNL00000003CRHK}
+          provider-dataspace-api-url: ${BPDM_INT_EDC_PROVIDER_DATASPACE_API:https://bpdm-edc.test.tractus-x.com/api/v1/dsp/2025-1}
+          provider-did: ${BPDM_INT_EDC_PROVIDER_DID:did:web:ssi-dim-wallet-stub.test.tractus-x.com:BPNL00000003CRHK}
+          consumer-bpnl: ${BPDM_INT_EDC_3_CONSUMER_BPNL:BPNL0000000009Z7}
         asset: *gate-input-full
     gate-3-output:
       edc:
         enabled: true
-        consumer: *operator-connector
+        consumer: *third-member-connector
         asset: *gate-output-read

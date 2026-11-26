@@ -186,17 +186,23 @@ mvn -B -U clean package -pl bpdm-system-tester -am -DskipTests
 
 ### Run
 
-The INT topology is checked in as the `int` Spring profile (`bpdm-system-tester/src/main/resources/application-int.yml`): the three base URLs and the Central-IDP issuer, with the credentials left to the environment.
+The INT topology is checked in as the `int` Spring profile (`bpdm-system-tester/src/main/resources/application-int.yml`): the Pool and Orchestrator of the centrally hosted core, the Gates of the three test sharing members and the Central-IDP issuer, with the credentials left to the environment.
 
 ```bash
 SPRING_PROFILES_ACTIVE=int \
-BPDM_INT_CLIENT_ID=<client id> \
-BPDM_INT_CLIENT_SECRET=<client secret> \
+BPDM_INT_CLIENT_ID=<operator client id> \
+BPDM_INT_CLIENT_SECRET=<operator client secret> \
+BPDM_INT_GATE_INPUT_CLIENT_ID=<input manager client id> \
+BPDM_INT_GATE_INPUT_CLIENT_SECRET=<input manager client secret> \
+BPDM_INT_GATE_OUTPUT_CLIENT_ID=<output consumer client id> \
+BPDM_INT_GATE_OUTPUT_CLIENT_SECRET=<output consumer client secret> \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
   --plugin json:target/cucumber-report.json
 ```
 
-The credentials are a Central-IDP technical user of the `Cx-Operator` company holding the Pool, Gate and Orchestrator permissions — one user serves all four clients. See [operator API access](environments.md#operator-api-access) for how to create one. A sharing member's own Gate needs two Gate users instead; see [testing through a sharing member's Gate](#testing-through-a-sharing-members-gate).
+`BPDM_INT_CLIENT_*` is a Central-IDP technical user of the `Cx-Operator` company holding the Pool and Orchestrator permissions; see [operator API access](environments.md#operator-api-access) for how to create one. The Gate users are the first test sharing member's; see [testing through a sharing member's Gate](#testing-through-a-sharing-members-gate). Run over the EDC instead, the suite needs no Gate users at all — see [testing over the EDC](#testing-over-the-edc).
+
+**Scale the core's Cleaning Service Dummy down for the run.** The tester reserves and resolves the golden record tasks itself; a running dummy takes them first and most scenarios time out. On INT the test environment operators host the dummy, so ask them to scale it down before the run and up again afterwards.
 
 Two things about this invocation are easy to get wrong:
 
@@ -219,14 +225,16 @@ A skipped scenario is reported as neither passed nor failed, so the Test issues 
 ```bash
 SPRING_PROFILES_ACTIVE=int \
 BPDM_INT_CLIENT_ID=<operator id> BPDM_INT_CLIENT_SECRET=<operator secret> \
-BPDM_INT_GATE_2_BASE_URL=https://business-partners.int.catena-x.net/companies/<other member> \
+BPDM_INT_GATE_INPUT_CLIENT_ID=... BPDM_INT_GATE_INPUT_CLIENT_SECRET=... \
+BPDM_INT_GATE_OUTPUT_CLIENT_ID=... BPDM_INT_GATE_OUTPUT_CLIENT_SECRET=... \
 BPDM_INT_GATE_2_INPUT_CLIENT_ID=<input manager id> BPDM_INT_GATE_2_INPUT_CLIENT_SECRET=<input manager secret> \
 BPDM_INT_GATE_2_OUTPUT_CLIENT_ID=<output consumer id> BPDM_INT_GATE_2_OUTPUT_CLIENT_SECRET=<output consumer secret> \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
   --plugin json:target/cucumber-report.json
 ```
 
-A third member follows the same shape, under `BPDM_INT_GATE_3_BASE_URL` and the four `BPDM_INT_GATE_3_*_CLIENT_*` variables.
+A third member follows the same shape, under the four `BPDM_INT_GATE_3_*_CLIENT_*` variables.
+The Gates of the second and third test sharing members are checked in; `BPDM_INT_GATE_2_BASE_URL` and `BPDM_INT_GATE_3_BASE_URL` override them, and blanking one (`BPDM_INT_GATE_3_BASE_URL=`) takes that member out of the run.
 
 Each member's two users are the input manager and output consumer pair described under [testing through a sharing member's Gate](#testing-through-a-sharing-members-gate), issued for that member's company.
 The company is the point: the tester compares the BPNL in the tokens of all members before the first scenario and refuses to run when two of them match, because members from one company would neither be told apart by their Gates nor counted separately.
@@ -234,7 +242,7 @@ Note the skips in the release check issue when no second member is available, so
 
 ### Trying the suite on the snapshot deployment first
 
-The `snapshot` profile targets the [`bpdm-snapshot` deployment](environments.md#int--argocdintcatena-xnet), which runs the development state of `main`.
+The `snapshot` profile targets the [`bpdm-snapshot` deployment](environments.md#int--argocdtesttractus-xcom) and its three sharing member Gates, which run the development state of `main`.
 It sits on the INT environment behind the same Central-IDP realm, so it takes the same credentials as the `int` profile and the variable names are shared:
 
 ```bash
@@ -251,25 +259,11 @@ Use it to shake the suite out before a release run — but do not report its res
 
 A Gate whose users the Portal manages cannot be driven by one credential. The Portal issues its technical users one role each, and the suite needs both sides of the Gate API: sharing input data and driving the sharing process is an **input manager**, reading the resulting golden records is an **output consumer**. The tester therefore configures two Gate clients — `bpdm.client.gate-input` for input and the sharing process, `bpdm.client.gate-output` for the output — and sends each call with the credential permitted to make it.
 
-Everything but the credentials defaults from the input client, so the `int` profile takes only the two users:
+Everything but the credentials defaults from the input client, so the `int` profile takes only the two users, as in the [run command](#run) above. On INT they are the Sharing Input Manager and Sharing Output Consumer technical users the member's subscription to the golden record process app created — the [INT walkthrough](https://github.com/eclipse-tractusx/bpdm/blob/environments/int/README.md#4-subscribe-the-test-sharing-members) lists them.
 
-```bash
-SPRING_PROFILES_ACTIVE=int \
-BPDM_INT_CLIENT_ID=<operator client id> \
-BPDM_INT_CLIENT_SECRET=<operator client secret> \
-BPDM_INT_GATE_INPUT_CLIENT_ID=<input manager client id> \
-BPDM_INT_GATE_INPUT_CLIENT_SECRET=<input manager client secret> \
-BPDM_INT_GATE_OUTPUT_CLIENT_ID=<output consumer client id> \
-BPDM_INT_GATE_OUTPUT_CLIENT_SECRET=<output consumer client secret> \
-  java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
-  --plugin json:target/cucumber-report.json
-```
-
-Point the Gate at that member's context path as well — `BPDM_CLIENT_GATE_INPUT_BASE_URL=https://business-partners.int.catena-x.net/companies/<member>`, which the output client follows. Pool and Orchestrator keep the operator user: the tester reads Pool metadata and golden records and acts as the cleaning service against the Orchestrator, which no sharing member user may do.
+The profile points at the first test sharing member's Gate; `BPDM_CLIENT_GATE_INPUT_BASE_URL=https://business-partners.test.tractus-x.com/companies/<member>` points the run at another one, and the output client follows it. Pool and Orchestrator keep the operator user: the tester reads Pool metadata and golden records and acts as the cleaning service against the Orchestrator, which no sharing member user may do.
 
 Both Gate users have to belong to the same company. The Gate scopes what a read returns by the BPNL of the token that made it, so an output consumer from another company reads an empty output rather than a `403`. The tester fetches a token for each Gate credential before the first scenario and refuses to run when the two name different companies, naming both in the message — without that check the run would fail much later, in the wait for the golden record output, with nothing pointing at the credentials. It logs the company it verified, and where it cannot decide — one credential in both roles, or a token carrying no BPNL — it says so and continues.
-
-Leaving the two pairs unset falls back to `BPDM_INT_CLIENT_ID`/`BPDM_INT_CLIENT_SECRET` for both clients, which is how the Gate of the golden record core deployment is tested.
 
 Naming further members' Gates and users on top of these runs the scenarios that need more than one sharing member — see [scenarios that need further sharing members](#scenarios-that-need-further-sharing-members).
 
@@ -286,14 +280,16 @@ BPDM_INT_CLIENT_ID=<operator client id> \
 BPDM_INT_CLIENT_SECRET=<operator client secret> \
 BPDM_INT_EDC_API_KEY=<test sharing member connector key> \
 BPDM_INT_EDC_2_API_KEY=<test sharing member 2 connector key> \
-BPDM_INT_EDC_3_API_KEY=<operator connector key> \
+BPDM_INT_EDC_3_API_KEY=<test sharing member 3 connector key> \
   java -jar bpdm-system-tester/target/bpdm-system-tester.jar \
   --plugin json:target/cucumber-report.json
 ```
 
 The keys are the `api#management-key` vault secrets of the three connectors — see [setting up the EDC](environments.md#setting-up-the-edc).
 Everything else defaults to the INT deployment as it stands: the connector addresses, the provider's DID and each member's BPNL are checked in, taken from the environment files next to each connector's [ArgoCD app](https://github.com/eclipse-tractusx/bpdm/tree/environments).
-The Gate base URLs come with them, so an EDC run acts for all three sharing members without any `BPDM_INT_GATE_2_*` or `BPDM_INT_GATE_3_*` variables — the scenarios that need further members run rather than skip.
+The Gate base URLs come from the `int` profile, so an EDC run acts for all three sharing members without any `BPDM_INT_GATE_*` variables — the scenarios that need further members run rather than skip.
+
+Layered on `snapshot` instead, the profile reaches the snapshot Gates through the snapshot provider connector, which has the same identity and only a host of its own: run with `SPRING_PROFILES_ACTIVE=snapshot,int-edc` and `BPDM_INT_EDC_PROVIDER_DATASPACE_API=https://bpdm-snapshot-edc.test.tractus-x.com/api/v1/dsp/2025-1`.
 
 `BPDM_INT_CLIENT_*` is still needed, because the Orchestrator and the Pool stay on the direct route.
 
@@ -303,8 +299,8 @@ Every Pool read the suite makes to verify a golden record (`/v7/legal-entities`,
 Putting a broader credential behind the standardised asset would make the deployment non-conformant and have the suite validate access no real sharing member has, so the Pool keeps the operator user and its `@EdcAccess` scenario reports as skipped.
 
 Each member negotiates through a connector carrying its own identity, because the Gate offers are scoped to the consumer's BPNL.
-The third member is the operator's own Gate at `/companies/test-company`, whose offers the providing connector consumes for it.
-All of them have to exist before the run — the offer set of every BPNL involved, the operator's own included; [INSTALL.md — creating offers](../../INSTALL.md#creating-offers) and the [EDC Provider Setup Postman collection](../admin/EDC%20Provider%20Setup.postman_collection.json) cover that.
+On INT each of the three test sharing members has a company, a Gate and a connector of its own.
+All of them have to exist before the run — the offer set of every BPNL involved; [INSTALL.md — creating offers](../../INSTALL.md#creating-offers) and the [EDC Provider Setup Postman collection](../admin/EDC%20Provider%20Setup.postman_collection.json) cover that.
 
 The negotiation happens once per offer while the Spring context starts, before the first scenario, and a failure is recorded instead of thrown so that the run names every offer it could not reach rather than dying on the first.
 A client whose negotiation failed fails on its first call with that failure as the cause.
